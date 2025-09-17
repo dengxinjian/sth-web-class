@@ -1,0 +1,267 @@
+<template>
+    <el-dialog
+      :visible.sync="innerVisible"
+      width="960px"
+      :before-close="handleClose"
+      append-to-body
+      class="add-swim-class-dialog"
+    >
+      <span slot="title">编辑其他运动课表</span>
+
+      <div class="form-section">
+        <el-form :model="form" label-width="60px">
+          <el-form-item label="标题：">
+            <el-input v-model="form.title" placeholder="标题" class="pill-input" />
+          </el-form-item>
+
+          <div class="summary">
+            <div class="summary-title">概要</div>
+            <div class="editor-wrapper">
+              <el-input
+                type="textarea"
+                v-model="form.summary"
+                :rows="12"
+                maxlength="2000"
+                show-word-limit
+                placeholder="请输入概要"
+                class="summary-textarea"
+              />
+            </div>
+          </div>
+        </el-form>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <!-- <el-button @click="onDelete" :disabled="!form.id">删除</el-button> -->
+        <el-button @click="onCancel">取消</el-button>
+        <el-button type="warning" @click="onSave(false)">保存</el-button>
+        <el-button type="danger" @click="onSave(true)">保存并关闭</el-button>
+      </span>
+    </el-dialog>
+  </template>
+
+<script>
+import {getData, submitData} from '@/api/common.js'
+
+export default {
+  name: 'AddSwimClassDialog',
+  props: {
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    value: {
+      // 兼容 v-model
+      type: Boolean,
+      default: undefined
+    },
+    data: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  data() {
+    return {
+      innerVisible: this.visible || this.value || false,
+      form: Object.assign(
+        {
+          id: this.data.id || '',
+          title: this.data.title || '',
+          groupId: this.data.groupId || '',
+          sportType: 'OTHER',
+          distance: '',
+          distanceUnit: 'm',
+          duration: '01:30:00',
+          sth: '',
+          summary: '',
+          tags: ''
+        },
+        this.data || {}
+      )
+    }
+  },
+  computed: {
+    canDelete() {
+      return !!(this.data && this.data.id)
+    },
+    summaryLength() {
+      return (this.form.summary || '').length
+    }
+  },
+  watch: {
+    visible(val) {
+      this.innerVisible = val
+    },
+    value(val) {
+      if (typeof val !== 'undefined') this.innerVisible = val
+    },
+    innerVisible(val) {
+      this.$emit('update:visible', val)
+      this.$emit('input', val)
+      // 当弹框打开时
+      if (val) {
+        if (this.data.id) {
+          // 如果有ID，先获取数据
+          this.getClassInfo(this.data.id)
+        } else {
+          // 如果没有ID，说明是新增，重置表单
+          this.resetForm()
+        }
+      }
+    }
+  },
+  methods: {
+    // 编辑进入弹框时，查询课程数据
+    getClassInfo(id) {
+      getData({
+        url: '/api/classSchedule/getClassScheduleById',
+        id
+      }).then(res => {
+        if (res.success) {
+          this.form = JSON.parse(res.result.classesJson)
+          this.form.id = res.result.id
+        }
+      })
+    },
+    // 新增课程
+    submitNewClass(flag) {
+      submitData({
+        url: '/api/classes/create',
+        classesTitle: this.form.title,
+        classesGroupId: this.form.groupId,
+        sportType: 'OTHER',
+        classesJson: JSON.stringify({...this.form})
+      }).then(res => {
+        if (res.success) {
+          this.form.id = res.result
+          this.$emit('save', {...this.form})
+          this.$message.success('课程保存成功')
+        }
+        if (flag) this.innerVisible = false
+      })
+    },
+    // 更新课程
+    submitUpdateClass(flag) {
+      submitData({
+        url: '/api/classSchedule/updateClassSchedule',
+        id: this.form.id,
+        classesJson: JSON.stringify({...this.form})
+      }).then(res => {
+        if (res.success) {
+          this.$emit('save', {...this.form})
+          this.$message.success('课表保存成功')
+        }
+        if (flag) this.innerVisible = false
+      })
+    },
+    // 删除课程
+    submitDeleteClass() {
+      this.$confirm('确认删除该课程？', '提示', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        submitData({
+          url: '/api/classes/deleteClasses?id=' + this.form.id,
+        }).then(res => {
+          if (res.success) {
+            this.resetForm()
+            this.$emit('save', {...this.form})
+            this.$message.success('课程删除成功')
+            this.innerVisible = false
+          }
+        })
+      }).catch(() => {})
+    },
+    handleClose() {
+      this.onCancel()
+    },
+    onCancel() {
+      this.innerVisible = false
+      this.$emit('save')
+    },
+    onSave(closeAfter) {
+      const payload = { ...this.form }
+      if (this.form.id) {
+        this.submitUpdateClass(closeAfter)
+      } else {
+        this.submitNewClass(closeAfter)
+      }
+    },
+    onDelete() {
+      if (this.form.id) {
+        this.submitDeleteClass()
+      } else {
+        this.resetForm()
+      }
+      this.$emit('delete', this.form)
+    },
+    resetForm() {
+      // 清空表单数据，但保留传入的title
+      this.form = {
+        id: this.data?.id || '',
+        title: this.data?.title || '',
+        groupId: this.data?.groupId || '',
+        sportType: 'OTHER',
+        distance: '',
+        distanceUnit: 'm',
+        duration: '01:30:00',
+        sth: '',
+        summary: '',
+        tips: ''
+      }
+    }
+  }
+}
+</script>
+
+  <style scoped>
+  .add-swim-class-dialog ::v-deep(.el-dialog__header){
+    padding: 16px 24px;
+  }
+  .add-swim-class-dialog ::v-deep(.el-dialog__body){
+    padding: 10px 24px 0 24px;
+  }
+  .pill-input .el-input__inner{
+    border-radius: 22px;
+    height: 40px;
+    border: 1px solid #e5e6eb;
+    background: #fff;
+    padding: 0 16px;
+  }
+  .pill-input.short{ width: 120px; }
+  .pill-select ::v-deep(.el-input__inner){
+    height: 40px;
+  }
+  .pill-time ::v-deep(.el-input__inner){
+    height: 40px;
+  }
+  .row{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .row-item{ margin-right: 16px; display: flex; align-items: center; }
+  .row-item .label{ margin-right: 8px; color: #666;width: 30px; }
+  .icon-box{
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #f2f2f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .summary{ margin-top: 10px;margin-bottom: 10px; }
+  .summary-title{ margin: 10px 0; font-weight: 600; color: rgb(96, 98, 102);text-indent: 6px; }
+  .editor-wrapper{ position: relative; }
+  .word-limit{ position: absolute; right: 8px; bottom: 6px; color: #999; font-size: 12px; }
+  .dialog-footer{
+    display: flex;
+    justify-content: center;
+  }
+  .dialog-footer .el-button{ min-width: 120px; border-radius: 22px; }
+  .dialog-footer .el-button--warning{ background: #f5a623; border-color: #f5a623; }
+  .dialog-footer .el-button--danger{ background: #d83b36; border-color: #d83b36; }
+  </style>
+
