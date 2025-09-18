@@ -120,41 +120,56 @@
                             <div class="schedule-table-cell-title">{{ item?.commonDate }}</div>
                             <div class="schedule-table-cell-item schedule-drag-container" :data-date="item.commonDate">
                                 <!-- 运动循环 -->
-                                <div v-for="activityItem in item.activityList" :key="activityItem.activityId" :class="activityItem.classesJson ? 'sport-container-noDrag':'sport-container-noDrag sport-container-put'" :data-id="activityItem.activityId">
-                                    <div :class="'sport-record ' + activityItem.completion">
-                                        <div class="sport-operate">
-                                            <el-popover popper-class="athletic-btn-popover" placement="right" trigger="click">
-                                                <div class="btn-list-hover">
-                                                    <el-button v-if="activityItem.classesJson" type="text" @click="handleUnbind(activityItem.classScheduleId)">解绑</el-button>
-                                                    <el-button v-if="!activityItem.classesJson" type="text" @click="handleDeleteActivity(activityItem.activityId)">删除</el-button>
-                                                </div>
-                                                <i class="el-icon-more" slot="reference"></i>
-                                            </el-popover>
-                                        </div>
+                                <div v-for="activityItem in item.activityList"
+                                     :key="activityItem.activityId"
+                                     class="classScheduleCard"
+                                     :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[1]}"
+                                     :data-id="activityItem.activityId">
+                                    <div class="card-body" :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[0]}">
+                                      <div class="body-title" :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[0]}">
+                                        <img class="image-icon" :src="getSportImageIcon(activityItem.sportType)" alt="">
+                                        <el-popover popper-class="athletic-btn-popover" placement="right" trigger="click">
+                                          <div class="btn-list-hover">
+                                            <el-button v-if="activityItem.classesJson" type="text" @click="handleUnbind(activityItem.classScheduleId)">解绑</el-button>
+                                            <el-button v-if="!activityItem.classesJson" type="text" @click="handleDeleteActivity(activityItem.activityId)">删除</el-button>
+                                          </div>
+                                          <i class="el-icon-more" slot="reference"></i>
+                                        </el-popover>
+                                      </div>
+
                                         <div class="sport-record-data" @click="handleSportDetail(activityItem.activityId, activityItem.classScheduleId, activityItem.sportType)">
-                                            <div>{{ activityItem.activityName }}</div>
-                                            <div>{{ activityItem.duration }}</div>
-                                            <div>{{ activityItem.distance }}km</div>
-                                            <div>{{ activityItem.sthValue }} STH</div>
+                                            <div class="title">{{ activityItem.activityName }}</div>
+                                            <div class="keyword">{{ activityItem.duration }}</div>
+                                          <div style="display:flex; "><div class="keyword">{{ activityItem.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
+                                          <div style="display:flex; "><div class="keyword">{{ activityItem.sthValue }} </div><div>&nbsp;&nbsp;STH</div></div>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- 课表循环 -->
-                                <div v-for="classItem in item.classSchedule" :key="classItem.id" class="class-block" :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.classesJson.sportType)">
-                                    <div class="class-block-title-delete"><i class="el-icon-delete" @click.stop="handleDeleteClassSchedule(classItem.id)"></i></div>
-                                    <div>{{ classItem.classesJson.title }}</div>
-                                    <div>{{ classItem.classesJson.sportType }}</div>
-                                    <div>{{ classItem.classesJson.duration }}</div>
-                                    <div>{{ classItem.classesJson.distance }}</div>
-                                    <div>{{ classItem.classesJson.sth }} STH</div>
-                                    <div v-if="classItem.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
+                                <div v-for="classItem in item.classSchedule"
+                                     :key="classItem.id" class="classScheduleCard"
+                                     style="background-color: #a9adb5"
+                                     :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.classesJson.sportType)">
+
+                                    <div class="card-body" style="background-color: white">
+                                      <div class="body-title">
+                                        <img class="image-icon" :src="getSportImageIcon(classItem.sportType)" alt="">
+                                        <i class="el-icon-delete" @click.stop="handleDeleteClassSchedule(classItem.id)"></i>
+                                      </div>
+                                      <div class="title">{{ classItem.classesJson.title }}</div>
+                                      <div class="keyword">{{ classItem.classesJson.sportType }}</div>
+                                      <div class="keyword">{{ classItem.classesJson.duration }}</div>
+                                      <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
+                                      <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.sth }} </div><div>&nbsp;&nbsp;STH</div></div>
+                                      <div v-if="classItem.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
                                         <div v-for="(i, index) in classItem.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
-                                            <div :style="{display: 'flex', gap: '2px', height: '16px'}">
-                                                <div v-for="n in i.times" :key="n" :style="{flex: 1}">
-                                                    <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="classItem.classesJson.maxIntensity" :height="16" />
-                                                </div>
+                                          <div :style="{display: 'flex', gap: '2px', height: '16px'}">
+                                            <div v-for="n in i.times" :key="n" :style="{flex: 1}">
+                                              <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="classItem.classesJson.maxIntensity" :height="16" />
                                             </div>
+                                          </div>
                                         </div>
+                                      </div>
                                     </div>
 
                                 </div>
@@ -177,11 +192,15 @@
                             </div>
                             <div v-for="item in statisticData" :key="item.title" class="week-data-item">
                                 <div class="week-data-text">
-                                    <span>{{ item.title }}:</span>
-                                    <div>
-                                      <span>{{ item.actualValue }}/</span>
-                                      <span>{{ item.planValue }}</span>
+                                    <div style="display: flex; align-items: center">
+                                      <img v-if="item.icon" style="width: 20px;margin-right: 10px" :src="item.icon" alt="">
+                                      <p>{{ item.title }}:</p>
+                                      <div style="display: flex; align-items: center; justify-content: space-between">
+                                        <span>{{ item.actualValue }} {{ item.unit }}</span>
+                                        <span>{{ item.planValue }} {{ item.unit }}</span>
+                                      </div>
                                     </div>
+
                                 </div>
                                 <el-progress :percentage="item.percent || 0" :color="item.color" :show-text="false"></el-progress>
                             </div>
@@ -240,46 +259,57 @@ const statisticKeyToTitle = {
   },
   totalDistanceKm: {
     title: '总距离',
+    unit: 'kcal',
     color: 'rgba(217, 206, 185, 1)'
   },
   totalCalories: {
     title: '总消耗',
+    unit: 'KM',
     color: 'rgba(217, 206, 185, 1)'
   },
   totalSTH: {
     title: '总STH',
+    unit: 'W',
     color: 'rgba(204, 35, 35, 1)'
   },
   runTime: {
     title: '跑步时间',
+    icon: require('@/assets/addClass/icon-run.png'),
     color: 'rgba(255, 21, 82, 1)'
   },
   runDistanceKm: {
     title: '跑步距离',
+    unit: 'KM',
     color: 'rgba(255, 21, 82, 1)'
   },
   cycleTime: {
     title: '骑车时间',
+    icon: require('@/assets/addClass/icon-bike.png'),
     color: 'rgba(134, 91, 214, 1)'
   },
   cycleDistanceKm: {
     title: '骑车距离',
+    unit: 'KM',
     color: 'rgba(134, 91, 214, 1)'
   },
   swimTime: {
     title: '游泳时间',
+    icon: require('@/assets/addClass/icon-swim.png'),
     color: 'rgba(46, 166, 223, 1)'
   },
   swimDistanceKm: {
     title: '游泳距离',
+    unit: 'KM',
     color: 'rgba(46, 166, 223, 1)'
   },
   strengthTime: {
     title: '力量',
+    icon: require('@/assets/addClass/icon-power.png'),
     color: 'rgba(163, 163, 163, 1)'
   },
   otherTime: {
     title: '其他',
+    icon: require('@/assets/addClass/icon-other.png'),
     color: 'rgba(163, 163, 163, 1)'
   }
 }
@@ -507,7 +537,9 @@ export default {
             return {
               ...item,
               title: statisticKeyToTitle[item.key]?.title,
-              color: statisticKeyToTitle[item.key]?.color
+              color: statisticKeyToTitle[item.key]?.color,
+              icon: statisticKeyToTitle[item.key]?.icon,
+              unit: statisticKeyToTitle[item.key]?.unit
             }
           })
           this.sthData = res.result.avgSthRespDto
@@ -534,6 +566,7 @@ export default {
         url: '/api/classSchedule/calculateTimeDistanceSth',
         requestData: {...data, triUserId: this.selectedAthletic}
       })
+      // eslint-disable-next-line require-atomic-updates
       data.classesJson = JSON.stringify({ ...JSON.parse(originalClassesJson), duration: secondsToHHMMSS(res.result.time), distance: res.result.distance + 'km', sth: res.result.sth })
       submitData({
         url: '/api/classSchedule/create',
@@ -909,69 +942,110 @@ export default {
       this.classSportType = ''
       this.classDetailData = {id: ''}
       this.getScheduleData()
-    }
+    },
+    // 获取icon 图片地址
+    getSportImageIcon(sportType) {
+      switch (sportType) {
+        case 'SWIM':
+          return require('@/assets/addClass/icon-swim.png');
+        case 'CYCLE':
+          return require('@/assets/addClass/icon-bike.png');
+        case 'RUN':
+          return require('@/assets/addClass/icon-run.png');
+        case 'STRENGTH':
+          return require('@/assets/addClass/icon-power.png');
+        default:
+          return require('@/assets/addClass/icon-other.png');
+      }
+    },
+    // 获取不同运动背景颜色
+    getSportBackgroundColor(percent) {
+      if (percent >= 80 && percent <= 120) {
+        return ['rgb(239,246,233)', 'rgb(120,203,40)'];
+      }
+      if (percent < 80 || percent > 120) {
+        return ['rgb(255,252,238)', 'rgb(255,213,91)'];
+      }
+      if (percent > 0 && percent < 60) {
+        return ['rgb(211,152,120)', 'rgb(234,99,49)'];
+      }
+      if (percent === 0) {
+        return ['rgb(254,235,235)', 'rgb(245,64,62)'];
+      }
+      return ['rgb(255,252,238)', 'rgb(129,129,254)'];
+    },
   }
 }
 </script>
 <style lang="scss" scoped>
 .container {
-    background-color: #fff;
+  background-color: #fff;
 }
+
 .athletic-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  overflow-x: auto;
+
+  .schedule {
+    flex: 1;
+    background-color: #fff;
+    padding: 10px;
+  }
+}
+
+.schedule-search {
+  display: flex;
+  margin: 10px 0;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.athletic-btn-list {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  padding-right: 8px;
+}
+
+.btn-list-hover {
+  width: 60px;
+
+  .el-button {
+    margin-left: 0;
+  }
+}
+
+.schedule-top {
+  background-color: #f5f5f5;
+  padding: 10px;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.schedule-table {
+  height: 100%;
+
+  .schedule-table-header {
     display: flex;
     flex-direction: row;
-    gap: 10px;
-
-    .schedule {
-        flex: 1;
-        background-color: #fff;
-        padding: 10px;
-    }
-}
-.schedule-search {
-    display: flex;
-    margin: 10px 0;
-    gap: 10px;
-    font-size: 12px;
-}
-.athletic-btn-list {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    padding-right: 8px;
-}
-.btn-list-hover {
-    width: 60px;
-    .el-button {
-        margin-left: 0;
-    }
-}
-.schedule-top {
+    gap: 4px;
     background-color: #f5f5f5;
-    padding: 10px;
-    display: flex;
-    gap: 20px;
-    margin-bottom: 10px;
-}
-.schedule-table {
-    height: 100%;
 
-    .schedule-table-header {
-        display: flex;
-        flex-direction: row;
-        gap: 4px;
-        background-color: #f5f5f5;
-        .schedule-table-header-cell {
-            flex: 1;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            line-height: 34px;
-            background-color: #FDE5E5;
-        }
-        .schedule-table-header-cell:last-child {
+    .schedule-table-header-cell {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 34px;
+      background-color: #FDE5E5;
+    }
+
+    .schedule-table-header-cell:last-child {
             border-right: none;
         }
         .schedule-table-header-cell-data {
@@ -993,6 +1067,7 @@ export default {
             display: flex;
             flex-direction: column;
             min-height: 400px;
+            width: 120px;
             background-color: #f5f5f5;
             .schedule-table-cell-title {
                 font-size: 12px;
@@ -1068,8 +1143,6 @@ export default {
                     border: 1px solid #e5e5e5;
                     transition: all 0.3s ease;
                     margin-bottom: 5px;
-                    background-color: #fff;
-
                     &:hover {
                         // border-color: rgba(239, 18, 88, 0.3);
                         // box-shadow: 0 2px 12px rgba(239, 18, 88, 0.2);
@@ -1135,12 +1208,9 @@ export default {
 }
 
 .week-data-item {
-    margin-bottom: 10px;
     .week-data-text {
         display: flex;
         flex-direction: row;
-        gap: 5px;
-        margin-bottom: 4px;
         div {
           text-align: right;
         }
@@ -1167,7 +1237,8 @@ export default {
 .type-change-list {
     list-style: none;
     padding: 10px 0;
-    width: 260px;
+    min-width: 250px;
+    //width: 370px;
     margin: 0;
     display: flex;
     flex-direction: row;
@@ -1263,5 +1334,46 @@ export default {
 }
 .class-block:hover .class-block-title-delete {
   display: block;
+}
+
+.classScheduleCard {
+  margin-left: 2px;
+  margin-right: 2px;
+  position: relative;
+  border: 1px solid #e5e5e5;
+  transition: all 0.3s ease;
+  margin-bottom: 5px;
+  overflow: hidden;
+  &:hover {
+    transform: scale(1.02);
+  }
+  border-radius: 6px;
+  background-color: #ffffff;
+  padding-top: 10px;
+  box-shadow: 0 0 1px 0 rgba(0,0,0,0.75);
+  .card-body {
+    width: 100%;
+    padding-left: 2px;
+    padding-right: 2px;
+    .body-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      background-color: white;
+      padding: 5px 3px;
+    }
+  }
+  .image-icon {
+    width: 20px;
+  }
+  .title {
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .keyword {
+    font-size: 12px;
+    font-weight: bold;
+  }
 }
 </style>
