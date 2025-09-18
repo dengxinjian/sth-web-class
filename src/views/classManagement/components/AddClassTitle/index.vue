@@ -68,7 +68,7 @@ export default {
           { min: 1, max: 50, message: '长度在1到50个字符', trigger: 'blur' }
         ],
         groupId: [
-          { required: true, message: '请选择分组', trigger: 'change' }
+          { required: false, message: '请选择分组', trigger: 'change' }
         ]
       },
       groups: []

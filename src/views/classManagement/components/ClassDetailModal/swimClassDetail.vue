@@ -166,8 +166,8 @@ export default {
       getData({
         url: '/api/classesLabel/user/getLabelsByUserId'
       }).then(res => {
-        if (res.data.success) {
-          this.existingTags = res.data.result
+        if (res.success) {
+          this.existingTags = res.result
         } else {
           this.existingTags = []
         }

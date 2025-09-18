@@ -15,7 +15,7 @@
             </div>
             <div class="basic-info-total">
                 <span>
-                    <img src="~@/assets/addClass/icon-bike.png" width="30" alt="">
+                    <img src="~@/assets/addClass/icon-run.png" width="30" alt="">
                 </span>
                 <span>{{ classInfo.duration }}</span>
                 <span>{{ classInfo.distance }}km</span>
@@ -339,7 +339,7 @@ export default {
       innerVisible: this.visible || this.value || false,
       timeline: [],
       maxIntensity: 1,
-      existingTags: ['标签1', '标签2', '标签3'], // 现有的标签
+      existingTags: [], // 现有的标签
       newTag: '', // 新标签输入
       classInfo: {
         id: '',
@@ -402,8 +402,8 @@ export default {
       this.$emit('input', val)
       // 当弹框打开时清空表单
       if (val) {
-        this.getTagList()
         this.resetForm()
+        this.getTagList()
         if (this.data.id) {
           this.getClassInfo(this.data.id)
         }
@@ -416,8 +416,8 @@ export default {
       getData({
         url: '/api/classesLabel/user/getLabelsByUserId'
       }).then(res => {
-        if (res.data.success) {
-          this.existingTags = res.data.result
+        if (res.success) {
+          this.existingTags = res.result || []
         } else {
           this.existingTags = []
         }

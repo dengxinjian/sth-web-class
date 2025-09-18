@@ -16,7 +16,7 @@
 
         <div class="row">
           <div class="row-item icon-box">
-            <i class="el-icon-picture-outline" />
+            <img src="~@/assets/addClass/icon-swim.png" width="30" alt="">
           </div>
           <div class="row-item">
             <span class="label">距离</span>
@@ -163,8 +163,8 @@ export default {
       getData({
         url: '/api/classesLabel/user/getLabelsByUserId'
       }).then(res => {
-        if (res.data.success) {
-          this.existingTags = res.data.result
+        if (res.success) {
+          this.existingTags = res.result || []
         } else {
           this.existingTags = []
         }

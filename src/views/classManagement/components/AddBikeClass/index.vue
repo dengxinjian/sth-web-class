@@ -357,7 +357,7 @@ export default {
         summary: '', // 概要
         tags: [], // 标签
         capacity: 'time', // 容量
-        range: 'target', // 范围
+        range: 'range', // 范围
         target: '00:20:00', // 目标
         hasCadence: false,
         thresholdFtp: 80,
@@ -368,7 +368,7 @@ export default {
         targetFtpRange: [140, 160],
         targetHeartRate: 150,
         targetHeartRateRange: [110, 150],
-        cadence: [60, 80],
+        cadence: [80, 90],
         lap: false,
         targetSeconds: 20 * 60, // 计算出来的秒数
       }
@@ -408,8 +408,8 @@ export default {
       getData({
         url: '/api/classesLabel/user/getLabelsByUserId'
       }).then(res => {
-        if (res.data.success) {
-          this.existingTags = res.data.result
+        if (res.success) {
+          this.existingTags = res.result || []
         } else {
           this.existingTags = []
         }

@@ -63,7 +63,7 @@
                                       </el-popover>
                                   </div>
                               </template>
-                              <div class="class-drag-container" :key="item.timespan" style="min-height: 20px;">
+                              <div class="js-class-drag-container" :key="item.timespan" style="min-height: 20px;">
 
                                   <div v-for="part in item.classesList" :key="part.id" class="schedule-class" :data-id="part.id" data-type="classTemplate" @click="handleClassDetail(part.id, part.sportType)">
                                       <div class="schedule-class-info">
@@ -88,7 +88,7 @@
                                                   <img src="~@/assets/addClass/icon-other.png" alt="">
                                               </span>
                                               <span>{{ part.classesJson.duration }}</span>
-                                              <span>{{ part.classesJson.distance }}km</span>
+                                              <span v-if="part.classesJson.distance">{{ part.classesJson.distance }}km</span>
                                           </div>
                                       </div>
                                       <div v-if="part.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
@@ -118,11 +118,11 @@
                   <div class="schedule-table-body">
                       <div v-for="item in currentWeek" :key="item.timesp" class="schedule-table-cell">
                           <div class="schedule-table-cell-title">{{ item?.commonDate }}</div>
-                          <div class="schedule-table-cell-item schedule-drag-container" :data-date="item.commonDate">
+                          <div class="schedule-table-cell-item js-schedule-drag-container" :data-date="item.commonDate">
                               <!-- 运动循环 -->
                               <div v-for="activityItem in item.activityList"
                                    :key="activityItem.activityId"
-                                   class="classScheduleCard"
+                                   class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
                                    :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[1]}"
                                    :data-id="activityItem.activityId">
                                   <div class="card-body" :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[0]}">
@@ -149,11 +149,11 @@
                               <div v-for="classItem in item.classSchedule"
                                    :key="classItem.id" class="classScheduleCard"
                                    style="background-color: #a9adb5"
-                                   :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.classesJson.sportType)">
+                                   :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.sportType)">
 
                                   <div class="card-body" style="background-color: white">
                                     <div class="body-title">
-                                      <img class="image-icon" :src="getSportImageIcon(classItem.sportType)" alt="">
+                                      <img class="image-icon" :src="getClassImageIcon(classItem.sportType)" alt="">
                                       <i class="el-icon-delete" @click.stop="handleDeleteClassSchedule(classItem.id)"></i>
                                     </div>
                                     <div class="title">{{ classItem.classesJson.title }}</div>
@@ -383,7 +383,7 @@ export default {
     }
   },
   mounted() {
-    this.getClassList()
+    // this.getClassList()
     this.getTeamAndAthleticData()
   },
   methods: {
@@ -426,11 +426,11 @@ export default {
           })
 
           this.$nextTick(() => {
-            document.querySelectorAll('.schedule-drag-container').forEach(el => {
+            document.querySelectorAll('.js-schedule-drag-container').forEach(el => {
               new Sortable(el, {
                 group: {name: 'classDrag'},
                 animation: 150,
-                filter: '.sport-container-noDrag',
+                filter: '.js-sport-container-noDrag',
                 dataIdAttr: 'data-id',
                 onEnd: (e) => {
                   console.log('拖拽课程：', e.item.dataset.id)
@@ -451,7 +451,7 @@ export default {
             });
 
             const _this = this
-            document.querySelectorAll('.sport-container-put').forEach(el => {
+            document.querySelectorAll('.js-sport-container-put').forEach(el => {
               new Sortable(el, {
                 sort: false,
                 group: {name: 'classDrag', pull: false},
@@ -676,8 +676,12 @@ export default {
               return {id: member.id, name: member.userNickname, triUserId: member.triUserId}
             })}
           })
-        // this.selectedTeam = this.teamList[0].id
-        // this.getAthleticList()
+          // 默认选中第一个团队
+          if (this.teamList.length > 0) {
+            this.selectedTeam = this.teamList[0].id
+            this.getAthleticList()
+            this.getScheduleData()
+          }
         }
       })
     },
@@ -692,8 +696,13 @@ export default {
     },
     getAthleticList() {
       this.athleticList = this.teamList.find(item => item.id === this.selectedTeam).members
-    // this.selectedAthletic = this.athleticList[0].triUserId
-    // this.athleticInfoData = this.athleticList[0]
+      // 默认选中第一个运动员
+      if (this.athleticList.length > 0) {
+        this.selectedAthletic = this.athleticList[0].triUserId
+        this.athleticInfoData = this.athleticList[0]
+        // 选中运动员后调用getClassList方法
+        this.getClassList()
+      }
     },
     onWeekChange(payload) {
     // payload = { currentWeek: { list, monday, sunday }, nextWeek: { list, monday, sunday }, meta: { year, month, weekIndex } }
@@ -733,7 +742,7 @@ export default {
       e.stopPropagation()
     },
     classSlideChange() {
-      document.querySelectorAll('.class-drag-container').forEach(el => {
+      document.querySelectorAll('.js-class-drag-container').forEach(el => {
         new Sortable(el, {
           group: {name: 'classDrag', put: false, pull: 'clone'},
           animation: 150,
@@ -904,6 +913,7 @@ export default {
     // 取消绑定
     onCancelBind() {
       this.showBindModal = false
+      this.getScheduleData()
     },
     // 处理绑定按钮点击
     handleBind(classItem, activityItem) {
@@ -930,6 +940,7 @@ export default {
     },
     // 进入课表详情
     handleClassSchedulaDetail(id, sportType) {
+      console.log(sportType)
       this.classSportType = sportType
       this.classDetailData = {id}
       this.$nextTick(() => {
@@ -943,8 +954,23 @@ export default {
       this.classDetailData = {id: ''}
       this.getScheduleData()
     },
-    // 获取icon 图片地址
+    // 获取运动icon 图片地址
     getSportImageIcon(sportType) {
+      switch (sportType) {
+        case 3:
+          return require('@/assets/addClass/icon-swim.png');
+        case 1:
+          return require('@/assets/addClass/icon-bike.png');
+        case 2:
+          return require('@/assets/addClass/icon-run.png');
+        case 4:
+          return require('@/assets/addClass/icon-power.png');
+        default:
+          return require('@/assets/addClass/icon-other.png');
+      }
+    },
+    // 获取课表icon 图片地址
+    getClassImageIcon(sportType) {
       switch (sportType) {
         case 'SWIM':
           return require('@/assets/addClass/icon-swim.png');
@@ -1088,7 +1114,7 @@ height: 100%;
                   display: none;
               }
 
-              .sport-container-noDrag {
+              .js-sport-container-noDrag {
                   .class-block {
                       display: none;
                   }
@@ -1334,6 +1360,12 @@ cursor: pointer;
 }
 .class-block:hover .class-block-title-delete {
 display: block;
+}
+
+.sportScheduleCard {
+  .classScheduleCard {
+    display: none;
+  }
 }
 
 .classScheduleCard {
