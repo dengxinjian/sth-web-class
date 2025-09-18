@@ -18,7 +18,7 @@ export default {
   props: {
     // 运动过程列表，每个元素包含 duration（时长，单位：分钟）和 intensity（强度，0-100）
     exerciseList: {
-      type: Array,
+      type: [Number, null],
       default: () => [],
       validator: (value) => {
         return value.every(item =>

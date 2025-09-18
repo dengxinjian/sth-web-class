@@ -24,6 +24,7 @@ export default {
     type: {
       type: Number,
       required: true,
+      default: 2, // 默认跑步
       validator: function (value) {
         // 验证type参数是否有效
         return [1, 2, 3, 4, 5].indexOf(value) !== -1

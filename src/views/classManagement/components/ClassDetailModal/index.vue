@@ -1,28 +1,28 @@
 <template>
-    <div>
-      <!-- 动态组件，根据type参数决定引入哪个组件 -->
-      <component
-        :is="currentComponent"
-        :visible="visible"
-        :value="value"
-        :data="data"
-        v-on="$listeners"
-      />
-    </div>
-  </template>
+  <div>
+    <!-- 动态组件，根据type参数决定引入哪个组件 -->
+    <component
+      :is="currentComponent"
+      :visible="visible"
+      :value="value"
+      :data="data"
+      v-on="$listeners"
+    />
+  </div>
+</template>
 
 <script>
 // 同步导入所有组件，避免懒加载导致的数据传递问题
-import RunDetail from './runClassDetail.vue'
-import BikeDetail from './bikeClassDetail.vue'
-import SwimDetail from './swimClassDetail.vue'
-import PowerDetail from './powerClassDetail.vue'
-import OtherDetail from './otherClassDetail.vue'
-import NoteDetail from './noteClassDetail.vue'
-import RestDetail from './restClassDetail.vue'
+import RunDetail from "./runClassDetail.vue";
+import BikeDetail from "./bikeClassDetail.vue";
+import SwimDetail from "./swimClassDetail.vue";
+import PowerDetail from "./powerClassDetail.vue";
+import OtherDetail from "./otherClassDetail.vue";
+import NoteDetail from "./noteClassDetail.vue";
+import RestDetail from "./restClassDetail.vue";
 
 export default {
-  name: 'SportDetailModal',
+  name: "SportDetailModal",
   props: {
     // 运动类型，用于决定引入哪个组件
     type: {
@@ -30,21 +30,31 @@ export default {
       required: true,
       validator: function (value) {
         // 验证type参数是否有效
-        return ['SWIM', 'CYCLE', 'RUN', 'STRENGTH', 'OTHER', 'REMARK', 'REST'].indexOf(value) !== -1
-      }
+        return (
+          [
+            "SWIM",
+            "CYCLE",
+            "RUN",
+            "STRENGTH",
+            "OTHER",
+            "REMARK",
+            "REST",
+          ].indexOf(value) !== -1
+        );
+      },
     },
     visible: {
       type: Boolean,
-      default: false
+      default: false,
     },
     value: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     data: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   computed: {
     // 根据type计算当前应该使用的组件
@@ -56,10 +66,10 @@ export default {
         STRENGTH: PowerDetail,
         OTHER: OtherDetail,
         REMARK: NoteDetail,
-        REST: RestDetail
-      }
-      return componentMap[this.type] || RunDetail
-    }
-  }
-}
+        REST: RestDetail,
+      };
+      return componentMap[this.type] || RunDetail;
+    },
+  },
+};
 </script>

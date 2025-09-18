@@ -46,6 +46,7 @@ export default {
   },
   methods: {
     generateTitle,
+    // ...existing code...
     getBreadcrumb() {
       // only show routes with meta.title
       let matched = this.$route.matched.filter(
@@ -53,8 +54,10 @@ export default {
       );
       const first = matched[0];
 
+      // 修复：roles 可能为 undefined
+      const roles = this.roles || [];
       if (!this.isDashboard(first)) {
-        const home = this.roles.findIndex((item) => item.role === "首页") > -1;
+        const home = roles.findIndex((item) => item.role === "首页") > -1;
         if (home) {
           matched = [{ path: "/home", meta: { title: "首页" } }].concat(
             matched
@@ -66,6 +69,7 @@ export default {
         (item) => item.meta && item.meta.title && item.meta.breadcrumb !== false
       );
     },
+    // ...existing code...
     isDashboard(route) {
       const name = route && route.name;
       if (!name) {
