@@ -5,7 +5,7 @@ Vue.use(Router);
 
 /* Layout */
 import Layout from "@/layout";
-import BlankLayout from "@/layout/BlankLayout.vue";
+import TopLayout from "@/layout/TopLayout.vue";
 
 /* Router Modules */
 import componentsRouter from "./modules/components";
@@ -136,9 +136,9 @@ export const asyncRoutes = [
   },
   {
     path: "/timeTable",
-    component: Layout,
+    component: TopLayout,
     redirect: "/timeTable/athletic",
-    alwaysShow: true,
+    alwaysShow: false,
     meta: { title: "课表查看", icon: "el-icon-setting" },
     children: [
       {

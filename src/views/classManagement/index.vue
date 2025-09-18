@@ -109,7 +109,7 @@
               </div>
           </div>
 
-          <div class="schedule">
+          <div class="schedule" v-loading="loading">
               <div class="schedule-table">
                   <div class="schedule-table-header">
                       <div v-for="item in weekList" :key="item.id" class="schedule-table-header-cell">{{ item.name }}</div>
@@ -119,6 +119,34 @@
                       <div v-for="item in currentWeek" :key="item.timesp" class="schedule-table-cell">
                           <div class="schedule-table-cell-title">{{ item?.commonDate }}</div>
                           <div class="schedule-table-cell-item js-schedule-drag-container" :data-date="item.commonDate">
+
+                            <!-- 课表循环 -->
+                            <div v-for="classItem in item.classSchedule"
+                                   :key="classItem.id" class="classScheduleCard"
+                                   style="background-color: #a9adb5"
+                                   :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.sportType)">
+
+                                  <div class="card-body" style="background-color: white">
+                                    <div class="body-title">
+                                      <img class="image-icon" :src="getClassImageIcon(classItem.sportType)" alt="">
+                                      <i class="el-icon-delete" @click.stop="handleDeleteClassSchedule(classItem.id)"></i>
+                                    </div>
+                                    <div class="title">{{ classItem.classesJson.title }}</div>
+                                    <div class="keyword">{{ classItem.classesJson.sportType }}</div>
+                                    <div class="keyword">{{ classItem.classesJson.duration }}</div>
+                                    <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
+                                    <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.sth }} </div><div>&nbsp;&nbsp;STH</div></div>
+                                    <div v-if="classItem.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
+                                      <div v-for="(i, index) in classItem.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
+                                        <div :style="{display: 'flex', gap: '2px', height: '16px'}">
+                                          <div v-for="n in i.times" :key="n" :style="{flex: 1}">
+                                            <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="classItem.classesJson.maxIntensity" :height="16" />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                              </div>
                               <!-- 运动循环 -->
                               <div v-for="activityItem in item.activityList"
                                    :key="activityItem.activityId"
@@ -145,34 +173,7 @@
                                       </div>
                                   </div>
                               </div>
-                              <!-- 课表循环 -->
-                              <div v-for="classItem in item.classSchedule"
-                                   :key="classItem.id" class="classScheduleCard"
-                                   style="background-color: #a9adb5"
-                                   :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.sportType)">
 
-                                  <div class="card-body" style="background-color: white">
-                                    <div class="body-title">
-                                      <img class="image-icon" :src="getClassImageIcon(classItem.sportType)" alt="">
-                                      <i class="el-icon-delete" @click.stop="handleDeleteClassSchedule(classItem.id)"></i>
-                                    </div>
-                                    <div class="title">{{ classItem.classesJson.title }}</div>
-                                    <div class="keyword">{{ classItem.classesJson.sportType }}</div>
-                                    <div class="keyword">{{ classItem.classesJson.duration }}</div>
-                                    <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
-                                    <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.sth }} </div><div>&nbsp;&nbsp;STH</div></div>
-                                    <div v-if="classItem.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
-                                      <div v-for="(i, index) in classItem.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
-                                        <div :style="{display: 'flex', gap: '2px', height: '16px'}">
-                                          <div v-for="n in i.times" :key="n" :style="{flex: 1}">
-                                            <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="classItem.classesJson.maxIntensity" :height="16" />
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                              </div>
                           </div>
                       </div>
                       <div class="schedule-table-cell-data">
@@ -379,7 +380,8 @@ export default {
       currentMonth: '',
       showClassDetailModal: false,
       classSportType: '',
-      classDetailData: {}
+      classDetailData: {},
+      loading: false
     }
   },
   mounted() {
@@ -390,7 +392,7 @@ export default {
   // 获取日程数据
     getScheduleData() {
       if (!this.selectedAthletic) return;
-
+      this.loading = true;
       getData({
         url: '/api/classSchedule/getCalenderOverview',
         begin: this.currentWeek[0].commonDate + ' 00:00:00',
@@ -398,6 +400,7 @@ export default {
         triUserId: this.selectedAthletic
       }).then(res => {
         if (res.success && res.result) {
+          this.loading = false;
           this.getStatisticData()
           // 修复：将map的结果赋值回this.currentWeek
           this.initScheduleData = res.result

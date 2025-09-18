@@ -363,7 +363,7 @@ export default {
         summary: '', // 概要
         tags: [], // 标签
         capacity: 'time', // 容量
-        range: 'target', // 范围
+        range: 'range', // 范围
         target: '00:20:00', // 目标时间
         targetDistance: 10,
         targetUnit: 'km',
@@ -557,6 +557,20 @@ export default {
       this.classInfo.stages.splice(index, 1)
       this.calculateTimeline()
     },
+    // 创建深拷贝的section模板
+    createSectionTemplate(title, stageMode) {
+      return {
+        ...this.sectionTemplate,
+        title,
+        stageMode,
+        tags: [...this.sectionTemplate.tags], // 深拷贝数组
+        thresholdSpeedRange: [...this.sectionTemplate.thresholdSpeedRange], // 深拷贝数组
+        thresholdHeartRateRange: [...this.sectionTemplate.thresholdHeartRateRange], // 深拷贝数组
+        targetSpeedRange: [...this.sectionTemplate.targetSpeedRange], // 深拷贝数组
+        targetHeartRateRange: [...this.sectionTemplate.targetHeartRateRange], // 深拷贝数组
+        cadence: [...this.sectionTemplate.cadence] // 深拷贝数组
+      }
+    },
     // 添加段落
     handleAddStage(type) {
       switch (type) {
@@ -564,7 +578,7 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              {...this.sectionTemplate, title: '热身', stageMode: 'warmup', }
+              this.createSectionTemplate('热身', 'warmup')
             ]
           })
           break
@@ -572,7 +586,7 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              {...this.sectionTemplate, title: '恢复', stageMode: 'recover', }
+              this.createSectionTemplate('恢复', 'recover')
             ]
           })
           break
@@ -580,7 +594,7 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              {...this.sectionTemplate, title: '冷身', stageMode: 'cooling', }
+              this.createSectionTemplate('冷身', 'cooling')
             ]
           })
           break
@@ -588,7 +602,7 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              {...this.sectionTemplate, title: '跑步', stageMode: 'bike', }
+              this.createSectionTemplate('跑步', 'bike')
             ]
           })
           break
@@ -596,8 +610,8 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              {...this.sectionTemplate, title: '跑步', stageMode: 'bike', },
-              {...this.sectionTemplate, title: '跑步', stageMode: 'bike', }
+              this.createSectionTemplate('跑步', 'bike'),
+              this.createSectionTemplate('跑步', 'bike')
             ]
           })
           break
@@ -605,9 +619,9 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              {...this.sectionTemplate, title: '跑步', stageMode: 'bike', },
-              {...this.sectionTemplate, title: '跑步', stageMode: 'bike', },
-              {...this.sectionTemplate, title: '跑步', stageMode: 'bike', }
+              this.createSectionTemplate('跑步', 'bike'),
+              this.createSectionTemplate('跑步', 'bike'),
+              this.createSectionTemplate('跑步', 'bike')
             ]
           })
           break
@@ -615,7 +629,7 @@ export default {
       this.calculateTimeline()
     },
     handleAddSection(index) {
-      this.classInfo.stages[index].sections.push({...this.sectionTemplate, title: '跑步', stageMode: 'bike'})
+      this.classInfo.stages[index].sections.push(this.createSectionTemplate('跑步', 'bike'))
       this.calculateTimeline()
     },
     handleRemoveSection(index, sectionIndex) {
