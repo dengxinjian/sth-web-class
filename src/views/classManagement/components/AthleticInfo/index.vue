@@ -89,49 +89,49 @@
               <div class="zoneTd">z1:恢复</div>
               <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.zone1[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="zoneTr">
               <div class="zoneTd">z2:有氧</div>
               <div class="zoneTd">{{ thresholdData.zone2[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone2[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.zone2[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="zoneTr">
               <div class="zoneTd">z3:节奏</div>
               <div class="zoneTd">{{ thresholdData.zone3[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone3[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.zone3[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="zoneTr">
               <div class="zoneTd">z4:阈值门槛</div>
               <div class="zoneTd">{{ thresholdData.zone4[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone4[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.zone4[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="zoneTr">
               <div class="zoneTd">z5A:阈值上限</div>
               <div class="zoneTd">{{ thresholdData.zone5A[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone5A[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.zone5A[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="zoneTr">
               <div class="zoneTd">z5B:最大摄氧量</div>
               <div class="zoneTd">{{ thresholdData.zone5B[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone5B[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.zone5B[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="zoneTr">
               <div class="zoneTd">z5C:无氧能力</div>
               <div class="zoneTd">{{ thresholdData.zone5C[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone5C[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.zone5C[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
           </div>
