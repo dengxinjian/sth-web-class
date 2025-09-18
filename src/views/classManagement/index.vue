@@ -1,231 +1,231 @@
 <template>
-    <div class="container">
-        <div class="schedule-top">
-            <WeekRangePicker @week-change="onWeekChange" />
-            <div class="schedule-search">
-                <div>
-                    <span>团队选择：</span>
-                    <el-select v-model="selectedTeam" size="mini" placeholder="选择团队" @change="handleTeamChange">
-                        <el-option
-                            v-for="t in teamList"
-                            :key="t.id"
-                            :label="t.name"
-                            :value="t.id"
-                        />
-                    </el-select>
-                </div>
-                <div>
-                    <span>人员选择：</span>
-                    <el-select v-model="selectedAthletic" size="mini" placeholder="选择人员" @change="handleAthleticChange">
-                        <el-option
-                            v-for="t in athleticList"
-                            :key="t.triUserId"
-                            :label="t.name"
-                            :value="t.triUserId"
-                        />
-                    </el-select>
-                </div>
-                <el-button type="text" size="mini" :disabled="!athleticInfoData.triUserId" @click="showAthleticInfoDialog = true">人员信息查看</el-button>
-                <el-button type="text" size="mini" :disabled="!athleticInfoData.triUserId" @click="showMonthStatisticDialog = true">月度统计</el-button>
-            </div>
-        </div>
-        <div class="athletic-container">
-            <div class="type-change">
-                <ul class="type-change-list">
-                    <li :class="activeName === 'athletic' ? 'active' : ''" @click="handleTypeChange('athletic')">运动员</li>
-                    <li :class="activeName === 'class' ? 'active' : ''" @click="handleTypeChange('class')">课程</li>
-                </ul>
-                <div v-if="activeName === 'athletic'">
-                    <AthleticManagement :teamId="selectedTeam"></AthleticManagement>
-                </div>
-                <div v-else class="class-container">
-                    <div class="class-title">课程</div>
-                    <div class="class-operation">
-                        <el-button type="primary" size="mini" @click="handleAddClass">新增课程</el-button>
-                        <el-input size="mini" v-model="classSearchInput">
-                            <el-button slot="append" icon="el-icon-search" @click="getClassList"></el-button>
-                        </el-input>
-                    </div>
-                    <div class="schedule-class-container">
-                        <el-collapse accordion @change="classSlideChange">
-                            <el-collapse-item v-for="item in classList" :key="item.groupId">
-                                <template slot="title">
-                                    <div class="schedule-class-title">
-                                        <span>{{ item.groupName }}</span>
-                                        <el-popover popper-class="athletic-btn-popover" placement="right" width="80" trigger="click">
-                                            <div style="display: flex;flex-direction: column;align-items: center;">
-                                                <span><el-button type="text" @click="handleAddGroup">新建分组</el-button></span>
-                                                <span><el-button type="text" :disabled="!item.groupId" @click="handleEditGroup(item.groupId, item.groupName)">编辑分组</el-button></span>
-                                                <span><el-button type="text" :disabled="!item.groupId" @click="handleDeleteGroup(item.groupId)">删除分组</el-button></span>
-                                                <span><el-button type="text" :disabled="!item.groupId" @click="handleMoveGroup(item.groupId)">移动分组</el-button></span>
-                                            </div>
-                                            <i class="el-icon-more" slot="reference" @click.stop="handleClassMoreClick"></i>
-                                        </el-popover>
-                                    </div>
-                                </template>
-                                <div class="class-drag-container" :key="item.timespan" style="min-height: 20px;">
-
-                                    <div v-for="part in item.classesList" :key="part.id" class="schedule-class" :data-id="part.id" data-type="classTemplate" @click="handleClassDetail(part.id, part.sportType)">
-                                        <div class="schedule-class-info">
-                                            <div class="schedule-class-info-item-title">
-                                                <span>{{ part.classesJson.title }}</span>
-                                                <div class="delete" @click.stop="handleDeleteClass(part.id)"><i class="el-icon-delete"></i></div>
-                                            </div>
-                                            <div class="schedule-class-info-item-content">
-                                                <span v-if="part.sportType === 'SWIM'">
-                                                    <img src="~@/assets/addClass/icon-swim.png" alt="">
-                                                </span>
-                                                <span v-else-if="part.sportType === 'CYCLE'">
-                                                    <img src="~@/assets/addClass/icon-bike.png" alt="">
-                                                </span>
-                                                <span v-else-if="part.sportType === 'RUN'">
-                                                    <img src="~@/assets/addClass/icon-run.png" alt="">
-                                                </span>
-                                                <span v-else-if="part.sportType === 'STRENGTH'">
-                                                    <img src="~@/assets/addClass/icon-power.png" alt="">
-                                                </span>
-                                                <span v-else>
-                                                    <img src="~@/assets/addClass/icon-other.png" alt="">
-                                                </span>
-                                                <span>{{ part.classesJson.duration }}</span>
-                                                <span>{{ part.classesJson.distance }}km</span>
-                                            </div>
-                                        </div>
-                                        <div v-if="part.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
-                                            <div v-for="(i, index) in part.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
-                                                <div :style="{display: 'flex', gap: '2px', height: '16px'}">
-                                                    <div v-for="n in i.times" :key="n" :style="{flex: 1}">
-                                                        <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="part.classesJson.maxIntensity" :height="16" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </el-collapse-item>
-                        </el-collapse>
-                    </div>
-                </div>
-            </div>
-
-            <div class="schedule">
-                <div class="schedule-table">
-                    <div class="schedule-table-header">
-                        <div v-for="item in weekList" :key="item.id" class="schedule-table-header-cell">{{ item.name }}</div>
-                        <div class="schedule-table-header-cell-data">周统计</div>
-                    </div>
-                    <div class="schedule-table-body">
-                        <div v-for="item in currentWeek" :key="item.timesp" class="schedule-table-cell">
-                            <div class="schedule-table-cell-title">{{ item?.commonDate }}</div>
-                            <div class="schedule-table-cell-item schedule-drag-container" :data-date="item.commonDate">
-                                <!-- 运动循环 -->
-                                <div v-for="activityItem in item.activityList"
-                                     :key="activityItem.activityId"
-                                     class="classScheduleCard"
-                                     :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[1]}"
-                                     :data-id="activityItem.activityId">
-                                    <div class="card-body" :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[0]}">
-                                      <div class="body-title" :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[0]}">
-                                        <img class="image-icon" :src="getSportImageIcon(activityItem.sportType)" alt="">
-                                        <el-popover popper-class="athletic-btn-popover" placement="right" trigger="click">
-                                          <div class="btn-list-hover">
-                                            <el-button v-if="activityItem.classesJson" type="text" @click="handleUnbind(activityItem.classScheduleId)">解绑</el-button>
-                                            <el-button v-if="!activityItem.classesJson" type="text" @click="handleDeleteActivity(activityItem.activityId)">删除</el-button>
+  <div class="container">
+      <div class="schedule-top">
+          <WeekRangePicker @week-change="onWeekChange" />
+          <div class="schedule-search">
+              <div>
+                  <span>团队选择：</span>
+                  <el-select v-model="selectedTeam" size="mini" placeholder="选择团队" @change="handleTeamChange">
+                      <el-option
+                          v-for="t in teamList"
+                          :key="t.id"
+                          :label="t.name"
+                          :value="t.id"
+                      />
+                  </el-select>
+              </div>
+              <div>
+                  <span>人员选择：</span>
+                  <el-select v-model="selectedAthletic" size="mini" placeholder="选择人员" @change="handleAthleticChange">
+                      <el-option
+                          v-for="t in athleticList"
+                          :key="t.triUserId"
+                          :label="t.name"
+                          :value="t.triUserId"
+                      />
+                  </el-select>
+              </div>
+              <el-button type="text" size="mini" :disabled="!athleticInfoData.triUserId" @click="showAthleticInfoDialog = true">人员信息查看</el-button>
+              <el-button type="text" size="mini" :disabled="!athleticInfoData.triUserId" @click="showMonthStatisticDialog = true">月度统计</el-button>
+          </div>
+      </div>
+      <div class="athletic-container">
+          <div class="type-change">
+              <ul class="type-change-list">
+                  <li :class="activeName === 'athletic' ? 'active' : ''" @click="handleTypeChange('athletic')">运动员</li>
+                  <li :class="activeName === 'class' ? 'active' : ''" @click="handleTypeChange('class')">课程</li>
+              </ul>
+              <div v-if="activeName === 'athletic'">
+                  <AthleticManagement :teamId="selectedTeam"></AthleticManagement>
+              </div>
+              <div v-else class="class-container">
+                  <div class="class-title">课程</div>
+                  <div class="class-operation">
+                      <el-button type="primary" size="mini" @click="handleAddClass">新增课程</el-button>
+                      <el-input size="mini" v-model="classSearchInput">
+                          <el-button slot="append" icon="el-icon-search" @click="getClassList"></el-button>
+                      </el-input>
+                  </div>
+                  <div class="schedule-class-container">
+                      <el-collapse accordion @change="classSlideChange">
+                          <el-collapse-item v-for="item in classList" :key="item.groupId">
+                              <template slot="title">
+                                  <div class="schedule-class-title">
+                                      <span>{{ item.groupName }}</span>
+                                      <el-popover popper-class="athletic-btn-popover" placement="right" width="80" trigger="click">
+                                          <div style="display: flex;flex-direction: column;align-items: center;">
+                                              <span><el-button type="text" @click="handleAddGroup">新建分组</el-button></span>
+                                              <span><el-button type="text" :disabled="!item.groupId" @click="handleEditGroup(item.groupId, item.groupName)">编辑分组</el-button></span>
+                                              <span><el-button type="text" :disabled="!item.groupId" @click="handleDeleteGroup(item.groupId)">删除分组</el-button></span>
+                                              <span><el-button type="text" :disabled="!item.groupId" @click="handleMoveGroup(item.groupId)">移动分组</el-button></span>
                                           </div>
-                                          <i class="el-icon-more" slot="reference"></i>
-                                        </el-popover>
-                                      </div>
+                                          <i class="el-icon-more" slot="reference" @click.stop="handleClassMoreClick"></i>
+                                      </el-popover>
+                                  </div>
+                              </template>
+                              <div class="class-drag-container" :key="item.timespan" style="min-height: 20px;">
 
-                                        <div class="sport-record-data" @click="handleSportDetail(activityItem.activityId, activityItem.classScheduleId, activityItem.sportType)">
-                                            <div class="title">{{ activityItem.activityName }}</div>
-                                            <div class="keyword">{{ activityItem.duration }}</div>
-                                          <div style="display:flex; "><div class="keyword">{{ activityItem.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
-                                          <div style="display:flex; "><div class="keyword">{{ activityItem.sthValue }} </div><div>&nbsp;&nbsp;STH</div></div>
+                                  <div v-for="part in item.classesList" :key="part.id" class="schedule-class" :data-id="part.id" data-type="classTemplate" @click="handleClassDetail(part.id, part.sportType)">
+                                      <div class="schedule-class-info">
+                                          <div class="schedule-class-info-item-title">
+                                              <span>{{ part.classesJson.title }}</span>
+                                              <div class="delete" @click.stop="handleDeleteClass(part.id)"><i class="el-icon-delete"></i></div>
+                                          </div>
+                                          <div class="schedule-class-info-item-content">
+                                              <span v-if="part.sportType === 'SWIM'">
+                                                  <img src="~@/assets/addClass/icon-swim.png" alt="">
+                                              </span>
+                                              <span v-else-if="part.sportType === 'CYCLE'">
+                                                  <img src="~@/assets/addClass/icon-bike.png" alt="">
+                                              </span>
+                                              <span v-else-if="part.sportType === 'RUN'">
+                                                  <img src="~@/assets/addClass/icon-run.png" alt="">
+                                              </span>
+                                              <span v-else-if="part.sportType === 'STRENGTH'">
+                                                  <img src="~@/assets/addClass/icon-power.png" alt="">
+                                              </span>
+                                              <span v-else>
+                                                  <img src="~@/assets/addClass/icon-other.png" alt="">
+                                              </span>
+                                              <span>{{ part.classesJson.duration }}</span>
+                                              <span>{{ part.classesJson.distance }}km</span>
+                                          </div>
+                                      </div>
+                                      <div v-if="part.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
+                                          <div v-for="(i, index) in part.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
+                                              <div :style="{display: 'flex', gap: '2px', height: '16px'}">
+                                                  <div v-for="n in i.times" :key="n" :style="{flex: 1}">
+                                                      <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="part.classesJson.maxIntensity" :height="16" />
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                              </div>
+                          </el-collapse-item>
+                      </el-collapse>
+                  </div>
+              </div>
+          </div>
+
+          <div class="schedule">
+              <div class="schedule-table">
+                  <div class="schedule-table-header">
+                      <div v-for="item in weekList" :key="item.id" class="schedule-table-header-cell">{{ item.name }}</div>
+                      <div class="schedule-table-header-cell-data">周统计</div>
+                  </div>
+                  <div class="schedule-table-body">
+                      <div v-for="item in currentWeek" :key="item.timesp" class="schedule-table-cell">
+                          <div class="schedule-table-cell-title">{{ item?.commonDate }}</div>
+                          <div class="schedule-table-cell-item schedule-drag-container" :data-date="item.commonDate">
+                              <!-- 运动循环 -->
+                              <div v-for="activityItem in item.activityList"
+                                   :key="activityItem.activityId"
+                                   class="classScheduleCard"
+                                   :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[1]}"
+                                   :data-id="activityItem.activityId">
+                                  <div class="card-body" :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[0]}">
+                                    <div class="body-title" :style="{backgroundColor: getSportBackgroundColor(activityItem.percent)[0]}">
+                                      <img class="image-icon" :src="getSportImageIcon(activityItem.sportType)" alt="">
+                                      <el-popover popper-class="athletic-btn-popover" placement="right" trigger="click">
+                                        <div class="btn-list-hover">
+                                          <el-button v-if="activityItem.classesJson" type="text" @click="handleUnbind(activityItem.classScheduleId)">解绑</el-button>
+                                          <el-button v-if="!activityItem.classesJson" type="text" @click="handleDeleteActivity(activityItem.activityId)">删除</el-button>
                                         </div>
+                                        <i class="el-icon-more" slot="reference"></i>
+                                      </el-popover>
                                     </div>
-                                </div>
-                                <!-- 课表循环 -->
-                                <div v-for="classItem in item.classSchedule"
-                                     :key="classItem.id" class="classScheduleCard"
-                                     style="background-color: #a9adb5"
-                                     :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.classesJson.sportType)">
 
-                                    <div class="card-body" style="background-color: white">
-                                      <div class="body-title">
-                                        <img class="image-icon" :src="getSportImageIcon(classItem.sportType)" alt="">
-                                        <i class="el-icon-delete" @click.stop="handleDeleteClassSchedule(classItem.id)"></i>
+                                      <div class="sport-record-data" @click="handleSportDetail(activityItem.activityId, activityItem.classScheduleId, activityItem.sportType)">
+                                          <div class="title">{{ activityItem.activityName }}</div>
+                                          <div class="keyword">{{ activityItem.duration }}</div>
+                                        <div style="display:flex; "><div class="keyword">{{ activityItem.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
+                                        <div style="display:flex; "><div class="keyword">{{ activityItem.sthValue }} </div><div>&nbsp;&nbsp;STH</div></div>
                                       </div>
-                                      <div class="title">{{ classItem.classesJson.title }}</div>
-                                      <div class="keyword">{{ classItem.classesJson.sportType }}</div>
-                                      <div class="keyword">{{ classItem.classesJson.duration }}</div>
-                                      <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
-                                      <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.sth }} </div><div>&nbsp;&nbsp;STH</div></div>
-                                      <div v-if="classItem.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
-                                        <div v-for="(i, index) in classItem.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
-                                          <div :style="{display: 'flex', gap: '2px', height: '16px'}">
-                                            <div v-for="n in i.times" :key="n" :style="{flex: 1}">
-                                              <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="classItem.classesJson.maxIntensity" :height="16" />
-                                            </div>
+                                  </div>
+                              </div>
+                              <!-- 课表循环 -->
+                              <div v-for="classItem in item.classSchedule"
+                                   :key="classItem.id" class="classScheduleCard"
+                                   style="background-color: #a9adb5"
+                                   :data-id="classItem.id" :data-date="item.commonDate" @click="handleClassSchedulaDetail(classItem.id, classItem.classesJson.sportType)">
+
+                                  <div class="card-body" style="background-color: white">
+                                    <div class="body-title">
+                                      <img class="image-icon" :src="getSportImageIcon(classItem.sportType)" alt="">
+                                      <i class="el-icon-delete" @click.stop="handleDeleteClassSchedule(classItem.id)"></i>
+                                    </div>
+                                    <div class="title">{{ classItem.classesJson.title }}</div>
+                                    <div class="keyword">{{ classItem.classesJson.sportType }}</div>
+                                    <div class="keyword">{{ classItem.classesJson.duration }}</div>
+                                    <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
+                                    <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.sth }} </div><div>&nbsp;&nbsp;STH</div></div>
+                                    <div v-if="classItem.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
+                                      <div v-for="(i, index) in classItem.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
+                                        <div :style="{display: 'flex', gap: '2px', height: '16px'}">
+                                          <div v-for="n in i.times" :key="n" :style="{flex: 1}">
+                                            <ExerciseProcessChart :exerciseList="i.stageTimeline" :maxIntensity="classItem.classesJson.maxIntensity" :height="16" />
                                           </div>
                                         </div>
                                       </div>
                                     </div>
+                                  </div>
 
-                                </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="schedule-table-cell-data">
+                          <div class="week-data-sth">
+                            <div>
+                              <span>{{ sthData.avgLong ? sthData.avgLong : 0 }}</span>
+                              <span>长期STH</span>
                             </div>
-                        </div>
-                        <div class="schedule-table-cell-data">
-                            <div class="week-data-sth">
-                              <div>
-                                <span>{{ sthData.avgLong ? sthData.avgLong : 0 }}</span>
-                                <span>长期STH</span>
-                              </div>
-                              <div>
-                                <span>{{ sthData.avgShort ? sthData.avgShort : 0 }}</span>
-                                <span>短期STH</span>
-                              </div>
-                              <div>
-                                <span>{{ sthData.avgBalanceBig ? sthData.avgBalanceBig - sthData.avgBalanceSmall : 0 }}</span>
-                                <span>STH平衡</span>
-                              </div>
+                            <div>
+                              <span>{{ sthData.avgShort ? sthData.avgShort : 0 }}</span>
+                              <span>短期STH</span>
                             </div>
-                            <div v-for="item in statisticData" :key="item.title" class="week-data-item">
-                                <div class="week-data-text">
-                                    <div style="display: flex; align-items: center">
-                                      <img v-if="item.icon" style="width: 20px;margin-right: 10px" :src="item.icon" alt="">
-                                      <p>{{ item.title }}:</p>
-                                      <div style="display: flex; align-items: center; justify-content: space-between">
-                                        <span>{{ item.actualValue }} {{ item.unit }}</span>
-                                        <span>{{ item.planValue }} {{ item.unit }}</span>
-                                      </div>
+                            <div>
+                              <span>{{ sthData.avgBalanceBig ? sthData.avgBalanceBig - sthData.avgBalanceSmall : 0 }}</span>
+                              <span>STH平衡</span>
+                            </div>
+                          </div>
+                          <div v-for="item in statisticData" :key="item.title" class="week-data-item">
+                              <div class="week-data-text">
+                                  <div style="display: flex; align-items: center">
+                                    <img v-if="item.icon" style="width: 20px;margin-right: 10px" :src="item.icon" alt="">
+                                    <p>{{ item.title }}:</p>
+                                    <div style="display: flex; align-items: center; justify-content: space-between">
+                                      <span>{{ item.actualValue }} {{ item.unit }}</span>
+                                      <span>{{ item.planValue }} {{ item.unit }}</span>
                                     </div>
+                                  </div>
 
-                                </div>
-                                <el-progress :percentage="item.percent || 0" :color="item.color" :show-text="false"></el-progress>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <AthleticInfoDialog v-model="showAthleticInfoDialog" :data="athleticInfoData" @save="onSaveAthleticInfo" />
-        <MonthStatisticDialog v-model="showMonthStatisticDialog" :triUserId="selectedAthletic" :currentMonth="currentMonth" @cancel="onCancelMonthStatistic" />
-        <SportTypeModal v-model="showSportTypeModal" :data="classModalData" @select="onSelectSportType" />
-        <SportDetailModal v-model="showSportDetailModal" :type="sportDetailData.sportType" :data="sportDetailData" @cancel="onCancelSportDetail" />
-        <AddSwimClass v-model="showAddSwimClass" :data="classModalData" @save="onSaveAddSwimClass" />
-        <AddRunClass v-model="showAddRunClass" :data="classModalData" @save="onSaveAddRunClass" />
-        <AddBikeClass v-model="showAddBikeClass" :data="classModalData" @save="onSaveAddBikeClass" />
-        <AddPowerClass v-model="showAddPowerClass" :data="classModalData" @save="onSaveAddPowerClass" />
-        <AddNoteClass v-model="showAddNoteClass" :data="classModalData" @save="onSaveAddNoteClass" />
-        <AddOtherClass v-model="showAddOtherClass" :data="classModalData" @save="onSaveAddOtherClass" />
-        <AddRestClass v-model="showAddRestClass" :data="classModalData" @save="onSaveAddRestClass" />
-        <AddClassTitle v-model="showAddClassTitle" :groups="[{id: 1, name: '我的课程'}, {id: 2, name: '团队课程'}]" @save="onSaveClassTitle" />
-        <AddGroup v-model="showAddGroup" :data="currentGroup" @save="onSaveAddGroup"></AddGroup>
-        <MoveGroup v-model="showMoveGroup" :id="moveGroupId" @save="onSaveMoveGroup"></MoveGroup>
-        <BindModal v-model="showBindModal" :exercise-data="bindExerciseData" :course-data="bindCourseData" @bind="onBind" @cancel="onCancelBind"></BindModal>
-        <ClassDetailModal v-model="showClassDetailModal" :type="classSportType" :data="classDetailData" @save="handleClassDetailSave"></ClassDetailModal>
-    </div>
+                              </div>
+                              <el-progress :percentage="item.percent || 0" :color="item.color" :show-text="false"></el-progress>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <AthleticInfoDialog v-model="showAthleticInfoDialog" :data="athleticInfoData" @save="onSaveAthleticInfo" />
+      <MonthStatisticDialog v-model="showMonthStatisticDialog" :triUserId="selectedAthletic" :currentMonth="currentMonth" @cancel="onCancelMonthStatistic" />
+      <SportTypeModal v-model="showSportTypeModal" :data="classModalData" @select="onSelectSportType" />
+      <SportDetailModal v-model="showSportDetailModal" :type="sportDetailData.sportType" :data="sportDetailData" @cancel="onCancelSportDetail" />
+      <AddSwimClass v-model="showAddSwimClass" :data="classModalData" @save="onSaveAddSwimClass" />
+      <AddRunClass v-model="showAddRunClass" :data="classModalData" @save="onSaveAddRunClass" />
+      <AddBikeClass v-model="showAddBikeClass" :data="classModalData" @save="onSaveAddBikeClass" />
+      <AddPowerClass v-model="showAddPowerClass" :data="classModalData" @save="onSaveAddPowerClass" />
+      <AddNoteClass v-model="showAddNoteClass" :data="classModalData" @save="onSaveAddNoteClass" />
+      <AddOtherClass v-model="showAddOtherClass" :data="classModalData" @save="onSaveAddOtherClass" />
+      <AddRestClass v-model="showAddRestClass" :data="classModalData" @save="onSaveAddRestClass" />
+      <AddClassTitle v-model="showAddClassTitle" :groups="[{id: 1, name: '我的课程'}, {id: 2, name: '团队课程'}]" @save="onSaveClassTitle" />
+      <AddGroup v-model="showAddGroup" :data="currentGroup" @save="onSaveAddGroup"></AddGroup>
+      <MoveGroup v-model="showMoveGroup" :id="moveGroupId" @save="onSaveMoveGroup"></MoveGroup>
+      <BindModal v-model="showBindModal" :exercise-data="bindExerciseData" :course-data="bindCourseData" @bind="onBind" @cancel="onCancelBind"></BindModal>
+      <ClassDetailModal v-model="showClassDetailModal" :type="classSportType" :data="classDetailData" @save="handleClassDetailSave"></ClassDetailModal>
+  </div>
 </template>
 <script>
 import Sortable from 'sortablejs'
@@ -387,7 +387,7 @@ export default {
     this.getTeamAndAthleticData()
   },
   methods: {
-    // 获取日程数据
+  // 获取日程数据
     getScheduleData() {
       if (!this.selectedAthletic) return;
 
@@ -676,8 +676,8 @@ export default {
               return {id: member.id, name: member.userNickname, triUserId: member.triUserId}
             })}
           })
-          // this.selectedTeam = this.teamList[0].id
-          // this.getAthleticList()
+        // this.selectedTeam = this.teamList[0].id
+        // this.getAthleticList()
         }
       })
     },
@@ -692,11 +692,11 @@ export default {
     },
     getAthleticList() {
       this.athleticList = this.teamList.find(item => item.id === this.selectedTeam).members
-      // this.selectedAthletic = this.athleticList[0].triUserId
-      // this.athleticInfoData = this.athleticList[0]
+    // this.selectedAthletic = this.athleticList[0].triUserId
+    // this.athleticInfoData = this.athleticList[0]
     },
     onWeekChange(payload) {
-      // payload = { currentWeek: { list, monday, sunday }, nextWeek: { list, monday, sunday }, meta: { year, month, weekIndex } }
+    // payload = { currentWeek: { list, monday, sunday }, nextWeek: { list, monday, sunday }, meta: { year, month, weekIndex } }
       console.log('当前周', payload.currentWeek.list)
       console.log('下一周', payload.nextWeek.list)
       this.currentWeek = payload.currentWeek.list.map(item => {
@@ -714,7 +714,7 @@ export default {
       this.getScheduleData()
     },
     onSaveAthleticInfo(payload) {
-      // 这里对接保存接口
+    // 这里对接保存接口
       console.log('保存人员信息：', payload)
     },
     onCancelMonthStatistic() {
@@ -907,15 +907,15 @@ export default {
     },
     // 处理绑定按钮点击
     handleBind(classItem, activityItem) {
-      // 模拟运动数据
+    // 模拟运动数据
       const exerciseData =
-        {
-          name: activityItem.activityName,
-          duration: activityItem.duration,
-          sth: activityItem.sthValue,
-          id: activityItem.activityId,
-          dataDate: activityItem.dataDate
-        }
+      {
+        name: activityItem.activityName,
+        duration: activityItem.duration,
+        sth: activityItem.sthValue,
+        id: activityItem.activityId,
+        dataDate: activityItem.dataDate
+      }
 
       // 模拟课程数据 - 这里可以从课程列表中选择
       const courseData = {
@@ -979,401 +979,401 @@ export default {
 </script>
 <style lang="scss" scoped>
 .container {
-  background-color: #fff;
+background-color: #fff;
 }
 
 .athletic-container {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  overflow-x: auto;
+display: flex;
+flex-direction: row;
+gap: 10px;
+overflow-x: auto;
 
-  .schedule {
-    flex: 1;
-    background-color: #fff;
-    padding: 10px;
-  }
+.schedule {
+  flex: 1;
+  background-color: #fff;
+  padding: 10px;
+}
 }
 
 .schedule-search {
-  display: flex;
-  margin: 10px 0;
-  gap: 10px;
-  font-size: 12px;
+display: flex;
+margin: 10px 0;
+gap: 10px;
+font-size: 12px;
 }
 
 .athletic-btn-list {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  padding-right: 8px;
+flex: 1;
+display: flex;
+align-items: center;
+justify-content: space-between;
+font-size: 12px;
+padding-right: 8px;
 }
 
 .btn-list-hover {
-  width: 60px;
+width: 60px;
 
-  .el-button {
-    margin-left: 0;
-  }
+.el-button {
+  margin-left: 0;
+}
 }
 
 .schedule-top {
-  background-color: #f5f5f5;
-  padding: 10px;
-  display: flex;
-  gap: 20px;
-  margin-bottom: 10px;
+background-color: #f5f5f5;
+padding: 10px;
+display: flex;
+gap: 20px;
+margin-bottom: 10px;
 }
 
 .schedule-table {
-  height: 100%;
+height: 100%;
 
-  .schedule-table-header {
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-    background-color: #f5f5f5;
+.schedule-table-header {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  background-color: #f5f5f5;
 
-    .schedule-table-header-cell {
-      flex: 1;
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 34px;
-      background-color: #FDE5E5;
-    }
+  .schedule-table-header-cell {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 34px;
+    background-color: #FDE5E5;
+  }
 
-    .schedule-table-header-cell:last-child {
-            border-right: none;
-        }
-        .schedule-table-header-cell-data {
-            background-color: #fff;
-            flex: 0 0 220px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            line-height: 34px;
-        }
-    }
-    .schedule-table-body {
-        display: flex;
-        gap: 4px;
-        flex-direction: row;
-        height: calc(100% - 34px);
-        .schedule-table-cell {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 400px;
-            width: 120px;
-            background-color: #f5f5f5;
-            .schedule-table-cell-title {
-                font-size: 12px;
-                text-align: center;
-                line-height: 30px;
-                background-color: #f8f8f8;
-                margin: 4px 0;
-            }
-            .schedule-table-cell-item {
-                flex: 1;
-                font-size: 12px;
-                line-height: 18px;
-                color: #333;
-                transition: all 0.3s ease;
-                cursor: pointer;
+  .schedule-table-header-cell:last-child {
+          border-right: none;
+      }
+      .schedule-table-header-cell-data {
+          background-color: #fff;
+          flex: 0 0 220px;
+          text-align: center;
+          font-weight: 600;
+          font-size: 14px;
+          line-height: 34px;
+      }
+  }
+  .schedule-table-body {
+      display: flex;
+      gap: 4px;
+      flex-direction: row;
+      height: calc(100% - 34px);
+      .schedule-table-cell {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-height: 400px;
+          width: 120px;
+          background-color: #f5f5f5;
+          .schedule-table-cell-title {
+              font-size: 12px;
+              text-align: center;
+              line-height: 30px;
+              background-color: #f8f8f8;
+              margin: 4px 0;
+          }
+          .schedule-table-cell-item {
+              flex: 1;
+              font-size: 12px;
+              line-height: 18px;
+              color: #333;
+              transition: all 0.3s ease;
+              cursor: pointer;
 
-                .schedule-class {
-                    display: none;
-                }
+              .schedule-class {
+                  display: none;
+              }
 
-                .sport-container-noDrag {
-                    .class-block {
-                        display: none;
-                    }
-                }
+              .sport-container-noDrag {
+                  .class-block {
+                      display: none;
+                  }
+              }
 
-                .sport-record {
-                    border: 1px solid #e5e5e5;
-                    transition: all 0.3s ease;
-                    margin-bottom: 5px;
-                    background-color: #fff;
+              .sport-record {
+                  border: 1px solid #e5e5e5;
+                  transition: all 0.3s ease;
+                  margin-bottom: 5px;
+                  background-color: #fff;
 
-                    &:hover {
-                        // border-color: rgba(239, 18, 88, 0.3);
-                        // box-shadow: 0 2px 12px rgba(239, 18, 88, 0.2);
-                        transform: scale(1.02);
-                    }
-                    .sport-operate {
-                        height: 18px;
-                        background-color: #D0D0D0;
-                        padding: 0 10px;
-                        text-align: right;
-                        color: #fff;
-                        line-height: 18px;
-                    }
-                    .sport-record-data {
-                        padding: 5px;
-                    }
-                }
-                .sport-unmatched {
-                    .sport-operate {
-                        background-color: #D0D0D0;
-                    }
-                }
-                .green {
-                    .sport-operate {
-                        background-color: #83DFA1;
-                    }
-                }
-                .shallowOrange {
-                    .sport-operate {
-                        background-color: #ffd18d;
-                    }
-                }
-                .deepOrange {
-                    .sport-operate {
-                        background-color: #dc8605;
-                    }
-                }
-                .class-block {
-                    position: relative;
-                    padding: 10px 5px 5px 5px;
-                    border: 1px solid #e5e5e5;
-                    transition: all 0.3s ease;
-                    margin-bottom: 5px;
-                    &:hover {
-                        // border-color: rgba(239, 18, 88, 0.3);
-                        // box-shadow: 0 2px 12px rgba(239, 18, 88, 0.2);
-                        transform: scale(1.02);
-                    }
-                }
-            }
-        }
-        .schedule-table-cell:last-child {
-            border-right: none;
-        }
-        .schedule-table-cell-data {
-            flex: 0 0 220px;
-            padding: 10px;
-        }
-    }
+                  &:hover {
+                      // border-color: rgba(239, 18, 88, 0.3);
+                      // box-shadow: 0 2px 12px rgba(239, 18, 88, 0.2);
+                      transform: scale(1.02);
+                  }
+                  .sport-operate {
+                      height: 18px;
+                      background-color: #D0D0D0;
+                      padding: 0 10px;
+                      text-align: right;
+                      color: #fff;
+                      line-height: 18px;
+                  }
+                  .sport-record-data {
+                      padding: 5px;
+                  }
+              }
+              .sport-unmatched {
+                  .sport-operate {
+                      background-color: #D0D0D0;
+                  }
+              }
+              .green {
+                  .sport-operate {
+                      background-color: #83DFA1;
+                  }
+              }
+              .shallowOrange {
+                  .sport-operate {
+                      background-color: #ffd18d;
+                  }
+              }
+              .deepOrange {
+                  .sport-operate {
+                      background-color: #dc8605;
+                  }
+              }
+              .class-block {
+                  position: relative;
+                  padding: 10px 5px 5px 5px;
+                  border: 1px solid #e5e5e5;
+                  transition: all 0.3s ease;
+                  margin-bottom: 5px;
+                  &:hover {
+                      // border-color: rgba(239, 18, 88, 0.3);
+                      // box-shadow: 0 2px 12px rgba(239, 18, 88, 0.2);
+                      transform: scale(1.02);
+                  }
+              }
+          }
+      }
+      .schedule-table-cell:last-child {
+          border-right: none;
+      }
+      .schedule-table-cell-data {
+          flex: 0 0 220px;
+          padding: 10px;
+      }
+  }
 }
 
 .week-data-sth {
+display: flex;
+flex-direction: row;
+gap: 2px;
+justify-content: center;
+align-items: center;
+margin-bottom: 10px;
+>div {
+  width: 60px;
+  text-align: center;
+  color: #fff;
+  font-size: 12px;
+  line-height: 22px;
   display: flex;
-  flex-direction: row;
-  gap: 2px;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 10px;
-  >div {
-    width: 60px;
-    text-align: center;
-    color: #fff;
-    font-size: 12px;
-    line-height: 22px;
-    display: flex;
-    flex-direction: column;
+  flex-direction: column;
 
-    span:nth-child(1) {
-      background-color: rgba(255, 255, 255, 0.46);
-    }
+  span:nth-child(1) {
+    background-color: rgba(255, 255, 255, 0.46);
   }
-  >div:nth-child(1) {
-    padding: 4px 0 0 4px;
+}
+>div:nth-child(1) {
+  padding: 4px 0 0 4px;
+  border-radius: 6px 0 0 6px;
+  background-color: rgba(93, 187, 246, 1);
+  span:nth-child(1) {
     border-radius: 6px 0 0 6px;
-    background-color: rgba(93, 187, 246, 1);
-    span:nth-child(1) {
-      border-radius: 6px 0 0 6px;
-    }
   }
-  >div:nth-child(2) {
-    padding: 4px 4px 6px 4px;
+}
+>div:nth-child(2) {
+  padding: 4px 4px 6px 4px;
+  border-radius: 6px;
+  background-color: rgba(204, 35, 35, 1);
+  span:nth-child(1) {
     border-radius: 6px;
-    background-color: rgba(204, 35, 35, 1);
-    span:nth-child(1) {
-      border-radius: 6px;
-    }
   }
-  >div:nth-child(3) {
-    padding: 4px 4px 0 0;
+}
+>div:nth-child(3) {
+  padding: 4px 4px 0 0;
+  border-radius: 0 6px 6px 0;
+  background-color: rgba(255, 181, 105, 1);
+  span:nth-child(1) {
     border-radius: 0 6px 6px 0;
-    background-color: rgba(255, 181, 105, 1);
-    span:nth-child(1) {
-      border-radius: 0 6px 6px 0;
-    }
   }
+}
 }
 
 .week-data-item {
-    .week-data-text {
-        display: flex;
-        flex-direction: row;
-        div {
-          text-align: right;
-        }
-        span,div {
-            flex: 1;
-            font-size: 12px;
-            color: #333;
-            span:nth-child(2) {
-                color: #999;
-            }
-        }
-        >span {
-          font-family: PingFangSC, PingFang SC;
-          font-weight: 500;
-          color: #000000;
-        }
-    }
+  .week-data-text {
+      display: flex;
+      flex-direction: row;
+      div {
+        text-align: right;
+      }
+      span,div {
+          flex: 1;
+          font-size: 12px;
+          color: #333;
+          span:nth-child(2) {
+              color: #999;
+          }
+      }
+      >span {
+        font-family: PingFangSC, PingFang SC;
+        font-weight: 500;
+        color: #000000;
+      }
+  }
 }
 
 .type-change {
-    width: 260px;
-    background-color: #f8f8f8;
+  width: 260px;
+  background-color: #f8f8f8;
 }
 .type-change-list {
-    list-style: none;
-    padding: 10px 0;
-    min-width: 250px;
-    //width: 370px;
-    margin: 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 20px;
-    >li {
-        width: 80px;
-        cursor: pointer;
-        line-height: 28px;
-        border-radius: 6px;
-        background-color: #fff;
-        font-size: 14px;
-        text-align: center;
-        color: #333;
-        transition: all 0.3s ease;
-        &:hover {
-            background-color: rgba(239, 18, 88, 0.1);
-        }
-        &.active {
-            background-color: #CC2323;
-            color: #fff;
-        }
-    }
+  list-style: none;
+  padding: 10px 0;
+  min-width: 250px;
+  //width: 370px;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+  >li {
+      width: 80px;
+      cursor: pointer;
+      line-height: 28px;
+      border-radius: 6px;
+      background-color: #fff;
+      font-size: 14px;
+      text-align: center;
+      color: #333;
+      transition: all 0.3s ease;
+      &:hover {
+          background-color: rgba(239, 18, 88, 0.1);
+      }
+      &.active {
+          background-color: #CC2323;
+          color: #fff;
+      }
+  }
 }
 
 .class-container {
-    padding: 10px;
+  padding: 10px;
 }
 .schedule-class-container {
-    padding: 10px 10px;
-    background-color: #fff;
+  padding: 10px 10px;
+  background-color: #fff;
 
-    .schedule-class-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding: 0 10px;
-    }
-}
-.schedule-class {
-    background-color: #f8f8f8;
-    margin-bottom: 10px;
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-
-    .schedule-class-info-item-title {
-        display: flex;
-        gap:6px;
-
-        >span {
-            flex: 1;
-        }
-        .delete {
-            display: none;
-        }
-    }
-    &:hover .schedule-class-info-item-title .delete {
-        display: block;
-    }
-}
-
-.class-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 20px;
-}
-.class-operation {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.schedule-class-info-item-content {
-    display: flex;
-    justify-content: flex-start;
-    gap: 10px;
-    align-items: center;
-    img {
-        width: 20px;
-    }
-}
-.class-block-title-delete {
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 0;
-  padding: 3px;
-  cursor: pointer;
-}
-.class-block:hover .class-block-title-delete {
-  display: block;
-}
-
-.classScheduleCard {
-  margin-left: 2px;
-  margin-right: 2px;
-  position: relative;
-  border: 1px solid #e5e5e5;
-  transition: all 0.3s ease;
-  margin-bottom: 5px;
-  overflow: hidden;
-  &:hover {
-    transform: scale(1.02);
-  }
-  border-radius: 6px;
-  background-color: #ffffff;
-  padding-top: 10px;
-  box-shadow: 0 0 1px 0 rgba(0,0,0,0.75);
-  .card-body {
-    width: 100%;
-    padding-left: 2px;
-    padding-right: 2px;
-    .body-title {
+  .schedule-class-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      background-color: white;
-      padding: 5px 3px;
-    }
+      padding: 0 10px;
   }
-  .image-icon {
-    width: 20px;
+}
+.schedule-class {
+  background-color: #f8f8f8;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+
+  .schedule-class-info-item-title {
+      display: flex;
+      gap:6px;
+
+      >span {
+          flex: 1;
+      }
+      .delete {
+          display: none;
+      }
   }
-  .title {
-    font-size: 14px;
-    font-weight: bold;
+  &:hover .schedule-class-info-item-title .delete {
+      display: block;
   }
-  .keyword {
-    font-size: 12px;
-    font-weight: bold;
+}
+
+.class-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.class-operation {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.schedule-class-info-item-content {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: center;
+  img {
+      width: 20px;
   }
+}
+.class-block-title-delete {
+display: none;
+position: absolute;
+right: 0;
+top: 0;
+padding: 3px;
+cursor: pointer;
+}
+.class-block:hover .class-block-title-delete {
+display: block;
+}
+
+.classScheduleCard {
+margin-left: 2px;
+margin-right: 2px;
+position: relative;
+border: 1px solid #e5e5e5;
+transition: all 0.3s ease;
+margin-bottom: 5px;
+overflow: hidden;
+&:hover {
+  transform: scale(1.02);
+}
+border-radius: 6px;
+background-color: #ffffff;
+padding-top: 10px;
+box-shadow: 0 0 1px 0 rgba(0,0,0,0.75);
+.card-body {
+  width: 100%;
+  padding-left: 2px;
+  padding-right: 2px;
+  .body-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: white;
+    padding: 5px 3px;
+  }
+}
+.image-icon {
+  width: 20px;
+}
+.title {
+  font-size: 14px;
+  font-weight: bold;
+}
+.keyword {
+  font-size: 12px;
+  font-weight: bold;
+}
 }
 </style>
