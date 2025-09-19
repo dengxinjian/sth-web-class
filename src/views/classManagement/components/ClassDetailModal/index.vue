@@ -28,7 +28,8 @@ export default {
     type: {
       type: String,
       required: true,
-      validator: function (value) {
+      default: "RUN",
+      validator: function (value = "RUN") {
         // 验证type参数是否有效
         return (
           [

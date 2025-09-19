@@ -5,6 +5,7 @@
       :before-close="handleClose"
       append-to-body
       class="add-swim-class-dialog"
+      @cancel="handleClose"
     >
       <span slot="title">其他运动</span>
 
@@ -172,28 +173,29 @@ export default {
     }
   },
   watch: {
-    visible(val) {
-      this.innerVisible = val
-    },
     value(val) {
-      if (typeof val !== 'undefined') this.innerVisible = val
+      this.innerVisible = val;
     },
-    innerVisible(val) {
-      this.$emit('update:visible', val)
-      this.$emit('input', val)
-      // 当弹框打开时清空表单
-      if (val) {
-        this.resetForm()
-        if (this.data.id) {
-          this.getClassInfo(this.data.id)
+    innerVisible: {
+      handler(val) {
+        // 当弹框打开时调用 handleOpen
+        if (val) {
+          this.handleOpen();
         }
-        if (this.data.activityId) {
-          this.getSportDetail(this.data.activityId)
-        }
-      }
-    }
+      },
+      immediate: true // 确保在组件挂载时立即执行一次
+    },
   },
   methods: {
+    handleOpen() {
+      this.resetForm();
+      if (this.data.id) {
+        this.getClassInfo(this.data.id);
+      }
+      if (this.data.activityId) {
+        this.getSportDetail(this.data.activityId);
+      }
+    },
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({

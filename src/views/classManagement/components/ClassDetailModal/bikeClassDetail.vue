@@ -120,7 +120,7 @@
                 </div>
                 <div class="phase-details">
                     <div class="phase-item">
-                        <div v-for="(item, index) in classInfo.stages" :key="index">
+                        <div v-for="(item, index) in classInfo.stages" :key="index + 'bike'">
                             <div v-for="(part, idx) in item.sections" :key="idx">
                                 <div>{{ part.title }}</div>
                                 <div v-if="classInfo.mode === 1 && part.range === 'range'">{{ part.target }} @ {{ part.thresholdFtpRange[0] }}~ {{ part.thresholdFtpRange[1] }}% 阈值功率 <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
