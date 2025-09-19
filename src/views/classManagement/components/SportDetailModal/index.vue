@@ -1,9 +1,12 @@
 <template>
   <div>
     <!-- 动态组件，根据type参数决定引入哪个组件 -->
+    <!-- 添加 key 属性确保组件切换时重新创建实例 -->
     <component
       :is="currentComponent"
-      v-bind="$attrs"
+      :key="componentKey"
+      :value="value"
+      :data="$attrs.data"
       v-on="$listeners"
     />
   </div>
@@ -29,6 +32,17 @@ export default {
         // 验证type参数是否有效
         return [1, 2, 3, 4, 5].indexOf(value) !== -1
       }
+    },
+    // 添加 value 属性来监听弹框的显示状态（v-model 对应的是 value）
+    value: {
+      type: Boolean,
+      default: false
+    }
+  },
+  data() {
+    return {
+      // 用于生成唯一的组件 key
+      componentKey: 0
     }
   },
   computed: {
@@ -43,6 +57,24 @@ export default {
         5: OtherDetail
       }
       return componentMap[this.type] || RunDetail // 默认返回跑步组件
+    }
+  },
+  watch: {
+    // 监听 value 和 type 的变化，确保组件重新创建
+    value(newVal, oldVal) {
+      console.log('SportDetailModal value 变化:', newVal, 'oldVal:', oldVal)
+      if (newVal && newVal !== oldVal) {
+        // 当弹框打开时，更新 componentKey 强制重新创建组件
+        this.componentKey = Date.now()
+        console.log('弹框打开，更新 componentKey:', this.componentKey)
+      }
+    },
+    type(newVal, oldVal) {
+      // 当运动类型改变时，也更新 componentKey
+      if (newVal !== oldVal) {
+        this.componentKey = Date.now()
+        console.log('运动类型改变，更新 componentKey:', this.componentKey)
+      }
     }
   }
 }
