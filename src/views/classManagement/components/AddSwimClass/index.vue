@@ -30,13 +30,14 @@
           </div>
           <div class="row-item">
             <span class="label">时长</span>
-            <el-time-picker
+            <!-- <el-time-picker
               v-model="form.duration"
               value-format="HH:mm:ss"
               format="HH:mm:ss"
               placeholder="00:00:00"
               class="pill-time"
-            />
+            /> -->
+          <TimeInput v-model="form.duration" size="small" />
           </div>
           <div class="row-item">
             <span class="label">STH</span>
@@ -90,9 +91,12 @@
 
 <script>
 import {getData, submitData} from '@/api/common.js'
-
+import TimeInput from '@/views/classManagement/components/timeInpt'
 export default {
   name: 'AddSwimClassDialog',
+  components: {
+    TimeInput
+  },
   props: {
     visible: {
       type: Boolean,

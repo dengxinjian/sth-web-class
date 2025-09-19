@@ -42,7 +42,6 @@
 
 <script>
 import {getData, submitData} from '@/api/common.js'
-
 export default {
   name: 'AddSwimClassDialog',
   props: {

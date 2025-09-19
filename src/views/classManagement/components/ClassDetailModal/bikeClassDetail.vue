@@ -210,8 +210,7 @@
                             <div class="config-item">
                                 <span class="label">目标</span>
                                 <!-- <el-input v-model="stages[0].duration" placeholder="00:01:00" size="small" /> -->
-                                <el-time-picker v-model="part.target" value-format="HH:mm:ss" placeholder="请选择" size="small" @change="handleTargetChange(index, idx)" style="max-width: 140px;">
-                                </el-time-picker>
+                                <TimeInput v-model="part.target" size="small" @change="handleTargetChange(index, idx)" />
                             </div>
                             <div v-if="classInfo.mode === 1 && part.range === 'range'" class="config-item">
                                 <span class="label">运动值</span>
@@ -307,11 +306,13 @@
 import Sortable from 'sortablejs'
 import ExerciseProcessChart from '@/components/ExerciseProcessChart'
 import {getData, submitData} from '@/api/common.js'
+import TimeInput from '@/views/classManagement/components/timeInpt'
 
 export default {
   name: 'AddBikeClassDialog',
   components: {
-    ExerciseProcessChart
+    ExerciseProcessChart,
+    TimeInput
   },
   props: {
     visible: {

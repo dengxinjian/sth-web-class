@@ -349,31 +349,38 @@ export default {
     justify-content: space-between;
     align-content: center;
     margin-bottom: 10px;
-    >span {
-        flex: 2;
-    }
-    span:last-child {
-        flex: 1.2
-    }
-}
-.sync-params-table {
+  }
+
+  .sync-params > span {
+    flex: 2;
+  }
+
+  .sync-params span:last-child {
+    flex: 1.2;
+  }
+
+  .sync-params-table {
     flex: 1;
     font-size: 12px;
     line-height: 20px;
     width: 100%;
     border-collapse: collapse;
-    td {
-        flex: 1;
-        text-align: center;
-    }
-    td:last-child {
-        flex: 1;
-    }
-    td:first-child {
-        flex: 1;
-    }
-    tr:first-child {
-        background-color: #f5f5f5;
-    }
-}
+  }
+
+  .sync-params-table td {
+    flex: 1;
+    text-align: center;
+  }
+
+  .sync-params-table td:last-child {
+    flex: 1;
+  }
+
+  .sync-params-table td:first-child {
+    flex: 1;
+  }
+
+  .sync-params-table tr:first-child {
+    background-color: #f5f5f5;
+  }
 </style>

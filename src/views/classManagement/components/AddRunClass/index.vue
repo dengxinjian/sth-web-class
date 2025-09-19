@@ -211,8 +211,9 @@
                             <div class="config-item">
                                 <span class="label">目标</span>
                                 <!-- <el-input v-model="stages[0].duration" placeholder="00:01:00" size="small" /> -->
-                                <el-time-picker v-if="part.capacity === 'time'" v-model="part.target" value-format="HH:mm:ss" placeholder="请选择" size="small" @change="handleTargetChange(index, idx)" style="max-width: 140px;">
-                                </el-time-picker>
+                                <!-- <el-time-picker v-if="part.capacity === 'time'" v-model="part.target" value-format="HH:mm:ss" placeholder="请选择" size="small" @change="handleTargetChange(index, idx)" style="max-width: 140px;">
+                                </el-time-picker> -->
+                                <TimeInput v-if="part.capacity === 'time'" v-model="part.target" size="small" @change="handleTargetChange(index, idx)" />
                                 <el-input-number v-if="part.capacity === 'distance'" :controls="false" :step="part.unit === 'km' ? 1:0.1" :step-strictly="true" v-model="part.targetDistance" size="small" @change="handleTargetChange(index, idx)" />
                                 <el-select v-if="part.capacity === 'distance'" v-model="part.targetUnit" placeholder="请选择" size="small" :style="{width: '80px', marginLeft: '8px'}" @change="handleTargetChange(index, idx)">
                                     <el-option label="km" value="km" />
@@ -313,11 +314,13 @@
 import Sortable from 'sortablejs'
 import ExerciseProcessChart from '@/components/ExerciseProcessChart'
 import {getData, submitData} from '@/api/common.js'
+import TimeInput from '@/views/classManagement/components/timeInpt'
 
 export default {
   name: 'AddRunClassDialog',
   components: {
-    ExerciseProcessChart
+    ExerciseProcessChart,
+    TimeInput
   },
   props: {
     visible: {
