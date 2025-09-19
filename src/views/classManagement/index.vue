@@ -136,6 +136,38 @@
                                     <div class="keyword">{{ classItem.classesJson.duration }}</div>
                                     <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.distance }} </div><div>&nbsp;&nbsp;KM</div></div>
                                     <div style="display:flex; "><div class="keyword">{{ classItem.classesJson.sth }} </div><div>&nbsp;&nbsp;STH</div></div>
+                                    <div v-if="classItem.sportType === 'CYCLE'" class="stage-details">
+                                      <div v-for="(stage, index) in classItem.classesJson.stages" :key="index" class="stage-item">
+                                        <div v-for="(part, idx) in stage.sections" :key="idx">
+                                            <div>{{ part.title }}</div>
+                                            <div v-if="classItem.classesJson.mode === 1 && part.range === 'range'">{{ part.target }} @ {{ part.thresholdFtpRangeNum[0] }}~ {{ part.thresholdFtpRangeNum[1] }}w <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 2 && part.range === 'range'">{{ part.target }} @ {{ part.thresholdHeartRateRangeNum[0] }}~ {{ part.thresholdHeartRateRangeNum[1] }}bpm <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 1 && part.range === 'target'">{{ part.target }} @ {{ part.thresholdFtpNum }}w <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 2 && part.range === 'target'">{{ part.target }} @ {{ part.thresholdHeartRateNum }}bpm <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 3 && part.range === 'range'">{{ part.target }} @ {{ part.targetFtpRange[0] }}~ {{ part.targetFtpRange[1] }}w <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 4 && part.range === 'range'">{{ part.target }} @ {{ part.targetHeartRateRangeNum[0] }}~ {{ part.targetHeartRateRangeNum[1] }}bpm <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 3 && part.range === 'target'">{{ part.target }} @ {{ part.targetFtp }}w <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 4 && part.range === 'target'">{{ part.target }} @ {{ part.targetHeartRate }}bpm <span v-if="part.hasCadence">踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                        </div>
+                                        <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
+                                      </div>
+                                    </div>
+                                    <div v-if="classItem.sportType === 'RUN'" class="stage-details">
+                                      <div v-for="(stage, index) in classItem.classesJson.stages" :key="index" class="stage-item">
+                                        <div v-for="(part, idx) in stage.sections" :key="idx">
+                                            <div>{{ part.title }}</div>
+                                            <div v-if="classItem.classesJson.mode === 1 && part.range === 'range'">{{ part.target }} @ {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~ {{ secondsToMMSS(part.thresholdSpeedRangeNum[1]) }}/km <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 2 && part.range === 'range'">{{ part.target }} @ {{ part.thresholdHeartRateRangeNum[0] }}~ {{ part.thresholdHeartRateRangeNum[1] }}bpm <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 1 && part.range === 'target'">{{ part.target }} @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 2 && part.range === 'target'">{{ part.target }} @ {{ part.thresholdHeartRateNum }}bpm <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 3 && part.range === 'range'">{{ part.target }} @ {{ part.targetSpeedRange[0] }}~ {{ part.targetSpeedRange[1] }}/km <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 4 && part.range === 'range'">{{ part.target }} @ {{ part.targetHeartRateRangeNum[0] }}~ {{ part.targetHeartRateRangeNum[1] }}bpm <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 3 && part.range === 'target'">{{ part.target }} @ {{ part.targetSpeed }}/km <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                            <div v-if="classItem.classesJson.mode === 4 && part.range === 'target'">{{ part.target }} @ {{ part.targetHeartRate }}bpm <span v-if="part.hasCadence">步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span></div>
+                                        </div>
+                                        <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
+                                      </div>
+                                    </div>
                                     <div v-if="classItem.classesJson.timeline" style="height: 16px;display: flex;gap:2px;">
                                       <div v-for="(i, index) in classItem.classesJson.timeline" :key="index" class="time-stage" :style="{flex: i.duration}">
                                         <div :style="{display: 'flex', gap: '2px', height: '16px'}">
@@ -249,7 +281,7 @@ import MoveGroup from '@/views/classManagement/components/MoveGroup'
 import BindModal from '@/views/classManagement/components/BindModal'
 import SportDetailModal from '@/views/classManagement/components/SportDetailModal'
 import ClassDetailModal from './components/ClassDetailModal'
-import { getLunarDate, secondsToHHMMSS } from '@/utils/index'
+import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from '@/utils/index'
 import {getData, submitData} from '@/api/common.js'
 import { MessageBox } from 'element-ui'
 
@@ -381,7 +413,13 @@ export default {
       showClassDetailModal: false,
       classSportType: '',
       classDetailData: {},
-      loading: false
+      loading: false,
+      athleticThreshold: {
+        run: 0,
+        cycle: 0,
+        swim: 0,
+        heartRate: 0
+      }
     }
   },
   mounted() {
@@ -389,7 +427,8 @@ export default {
     this.getTeamAndAthleticData()
   },
   methods: {
-  // 获取日程数据
+    secondsToMMSS,
+    // 获取日程数据
     getScheduleData() {
       if (!this.selectedAthletic) return;
       this.loading = true;
@@ -549,6 +588,30 @@ export default {
         }
       })
     },
+    // 获取运动员阈值
+    getAthleticThreshold(id) {
+      getData({
+        url: '/api/classSchedule/getUserProfile',
+        triUserId: id
+      }).then(res => {
+        res.result.thresholdRecordList.forEach(item => {
+          switch (item.thresholdType) {
+            case 1:
+              this.athleticThreshold.heartRate = item.threshold
+              break;
+            case 2:
+              this.athleticThreshold.cycle = item.threshold
+              break;
+            case 3:
+              this.athleticThreshold.run = item.threshold
+              break
+            case 4:
+              this.athleticThreshold.swim = item.threshold
+              break
+          }
+        })
+      })
+    },
     // 通过课程id查找课程
     findClassById(id) {
       let findClass = {}
@@ -564,13 +627,37 @@ export default {
     // 课程拖到日历中
     async AddScheduleClass(data) {
       if (!this.selectedAthletic) return;
-      const originalClassesJson = data.classesJson;
+      const originalClassesJson = JSON.parse(data.classesJson);
+      // 将运动员阈值代入课程中计算具体值
+      originalClassesJson.stages.forEach(item => {
+        item.sections.forEach(part => {
+          if (part.thresholdFtp) {
+            part.thresholdFtpNum = Math.round(part.thresholdFtp / 100 * this.athleticThreshold.cycle)
+          }
+          if (part.thresholdFtpRange) {
+            part.thresholdFtpRangeNum = [Math.round(part.thresholdFtpRange[0] / 100 * this.athleticThreshold.cycle), Math.round(part.thresholdFtpRange[1] / 100 * this.athleticThreshold.cycle)]
+          }
+          if (part.thresholdHeartRate) {
+            part.thresholdHeartRateNum = Math.round(part.thresholdHeartRate / 100 * this.athleticThreshold.heartRate)
+          }
+          if (part.thresholdHeartRateRange) {
+            part.thresholdHeartRateRangeNum = [Math.round(part.thresholdHeartRateRange[0] / 100 * this.athleticThreshold.heartRate), Math.round(part.thresholdHeartRateRange[1] / 100 * this.athleticThreshold.heartRate)]
+          }
+          if (part.thresholdSpeed) {
+            part.thresholdSpeedNum = Math.round(100 / part.thresholdSpeed * this.athleticThreshold.run)
+          }
+          if (part.thresholdSpeedRange) {
+            part.thresholdSpeedRangeNum = [Math.round(100 / part.thresholdSpeedRange[0] * this.athleticThreshold.run), Math.round(100 / part.thresholdSpeedRange[1] * this.athleticThreshold.run)]
+          }
+        })
+      })
+      console.log(originalClassesJson)
       const res = await submitData({
         url: '/api/classSchedule/calculateTimeDistanceSth',
         requestData: {...data, triUserId: this.selectedAthletic}
       })
       // eslint-disable-next-line require-atomic-updates
-      data.classesJson = JSON.stringify({ ...JSON.parse(originalClassesJson), duration: secondsToHHMMSS(res.result.time), distance: res.result.distance + 'km', sth: res.result.sth })
+      data.classesJson = JSON.stringify({ ...originalClassesJson, duration: secondsToHHMMSS(res.result.time || 0), distance: (res.result.distance || 0) + 'km', sth: res.result.sth })
       submitData({
         url: '/api/classSchedule/create',
         requestData: {...data, triUserId: this.selectedAthletic}
@@ -696,6 +783,7 @@ export default {
       this.selectedAthletic = val
       this.athleticInfoData = this.athleticList.find(item => item.triUserId === val)
       this.getScheduleData()
+      this.getAthleticThreshold(val)
     },
     getAthleticList() {
       this.athleticList = this.teamList.find(item => item.id === this.selectedTeam).members
@@ -705,6 +793,7 @@ export default {
         this.athleticInfoData = this.athleticList[0]
         // 选中运动员后调用getClassList方法
         this.getClassList()
+        this.getAthleticThreshold(this.selectedAthletic)
       }
     },
     onWeekChange(payload) {
@@ -745,6 +834,7 @@ export default {
       e.stopPropagation()
     },
     classSlideChange() {
+      // 课程往课表中拖动
       document.querySelectorAll('.js-class-drag-container').forEach(el => {
         new Sortable(el, {
           group: {name: 'classDrag', put: false, pull: 'clone'},
@@ -1397,6 +1487,20 @@ box-shadow: 0 0 1px 0 rgba(0,0,0,0.75);
     width: 100%;
     background-color: white;
     padding: 5px 3px;
+  }
+  .stage-details {
+    font-size: 12px;
+    color: #999;
+    padding: 5px 5px 0;
+    line-height: 16px;
+    .stage-item {
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .stage-item:last-child {
+      border-bottom: none;
+    }
   }
 }
 .image-icon {
