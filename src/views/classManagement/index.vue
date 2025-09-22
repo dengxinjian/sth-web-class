@@ -1082,6 +1082,15 @@ export default {
     // 设备关闭或打开
     handleDeviceChange(item) {
       console.log("设备变化：", item);
+      const syncFlag = item.enabled ? 1 : 0;
+      submitData({
+        url: `/api/classSchedule/updateAuthorizedDevice?deviceId=${item.id}&syncFlag=${syncFlag}`,
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success(res.message);
+          this.getAuthorizedDeviceList();
+        }
+      });
     },
     // 获取日程数据
     getScheduleData() {
@@ -1397,6 +1406,7 @@ export default {
         distance: (res.result.distance || 0) + "km",
         sth: res.result.sth,
       });
+      console.log(data, "data");
       submitData({
         url: "/api/classSchedule/create",
         requestData: { ...data, triUserId: this.selectedAthletic },
