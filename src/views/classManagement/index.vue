@@ -179,6 +179,15 @@
                         <span v-else-if="part.sportType === 'STRENGTH'">
                           <img src="~@/assets/addClass/icon-power.png" alt="" />
                         </span>
+                        <span v-else-if="part.sportType === 'OTHER'">
+                          <img src="~@/assets/addClass/icon-other.png" alt="" />
+                        </span>
+                        <span v-else-if="part.sportType === 'REMARK'">
+                          <img src="~@/assets/addClass/icon-note.png" alt="" />
+                        </span>
+                        <span v-else-if="part.sportType === 'REST'">
+                          <img src="~@/assets/addClass/icon-rest.png" alt="" />
+                        </span>
                         <span v-else>
                           <img src="~@/assets/addClass/icon-other.png" alt="" />
                         </span>
@@ -684,7 +693,7 @@
                       <div class="keyword">{{ activityItem.duration }}</div>
                       <div style="display: flex">
                         <div class="keyword">{{ activityItem.distance }}</div>
-                        <div>&nbsp;&nbsp;KM</div>
+                        <div>km</div>
                       </div>
                       <div style="display: flex">
                         <div class="keyword">{{ activityItem.sthValue }}</div>
@@ -1917,6 +1926,12 @@ export default {
           return require("@/assets/addClass/icon-run.png");
         case "STRENGTH":
           return require("@/assets/addClass/icon-power.png");
+        case "OTHER":
+          return require("@/assets/addClass/icon-other.png");
+        case "REMARK":
+          return require("@/assets/addClass/icon-note.png");
+        case "REST":
+          return require("@/assets/addClass/icon-rest.png");
         default:
           return require("@/assets/addClass/icon-other.png");
       }
