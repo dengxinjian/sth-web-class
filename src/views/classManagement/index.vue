@@ -310,7 +310,7 @@
                       <div class="keyword">
                         {{ classItem.classesJson.distance }}
                       </div>
-                      <div>&nbsp;&nbsp;KM</div>
+                      <div>&nbsp;&nbsp;</div>
                     </div>
                     <div style="display: flex">
                       <div class="keyword">{{ classItem.classesJson.sth }}</div>
@@ -1039,6 +1039,13 @@ export default {
         4: "S",
       },
       deviceList: [],
+      currentActivityDict: {
+        1: "BIKE",
+        2: "RUN",
+        3: "SWIM",
+        4: "POWER",
+        5: "OTHER",
+      },
     };
   },
   mounted() {
@@ -1221,11 +1228,21 @@ export default {
                       if (e.item.dataset.type === "classTemplate") {
                         currentClass = _this.findClassById(e.item.dataset.id);
                         // alert("该逻辑待补充，暂时先新建课表再合并");
-                        _this.handleBind(currentClass, {
-                          ...currentActivity,
-                          dataDate: activityDate,
-                          type: "classTemplate",
-                        });
+                        if (
+                          currentClass.classesJson.sportType ===
+                          _this.currentActivityDict[currentActivity.sportType]
+                        ) {
+                          _this.handleBind(
+                            currentClass,
+                            {
+                              ...currentActivity,
+                              dataDate: activityDate,
+                            },
+                            "classTemplate"
+                          );
+                        } else {
+                          _this.$message.error("该运动类型与课程类型不匹配");
+                        }
                       } else {
                         _this.handleBind(currentClass, {
                           ...currentActivity,
@@ -1331,7 +1348,7 @@ export default {
       return findClass;
     },
     // 课程拖到日历中
-    async AddScheduleClass(data) {
+    async AddScheduleClass(data, type = "") {
       if (!this.selectedAthletic) return;
       const originalClassesJson = JSON.parse(data.classesJson);
       console.log(originalClassesJson, "this.originalClassesJson", data);
@@ -1406,6 +1423,10 @@ export default {
         distance: (res.result.distance || 0) + "km",
         sth: res.result.sth,
       });
+      if (type === "classTemplate") {
+        console.log(data, "data");
+        return data;
+      }
       console.log(data, "data");
       submitData({
         url: "/api/classSchedule/create",
@@ -1773,8 +1794,34 @@ export default {
       this.bindType = type || "";
     },
     // 绑定确认
-    onBind(data) {
+    async onBind(data) {
       console.log("绑定数据：", data);
+      if (data.type === "classTemplate") {
+        const params = {
+          classesId: data.courseData.id,
+          classesJson: JSON.stringify(data.courseData.classesJson),
+          classesDate: data.exerciseData.dataDate,
+          sportType: data.courseData.classesJson.sportType,
+        };
+        const josnData = await this.AddScheduleClass(params, data.type);
+        submitData({
+          url: "/api/classSchedule/create",
+          requestData: {
+            ...josnData,
+            bindingActivityId: data.exerciseData.id,
+            triUserId: this.selectedAthletic,
+          },
+        }).then((res) => {
+          if (res.success) {
+            this.$message.success("绑定成功");
+            this.getScheduleData();
+          } else {
+            this.$message.error(res.message);
+            this.getScheduleData();
+          }
+        });
+        return;
+      }
       // 这里可以调用绑定API
       submitData({
         url: "/api/classSchedule/classBindingActivity",
@@ -1804,6 +1851,7 @@ export default {
     },
     // 处理绑定按钮点击
     handleBind(classItem, activityItem, type) {
+      console.log("handleBind：", classItem, activityItem, type);
       // 模拟运动数据
       const exerciseData = {
         name: activityItem.activityName,
@@ -1813,15 +1861,14 @@ export default {
         dataDate: activityItem.dataDate,
         distance: activityItem.distance,
       };
-      console.log("courseData：", courseData);
-
       // 模拟课程数据 - 这里可以从课程列表中选择
       const courseData = {
         name: classItem.classesJson.title,
-        duration: classItem.duration,
-        sth: classItem.sthValue,
+        duration: classItem.classesJson.duration,
+        sth: classItem.classesJson.sth,
         id: classItem.id,
         classesJson: classItem.classesJson,
+        distance: classItem.classesJson.distance,
       };
       console.log("exerciseData：", exerciseData, activityItem);
       console.log("courseData：", courseData);

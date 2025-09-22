@@ -25,7 +25,7 @@
               <div class="card-title">{{ exerciseData.name }}</div>
               <div class="card-duration">{{ exerciseData.duration }}</div>
               <div class="card-sth">{{ exerciseData.sth }} STH</div>
-              <div class="card-distance">{{ exerciseData.distance }} KM</div>
+              <div class="card-distance">{{ exerciseData.distance }}km</div>
             </div>
           </div>
 
@@ -37,6 +37,8 @@
               <div class="card-title">{{ courseData.name }}</div>
               <div class="card-duration">{{ courseData.duration }}</div>
               <div class="card-sth">{{ courseData.sth }} STH</div>
+              <div class="card-distance">{{ courseData.distance }} </div>
+
             </div>
           </div>
         </div>
@@ -97,6 +99,10 @@ export default {
         sth: '28',
         dataDate: ''
       })
+    },
+    type: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -118,9 +124,11 @@ export default {
       this.$emit('cancel')
     },
     handleBind() {
+      console.log("绑定数据：", this.exerciseData, this.courseData, this.type);
       this.$emit('bind', {
         exerciseData: this.exerciseData,
-        courseData: this.courseData
+        courseData: this.courseData,
+        type: this.type
       })
       this.visible = false
     }
