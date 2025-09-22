@@ -237,7 +237,17 @@
             >
               {{ item.name }}
             </div>
-            <div class="schedule-table-header-cell-data">周统计</div>
+            <div class="schedule-table-header-cell-data">
+              <el-switch
+                v-for="item in deviceList"
+                :key="item.id"
+                v-model="item.enabled"
+                :inactive-text="
+                  item.deviceType ? deviceTypeDict[item.deviceType] : '未知设备'
+                "
+                @change="handleDeviceChange(item)"
+              ></el-switch>
+            </div>
           </div>
           <div class="schedule-table-body">
             <div
@@ -266,11 +276,24 @@
                 >
                   <div class="card-body" style="background-color: white">
                     <div class="body-title">
-                      <img
-                        class="image-icon"
-                        :src="getClassImageIcon(classItem.sportType)"
-                        alt=""
-                      />
+                      <div class="sport-type-icon">
+                        <img
+                          class="image-icon"
+                          :src="getClassImageIcon(classItem.sportType)"
+                          alt=""
+                        />
+                        <div
+                          :class="[
+                            'sport-type-name',
+                            'sport-type-color' + device.syncStatus,
+                          ]"
+                          v-for="device in classItem.syncStatusList"
+                          :key="device.deviceType + device.syncStatus"
+                          @click.stop="handleDeviceClick(classItem, device)"
+                        >
+                          {{ deviceTypeIconDict[device.deviceType] }}
+                        </div>
+                      </div>
                       <i
                         class="el-icon-delete"
                         @click.stop="handleDeleteClassSchedule(classItem.id)"
@@ -615,11 +638,13 @@
                         )[0],
                       }"
                     >
-                      <img
-                        class="image-icon"
-                        :src="getSportImageIcon(activityItem.sportType)"
-                        alt=""
-                      />
+                      <div class="sport-type-icon">
+                        <img
+                          class="image-icon"
+                          :src="getSportImageIcon(activityItem.sportType)"
+                          alt=""
+                        />
+                      </div>
                       <el-popover
                         popper-class="athletic-btn-popover"
                         placement="right"
@@ -805,6 +830,7 @@
       v-model="showBindModal"
       :exercise-data="bindExerciseData"
       :course-data="bindCourseData"
+      :type="bindType"
       @bind="onBind"
       @cancel="onCancelBind"
     ></BindModal>
@@ -980,6 +1006,7 @@ export default {
       showBindModal: false,
       bindExerciseData: [],
       bindCourseData: {},
+      bindType: "",
       athleticInfoData: {},
       sthData: {},
       statisticData: [],
@@ -997,6 +1024,21 @@ export default {
         swim: 0,
         heartRate: 0,
       },
+      deviceTypeDict: {
+        1: "高驰",
+        2: "佳明国际",
+        3: "佳明中国",
+        4: "华米",
+        5: "颂拓国际",
+        6: "颂拓中国",
+      },
+      deviceTypeIconDict: {
+        1: "C",
+        2: "G",
+        3: "Z",
+        4: "S",
+      },
+      deviceList: [],
     };
   },
   mounted() {
@@ -1005,6 +1047,42 @@ export default {
   },
   methods: {
     secondsToMMSS,
+    // 课表同步设备点击
+    handleDeviceClick(classItem, device) {
+      console.log("设备点击：", device);
+      if (device.syncStatus === 1) {
+        this.$message.error("该设备已同步成功");
+        return;
+      }
+      submitData({
+        url: `/api/classSchedule/retryClassScheduleSync?classScheduleId=${classItem.id}&deviceType=${device.deviceType}`,
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success(res.result);
+          // 更新课表数据
+          this.getScheduleData();
+        } else {
+          this.$message.error(res.message);
+        }
+      });
+    },
+    // 获取用户已授权设备列表
+    getAuthorizedDeviceList() {
+      getData({
+        url: "/api/classSchedule/authorizedDevice",
+        triUserId: this.selectedAthletic,
+      }).then((res) => {
+        this.deviceList = (res.result || []).map((device) => ({
+          ...device,
+          enabled: device.syncFlag === 1, // 默认关闭状态
+          deviceType: device.deviceType || 0,
+        }));
+      });
+    },
+    // 设备关闭或打开
+    handleDeviceChange(item) {
+      console.log("设备变化：", item);
+    },
     // 获取日程数据
     getScheduleData() {
       if (!this.selectedAthletic) return;
@@ -1106,7 +1184,10 @@ export default {
                     animation: 150,
                     dataIdAttr: "data-id",
                     onAdd(e) {
-                      console.log("课表id:" + e.item.dataset.id);
+                      console.log(
+                        "课表id:" + e.item.dataset.id,
+                        e.item.dataset.type
+                      );
                       console.log("运动id:" + e.to.dataset.id);
                       if (!e.item.dataset.id || !e.to.dataset.id) {
                         return;
@@ -1129,19 +1210,19 @@ export default {
                       });
                       // 判断是否从课程模板中拖拽
                       if (e.item.dataset.type === "classTemplate") {
+                        currentClass = _this.findClassById(e.item.dataset.id);
                         // alert("该逻辑待补充，暂时先新建课表再合并");
-                        _this.classList.forEach((item) => {
-                          item.classesList.forEach((part) => {
-                            if (part.id === +e.item.dataset.id) {
-                              currentClass = part;
-                            }
-                          });
+                        _this.handleBind(currentClass, {
+                          ...currentActivity,
+                          dataDate: activityDate,
+                          type: "classTemplate",
+                        });
+                      } else {
+                        _this.handleBind(currentClass, {
+                          ...currentActivity,
+                          dataDate: activityDate,
                         });
                       }
-                      _this.handleBind(currentClass, {
-                        ...currentActivity,
-                        dataDate: activityDate,
-                      });
                     },
                   });
                 });
@@ -1460,6 +1541,7 @@ export default {
       );
       this.getScheduleData();
       this.getAthleticThreshold(val);
+      this.getAuthorizedDeviceList();
     },
     getAthleticList() {
       this.athleticList = this.teamList.find(
@@ -1472,6 +1554,7 @@ export default {
         // 选中运动员后调用getClassList方法
         this.getClassList();
         this.getAthleticThreshold(this.selectedAthletic);
+        this.getAuthorizedDeviceList();
       }
     },
     onWeekChange(payload) {
@@ -1673,10 +1756,11 @@ export default {
       this.getClassList();
     },
     // 显示绑定弹框
-    showBindModalDialog(exerciseData, courseData) {
+    showBindModalDialog(exerciseData, courseData, type) {
       this.bindExerciseData = exerciseData;
       this.bindCourseData = courseData;
       this.showBindModal = true;
+      this.bindType = type || "";
     },
     // 绑定确认
     onBind(data) {
@@ -1709,7 +1793,7 @@ export default {
       this.getScheduleData();
     },
     // 处理绑定按钮点击
-    handleBind(classItem, activityItem) {
+    handleBind(classItem, activityItem, type) {
       // 模拟运动数据
       const exerciseData = {
         name: activityItem.activityName,
@@ -1717,7 +1801,9 @@ export default {
         sth: activityItem.sthValue,
         id: activityItem.activityId,
         dataDate: activityItem.dataDate,
+        distance: activityItem.distance,
       };
+      console.log("courseData：", courseData);
 
       // 模拟课程数据 - 这里可以从课程列表中选择
       const courseData = {
@@ -1727,8 +1813,10 @@ export default {
         id: classItem.id,
         classesJson: classItem.classesJson,
       };
+      console.log("exerciseData：", exerciseData, activityItem);
+      console.log("courseData：", courseData);
 
-      this.showBindModalDialog(exerciseData, courseData);
+      this.showBindModalDialog(exerciseData, courseData, type);
     },
     // 进入课表详情
     handleClassSchedulaDetail(id, sportType) {
@@ -1869,10 +1957,12 @@ export default {
     .schedule-table-header-cell-data {
       background-color: #fff;
       flex: 0 0 220px;
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 34px;
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
     }
   }
   .schedule-table-body {
@@ -2187,6 +2277,29 @@ export default {
       width: 100%;
       background-color: white;
       padding: 5px 3px;
+      .sport-type-icon {
+        display: flex;
+        align-content: center;
+        .sport-type-name {
+          width: 15px;
+          height: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          margin-left: 5px;
+          font-weight: 700;
+        }
+        .sport-type-color1 {
+          background-color: #7fb135;
+        }
+        .sport-type-color2 {
+          background-color: #c72a29;
+        }
+        .sport-type-color0 {
+          background-color: #aaaaaa;
+        }
+      }
     }
     .stage-details {
       font-size: 12px;
