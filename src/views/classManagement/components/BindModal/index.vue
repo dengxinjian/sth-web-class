@@ -25,6 +25,7 @@
               <div class="card-title">{{ exerciseData.name }}</div>
               <div class="card-duration">{{ exerciseData.duration }}</div>
               <div class="card-sth">{{ exerciseData.sth }} STH</div>
+              <div class="card-distance">{{ exerciseData.distance }} KM</div>
             </div>
           </div>
 
