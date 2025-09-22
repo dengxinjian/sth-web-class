@@ -6,6 +6,7 @@
       :visible="visible"
       :value="value"
       :data="data"
+      :athleticThreshold="athleticThreshold"
       v-on="$listeners"
     />
   </div>
@@ -56,6 +57,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    athleticThreshold: {
+      type: Object,
+      default: () => ({})
+    }
   },
   computed: {
     // 根据type计算当前应该使用的组件
