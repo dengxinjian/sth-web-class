@@ -65,7 +65,7 @@
                 <el-form-item label="当前分组">
                     <el-input :value="currentGroup.groupName" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="目标分组" prop="targetGroupId">
+                <el-form-item label="目标分组" prop="targetGroupId" required>
                     <el-select v-model="targetGroupId" placeholder="请选择目标分组" style="width: 100%">
                         <el-option
                             v-for="group in availableGroups"

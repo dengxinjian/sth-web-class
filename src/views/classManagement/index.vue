@@ -1129,13 +1129,19 @@ export default {
                       });
                       // 判断是否从课程模板中拖拽
                       if (e.item.dataset.type === "classTemplate") {
-                        alert("该逻辑待补充，暂时先新建课表再合并");
-                      } else {
-                        _this.handleBind(currentClass, {
-                          ...currentActivity,
-                          dataDate: activityDate,
+                        // alert("该逻辑待补充，暂时先新建课表再合并");
+                        _this.classList.forEach((item) => {
+                          item.classesList.forEach((part) => {
+                            if (part.id === +e.item.dataset.id) {
+                              currentClass = part;
+                            }
+                          });
                         });
                       }
+                      _this.handleBind(currentClass, {
+                        ...currentActivity,
+                        dataDate: activityDate,
+                      });
                     },
                   });
                 });

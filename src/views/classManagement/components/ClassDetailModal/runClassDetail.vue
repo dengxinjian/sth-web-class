@@ -90,7 +90,7 @@
         v-for="(item, index) in timeline"
         :key="index"
         class="time-stage"
-        :style="{ flex: item.duration }"
+        :style="{ flex: item.duration, minWidth: 0 }"
       >
         <span class="time-stage-close" @click="handleDeleteStage(index)"
           ><i class="el-icon-close"></i
@@ -1402,6 +1402,7 @@ export default {
       line-height: 18px;
       text-align: center;
       margin-bottom: 5px;
+      white-space: nowrap;
     }
     .time-stage-for {
       display: flex;

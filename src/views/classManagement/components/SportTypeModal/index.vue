@@ -25,9 +25,9 @@
       </div>
     </div>
 
-    <span slot="footer" class="dialog-footer">
+    <!-- <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-    </span>
+    </span> -->
   </el-dialog>
 </template>
 
@@ -78,7 +78,7 @@ export default {
   padding: 16px 24px;
 }
 .sport-type-modal ::v-deep(.el-dialog__body){
-  padding: 10px 24px 0 24px;
+  padding: 10px 24px 30px 24px;
 }
 .type-grid{
   display: flex;

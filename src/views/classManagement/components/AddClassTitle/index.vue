@@ -39,7 +39,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm">确定</el-button>
+      <el-button type="primary" @click="onConfirm">下一步</el-button>
     </span>
   </el-dialog>
 </template>

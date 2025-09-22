@@ -82,7 +82,7 @@
     </div>
 
     <div class="time-line" id="timeLineDrag">
-        <div v-for="(item, index) in timeline" :key="index" class="time-stage" :style="{flex: item.duration}">
+        <div v-for="(item, index) in timeline" :key="index" class="time-stage" :style="{flex: item.duration, minWidth: 0}">
             <span class="time-stage-close" @click="handleDeleteStage(index)"><i class="el-icon-close"></i></span>
             <div class="time-stage-title">{{ item.stageTimeline.length > 1 ? '跑步' : item.stageTimeline[0].title }}</div>
             <div class="time-stage-for">
@@ -922,6 +922,7 @@ export default {
             line-height: 18px;
             text-align: center;
             margin-bottom: 5px;
+            white-space: nowrap;
         }
         .time-stage-for {
             display: flex;

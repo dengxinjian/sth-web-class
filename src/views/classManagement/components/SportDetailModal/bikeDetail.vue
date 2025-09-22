@@ -91,7 +91,7 @@
         v-for="(item, index) in timeline"
         :key="index"
         class="time-stage"
-        :style="{ flex: item.duration }"
+        :style="{ flex: item.duration, minWidth: 0 }"
       >
         <div class="time-stage-title">
           {{
@@ -1096,6 +1096,7 @@ export default {
       line-height: 18px;
       text-align: center;
       margin-bottom: 5px;
+      white-space: nowrap;
     }
     .time-stage-for {
       display: flex;
