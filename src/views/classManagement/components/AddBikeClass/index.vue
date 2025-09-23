@@ -242,7 +242,7 @@
             :key="index"
             class="stage-section"
           >
-            <div class="stage-header">
+            <div v-if="item.sections.length > 1" class="stage-header">
               <span class="stage-title">重复次数</span>
               <el-input
                 v-model="item.times"
