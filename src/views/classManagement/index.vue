@@ -4,7 +4,7 @@
       <WeekRangePicker @week-change="onWeekChange" />
       <div class="schedule-search">
         <div>
-          <span>团队选择：</span>
+          <span>团队：</span>
           <el-select
             v-model="selectedTeam"
             size="mini"
@@ -20,7 +20,7 @@
           </el-select>
         </div>
         <div>
-          <span>人员选择：</span>
+          <span>运动员：</span>
           <el-select
             v-model="selectedAthletic"
             size="mini"
@@ -40,7 +40,7 @@
           size="mini"
           :disabled="!athleticInfoData.triUserId"
           @click="showAthleticInfoDialog = true"
-          >人员信息查看</el-button
+          >运动员信息查看</el-button
         >
         <el-button
           type="text"
