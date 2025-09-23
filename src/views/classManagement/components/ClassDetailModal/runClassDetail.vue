@@ -5,6 +5,7 @@
     :before-close="handleClose"
     append-to-body
     class="add-swim-class-dialog"
+     :close-on-click-modal="false"
   >
     <span slot="title">编辑跑步课表</span>
     <div class="basic-info">

@@ -4,6 +4,7 @@
     width="800px"
     :before-close="handleClose"
     append-to-body
+    :close-on-click-modal="false"
     class="month-statistic-dialog"
   >
     <span slot="title">月度统计</span>

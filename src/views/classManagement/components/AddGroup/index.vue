@@ -5,6 +5,7 @@
     append-to-body
     :before-close="onCancel"
     class="add-group-modal"
+     :close-on-click-modal="false"
   >
     <span slot="title">{{ form.id ? '编辑分组' : '新建分组' }}</span>
 

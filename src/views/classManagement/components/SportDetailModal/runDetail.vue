@@ -6,6 +6,7 @@
     append-to-body
     class="add-swim-class-dialog"
     @open="handleOpen"
+     :close-on-click-modal="false"
   >
     <span slot="title">跑步</span>
     <div class="basic-info">

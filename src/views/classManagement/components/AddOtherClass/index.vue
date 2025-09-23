@@ -5,6 +5,7 @@
     :before-close="handleClose"
     append-to-body
     class="add-swim-class-dialog"
+     :close-on-click-modal="false"
   >
     <span slot="title">新建其他课程</span>
 
