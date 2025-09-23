@@ -89,7 +89,7 @@
               <el-collapse-item v-for="item in classList" :key="item.groupId">
                 <template slot="title">
                   <div class="schedule-class-title">
-                    <span>{{ item.groupName }}</span>
+                    <div class="group-name">{{ item.groupName }}</div>
                     <el-popover
                       popper-class="athletic-btn-popover"
                       placement="right"
@@ -2180,8 +2180,16 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: 200px;
     padding: 0 10px;
+     .group-name {
+      // 文本超出 以...
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 80%;
+     }
+
   }
 }
 .schedule-class {
