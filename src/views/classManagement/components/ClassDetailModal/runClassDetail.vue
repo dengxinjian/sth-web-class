@@ -5,7 +5,7 @@
     :before-close="handleClose"
     append-to-body
     class="add-swim-class-dialog"
-     :close-on-click-modal="false"
+    :close-on-click-modal="false"
   >
     <span slot="title">编辑跑步课表</span>
     <div class="basic-info">
@@ -89,7 +89,7 @@
     <div class="time-line" id="timeLineDrag">
       <div
         v-for="(item, index) in timeline"
-        :key="index"
+        :key="`timeline-${index}-${item.duration}-${item.times}`"
         class="time-stage"
         :style="{ flex: item.duration, minWidth: 0 }"
       >
@@ -102,7 +102,7 @@
           }}
         </div>
         <div class="time-stage-for">
-          <div v-for="n in item.times" :key="n" class="time-stage-item">
+          <div v-for="n in item.times" :key="`stage-${index}-${n}-${item.duration}`" class="time-stage-item">
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
@@ -469,7 +469,13 @@
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit">%阈值心率</span>
-                  <span class="label">{{ calculateThresholdHeartRateRangeNum(part.thresholdHeartRateRange).join(" ~ ") }}bpm</span>
+                  <span class="label"
+                    >{{
+                      calculateThresholdHeartRateRangeNum(
+                        part.thresholdHeartRateRange
+                      ).join(" ~ ")
+                    }}bpm</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 2 && part.range === 'target'"
@@ -487,7 +493,11 @@
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit">%阈值心率</span>
-                  <span class="label">{{ calculateThresholdHeartRateNum(part.thresholdHeartRate) }}bpm</span>
+                  <span class="label"
+                    >{{
+                      calculateThresholdHeartRateNum(part.thresholdHeartRate)
+                    }}bpm</span
+                  >
                 </div>
                 <div
                   v-if="classInfo.mode === 3 && part.range === 'range'"
@@ -782,12 +792,18 @@ export default {
     },
     calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
       return [
-        Math.round(this.athleticThreshold.heartRate * (thresholdHeartRateRange[0] / 100)),
-        Math.round(this.athleticThreshold.heartRate * (thresholdHeartRateRange[1] / 100)),
+        Math.round(
+          this.athleticThreshold.heartRate * (thresholdHeartRateRange[0] / 100)
+        ),
+        Math.round(
+          this.athleticThreshold.heartRate * (thresholdHeartRateRange[1] / 100)
+        ),
       ];
     },
     calculateThresholdHeartRateNum(thresholdHeartRate) {
-      return Math.round(this.athleticThreshold.heartRate * (thresholdHeartRate / 100));
+      return Math.round(
+        this.athleticThreshold.heartRate * (thresholdHeartRate / 100)
+      );
     },
     updateClassInfoCalculatedValues() {
       // 更新所有阶段的阈值功率计算值
@@ -799,13 +815,19 @@ export default {
             );
           }
           if (section.thresholdSpeedRange !== undefined) {
-            section.thresholdSpeedRangeNum = this.calculateThresholdSpeedRangeNum(section.thresholdSpeedRange);
+            section.thresholdSpeedRangeNum =
+              this.calculateThresholdSpeedRangeNum(section.thresholdSpeedRange);
           }
           if (section.thresholdHeartRate !== undefined) {
-            section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(section.thresholdHeartRate);
+            section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(
+              section.thresholdHeartRate
+            );
           }
           if (section.thresholdHeartRateRange !== undefined) {
-            section.thresholdHeartRateRangeNum = this.calculateThresholdHeartRateRangeNum(section.thresholdHeartRateRange);
+            section.thresholdHeartRateRangeNum =
+              this.calculateThresholdHeartRateRangeNum(
+                section.thresholdHeartRateRange
+              );
           }
         });
       });

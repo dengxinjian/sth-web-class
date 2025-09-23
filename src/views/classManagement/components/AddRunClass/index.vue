@@ -83,11 +83,11 @@
     </div>
 
     <div class="time-line" id="timeLineDrag">
-        <div v-for="(item, index) in timeline" :key="index" class="time-stage" :style="{flex: item.duration, minWidth: 0}">
+        <div v-for="(item, index) in timeline" :key="`timeline-${index}-${item.duration}-${item.times}`" class="time-stage" :style="{flex: item.duration, minWidth: 0}">
             <span class="time-stage-close" @click="handleDeleteStage(index)"><i class="el-icon-close"></i></span>
             <div class="time-stage-title">{{ item.stageTimeline.length > 1 ? '跑步' : item.stageTimeline[0].title }}</div>
             <div class="time-stage-for">
-                <div v-for="n in item.times" :key="n" class="time-stage-item">
+                <div v-for="n in item.times" :key="`stage-${index}-${n}-${item.duration}`" class="time-stage-item">
                     <ExerciseProcessChart :exerciseList="item.stageTimeline" :maxIntensity="maxIntensity" :height="30" />
                 </div>
             </div>

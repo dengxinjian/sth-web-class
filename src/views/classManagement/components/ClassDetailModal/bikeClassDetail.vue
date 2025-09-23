@@ -85,7 +85,7 @@
     <div class="time-line" id="timeLineDrag">
       <div
         v-for="(item, index) in timeline"
-        :key="index"
+        :key="`timeline-${index}-${item.duration}-${item.times}`"
         class="time-stage"
         :style="{ flex: item.duration, minWidth: 0 }"
       >
@@ -98,7 +98,7 @@
           }}
         </div>
         <div class="time-stage-for">
-          <div v-for="n in item.times" :key="n" class="time-stage-item">
+          <div v-for="n in item.times" :key="`stage-${index}-${n}-${item.duration}`" class="time-stage-item">
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
