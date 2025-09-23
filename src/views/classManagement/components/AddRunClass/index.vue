@@ -7,7 +7,7 @@
         class="add-swim-class-dialog"
          :close-on-click-modal="false"
     >
-    <span slot="title">新建跑步课程</span>
+    <span slot="title">{{ type === 'add' ? '新建跑步课程' : '编辑跑步课程' }}</span>
     <div class="basic-info">
         <div class="basic-info-item">
             <div class="basic-info-title">
@@ -336,6 +336,10 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    type: {
+      type: String,
+      default: 'add'
     }
   },
   data() {

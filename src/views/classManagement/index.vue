@@ -777,36 +777,43 @@
       v-model="showAddSwimClass"
       :data="classModalData"
       @save="onSaveAddSwimClass"
+      :type="classModalDataType"
     />
     <AddRunClass
       v-model="showAddRunClass"
       :data="classModalData"
       @save="onSaveAddRunClass"
+      :type="classModalDataType"
     />
     <AddBikeClass
       v-model="showAddBikeClass"
       :data="classModalData"
       @save="onSaveAddBikeClass"
+      :type="classModalDataType"
     />
     <AddPowerClass
       v-model="showAddPowerClass"
       :data="classModalData"
       @save="onSaveAddPowerClass"
+      :type="classModalDataType"
     />
     <AddNoteClass
       v-model="showAddNoteClass"
       :data="classModalData"
       @save="onSaveAddNoteClass"
+      :type="classModalDataType"
     />
     <AddOtherClass
       v-model="showAddOtherClass"
       :data="classModalData"
       @save="onSaveAddOtherClass"
+      :type="classModalDataType"
     />
     <AddRestClass
       v-model="showAddRestClass"
       :data="classModalData"
       @save="onSaveAddRestClass"
+      :type="classModalDataType"
     />
     <AddClassTitle
       v-model="showAddClassTitle"
@@ -1606,6 +1613,7 @@ export default {
       this.showSportTypeModal = true;
     },
     onSelectSportType(item) {
+      this.classModalDataType = 'add';
       switch (item.key) {
         case "swim":
           this.showAddSwimClass = true;
@@ -1662,6 +1670,7 @@ export default {
     handleClassDetail(id, sportType) {
       console.log(sportType);
       this.classModalData.id = id;
+      this.classModalDataType = 'edit';
       switch (sportType) {
         case "SWIM":
           this.showAddSwimClass = true;
