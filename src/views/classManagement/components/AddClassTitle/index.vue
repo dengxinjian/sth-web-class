@@ -5,6 +5,7 @@
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
+     :close-on-click-modal="false"
   >
     <span slot="title">新建课程</span>
 

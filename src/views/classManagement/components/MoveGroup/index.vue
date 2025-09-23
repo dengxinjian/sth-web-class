@@ -5,6 +5,7 @@
     append-to-body
     :before-close="onCancel"
     class="move-group-modal"
+     :close-on-click-modal="false"
   >
     <span slot="title">移动分组</span>
 

@@ -6,6 +6,7 @@
       append-to-body
       class="add-swim-class-dialog"
       @cancel="handleClose"
+       :close-on-click-modal="false"
     >
       <span slot="title">其他运动</span>
 

@@ -4,6 +4,7 @@
     :visible.sync="visible"
     width="600px"
     :before-close="handleClose"
+     :close-on-click-modal="false"
     center
   >
     <div class="bind-modal-content">

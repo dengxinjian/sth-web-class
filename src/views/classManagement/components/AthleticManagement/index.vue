@@ -251,6 +251,24 @@ export default {
     // 获取邀请码
     getInvitationCode() {
       // TODO: 替换为实际的API地址
+      getData({
+        url: '/api/team/invite/current/3', // 请替换为实际API
+        userType: 3
+      }).then(res => {
+        if (res.success) {
+          this.invitationCode = res.result.inviteCode
+        } else {
+          this.$message.error(res.message || '获取邀请码失败')
+          this.createInvitationCode()
+        }
+      }).catch(error => {
+        console.error('获取邀请码失败:', error)
+        this.createInvitationCode()
+        this.$message.error('获取邀请码失败')
+      })
+    },
+    // 创建邀请码
+    createInvitationCode() {
       submitData({
         url: '/api/team/invite/generate', // 请替换为实际API
         userType: 3
@@ -258,11 +276,11 @@ export default {
         if (res.success) {
           this.invitationCode = res.result.inviteCode
         } else {
-          this.$message.error(res.message || '获取邀请码失败')
+          this.$message.error(res.message || '创建邀请码失败')
         }
       }).catch(error => {
-        console.error('获取邀请码失败:', error)
-        this.$message.error('获取邀请码失败')
+        console.error('创建邀请码失败:', error)
+        this.$message.error('创建邀请码失败')
       })
     },
 
@@ -317,7 +335,7 @@ export default {
 
     // 重新生成邀请码
     regenerateInvitationCode() {
-      this.getInvitationCode()
+      this.createInvitationCode()
     },
 
     // 新建分组

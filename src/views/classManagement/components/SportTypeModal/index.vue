@@ -5,6 +5,7 @@
     append-to-body
     :before-close="onCancel"
     class="sport-type-modal"
+     :close-on-click-modal="false"
   >
     <span slot="title">类型选择</span>
 

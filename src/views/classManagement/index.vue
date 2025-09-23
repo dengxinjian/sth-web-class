@@ -4,7 +4,7 @@
       <WeekRangePicker @week-change="onWeekChange" />
       <div class="schedule-search">
         <div>
-          <span>团队选择：</span>
+          <span>团队：</span>
           <el-select
             v-model="selectedTeam"
             size="mini"
@@ -20,7 +20,7 @@
           </el-select>
         </div>
         <div>
-          <span>人员选择：</span>
+          <span>运动员：</span>
           <el-select
             v-model="selectedAthletic"
             size="mini"
@@ -40,7 +40,7 @@
           size="mini"
           :disabled="!athleticInfoData.triUserId"
           @click="showAthleticInfoDialog = true"
-          >人员信息查看</el-button
+          >运动员信息查看</el-button
         >
         <el-button
           type="text"
@@ -89,7 +89,7 @@
               <el-collapse-item v-for="item in classList" :key="item.groupId">
                 <template slot="title">
                   <div class="schedule-class-title">
-                    <span>{{ item.groupName }}</span>
+                    <div class="group-name">{{ item.groupName }}</div>
                     <el-popover
                       popper-class="athletic-btn-popover"
                       placement="right"
@@ -786,36 +786,43 @@
       v-model="showAddSwimClass"
       :data="classModalData"
       @save="onSaveAddSwimClass"
+      :type="classModalDataType"
     />
     <AddRunClass
       v-model="showAddRunClass"
       :data="classModalData"
       @save="onSaveAddRunClass"
+      :type="classModalDataType"
     />
     <AddBikeClass
       v-model="showAddBikeClass"
       :data="classModalData"
       @save="onSaveAddBikeClass"
+      :type="classModalDataType"
     />
     <AddPowerClass
       v-model="showAddPowerClass"
       :data="classModalData"
       @save="onSaveAddPowerClass"
+      :type="classModalDataType"
     />
     <AddNoteClass
       v-model="showAddNoteClass"
       :data="classModalData"
       @save="onSaveAddNoteClass"
+      :type="classModalDataType"
     />
     <AddOtherClass
       v-model="showAddOtherClass"
       :data="classModalData"
       @save="onSaveAddOtherClass"
+      :type="classModalDataType"
     />
     <AddRestClass
       v-model="showAddRestClass"
       :data="classModalData"
       @save="onSaveAddRestClass"
+      :type="classModalDataType"
     />
     <AddClassTitle
       v-model="showAddClassTitle"
@@ -876,68 +883,7 @@ import ClassDetailModal from "./components/ClassDetailModal";
 import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
 import { getData, submitData } from "@/api/common.js";
 import { MessageBox } from "element-ui";
-
-const statisticKeyToTitle = {
-  totalTime: {
-    title: "总时长",
-    color: "rgba(217, 206, 185, 1)",
-  },
-  totalDistanceKm: {
-    title: "总距离",
-    unit: "kcal",
-    color: "rgba(217, 206, 185, 1)",
-  },
-  totalCalories: {
-    title: "总消耗",
-    unit: "KM",
-    color: "rgba(217, 206, 185, 1)",
-  },
-  totalSTH: {
-    title: "总STH",
-    unit: "W",
-    color: "rgba(204, 35, 35, 1)",
-  },
-  runTime: {
-    title: "跑步时间",
-    icon: require("@/assets/addClass/icon-run.png"),
-    color: "rgba(255, 21, 82, 1)",
-  },
-  runDistanceKm: {
-    title: "跑步距离",
-    unit: "KM",
-    color: "rgba(255, 21, 82, 1)",
-  },
-  cycleTime: {
-    title: "骑车时间",
-    icon: require("@/assets/addClass/icon-bike.png"),
-    color: "rgba(134, 91, 214, 1)",
-  },
-  cycleDistanceKm: {
-    title: "骑车距离",
-    unit: "KM",
-    color: "rgba(134, 91, 214, 1)",
-  },
-  swimTime: {
-    title: "游泳时间",
-    icon: require("@/assets/addClass/icon-swim.png"),
-    color: "rgba(46, 166, 223, 1)",
-  },
-  swimDistanceKm: {
-    title: "游泳距离",
-    unit: "KM",
-    color: "rgba(46, 166, 223, 1)",
-  },
-  strengthTime: {
-    title: "力量",
-    icon: require("@/assets/addClass/icon-power.png"),
-    color: "rgba(163, 163, 163, 1)",
-  },
-  otherTime: {
-    title: "其他",
-    icon: require("@/assets/addClass/icon-other.png"),
-    color: "rgba(163, 163, 163, 1)",
-  },
-};
+import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
 
 export default {
   name: "ClassManagement",
@@ -1310,6 +1256,7 @@ export default {
           this.statisticData = res.result.statisticsVoList.map((item) => {
             return {
               ...item,
+              actualValue: unitConversion(item.actualValue, statisticKeyToTitle[item.key]?.unit),
               title: statisticKeyToTitle[item.key]?.title,
               color: statisticKeyToTitle[item.key]?.color,
               icon: statisticKeyToTitle[item.key]?.icon,
@@ -1676,6 +1623,7 @@ export default {
       this.showSportTypeModal = true;
     },
     onSelectSportType(item) {
+      this.classModalDataType = 'add';
       switch (item.key) {
         case "swim":
           this.showAddSwimClass = true;
@@ -1732,6 +1680,7 @@ export default {
     handleClassDetail(id, sportType) {
       console.log(sportType);
       this.classModalData.id = id;
+      this.classModalDataType = 'edit';
       switch (sportType) {
         case "SWIM":
           this.showAddSwimClass = true;
@@ -2256,8 +2205,16 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    width: 200px;
     padding: 0 10px;
+     .group-name {
+      // 文本超出 以...
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 80%;
+     }
+
   }
 }
 .schedule-class {

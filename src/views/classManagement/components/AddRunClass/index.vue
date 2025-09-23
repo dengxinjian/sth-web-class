@@ -5,8 +5,9 @@
         :before-close="handleClose"
         append-to-body
         class="add-swim-class-dialog"
+         :close-on-click-modal="false"
     >
-    <span slot="title">新建跑步课程</span>
+    <span slot="title">{{ type === 'add' ? '新建跑步课程' : '编辑跑步课程' }}</span>
     <div class="basic-info">
         <div class="basic-info-item">
             <div class="basic-info-title">
@@ -82,11 +83,11 @@
     </div>
 
     <div class="time-line" id="timeLineDrag">
-        <div v-for="(item, index) in timeline" :key="index" class="time-stage" :style="{flex: item.duration, minWidth: 0}">
+        <div v-for="(item, index) in timeline" :key="`timeline-${index}-${item.duration}-${item.times}`" class="time-stage" :style="{flex: item.duration, minWidth: 0}">
             <span class="time-stage-close" @click="handleDeleteStage(index)"><i class="el-icon-close"></i></span>
             <div class="time-stage-title">{{ item.stageTimeline.length > 1 ? '跑步' : item.stageTimeline[0].title }}</div>
             <div class="time-stage-for">
-                <div v-for="n in item.times" :key="n" class="time-stage-item">
+                <div v-for="n in item.times" :key="`stage-${index}-${n}-${item.duration}`" class="time-stage-item">
                     <ExerciseProcessChart :exerciseList="item.stageTimeline" :maxIntensity="maxIntensity" :height="30" />
                 </div>
             </div>
@@ -174,7 +175,7 @@
                  <div v-for="(item, index) in classInfo.stages" :key="index" class="stage-section">
                     <div v-if="item.sections.length > 1" class="stage-header">
                         <span class="stage-title">重复次数</span>
-                        <el-input-number :controls="false" :step="1" :step-strictly="true" v-model="item.times" size="small" @change="calculateTimeline" />
+                        <el-input v-model="item.times" class="times-input" size="small" @input="handleTimesChange(index)" @change="calculateTimeline" />
                     </div>
                      <div v-for="(part, idx) in item.sections" :key="idx + '' + index" class="stage-config">
                         <div class="config-row">
@@ -315,6 +316,7 @@ import Sortable from 'sortablejs'
 import ExerciseProcessChart from '@/components/ExerciseProcessChart'
 import {getData, submitData} from '@/api/common.js'
 import TimeInput from '@/views/classManagement/components/timeInpt'
+import { debounce } from '@/views/classManagement/uilt'
 
 export default {
   name: 'AddRunClassDialog',
@@ -335,6 +337,10 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    type: {
+      type: String,
+      default: 'add'
     }
   },
   data() {
@@ -413,7 +419,24 @@ export default {
       }
     }
   },
+  created() {
+    this.handleTimesChange = debounce(this.handleTimesChange, 500);
+  },
   methods: {
+    handleTimesChange(stageIndex) {
+      const stage = this.classInfo.stages[stageIndex];
+      console.log(stage, "stage", stageIndex);
+      const times = Number(stage.times);
+      if (isNaN(times) || times < 1) {
+        this.$set(this.classInfo.stages[stageIndex], "times", 1);
+      } else if (!Number.isInteger(times)) {
+        this.$set(
+          this.classInfo.stages[stageIndex],
+          "times",
+          Math.max(1, Math.round(times))
+        );
+      }
+    },
     // 获取标签列表
     getTagList() {
       getData({
@@ -1098,6 +1121,9 @@ export default {
                  border: 1px solid #e4e7ed;
                  padding: 5px;
                  margin-bottom: 10px;
+                 .times-input {
+                  width: 130px;
+                 }
 
                  &.template {
                      border-style: dashed;

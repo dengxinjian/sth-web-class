@@ -4,6 +4,7 @@
     width="800px"
     :before-close="handleClose"
     append-to-body
+    :close-on-click-modal="false"
     class="month-statistic-dialog"
   >
     <span slot="title">月度统计</span>
@@ -15,8 +16,8 @@
         <div class="month-data-text">
           <span>{{ item.title }}:</span>
           <div>
-            <span>{{ item.actualValue }}/</span>
-            <span>{{ item.planValue }}</span>
+            <span>{{ item.actualValue }} {{ item.unit }}</span>
+            <span style="padding-left: 5px;">{{ item.planValue || 0 }} {{ item.unit }}</span>
           </div>
         </div>
         <el-progress :percentage="item.percent || 0" :color="item.color" :show-text="false"></el-progress>
@@ -31,57 +32,7 @@
 
 <script>
 import { getData } from '@/api/common.js'
-
-const statisticKeyToTitle = {
-  totalTime: {
-    title: '总时长',
-    color: 'rgba(217, 206, 185, 1)'
-  },
-  totalDistanceKm: {
-    title: '总距离',
-    color: 'rgba(217, 206, 185, 1)'
-  },
-  totalCalories: {
-    title: '总消耗',
-    color: 'rgba(217, 206, 185, 1)'
-  },
-  totalSTH: {
-    title: '总STH',
-    color: 'rgba(204, 35, 35, 1)'
-  },
-  runTime: {
-    title: '跑步时间',
-    color: 'rgba(255, 21, 82, 1)'
-  },
-  runDistanceKm: {
-    title: '跑步距离',
-    color: 'rgba(255, 21, 82, 1)'
-  },
-  cycleTime: {
-    title: '骑车时间',
-    color: 'rgba(134, 91, 214, 1)'
-  },
-  cycleDistanceKm: {
-    title: '骑车距离',
-    color: 'rgba(134, 91, 214, 1)'
-  },
-  swimTime: {
-    title: '游泳时间',
-    color: 'rgba(46, 166, 223, 1)'
-  },
-  swimDistanceKm: {
-    title: '游泳距离',
-    color: 'rgba(46, 166, 223, 1)'
-  },
-  strengthTime: {
-    title: '力量',
-    color: 'rgba(163, 163, 163, 1)'
-  },
-  otherTime: {
-    title: '其他',
-    color: 'rgba(163, 163, 163, 1)'
-  }
-}
+import { statisticKeyToTitle, unitConversion } from "../../statisticKeyToTitle";
 
 export default {
   name: 'MonthStatisticDialog',
@@ -165,8 +116,11 @@ export default {
           this.statisticData = res.result.statisticsVoList.map(item => {
             return {
               ...item,
+              actualValue: unitConversion(item.actualValue, statisticKeyToTitle[item.key]?.unit),
               title: statisticKeyToTitle[item.key]?.title,
-              color: statisticKeyToTitle[item.key]?.color
+              color: statisticKeyToTitle[item.key]?.color,
+              icon: statisticKeyToTitle[item.key]?.icon,
+              unit: statisticKeyToTitle[item.key]?.unit,
             }
           })
           this.sthData = res.result.avgSthRespDto

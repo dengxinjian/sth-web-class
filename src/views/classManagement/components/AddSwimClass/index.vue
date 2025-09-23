@@ -5,8 +5,9 @@
     :before-close="handleClose"
     append-to-body
     class="add-swim-class-dialog"
+     :close-on-click-modal="false"
   >
-    <span slot="title">新建游泳课程</span>
+    <span slot="title">{{ type === 'add' ? '新建游泳课程' : '编辑游泳课程' }}</span>
 
     <div class="form-section">
       <el-form :model="form" label-width="60px">
@@ -110,6 +111,10 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    type: {
+      type: String,
+      default: 'add'
     }
   },
   data() {

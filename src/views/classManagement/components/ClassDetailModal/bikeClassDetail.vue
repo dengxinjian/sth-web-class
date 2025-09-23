@@ -5,6 +5,7 @@
     :before-close="handleClose"
     append-to-body
     class="add-swim-class-dialog"
+    :close-on-click-modal="false"
   >
     <span slot="title">编辑骑行课表</span>
     <div class="basic-info">
@@ -84,7 +85,7 @@
     <div class="time-line" id="timeLineDrag">
       <div
         v-for="(item, index) in timeline"
-        :key="index"
+        :key="`timeline-${index}-${item.duration}-${item.times}`"
         class="time-stage"
         :style="{ flex: item.duration, minWidth: 0 }"
       >
@@ -97,7 +98,7 @@
           }}
         </div>
         <div class="time-stage-for">
-          <div v-for="n in item.times" :key="n" class="time-stage-item">
+          <div v-for="n in item.times" :key="`stage-${index}-${n}-${item.duration}`" class="time-stage-item">
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
@@ -157,7 +158,7 @@
                     >
                   </div>
                   <div v-if="classInfo.mode === 1 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.thresholdFtpNum }}bpm 阈值功率
+                    {{ part.target }} @ {{ part.thresholdFtpNum }}w 阈值功率
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
@@ -240,14 +241,13 @@
             :key="index"
             class="stage-section"
           >
-            <div class="stage-header">
+          <div v-if="item.sections.length > 1" class="stage-header">
               <span class="stage-title">重复次数</span>
-              <el-input-number
-                :controls="false"
-                :step="1"
-                :step-strictly="true"
+              <el-input
                 v-model="item.times"
+                class="times-input"
                 size="small"
+                @input="handleTimesChange(index)"
                 @change="calculateTimeline"
               />
             </div>
@@ -574,6 +574,7 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
+import { debounce } from "@/views/classManagement/uilt";
 
 export default {
   name: "AddBikeClassDialog",
@@ -677,7 +678,24 @@ export default {
       }
     },
   },
+  created() {
+    this.handleTimesChange = debounce(this.handleTimesChange, 500);
+  },
   methods: {
+    handleTimesChange(stageIndex) {
+      const stage = this.classInfo.stages[stageIndex];
+      console.log(stage, "stage",stageIndex);
+      const times = Number(stage.times);
+      if (isNaN(times) || times < 1) {
+        this.$set(this.classInfo.stages[stageIndex], "times", 1);
+      } else if (!Number.isInteger(times)) {
+        this.$set(
+          this.classInfo.stages[stageIndex],
+          "times",
+          Math.max(1, Math.round(times))
+        );
+      }
+    },
     calculateThresholdFtpNum(thresholdFtp) {
       return Math.round(this.athleticThreshold.cycle * (thresholdFtp / 100));
     },
@@ -1349,6 +1367,9 @@ export default {
         border: 1px solid #e4e7ed;
         padding: 5px;
         margin-bottom: 10px;
+        .times-input {
+          width: 130px;
+        }
 
         &.template {
           border-style: dashed;

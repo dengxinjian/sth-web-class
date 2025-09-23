@@ -5,6 +5,7 @@
     :before-close="handleClose"
     append-to-body
     class="athletic-info-dialog"
+     :close-on-click-modal="false"
   >
     <span slot="title">运动员信息</span>
     <el-tabs v-model="activeMainTab">
