@@ -157,7 +157,7 @@
                     >
                   </div>
                   <div v-if="classInfo.mode === 1 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.thresholdFtpNum }}bpm 阈值功率
+                    {{ part.target }} @ {{ part.thresholdFtpNum }}w 阈值功率
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
