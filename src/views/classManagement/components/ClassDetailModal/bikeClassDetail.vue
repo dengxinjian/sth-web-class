@@ -243,12 +243,11 @@
           >
             <div class="stage-header">
               <span class="stage-title">重复次数</span>
-              <el-input-number
-                :controls="false"
-                :step="1"
-                :step-strictly="true"
+              <el-input
                 v-model="item.times"
+                class="times-input"
                 size="small"
+                @input="handleTimesChange(index)"
                 @change="calculateTimeline"
               />
             </div>
@@ -575,6 +574,7 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
+import { debounce } from "@/views/classManagement/uilt";
 
 export default {
   name: "AddBikeClassDialog",
@@ -678,7 +678,24 @@ export default {
       }
     },
   },
+  created() {
+    this.handleTimesChange = debounce(this.handleTimesChange, 500);
+  },
   methods: {
+    handleTimesChange(stageIndex) {
+      const stage = this.classInfo.stages[stageIndex];
+      console.log(stage, "stage",stageIndex);
+      const times = Number(stage.times);
+      if (isNaN(times) || times < 1) {
+        this.$set(this.classInfo.stages[stageIndex], "times", 1);
+      } else if (!Number.isInteger(times)) {
+        this.$set(
+          this.classInfo.stages[stageIndex],
+          "times",
+          Math.max(1, Math.round(times))
+        );
+      }
+    },
     calculateThresholdFtpNum(thresholdFtp) {
       return Math.round(this.athleticThreshold.cycle * (thresholdFtp / 100));
     },
@@ -1350,6 +1367,9 @@ export default {
         border: 1px solid #e4e7ed;
         padding: 5px;
         margin-bottom: 10px;
+        .times-input {
+          width: 130px;
+        }
 
         &.template {
           border-style: dashed;
