@@ -5,17 +5,17 @@ export const statisticKeyToTitle = {
   },
   totalDistanceKm: {
     title: "总距离",
-    unit: "kcal",
+    unit: "KM",
     color: "rgba(217, 206, 185, 1)",
   },
   totalCalories: {
     title: "总消耗",
-    unit: "KM",
+    unit: "kcal",
     color: "rgba(217, 206, 185, 1)",
   },
   totalSTH: {
     title: "总STH",
-    unit: "W",
+    unit: "",
     color: "rgba(204, 35, 35, 1)",
   },
   runTime: {
@@ -58,4 +58,18 @@ export const statisticKeyToTitle = {
     icon: require("@/assets/addClass/icon-other.png"),
     color: "rgba(163, 163, 163, 1)",
   },
+};
+
+// 单位转换
+export const unitConversion = (value, unit) => {
+  console.log(value, "value");
+  console.log(unit, "unit");
+  if (unit === "kcal") {
+    return value / 1000;
+  } else if (unit === "KM") {
+    console.log((value / 1000).toFixed(2), "value");
+    return (value / 1000).toFixed(2);
+  } else {
+    return value;
+  }
 };

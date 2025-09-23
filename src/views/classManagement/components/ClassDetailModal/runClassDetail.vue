@@ -16,7 +16,7 @@
         </div>
         <div class="basic-info-total">
           <span>
-            <img src="~@/assets/addClass/icon-bike.png" width="30" alt="" />
+            <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{ classInfo.duration }}</span>
           <span>{{ classInfo.distance }}km</span>

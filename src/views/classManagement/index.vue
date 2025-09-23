@@ -874,7 +874,7 @@ import ClassDetailModal from "./components/ClassDetailModal";
 import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
 import { getData, submitData } from "@/api/common.js";
 import { MessageBox } from "element-ui";
-import { statisticKeyToTitle } from "./statisticKeyToTitle";
+import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
 
 export default {
   name: "ClassManagement",
@@ -1247,6 +1247,7 @@ export default {
           this.statisticData = res.result.statisticsVoList.map((item) => {
             return {
               ...item,
+              actualValue: unitConversion(item.actualValue, statisticKeyToTitle[item.key]?.unit),
               title: statisticKeyToTitle[item.key]?.title,
               color: statisticKeyToTitle[item.key]?.color,
               icon: statisticKeyToTitle[item.key]?.icon,
