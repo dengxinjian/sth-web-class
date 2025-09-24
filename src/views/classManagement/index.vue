@@ -1208,6 +1208,8 @@ export default {
                     });
                   } else {
                     _this.$message.error("该运动类型与课程类型不匹配");
+                    // 刷新
+                    _this.getScheduleData();
                   }
                 }
               },
