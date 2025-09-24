@@ -994,7 +994,7 @@ export default {
         4: "POWER",
         5: "OTHER",
       },
-      classModalDataType: '',
+      classModalDataType: "",
     };
   },
   mounted() {
@@ -1189,10 +1189,17 @@ export default {
                     _this.$message.error("该运动类型与课程类型不匹配");
                   }
                 } else {
-                  _this.handleBind(currentClass, {
-                    ...currentActivity,
-                    dataDate: activityDate,
-                  });
+                  if (
+                    currentClass.classesJson.sportType ===
+                    _this.currentActivityDict[currentActivity.sportType]
+                  ) {
+                    _this.handleBind(currentClass, {
+                      ...currentActivity,
+                      dataDate: activityDate,
+                    });
+                  } else {
+                    _this.$message.error("该运动类型与课程类型不匹配");
+                  }
                 }
               },
             });
@@ -1244,7 +1251,10 @@ export default {
           this.statisticData = res.result.statisticsVoList.map((item) => {
             return {
               ...item,
-              actualValue: unitConversion(item.actualValue, statisticKeyToTitle[item.key]?.unit),
+              actualValue: unitConversion(
+                item.actualValue,
+                statisticKeyToTitle[item.key]?.unit
+              ),
               title: statisticKeyToTitle[item.key]?.title,
               color: statisticKeyToTitle[item.key]?.color,
               icon: statisticKeyToTitle[item.key]?.icon,
@@ -1611,7 +1621,7 @@ export default {
       this.showSportTypeModal = true;
     },
     onSelectSportType(item) {
-      this.classModalDataType = 'add';
+      this.classModalDataType = "add";
       switch (item.key) {
         case "swim":
           this.showAddSwimClass = true;
@@ -1668,7 +1678,7 @@ export default {
     handleClassDetail(id, sportType) {
       console.log(sportType);
       this.classModalData.id = id;
-      this.classModalDataType = 'edit';
+      this.classModalDataType = "edit";
       switch (sportType) {
         case "SWIM":
           this.showAddSwimClass = true;
@@ -2189,14 +2199,13 @@ export default {
     align-items: center;
     width: 200px;
     padding: 0 10px;
-     .group-name {
+    .group-name {
       // 文本超出 以...
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       width: 80%;
-     }
-
+    }
   }
 }
 .schedule-class {
