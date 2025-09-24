@@ -262,7 +262,8 @@ export default {
     getThresholdData() {
       getData({
         url: '/api/classSchedule/getThresholdDetail',
-        type: this.activeSport
+        type: this.activeSport,
+        triUserId: this.data.triUserId
       }).then(res => {
         this.thresholdData = res.result[0]
         if (this.activeSport === 4 || this.activeSport === 3) {

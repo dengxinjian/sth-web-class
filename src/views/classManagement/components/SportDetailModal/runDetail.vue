@@ -45,7 +45,7 @@
             <div class="modal-block">
               <div class="modal-block-cooling"></div>
             </div>
-            <span>冷却</span>
+            <span>冷身</span>
           </div>
           <div class="modal-container">
             <div class="modal-block">
@@ -367,7 +367,7 @@
                     <el-option label="热身" value="warmup" />
                     <el-option label="跑步" value="bike" />
                     <el-option label="恢复" value="recover" />
-                    <el-option label="冷却" value="cooling" />
+                    <el-option label="冷身" value="cooling" />
                   </el-select>
                 </div>
                 <div class="config-item">

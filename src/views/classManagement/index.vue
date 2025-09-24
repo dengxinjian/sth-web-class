@@ -195,9 +195,9 @@
                           <img src="~@/assets/addClass/icon-other.png" alt="" />
                         </span>
                         <span v-if="['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(part.sportType)">{{ part.classesJson.duration }}</span>
-                        <span v-if="['RUN', 'CYCLE', 'SWIM'].includes(part.sportType)"
-                          >{{ part.classesJson.distance }}km</span
-                        >
+                        <span v-if="['RUN', 'CYCLE', 'SWIM'].includes(part.sportType) && part.classesJson.distance">
+                          {{ part.classesJson.distance }}<span v-if="part.sportType === 'SWIM'">{{ part.classesJson.distanceUnit }}</span><span v-else>km</span>
+                        </span>
                       </div>
                     </div>
                     <div
@@ -1142,6 +1142,7 @@ export default {
                     requestData: {
                       classScheduleId: e.item.dataset.id,
                       classesDate: e.to.dataset.date,
+                      triUserId: this.selectedAthletic,
                     },
                   })
                     .then((res) => {
@@ -1813,6 +1814,7 @@ export default {
           classScheduleId: data.courseData.id,
           bindingActivityId: data.exerciseData.id,
           classesDate: data.exerciseData.dataDate,
+          triUserId: this.selectedAthletic,
         },
       })
         .then((res) => {
