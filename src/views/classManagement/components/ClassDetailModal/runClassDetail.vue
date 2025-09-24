@@ -341,7 +341,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="handleTargetChange(index, idx);calculateTimeline"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围值" value="range" />
@@ -1169,7 +1169,7 @@ export default {
       if (range === "range") {
         speed =
           (this.translateSpeedToSeconds(targetSpeedRange[0]) +
-            this.translateSpeedToSeconds(targetSpeedRange[0])) /
+            this.translateSpeedToSeconds(targetSpeedRange[1])) /
           2;
       } else {
         speed = this.translateSpeedToSeconds(targetSpeed);
@@ -1245,6 +1245,7 @@ export default {
       let timeFlag = false; // 判断是否可以显示时间，当存在阶段 模式≠3 且 容量=距离 时，不显示时间
       let distanceFlag = false; // 判断是否可以显示距离，当存在阶段 模式≠3 且 容量=时间 时，不显示距离
       this.maxIntensity = 0;
+      console.log(this.classInfo, "this.classInfo.stages");
       this.timeline = this.classInfo.stages.map((stage) => {
         let totalTime = 0;
         let totalDistance = 0;
