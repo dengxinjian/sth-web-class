@@ -19,7 +19,7 @@
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{ classInfo.duration }}</span>
-          <span>{{ classInfo.distance }}</span>
+          <span v-if="classInfo.mode == 1 || classInfo.mode == 3">{{ classInfo.distance }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -110,6 +110,7 @@
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
+              :duration="item.duration"
               :height="30"
             />
           </div>
@@ -699,6 +700,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    triUserId: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -875,6 +880,7 @@ export default {
         if (res.success) {
           this.classInfo = JSON.parse(res.result.classesJson);
           this.timeline = JSON.parse(res.result.classesJson).timeline;
+          console.log(this.timeline, "this.timeline");
           this.classInfo.id = res.result.id;
           this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
           console.log(this.classInfo, "this.classInfo");
@@ -947,7 +953,7 @@ export default {
     // 获取sth值
     getSth() {
       submitData({
-        url: "/api/classes/calculateTimeDistanceSth",
+        url: "/api/classSchedule/calculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
@@ -957,9 +963,12 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
+        triUserId: this.triUserId
       }).then((res) => {
         if (res.success) {
           this.classInfo.sth = res.result?.sth || "";
+          this.classInfo.distance = res.result?.distance || "";
+          this.classInfo.duration = this.translateTime(res.result?.time || "");
         }
       });
     },
@@ -1234,48 +1243,47 @@ export default {
       this.updateClassInfoCalculatedValues(); // 更新计算值
       this.getSth();
       let duration = 0;
-      let distance = 0;
+      const distance = 0;
       let timeFlag = false; // 判断是否可以显示时间，当存在阶段 模式≠3 且 容量=距离 时，不显示时间
       let distanceFlag = false; // 判断是否可以显示距离，当存在阶段 模式≠3 且 容量=时间 时，不显示距离
       this.maxIntensity = 0;
       this.timeline = this.classInfo.stages.map((stage) => {
-        let totalTime = 0;
-        let totalDistance = 0;
-        stage.sections.forEach((section) => {
-          totalTime += section.targetSeconds;
-          // 下面的逻辑用来计算总距离，mode=3 capacity=time的情况下需要把距离计算出来，其他情况直接相加，用其他逻辑判断距离是否显示
-          if (
-            this.classInfo.mode === 3 &&
-            section.capacity === "time" &&
-            section.range === "target"
-          ) {
-            totalDistance += this.translateSpeedToDistance(
-              this.translateSpeedToSeconds(section.targetSpeed),
-              section.target
-            );
-          } else if (
-            this.classInfo.mode === 3 &&
-            section.capacity === "time" &&
-            section.range === "range"
-          ) {
-            const speed =
-              (this.translateSpeedToSeconds(section.targetSpeedRange[0]) +
-                this.translateSpeedToSeconds(section.targetSpeedRange[1])) /
-              2;
-            totalDistance += this.translateSpeedToDistance(
-              speed,
-              section.target
-            );
-          } else {
-            if (section.targetUnit === "km") {
-              totalDistance += section.targetDistance * 1000;
-            } else {
-              totalDistance += section.targetDistance;
-            }
-          }
-        });
-
+        // stage.sections.forEach((section) => {
+        //   totalTime += section.targetSeconds;
+        //   // 下面的逻辑用来计算总距离，mode=3 capacity=time的情况下需要把距离计算出来，其他情况直接相加，用其他逻辑判断距离是否显示
+        //   if (
+        //     this.classInfo.mode === 3 &&
+        //     section.capacity === "time" &&
+        //     section.range === "target"
+        //   ) {
+        //     totalDistance += this.translateSpeedToDistance(
+        //       this.translateSpeedToSeconds(section.targetSpeed),
+        //       section.target
+        //     );
+        //   } else if (
+        //     this.classInfo.mode === 3 &&
+        //     section.capacity === "time" &&
+        //     section.range === "range"
+        //   ) {
+        //     const speed =
+        //       (this.translateSpeedToSeconds(section.targetSpeedRange[0]) +
+        //         this.translateSpeedToSeconds(section.targetSpeedRange[1])) /
+        //       2;
+        //     totalDistance += this.translateSpeedToDistance(
+        //       speed,
+        //       section.target
+        //     );
+        //   } else {
+        //     if (section.targetUnit === "km") {
+        //       totalDistance += section.targetDistance * 1000;
+        //     } else {
+        //       totalDistance += section.targetDistance;
+        //     }
+        //   }
+        // });
+        duration = 0;
         const stageTimeline = stage.sections.map((section) => {
+          duration += section.targetSeconds;
           const intensity = this.calculateIndent(section, this.classInfo.mode);
           if (this.maxIntensity < intensity) {
             this.maxIntensity = intensity;
@@ -1293,20 +1301,13 @@ export default {
           };
         });
 
-        duration += totalTime * stage.times;
-        distance += totalDistance * stage.times;
         return {
-          duration: totalTime * stage.times,
+          duration: duration * stage.times,
           stageTimeline,
           times: stage.times,
+          distance: stage.distance,
         };
       });
-      this.classInfo.duration = timeFlag
-        ? "--:--:--"
-        : this.translateTime(duration);
-      this.classInfo.distance = distanceFlag
-        ? "-"
-        : Math.round(distance / 100) / 10;
       this.handleClassDrag();
     },
     // 段落图形拖拽

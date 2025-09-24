@@ -7,6 +7,7 @@
       :value="value"
       :data="data"
       :athleticThreshold="athleticThreshold"
+      :triUserId="triUserId"
       v-on="$listeners"
     />
   </div>
@@ -60,7 +61,11 @@ export default {
     athleticThreshold: {
       type: Object,
       default: () => ({})
-    }
+    },
+    triUserId: {
+      type: String,
+      default: "",
+    },
   },
   computed: {
     // 根据type计算当前应该使用的组件
