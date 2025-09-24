@@ -258,6 +258,7 @@
               <div class="schedule-table-cell-title">
                 {{ item?.commonDate }}
               </div>
+              <!-- {{ item.classSchedule }} -->
               <div
                 class="schedule-table-cell-item js-schedule-drag-container"
                 :data-date="item.commonDate"
@@ -847,6 +848,7 @@
       :data="classDetailData"
       @save="handleClassDetailSave"
       :athleticThreshold="athleticThreshold"
+      :triUserId="selectedAthletic"
     ></ClassDetailModal>
   </div>
 </template>
@@ -992,6 +994,7 @@ export default {
         4: "POWER",
         5: "OTHER",
       },
+      classModalDataType: '',
     };
   },
   mounted() {
@@ -1046,166 +1049,160 @@ export default {
       });
     },
     // 获取日程数据
-    getScheduleData() {
+    async getScheduleData() {
       if (!this.selectedAthletic) return;
       this.loading = true;
-      getData({
+      const res = await getData({
         url: "/api/classSchedule/getCalenderOverview",
         begin: this.currentWeek[0].commonDate + " 00:00:00",
         end: this.currentWeek[6].commonDate + " 23:59:59",
         triUserId: this.selectedAthletic,
-      })
-        .then((res) => {
-          if (res.success && res.result) {
-            this.loading = false;
-            this.getStatisticData();
-            // 修复：将map的结果赋值回this.currentWeek
-            this.initScheduleData = res.result;
-            this.currentWeek = this.currentWeek.map((item) => {
-              let activityList = [];
-              let classSchedule = [];
-              res.result.forEach((part) => {
-                if (item.commonDate === part.dataDate) {
-                  activityList = (part.activityOverviewList || []).map((i) => {
-                    let completion = "";
-                    if (i.percent >= 80 && i.percent <= 120) {
-                      completion = "green";
-                    } else if (i.percent < 60) {
-                      completion = "shallowOrange";
-                    } else if (
-                      (i.percent >= 60 && i.percent < 80) ||
-                      i.percent > 120
-                    ) {
-                      completion = "deepOrange";
-                    }
-                    return {
-                      ...i,
-                      completion: i.classesJson ? completion : "",
-                      distance: Math.round(i.distance / 100) / 10,
-                    };
-                  });
-                  classSchedule = (part.classScheduleVoList || [])
-                    .map((i) => {
-                      return { ...i, classesJson: JSON.parse(i.classesJson) };
-                    })
-                    .filter((i) => !i.bindingActivityId);
+      });
+      if (res.success && res.result) {
+        this.getStatisticData();
+        // 修复：将map的结果赋值回this.currentWeek
+        this.initScheduleData = res.result;
+        this.currentWeek = this.currentWeek.map((item) => {
+          let activityList = [];
+          let classSchedule = [];
+          res.result.forEach((part) => {
+            if (item.commonDate === part.dataDate) {
+              activityList = (part.activityOverviewList || []).map((i) => {
+                let completion = "";
+                if (i.percent >= 80 && i.percent <= 120) {
+                  completion = "green";
+                } else if (i.percent < 60) {
+                  completion = "shallowOrange";
+                } else if (
+                  (i.percent >= 60 && i.percent < 80) ||
+                  i.percent > 120
+                ) {
+                  completion = "deepOrange";
                 }
+                return {
+                  ...i,
+                  completion: i.classesJson ? completion : "",
+                  distance: Math.round(i.distance / 100) / 10,
+                };
               });
-              return {
-                ...item,
-                activityList,
-                classSchedule,
-                timesp: new Date().getTime(),
-              };
-            });
-
-            this.$nextTick(() => {
-              document
-                .querySelectorAll(".js-schedule-drag-container")
-                .forEach((el) => {
-                  new Sortable(el, {
-                    group: { name: "classDrag" },
-                    animation: 150,
-                    filter: ".js-sport-container-noDrag",
-                    dataIdAttr: "data-id",
-                    onEnd: (e) => {
-                      console.log("拖拽课程：", e.item.dataset.id);
-                      console.log("拖拽日期：", e.to.dataset.date);
-                      if (
-                        e.item.dataset.date === e.to.dataset.date ||
-                        !e.to.dataset.date
-                      ) {
-                        return;
-                      }
-                      submitData({
-                        url: "/api/classSchedule/classBindingActivity",
-                        requestData: {
-                          classScheduleId: e.item.dataset.id,
-                          classesDate: e.to.dataset.date,
-                        },
-                      })
-                        .then((res) => {
-                          if (res.success) {
-                            this.$message.success("课表移动成功");
-                          }
-                        })
-                        .finally(() => {
-                          this.getScheduleData();
-                        });
-                    },
-                  });
-                });
-
-              const _this = this;
-              document
-                .querySelectorAll(".js-sport-container-put")
-                .forEach((el) => {
-                  new Sortable(el, {
-                    sort: false,
-                    group: { name: "classDrag", pull: false },
-                    animation: 150,
-                    dataIdAttr: "data-id",
-                    onAdd(e) {
-                      console.log(
-                        "课表id:" + e.item.dataset.id,
-                        e.item.dataset.type
-                      );
-                      console.log("运动id:" + e.to.dataset.id);
-                      if (!e.item.dataset.id || !e.to.dataset.id) {
-                        return;
-                      }
-                      let currentClass = {};
-                      let currentActivity = {};
-                      let activityDate = "";
-                      _this.currentWeek.forEach((item) => {
-                        item.activityList.forEach((activity) => {
-                          if (activity.activityId === e.to.dataset.id) {
-                            currentActivity = activity;
-                            activityDate = item.commonDate;
-                          }
-                        });
-                        item.classSchedule.forEach((classItem) => {
-                          if (classItem.id === +e.item.dataset.id) {
-                            currentClass = classItem;
-                          }
-                        });
-                      });
-                      // 判断是否从课程模板中拖拽
-                      if (e.item.dataset.type === "classTemplate") {
-                        currentClass = _this.findClassById(e.item.dataset.id);
-                        // alert("该逻辑待补充，暂时先新建课表再合并");
-                        if (
-                          currentClass.classesJson.sportType ===
-                          _this.currentActivityDict[currentActivity.sportType]
-                        ) {
-                          _this.handleBind(
-                            currentClass,
-                            {
-                              ...currentActivity,
-                              dataDate: activityDate,
-                            },
-                            "classTemplate"
-                          );
-                        } else {
-                          _this.$message.error("该运动类型与课程类型不匹配");
-                        }
-                      } else {
-                        _this.handleBind(currentClass, {
-                          ...currentActivity,
-                          dataDate: activityDate,
-                        });
-                      }
-                    },
-                  });
-                });
-            });
-          } else {
-            console.error("获取日程数据失败:", res.message || "未知错误");
-          }
-        })
-        .catch((error) => {
-          console.error("API调用失败:", error);
+              classSchedule = (part.classScheduleVoList || [])
+                .map((i) => {
+                  return { ...i, classesJson: JSON.parse(i.classesJson) };
+                })
+                .filter((i) => !i.bindingActivityId);
+            }
+          });
+          console.log(activityList, "activityList");
+          console.log(classSchedule, "classSchedule");
+          return {
+            ...item,
+            activityList,
+            classSchedule,
+            timesp: new Date().getTime(),
+          };
         });
+        console.log(this.currentWeek, "this.currentWeek");
+
+        this.$nextTick(() => {
+          document
+            .querySelectorAll(".js-schedule-drag-container")
+            .forEach((el) => {
+              new Sortable(el, {
+                group: { name: "classDrag" },
+                animation: 150,
+                filter: ".js-sport-container-noDrag",
+                dataIdAttr: "data-id",
+                onEnd: (e) => {
+                  console.log("拖拽课程：", e.item.dataset.id);
+                  console.log("拖拽日期：", e.to.dataset.date);
+                  if (
+                    e.item.dataset.date === e.to.dataset.date ||
+                    !e.to.dataset.date
+                  ) {
+                    return;
+                  }
+                  submitData({
+                    url: "/api/classSchedule/classBindingActivity",
+                    requestData: {
+                      classScheduleId: e.item.dataset.id,
+                      classesDate: e.to.dataset.date,
+                    },
+                  })
+                    .then((res) => {
+                      if (res.success) {
+                        this.$message.success("课表移动成功");
+                      }
+                    })
+                    .finally(() => {
+                      this.getScheduleData();
+                    });
+                },
+              });
+            });
+
+          const _this = this;
+          document.querySelectorAll(".js-sport-container-put").forEach((el) => {
+            new Sortable(el, {
+              sort: false,
+              group: { name: "classDrag", pull: false },
+              animation: 150,
+              dataIdAttr: "data-id",
+              onAdd(e) {
+                console.log("课表id:" + e.item.dataset.id, e.item.dataset.type);
+                console.log("运动id:" + e.to.dataset.id);
+                if (!e.item.dataset.id || !e.to.dataset.id) {
+                  return;
+                }
+                let currentClass = {};
+                let currentActivity = {};
+                let activityDate = "";
+                _this.currentWeek.forEach((item) => {
+                  item.activityList.forEach((activity) => {
+                    if (activity.activityId === e.to.dataset.id) {
+                      currentActivity = activity;
+                      activityDate = item.commonDate;
+                    }
+                  });
+                  item.classSchedule.forEach((classItem) => {
+                    if (classItem.id === +e.item.dataset.id) {
+                      currentClass = classItem;
+                    }
+                  });
+                });
+                // 判断是否从课程模板中拖拽
+                if (e.item.dataset.type === "classTemplate") {
+                  currentClass = _this.findClassById(e.item.dataset.id);
+                  // alert("该逻辑待补充，暂时先新建课表再合并");
+                  if (
+                    currentClass.classesJson.sportType ===
+                    _this.currentActivityDict[currentActivity.sportType]
+                  ) {
+                    _this.handleBind(
+                      currentClass,
+                      {
+                        ...currentActivity,
+                        dataDate: activityDate,
+                      },
+                      "classTemplate"
+                    );
+                  } else {
+                    _this.$message.error("该运动类型与课程类型不匹配");
+                  }
+                } else {
+                  _this.handleBind(currentClass, {
+                    ...currentActivity,
+                    dataDate: activityDate,
+                  });
+                }
+              },
+            });
+          });
+        });
+      } else {
+        console.error("获取日程数据失败:", res.message || "未知错误");
+      }
+      this.loading = false;
+      console.log(this.loading, "this.loading");
     },
     // 获取课程列表
     getClassList() {

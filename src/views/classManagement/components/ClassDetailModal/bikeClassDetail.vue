@@ -102,6 +102,7 @@
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
+              :duration="item.duration"
               :height="30"
             />
           </div>
@@ -1039,15 +1040,15 @@ export default {
           if (this.maxIntensity < intensity) {
             this.maxIntensity = intensity;
           }
+          duration += section.targetSeconds;
           return {
             duration: section.targetSeconds,
             intensity,
             title: section.title,
           };
         });
-        duration += totalTime * stage.times;
         return {
-          duration: totalTime * stage.times,
+          duration: duration * stage.times,
           stageTimeline,
           times: stage.times,
         };
