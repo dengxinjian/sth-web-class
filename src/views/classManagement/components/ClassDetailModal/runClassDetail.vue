@@ -75,7 +75,7 @@
           <el-select
             v-model="classInfo.mode"
             class="pill-select short"
-            @change="calculateTimeline"
+            @change="handleModeChange"
           >
             <el-option label="跟随阈值配速" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
@@ -787,7 +787,7 @@ export default {
   methods: {
     handleTimesChange(stageIndex) {
       const stage = this.classInfo.stages[stageIndex];
-      console.log(stage, "stage",stageIndex);
+      console.log(stage, "stage", stageIndex);
       const times = Number(stage.times);
       if (isNaN(times) || times < 1) {
         this.$set(this.classInfo.stages[stageIndex], "times", 1);
@@ -961,7 +961,7 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
-        triUserId: this.triUserId
+        triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
           this.classInfo.sth = res.result?.sth || "";
@@ -1169,7 +1169,7 @@ export default {
       if (range === "range") {
         speed =
           (this.translateSpeedToSeconds(targetSpeedRange[0]) +
-            this.translateSpeedToSeconds(targetSpeedRange[0])) /
+            this.translateSpeedToSeconds(targetSpeedRange[1])) /
           2;
       } else {
         speed = this.translateSpeedToSeconds(targetSpeed);
@@ -1236,6 +1236,17 @@ export default {
     translateTime(seconds) {
       return new Date(seconds * 1000).toISOString().substr(11, 8);
     },
+    // 模式变更时重新计算时间
+    handleModeChange() {
+      if (this.classInfo.mode === 3) {
+        this.classInfo.stages.forEach((stage, index) => {
+          stage.sections.forEach((section, idx) => {
+            this.handleTargetChange(index, idx);
+          });
+        });
+      }
+      this.calculateTimeline();
+    },
     // 计算时间线
     calculateTimeline() {
       this.updateClassInfoCalculatedValues(); // 更新计算值
@@ -1245,6 +1256,7 @@ export default {
       let timeFlag = false; // 判断是否可以显示时间，当存在阶段 模式≠3 且 容量=距离 时，不显示时间
       let distanceFlag = false; // 判断是否可以显示距离，当存在阶段 模式≠3 且 容量=时间 时，不显示距离
       this.maxIntensity = 0;
+      console.log(this.classInfo, "this.classInfo.stages");
       this.timeline = this.classInfo.stages.map((stage) => {
         let totalTime = 0;
         let totalDistance = 0;
@@ -1300,8 +1312,8 @@ export default {
             title: section.title,
           };
         });
-        duration += totalTime * stage.times
-        distance += totalDistance * stage.times
+        duration += totalTime * stage.times;
+        distance += totalDistance * stage.times;
         return {
           duration: totalTime * stage.times,
           stageTimeline,

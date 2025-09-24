@@ -6,9 +6,6 @@
         :key="index"
         class="exercise-bar"
         :style="getBarStyle(exercise, index)"
-        :title="`运动${index + 1}: 时长${exercise.duration / 60}分钟, 强度${
-          exercise.intensity
-        }`"
       ></div>
     </div>
   </div>

@@ -7,7 +7,7 @@
       class="add-swim-class-dialog"
        :close-on-click-modal="false"
     >
-      <span slot="title">新建力量课程</span>
+      <span slot="title">编辑力量课程</span>
 
       <div class="form-section">
         <el-form :model="form" label-width="60px">
