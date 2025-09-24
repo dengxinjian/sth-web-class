@@ -731,6 +731,7 @@ export function secondsToMMSS(seconds) {
  * @returns {number} 返回秒数
  */
 export function mmssToSeconds(timeString) {
+  console.log(timeString, "timeString");
   if (typeof timeString !== 'string') {
     return 0;
   }
@@ -754,6 +755,18 @@ export function mmssToSeconds(timeString) {
   return minutes * 60 + seconds;
 }
 
+/**
+ * 将 hh:mm:ss 格式转换为秒数
+ * @param {string} timeString - mm:ss 格式的时间字符串
+ * @returns {number} 返回秒数
+ */
+export function hhmmssToSeconds(timeString) {
+  if (typeof timeString !== 'string') {
+    return 0;
+  }
+  const [hours, minutes, seconds] = timeString.split(':').map(Number);
+  return hours * 3600 + minutes * 60 + seconds;
+}
 /**
  * 将秒数转换为 hh:mm:ss 格式
  * @param {number} seconds - 秒数

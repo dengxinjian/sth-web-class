@@ -19,7 +19,9 @@
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{ classInfo.duration }}</span>
-          <span v-if="classInfo.mode == 1 || classInfo.mode == 3">{{ classInfo.distance }}km</span>
+          <span v-if="classInfo.mode == 1 || classInfo.mode == 3"
+            >{{ classInfo.distance }}km</span
+          >
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -75,7 +77,7 @@
           <el-select
             v-model="classInfo.mode"
             class="pill-select short"
-            @change="calculateTimeline"
+            @change="handleModeChange"
           >
             <el-option label="跟随阈值配速" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
@@ -341,7 +343,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="handleTargetChange(index, idx);calculateTimeline"
+                    @change="calculateTimeline"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围值" value="range" />
@@ -787,7 +789,7 @@ export default {
   methods: {
     handleTimesChange(stageIndex) {
       const stage = this.classInfo.stages[stageIndex];
-      console.log(stage, "stage",stageIndex);
+      console.log(stage, "stage", stageIndex);
       const times = Number(stage.times);
       if (isNaN(times) || times < 1) {
         this.$set(this.classInfo.stages[stageIndex], "times", 1);
@@ -961,7 +963,7 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
-        triUserId: this.triUserId
+        triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
           this.classInfo.sth = res.result?.sth || "";
@@ -1236,6 +1238,17 @@ export default {
     translateTime(seconds) {
       return new Date(seconds * 1000).toISOString().substr(11, 8);
     },
+    // 模式变更时重新计算时间
+    handleModeChange() {
+      if (this.classInfo.mode === 3) {
+        this.classInfo.stages.forEach((stage, index) => {
+          stage.sections.forEach((section, idx) => {
+            this.handleTargetChange(index, idx);
+          });
+        });
+      }
+      this.calculateTimeline();
+    },
     // 计算时间线
     calculateTimeline() {
       this.updateClassInfoCalculatedValues(); // 更新计算值
@@ -1301,8 +1314,8 @@ export default {
             title: section.title,
           };
         });
-        duration += totalTime * stage.times
-        distance += totalDistance * stage.times
+        duration += totalTime * stage.times;
+        distance += totalDistance * stage.times;
         return {
           duration: totalTime * stage.times,
           stageTimeline,

@@ -77,7 +77,7 @@
           <el-select
             v-model="classInfo.mode"
             class="pill-select short"
-            @change="calculateTimeline"
+            @change="handleModeChange"
           >
             <el-option label="跟随阈值配速" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
@@ -342,7 +342,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="handleTargetChange(index, idx)"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围值" value="range" />
@@ -640,6 +640,7 @@ import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
 import { debounce } from "@/views/classManagement/uilt";
+import { mmssToSeconds, hhmmssToSeconds } from "@/utils/index";
 
 export default {
   name: "AddRunClassDialog",
@@ -871,6 +872,75 @@ export default {
           this.classInfo.sth = res.result?.sth || "";
         }
       });
+      this.classInfo.duration = 0;
+      this.classInfo.distance = 0;
+
+      this.classInfo.stages.forEach((stage) => {
+        stage.sections.forEach((section) => {
+          if (
+            this.classInfo.mode === 1 ||
+            this.classInfo.mode === 2 ||
+            this.classInfo.mode === 4
+          ) {
+            if (section.capacity === "time") {
+              this.classInfo.duration += section.targetSeconds;
+            } else {
+              if (section.targetUnit === "m") {
+                this.classInfo.distance =
+                  this.classInfo.distance + section.targetDistance / 1000;
+              } else {
+                this.classInfo.distance =
+                  this.classInfo.distance + section.targetDistance;
+              }
+            }
+          } else {
+            if (section.capacity === "time") {
+              this.classInfo.duration += section.targetSeconds;
+              if (section.range === "target") {
+                const timer = mmssToSeconds(section.targetSpeed);
+                const timer1 = hhmmssToSeconds(section.target);
+                console.log(
+                  this.classInfo.distance,
+                  (timer1 / timer).toFixed(2),
+                  "this.classInfo.distance"
+                );
+                this.classInfo.distance =
+                  this.classInfo.distance + Number((timer1 / timer).toFixed(2));
+              } else {
+                const timer = hhmmssToSeconds(section.target);
+                const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
+                const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
+                const timer3 = (timer1 + timer2) / 2;
+                this.classInfo.distance =
+                  this.classInfo.distance + Number((timer / timer3).toFixed(2));
+                this.classInfo.duration += timer3;
+              }
+            } else {
+              this.classInfo.distance += section.targetDistance;
+              console.log(section, "section");
+
+              if (section.range === "target") {
+                console.log(
+                  section,
+                  "section",
+                  mmssToSeconds(section.targetSpeed)
+                );
+                const timer =
+                  section.targetDistance * mmssToSeconds(section.targetSpeed);
+                this.classInfo.duration += timer;
+                console.log(timer, "timer");
+              } else {
+                const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
+                const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
+                const timer3 = (timer1 + timer2) / 2;
+                this.classInfo.duration += section.targetDistance * timer3;
+              }
+            }
+          }
+        });
+      });
+      console.log(this.classInfo.duration, "this.classInfo.duration");
+      this.classInfo.duration = this.translateTime(this.classInfo.duration);
     },
     handleClose() {
       this.onCancel();
@@ -1143,6 +1213,17 @@ export default {
     // 秒转换成HH:mm:ss
     translateTime(seconds) {
       return new Date(seconds * 1000).toISOString().substr(11, 8);
+    },
+    // 模式变更时重新计算时间
+    handleModeChange() {
+      if (this.classInfo.mode === 3) {
+        this.classInfo.stages.forEach((stage, index) => {
+          stage.sections.forEach((section, idx) => {
+            this.handleTargetChange(index, idx);
+          });
+        });
+      }
+      this.calculateTimeline();
     },
     // 计算时间线
     calculateTimeline() {
