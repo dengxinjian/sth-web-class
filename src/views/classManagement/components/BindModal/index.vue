@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="运动数据绑定"
+    title="运动数据匹配"
     :visible.sync="visible"
     width="600px"
     :before-close="handleClose"
@@ -10,11 +10,11 @@
     <div class="bind-modal-content">
       <!-- 问题文本 -->
       <div class="question-text">
-        <p class="question">你确定将选择的课程和运动数据进行绑定吗？</p>
-        <p class="explanation">绑定后会将完成的运动数据加到课程中。您的所有数据、描述和评论都将保持不变。</p>
+        <p class="question">你确定将选择的课程和运动数据进行匹配吗？</p>
+        <p class="explanation">匹配后会将完成的运动数据加到课程中。您的所有数据、描述和评论都将保持不变。</p>
       </div>
 
-      <!-- 数据绑定可视化 -->
+      <!-- 数据匹配可视化 -->
       <div class="binding-visualization">
         <!-- 左侧运动数据 -->
         <div class="exercise-data">
@@ -68,7 +68,7 @@
     <!-- 底部按钮 -->
     <div slot="footer" class="dialog-footer">
       <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" @click="handleBind">绑定</el-button>
+      <el-button type="primary" @click="handleBind">匹配</el-button>
     </div>
   </el-dialog>
 </template>
@@ -125,7 +125,7 @@ export default {
       this.$emit('cancel')
     },
     handleBind() {
-      console.log("绑定数据：", this.exerciseData, this.courseData, this.type);
+      console.log("匹配数据：", this.exerciseData, this.courseData, this.type);
       this.$emit('bind', {
         exerciseData: this.exerciseData,
         courseData: this.courseData,

@@ -62,12 +62,9 @@ export const statisticKeyToTitle = {
 
 // 单位转换
 export const unitConversion = (value, unit) => {
-  console.log(value, "value");
-  console.log(unit, "unit");
   if (unit === "kcal") {
-    return value / 1000;
+    return value;
   } else if (unit === "KM") {
-    console.log((value / 1000).toFixed(2), "value");
     return (value / 1000).toFixed(2);
   } else {
     return value;

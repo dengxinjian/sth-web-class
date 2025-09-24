@@ -217,18 +217,18 @@ export default {
       if (!this.teamId) return
 
       getData({
-        // url: `/api/team/group/list/${this.teamId}`,
-        url: '/api/team/coach/all-teams',
+        url: `/api/team/group/list/${this.teamId}`,
+        // url: '/api/team/coach/all-teams',
         teamId: this.teamId
       }).then(res => {
         if (res.success) {
           this.athleticData = res.result.map(item => {
             return {
               id: item.id,
-              label: item.teamName,
+              label: item.groupName,
               description: item.description || '',
               isGroup: true,
-              groupName: item.teamName,
+              groupName: item.groupName,
               children: (item.members || []).map(member => {
                 return {id: member.id, label: member.userNickname}
               })

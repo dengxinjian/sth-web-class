@@ -280,7 +280,7 @@
                   v-for="classItem in item.classSchedule"
                   :key="classItem.id"
                   class="classScheduleCard"
-                  style="background-color: #a9adb5"
+                  :style="item.commonDate < new Date().toISOString().split('T')[0] ? 'background-color: rgba(204, 35, 35, 1)' : 'background-color: rgba(199, 199, 199, 1)'"
                   :data-id="classItem.id"
                   :data-date="item.commonDate"
                   @click="
@@ -631,24 +631,20 @@
                   :style="{
                     backgroundColor: getSportBackgroundColor(
                       activityItem.percent
-                    )[1],
+                    )[0],
                   }"
                   :data-id="activityItem.activityId"
                 >
                   <div
                     class="card-body"
                     :style="{
-                      backgroundColor: getSportBackgroundColor(
-                        activityItem.percent
-                      )[0],
+                      backgroundColor: '#fff',
                     }"
                   >
                     <div
                       class="body-title"
                       :style="{
-                        backgroundColor: getSportBackgroundColor(
-                          activityItem.percent
-                        )[0],
+                        backgroundColor: '#fff',
                       }"
                     >
                       <div class="sport-type-icon">
@@ -668,7 +664,7 @@
                             v-if="activityItem.classesJson"
                             type="text"
                             @click="handleUnbind(activityItem.classScheduleId)"
-                            >解绑</el-button
+                            >解除匹配</el-button
                           >
                           <el-button
                             v-if="!activityItem.classesJson"
@@ -1464,9 +1460,9 @@ export default {
     handleDataTypeClick(tab, event) {
       this.dataLineType = tab.name;
     },
-    // 解绑
+    // 解除匹配
     handleUnbind(id) {
-      MessageBox.confirm("确定要将这条运动和课表解绑吗？", "提示", {
+      MessageBox.confirm("确定要将这条运动和课表解除匹配吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -1477,13 +1473,13 @@ export default {
             requestData: { classScheduleId: id },
           }).then((res) => {
             if (res.success) {
-              this.$message.success("解绑成功");
+              this.$message.success("解除匹配成功");
               this.getScheduleData();
             }
           });
         })
         .catch(() => {
-          this.$message.info("已取消解绑");
+          this.$message.info("已取消匹配");
         });
     },
     handleDeleteActivity(id) {
@@ -1771,16 +1767,16 @@ export default {
       this.moveType = "";
       this.getClassList();
     },
-    // 显示绑定弹框
+    // 显示匹配弹框
     showBindModalDialog(exerciseData, courseData, type) {
       this.bindExerciseData = exerciseData;
       this.bindCourseData = courseData;
       this.showBindModal = true;
       this.bindType = type || "";
     },
-    // 绑定确认
+    // 匹配确认
     async onBind(data) {
-      console.log("绑定数据：", data);
+      console.log("匹配数据：", data);
       if (data.type === "classTemplate") {
         const params = {
           classesId: data.courseData.id,
@@ -1798,7 +1794,7 @@ export default {
           },
         }).then((res) => {
           if (res.success) {
-            this.$message.success("绑定成功");
+            this.$message.success("匹配成功");
             this.getScheduleData();
           } else {
             this.$message.error(res.message);
@@ -1807,7 +1803,7 @@ export default {
         });
         return;
       }
-      // 这里可以调用绑定API
+      // 这里可以调用匹配API
       submitData({
         url: "/api/classSchedule/classBindingActivity",
         requestData: {
@@ -1819,7 +1815,7 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.$message.success("绑定成功");
+            this.$message.success("匹配成功");
             this.getScheduleData();
           } else {
             this.$message.error(res.message);
@@ -1830,12 +1826,12 @@ export default {
           this.getScheduleData();
         });
     },
-    // 取消绑定
+    // 取消匹配
     onCancelBind() {
       this.showBindModal = false;
       this.getScheduleData();
     },
-    // 处理绑定按钮点击
+    // 处理匹配按钮点击
     handleBind(classItem, activityItem, type) {
       console.log("handleBind：", classItem, activityItem, type);
       // 模拟运动数据
@@ -1916,18 +1912,18 @@ export default {
     // 获取不同运动背景颜色
     getSportBackgroundColor(percent) {
       if (percent >= 80 && percent <= 120) {
-        return ["rgb(239,246,233)", "rgb(120,203,40)"];
+        return ["rgba(131, 223, 161, 1)", "rgba(131, 223, 161, 1)"];
       }
-      if (percent < 80 || percent > 120) {
-        return ["rgb(255,252,238)", "rgb(255,213,91)"];
+      if (percent >= 60 && percent < 80 || percent > 120) {
+        return ["rgba(247, 200, 134, 1)", "rgba(247, 200, 134, 1)"];
       }
       if (percent > 0 && percent < 60) {
-        return ["rgb(211,152,120)", "rgb(234,99,49)"];
+        return ["rgba(201, 143, 93, 1)", "rgba(201, 143, 93, 1)"];
       }
       if (percent === 0) {
-        return ["rgb(254,235,235)", "rgb(245,64,62)"];
+        return ["#fff", "#fbacac"];
       }
-      return ["rgb(255,252,238)", "rgb(129,129,254)"];
+      return ["#fff", "#fbacac"];
     },
   },
 };

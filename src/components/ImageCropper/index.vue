@@ -397,7 +397,7 @@ export default {
     }
   },
   created() {
-    // 绑定按键esc隐藏此插件事件
+    // 匹配按键esc隐藏此插件事件
     document.addEventListener('keyup', this.closeHandler)
   },
   destroyed() {
@@ -425,7 +425,7 @@ export default {
         this.step = no
       }, 200)
     },
-    /* 图片选择区域函数绑定
+    /* 图片选择区域函数匹配
      ---------------------------------------------------------------*/
     preventDefault(e) {
       e.preventDefault()

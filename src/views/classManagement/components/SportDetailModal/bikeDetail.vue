@@ -139,11 +139,11 @@
           </div>
           <div class="sync-params">
             <span>时间：{{ sportDetail.endTime }}</span>
-            <span>距离：{{ sportDetail.distance }} m</span>
+            <span>距离：{{ (sportDetail.distance/1000).toFixed(2) }} km</span>
           </div>
           <div class="sync-params">
-            <span>平均速度：{{ sportDetail.avgSpeed }}</span>
-            <span>卡路里：{{ sportDetail.calories }} cal</span>
+            <span>平均速度：{{ sportDetail.avgSpeed }} m/s</span>
+            <span>卡路里：{{ sportDetail.calories }} kcal</span>
           </div>
           <div class="sync-params">
             <span>爬升：{{ sportDetail.totalAscent }} m</span>
@@ -189,27 +189,27 @@
                 <div v-for="(part, idx) in item.sections" :key="idx">
                   <div>{{ part.title }}</div>
                   <div v-if="classInfo.mode === 1 && part.range === 'range'">
-                    {{ part.target }} @ {{ part.thresholdFtpRange[0] }}~
-                    {{ part.thresholdFtpRange[1] }}% 阈值功率
+                    {{ part.target }} @ {{ part.thresholdFtpRangeNum[0] }}~
+                    {{ part.thresholdFtpRangeNum[1] }}w 阈值功率
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 2 && part.range === 'range'">
-                    {{ part.target }} @ {{ part.thresholdHeartRateRange[0] }}~
-                    {{ part.thresholdHeartRateRange[1] }}% 阈值心率
+                    {{ part.target }} @ {{ part.thresholdHeartRateRangeNum[0] }}~
+                    {{ part.thresholdHeartRateRangeNum[1] }}bpm 阈值心率
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 1 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.thresholdFtp }}% 阈值功率
+                    {{ part.target }} @ {{ part.thresholdFtpNum }}w 阈值功率
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 2 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.thresholdHeartRate }}% 阈值心率
+                    {{ part.target }} @ {{ part.thresholdHeartRateNum }}bpm 阈值心率
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -390,6 +390,7 @@
                     disabled
                   />
                   <span class="unit">%阈值功率</span>
+                  <span class="label">{{ part.thresholdFtpRangeNum[0] }}~{{ part.thresholdFtpRangeNum[1] }}w</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 1 && part.range === 'target'"
@@ -407,6 +408,7 @@
                     disabled
                   />
                   <span class="unit">%阈值功率</span>
+                  <span class="label">{{ part.thresholdFtpNum }}w</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 2 && part.range === 'range'"
@@ -433,6 +435,7 @@
                     disabled
                   />
                   <span class="unit">%阈值心率</span>
+                  <span class="label">{{ part.thresholdHeartRateRangeNum[0] }}~{{ part.thresholdHeartRateRangeNum[1] }}bpm</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 2 && part.range === 'target'"
@@ -450,6 +453,7 @@
                     disabled
                   />
                   <span class="unit">%阈值心率</span>
+                  <span class="label">{{ part.thresholdHeartRateNum }}bpm</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 3 && part.range === 'range'"

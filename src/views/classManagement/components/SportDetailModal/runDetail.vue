@@ -17,7 +17,7 @@
         </div>
         <div class="basic-info-total">
           <span>
-            <img src="~@/assets/addClass/icon-bike.png" width="30" alt="" />
+            <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{ classInfo.duration }}</span>
           <span>{{ classInfo.distance }}</span>
@@ -139,13 +139,13 @@
           </div>
           <div class="sync-params">
             <span>时间：{{ sportDetail.endTime }}</span>
-            <span>距离：{{ sportDetail.distance }} m</span>
+            <span>距离：{{ (sportDetail.distance/1000).toFixed(2) }} km</span>
           </div>
           <div class="sync-params">
             <span
               >平均配速：{{ convertSpeedToPace(sportDetail.avgSpeed) }}/km</span
             >
-            <span>卡路里：{{ sportDetail.calories }} cal</span>
+            <span>卡路里：{{ sportDetail.calories }} kcal</span>
           </div>
           <div class="sync-params">
             <span>爬升：{{ sportDetail.totalAscent }} m</span>
@@ -196,8 +196,8 @@
                         ? part.target
                         : part.targetDistance + part.targetUnit
                     }}
-                    @ {{ part.thresholdSpeedRange[0] }}~
-                    {{ part.thresholdSpeedRange[1] }}% 阈值配速
+                    @ {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~
+                    {{ secondsToMMSS(part.thresholdSpeedRangeNum[1]) }}/km 阈值配速
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -208,8 +208,8 @@
                         ? part.target
                         : part.targetDistance + part.targetUnit
                     }}
-                    @ {{ part.thresholdHeartRateRange[0] }}~
-                    {{ part.thresholdHeartRateRange[1] }}% 阈值心率
+                    @ {{ part.thresholdHeartRateRangeNum[0] }}~
+                    {{ part.thresholdHeartRateRangeNum[1] }}bpm 阈值心率
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -220,7 +220,7 @@
                         ? part.target
                         : part.targetDistance + part.targetUnit
                     }}
-                    @ {{ part.thresholdSpeed }}% 阈值配速
+                    @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km 阈值配速
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -231,7 +231,7 @@
                         ? part.target
                         : part.targetDistance + part.targetUnit
                     }}
-                    @ {{ part.thresholdHeartRate }}% 阈值心率
+                    @ {{ part.thresholdHeartRateNum }}bpm 阈值心率
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -463,6 +463,11 @@
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit">%阈值配速</span>
+                  <span class="label"
+                    >{{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~{{
+                      secondsToMMSS(part.thresholdSpeedRangeNum[1])
+                    }}/km</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 1 && part.range === 'target'"
@@ -481,6 +486,9 @@
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit">%阈值配速</span>
+                  <span class="label"
+                    >{{ secondsToMMSS(part.thresholdSpeedNum) }}/km</span
+                  >
                 </div>
                 <div
                   v-if="classInfo.mode === 2 && part.range === 'range'"
@@ -509,6 +517,11 @@
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit">%阈值心率</span>
+                  <span class="label"
+                    >{{ part.thresholdHeartRateRangeNum[0] }}~{{
+                      part.thresholdHeartRateRangeNum[1]
+                    }}bpm</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 2 && part.range === 'target'"
@@ -527,6 +540,9 @@
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit">%阈值心率</span>
+                  <span class="label"
+                    >{{ part.thresholdHeartRateNum }}bpm</span
+                  >
                 </div>
                 <div
                   v-if="classInfo.mode === 3 && part.range === 'range'"
@@ -705,6 +721,7 @@
 import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
+import { secondsToMMSS } from "@/utils/index";
 
 export default {
   name: "RunDetailDialog",
@@ -798,6 +815,7 @@ export default {
     },
   },
   methods: {
+    secondsToMMSS,
     handleOpen() {
       this.resetForm();
       if (this.data.id) {
