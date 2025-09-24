@@ -1047,8 +1047,9 @@ export default {
             title: section.title,
           };
         });
+        duration += totalTime * stage.times
         return {
-          duration: duration * stage.times,
+          duration: totalTime * stage.times,
           stageTimeline,
           times: stage.times,
         };
