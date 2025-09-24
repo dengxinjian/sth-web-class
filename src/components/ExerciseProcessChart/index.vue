@@ -6,7 +6,7 @@
         :key="index"
         class="exercise-bar"
         :style="getBarStyle(exercise, index)"
-        :title="`运动${index + 1}: 时长${duration / 60}分钟, 强度${
+        :title="`运动${index + 1}: 时长${exercise.duration / 60}分钟, 强度${
           exercise.intensity
         }`"
       ></div>
@@ -32,11 +32,6 @@ export default {
             item.intensity <= 100
         );
       },
-    },
-    // 运动时长，单位：分钟
-    duration: {
-      type: Number,
-      default: 0,
     },
     // 图表高度，默认200px
     height: {

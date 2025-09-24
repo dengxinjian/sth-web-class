@@ -110,7 +110,6 @@
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
-              :duration="item.duration"
               :height="30"
             />
           </div>
@@ -880,7 +879,6 @@ export default {
         if (res.success) {
           this.classInfo = JSON.parse(res.result.classesJson);
           this.timeline = JSON.parse(res.result.classesJson).timeline;
-          console.log(this.timeline, "this.timeline");
           this.classInfo.id = res.result.id;
           this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
           console.log(this.classInfo, "this.classInfo");
@@ -1243,44 +1241,46 @@ export default {
       this.updateClassInfoCalculatedValues(); // 更新计算值
       this.getSth();
       let duration = 0;
-      const distance = 0;
+      let distance = 0;
       let timeFlag = false; // 判断是否可以显示时间，当存在阶段 模式≠3 且 容量=距离 时，不显示时间
       let distanceFlag = false; // 判断是否可以显示距离，当存在阶段 模式≠3 且 容量=时间 时，不显示距离
       this.maxIntensity = 0;
       this.timeline = this.classInfo.stages.map((stage) => {
-        // stage.sections.forEach((section) => {
-        //   totalTime += section.targetSeconds;
-        //   // 下面的逻辑用来计算总距离，mode=3 capacity=time的情况下需要把距离计算出来，其他情况直接相加，用其他逻辑判断距离是否显示
-        //   if (
-        //     this.classInfo.mode === 3 &&
-        //     section.capacity === "time" &&
-        //     section.range === "target"
-        //   ) {
-        //     totalDistance += this.translateSpeedToDistance(
-        //       this.translateSpeedToSeconds(section.targetSpeed),
-        //       section.target
-        //     );
-        //   } else if (
-        //     this.classInfo.mode === 3 &&
-        //     section.capacity === "time" &&
-        //     section.range === "range"
-        //   ) {
-        //     const speed =
-        //       (this.translateSpeedToSeconds(section.targetSpeedRange[0]) +
-        //         this.translateSpeedToSeconds(section.targetSpeedRange[1])) /
-        //       2;
-        //     totalDistance += this.translateSpeedToDistance(
-        //       speed,
-        //       section.target
-        //     );
-        //   } else {
-        //     if (section.targetUnit === "km") {
-        //       totalDistance += section.targetDistance * 1000;
-        //     } else {
-        //       totalDistance += section.targetDistance;
-        //     }
-        //   }
-        // });
+        let totalTime = 0;
+        let totalDistance = 0;
+        stage.sections.forEach((section) => {
+          totalTime += section.targetSeconds;
+          // 下面的逻辑用来计算总距离，mode=3 capacity=time的情况下需要把距离计算出来，其他情况直接相加，用其他逻辑判断距离是否显示
+          if (
+            this.classInfo.mode === 3 &&
+            section.capacity === "time" &&
+            section.range === "target"
+          ) {
+            totalDistance += this.translateSpeedToDistance(
+              this.translateSpeedToSeconds(section.targetSpeed),
+              section.target
+            );
+          } else if (
+            this.classInfo.mode === 3 &&
+            section.capacity === "time" &&
+            section.range === "range"
+          ) {
+            const speed =
+              (this.translateSpeedToSeconds(section.targetSpeedRange[0]) +
+                this.translateSpeedToSeconds(section.targetSpeedRange[1])) /
+              2;
+            totalDistance += this.translateSpeedToDistance(
+              speed,
+              section.target
+            );
+          } else {
+            if (section.targetUnit === "km") {
+              totalDistance += section.targetDistance * 1000;
+            } else {
+              totalDistance += section.targetDistance;
+            }
+          }
+        });
         duration = 0;
         const stageTimeline = stage.sections.map((section) => {
           duration += section.targetSeconds;
@@ -1300,15 +1300,17 @@ export default {
             title: section.title,
           };
         });
-
+        duration += totalTime * stage.times
+        distance += totalDistance * stage.times
         return {
-          duration: duration * stage.times,
+          duration: totalTime * stage.times,
           stageTimeline,
           times: stage.times,
           distance: stage.distance,
         };
       });
       this.handleClassDrag();
+      console.log(this.timeline, "this.timeline");
     },
     // 段落图形拖拽
     handleClassDrag(e) {
