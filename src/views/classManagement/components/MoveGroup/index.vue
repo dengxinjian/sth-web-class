@@ -39,7 +39,9 @@ export default {
     value: { type: Boolean, default: undefined },
     visible: { type: Boolean, default: false },
     // 当前分组ID，用于过滤掉自己
-    id: { type: [String, Number], default: '' }
+    id: { type: [String, Number], default: '' },
+    classId: { type: [String, Number], default: '' },
+    type: { type: String, default: '' }
   },
   data() {
     return {
@@ -86,15 +88,33 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate(valid => {
         if (!valid) return
-        submitData({
-          url: `/api/classesGroup/moveClassesGroupById?id=${this.id}&destinationId=${this.form.destinationId}`,
-        }).then(res => {
-          if (res.success) {
-            this.$message.success('分组移动成功')
-            this.innerVisible = false
-            this.$emit('save', {...this.form})
-          }
-        })
+        if (this.type === 'group') {
+          this.submitGroupMove()
+        } else {
+          this.submitClassMove()
+        }
+      })
+    },
+    submitGroupMove() {
+      submitData({
+        url: `/api/classesGroup/moveClassesGroupById?id=${this.id}&destinationId=${this.form.destinationId}`,
+      }).then(res => {
+        if (res.success) {
+          this.$message.success('分组移动成功')
+          this.innerVisible = false
+          this.$emit('save', {...this.form})
+        }
+      })
+    },
+    submitClassMove() {
+      submitData({
+        url: `/api/classes/moveClasses?id=${this.classId}&destinationGroupId=${this.form.destinationId}`,
+      }).then(res => {
+        if (res.success) {
+          this.$message.success('课程移动成功')
+          this.innerVisible = false
+          this.$emit('save', {...this.form})
+        }
       })
     }
   }

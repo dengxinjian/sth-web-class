@@ -299,7 +299,7 @@
                     @change="calculateTimeline"
                   >
                     <el-option label="目标值" value="target" />
-                    <el-option label="范围值" value="range" />
+                    <el-option label="范围" value="range" />
                   </el-select>
                 </div>
               </div>

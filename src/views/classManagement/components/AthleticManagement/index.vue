@@ -14,12 +14,13 @@
             :expand-on-click-node="false">
             <span class="athletic-btn-list" slot-scope="{ node }">
                 <span>{{ node.label }}</span>
-                <el-popover v-if="node.data.isGroup" popper-class="athletic-btn-popover" placement="right" trigger="click">
+                <el-popover popper-class="athletic-btn-popover" placement="right" trigger="click">
                     <div class="btn-list-hover">
-                        <el-button type="text" size="mini" @click="handleAddGroup">新建分组</el-button>
-                        <el-button v-if="node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleEditGroup(node)">编辑分组</el-button>
-                        <el-button v-if="node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleDeleteGroup(node)">删除分组</el-button>
-                        <el-button v-if="node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button>
+                        <el-button v-if="node.data.isGroup" type="text" size="mini" @click="handleAddGroup">新建分组</el-button>
+                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleEditGroup(node)">编辑分组</el-button>
+                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleDeleteGroup(node)">删除分组</el-button>
+                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button>
+                        <el-button v-if="!node.data.isGroup" type="text" size="mini" @click="handleMoveAthletic(node)">移动分组</el-button>
                     </div>
                     <el-button
                         type="text"
@@ -65,7 +66,7 @@
                 <el-form-item label="当前分组">
                     <el-input :value="currentGroup.groupName" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="目标分组" prop="targetGroupId" required>
+                <el-form-item label="目标分组" required>
                     <el-select v-model="targetGroupId" placeholder="请选择目标分组" style="width: 100%">
                         <el-option
                             v-for="group in availableGroups"
@@ -178,7 +179,8 @@ export default {
       showInviteDialog: false,
       invitationCode: '',
       copyLoading: false,
-      regenerateLoading: false
+      regenerateLoading: false,
+      moveType: ''
     }
   },
   computed: {
@@ -215,17 +217,18 @@ export default {
       if (!this.teamId) return
 
       getData({
-        url: `/api/team/group/list/${this.teamId}`,
+        // url: `/api/team/group/list/${this.teamId}`,
+        url: '/api/team/coach/all-teams',
         teamId: this.teamId
       }).then(res => {
         if (res.success) {
           this.athleticData = res.result.map(item => {
             return {
               id: item.id,
-              label: item.groupName,
+              label: item.teamName,
               description: item.description || '',
               isGroup: true,
-              groupName: item.groupName,
+              groupName: item.teamName,
               children: (item.members || []).map(member => {
                 return {id: member.id, label: member.userNickname}
               })
@@ -378,6 +381,16 @@ export default {
       this.currentGroup = node.data
       this.targetGroupId = ''
       this.showMoveDialog = true
+      this.moveType = 'group'
+    },
+
+    // 运动员移动分组
+    handleMoveAthletic(node) {
+      this.currentGroup = node.parent.data
+      this.currentAthletic = node.data
+      this.targetGroupId = ''
+      this.showMoveDialog = true
+      this.moveType = 'athletic'
     },
 
     // 保存分组（新建/编辑）
@@ -475,15 +488,23 @@ export default {
         return
       }
 
-      const params = {
-        groupId: this.targetGroupId,
-        teamId: this.teamId,
-        memberIds: this.currentGroup.children.map(member => member.id)
+      let params = {}
+      if (this.moveType === 'group') {
+        params = {
+          groupId: this.targetGroupId,
+          teamId: this.teamId,
+          memberIds: this.currentGroup.children.map(member => member.id)
+        }
+      } else {
+        params = {
+          groupId: this.targetGroupId,
+          teamId: this.teamId,
+          memberIds: [this.currentAthletic.id]
+        }
       }
 
-      // TODO: 替换为实际的API地址
       submitData({
-        url: '/api/team/group/member/batch-set', // 请替换为实际API
+        url: '/api/team/group/member/batch-set',
         requestData: params
       }).then(res => {
         if (res.success) {
@@ -497,6 +518,11 @@ export default {
         console.error('移动分组失败:', error)
         this.$message.error('移动失败')
       })
+    },
+
+    // 整个分组移动
+    handleMoveGroup() {
+
     },
 
     // 重置分组表单

@@ -19,7 +19,7 @@
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{ classInfo.duration }}</span>
-          <span>{{ classInfo.distance }}km</span>
+          <span>{{ classInfo.distance }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -344,7 +344,7 @@
                     @change="calculateTimeline"
                   >
                     <el-option label="目标值" value="target" />
-                    <el-option label="范围值" value="range" />
+                    <el-option label="范围" value="range" />
                   </el-select>
                 </div>
               </div>

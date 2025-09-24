@@ -203,7 +203,7 @@
                                 <span class="label required">范围选择</span>
                                 <el-select v-model="part.range" placeholder="请选择" size="small" @change="calculateTimeline">
                                     <el-option label="目标值" value="target" />
-                                    <el-option label="范围值" value="range" />
+                                    <el-option label="范围" value="range" />
                                 </el-select>
                             </div>
                         </div>

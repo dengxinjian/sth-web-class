@@ -159,6 +159,9 @@
                     <div class="schedule-class-info">
                       <div class="schedule-class-info-item-title">
                         <span>{{ part.classesJson.title }}</span>
+                        <div class="delete" @click.stop="handleMoveClass(part.id, item.groupId)">
+                          <i class="el-icon-set-up"></i>
+                        </div>
                         <div
                           class="delete"
                           @click.stop="handleDeleteClass(part.id)"
@@ -191,8 +194,8 @@
                         <span v-else>
                           <img src="~@/assets/addClass/icon-other.png" alt="" />
                         </span>
-                        <span>{{ part.classesJson.duration }}</span>
-                        <span v-if="part.classesJson.distance"
+                        <span v-if="['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(part.sportType)">{{ part.classesJson.duration }}</span>
+                        <span v-if="['RUN', 'CYCLE', 'SWIM'].includes(part.sportType)"
                           >{{ part.classesJson.distance }}km</span
                         >
                       </div>
@@ -840,6 +843,8 @@
     <MoveGroup
       v-model="showMoveGroup"
       :id="moveGroupId"
+      :class-id="moveClassId"
+      :type="moveType"
       @save="onSaveMoveGroup"
     ></MoveGroup>
     <BindModal
@@ -956,6 +961,8 @@ export default {
       currentGroup: { id: "", classesGroupName: "" },
       showMoveGroup: false,
       moveGroupId: "",
+      moveClassId: "",
+      moveType: "",
       classSearchInput: "",
       initScheduleData: null,
       showBindModal: false,
@@ -1368,17 +1375,20 @@ export default {
         });
       }
       console.log(originalClassesJson);
-      const res = await submitData({
-        url: "/api/classSchedule/calculateTimeDistanceSth",
-        requestData: { ...data, triUserId: this.selectedAthletic },
-      });
-      // eslint-disable-next-line require-atomic-updates
-      data.classesJson = JSON.stringify({
-        ...originalClassesJson,
-        duration: secondsToHHMMSS(res.result.time || 0),
-        distance: (res.result.distance || 0) + "km",
-        sth: res.result.sth,
-      });
+      if (['RUN', 'CYCLE'].includes(data.sportType)) {
+        const res = await submitData({
+          url: "/api/classSchedule/calculateTimeDistanceSth",
+          requestData: { ...data, triUserId: this.selectedAthletic },
+        });
+        // eslint-disable-next-line require-atomic-updates
+        data.classesJson = JSON.stringify({
+          ...originalClassesJson,
+          duration: secondsToHHMMSS(res.result.time || 0),
+          distance: (res.result.distance || 0) + "km",
+          sth: res.result.sth,
+        });
+      }
+
       if (type === "classTemplate") {
         console.log(data, "data");
         return data;
@@ -1738,10 +1748,19 @@ export default {
     handleMoveGroup(id) {
       this.moveGroupId = id;
       this.showMoveGroup = true;
+      this.moveType = 'group';
+    },
+    handleMoveClass(id, groupId) {
+      this.moveGroupId = groupId;
+      this.showMoveGroup = true;
+      this.moveClassId = id;
+      this.moveType = 'class';
     },
     onSaveMoveGroup() {
       this.showMoveGroup = false;
       this.moveGroupId = "";
+      this.moveClassId = "";
+      this.moveType = "";
       this.getClassList();
     },
     // 显示绑定弹框
