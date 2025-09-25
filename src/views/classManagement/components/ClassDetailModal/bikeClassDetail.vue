@@ -832,14 +832,23 @@ export default {
             section.thresholdFtpNum = this.calculateThresholdFtpNum(
               section.thresholdFtp
             );
+            section.thresholdFtpNumZone = this.calculateThresholdFtpNumZone(
+              section.thresholdFtp
+            );
           }
           if (section.thresholdFtpRange !== undefined) {
             section.thresholdFtpRangeNum = this.calculateThresholdFtpRangeNum(
               section.thresholdFtpRange
             );
+            section.thresholdFtpRangeNumZone = this.calculateThresholdFtpRangeNumZone(
+              section.thresholdFtpRange
+            );
           }
           if (section.thresholdHeartRate !== undefined) {
             section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(
+              section.thresholdHeartRate
+            );
+            section.thresholdHeartRateNumZone = this.calculateThresholdHeartRateNumZone(
               section.thresholdHeartRate
             );
           }
@@ -848,6 +857,9 @@ export default {
               this.calculateThresholdHeartRateRangeNum(
                 section.thresholdHeartRateRange
               );
+            section.thresholdHeartRateRangeNumZone = this.calculateThresholdHeartRateRangeNumZone(
+              section.thresholdHeartRateRange
+            );
           }
         });
       });
