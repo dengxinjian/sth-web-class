@@ -94,7 +94,7 @@
                       popper-class="athletic-btn-popover"
                       placement="right"
                       width="80"
-                      trigger="click"
+                      trigger="hover"
                     >
                       <div
                         style="
@@ -321,7 +321,7 @@
                     </div>
                     <div style="display: flex">
                       <div class="keyword">
-                        {{ classItem.classesJson.distance }}
+                        {{ classItem.classesJson.distance }}<span v-if="classItem.sportType === 'SWIM'">{{ classItem.classesJson.distanceUnit }}</span>
                       </div>
                       <div>&nbsp;&nbsp;</div>
                     </div>
@@ -995,8 +995,10 @@ export default {
       deviceTypeIconDict: {
         1: "C",
         2: "G",
-        3: "Z",
-        4: "S",
+        3: "G",
+        4: "Z",
+        5: "S",
+        6: "S",
       },
       deviceList: [],
       currentActivityDict: {

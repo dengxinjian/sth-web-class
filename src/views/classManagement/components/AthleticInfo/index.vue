@@ -132,7 +132,7 @@
               <div class="zoneTd">z5C:无氧能力</div>
               <div class="zoneTd">{{ thresholdData.zone5C[0] }}</div>
               <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone5C[1] }}</div>
+              <div class="zoneTd">max</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
           </div>
