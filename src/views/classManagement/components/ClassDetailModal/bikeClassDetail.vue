@@ -771,13 +771,16 @@ export default {
       ];
     },
     calculateThresholdFtpRangeNumZoneFollow(reciprocal) {
+      const one1 = 0.4;
       const one = 0.71;
       const two = 0.83;
       const three = 0.91;
       const four = 0.99;
       const five = 1.02;
       const six = 1.1;
-      if (reciprocal < one) {
+      if (reciprocal < one1) {
+        return "热身/冷身";
+      } else if (reciprocal < one) {
         return "Z1";
       } else if (reciprocal < two) {
         return "Z2";

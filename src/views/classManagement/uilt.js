@@ -15,7 +15,10 @@ export const calculateThresholdHeartRateNumZoneFollow = (reciprocal) => {
   const four = 0.99;
   const five = 1.03;
   const six = 1.06;
-  if (reciprocal < one) {
+  const one1 = 0.65;
+  if (reciprocal < one1) {
+    return "热身/冷身";
+  } else if (reciprocal < one) {
     return "Z1";
   } else if (reciprocal < two) {
     return "Z2";
@@ -31,3 +34,4 @@ export const calculateThresholdHeartRateNumZoneFollow = (reciprocal) => {
     return "Z5C";
   }
 }
+

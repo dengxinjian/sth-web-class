@@ -704,8 +704,11 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
-import { debounce, calculateThresholdHeartRateNumZoneFollow } from "@/views/classManagement/uilt";
+import { getLunarDate, secondsToHHMMSS, secondsToMMSS, mmssToSeconds } from "@/utils/index";
+import {
+  debounce,
+  calculateThresholdHeartRateNumZoneFollow,
+} from "@/views/classManagement/uilt";
 
 export default {
   name: "AddRunClassDialog",
@@ -865,13 +868,16 @@ export default {
     },
     // 计算跟随阀值配速目标值的分组
     calculateThresholdSpeedNumZoneFollow(reciprocal) {
+      const one1 = 2;
       const one = 1.3;
       const two = 1.14;
       const three = 1.06;
       const four = 1.0;
       const five = 0.97;
       const six = 0.9;
-      if (reciprocal > one) {
+      if (reciprocal > one1) {
+        return "热身/冷身";
+      } else if (reciprocal > one) {
         return "Z1";
       } else if (reciprocal > two) {
         return "Z2";
@@ -918,6 +924,17 @@ export default {
       return calculateThresholdHeartRateNumZoneFollow(
         (thresholdHeartRate / 100).toFixed(2)
       );
+    },
+    // 计算固定配速运动值的分组
+    calculateTargetSpeedRangeNumZone(targetSpeedRange) {
+      return [
+        this.calculateThresholdSpeedNumZoneFollow(
+          (targetSpeedRange[0] / 100).toFixed(2)
+        ),
+        this.calculateThresholdSpeedNumZoneFollow(
+          (targetSpeedRange[1] / 100).toFixed(2)
+        ),
+      ];
     },
     updateClassInfoCalculatedValues() {
       // 更新所有阶段的阈值功率计算值
