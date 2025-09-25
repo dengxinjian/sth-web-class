@@ -19,7 +19,9 @@
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{ classInfo.duration }}</span>
-          <span v-if="classInfo.mode == 1 || classInfo.mode == 3">{{ classInfo.distance }}</span>
+          <span v-if="classInfo.mode == 1 || classInfo.mode == 3">{{
+            classInfo.distance
+          }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -406,7 +408,18 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">%阈值配速</span>
+                  <span class="unit"
+                    >%阈值配速
+                    {{
+                      calculateThresholdSpeedRangeNumZone(
+                        part.thresholdSpeedRange
+                      )[0]
+                    }}~{{
+                      calculateThresholdSpeedRangeNumZone(
+                        part.thresholdSpeedRange
+                      )[1]
+                    }}</span
+                  >
                   <span class="label"
                     >{{
                       secondsToMMSS(
@@ -438,7 +451,12 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">%阈值配速</span>
+                  <span class="unit"
+                    >%阈值配速
+                    {{
+                      calculateThresholdSpeedNumZone(part.thresholdSpeed)
+                    }}</span
+                  >
                   <span class="label"
                     >{{
                       secondsToMMSS(
@@ -471,7 +489,14 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">%阈值心率</span>
+                  <span class="unit"
+                    >%阈值心率
+                    {{
+                      calculateThresholdHeartRateRangeNumZone(
+                        part.thresholdHeartRateRange
+                      ).join(" ~ ")
+                    }}</span
+                  >
                   <span class="label"
                     >{{
                       calculateThresholdHeartRateRangeNum(
@@ -495,7 +520,14 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">%阈值心率</span>
+                  <span class="unit"
+                    >%阈值心率
+                    {{
+                      calculateThresholdHeartRateNumZone(
+                        part.thresholdHeartRate
+                      )
+                    }}</span
+                  >
                   <span class="label"
                     >{{
                       calculateThresholdHeartRateNum(part.thresholdHeartRate)
@@ -673,7 +705,7 @@ import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
 import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
-import { debounce } from "@/views/classManagement/uilt";
+import { debounce, calculateThresholdHeartRateNumZoneFollow } from "@/views/classManagement/uilt";
 
 export default {
   name: "AddRunClassDialog",
@@ -810,10 +842,62 @@ export default {
         ),
       ];
     },
+    calculateThresholdSpeedRangeNumZone(thresholdSpeedRange) {
+      console.log(thresholdSpeedRange, "thresholdSpeedRange");
+      return [
+        this.calculateThresholdSpeedNumZoneFollow(
+          (1 / (thresholdSpeedRange[0] / 100)).toFixed(2)
+        ),
+        this.calculateThresholdSpeedNumZoneFollow(
+          (1 / (thresholdSpeedRange[1] / 100)).toFixed(2)
+        ),
+      ];
+    },
     calculateThresholdSpeedNum(thresholdSpeed) {
       return Math.round(
         this.athleticThreshold.run * (1 / (thresholdSpeed / 100))
       );
+    },
+    calculateThresholdSpeedNumZone(thresholdSpeed) {
+      const reciprocal = (1 / (thresholdSpeed / 100)).toFixed(2);
+      console.log(reciprocal, "reciprocal");
+      return this.calculateThresholdSpeedNumZoneFollow(reciprocal);
+    },
+    // 计算跟随阀值配速目标值的分组
+    calculateThresholdSpeedNumZoneFollow(reciprocal) {
+      const one = 1.3;
+      const two = 1.14;
+      const three = 1.06;
+      const four = 1.0;
+      const five = 0.97;
+      const six = 0.9;
+      if (reciprocal > one) {
+        return "Z1";
+      } else if (reciprocal > two) {
+        return "Z2";
+      } else if (reciprocal > three) {
+        return "Z3";
+      } else if (reciprocal > four) {
+        return "Z4";
+      } else if (reciprocal > five) {
+        return "Z5A";
+      } else if (reciprocal > six) {
+        return "Z5B";
+      } else {
+        return "Z5C";
+      }
+    },
+
+    // 计算跟随阀值心率目标值的分组
+    calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
+      return [
+        calculateThresholdHeartRateNumZoneFollow(
+          (thresholdHeartRateRange[0] / 100).toFixed(2)
+        ),
+        calculateThresholdHeartRateNumZoneFollow(
+          (thresholdHeartRateRange[1] / 100).toFixed(2)
+        ),
+      ];
     },
     calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
       return [
@@ -830,6 +914,11 @@ export default {
         this.athleticThreshold.heartRate * (thresholdHeartRate / 100)
       );
     },
+    calculateThresholdHeartRateNumZone(thresholdHeartRate) {
+      return calculateThresholdHeartRateNumZoneFollow(
+        (thresholdHeartRate / 100).toFixed(2)
+      );
+    },
     updateClassInfoCalculatedValues() {
       // 更新所有阶段的阈值功率计算值
       this.classInfo.stages.forEach((stage, stageIndex) => {
@@ -838,19 +927,34 @@ export default {
             section.thresholdSpeedNum = this.calculateThresholdSpeedNum(
               section.thresholdSpeed
             );
+            section.thresholdSpeedNumZone = this.calculateThresholdSpeedNumZone(
+              section.thresholdSpeed
+            );
           }
           if (section.thresholdSpeedRange !== undefined) {
             section.thresholdSpeedRangeNum =
               this.calculateThresholdSpeedRangeNum(section.thresholdSpeedRange);
+            section.thresholdSpeedRangeNumZone =
+              this.calculateThresholdSpeedRangeNumZone(
+                section.thresholdSpeedRange
+              );
           }
           if (section.thresholdHeartRate !== undefined) {
             section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(
               section.thresholdHeartRate
             );
+            section.thresholdHeartRateNumZone =
+              this.calculateThresholdHeartRateNumZone(
+                section.thresholdHeartRate
+              );
           }
           if (section.thresholdHeartRateRange !== undefined) {
             section.thresholdHeartRateRangeNum =
               this.calculateThresholdHeartRateRangeNum(
+                section.thresholdHeartRateRange
+              );
+            section.thresholdHeartRateRangeNumZone =
+              this.calculateThresholdHeartRateRangeNumZone(
                 section.thresholdHeartRateRange
               );
           }
@@ -903,7 +1007,7 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.classInfo.id = res.result;
-          this.$emit("save",flag);
+          this.$emit("save", flag);
           this.$message.success("课程保存成功");
         }
         if (flag) this.innerVisible = false;
@@ -921,7 +1025,7 @@ export default {
         }),
       }).then((res) => {
         if (res.success) {
-          this.$emit("save",flag);
+          this.$emit("save", flag);
           this.$message.success("课表保存成功");
         }
         if (flag) this.innerVisible = false;
@@ -940,7 +1044,7 @@ export default {
           }).then((res) => {
             if (res.success) {
               this.resetForm();
-              this.$emit("save",true);
+              this.$emit("save", true);
               this.$message.success("课程删除成功");
               this.innerVisible = false;
             }
@@ -975,7 +1079,7 @@ export default {
     },
     onCancel() {
       this.innerVisible = false;
-      this.$emit("save",true);
+      this.$emit("save", true);
     },
     onSave(closeAfter) {
       console.log(JSON.stringify(this.classInfo));

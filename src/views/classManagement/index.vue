@@ -1882,9 +1882,9 @@ export default {
     handleClassDetailSave(flag) {
       if (flag) {
         this.showClassDetailModal = false;
+        this.classSportType = "";
+        this.classDetailData = { id: "" };
       }
-      this.classSportType = "";
-      this.classDetailData = { id: "" };
       this.getScheduleData();
     },
     // 获取运动icon 图片地址
