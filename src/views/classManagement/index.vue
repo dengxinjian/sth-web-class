@@ -1846,7 +1846,6 @@ export default {
             sth: res.result.sth,
           };
         }
-        
       }
       // data.classesJson =
       if (data.sportType === "RUN") {
