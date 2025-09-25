@@ -293,7 +293,7 @@
                 class="times-input"
                 size="small"
                 @input="handleTimesChange(index)"
-                @change="calculateTimeline"
+                @change="calculateTimeline(item.times)"
               />
             </div>
             <div
@@ -830,6 +830,7 @@ export default {
           this.$emit("save", { ...this.classInfo });
           this.$message.success("课程保存成功");
         }
+        console.log(flag, "flag");
         if (flag) this.innerVisible = false;
       });
     },
@@ -1226,7 +1227,13 @@ export default {
       this.calculateTimeline();
     },
     // 计算时间线
-    calculateTimeline() {
+    calculateTimeline(times = 1) {
+      const timesNum = Number(times);
+      if (isNaN(timesNum) || timesNum < 1) {
+        return;
+      } else if (!Number.isInteger(timesNum)) {
+        return;
+      }
       this.getSth();
       let duration = 0;
       let distance = 0;

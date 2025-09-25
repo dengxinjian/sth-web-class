@@ -249,7 +249,7 @@
                 class="times-input"
                 size="small"
                 @input="handleTimesChange(index)"
-                @change="calculateTimeline"
+                @change="calculateTimeline(item.times)"
               />
             </div>
             <div
@@ -991,7 +991,13 @@ export default {
       return new Date(seconds * 1000).toISOString().substr(11, 8);
     },
     // 计算时间线
-    calculateTimeline() {
+    calculateTimeline(times = 1) {
+      const timesNum = Number(times);
+      if (isNaN(timesNum) || timesNum < 1) {
+        return;
+      } else if (!Number.isInteger(timesNum)) {
+        return;
+      }
       this.getSth();
       let duration = 0;
       this.maxIntensity = 0;

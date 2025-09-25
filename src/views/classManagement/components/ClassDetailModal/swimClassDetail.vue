@@ -203,7 +203,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.form.id = res.result
-          this.$emit('save', {...this.form})
+          this.$emit('save', flag)
           this.$message.success('课程保存成功')
         }
         if (flag) this.innerVisible = false
@@ -217,7 +217,7 @@ export default {
         classesJson: JSON.stringify({...this.form})
       }).then(res => {
         if (res.success) {
-          this.$emit('save', {...this.form})
+          this.$emit('save', flag)
           this.$message.success('课表保存成功')
         }
         if (flag) this.innerVisible = false
@@ -235,7 +235,7 @@ export default {
         }).then(res => {
           if (res.success) {
             this.resetForm()
-            this.$emit('save', {...this.form})
+            this.$emit('save', true)
             this.$message.success('课程删除成功')
             this.innerVisible = false
           }
@@ -247,7 +247,7 @@ export default {
     },
     onCancel() {
       this.innerVisible = false
-      this.$emit('cancel')
+      this.$emit('cancel', true)
     },
     onSave(closeAfter) {
       const payload = { ...this.form }
