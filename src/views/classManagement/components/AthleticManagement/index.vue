@@ -21,7 +21,7 @@
                         <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleDeleteGroup(node)">删除分组</el-button>
                         <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button>
                         <el-button v-if="!node.data.isGroup" type="text" size="mini" @click="handleMoveAthletic(node)">移动分组</el-button>
-                        <el-button v-if="!node.data.isGroup && node.parent.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveOutAthletic(node)">移出分组</el-button>
+                        <el-button v-if="!node.data.isGroup" type="text" size="mini" @click="handleMoveOutAthletic(node)">移出</el-button>
                     </div>
                     <el-button
                         type="text"
@@ -232,7 +232,7 @@ export default {
               groupName: item.groupName,
               triUserId: item.triUserId,
               children: (item.members || []).map(member => {
-                return {id: member.id, label: member.userNickname, triUserId: member.triUserId}
+                return {id: member.id, label: member.userNickname, triUserId: member.triUserId, userType: member.userType}
               })
             }
           })
@@ -397,29 +397,24 @@ export default {
 
     // 运动员移出分组
     handleMoveOutAthletic(node) {
-      this.$confirm('确定要移出该运动员吗？', '提示', {
+      this.$confirm('确定从该团队移出该运动员吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        const params = {
-          groupId: null,
-          teamId: this.teamId,
-          memberIds: [node.data.triUserId]
-        }
         submitData({
-          url: '/api/team/group/member/batch-set',
-          requestData: params
+          url: `/api/team/kick/${this.teamId}/${node.data.triUserId}/${node.data.userType}`,
+          method: 'delete'
         }).then(res => {
           if (res.success) {
-            this.$message.success('移出分组成功')
+            this.$message.success('移出团队成功')
             this.getAthleticData()
           } else {
-            this.$message.error(res.message || '移出分组失败')
+            this.$message.error(res.message || '移出团队失败')
           }
         }).catch(error => {
-          console.error('移出分组失败:', error)
-          this.$message.error('移出分组失败')
+          console.error('移出团队失败:', error)
+          this.$message.error('移出团队失败')
         })
       })
     },
