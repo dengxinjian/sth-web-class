@@ -33,5 +33,265 @@ export const calculateThresholdHeartRateNumZoneFollow = (reciprocal) => {
   } else {
     return "Z5C";
   }
+};
+
+// 跑步计算类
+export class CalculateRun {
+  constructor(athleticThreshold, classInfo) {
+    this.classInfo = classInfo;
+    this.athleticThreshold = athleticThreshold;
+  }
+  calculateThresholdSpeedRangeNum(thresholdSpeedRange) {
+    return [
+      Math.round(
+        this.athleticThreshold.run * (1 / (thresholdSpeedRange[0] / 100))
+      ),
+      Math.round(
+        this.athleticThreshold.run * (1 / (thresholdSpeedRange[1] / 100))
+      ),
+    ];
+  }
+  calculateThresholdSpeedNum(thresholdSpeed) {
+    return Math.round(
+      this.athleticThreshold.run * (1 / (thresholdSpeed / 100))
+    );
+  }
+  calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
+    return [
+      Math.round(
+        this.athleticThreshold.heartRate * (thresholdHeartRateRange[0] / 100)
+      ),
+      Math.round(
+        this.athleticThreshold.heartRate * (thresholdHeartRateRange[1] / 100)
+      ),
+    ];
+  }
+  calculateThresholdHeartRateNum(thresholdHeartRate) {
+    return Math.round(
+      this.athleticThreshold.heartRate * (thresholdHeartRate / 100)
+    );
+  }
+  calculateThresholdSpeedNumZoneFollow(reciprocal) {
+    const one1 = 2;
+    const one = 1.3;
+    const two = 1.14;
+    const three = 1.06;
+    const four = 1.0;
+    const five = 0.97;
+    const six = 0.9;
+    if (reciprocal > one1) {
+      return "热身/冷身";
+    } else if (reciprocal > one) {
+      return "Z1";
+    } else if (reciprocal > two) {
+      return "Z2";
+    } else if (reciprocal > three) {
+      return "Z3";
+    } else if (reciprocal > four) {
+      return "Z4";
+    } else if (reciprocal > five) {
+      return "Z5A";
+    } else if (reciprocal > six) {
+      return "Z5B";
+    } else {
+      return "Z5C";
+    }
+  }
+  calculateThresholdSpeedNumZone(thresholdSpeed) {
+    const reciprocal = (1 / (thresholdSpeed / 100)).toFixed(2);
+    return this.calculateThresholdSpeedNumZoneFollow(reciprocal);
+  }
+  calculateThresholdSpeedRangeNumZone(thresholdSpeedRange) {
+    return [
+      this.calculateThresholdSpeedNumZoneFollow(
+        (1 / (thresholdSpeedRange[0] / 100)).toFixed(2)
+      ),
+      this.calculateThresholdSpeedNumZoneFollow(
+        (1 / (thresholdSpeedRange[1] / 100)).toFixed(2)
+      ),
+    ];
+  }
+  calculateThresholdHeartRateNumZone(thresholdHeartRate) {
+    return calculateThresholdHeartRateNumZoneFollow(
+      (thresholdHeartRate / 100).toFixed(2)
+    );
+  }
+  calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
+    return [
+      calculateThresholdHeartRateNumZoneFollow(
+        (thresholdHeartRateRange[0] / 100).toFixed(2)
+      ),
+      calculateThresholdHeartRateNumZoneFollow(
+        (thresholdHeartRateRange[1] / 100).toFixed(2)
+      ),
+    ];
+  }
+  updateClassInfoCalculatedValues() {
+    this.classInfo.stages.forEach((stage, stageIndex) => {
+      stage.sections.forEach((section, sectionIndex) => {
+        if (section.thresholdSpeed !== undefined) {
+          section.thresholdSpeedNum = this.calculateThresholdSpeedNum(
+            section.thresholdSpeed
+          );
+          section.thresholdSpeedNumZone = this.calculateThresholdSpeedNumZone(
+            section.thresholdSpeed
+          );
+        }
+        if (section.thresholdSpeedRange !== undefined) {
+          section.thresholdSpeedRangeNum = this.calculateThresholdSpeedRangeNum(
+            section.thresholdSpeedRange
+          );
+          section.thresholdSpeedRangeNumZone =
+            this.calculateThresholdSpeedRangeNumZone(
+              section.thresholdSpeedRange
+            );
+        }
+        if (section.thresholdHeartRate !== undefined) {
+          section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(
+            section.thresholdHeartRate
+          );
+          section.thresholdHeartRateNumZone =
+            this.calculateThresholdHeartRateNumZone(section.thresholdHeartRate);
+        }
+        if (section.thresholdHeartRateRange !== undefined) {
+          section.thresholdHeartRateRangeNum =
+            this.calculateThresholdHeartRateRangeNum(
+              section.thresholdHeartRateRange
+            );
+          section.thresholdHeartRateRangeNumZone =
+            this.calculateThresholdHeartRateRangeNumZone(
+              section.thresholdHeartRateRange
+            );
+        }
+      });
+    });
+    return this.classInfo;
+  }
 }
 
+// 骑行 计算类
+export class CalculateBike {
+  constructor(athleticThreshold, classInfo) {
+    this.classInfo = classInfo;
+    this.athleticThreshold = athleticThreshold;
+  }
+  calculateThresholdFtpNum(thresholdFtp) {
+    return Math.round(this.athleticThreshold.cycle * (thresholdFtp / 100));
+  }
+  calculateThresholdFtpRangeNum(thresholdFtpRange) {
+    return [
+      Math.round(this.athleticThreshold.cycle * (thresholdFtpRange[0] / 100)),
+      Math.round(this.athleticThreshold.cycle * (thresholdFtpRange[1] / 100)),
+    ];
+  }
+  calculateThresholdHeartRateNum(thresholdHeartRate) {
+    return Math.round(
+      this.athleticThreshold.heartRate * (thresholdHeartRate / 100)
+    );
+  }
+  calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
+    return [
+      Math.round(
+        this.athleticThreshold.heartRate * (thresholdHeartRateRange[0] / 100)
+      ),
+      Math.round(
+        this.athleticThreshold.heartRate * (thresholdHeartRateRange[1] / 100)
+      ),
+    ];
+  }
+  calculateThresholdFtpRangeNumZoneFollow(reciprocal) {
+    const one1 = 0.4;
+    const one = 0.71;
+    const two = 0.83;
+    const three = 0.91;
+    const four = 0.99;
+    const five = 1.02;
+    const six = 1.1;
+    if (reciprocal < one1) {
+      return "热身/冷身";
+    } else if (reciprocal < one) {
+      return "Z1";
+    } else if (reciprocal < two) {
+      return "Z2";
+    } else if (reciprocal < three) {
+      return "Z3";
+    } else if (reciprocal < four) {
+      return "Z4";
+    } else if (reciprocal < five) {
+      return "Z5A";
+    } else if (reciprocal < six) {
+      return "Z5B";
+    } else {
+      return "Z5C";
+    }
+  }
+  calculateThresholdFtpNumZone(thresholdFtp) {
+    return this.calculateThresholdFtpRangeNumZoneFollow(
+      (thresholdFtp / 100).toFixed(2)
+    );
+  }
+  calculateThresholdFtpRangeNumZone(thresholdFtpRange) {
+    return [
+      this.calculateThresholdFtpRangeNumZoneFollow(
+        (thresholdFtpRange[0] / 100).toFixed(2)
+      ),
+      this.calculateThresholdFtpRangeNumZoneFollow(
+        (thresholdFtpRange[1] / 100).toFixed(2)
+      ),
+    ];
+  }
+  calculateThresholdHeartRateNumZone(thresholdHeartRate) {
+    return calculateThresholdHeartRateNumZoneFollow(
+      (thresholdHeartRate / 100).toFixed(2)
+    );
+  }
+  calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
+    return [
+      calculateThresholdHeartRateNumZoneFollow(
+        (thresholdHeartRateRange[0] / 100).toFixed(2)
+      ),
+      calculateThresholdHeartRateNumZoneFollow(
+        (thresholdHeartRateRange[1] / 100).toFixed(2)
+      ),
+    ];
+  }
+  updateClassInfoCalculatedValues() {
+    this.classInfo.stages.forEach((stage, stageIndex) => {
+      stage.sections.forEach((section, sectionIndex) => {
+        if (section.thresholdFtp !== undefined) {
+          section.thresholdFtpNum = this.calculateThresholdFtpNum(
+            section.thresholdFtp
+          );
+          section.thresholdFtpNumZone = this.calculateThresholdFtpNumZone(
+            section.thresholdFtp
+          );
+        }
+        if (section.thresholdFtpRange !== undefined) {
+          section.thresholdFtpRangeNum = this.calculateThresholdFtpRangeNum(
+            section.thresholdFtpRange
+          );
+          section.thresholdFtpRangeNumZone =
+            this.calculateThresholdFtpRangeNumZone(section.thresholdFtpRange);
+        }
+        if (section.thresholdHeartRate !== undefined) {
+          section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(
+            section.thresholdHeartRate
+          );
+          section.thresholdHeartRateNumZone =
+            this.calculateThresholdHeartRateNumZone(section.thresholdHeartRate);
+        }
+        if (section.thresholdHeartRateRange !== undefined) {
+          section.thresholdHeartRateRangeNum =
+            this.calculateThresholdHeartRateRangeNum(
+              section.thresholdHeartRateRange
+            );
+          section.thresholdHeartRateRangeNumZone =
+            this.calculateThresholdHeartRateRangeNumZone(
+              section.thresholdHeartRateRange
+            );
+        }
+      });
+    });
+    return this.classInfo;
+  }
+}
