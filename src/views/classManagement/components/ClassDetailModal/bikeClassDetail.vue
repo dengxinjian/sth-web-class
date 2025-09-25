@@ -98,7 +98,11 @@
           }}
         </div>
         <div class="time-stage-for">
-          <div v-for="n in item.times" :key="`stage-${index}-${n}-${item.duration}`" class="time-stage-item">
+          <div
+            v-for="n in item.times"
+            :key="`stage-${index}-${n}-${item.duration}`"
+            class="time-stage-item"
+          >
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
@@ -242,7 +246,7 @@
             :key="index"
             class="stage-section"
           >
-          <div v-if="item.sections.length > 1" class="stage-header">
+            <div v-if="item.sections.length > 1" class="stage-header">
               <span class="stage-title">重复次数</span>
               <el-input
                 v-model="item.times"
@@ -338,8 +342,21 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">%阈值功率</span>
-                   <span class="label">{{ calculateThresholdFtpRangeNum(part.thresholdFtpRange).join(" ~ ") }}w</span>
+                  <span class="unit"
+                    >%阈值功率
+                    {{
+                      calculateThresholdFtpRangeNumZone(
+                        part.thresholdFtpRange
+                      ).join(" ~ ")
+                    }}</span
+                  >
+                  <span class="label"
+                    >{{
+                      calculateThresholdFtpRangeNum(
+                        part.thresholdFtpRange
+                      ).join(" ~ ")
+                    }}w</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 1 && part.range === 'target'"
@@ -356,8 +373,13 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">%阈值功率</span>
-                   <span class="label">{{ calculateThresholdFtpNum(part.thresholdFtp) }}w</span>
+                  <span class="unit"
+                    >%阈值功率
+                    {{ calculateThresholdFtpNumZone(part.thresholdFtp) }}</span
+                  >
+                  <span class="label"
+                    >{{ calculateThresholdFtpNum(part.thresholdFtp) }}w</span
+                  >
                 </div>
                 <div
                   v-if="classInfo.mode === 2 && part.range === 'range'"
@@ -383,8 +405,21 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">%阈值心率</span>
-                  <span class="label">{{ calculateThresholdHeartRateRangeNum(part.thresholdHeartRateRange).join(" ~ ") }}bpm</span>
+                  <span class="unit"
+                    >%阈值心率
+                    {{
+                      calculateThresholdHeartRateRangeNumZone(
+                        part.thresholdHeartRateRange
+                      ).join(" ~ ")
+                    }}
+                  </span>
+                  <span class="label"
+                    >{{
+                      calculateThresholdHeartRateRangeNum(
+                        part.thresholdHeartRateRange
+                      ).join(" ~ ")
+                    }}bpm</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 2 && part.range === 'target'"
@@ -401,8 +436,19 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">%阈值心率</span>
-                  <span class="label">{{ calculateThresholdHeartRateNum(part.thresholdHeartRate) }}bpm</span>
+                  <span class="unit"
+                    >%阈值心率
+                    {{
+                      calculateThresholdHeartRateNumZone(
+                        part.thresholdHeartRate
+                      )
+                    }}</span
+                  >
+                  <span class="label"
+                    >{{
+                      calculateThresholdHeartRateNum(part.thresholdHeartRate)
+                    }}bpm</span
+                  >
                 </div>
                 <div
                   v-if="classInfo.mode === 3 && part.range === 'range'"
@@ -575,7 +621,10 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-import { debounce } from "@/views/classManagement/uilt";
+import {
+  debounce,
+  calculateThresholdHeartRateNumZoneFollow,
+} from "@/views/classManagement/uilt";
 
 export default {
   name: "AddBikeClassDialog",
@@ -685,7 +734,7 @@ export default {
   methods: {
     handleTimesChange(stageIndex) {
       const stage = this.classInfo.stages[stageIndex];
-      console.log(stage, "stage",stageIndex);
+      console.log(stage, "stage", stageIndex);
       const times = Number(stage.times);
       if (isNaN(times) || times < 1) {
         this.$set(this.classInfo.stages[stageIndex], "times", 1);
@@ -706,13 +755,73 @@ export default {
         Math.round(this.athleticThreshold.cycle * (thresholdFtpRange[1] / 100)),
       ];
     },
+    calculateThresholdFtpNumZone(thresholdFtp) {
+      return this.calculateThresholdFtpRangeNumZoneFollow(
+        (thresholdFtp / 100).toFixed(2)
+      );
+    },
+    calculateThresholdFtpRangeNumZone(thresholdFtpRange) {
+      return [
+        this.calculateThresholdFtpRangeNumZoneFollow(
+          (thresholdFtpRange[0] / 100).toFixed(2)
+        ),
+        this.calculateThresholdFtpRangeNumZoneFollow(
+          (thresholdFtpRange[1] / 100).toFixed(2)
+        ),
+      ];
+    },
+    calculateThresholdFtpRangeNumZoneFollow(reciprocal) {
+      const one = 0.71;
+      const two = 0.83;
+      const three = 0.91;
+      const four = 0.99;
+      const five = 1.02;
+      const six = 1.1;
+      if (reciprocal < one) {
+        return "Z1";
+      } else if (reciprocal < two) {
+        return "Z2";
+      } else if (reciprocal < three) {
+        return "Z3";
+      } else if (reciprocal < four) {
+        return "Z4";
+      } else if (reciprocal < five) {
+        return "Z5A";
+      } else if (reciprocal < six) {
+        return "Z5B";
+      } else {
+        return "Z5C";
+      }
+    },
     calculateThresholdHeartRateNum(thresholdHeartRate) {
-      return Math.round(this.athleticThreshold.heartRate * (thresholdHeartRate / 100));
+      return Math.round(
+        this.athleticThreshold.heartRate * (thresholdHeartRate / 100)
+      );
+    },
+    calculateThresholdHeartRateNumZone(thresholdHeartRate) {
+      return calculateThresholdHeartRateNumZoneFollow(
+        (thresholdHeartRate / 100).toFixed(2)
+      );
     },
     calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
       return [
-        Math.round(this.athleticThreshold.heartRate * (thresholdHeartRateRange[0] / 100)),
-        Math.round(this.athleticThreshold.heartRate * (thresholdHeartRateRange[1] / 100)),
+        Math.round(
+          this.athleticThreshold.heartRate * (thresholdHeartRateRange[0] / 100)
+        ),
+        Math.round(
+          this.athleticThreshold.heartRate * (thresholdHeartRateRange[1] / 100)
+        ),
+      ];
+    },
+    // 计算跟随阀值心率目标值的分组
+    calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
+      return [
+        calculateThresholdHeartRateNumZoneFollow(
+          (thresholdHeartRateRange[0] / 100).toFixed(2)
+        ),
+        calculateThresholdHeartRateNumZoneFollow(
+          (thresholdHeartRateRange[1] / 100).toFixed(2)
+        ),
       ];
     },
     updateClassInfoCalculatedValues() {
@@ -720,16 +829,25 @@ export default {
       this.classInfo.stages.forEach((stage, stageIndex) => {
         stage.sections.forEach((section, sectionIndex) => {
           if (section.thresholdFtp !== undefined) {
-            section.thresholdFtpNum = this.calculateThresholdFtpNum(section.thresholdFtp);
+            section.thresholdFtpNum = this.calculateThresholdFtpNum(
+              section.thresholdFtp
+            );
           }
           if (section.thresholdFtpRange !== undefined) {
-            section.thresholdFtpRangeNum = this.calculateThresholdFtpRangeNum(section.thresholdFtpRange);
+            section.thresholdFtpRangeNum = this.calculateThresholdFtpRangeNum(
+              section.thresholdFtpRange
+            );
           }
           if (section.thresholdHeartRate !== undefined) {
-            section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(section.thresholdHeartRate);
+            section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(
+              section.thresholdHeartRate
+            );
           }
           if (section.thresholdHeartRateRange !== undefined) {
-            section.thresholdHeartRateRangeNum = this.calculateThresholdHeartRateRangeNum(section.thresholdHeartRateRange);
+            section.thresholdHeartRateRangeNum =
+              this.calculateThresholdHeartRateRangeNum(
+                section.thresholdHeartRateRange
+              );
           }
         });
       });
@@ -780,7 +898,7 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.classInfo.id = res.result;
-          this.$emit("save",flag);
+          this.$emit("save", flag);
           this.$message.success("课程保存成功");
         }
         if (flag) this.innerVisible = false;
@@ -798,7 +916,7 @@ export default {
         }),
       }).then((res) => {
         if (res.success) {
-          this.$emit("save",flag);
+          this.$emit("save", flag);
           this.$message.success("课表保存成功");
         }
         if (flag) this.innerVisible = false;
@@ -817,7 +935,7 @@ export default {
           }).then((res) => {
             if (res.success) {
               this.resetForm();
-              this.$emit("save",true);
+              this.$emit("save", true);
               this.$message.success("课程删除成功");
               this.innerVisible = false;
             }
@@ -849,7 +967,7 @@ export default {
     },
     onCancel() {
       this.innerVisible = false;
-      this.$emit("cancel",true);
+      this.$emit("cancel", true);
     },
     onSave(closeAfter) {
       console.log(JSON.stringify(this.classInfo));
@@ -1053,7 +1171,7 @@ export default {
             title: section.title,
           };
         });
-        duration += totalTime * stage.times
+        duration += totalTime * stage.times;
         return {
           duration: totalTime * stage.times,
           stageTimeline,
