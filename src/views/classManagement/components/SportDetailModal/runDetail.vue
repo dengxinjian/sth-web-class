@@ -138,7 +138,7 @@
             <span class="section-title">同步参数</span>
           </div>
           <div class="sync-params">
-            <span>时间：{{ sportDetail.endTime }}</span>
+            <span>时间：{{ sportDetail.startTime }}</span>
             <span>距离：{{ (sportDetail.distance/1000).toFixed(2) }} km</span>
           </div>
           <div class="sync-params">

@@ -53,7 +53,7 @@
             <div class="sync-params-container">
               <div class="sync-params-left">
                 <div class="sync-params">
-                    <span>时间：{{ sportDetail.endTime }}</span>
+                    <span>时间：{{ sportDetail.startTime }}</span>
                     <span>距离：{{ sportDetail.distance }} m</span>
                 </div>
                 <div class="sync-params">

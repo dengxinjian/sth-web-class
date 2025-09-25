@@ -349,6 +349,7 @@
                             {{ part.target }} @
                             {{ part.thresholdFtpRangeNum[0] }}~
                             {{ part.thresholdFtpRangeNum[1] }}w
+                            <span v-if="part?.thresholdFtpRangeNumZone">{{ part.thresholdFtpRangeNumZone[0] }}~{{ part.thresholdFtpRangeNumZone[1] }}</span>
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -364,6 +365,7 @@
                             {{ part.target }} @
                             {{ part.thresholdHeartRateRangeNum[0] }}~
                             {{ part.thresholdHeartRateRangeNum[1] }}bpm
+                            <span v-if="part?.thresholdHeartRateRangeNumZone">{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -377,6 +379,7 @@
                             "
                           >
                             {{ part.target }} @ {{ part.thresholdFtpNum }}w
+                            <span v-if="part?.thresholdFtpNumZone"></span>{{ part.thresholdFtpNumZone }}</span>
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -391,6 +394,7 @@
                           >
                             {{ part.target }} @
                             {{ part.thresholdHeartRateNum }}bpm
+                            <span v-if="part?.thresholdHeartRateNumZone">{{ part.thresholdHeartRateNumZone }}</span>
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -480,6 +484,7 @@
                             {{
                               secondsToMMSS(part.thresholdSpeedRangeNum[1])
                             }}/km
+                            <span v-if="part?.thresholdSpeedRangeNumZone"></span>{{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -495,6 +500,7 @@
                             {{ part.target }} @
                             {{ part.thresholdHeartRateRangeNum[0] }}~
                             {{ part.thresholdHeartRateRangeNum[1] }}bpm
+                            <span v-if="part?.thresholdHeartRateRangeNumZone"></span>{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -509,6 +515,7 @@
                           >
                             {{ part.target }} @
                             {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
+                            <span v-if="part?.thresholdSpeedNumZone"></span>{{ part.thresholdSpeedNumZone }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -523,6 +530,7 @@
                           >
                             {{ part.target }} @
                             {{ part.thresholdHeartRateNum }}bpm
+                            <span v-if="part?.thresholdHeartRateNumZone"></span>{{ part.thresholdHeartRateNumZone }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -1002,10 +1010,10 @@ export default {
       },
       deviceList: [],
       currentActivityDict: {
-        1: "BIKE",
+        1: "CYCLE",
         2: "RUN",
         3: "SWIM",
-        4: "POWER",
+        4: "STRENGTH",
         5: "OTHER",
       },
       classModalDataType: "",
@@ -1189,7 +1197,7 @@ export default {
                   currentClass = _this.findClassById(e.item.dataset.id);
                   // alert("该逻辑待补充，暂时先新建课表再合并");
                   if (
-                    currentClass.classesJson.sportType ===
+                    currentClass.sportType ===
                     _this.currentActivityDict[currentActivity.sportType]
                   ) {
                     _this.handleBind(
@@ -1205,7 +1213,7 @@ export default {
                   }
                 } else {
                   if (
-                    currentClass.classesJson.sportType ===
+                    currentClass.sportType ===
                     _this.currentActivityDict[currentActivity.sportType]
                   ) {
                     _this.handleBind(currentClass, {

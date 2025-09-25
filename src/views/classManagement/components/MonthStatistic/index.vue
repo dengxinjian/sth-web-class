@@ -16,8 +16,8 @@
         <div class="month-data-text">
           <span>{{ item.title }}:</span>
           <div>
-            <span>{{ item.actualValue }} {{ item.unit }}</span>
-            <span style="padding-left: 5px;">{{ item.planValue || 0 }} {{ item.unit }}</span>
+            <span>{{ item.actualValue }} {{ item.key === 'totalSTH' ? 'w' : item.unit }}</span>
+            <span style="padding-left: 5px;">{{ item.planValue || 0 }} {{ item.key === 'totalSTH' ? 'w' : item.unit }}</span>
           </div>
         </div>
         <el-progress :percentage="item.percent || 0" :color="item.color" :show-text="false"></el-progress>
@@ -114,13 +114,16 @@ export default {
       }).then(res => {
         if (res.success) {
           this.statisticData = res.result.statisticsVoList.map(item => {
+            const actualValue = item.key === 'totalSTH' ? Math.round(item.actualValue / 100) / 100 : item.actualValue
+            const planValue = item.key === 'totalSTH' ? Math.round(item.planValue / 100) / 100 : item.planValue
             return {
               ...item,
-              actualValue: unitConversion(item.actualValue, statisticKeyToTitle[item.key]?.unit),
+              actualValue: unitConversion(actualValue, statisticKeyToTitle[item.key]?.unit),
               title: statisticKeyToTitle[item.key]?.title,
               color: statisticKeyToTitle[item.key]?.color,
               icon: statisticKeyToTitle[item.key]?.icon,
               unit: statisticKeyToTitle[item.key]?.unit,
+              planValue
             }
           })
           this.sthData = res.result.avgSthRespDto
