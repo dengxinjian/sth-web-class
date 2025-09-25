@@ -14,7 +14,7 @@
       <div class="basic-info-item">
         <div class="basic-info-title">
           <span>标题：</span>
-          <el-input type="text" v-model="classInfo.title" />
+          <el-input type="text" v-model="classInfo.title" :maxlength="50" />
         </div>
         <div class="basic-info-total">
           <span>

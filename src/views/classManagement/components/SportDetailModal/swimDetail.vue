@@ -18,7 +18,7 @@
 
           <div class="row">
             <div class="row-item icon-box">
-              <i class="el-icon-picture-outline" />
+              <img src="~@/assets/addClass/icon-swim.png" width="30" alt="" />
             </div>
             <div class="row-item">
               <span class="label">距离</span>
@@ -53,7 +53,7 @@
             <div class="sync-params-container">
               <div class="sync-params-left">
                 <div class="sync-params">
-                    <span>时间：{{ sportDetail.endTime }}</span>
+                    <span>时间：{{ sportDetail.startTime }}</span>
                     <span>距离：{{ sportDetail.distance }} m</span>
                 </div>
                 <div class="sync-params">

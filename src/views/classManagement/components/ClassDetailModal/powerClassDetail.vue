@@ -17,7 +17,7 @@
 
           <div class="row">
             <div class="row-item icon-box">
-              <i class="el-icon-picture-outline" />
+              <img src="~@/assets/addClass/icon-power.png" width="30" alt="" />
             </div>
             <div class="row-item">
               <span class="label">时长</span>

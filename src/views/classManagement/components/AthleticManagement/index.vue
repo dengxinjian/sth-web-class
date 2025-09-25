@@ -14,13 +14,14 @@
             :expand-on-click-node="false">
             <span class="athletic-btn-list" slot-scope="{ node }">
                 <span>{{ node.label }}</span>
-                <el-popover popper-class="athletic-btn-popover" placement="right" trigger="click">
+                <el-popover popper-class="athletic-btn-popover" placement="right" trigger="hover">
                     <div class="btn-list-hover">
                         <el-button v-if="node.data.isGroup" type="text" size="mini" @click="handleAddGroup">新建分组</el-button>
                         <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleEditGroup(node)">编辑分组</el-button>
                         <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleDeleteGroup(node)">删除分组</el-button>
                         <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button>
                         <el-button v-if="!node.data.isGroup" type="text" size="mini" @click="handleMoveAthletic(node)">移动分组</el-button>
+                        <el-button v-if="!node.data.isGroup && node.parent.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveOutAthletic(node)">移出分组</el-button>
                     </div>
                     <el-button
                         type="text"
@@ -229,8 +230,9 @@ export default {
               description: item.description || '',
               isGroup: true,
               groupName: item.groupName,
+              triUserId: item.triUserId,
               children: (item.members || []).map(member => {
-                return {id: member.id, label: member.userNickname}
+                return {id: member.id, label: member.userNickname, triUserId: member.triUserId}
               })
             }
           })
@@ -370,7 +372,7 @@ export default {
           type: 'warning'
         }
       ).then(() => {
-        this.deleteGroup(node.id)
+        this.deleteGroup(node.data.id)
       }).catch(() => {
         this.$message.info('已取消删除')
       })
@@ -391,6 +393,35 @@ export default {
       this.targetGroupId = ''
       this.showMoveDialog = true
       this.moveType = 'athletic'
+    },
+
+    // 运动员移出分组
+    handleMoveOutAthletic(node) {
+      this.$confirm('确定要移出该运动员吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const params = {
+          groupId: null,
+          teamId: this.teamId,
+          memberIds: [node.data.triUserId]
+        }
+        submitData({
+          url: '/api/team/group/member/batch-set',
+          requestData: params
+        }).then(res => {
+          if (res.success) {
+            this.$message.success('移出分组成功')
+            this.getAthleticData()
+          } else {
+            this.$message.error(res.message || '移出分组失败')
+          }
+        }).catch(error => {
+          console.error('移出分组失败:', error)
+          this.$message.error('移出分组失败')
+        })
+      })
     },
 
     // 保存分组（新建/编辑）
@@ -493,13 +524,13 @@ export default {
         params = {
           groupId: this.targetGroupId,
           teamId: this.teamId,
-          memberIds: this.currentGroup.children.map(member => member.id)
+          memberIds: this.currentGroup.children.map(member => member.triUserId)
         }
       } else {
         params = {
           groupId: this.targetGroupId,
           teamId: this.teamId,
-          memberIds: [this.currentAthletic.id]
+          memberIds: [this.currentAthletic.triUserId]
         }
       }
 
