@@ -325,7 +325,7 @@
                           ]"
                           v-for="device in classItem.syncStatusList"
                           :key="device.deviceType + device.syncStatus"
-                          @click.stop="handleDeviceClick(classItem, device)"
+                          @click.stop="handleDeviceClick(classItem, device, item.commonDate)"
                         >
                           {{ deviceTypeIconDict[device.deviceType] }}
                         </div>
@@ -1095,7 +1095,7 @@
                         </div>
                         <div style="display: flex">
                           <div class="keyword">
-                            {{ activityItem.classesJson.sthValue }}
+                            {{ activityItem.classesJson.sth }}
                           </div>
                           <div>&nbsp;&nbsp;STH</div>
                         </div>
@@ -1455,10 +1455,14 @@ export default {
   methods: {
     secondsToMMSS,
     // 课表同步设备点击
-    handleDeviceClick(classItem, device) {
+    handleDeviceClick(classItem, device, date) {
+      if (date < new Date().toISOString().split('T')[0]) {
+        this.$message.error("该课程已过期");
+        return;
+      }
       console.log("设备点击：", device);
       if (device.syncStatus === 1) {
-        this.$message.error("该设备已同步成功");
+        this.$message.info("该设备已同步成功");
         return;
       }
       submitData({
@@ -1827,12 +1831,22 @@ export default {
           requestData: { ...data, triUserId: this.selectedAthletic },
         });
         // eslint-disable-next-line require-atomic-updates
-        data.classesJson = {
-          ...originalClassesJson,
-          duration: secondsToHHMMSS(res.result.time || 0),
-          distance: (res.result.distance || 0) + "km",
-          sth: res.result.sth,
-        };
+        if (data.sportType === 'RUN') {
+          data.classesJson = {
+            ...originalClassesJson,
+            duration: secondsToHHMMSS(res.result.time || 0),
+            distance: (res.result.distance || 0) + "km",
+            sth: res.result.sth,
+          };
+        } else if (data.sportType === 'CYCLE') {
+          data.classesJson = {
+            ...originalClassesJson,
+            duration: JSON.parse(data.classesJson).duration,
+            distance: JSON.parse(data.classesJson).distance,
+            sth: res.result.sth,
+          };
+        }
+        
       }
       // data.classesJson =
       if (data.sportType === "RUN") {
@@ -2313,7 +2327,7 @@ export default {
       this.showBindModalDialog(exerciseData, courseData, type);
     },
     // 进入课表详情
-    handleClassSchedulaDetail(id, sportType) {
+    handleClassSchedulaDetail(id, sportType, date) {
       console.log(sportType);
       this.classSportType = sportType;
       this.classDetailData = { id };
@@ -2799,6 +2813,7 @@ export default {
           font-size: 12px;
           margin-left: 5px;
           font-weight: 700;
+          color: #fff;
         }
         .sport-type-color1 {
           background-color: #7fb135;

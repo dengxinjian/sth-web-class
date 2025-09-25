@@ -1135,7 +1135,7 @@ export default {
           if (this.maxIntensity < intensity) {
             this.maxIntensity = intensity;
           }
-          duration += section.targetSeconds;
+          // duration += section.targetSeconds;
           return {
             duration: section.targetSeconds,
             intensity,

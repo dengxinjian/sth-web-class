@@ -87,6 +87,13 @@
           </div>
           <div class="zoneContainer">
             <div class="zoneTr">
+              <div class="zoneTd">热身/冷身</div>
+              <div class="zoneTd">min</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
               <div class="zoneTd">z1:恢复</div>
               <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
               <div class="zoneTd">~</div>
