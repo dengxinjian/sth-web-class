@@ -18,7 +18,7 @@
           <span>
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
-          <span>{{ classInfo.duration }}</span>
+          <span>{{ classInfo.duration }}km</span>
           <span v-if="classInfo.mode == 1 || classInfo.mode == 3">{{
             classInfo.distance
           }}</span>
