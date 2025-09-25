@@ -875,6 +875,7 @@ export default {
       });
       this.classInfo.duration = 0;
       this.classInfo.distance = 0;
+      const capacityList = [];
 
       this.classInfo.stages.forEach((stage) => {
         stage.sections.forEach((section) => {
@@ -883,6 +884,7 @@ export default {
             this.classInfo.mode === 2 ||
             this.classInfo.mode === 4
           ) {
+            capacityList.push(section.capacity);
             if (section.capacity === "time") {
               this.classInfo.duration += section.targetSeconds;
             } else {
@@ -914,7 +916,6 @@ export default {
                 const timer3 = (timer1 + timer2) / 2;
                 this.classInfo.distance =
                   this.classInfo.distance + Number((timer / timer3).toFixed(2));
-                this.classInfo.duration += timer3;
               }
             } else {
               this.classInfo.distance += section.targetDistance;
@@ -940,8 +941,14 @@ export default {
           }
         });
       });
+      if (new Set(capacityList).size !== 1 && capacityList.length > 0) {
+        this.classInfo.duration = 0;
+        this.classInfo.distance = 0;
+        this.classInfo.duration = this.translateTime(this.classInfo.duration);
+      } else {
+        this.classInfo.duration = this.translateTime(this.classInfo.duration);
+      }
       console.log(this.classInfo.duration, "this.classInfo.duration");
-      this.classInfo.duration = this.translateTime(this.classInfo.duration);
     },
     handleClose() {
       this.onCancel();
