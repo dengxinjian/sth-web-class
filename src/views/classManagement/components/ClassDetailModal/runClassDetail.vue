@@ -420,6 +420,20 @@
                       )[1]
                     }}</span
                   >
+                  <!-- <span class="label"
+                    >{{
+                      secondsToMMSS(
+                        calculateThresholdSpeedRangeNum(
+                          part.thresholdSpeedRange
+                        )[0]
+                      )
+                    }}~{{
+                      secondsToMMSS(
+                        calculateThresholdSpeedRangeNum(
+                          part.thresholdSpeedRange
+                        )[1]
+                      )
+                    }}/km</span> -->
                   <span class="label"
                     >{{
                       secondsToMMSS(
@@ -704,9 +718,16 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
-import { debounce, calculateThresholdHeartRateNumZoneFollow } from "@/views/classManagement/uilt";
-
+import {
+  getLunarDate,
+  secondsToHHMMSS,
+  secondsToMMSS,
+  mmssToSeconds,
+} from "@/utils/index";
+import {
+  debounce,
+  CalculateRun
+} from "@/views/classManagement/uilt";
 export default {
   name: "AddRunClassDialog",
   components: {
@@ -832,135 +853,59 @@ export default {
       }
     },
     secondsToMMSS,
-    calculateThresholdSpeedRangeNum(thresholdSpeedRange) {
-      return [
-        Math.round(
-          this.athleticThreshold.run * (1 / (thresholdSpeedRange[0] / 100))
-        ),
-        Math.round(
-          this.athleticThreshold.run * (1 / (thresholdSpeedRange[1] / 100))
-        ),
-      ];
+    calculateThresholdSpeedRangeNum(thresholdSpeedRange, run) {
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdSpeedRangeNum(thresholdSpeedRange);
     },
     calculateThresholdSpeedRangeNumZone(thresholdSpeedRange) {
-      console.log(thresholdSpeedRange, "thresholdSpeedRange");
-      return [
-        this.calculateThresholdSpeedNumZoneFollow(
-          (1 / (thresholdSpeedRange[0] / 100)).toFixed(2)
-        ),
-        this.calculateThresholdSpeedNumZoneFollow(
-          (1 / (thresholdSpeedRange[1] / 100)).toFixed(2)
-        ),
-      ];
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdSpeedRangeNumZone(thresholdSpeedRange);
     },
     calculateThresholdSpeedNum(thresholdSpeed) {
-      return Math.round(
-        this.athleticThreshold.run * (1 / (thresholdSpeed / 100))
-      );
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdSpeedNum(thresholdSpeed);
     },
     calculateThresholdSpeedNumZone(thresholdSpeed) {
-      const reciprocal = (1 / (thresholdSpeed / 100)).toFixed(2);
-      console.log(reciprocal, "reciprocal");
-      return this.calculateThresholdSpeedNumZoneFollow(reciprocal);
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdSpeedNumZone(thresholdSpeed);
     },
-    // 计算跟随阀值配速目标值的分组
-    calculateThresholdSpeedNumZoneFollow(reciprocal) {
-      const one = 1.3;
-      const two = 1.14;
-      const three = 1.06;
-      const four = 1.0;
-      const five = 0.97;
-      const six = 0.9;
-      if (reciprocal > one) {
-        return "Z1";
-      } else if (reciprocal > two) {
-        return "Z2";
-      } else if (reciprocal > three) {
-        return "Z3";
-      } else if (reciprocal > four) {
-        return "Z4";
-      } else if (reciprocal > five) {
-        return "Z5A";
-      } else if (reciprocal > six) {
-        return "Z5B";
-      } else {
-        return "Z5C";
-      }
-    },
-
     // 计算跟随阀值心率目标值的分组
     calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
-      return [
-        calculateThresholdHeartRateNumZoneFollow(
-          (thresholdHeartRateRange[0] / 100).toFixed(2)
-        ),
-        calculateThresholdHeartRateNumZoneFollow(
-          (thresholdHeartRateRange[1] / 100).toFixed(2)
-        ),
-      ];
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange);
     },
     calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
-      return [
-        Math.round(
-          this.athleticThreshold.heartRate * (thresholdHeartRateRange[0] / 100)
-        ),
-        Math.round(
-          this.athleticThreshold.heartRate * (thresholdHeartRateRange[1] / 100)
-        ),
-      ];
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdHeartRateRangeNum(thresholdHeartRateRange);
     },
     calculateThresholdHeartRateNum(thresholdHeartRate) {
-      return Math.round(
-        this.athleticThreshold.heartRate * (thresholdHeartRate / 100)
-      );
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdHeartRateNum(thresholdHeartRate);
     },
     calculateThresholdHeartRateNumZone(thresholdHeartRate) {
-      return calculateThresholdHeartRateNumZoneFollow(
-        (thresholdHeartRate / 100).toFixed(2)
-      );
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateThresholdHeartRateNumZone(thresholdHeartRate);
+    },
+    // 计算固定配速运动值的分组
+    calculateTargetSpeedRangeNumZone(targetSpeedRange) {
+
     },
     updateClassInfoCalculatedValues() {
       // 更新所有阶段的阈值功率计算值
-      this.classInfo.stages.forEach((stage, stageIndex) => {
-        stage.sections.forEach((section, sectionIndex) => {
-          if (section.thresholdSpeed !== undefined) {
-            section.thresholdSpeedNum = this.calculateThresholdSpeedNum(
-              section.thresholdSpeed
-            );
-            section.thresholdSpeedNumZone = this.calculateThresholdSpeedNumZone(
-              section.thresholdSpeed
-            );
-          }
-          if (section.thresholdSpeedRange !== undefined) {
-            section.thresholdSpeedRangeNum =
-              this.calculateThresholdSpeedRangeNum(section.thresholdSpeedRange);
-            section.thresholdSpeedRangeNumZone =
-              this.calculateThresholdSpeedRangeNumZone(
-                section.thresholdSpeedRange
-              );
-          }
-          if (section.thresholdHeartRate !== undefined) {
-            section.thresholdHeartRateNum = this.calculateThresholdHeartRateNum(
-              section.thresholdHeartRate
-            );
-            section.thresholdHeartRateNumZone =
-              this.calculateThresholdHeartRateNumZone(
-                section.thresholdHeartRate
-              );
-          }
-          if (section.thresholdHeartRateRange !== undefined) {
-            section.thresholdHeartRateRangeNum =
-              this.calculateThresholdHeartRateRangeNum(
-                section.thresholdHeartRateRange
-              );
-            section.thresholdHeartRateRangeNumZone =
-              this.calculateThresholdHeartRateRangeNumZone(
-                section.thresholdHeartRateRange
-              );
-          }
-        });
-      });
       console.log(this.classInfo, "this.classInfo");
+
+      this.classInfo = new CalculateRun(
+        this.athleticThreshold,
+        this.classInfo
+      ).updateClassInfoCalculatedValues();
     },
     // 获取标签列表
     getTagList() {

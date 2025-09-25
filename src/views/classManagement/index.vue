@@ -159,7 +159,10 @@
                     <div class="schedule-class-info">
                       <div class="schedule-class-info-item-title">
                         <span>{{ part.classesJson.title }}</span>
-                        <div class="delete" @click.stop="handleMoveClass(part.id, item.groupId)">
+                        <div
+                          class="delete"
+                          @click.stop="handleMoveClass(part.id, item.groupId)"
+                        >
                           <i class="el-icon-set-up"></i>
                         </div>
                         <div
@@ -194,9 +197,25 @@
                         <span v-else>
                           <img src="~@/assets/addClass/icon-other.png" alt="" />
                         </span>
-                        <span v-if="['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(part.sportType)">{{ part.classesJson.duration }}</span>
-                        <span v-if="['RUN', 'CYCLE', 'SWIM'].includes(part.sportType) && part.classesJson.distance">
-                          {{ part.classesJson.distance }}<span v-if="part.sportType === 'SWIM'">{{ part.classesJson.distanceUnit }}</span><span v-else>km</span>
+                        <span
+                          v-if="
+                            ['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(
+                              part.sportType
+                            )
+                          "
+                          >{{ part.classesJson.duration }}</span
+                        >
+                        <span
+                          v-if="
+                            ['RUN', 'CYCLE', 'SWIM'].includes(part.sportType) &&
+                            part.classesJson.distance
+                          "
+                        >
+                          {{ part.classesJson.distance
+                          }}<span v-if="part.sportType === 'SWIM'">{{
+                            part.classesJson.distanceUnit
+                          }}</span
+                          ><span v-else>km</span>
                         </span>
                       </div>
                     </div>
@@ -280,7 +299,11 @@
                   v-for="classItem in item.classSchedule"
                   :key="classItem.id"
                   class="classScheduleCard"
-                  :style="item.commonDate < new Date().toISOString().split('T')[0] ? 'background-color: rgba(204, 35, 35, 1)' : 'background-color: rgba(199, 199, 199, 1)'"
+                  :style="
+                    item.commonDate < new Date().toISOString().split('T')[0]
+                      ? 'background-color: rgba(204, 35, 35, 1)'
+                      : 'background-color: rgba(199, 199, 199, 1)'
+                  "
                   :data-id="classItem.id"
                   :data-date="item.commonDate"
                   @click="
@@ -321,7 +344,10 @@
                     </div>
                     <div style="display: flex">
                       <div class="keyword">
-                        {{ classItem.classesJson.distance }}<span v-if="classItem.sportType === 'SWIM'">{{ classItem.classesJson.distanceUnit }}</span>
+                        {{ classItem.classesJson.distance
+                        }}<span v-if="classItem.sportType === 'SWIM'">{{
+                          classItem.classesJson.distanceUnit
+                        }}</span>
                       </div>
                       <div>&nbsp;&nbsp;</div>
                     </div>
@@ -329,7 +355,10 @@
                       <div class="keyword">{{ classItem.classesJson.sth }}</div>
                       <div>&nbsp;&nbsp;STH</div>
                     </div>
-                    <div v-if="classItem.classesJson.summary" class="stage-details">
+                    <div
+                      v-if="classItem.classesJson.summary"
+                      class="stage-details"
+                    >
                       {{ classItem.classesJson.summary }}
                     </div>
                     <div
@@ -352,7 +381,11 @@
                             {{ part.target }} @
                             {{ part.thresholdFtpRangeNum[0] }}~
                             {{ part.thresholdFtpRangeNum[1] }}w
-                            <span v-if="part?.thresholdFtpRangeNumZone">{{ part.thresholdFtpRangeNumZone[0] }}~{{ part.thresholdFtpRangeNumZone[1] }}</span>
+                            <span v-if="part?.thresholdFtpRangeNumZone"
+                              >{{ part.thresholdFtpRangeNumZone[0] }}~{{
+                                part.thresholdFtpRangeNumZone[1]
+                              }}</span
+                            >
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -368,7 +401,11 @@
                             {{ part.target }} @
                             {{ part.thresholdHeartRateRangeNum[0] }}~
                             {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                            <span v-if="part?.thresholdHeartRateRangeNumZone">{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
+                            <span v-if="part?.thresholdHeartRateRangeNumZone"
+                              >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                                part.thresholdHeartRateRangeNumZone[1]
+                              }}</span
+                            >
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -382,7 +419,9 @@
                             "
                           >
                             {{ part.target }} @ {{ part.thresholdFtpNum }}w
-                            <span v-if="part?.thresholdFtpNumZone">{{ part.thresholdFtpNumZone }}</span>
+                            <span v-if="part?.thresholdFtpNumZone">{{
+                              part.thresholdFtpNumZone
+                            }}</span>
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -397,7 +436,9 @@
                           >
                             {{ part.target }} @
                             {{ part.thresholdHeartRateNum }}bpm
-                            <span v-if="part?.thresholdHeartRateNumZone">{{ part.thresholdHeartRateNumZone }}</span>
+                            <span v-if="part?.thresholdHeartRateNumZone">{{
+                              part.thresholdHeartRateNumZone
+                            }}</span>
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -487,7 +528,11 @@
                             {{
                               secondsToMMSS(part.thresholdSpeedRangeNum[1])
                             }}/km
-                            <span v-if="part.thresholdSpeedRangeNumZone">{{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}</span>
+                            <span v-if="part.thresholdSpeedRangeNumZone"
+                              >{{ part.thresholdSpeedRangeNumZone[0] }}~{{
+                                part.thresholdSpeedRangeNumZone[1]
+                              }}</span
+                            >
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -503,7 +548,11 @@
                             {{ part.target }} @
                             {{ part.thresholdHeartRateRangeNum[0] }}~
                             {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                            <span v-if="part.thresholdHeartRateRangeNumZone">{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
+                            <span v-if="part.thresholdHeartRateRangeNumZone"
+                              >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                                part.thresholdHeartRateRangeNumZone[1]
+                              }}</span
+                            >
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -518,7 +567,9 @@
                           >
                             {{ part.target }} @
                             {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
-                            <span v-if="part.thresholdSpeedNumZone">{{ part.thresholdSpeedNumZone }}</span>
+                            <span v-if="part.thresholdSpeedNumZone">{{
+                              part.thresholdSpeedNumZone
+                            }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -533,7 +584,9 @@
                           >
                             {{ part.target }} @
                             {{ part.thresholdHeartRateNum }}bpm
-                            <span v-if="part.thresholdHeartRateNumZone">{{ part.thresholdHeartRateNumZone }}</span>
+                            <span v-if="part.thresholdHeartRateNumZone">{{
+                              part.thresholdHeartRateNumZone
+                            }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -712,7 +765,10 @@
                       </div>
                       <div v-if="activityItem.classScheduleId">
                         <!-- 运动匹配课表之后，显示课表相关内容 -->
-                        <div v-if="activityItem.classesJson.summary" class="stage-details">
+                        <div
+                          v-if="activityItem.classesJson.summary"
+                          class="stage-details"
+                        >
                           {{ activityItem.classesJson.summary }}
                         </div>
                         <div
@@ -720,11 +776,15 @@
                           class="stage-details"
                         >
                           <div
-                            v-for="(stage, index) in activityItem.classesJson.stages"
+                            v-for="(stage, index) in activityItem.classesJson
+                              .stages"
                             :key="index"
                             class="stage-item"
                           >
-                            <div v-for="(part, idx) in stage.sections" :key="idx">
+                            <div
+                              v-for="(part, idx) in stage.sections"
+                              :key="idx"
+                            >
                               <div>{{ part.title }}</div>
                               <div
                                 v-if="
@@ -735,7 +795,11 @@
                                 {{ part.target }} @
                                 {{ part.thresholdFtpRangeNum[0] }}~
                                 {{ part.thresholdFtpRangeNum[1] }}w
-                                <span v-if="part?.thresholdFtpRangeNumZone">{{ part.thresholdFtpRangeNumZone[0] }}~{{ part.thresholdFtpRangeNumZone[1] }}</span>
+                                <span v-if="part?.thresholdFtpRangeNumZone"
+                                  >{{ part.thresholdFtpRangeNumZone[0] }}~{{
+                                    part.thresholdFtpRangeNumZone[1]
+                                  }}</span
+                                >
                                 <span v-if="part.hasCadence"
                                   >踏频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -751,7 +815,14 @@
                                 {{ part.target }} @
                                 {{ part.thresholdHeartRateRangeNum[0] }}~
                                 {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                                <span v-if="part?.thresholdHeartRateRangeNumZone">{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
+                                <span
+                                  v-if="part?.thresholdHeartRateRangeNumZone"
+                                  >{{
+                                    part.thresholdHeartRateRangeNumZone[0]
+                                  }}~{{
+                                    part.thresholdHeartRateRangeNumZone[1]
+                                  }}</span
+                                >
                                 <span v-if="part.hasCadence"
                                   >踏频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -765,7 +836,9 @@
                                 "
                               >
                                 {{ part.target }} @ {{ part.thresholdFtpNum }}w
-                                <span v-if="part?.thresholdFtpNumZone">{{ part.thresholdFtpNumZone }}</span>
+                                <span v-if="part?.thresholdFtpNumZone">{{
+                                  part.thresholdFtpNumZone
+                                }}</span>
                                 <span v-if="part.hasCadence"
                                   >踏频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -780,7 +853,9 @@
                               >
                                 {{ part.target }} @
                                 {{ part.thresholdHeartRateNum }}bpm
-                                <span v-if="part?.thresholdHeartRateNumZone">{{ part.thresholdHeartRateNumZone }}</span>
+                                <span v-if="part?.thresholdHeartRateNumZone">{{
+                                  part.thresholdHeartRateNumZone
+                                }}</span>
                                 <span v-if="part.hasCadence"
                                   >踏频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -793,7 +868,8 @@
                                   part.range === 'range'
                                 "
                               >
-                                {{ part.target }} @ {{ part.targetFtpRange[0] }}~
+                                {{ part.target }} @
+                                {{ part.targetFtpRange[0] }}~
                                 {{ part.targetFtpRange[1] }}w
                                 <span v-if="part.hasCadence"
                                   >踏频{{ part.cadence[0] }}~{{
@@ -835,7 +911,8 @@
                                   part.range === 'target'
                                 "
                               >
-                                {{ part.target }} @ {{ part.targetHeartRate }}bpm
+                                {{ part.target }} @
+                                {{ part.targetHeartRate }}bpm
                                 <span v-if="part.hasCadence"
                                   >踏频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -853,11 +930,15 @@
                           class="stage-details"
                         >
                           <div
-                            v-for="(stage, index) in activityItem.classesJson.stages"
+                            v-for="(stage, index) in activityItem.classesJson
+                              .stages"
                             :key="index"
                             class="stage-item"
                           >
-                            <div v-for="(part, idx) in stage.sections" :key="idx">
+                            <div
+                              v-for="(part, idx) in stage.sections"
+                              :key="idx"
+                            >
                               <div>{{ part.title }}</div>
                               <div
                                 v-if="
@@ -866,11 +947,17 @@
                                 "
                               >
                                 {{ part.target }} @
-                                {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~
+                                {{
+                                  secondsToMMSS(part.thresholdSpeedRangeNum[0])
+                                }}~
                                 {{
                                   secondsToMMSS(part.thresholdSpeedRangeNum[1])
                                 }}/km
-                                <span v-if="part?.thresholdSpeedRangeNumZone">{{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}</span>
+                                <span v-if="part?.thresholdSpeedRangeNumZone"
+                                  >{{ part.thresholdSpeedRangeNumZone[0] }}~{{
+                                    part.thresholdSpeedRangeNumZone[1]
+                                  }}</span
+                                >
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -886,7 +973,14 @@
                                 {{ part.target }} @
                                 {{ part.thresholdHeartRateRangeNum[0] }}~
                                 {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                                <span v-if="part?.thresholdHeartRateRangeNumZone">{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
+                                <span
+                                  v-if="part?.thresholdHeartRateRangeNumZone"
+                                  >{{
+                                    part.thresholdHeartRateRangeNumZone[0]
+                                  }}~{{
+                                    part.thresholdHeartRateRangeNumZone[1]
+                                  }}</span
+                                >
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -901,7 +995,9 @@
                               >
                                 {{ part.target }} @
                                 {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
-                                <span v-if="part?.thresholdSpeedNumZone">{{ part.thresholdSpeedNumZone }}</span>
+                                <span v-if="part?.thresholdSpeedNumZone">{{
+                                  part.thresholdSpeedNumZone
+                                }}</span>
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -916,7 +1012,9 @@
                               >
                                 {{ part.target }} @
                                 {{ part.thresholdHeartRateNum }}bpm
-                                <span v-if="part?.thresholdHeartRateNumZone">{{ part.thresholdHeartRateNumZone }}</span>
+                                <span v-if="part?.thresholdHeartRateNumZone">{{
+                                  part.thresholdHeartRateNumZone
+                                }}</span>
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -929,7 +1027,8 @@
                                   part.range === 'range'
                                 "
                               >
-                                {{ part.target }} @ {{ part.targetSpeedRange[0] }}~
+                                {{ part.target }} @
+                                {{ part.targetSpeedRange[0] }}~
                                 {{ part.targetSpeedRange[1] }}/km
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
@@ -971,7 +1070,8 @@
                                   part.range === 'target'
                                 "
                               >
-                                {{ part.target }} @ {{ part.targetHeartRate }}bpm
+                                {{ part.target }} @
+                                {{ part.targetHeartRate }}bpm
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -985,21 +1085,28 @@
                           </div>
                         </div>
 
-                        <div class="keyword">{{ activityItem.classesJson.duration }}</div>
-                        <div style="display: flex">
-                          <div class="keyword">{{ activityItem.classesJson.distance }}</div>
+                        <div class="keyword">
+                          {{ activityItem.classesJson.duration }}
                         </div>
                         <div style="display: flex">
-                          <div class="keyword">{{ activityItem.classesJson.sthValue }}</div>
+                          <div class="keyword">
+                            {{ activityItem.classesJson.distance }}
+                          </div>
+                        </div>
+                        <div style="display: flex">
+                          <div class="keyword">
+                            {{ activityItem.classesJson.sthValue }}
+                          </div>
                           <div>&nbsp;&nbsp;STH</div>
                         </div>
 
                         <div
                           v-if="activityItem.classesJson.timeline"
-                          style="height: 16px; display: flex; gap: 2px;"
+                          style="height: 16px; display: flex; gap: 2px"
                         >
                           <div
-                            v-for="(i, index) in activityItem.classesJson.timeline"
+                            v-for="(i, index) in activityItem.classesJson
+                              .timeline"
                             :key="index"
                             class="time-stage"
                             :style="{ flex: i.duration }"
@@ -1018,14 +1125,15 @@
                               >
                                 <ExerciseProcessChart
                                   :exerciseList="i.stageTimeline"
-                                  :maxIntensity="activityItem.classesJson.maxIntensity"
+                                  :maxIntensity="
+                                    activityItem.classesJson.maxIntensity
+                                  "
                                   :height="16"
                                 />
                               </div>
                             </div>
                           </div>
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -1215,6 +1323,7 @@ import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
 import { getData, submitData } from "@/api/common.js";
 import { MessageBox } from "element-ui";
 import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
+import { CalculateRun, CalculateBike } from "./uilt";
 
 export default {
   name: "ClassManagement",
@@ -1423,7 +1532,7 @@ export default {
                 }
                 return {
                   ...i,
-                  classesJson: i.classesJson ? JSON.parse(i.classesJson) : '',
+                  classesJson: i.classesJson ? JSON.parse(i.classesJson) : "",
                   completion: i.classesJson ? completion : "",
                   distance: Math.round(i.distance / 100) / 10,
                 };
@@ -1712,20 +1821,33 @@ export default {
         });
       }
       console.log(originalClassesJson);
-      if (['RUN', 'CYCLE'].includes(data.sportType)) {
+      if (["RUN", "CYCLE"].includes(data.sportType)) {
         const res = await submitData({
           url: "/api/classSchedule/calculateTimeDistanceSth",
           requestData: { ...data, triUserId: this.selectedAthletic },
         });
         // eslint-disable-next-line require-atomic-updates
-        data.classesJson = JSON.stringify({
+        data.classesJson = {
           ...originalClassesJson,
           duration: secondsToHHMMSS(res.result.time || 0),
           distance: (res.result.distance || 0) + "km",
           sth: res.result.sth,
-        });
+        };
       }
-
+      // data.classesJson =
+      if (data.sportType === "RUN") {
+        data.classesJson = new CalculateRun(
+          this.athleticThreshold,
+          originalClassesJson
+        ).updateClassInfoCalculatedValues();
+        // Avoid possible race condition by merging with latest data.classesJson if needed
+      } else if (data.sportType === "CYCLE") {
+        data.classesJson = new CalculateBike(
+          this.athleticThreshold,
+          originalClassesJson
+        ).updateClassInfoCalculatedValues();
+      }
+      data.classesJson = JSON.stringify(data.classesJson);
       if (type === "classTemplate") {
         console.log(data, "data");
         return data;
@@ -2085,13 +2207,13 @@ export default {
     handleMoveGroup(id) {
       this.moveGroupId = id;
       this.showMoveGroup = true;
-      this.moveType = 'group';
+      this.moveType = "group";
     },
     handleMoveClass(id, groupId) {
       this.moveGroupId = groupId;
       this.showMoveGroup = true;
       this.moveClassId = id;
-      this.moveType = 'class';
+      this.moveType = "class";
     },
     onSaveMoveGroup() {
       this.showMoveGroup = false;
@@ -2249,7 +2371,7 @@ export default {
       if (percent >= 80 && percent <= 120) {
         return ["rgba(131, 223, 161, 1)", "rgba(131, 223, 161, 1)"];
       }
-      if (percent >= 60 && percent < 80 || percent > 120) {
+      if ((percent >= 60 && percent < 80) || percent > 120) {
         return ["rgba(247, 200, 134, 1)", "rgba(247, 200, 134, 1)"];
       }
       if (percent > 0 && percent < 60) {
