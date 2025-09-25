@@ -1869,8 +1869,10 @@ export default {
       });
     },
     // 关闭课表详情
-    handleClassDetailSave() {
-      this.showClassDetailModal = false;
+    handleClassDetailSave(flag) {
+      if (flag) {
+        this.showClassDetailModal = false;
+      }
       this.classSportType = "";
       this.classDetailData = { id: "" };
       this.getScheduleData();

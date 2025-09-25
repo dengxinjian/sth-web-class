@@ -249,7 +249,7 @@
                 class="times-input"
                 size="small"
                 @input="handleTimesChange(index)"
-                @change="calculateTimeline"
+                @change="calculateTimeline(item.times)"
               />
             </div>
             <div
@@ -780,7 +780,7 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.classInfo.id = res.result;
-          this.$emit("save", { ...this.classInfo });
+          this.$emit("save",flag);
           this.$message.success("课程保存成功");
         }
         if (flag) this.innerVisible = false;
@@ -798,7 +798,7 @@ export default {
         }),
       }).then((res) => {
         if (res.success) {
-          this.$emit("save", { ...this.classInfo });
+          this.$emit("save",flag);
           this.$message.success("课表保存成功");
         }
         if (flag) this.innerVisible = false;
@@ -817,7 +817,7 @@ export default {
           }).then((res) => {
             if (res.success) {
               this.resetForm();
-              this.$emit("save", { ...this.classInfo });
+              this.$emit("save",true);
               this.$message.success("课程删除成功");
               this.innerVisible = false;
             }
@@ -849,7 +849,7 @@ export default {
     },
     onCancel() {
       this.innerVisible = false;
-      this.$emit("cancel");
+      this.$emit("cancel",true);
     },
     onSave(closeAfter) {
       console.log(JSON.stringify(this.classInfo));
@@ -1025,7 +1025,13 @@ export default {
       return new Date(seconds * 1000).toISOString().substr(11, 8);
     },
     // 计算时间线
-    calculateTimeline() {
+    calculateTimeline(times = 1) {
+      const timesNum = Number(times);
+      if (isNaN(timesNum) || timesNum < 1) {
+        return;
+      } else if (!Number.isInteger(timesNum)) {
+        return;
+      }
       this.updateClassInfoCalculatedValues(); // 更新计算值
       this.getSth();
       let duration = 0;
