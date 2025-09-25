@@ -382,7 +382,7 @@
                             "
                           >
                             {{ part.target }} @ {{ part.thresholdFtpNum }}w
-                            <span v-if="part?.thresholdFtpNumZone"></span>{{ part.thresholdFtpNumZone }}</span>
+                            <span v-if="part?.thresholdFtpNumZone">{{ part.thresholdFtpNumZone }}</span>
                             <span v-if="part.hasCadence"
                               >踏频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -487,7 +487,7 @@
                             {{
                               secondsToMMSS(part.thresholdSpeedRangeNum[1])
                             }}/km
-                            <span v-if="part?.thresholdSpeedRangeNumZone"></span>{{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}</span>
+                            <span v-if="part.thresholdSpeedRangeNumZone">{{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -503,7 +503,7 @@
                             {{ part.target }} @
                             {{ part.thresholdHeartRateRangeNum[0] }}~
                             {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                            <span v-if="part?.thresholdHeartRateRangeNumZone"></span>{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
+                            <span v-if="part.thresholdHeartRateRangeNumZone">{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -518,7 +518,7 @@
                           >
                             {{ part.target }} @
                             {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
-                            <span v-if="part?.thresholdSpeedNumZone"></span>{{ part.thresholdSpeedNumZone }}</span>
+                            <span v-if="part.thresholdSpeedNumZone">{{ part.thresholdSpeedNumZone }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -533,7 +533,7 @@
                           >
                             {{ part.target }} @
                             {{ part.thresholdHeartRateNum }}bpm
-                            <span v-if="part?.thresholdHeartRateNumZone"></span>{{ part.thresholdHeartRateNumZone }}</span>
+                            <span v-if="part.thresholdHeartRateNumZone">{{ part.thresholdHeartRateNumZone }}</span>
                             <span v-if="part.hasCadence"
                               >步频{{ part.cadence[0] }}~{{
                                 part.cadence[1]
@@ -765,7 +765,7 @@
                                 "
                               >
                                 {{ part.target }} @ {{ part.thresholdFtpNum }}w
-                                <span v-if="part?.thresholdFtpNumZone"></span>{{ part.thresholdFtpNumZone }}</span>
+                                <span v-if="part?.thresholdFtpNumZone">{{ part.thresholdFtpNumZone }}</span>
                                 <span v-if="part.hasCadence"
                                   >踏频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -870,7 +870,7 @@
                                 {{
                                   secondsToMMSS(part.thresholdSpeedRangeNum[1])
                                 }}/km
-                                <span v-if="part?.thresholdSpeedRangeNumZone"></span>{{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}</span>
+                                <span v-if="part?.thresholdSpeedRangeNumZone">{{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}</span>
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -886,7 +886,7 @@
                                 {{ part.target }} @
                                 {{ part.thresholdHeartRateRangeNum[0] }}~
                                 {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                                <span v-if="part?.thresholdHeartRateRangeNumZone"></span>{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
+                                <span v-if="part?.thresholdHeartRateRangeNumZone">{{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -901,7 +901,7 @@
                               >
                                 {{ part.target }} @
                                 {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
-                                <span v-if="part?.thresholdSpeedNumZone"></span>{{ part.thresholdSpeedNumZone }}</span>
+                                <span v-if="part?.thresholdSpeedNumZone">{{ part.thresholdSpeedNumZone }}</span>
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
@@ -916,7 +916,7 @@
                               >
                                 {{ part.target }} @
                                 {{ part.thresholdHeartRateNum }}bpm
-                                <span v-if="part?.thresholdHeartRateNumZone"></span>{{ part.thresholdHeartRateNumZone }}</span>
+                                <span v-if="part?.thresholdHeartRateNumZone">{{ part.thresholdHeartRateNumZone }}</span>
                                 <span v-if="part.hasCadence"
                                   >步频{{ part.cadence[0] }}~{{
                                     part.cadence[1]
