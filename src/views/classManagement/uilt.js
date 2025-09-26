@@ -20,19 +20,19 @@ export const calculateThresholdHeartRateNumZoneFollow = (reciprocal) => {
   if (reciprocal < one1) {
     return "热身/冷身";
   } else if (reciprocal < one) {
-    return "Z1";
+    return "z1";
   } else if (reciprocal < two) {
-    return "Z2";
+    return "z2";
   } else if (reciprocal < three) {
-    return "Z3";
+    return "z3";
   } else if (reciprocal < four) {
-    return "Z4";
+    return "z4";
   } else if (reciprocal < five) {
-    return "Z5A";
+    return "z5A";
   } else if (reciprocal < six) {
-    return "Z5B";
+    return "z5B";
   } else {
-    return "Z5C";
+    return "z5C";
   }
 };
 
@@ -84,19 +84,19 @@ export class CalculateRun {
     if (reciprocal > one1) {
       return "热身/冷身";
     } else if (reciprocal > one) {
-      return "Z1";
+      return "z1";
     } else if (reciprocal > two) {
-      return "Z2";
+      return "z2";
     } else if (reciprocal > three) {
-      return "Z3";
+      return "z3";
     } else if (reciprocal > four) {
-      return "Z4";
+      return "z4";
     } else if (reciprocal > five) {
-      return "Z5A";
+      return "z5A";
     } else if (reciprocal > six) {
-      return "Z5B";
+      return "z5B";
     } else {
-      return "Z5C";
+      return "z5C";
     }
   }
   calculateThresholdSpeedNumZone(thresholdSpeed) {
@@ -265,19 +265,19 @@ export class CalculateBike {
     if (reciprocal < one1) {
       return "热身/冷身";
     } else if (reciprocal < one) {
-      return "Z1";
+      return "z1";
     } else if (reciprocal < two) {
-      return "Z2";
+      return "z2";
     } else if (reciprocal < three) {
-      return "Z3";
+      return "z3";
     } else if (reciprocal < four) {
-      return "Z4";
+      return "z4";
     } else if (reciprocal < five) {
-      return "Z5A";
+      return "z5A";
     } else if (reciprocal < six) {
-      return "Z5B";
+      return "z5B";
     } else {
-      return "Z5C";
+      return "z5C";
     }
   }
   calculateThresholdFtpNumZone(thresholdFtp) {
