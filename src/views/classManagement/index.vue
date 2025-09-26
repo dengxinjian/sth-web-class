@@ -1504,7 +1504,7 @@ export default {
   },
   data() {
     return {
-      activeName: "athletic",
+      activeName: "class",
       dataLineType: "week",
       teamList: [],
       athleticList: [],
@@ -1659,7 +1659,7 @@ export default {
         url: `/api/classSchedule/updateAuthorizedDevice?deviceId=${item.id}&syncFlag=${syncFlag}`,
       }).then((res) => {
         if (res.success) {
-          this.$message.success(res.message);
+          this.$message.success('操作成功');
           this.getAuthorizedDeviceList();
         }
       });

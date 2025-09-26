@@ -58,7 +58,7 @@
                 </div>
                 <div class="sync-params">
                     <span>平均配速：{{ convertSpeedToPace(sportDetail.avgSpeed) }}/km</span>
-                    <span>卡路里：{{ sportDetail.calories }} cal</span>
+                    <span>运动消耗：{{ sportDetail.calories }} kcal</span>
                 </div>
                 <div class="sync-params">
                     <span>STH：{{ sportDetail.sthValue }}</span>
@@ -78,7 +78,7 @@
                         <td>{{ convertSpeedToPace(sportDetail.minSpeed) }}</td>
                         <td>{{ convertSpeedToPace(sportDetail.avgSpeed) }}</td>
                         <td>{{ convertSpeedToPace(sportDetail.maxSpeed) }}</td>
-                        <td>min/km</td>
+                        <td>min/100m</td>
                     </tr>
                     <tr>
                         <td>心率</td>
@@ -243,7 +243,7 @@ export default {
 
       // 速度 m/s 转换为配速 min/km
       // 配速 = 1000 / (速度 * 60) 分钟
-      const paceInMinutes = 1000 / (speedInMs * 60)
+      const paceInMinutes = 100 / (speedInMs * 60)
 
       // 分离分钟和秒数
       const minutes = Math.floor(paceInMinutes)
