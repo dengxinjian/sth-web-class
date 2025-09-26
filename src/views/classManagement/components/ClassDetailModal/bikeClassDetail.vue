@@ -474,7 +474,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">w</span>
+                  <span class="unit">w {{ calculateTargetFtpRangeNumZone(part.targetFtpRange).join(" ~ ") }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 3 && part.range === 'target'"
@@ -491,7 +491,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">w</span>
+                  <span class="unit">w {{ calculateTargetFtpNumZone(part.targetFtp) }}</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 4 && part.range === 'range'"
@@ -517,7 +517,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">bpm</span>
+                  <span class="unit">bpm {{ calculateTargetHeartRateRangeNumZone(part.targetHeartRateRange).join(" ~ ") }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 4 && part.range === 'target'"
@@ -534,7 +534,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">bpm</span>
+                  <span class="unit">bpm {{ calculateTargetHeartRateNumZone(part.targetHeartRate) }}</span>
                 </div>
                 <div v-if="part.hasCadence" class="config-item">
                   <el-input-number
@@ -813,6 +813,27 @@ export default {
       return new CalculateBike(
         this.athleticThreshold
       ).calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange);
+    },
+    // 计算固定功率分组
+    calculateTargetFtpRangeNumZone(thresholdFtpRange) {
+      return new CalculateBike(
+        this.athleticThreshold
+      ).calculateTargetFtpRangeNumZone(thresholdFtpRange);
+    },
+    calculateTargetFtpNumZone(thresholdFtp) {
+      return new CalculateBike(
+        this.athleticThreshold
+      ).calculateTargetFtpNumZone(thresholdFtp);
+    },
+    calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
+      return new CalculateBike(
+        this.athleticThreshold
+      ).calculateTargetHeartRateRangeNumZone(targetHeartRateRange);
+    },
+    calculateTargetHeartRateNumZone(targetHeartRate) {
+      return new CalculateBike(
+        this.athleticThreshold
+      ).calculateTargetHeartRateNumZone(targetHeartRate);
     },
     updateClassInfoCalculatedValues() {
       // 更新所有阶段的阈值功率计算值
