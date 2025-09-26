@@ -318,9 +318,7 @@
         </div>
 
         <!-- 邀请码说明 -->
-        <div class="invite-code-tip">
-          邀请码5分钟内有效
-        </div>
+        <div class="invite-code-tip">邀请码5分钟内有效</div>
       </div>
 
       <div slot="footer" class="invite-footer">
@@ -468,7 +466,7 @@ export default {
 
             // 处理unGrouped团队的members，将userType为1或2的members移动到新建的coach团队下
             const unGroupIndex = processedData.findIndex(
-              (item) => item.id === "unGrouped"
+              (item) => item.id === null
             );
             if (unGroupIndex !== -1) {
               const unGroupData = processedData[unGroupIndex];
@@ -489,6 +487,7 @@ export default {
                 ...unGroupData,
                 children: remainingMembers,
               };
+              console.log(coachMembers, "this.coachingData");
 
               // 只有当存在coach类型的members时才创建coach团队
               if (coachMembers.length > 0) {
@@ -505,7 +504,7 @@ export default {
                 // 将coach团队添加到数据中
                 // processedData.unshift(coachTeam)
                 this.coachingData = [coachTeam];
-                console.log(this.coachingData,"this.coachingData");
+                console.log(this.coachingData, "this.coachingData");
               }
             }
 

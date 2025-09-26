@@ -84,6 +84,7 @@ export default {
   watch: {
     exerciseList: {
       handler() {
+        console.log(this.exerciseList, "this.exerciseList");
         this.$nextTick(() => {
           this.updateContainerSize();
         });
@@ -123,7 +124,9 @@ export default {
       const widthPercent = (exercise.duration / this.totalDuration) * 100;
       // 计算高度比例（基于强度）
       const heightPercent =
-        (exercise.intensity / this.actualMaxIntensity) * 100;
+        (exercise.intensity / Math.max(...this.exerciseList.map((item) => item.intensity), 0)) * 100;
+      // console.log(this.exerciseList.map((item) => item.intensity), "exercise");
+      // console.log(widthPercent, heightPercent, Math.max(...this.exerciseList.map((item) => item.intensity), 0), "widthPercent, heightPercent");
 
       // 最后一个矩形不需要减去gap
       const isLast = index === this.exerciseList.length - 1;
