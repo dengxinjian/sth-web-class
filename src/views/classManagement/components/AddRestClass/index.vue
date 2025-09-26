@@ -76,7 +76,7 @@ export default {
           sportType: 'REST',
           distance: '',
           distanceUnit: 'm',
-          duration: '01:30:00',
+          duration: '',
           sth: '',
           summary: '',
           tags: ''

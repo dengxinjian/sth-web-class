@@ -81,9 +81,14 @@
         <div v-else class="class-container">
           <div class="class-title">课程</div>
           <div class="class-operation">
-            <el-button type="primary" size="mini" @click="handleAddClass"
-              >新增课程</el-button
-            >
+            <el-popover placement="bottom" width="100" trigger="click" popper-class="add-class-btn-popover">
+              <el-button type="primary" size="mini" slot="reference">新增</el-button>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <span><el-button type="primary" size="mini" @click="handleAddClass">新增课程</el-button></span>
+                <span><el-button type="primary" size="mini" @click="handleAddGroup">新增分组</el-button></span>
+              </div>
+            </el-popover>
+            
             <el-input size="mini" v-model="classSearchInput">
               <el-button
                 slot="append"
@@ -111,11 +116,11 @@
                           align-items: center;
                         "
                       >
-                        <span
+                        <!-- <span
                           ><el-button type="text" @click="handleAddGroup"
                             >新建分组</el-button
                           ></span
-                        >
+                        > -->
                         <span
                           ><el-button
                             type="text"

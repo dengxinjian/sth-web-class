@@ -46,7 +46,7 @@
             <div class="modal-block">
               <div class="modal-block-cooling"></div>
             </div>
-            <span>冷却</span>
+            <span>冷身</span>
           </div>
           <div class="modal-container" @click="handleAddStage('stage1')">
             <div class="modal-block">
@@ -146,7 +146,8 @@
           </div>
           <div class="phase-details">
             <div class="phase-item">
-              <div v-for="(item, index) in classInfo.stages" :key="index">
+              <div v-for="(item, index) in classInfo.stages" :key="index" class="phase-item-content">
+                <div v-if="item.times > 1">重复{{ item.times }}次</div>
                 <div v-for="(part, idx) in item.sections" :key="idx">
                   <div>{{ part.title }}</div>
                   <div v-if="classInfo.mode === 1 && part.range === 'range'">
@@ -242,7 +243,6 @@
                     >
                   </div>
                 </div>
-                <div v-if="item.times > 1">重复{{ item.times }}次</div>
               </div>
             </div>
           </div>
@@ -321,7 +321,7 @@
                     <el-option label="热身" value="warmup" />
                     <el-option label="跑步" value="bike" />
                     <el-option label="恢复" value="recover" />
-                    <el-option label="冷却" value="cooling" />
+                    <el-option label="冷身" value="cooling" />
                   </el-select>
                 </div>
                 <div class="config-item">
@@ -1766,5 +1766,10 @@ export default {
       }
     }
   }
+}
+
+.phase-item-content {
+  background-color: #efefef;
+  padding: 5px 10px;
 }
 </style>

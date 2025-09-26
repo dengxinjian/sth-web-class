@@ -185,7 +185,8 @@
           </div>
           <div class="phase-details">
             <div class="phase-item">
-              <div v-for="(item, index) in classInfo.stages" :key="index">
+              <div v-for="(item, index) in classInfo.stages" :key="index" class="phase-item-content">
+                <div v-if="item.times > 1">重复{{ item.times }}次</div>
                 <div v-for="(part, idx) in item.sections" :key="idx">
                   <div>{{ part.title }}</div>
                   <div v-if="classInfo.mode === 1 && part.range === 'range'">
@@ -258,7 +259,6 @@
                     >
                   </div>
                 </div>
-                <div v-if="item.times > 1">重复{{ item.times }}次</div>
               </div>
             </div>
           </div>
@@ -1463,5 +1463,10 @@ export default {
   tr:first-child {
     background-color: #f5f5f5;
   }
+}
+
+.phase-item-content {
+  background-color: #efefef;
+  padding: 5px 10px;
 }
 </style>
