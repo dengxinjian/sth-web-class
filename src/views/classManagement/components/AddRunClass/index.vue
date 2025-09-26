@@ -886,19 +886,20 @@ export default {
           ) {
             capacityList.push(section.capacity);
             if (section.capacity === "time") {
-              this.classInfo.duration += section.targetSeconds;
+              this.classInfo.duration +=
+                section.targetSeconds * Number(stage.times || 1);
             } else {
               if (section.targetUnit === "m") {
-                this.classInfo.distance =
-                  this.classInfo.distance + section.targetDistance / 1000;
+                this.classInfo.distance +=
+                  (section.targetDistance / 1000) * Number(stage.times || 1);
               } else {
-                this.classInfo.distance =
-                  this.classInfo.distance + section.targetDistance;
+                this.classInfo.distance +=
+                 section.targetDistance * Number(stage.times || 1);
               }
             }
           } else {
             if (section.capacity === "time") {
-              this.classInfo.duration += section.targetSeconds;
+              this.classInfo.duration += section.targetSeconds * Number(stage.times || 1);
               if (section.range === "target") {
                 const timer = mmssToSeconds(section.targetSpeed);
                 const timer1 = hhmmssToSeconds(section.target);
@@ -908,17 +909,17 @@ export default {
                   "this.classInfo.distance"
                 );
                 this.classInfo.distance =
-                  this.classInfo.distance + Number((timer1 / timer).toFixed(2));
+                  this.classInfo.distance + Number((timer1 / timer).toFixed(2)) * Number(stage.times || 1);
               } else {
                 const timer = hhmmssToSeconds(section.target);
                 const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
                 const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
                 const timer3 = (timer1 + timer2) / 2;
                 this.classInfo.distance =
-                  this.classInfo.distance + Number((timer / timer3).toFixed(2));
+                  this.classInfo.distance + Number((timer / timer3).toFixed(2)) * Number(stage.times || 1);
               }
             } else {
-              this.classInfo.distance += section.targetDistance;
+              this.classInfo.distance += section.targetDistance * Number(stage.times || 1);
               console.log(section, "section");
 
               if (section.range === "target") {
@@ -928,18 +929,30 @@ export default {
                   mmssToSeconds(section.targetSpeed)
                 );
                 const timer =
-                  section.targetDistance * mmssToSeconds(section.targetSpeed);
+                  section.targetDistance * mmssToSeconds(section.targetSpeed) * Number(stage.times || 1);
                 this.classInfo.duration += timer;
                 console.log(timer, "timer");
               } else {
                 const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
                 const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
                 const timer3 = (timer1 + timer2) / 2;
-                this.classInfo.duration += section.targetDistance * timer3;
+                this.classInfo.duration += section.targetDistance * timer3 * Number(stage.times || 1);
               }
             }
           }
         });
+        console.log(
+          this.classInfo.duration,
+          "this.classInfo.duration",
+          stage.times
+        );
+        console.log(
+          this.classInfo.distance,
+          "this.classInfo.distance",
+          stage.times
+        );
+        // this.classInfo.duration += stage.times * this.classInfo.duration;
+        // this.classInfo.distance += stage.times * this.classInfo.distance;
       });
       if (new Set(capacityList).size !== 1 && capacityList.length > 0) {
         this.classInfo.duration = 0;

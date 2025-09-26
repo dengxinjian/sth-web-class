@@ -6,7 +6,7 @@ Vue.use(Router);
 // 环境配置
 const config = {
   development: {
-    loginComponent: () => import("@/views/login-wx/index")
+    loginComponent: () => import("@/views/login/index")
   },
   staging: {
     loginComponent: () => import("@/views/login-wx/index")

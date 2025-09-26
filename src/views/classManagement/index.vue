@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <div style="color: #999; font-size: 12px; font-weight: 600; padding: 10px 0;">
+    <div
+      style="color: #999; font-size: 12px; font-weight: 600; padding: 10px 0"
+    >
       公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
     </div>
     <div class="schedule-top">
@@ -149,10 +151,7 @@
                     </el-popover>
                   </div>
                 </template>
-                <div
-                  class="js-class-drag-container"
-                  :key="item.timespan"
-                >
+                <div class="js-class-drag-container" :key="item.timespan">
                   <div
                     v-for="part in item.classesList"
                     :key="part.id"
@@ -276,22 +275,30 @@
                   : 'schedule-table-header-cell'
               "
             >
-              {{ item.name }} {{ currentWeek[index]?.commonDate === new Date().toISOString().split('T')[0] ? '（今天）' : '' }}
+              {{ item.name }}
+              {{
+                currentWeek[index]?.commonDate ===
+                new Date().toISOString().split("T")[0]
+                  ? "（今天）"
+                  : ""
+              }}
             </div>
             <div class="schedule-table-header-cell-data">
               <!-- <div style="font-size: 14px; font-weight: 600;">
                 同步开关
               </div> -->
-              <div style="display: flex; flex-direction: row; gap: 10px;">
+              <div style="display: flex; flex-direction: row; gap: 10px">
                 <el-switch
-                v-for="item in deviceList"
-                :key="item.id"
-                v-model="item.enabled"
-                :inactive-text="
-                  item.deviceType ? deviceTypeDict[item.deviceType] : '未知设备'
-                "
-                @change="handleDeviceChange(item)"
-              ></el-switch>
+                  v-for="item in deviceList"
+                  :key="item.id"
+                  v-model="item.enabled"
+                  :inactive-text="
+                    item.deviceType
+                      ? deviceTypeDict[item.deviceType]
+                      : '未知设备'
+                  "
+                  @change="handleDeviceChange(item)"
+                ></el-switch>
               </div>
             </div>
           </div>
@@ -302,7 +309,7 @@
               class="schedule-table-cell"
             >
               <div class="schedule-table-cell-title">
-                {{ item?.commonDate }} {{  }}
+                {{ item?.commonDate }}
               </div>
               <!-- {{ item.classSchedule }} -->
               <div
@@ -358,9 +365,16 @@
                     </div>
                     <div class="title">{{ classItem.classesJson.title }}</div>
                     <div class="keyword">
-                      {{ classItem.classesJson.sportType }}
+                      {{ classItem.sportType }}
                     </div>
-                    <div class="keyword">
+                    <div
+                      class="keyword"
+                      v-if="
+                        classItem.sportType !== 'REST' &&
+                        classItem.sportType !== 'REMARK' &&
+                        classItem.sportType !== 'OTHER'
+                      "
+                    >
                       {{ classItem.classesJson.duration }}
                     </div>
                     <div style="display: flex">
@@ -372,7 +386,14 @@
                       </div>
                       <div>&nbsp;&nbsp;</div>
                     </div>
-                    <div style="display: flex">
+                    <div
+                      style="display: flex"
+                      v-if="
+                        classItem.sportType !== 'REST' &&
+                        classItem.sportType !== 'REMARK' &&
+                        classItem.sportType !== 'OTHER'
+                      "
+                    >
                       <div class="keyword">{{ classItem.classesJson.sth }}</div>
                       <div>&nbsp;&nbsp;STH</div>
                     </div>
