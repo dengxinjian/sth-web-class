@@ -365,7 +365,11 @@
                     </div>
                     <div class="title">{{ classItem.classesJson.title }}</div>
                     <div class="keyword">
-                      {{ classItem.sportType == "CYCLE"? "BIKE": classItem.sportType }}
+                      {{
+                        classItem.sportType == "CYCLE"
+                          ? "BIKE"
+                          : classItem.sportType
+                      }}
                     </div>
                     <div
                       class="keyword"
@@ -375,11 +379,22 @@
                         classItem.sportType !== 'OTHER'
                       "
                     >
-                      {{ classItem.classesJson.duration }}
+                      {{
+                        classItem.classesJson.duration == "00:00:00"
+                          ? "--：--：--"
+                          : classItem.classesJson.duration
+                      }}
                     </div>
-                    <div style="display: flex" v-if="classItem.classesJson.distance">
+                    <div
+                      style="display: flex"
+                      v-if="classItem.classesJson.distance"
+                    >
                       <div class="keyword">
-                        {{ classItem.classesJson.distance
+                        {{
+                          !classItem.classesJson.distance ||
+                          classItem.classesJson.distance == "0"
+                            ? "--km"
+                            : classItem.classesJson.distance
                         }}<span v-if="classItem.sportType === 'SWIM'">{{
                           classItem.classesJson.distanceUnit
                         }}</span>
@@ -2570,7 +2585,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-
 .container {
   background-color: #fff;
 }
