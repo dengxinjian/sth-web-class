@@ -18,7 +18,7 @@
           <span>
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
-          <span>{{ classInfo.duration == "00:00:00" ? "--：--：--" : classInfo.duration }}</span>
+          <span>{{ classInfo.duration == "00:00:00" ? "--:--:--" : classInfo.duration }}</span>
           <span>{{ !classInfo.distance || classInfo.distance == "0" ? "--km" : classInfo.distance }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}

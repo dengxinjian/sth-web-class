@@ -78,6 +78,10 @@ export default {
       if (this.maxIntensity !== null) {
         return this.maxIntensity;
       }
+      // 处理空数组的情况，避免返回 -Infinity
+      if (this.exerciseList.length === 0) {
+        return 100; // 默认最大强度为100
+      }
       return Math.max(...this.exerciseList.map((item) => item.intensity), 0);
     },
   },
@@ -123,8 +127,7 @@ export default {
       // 计算宽度比例（基于时长）
       const widthPercent = (exercise.duration / this.totalDuration) * 100;
       // 计算高度比例（基于强度）
-      const heightPercent =
-        (exercise.intensity / Math.max(...this.exerciseList.map((item) => item.intensity), 0)) * 100;
+      const heightPercent = (exercise.intensity / this.actualMaxIntensity) * 100;
       // console.log(this.exerciseList.map((item) => item.intensity), "exercise");
       // console.log(widthPercent, heightPercent, Math.max(...this.exerciseList.map((item) => item.intensity), 0), "widthPercent, heightPercent");
 
@@ -173,47 +176,47 @@ export default {
     .exercise-bar {
       background-color: #bbc2d1;
       border-radius: 2px;
-      transition: all 0.3s ease;
+      // transition: all 0.3s ease;
 
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      }
+      // &:hover {
+      //   transform: translateY(-2px);
+      //   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      // }
 
       // 动画效果
-      &.animated {
-        animation: fadeInUp 0.6s ease-out forwards;
-        opacity: 0;
-        transform: translateY(20px);
-      }
+      // &.animated {
+      //   animation: fadeInUp 0.6s ease-out forwards;
+      //   opacity: 0;
+      //   transform: translateY(20px);
+      // }
     }
   }
 }
 
 // 动画关键帧
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+// @keyframes fadeInUp {
+//   from {
+//     opacity: 0;
+//     transform: translateY(20px);
+//   }
+//   to {
+//     opacity: 1;
+//     transform: translateY(0);
+//   }
+// }
 
 // 响应式设计
-@media (max-width: 768px) {
-  .exercise-process-chart {
-    .chart-wrapper {
-      .exercise-bar {
-        border-radius: 1px;
+// @media (max-width: 768px) {
+//   .exercise-process-chart {
+//     .chart-wrapper {
+//       .exercise-bar {
+//         border-radius: 1px;
 
-        &:hover {
-          transform: translateY(-1px);
-        }
-      }
-    }
-  }
-}
+//         &:hover {
+//           transform: translateY(-1px);
+//         }
+//       }
+//     }
+//   }
+// }
 </style>

@@ -17,7 +17,7 @@
         <div class="content-overlay">
             <div class="text-content">
                 <h1>强者之心</h1>
-                <p>科学普及训练</p>
+                <p>让科学普及训练</p>
                 <!-- <p>敬请期待！</p> -->
                 <div class="contact-info">
                     <h2>联系我们</h2>
@@ -316,7 +316,7 @@ export default {
     },
     createWxLogin() {
       try {
-        const appId = 'wx4064cabd6845def1';
+        const appId = process.env.NODE_ENV === 'production' ? 'wxe34b400e55bd075b' : 'wx4064cabd6845def1';
         const state = (Math.random().toString(36).slice(2) + Date.now()).toString();
         const redirectUri = encodeURIComponent(
           process.env.NODE_ENV === 'production' ? 'https://web.strongtri.com/#/login-scan' : 'https://webtest.strongtri.com/#/login-scan'

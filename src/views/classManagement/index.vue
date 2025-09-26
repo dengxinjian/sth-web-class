@@ -230,7 +230,7 @@
                     </div>
                     <div
                       v-if="part.classesJson.timeline"
-                      style="height: 16px; display: flex; gap: 2px"
+                      style="height: 16px; display: flex; gap: 1px"
                     >
                       <div
                         v-for="(i, index) in part.classesJson.timeline"
@@ -241,7 +241,7 @@
                         <div
                           :style="{
                             display: 'flex',
-                            gap: '2px',
+                            gap: '1px',
                             height: '16px',
                           }"
                         >
@@ -396,7 +396,7 @@
                     >
                       {{
                         classItem.classesJson.duration == "00:00:00"
-                          ? "--：--：--"
+                          ? "--:--:--"
                           : classItem.classesJson.duration
                       }}
                     </div>
@@ -805,7 +805,7 @@
                     </div>
                     <div
                       v-if="classItem.classesJson.timeline"
-                      style="height: 16px; display: flex; gap: 2px"
+                      style="height: 16px; display: flex; gap: 1px"
                     >
                       <div
                         v-for="(i, index) in classItem.classesJson.timeline"
@@ -816,7 +816,7 @@
                         <div
                           :style="{
                             display: 'flex',
-                            gap: '2px',
+                            gap: '1px',
                             height: '16px',
                           }"
                         >
@@ -1276,7 +1276,7 @@
                         >
                           {{
                             activityItem.classesJson.duration == "00:00:00"
-                              ? "--：--：--"
+                              ? "--:--:--"
                               : activityItem.classesJson.duration
                           }}
                         </div>
@@ -1310,7 +1310,7 @@
 
                         <div
                           v-if="activityItem.classesJson.timeline"
-                          style="height: 16px; display: flex; gap: 2px"
+                          style="height: 16px; display: flex; gap: 1px"
                         >
                           <div
                             v-for="(i, index) in activityItem.classesJson
@@ -1322,7 +1322,7 @@
                             <div
                               :style="{
                                 display: 'flex',
-                                gap: '2px',
+                                gap: '1px',
                                 height: '16px',
                               }"
                             >
