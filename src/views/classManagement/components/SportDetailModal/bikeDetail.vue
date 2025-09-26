@@ -100,7 +100,7 @@
           }}
         </div>
         <div class="time-stage-for">
-          <div v-for="n in item.times" :key="n" class="time-stage-item">
+          <div v-for="n in +item.times" :key="n" class="time-stage-item">
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
