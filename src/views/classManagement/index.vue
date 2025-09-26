@@ -1883,64 +1883,64 @@ export default {
       const originalClassesJson = JSON.parse(data.classesJson);
       console.log(originalClassesJson, "this.originalClassesJson", data);
       // 将运动员阈值代入课程中计算具体值
-      if (originalClassesJson.stages) {
-        originalClassesJson.stages.forEach((item) => {
-          item.sections.forEach((part) => {
-            if (part.thresholdFtp) {
-              part.thresholdFtpNum = Math.round(
-                (part.thresholdFtp / 100) * this.athleticThreshold.cycle
-              );
-            }
-            if (part.thresholdFtpRange) {
-              part.thresholdFtpRangeNum = [
-                Math.round(
-                  (part.thresholdFtpRange[0] / 100) *
-                    this.athleticThreshold.cycle
-                ),
-                Math.round(
-                  (part.thresholdFtpRange[1] / 100) *
-                    this.athleticThreshold.cycle
-                ),
-              ];
-            }
-            if (part.thresholdHeartRate) {
-              part.thresholdHeartRateNum = Math.round(
-                (part.thresholdHeartRate / 100) *
-                  this.athleticThreshold.heartRate
-              );
-            }
-            if (part.thresholdHeartRateRange) {
-              part.thresholdHeartRateRangeNum = [
-                Math.round(
-                  (part.thresholdHeartRateRange[0] / 100) *
-                    this.athleticThreshold.heartRate
-                ),
-                Math.round(
-                  (part.thresholdHeartRateRange[1] / 100) *
-                    this.athleticThreshold.heartRate
-                ),
-              ];
-            }
-            if (part.thresholdSpeed) {
-              part.thresholdSpeedNum = Math.round(
-                (100 / part.thresholdSpeed) * this.athleticThreshold.run
-              );
-            }
-            if (part.thresholdSpeedRange) {
-              part.thresholdSpeedRangeNum = [
-                Math.round(
-                  (100 / part.thresholdSpeedRange[0]) *
-                    this.athleticThreshold.run
-                ),
-                Math.round(
-                  (100 / part.thresholdSpeedRange[1]) *
-                    this.athleticThreshold.run
-                ),
-              ];
-            }
-          });
-        });
-      }
+      // if (originalClassesJson.stages) {
+      //   originalClassesJson.stages.forEach((item) => {
+      //     item.sections.forEach((part) => {
+      //       if (part.thresholdFtp) {
+      //         part.thresholdFtpNum = Math.round(
+      //           (part.thresholdFtp / 100) * this.athleticThreshold.cycle
+      //         );
+      //       }
+      //       if (part.thresholdFtpRange) {
+      //         part.thresholdFtpRangeNum = [
+      //           Math.round(
+      //             (part.thresholdFtpRange[0] / 100) *
+      //               this.athleticThreshold.cycle
+      //           ),
+      //           Math.round(
+      //             (part.thresholdFtpRange[1] / 100) *
+      //               this.athleticThreshold.cycle
+      //           ),
+      //         ];
+      //       }
+      //       if (part.thresholdHeartRate) {
+      //         part.thresholdHeartRateNum = Math.round(
+      //           (part.thresholdHeartRate / 100) *
+      //             this.athleticThreshold.heartRate
+      //         );
+      //       }
+      //       if (part.thresholdHeartRateRange) {
+      //         part.thresholdHeartRateRangeNum = [
+      //           Math.round(
+      //             (part.thresholdHeartRateRange[0] / 100) *
+      //               this.athleticThreshold.heartRate
+      //           ),
+      //           Math.round(
+      //             (part.thresholdHeartRateRange[1] / 100) *
+      //               this.athleticThreshold.heartRate
+      //           ),
+      //         ];
+      //       }
+      //       if (part.thresholdSpeed) {
+      //         part.thresholdSpeedNum = Math.round(
+      //           (100 / part.thresholdSpeed) * this.athleticThreshold.run
+      //         );
+      //       }
+      //       if (part.thresholdSpeedRange) {
+      //         part.thresholdSpeedRangeNum = [
+      //           Math.round(
+      //             (100 / part.thresholdSpeedRange[0]) *
+      //               this.athleticThreshold.run
+      //           ),
+      //           Math.round(
+      //             (100 / part.thresholdSpeedRange[1]) *
+      //               this.athleticThreshold.run
+      //           ),
+      //         ];
+      //       }
+      //     });
+      //   });
+      // }
 
       // data.classesJson =
       if (data.sportType === "RUN") {
