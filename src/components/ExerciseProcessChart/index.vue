@@ -103,7 +103,6 @@ export default {
     // 初始化图表
     initChart() {
       this.$nextTick(() => {
-        console.log(this.exerciseList, "this.exerciseList");
         this.updateContainerSize();
       });
     },
