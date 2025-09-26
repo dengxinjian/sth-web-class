@@ -125,7 +125,7 @@ export default {
     min-width: 200px;
 
     .logo {
-      height: 32px;
+      height: 26px;
       margin-right: 12px;
     }
 
