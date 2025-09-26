@@ -38,7 +38,7 @@ export default {
     // 图表间距
     gap: {
       type: Number,
-      default: 2,
+      default: 1,
     },
     // 是否显示动画
     animated: {
@@ -165,6 +165,7 @@ export default {
     display: flex;
     align-items: flex-end;
     gap: v-bind("chartStyle.gap");
+    min-width: 2px;
 
     .exercise-bar {
       background-color: rgba(222, 187, 146, 1);
