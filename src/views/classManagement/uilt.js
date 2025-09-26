@@ -100,31 +100,31 @@ export class CalculateRun {
     }
   }
   calculateThresholdSpeedNumZone(thresholdSpeed) {
-    const reciprocal = (1 / (thresholdSpeed / 100)).toFixed(2);
+    const reciprocal = (1 / (thresholdSpeed / 100)).toFixed(4);
     return this.calculateThresholdSpeedNumZoneFollow(reciprocal);
   }
   calculateThresholdSpeedRangeNumZone(thresholdSpeedRange) {
     return [
       this.calculateThresholdSpeedNumZoneFollow(
-        (1 / (thresholdSpeedRange[0] / 100)).toFixed(2)
+        (1 / (thresholdSpeedRange[0] / 100)).toFixed(4)
       ),
       this.calculateThresholdSpeedNumZoneFollow(
-        (1 / (thresholdSpeedRange[1] / 100)).toFixed(2)
+        (1 / (thresholdSpeedRange[1] / 100)).toFixed(4)
       ),
     ];
   }
   calculateThresholdHeartRateNumZone(thresholdHeartRate) {
     return calculateThresholdHeartRateNumZoneFollow(
-      (thresholdHeartRate / 100).toFixed(2)
+      (thresholdHeartRate / 100).toFixed(4)
     );
   }
   calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
     return [
       calculateThresholdHeartRateNumZoneFollow(
-        (thresholdHeartRateRange[0] / 100).toFixed(2)
+        (thresholdHeartRateRange[0] / 100).toFixed(4)
       ),
       calculateThresholdHeartRateNumZoneFollow(
-        (thresholdHeartRateRange[1] / 100).toFixed(2)
+        (thresholdHeartRateRange[1] / 100).toFixed(4)
       ),
     ];
   }
@@ -133,32 +133,32 @@ export class CalculateRun {
     const timer2 = mmssToSeconds(targetSpeedRange[1]);
     return [
       this.calculateThresholdSpeedNumZoneFollow(
-        (timer1 / this.athleticThreshold.run).toFixed(2)
+        (timer1 / this.athleticThreshold.run).toFixed(4)
       ),
       this.calculateThresholdSpeedNumZoneFollow(
-        (timer2 / this.athleticThreshold.run).toFixed(2)
+        (timer2 / this.athleticThreshold.run).toFixed(4)
       ),
     ];
   }
   calculateTargetSpeedNumZone(targetSpeed) {
     const timer1 = mmssToSeconds(targetSpeed);
     return this.calculateThresholdSpeedNumZoneFollow(
-      (timer1 / this.athleticThreshold.run).toFixed(2)
+      (timer1 / this.athleticThreshold.run).toFixed(4)
     );
   }
   calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
     return [
       calculateThresholdHeartRateNumZoneFollow(
-        (targetHeartRateRange[0] / this.athleticThreshold.heartRate).toFixed(2)
+        (targetHeartRateRange[0] / this.athleticThreshold.heartRate).toFixed(4)
       ),
       calculateThresholdHeartRateNumZoneFollow(
-        (targetHeartRateRange[1] / this.athleticThreshold.heartRate).toFixed(2)
+        (targetHeartRateRange[1] / this.athleticThreshold.heartRate).toFixed(4)
       ),
     ];
   }
   calculateTargetHeartRateNumZone(targetHeartRate) {
     return calculateThresholdHeartRateNumZoneFollow(
-      (targetHeartRate / this.athleticThreshold.heartRate).toFixed(2)
+      (targetHeartRate / this.athleticThreshold.heartRate).toFixed(4)
     );
   }
   updateClassInfoCalculatedValues() {
@@ -204,9 +204,8 @@ export class CalculateRun {
           );
         }
         if (section.targetSpeedRange !== undefined) {
-          section.targetSpeedRangeNumZone = this.calculateTargetSpeedRangeNumZone(
-            section.targetSpeedRange
-          );
+          section.targetSpeedRangeNumZone =
+            this.calculateTargetSpeedRangeNumZone(section.targetSpeedRange);
         }
         if (section.targetHeartRate !== undefined) {
           section.targetHeartRateNumZone = this.calculateTargetHeartRateNumZone(
@@ -214,9 +213,10 @@ export class CalculateRun {
           );
         }
         if (section.targetHeartRateRange !== undefined) {
-          section.targetHeartRateRangeNumZone = this.calculateTargetHeartRateRangeNumZone(
-            section.targetHeartRateRange
-          );
+          section.targetHeartRateRangeNumZone =
+            this.calculateTargetHeartRateRangeNumZone(
+              section.targetHeartRateRange
+            );
         }
       });
     });
@@ -282,62 +282,62 @@ export class CalculateBike {
   }
   calculateThresholdFtpNumZone(thresholdFtp) {
     return this.calculateThresholdFtpRangeNumZoneFollow(
-      (thresholdFtp / 100).toFixed(2)
+      (thresholdFtp / 100).toFixed(4)
     );
   }
   calculateThresholdFtpRangeNumZone(thresholdFtpRange) {
     return [
       this.calculateThresholdFtpRangeNumZoneFollow(
-        (thresholdFtpRange[0] / 100).toFixed(2)
+        (thresholdFtpRange[0] / 100).toFixed(4)
       ),
       this.calculateThresholdFtpRangeNumZoneFollow(
-        (thresholdFtpRange[1] / 100).toFixed(2)
+        (thresholdFtpRange[1] / 100).toFixed(4)
       ),
     ];
   }
   calculateThresholdHeartRateNumZone(thresholdHeartRate) {
     return calculateThresholdHeartRateNumZoneFollow(
-      (thresholdHeartRate / 100).toFixed(2)
+      (thresholdHeartRate / 100).toFixed(4)
     );
   }
   calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
     return [
       calculateThresholdHeartRateNumZoneFollow(
-        (thresholdHeartRateRange[0] / 100).toFixed(2)
+        (thresholdHeartRateRange[0] / 100).toFixed(4)
       ),
       calculateThresholdHeartRateNumZoneFollow(
-        (thresholdHeartRateRange[1] / 100).toFixed(2)
+        (thresholdHeartRateRange[1] / 100).toFixed(4)
       ),
     ];
   }
   calculateTargetFtpRangeNumZone(targetFtpRange) {
     return [
       this.calculateThresholdFtpRangeNumZoneFollow(
-        (targetFtpRange[0] / this.athleticThreshold.cycle).toFixed(2)
+        (targetFtpRange[0] / this.athleticThreshold.cycle).toFixed(4)
       ),
       this.calculateThresholdFtpRangeNumZoneFollow(
-        (targetFtpRange[1] / this.athleticThreshold.cycle).toFixed(2)
+        (targetFtpRange[1] / this.athleticThreshold.cycle).toFixed(4)
       ),
     ];
   }
   calculateTargetFtpNumZone(targetFtp) {
     return this.calculateThresholdFtpRangeNumZoneFollow(
-      (targetFtp / this.athleticThreshold.cycle).toFixed(2)
+      (targetFtp / this.athleticThreshold.cycle).toFixed(4)
     );
   }
   calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
     return [
       calculateThresholdHeartRateNumZoneFollow(
-        (targetHeartRateRange[0] / this.athleticThreshold.heartRate).toFixed(2)
+        (targetHeartRateRange[0] / this.athleticThreshold.heartRate).toFixed(4)
       ),
       calculateThresholdHeartRateNumZoneFollow(
-        (targetHeartRateRange[1] / this.athleticThreshold.heartRate).toFixed(2)
+        (targetHeartRateRange[1] / this.athleticThreshold.heartRate).toFixed(4)
       ),
     ];
   }
   calculateTargetHeartRateNumZone(targetHeartRate) {
     return calculateThresholdHeartRateNumZoneFollow(
-      (targetHeartRate / this.athleticThreshold.heartRate).toFixed(2)
+      (targetHeartRate / this.athleticThreshold.heartRate).toFixed(4)
     );
   }
   updateClassInfoCalculatedValues() {
@@ -391,9 +391,10 @@ export class CalculateBike {
           );
         }
         if (section.targetHeartRateRange !== undefined) {
-          section.targetHeartRateRangeNumZone = this.calculateTargetHeartRateRangeNumZone(
-            section.targetHeartRateRange
-          );
+          section.targetHeartRateRangeNumZone =
+            this.calculateTargetHeartRateRangeNumZone(
+              section.targetHeartRateRange
+            );
         }
       });
     });

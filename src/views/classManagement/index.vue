@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <div style="color: #999; font-size: 12px; font-weight: 600; padding: 10px 0;">
+    <div
+      style="color: #999; font-size: 12px; font-weight: 600; padding: 10px 0"
+    >
       公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
     </div>
     <div class="schedule-top">
@@ -149,10 +151,7 @@
                     </el-popover>
                   </div>
                 </template>
-                <div
-                  class="js-class-drag-container"
-                  :key="item.timespan"
-                >
+                <div class="js-class-drag-container" :key="item.timespan">
                   <div
                     v-for="part in item.classesList"
                     :key="part.id"
@@ -276,22 +275,30 @@
                   : 'schedule-table-header-cell'
               "
             >
-              {{ item.name }} {{ currentWeek[index]?.commonDate === new Date().toISOString().split('T')[0] ? '（今天）' : '' }}
+              {{ item.name }}
+              {{
+                currentWeek[index]?.commonDate ===
+                new Date().toISOString().split("T")[0]
+                  ? "（今天）"
+                  : ""
+              }}
             </div>
             <div class="schedule-table-header-cell-data">
               <!-- <div style="font-size: 14px; font-weight: 600;">
                 同步开关
               </div> -->
-              <div style="display: flex; flex-direction: row; gap: 10px;">
+              <div style="display: flex; flex-direction: row; gap: 10px">
                 <el-switch
-                v-for="item in deviceList"
-                :key="item.id"
-                v-model="item.enabled"
-                :inactive-text="
-                  item.deviceType ? deviceTypeDict[item.deviceType] : '未知设备'
-                "
-                @change="handleDeviceChange(item)"
-              ></el-switch>
+                  v-for="item in deviceList"
+                  :key="item.id"
+                  v-model="item.enabled"
+                  :inactive-text="
+                    item.deviceType
+                      ? deviceTypeDict[item.deviceType]
+                      : '未知设备'
+                  "
+                  @change="handleDeviceChange(item)"
+                ></el-switch>
               </div>
             </div>
           </div>
@@ -302,7 +309,7 @@
               class="schedule-table-cell"
             >
               <div class="schedule-table-cell-title">
-                {{ item?.commonDate }} {{ }}
+                {{ item?.commonDate }}
               </div>
               <!-- {{ item.classSchedule }} -->
               <div
@@ -358,12 +365,19 @@
                     </div>
                     <div class="title">{{ classItem.classesJson.title }}</div>
                     <div class="keyword">
-                      {{ classItem.classesJson.sportType }}
+                      {{ classItem.sportType == "CYCLE"? "BIKE": classItem.sportType }}
                     </div>
-                    <div class="keyword">
+                    <div
+                      class="keyword"
+                      v-if="
+                        classItem.sportType !== 'REST' &&
+                        classItem.sportType !== 'REMARK' &&
+                        classItem.sportType !== 'OTHER'
+                      "
+                    >
                       {{ classItem.classesJson.duration }}
                     </div>
-                    <div style="display: flex">
+                    <div style="display: flex" v-if="classItem.classesJson.distance">
                       <div class="keyword">
                         {{ classItem.classesJson.distance
                         }}<span v-if="classItem.sportType === 'SWIM'">{{
@@ -372,16 +386,32 @@
                       </div>
                       <div>&nbsp;&nbsp;</div>
                     </div>
-                    <div style="display: flex">
+                    <div
+                      style="display: flex"
+                      v-if="
+                        classItem.sportType !== 'REST' &&
+                        classItem.sportType !== 'REMARK' &&
+                        classItem.sportType !== 'OTHER'
+                      "
+                    >
                       <div class="keyword">{{ classItem.classesJson.sth }}</div>
                       <div>&nbsp;&nbsp;STH</div>
                     </div>
-                    <div
+                    <pre
                       v-if="classItem.classesJson.summary"
                       class="stage-details"
                     >
                       {{ classItem.classesJson.summary }}
-                    </div>
+                    </pre>
+                    <!-- <el-input
+                      type="textarea"
+                      v-if="classItem.classesJson.summary"
+                      v-model="classItem.classesJson.summary"
+                      placeholder="请输入概要"
+                      autosize
+                      class="summary-textarea"
+                    >
+                    </el-input> -->
                     <div
                       v-else-if="classItem.sportType === 'CYCLE'"
                       class="stage-details"
@@ -1896,64 +1926,64 @@ export default {
       const originalClassesJson = JSON.parse(data.classesJson);
       console.log(originalClassesJson, "this.originalClassesJson", data);
       // 将运动员阈值代入课程中计算具体值
-      if (originalClassesJson.stages) {
-        originalClassesJson.stages.forEach((item) => {
-          item.sections.forEach((part) => {
-            if (part.thresholdFtp) {
-              part.thresholdFtpNum = Math.round(
-                (part.thresholdFtp / 100) * this.athleticThreshold.cycle
-              );
-            }
-            if (part.thresholdFtpRange) {
-              part.thresholdFtpRangeNum = [
-                Math.round(
-                  (part.thresholdFtpRange[0] / 100) *
-                    this.athleticThreshold.cycle
-                ),
-                Math.round(
-                  (part.thresholdFtpRange[1] / 100) *
-                    this.athleticThreshold.cycle
-                ),
-              ];
-            }
-            if (part.thresholdHeartRate) {
-              part.thresholdHeartRateNum = Math.round(
-                (part.thresholdHeartRate / 100) *
-                  this.athleticThreshold.heartRate
-              );
-            }
-            if (part.thresholdHeartRateRange) {
-              part.thresholdHeartRateRangeNum = [
-                Math.round(
-                  (part.thresholdHeartRateRange[0] / 100) *
-                    this.athleticThreshold.heartRate
-                ),
-                Math.round(
-                  (part.thresholdHeartRateRange[1] / 100) *
-                    this.athleticThreshold.heartRate
-                ),
-              ];
-            }
-            if (part.thresholdSpeed) {
-              part.thresholdSpeedNum = Math.round(
-                (100 / part.thresholdSpeed) * this.athleticThreshold.run
-              );
-            }
-            if (part.thresholdSpeedRange) {
-              part.thresholdSpeedRangeNum = [
-                Math.round(
-                  (100 / part.thresholdSpeedRange[0]) *
-                    this.athleticThreshold.run
-                ),
-                Math.round(
-                  (100 / part.thresholdSpeedRange[1]) *
-                    this.athleticThreshold.run
-                ),
-              ];
-            }
-          });
-        });
-      }
+      // if (originalClassesJson.stages) {
+      //   originalClassesJson.stages.forEach((item) => {
+      //     item.sections.forEach((part) => {
+      //       if (part.thresholdFtp) {
+      //         part.thresholdFtpNum = Math.round(
+      //           (part.thresholdFtp / 100) * this.athleticThreshold.cycle
+      //         );
+      //       }
+      //       if (part.thresholdFtpRange) {
+      //         part.thresholdFtpRangeNum = [
+      //           Math.round(
+      //             (part.thresholdFtpRange[0] / 100) *
+      //               this.athleticThreshold.cycle
+      //           ),
+      //           Math.round(
+      //             (part.thresholdFtpRange[1] / 100) *
+      //               this.athleticThreshold.cycle
+      //           ),
+      //         ];
+      //       }
+      //       if (part.thresholdHeartRate) {
+      //         part.thresholdHeartRateNum = Math.round(
+      //           (part.thresholdHeartRate / 100) *
+      //             this.athleticThreshold.heartRate
+      //         );
+      //       }
+      //       if (part.thresholdHeartRateRange) {
+      //         part.thresholdHeartRateRangeNum = [
+      //           Math.round(
+      //             (part.thresholdHeartRateRange[0] / 100) *
+      //               this.athleticThreshold.heartRate
+      //           ),
+      //           Math.round(
+      //             (part.thresholdHeartRateRange[1] / 100) *
+      //               this.athleticThreshold.heartRate
+      //           ),
+      //         ];
+      //       }
+      //       if (part.thresholdSpeed) {
+      //         part.thresholdSpeedNum = Math.round(
+      //           (100 / part.thresholdSpeed) * this.athleticThreshold.run
+      //         );
+      //       }
+      //       if (part.thresholdSpeedRange) {
+      //         part.thresholdSpeedRangeNum = [
+      //           Math.round(
+      //             (100 / part.thresholdSpeedRange[0]) *
+      //               this.athleticThreshold.run
+      //           ),
+      //           Math.round(
+      //             (100 / part.thresholdSpeedRange[1]) *
+      //               this.athleticThreshold.run
+      //           ),
+      //         ];
+      //       }
+      //     });
+      //   });
+      // }
 
       // data.classesJson =
       if (data.sportType === "RUN") {
@@ -2539,6 +2569,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+::v-deep .el-textarea__inner{
+  border: none !important;
+}
 .container {
   background-color: #fff;
 }
@@ -2938,6 +2971,13 @@ export default {
     padding-left: 2px;
     padding-right: 2px;
     padding-bottom: 5px;
+    .summary-textarea {
+      font-size: 12px;
+      border: none;
+      // .el-textarea__inner {
+      //   border: none !important;
+      // }
+    }
     .body-title {
       display: flex;
       justify-content: space-between;
@@ -2975,6 +3015,10 @@ export default {
       color: #999;
       padding: 5px 5px 0;
       line-height: 16px;
+      // 文本溢出换行
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-line;
       .stage-item {
         margin-bottom: 5px;
         padding-bottom: 5px;

@@ -2,8 +2,8 @@
   <div class="top-navbar">
     <!-- Logo区域 -->
     <div class="logo-container">
-      <img v-if="showLogo" :src="logoUrl" alt="Logo" class="logo" />
-      <span class="title">{{ title }}</span>
+      <img :src="logoUrl" alt="Logo" class="logo" />
+      <!-- <span class="title">{{ title }}</span> -->
     </div>
 
     <!-- 面包屑导航 -->

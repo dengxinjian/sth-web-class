@@ -29,12 +29,12 @@ export const statisticKeyToTitle = {
     color: "rgba(255, 21, 82, 1)",
   },
   cycleTime: {
-    title: "骑车时间",
+    title: "骑行时间",
     icon: require("@/assets/addClass/icon-bike.png"),
     color: "rgba(134, 91, 214, 1)",
   },
   cycleDistanceKm: {
-    title: "骑车距离",
+    title: "骑行距离",
     unit: "KM",
     color: "rgba(134, 91, 214, 1)",
   },
