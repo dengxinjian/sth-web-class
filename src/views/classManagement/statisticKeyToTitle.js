@@ -25,6 +25,7 @@ export const statisticKeyToTitle = {
   },
   runDistanceKm: {
     title: "跑步距离",
+    icon: require("@/assets/addClass/icon-run.png"),
     unit: "KM",
     color: "rgba(255, 21, 82, 1)",
   },
@@ -35,6 +36,7 @@ export const statisticKeyToTitle = {
   },
   cycleDistanceKm: {
     title: "骑行距离",
+    icon: require("@/assets/addClass/icon-bike.png"),
     unit: "KM",
     color: "rgba(134, 91, 214, 1)",
   },
@@ -45,6 +47,7 @@ export const statisticKeyToTitle = {
   },
   swimDistanceKm: {
     title: "游泳距离",
+    icon: require("@/assets/addClass/icon-swim.png"),
     unit: "KM",
     color: "rgba(46, 166, 223, 1)",
   },
