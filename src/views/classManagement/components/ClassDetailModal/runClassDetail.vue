@@ -18,7 +18,7 @@
           <span>
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
-          <span>{{ classInfo.duration }}km</span>
+          <span>{{ classInfo.duration }}</span>
           <span v-if="classInfo.mode == 1 || classInfo.mode == 3">{{
             classInfo.distance
           }}</span>
@@ -1014,7 +1014,7 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.classInfo.sth = res.result?.sth || "";
-          this.classInfo.distance = res.result?.distance || "";
+          this.classInfo.distance = res.result?.distance ? res.result.distance + 'km' : "";
           this.classInfo.duration = this.translateTime(res.result?.time || "");
         }
       });
