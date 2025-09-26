@@ -572,7 +572,7 @@
                     :style="{ width: '100px' }"
                     @change="handleTargetChange(index, idx)"
                   ></el-time-picker>
-                  <span class="unit">min/km</span>
+                  <span class="unit">min/km {{ calculateTargetSpeedRangeNumZone(part.targetSpeedRange).join(" ~ ") }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 3 && part.range === 'target'"
@@ -588,7 +588,7 @@
                     :style="{ width: '100px' }"
                     @change="handleTargetChange(index, idx)"
                   ></el-time-picker>
-                  <span class="unit">min/km</span>
+                  <span class="unit">min/km {{ calculateTargetSpeedNumZone(part.targetSpeed) }}</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 4 && part.range === 'range'"
@@ -614,7 +614,7 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">bpm</span>
+                  <span class="unit">bpm {{ calculateTargetHeartRateRangeNumZone(part.targetHeartRateRange).join(" ~ ") }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 4 && part.range === 'target'"
@@ -631,7 +631,7 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">bpm</span>
+                  <span class="unit">bpm {{ calculateTargetHeartRateNumZone(part.targetHeartRate) }}</span>
                 </div>
                 <div v-if="part.hasCadence" class="config-item">
                   <el-input-number
@@ -896,7 +896,25 @@ export default {
     },
     // 计算固定配速运动值的分组
     calculateTargetSpeedRangeNumZone(targetSpeedRange) {
-
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateTargetSpeedRangeNumZone(targetSpeedRange);
+    },
+    calculateTargetSpeedNumZone(targetSpeed) {
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateTargetSpeedNumZone(targetSpeed);
+    },
+    // 计算固定心率分组
+    calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateTargetHeartRateRangeNumZone(targetHeartRateRange);
+    },
+    calculateTargetHeartRateNumZone(targetHeartRate) {
+      return new CalculateRun(
+        this.athleticThreshold
+      ).calculateTargetHeartRateNumZone(targetHeartRate);
     },
     updateClassInfoCalculatedValues() {
       // 更新所有阶段的阈值功率计算值

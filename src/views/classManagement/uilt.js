@@ -1,3 +1,4 @@
+import { mmssToSeconds } from "@/utils/index";
 export const debounce = (cb, wait) => {
   let timer;
   return function (...args) {
@@ -40,6 +41,7 @@ export class CalculateRun {
   constructor(athleticThreshold, classInfo) {
     this.classInfo = classInfo;
     this.athleticThreshold = athleticThreshold;
+    console.log(this.athleticThreshold, "this.athleticThreshold");
   }
   calculateThresholdSpeedRangeNum(thresholdSpeedRange) {
     return [
@@ -126,6 +128,39 @@ export class CalculateRun {
       ),
     ];
   }
+  calculateTargetSpeedRangeNumZone(targetSpeedRange) {
+    const timer1 = mmssToSeconds(targetSpeedRange[0]);
+    const timer2 = mmssToSeconds(targetSpeedRange[1]);
+    return [
+      this.calculateThresholdSpeedNumZoneFollow(
+        (timer1 / this.athleticThreshold.run).toFixed(2)
+      ),
+      this.calculateThresholdSpeedNumZoneFollow(
+        (timer2 / this.athleticThreshold.run).toFixed(2)
+      ),
+    ];
+  }
+  calculateTargetSpeedNumZone(targetSpeed) {
+    const timer1 = mmssToSeconds(targetSpeed);
+    return this.calculateThresholdSpeedNumZoneFollow(
+      (timer1 / this.athleticThreshold.run).toFixed(2)
+    );
+  }
+  calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
+    return [
+      calculateThresholdHeartRateNumZoneFollow(
+        (targetHeartRateRange[0] / this.athleticThreshold.heartRate).toFixed(2)
+      ),
+      calculateThresholdHeartRateNumZoneFollow(
+        (targetHeartRateRange[1] / this.athleticThreshold.heartRate).toFixed(2)
+      ),
+    ];
+  }
+  calculateTargetHeartRateNumZone(targetHeartRate) {
+    return calculateThresholdHeartRateNumZoneFollow(
+      (targetHeartRate / this.athleticThreshold.heartRate).toFixed(2)
+    );
+  }
   updateClassInfoCalculatedValues() {
     this.classInfo.stages.forEach((stage, stageIndex) => {
       stage.sections.forEach((section, sectionIndex) => {
@@ -162,6 +197,26 @@ export class CalculateRun {
             this.calculateThresholdHeartRateRangeNumZone(
               section.thresholdHeartRateRange
             );
+        }
+        if (section.targetSpeed !== undefined) {
+          section.targetSpeedNumZone = this.calculateTargetSpeedNumZone(
+            section.targetSpeed
+          );
+        }
+        if (section.targetSpeedRange !== undefined) {
+          section.targetSpeedRangeNumZone = this.calculateTargetSpeedRangeNumZone(
+            section.targetSpeedRange
+          );
+        }
+        if (section.targetHeartRate !== undefined) {
+          section.targetHeartRateNumZone = this.calculateTargetHeartRateNumZone(
+            section.targetHeartRate
+          );
+        }
+        if (section.targetHeartRateRange !== undefined) {
+          section.targetHeartRateRangeNumZone = this.calculateTargetHeartRateRangeNumZone(
+            section.targetHeartRateRange
+          );
         }
       });
     });
@@ -255,6 +310,36 @@ export class CalculateBike {
       ),
     ];
   }
+  calculateTargetFtpRangeNumZone(targetFtpRange) {
+    return [
+      this.calculateThresholdFtpRangeNumZoneFollow(
+        (targetFtpRange[0] / this.athleticThreshold.cycle).toFixed(2)
+      ),
+      this.calculateThresholdFtpRangeNumZoneFollow(
+        (targetFtpRange[1] / this.athleticThreshold.cycle).toFixed(2)
+      ),
+    ];
+  }
+  calculateTargetFtpNumZone(targetFtp) {
+    return this.calculateThresholdFtpRangeNumZoneFollow(
+      (targetFtp / this.athleticThreshold.cycle).toFixed(2)
+    );
+  }
+  calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
+    return [
+      calculateThresholdHeartRateNumZoneFollow(
+        (targetHeartRateRange[0] / this.athleticThreshold.heartRate).toFixed(2)
+      ),
+      calculateThresholdHeartRateNumZoneFollow(
+        (targetHeartRateRange[1] / this.athleticThreshold.heartRate).toFixed(2)
+      ),
+    ];
+  }
+  calculateTargetHeartRateNumZone(targetHeartRate) {
+    return calculateThresholdHeartRateNumZoneFollow(
+      (targetHeartRate / this.athleticThreshold.heartRate).toFixed(2)
+    );
+  }
   updateClassInfoCalculatedValues() {
     this.classInfo.stages.forEach((stage, stageIndex) => {
       stage.sections.forEach((section, sectionIndex) => {
@@ -289,6 +374,26 @@ export class CalculateBike {
             this.calculateThresholdHeartRateRangeNumZone(
               section.thresholdHeartRateRange
             );
+        }
+        if (section.targetFtp !== undefined) {
+          section.targetFtpNumZone = this.calculateTargetFtpNumZone(
+            section.targetFtp
+          );
+        }
+        if (section.targetFtpRange !== undefined) {
+          section.targetFtpRangeNumZone = this.calculateTargetFtpRangeNumZone(
+            section.targetFtpRange
+          );
+        }
+        if (section.targetHeartRate !== undefined) {
+          section.targetHeartRateNumZone = this.calculateTargetHeartRateNumZone(
+            section.targetHeartRate
+          );
+        }
+        if (section.targetHeartRateRange !== undefined) {
+          section.targetHeartRateRangeNumZone = this.calculateTargetHeartRateRangeNumZone(
+            section.targetHeartRateRange
+          );
         }
       });
     });
