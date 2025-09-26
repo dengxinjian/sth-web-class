@@ -401,7 +401,7 @@
                       v-if="classItem.classesJson.summary"
                       class="stage-details"
                     >
-                      {{ classItem.classesJson.summary }}
+                      {{ truncateByLines(classItem.classesJson.summary) }}
                     </pre>
                     <!-- <el-input
                       type="textarea"
@@ -1477,7 +1477,7 @@ import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
 import { getData, submitData } from "@/api/common.js";
 import { MessageBox } from "element-ui";
 import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
-import { CalculateRun, CalculateBike } from "./uilt";
+import { CalculateRun, CalculateBike, truncateByLines } from "./uilt";
 
 export default {
   name: "ClassManagement",
@@ -1608,6 +1608,7 @@ export default {
   },
   methods: {
     secondsToMMSS,
+    truncateByLines,
     // 课表同步设备点击
     handleDeviceClick(classItem, device, date) {
       if (date < new Date().toISOString().split("T")[0]) {

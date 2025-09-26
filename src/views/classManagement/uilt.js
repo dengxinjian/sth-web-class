@@ -401,3 +401,11 @@ export class CalculateBike {
     return this.classInfo;
   }
 }
+
+export function truncateByLines(str, maxLines = 6) {
+  const lines = str.split("\n");
+  if (lines.length > maxLines) {
+    return lines.slice(0, maxLines).join("\n") + "...";
+  }
+  return str;
+}

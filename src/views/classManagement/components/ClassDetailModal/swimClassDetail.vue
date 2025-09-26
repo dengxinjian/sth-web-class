@@ -188,6 +188,7 @@ export default {
         if (res.success) {
           this.form = JSON.parse(res.result.classesJson)
           this.form.id = res.result.id
+          console.log(this.form, "this.form");
         }
       })
     },
