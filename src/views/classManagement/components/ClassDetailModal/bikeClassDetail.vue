@@ -149,7 +149,7 @@
                   <div>{{ part.title }}</div>
                   <div v-if="classInfo.mode === 1 && part.range === 'range'">
                     {{ part.target }} @ {{ part.thresholdFtpRangeNum[0] }}~
-                    {{ part.thresholdFtpRangeNum[1] }}w 阈值功率
+                    {{ part.thresholdFtpRangeNum[1] }}w {{ part.thresholdFtpRangeNumZone[0] }}~{{ part.thresholdFtpRangeNumZone[1] }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
@@ -157,46 +157,46 @@
                   <div v-if="classInfo.mode === 2 && part.range === 'range'">
                     {{ part.target }} @
                     {{ part.thresholdHeartRateRangeNum[0] }}~
-                    {{ part.thresholdHeartRateRangeNum[1] }}bpm 阈值心率
+                    {{ part.thresholdHeartRateRangeNum[1] }}bpm {{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 1 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.thresholdFtpNum }}w 阈值功率
+                    {{ part.target }} @ {{ part.thresholdFtpNum }}w {{ part.thresholdFtpNumZone }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 2 && part.range === 'target'">
                     {{ part.target }} @ {{ part.thresholdHeartRateNum }}bpm
-                    阈值心率
+                    {{ part.thresholdHeartRateNumZone }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 3 && part.range === 'range'">
                     {{ part.target }} @ {{ part.targetFtpRange[0] }}~
-                    {{ part.targetFtpRange[1] }}w
+                    {{ part.targetFtpRange[1] }}w {{ part.targetFtpRangeNumZone[0] }}~{{ part.targetFtpRangeNumZone[1] }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 4 && part.range === 'range'">
                     {{ part.target }} @ {{ part.targetHeartRateRange[0] }}~
-                    {{ part.targetHeartRateRange[1] }}rpm
+                    {{ part.targetHeartRateRange[1] }}rpm {{ part.targetHeartRateRangeNumZone[0] }}~{{ part.targetHeartRateRangeNumZone[1] }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 3 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.targetFtp }}rpm
+                    {{ part.target }} @ {{ part.targetFtp }}rpm {{ part.targetFtpNumZone }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 4 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.targetHeartRate }}rpm
+                    {{ part.target }} @ {{ part.targetHeartRate }}rpm {{ part.targetHeartRateNumZone }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
