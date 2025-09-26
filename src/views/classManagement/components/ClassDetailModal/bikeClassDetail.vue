@@ -343,7 +343,7 @@
                     @change="calculateTimeline"
                   />
                   <span class="unit"
-                    >%阈值功率
+                    >%阈值功率 &nbsp; &nbsp;
                     {{
                       calculateThresholdFtpRangeNumZone(
                         part.thresholdFtpRange
@@ -374,7 +374,7 @@
                     @change="calculateTimeline"
                   />
                   <span class="unit"
-                    >%阈值功率
+                    >%阈值功率 &nbsp; &nbsp;
                     {{ calculateThresholdFtpNumZone(part.thresholdFtp) }}</span
                   >
                   <span class="label"
@@ -406,7 +406,7 @@
                     @change="calculateTimeline"
                   />
                   <span class="unit"
-                    >%阈值心率
+                    >%阈值心率 &nbsp; &nbsp;
                     {{
                       calculateThresholdHeartRateRangeNumZone(
                         part.thresholdHeartRateRange
@@ -437,7 +437,7 @@
                     @change="calculateTimeline"
                   />
                   <span class="unit"
-                    >%阈值心率
+                    >%阈值心率 &nbsp; &nbsp;
                     {{
                       calculateThresholdHeartRateNumZone(
                         part.thresholdHeartRate
@@ -474,7 +474,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">w {{ calculateTargetFtpRangeNumZone(part.targetFtpRange).join(" ~ ") }}</span>
+                  <span class="unit">w &nbsp; &nbsp; {{ calculateTargetFtpRangeNumZone(part.targetFtpRange).join(" ~ ") }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 3 && part.range === 'target'"
@@ -491,7 +491,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">w {{ calculateTargetFtpNumZone(part.targetFtp) }}</span>
+                  <span class="unit">w &nbsp; &nbsp; {{ calculateTargetFtpNumZone(part.targetFtp) }}</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 4 && part.range === 'range'"
@@ -517,7 +517,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">bpm {{ calculateTargetHeartRateRangeNumZone(part.targetHeartRateRange).join(" ~ ") }}</span>
+                  <span class="unit">bpm &nbsp; &nbsp; {{ calculateTargetHeartRateRangeNumZone(part.targetHeartRateRange).join(" ~ ") }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 4 && part.range === 'target'"
@@ -534,7 +534,7 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">bpm {{ calculateTargetHeartRateNumZone(part.targetHeartRate) }}</span>
+                  <span class="unit">bpm &nbsp; &nbsp; {{ calculateTargetHeartRateNumZone(part.targetHeartRate) }}</span>
                 </div>
                 <div v-if="part.hasCadence" class="config-item">
                   <el-input-number

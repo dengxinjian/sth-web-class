@@ -516,7 +516,7 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">%阈值心率 {{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
+                  <span class="unit">%阈值心率 &nbsp; &nbsp; {{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}</span>
                   <span class="label"
                     >{{ part.thresholdHeartRateRangeNum[0] }}~{{
                       part.thresholdHeartRateRangeNum[1]
@@ -539,7 +539,7 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">%阈值心率 {{ part.thresholdHeartRateNumZone }}</span>
+                  <span class="unit">%阈值心率 &nbsp; &nbsp; {{ part.thresholdHeartRateNumZone }}</span>
                   <span class="label"
                     >{{ part.thresholdHeartRateNum }}bpm</span
                   >
@@ -587,7 +587,7 @@
                     :style="{ width: '100px' }"
                     @change="handleTargetChange(index, idx)"
                   ></el-time-picker>
-                  <span class="unit">min/km {{ part.targetSpeedNumZone }}</span>
+                  <span class="unit">min/km &nbsp; &nbsp; {{ part.targetSpeedNumZone }}</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 4 && part.range === 'range'"
@@ -615,7 +615,7 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">bpm {{ part.targetHeartRateNumZone }}</span>
+                  <span class="unit">bpm &nbsp; &nbsp; {{ part.targetHeartRateNumZone }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 4 && part.range === 'target'"
@@ -633,7 +633,7 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">bpm {{ part.targetHeartRateNumZone }}</span>
+                  <span class="unit">bpm &nbsp; &nbsp; {{ part.targetHeartRateNumZone }}</span>
                 </div>
                 <div v-if="part.hasCadence" class="config-item">
                   <el-input-number
