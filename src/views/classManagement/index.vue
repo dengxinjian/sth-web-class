@@ -365,7 +365,7 @@
                     </div>
                     <div class="title">{{ classItem.classesJson.title }}</div>
                     <div class="keyword">
-                      {{ classItem.sportType }}
+                      {{ classItem.sportType == "CYCLE"? "BIKE": classItem.sportType }}
                     </div>
                     <div
                       class="keyword"
