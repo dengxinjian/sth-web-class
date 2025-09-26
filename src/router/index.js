@@ -82,6 +82,11 @@ export const constantRoutes = [
     hidden: true,
   },
   {
+    path: "/agreement",
+    component: () => import("@/views/agreement/index"),
+    hidden: true,
+  },
+  {
     path: "/auth-redirect",
     component: () => import("@/views/login/auth-redirect"),
     hidden: true,

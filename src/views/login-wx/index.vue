@@ -33,8 +33,8 @@
             </div>
         </div>
           <div class="wx-login-block">
-             <div class="elite-title">ELITE</div>
-             <div id="wx-login-container" class="wx-login-container">
+            <div class="elite-title">ELITE</div>
+            <div id="wx-login-container" :class="'wx-login-container '+ (!isAgreement ? ' noAgreement' : '')">
                <!-- 扫码成功状态 -->
                <div v-if="hasCode" class="login-success">
                  <div class="success-icon">✓</div>
@@ -53,6 +53,12 @@
                  <div class="error-subtitle">请刷新重试</div>
                </div>
              </div>
+             <div v-if="!isAgreement" class="wx-login-cover"></div>
+             <div style="display: flex; align-items: center;font-size: 14px;">
+                <el-checkbox v-model="isAgreement" label="" style="margin-right: 5px;"></el-checkbox>
+                <span>我已阅读并同意</span>
+                <router-link to="/agreement" style="color: #0924f5;">《课程配置器用户协议》</router-link>
+              </div>
           </div>
     </div>
 
@@ -80,7 +86,8 @@ export default {
       ],
       carouselTimer: null,
       hasCode: false, // 是否包含code参数
-      wxLoginStatus: 'loading' // 微信登录状态：loading, success, error
+      wxLoginStatus: 'loading', // 微信登录状态：loading, success, error
+      isAgreement: false // 是否同意用户协议
     };
   },
   mounted() {
@@ -312,7 +319,7 @@ export default {
         const appId = 'wx4064cabd6845def1';
         const state = (Math.random().toString(36).slice(2) + Date.now()).toString();
         const redirectUri = encodeURIComponent(
-          'https://webtest.strongtri.com/#/login-scan'
+          process.env.NODE_ENV === 'production' ? 'https://web.strongtri.com/#/login-scan' : 'https://webtest.strongtri.com/#/login-scan'
         );
 
         console.log('开始创建微信登录二维码...');
@@ -529,11 +536,12 @@ footer {
   z-index: 1000;
   transform: translateY(-50%);
   width: 340px;
-  height: 480px;
+  height: 520px;
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding-top: 80px;
@@ -550,6 +558,17 @@ footer {
     line-height: 40px;
     font-weight: bold;
   }
+}
+.wx-login-cover {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  z-index: 1000;
+  width: 340px;
+  height: 400px;
+}
+.wx-login-container.noAgreement {
+  filter: blur(5px);
 }
 
 .wx-login-container iframe {

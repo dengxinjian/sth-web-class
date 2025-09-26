@@ -2959,15 +2959,15 @@ export default {
           font-weight: 700;
           color: #fff;
         }
-        .sport-type-color1 {
-          background-color: #7fb135;
-        }
-        .sport-type-color2 {
-          background-color: #c72a29;
-        }
-        .sport-type-color0 {
-          background-color: #aaaaaa;
-        }
+        // .sport-type-color1 {
+        //   background-color: #7fb135;
+        // }
+        // .sport-type-color2 {
+        //   background-color: #c72a29;
+        // }
+        // .sport-type-color0 {
+        //   background-color: #aaaaaa;
+        // }
       }
     }
     .stage-details {
