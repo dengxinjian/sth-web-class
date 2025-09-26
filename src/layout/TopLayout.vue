@@ -128,7 +128,7 @@ export default {
 }
 
 .main-container {
-  margin-top: 50px; /* 50px navbar + 50px menu */
+  margin-top: 40px; /* 50px navbar + 50px menu */
   margin-left: 0 !important;
   flex: 1;
   width: 100%;

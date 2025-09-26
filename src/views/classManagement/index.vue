@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <div style="color: #999; font-size: 12px; font-weight: 600; padding: 10px 0;">
+      公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
+    </div>
     <div class="schedule-top">
       <WeekRangePicker @week-change="onWeekChange" />
       <div class="schedule-search">
