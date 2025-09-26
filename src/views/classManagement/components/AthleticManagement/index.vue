@@ -8,7 +8,7 @@
         </div>
         <div class="athletic-btn">
           <el-button type="primary" size="mini" @click="handleInviteAthletic">邀请运动员</el-button>
-          <el-button type="primary" size="mini" @click="handleInviteAthletic">邀请执教</el-button>
+          <el-button type="primary" size="mini" @click="handleInviteCoach">邀请执教</el-button>
         </div>
         <el-tree
             :data="filteredAthleticData"
@@ -20,11 +20,12 @@
                 <el-popover popper-class="athletic-btn-popover" placement="right" trigger="hover">
                     <div class="btn-list-hover">
                         <el-button v-if="node.data.isGroup" type="text" size="mini" @click="handleAddGroup">新建分组</el-button>
-                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleEditGroup(node)">编辑分组</el-button>
-                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleDeleteGroup(node)">删除分组</el-button>
-                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button>
-                        <el-button v-if="!node.data.isGroup" type="text" size="mini" @click="handleMoveAthletic(node)">移动分组</el-button>
-                        <el-button v-if="!node.data.isGroup" type="text" size="mini" @click="handleMoveOutAthletic(node)">移出</el-button>
+                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped' && node.data.id !== 'coach'" type="text" size="mini" @click="handleEditGroup(node)">编辑分组</el-button>
+                        <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped' && node.data.id !== 'coach'" type="text" size="mini" @click="handleDeleteGroup(node)">删除分组</el-button>
+                        <!-- <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button> -->
+                        <el-button v-if="!node.data.isGroup && node.parent.data.id !== 'coach'" type="text" size="mini" @click="handleMoveAthletic(node)">移动分组</el-button>
+                        <el-button v-if="!node.data.isGroup && node.parent.data.id !== 'coach'" type="text" size="mini" @click="handleMoveOutAthletic(node)">解绑</el-button>
+                        <el-button v-if="!node.data.isGroup && node.parent.data.id === 'coach'" type="text" size="mini" @click="handleMoveOutCoach(node)">解绑</el-button>
                     </div>
                     <el-button
                         type="text"
@@ -144,7 +145,7 @@
         <!-- 邀请执教弹框 -->
         <el-dialog
             title="邀请执教"
-            :visible.sync="showInviteDialog"
+            :visible.sync="showInviteCoachDialog"
             width="500px"
             :close-on-click-modal="false"
             :close-on-press-escape="false"
@@ -153,7 +154,7 @@
                 <!-- 插图 -->
                 <div class="invite-illustration">
                     <div class="athlete-illustration">
-                        <img src="~@/assets/addClass/athlete-invite.png" alt="">
+                        <img src="~@/assets/addClass/coach-invite.png" alt="">
                     </div>
                 </div>
 
@@ -169,7 +170,7 @@
                 <!-- 邀请码显示 -->
                 <div class="invite-code-container">
                     <div class="invite-code-label">执教邀请码:</div>
-                    <div class="invite-code-value">{{ invitationCode }}</div>
+                    <div class="invite-code-value">{{ coachInvitationCode }}</div>
                 </div>
 
                 <!-- 邀请码说明 -->
@@ -182,13 +183,13 @@
                 <el-button
                     type="primary"
                     class="copy-btn"
-                    @click="copyInvitationCode"
+                    @click="copyCoachInvitationCode"
                     :loading="copyLoading">
                     一键复制执教邀请码
                 </el-button>
                 <el-button
                     class="regenerate-btn"
-                    @click="regenerateInvitationCode"
+                    @click="getCoachInvitationCode"
                     :loading="regenerateLoading">
                     重新生成执教邀请码
                 </el-button>
@@ -239,7 +240,9 @@ export default {
       },
       // 邀请运动员相关
       showInviteDialog: false,
+      showInviteCoachDialog: false,
       invitationCode: '',
+      coachInvitationCode: '',
       copyLoading: false,
       regenerateLoading: false,
       moveType: ''
@@ -284,7 +287,7 @@ export default {
         teamId: this.teamId
       }).then(res => {
         if (res.success) {
-          this.athleticData = res.result.map(item => {
+          const processedData = res.result.map(item => {
             return {
               id: item.id,
               label: item.groupName,
@@ -297,6 +300,45 @@ export default {
               })
             }
           })
+
+          // 处理unGrouped团队的members，将userType为1或2的members移动到新建的coach团队下
+          const unGroupIndex = processedData.findIndex(item => item.id === 'unGrouped')
+          if (unGroupIndex !== -1) {
+            const unGroupData = processedData[unGroupIndex]
+            const allMembers = unGroupData.children || []
+
+            // 筛选出userType为1或2的members
+            const coachMembers = allMembers.filter(member => member.userType === 1 || member.userType === 2)
+
+            // 筛选出其他userType的members，保留在unGrouped团队中
+            const remainingMembers = allMembers.filter(member => member.userType !== 1 && member.userType !== 2)
+
+            // 更新unGrouped团队，只保留非coach类型的members
+            processedData[unGroupIndex] = {
+              ...unGroupData,
+              children: remainingMembers
+            }
+
+            // 只有当存在coach类型的members时才创建coach团队
+            if (coachMembers.length > 0) {
+              // 创建新的coach团队
+              const coachTeam = {
+                id: 'coach',
+                label: '我的执教',
+                description: '执教团队',
+                isGroup: true,
+                groupName: '我的执教',
+                triUserId: null,
+                children: coachMembers
+              }
+
+              // 将coach团队添加到数据中
+              processedData.unshift(coachTeam)
+            }
+
+          }
+
+          this.athleticData = processedData
         }
       }).catch(error => {
         console.error('获取运动员数据失败:', error)
@@ -312,6 +354,12 @@ export default {
     handleInviteAthletic() {
       this.showInviteDialog = true
       this.getInvitationCode()
+    },
+
+    // 邀请执教
+    handleInviteCoach() {
+      this.showInviteCoachDialog = true
+      this.getCoachInvitationCode()
     },
 
     // 获取邀请码
@@ -331,6 +379,17 @@ export default {
         console.error('获取邀请码失败:', error)
         this.createInvitationCode()
         this.$message.error('获取邀请码失败')
+      })
+    },
+    // 获取执教邀请码
+    getCoachInvitationCode() {
+      submitData({
+        url: '/api/team/invite/generate', // 请替换为实际API
+        userType: 2
+      }).then(res => {
+        if (res.success) {
+          this.coachInvitationCode = res.result.inviteCode
+        }
       })
     },
     // 创建邀请码
@@ -370,6 +429,29 @@ export default {
       } else {
         // 降级方案
         this.fallbackCopyTextToClipboard(this.invitationCode)
+      }
+    },
+
+    // 复制执教邀请码
+    copyCoachInvitationCode() {
+      if (!this.coachInvitationCode) {
+        this.$message.warning('执教邀请码为空')
+        return
+      }
+
+      this.copyLoading = true
+
+      // 使用现代浏览器的 Clipboard API
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(this.coachInvitationCode).then(() => {
+          this.$message.success('执教邀请码已复制到剪贴板')
+          this.copyLoading = false
+        }).catch(() => {
+          this.fallbackCopyTextToClipboard(this.coachInvitationCode)
+        })
+      } else {
+        // 降级方案
+        this.fallbackCopyTextToClipboard(this.coachInvitationCode)
       }
     },
 
@@ -456,9 +538,9 @@ export default {
       this.moveType = 'athletic'
     },
 
-    // 运动员移出分组
+    // 运动员解绑分组
     handleMoveOutAthletic(node) {
-      this.$confirm('确定从该团队移出该运动员吗？', '提示', {
+      this.$confirm('确定解绑该运动员吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -468,14 +550,42 @@ export default {
           method: 'delete'
         }).then(res => {
           if (res.success) {
-            this.$message.success('移出团队成功')
+            this.$message.success('解绑成功')
             this.getAthleticData()
           } else {
-            this.$message.error(res.message || '移出团队失败')
+            this.$message.error(res.message || '解绑失败')
           }
         }).catch(error => {
-          console.error('移出团队失败:', error)
-          this.$message.error('移出团队失败')
+          console.error('解绑失败:', error)
+          this.$message.error('解绑失败')
+        })
+      })
+    },
+
+    // 教练解绑分组
+    handleMoveOutCoach(node) {
+      if (node.data.userType === 1) {
+        this.$message.error('不能解绑主教练')
+        return
+      }
+      this.$confirm('确定解绑该执教吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        submitData({
+          url: `/api/team/kick/${this.teamId}/${node.data.triUserId}/${node.data.userType}`,
+          method: 'delete'
+        }).then(res => {
+          if (res.success) {
+            this.$message.success('解绑成功')
+            this.getAthleticData()
+          } else {
+            this.$message.error(res.message || '解绑失败')
+          }
+        }).catch(error => {
+          console.error('解绑失败:', error)
+          this.$message.error('解绑失败')
         })
       })
     },
@@ -605,11 +715,6 @@ export default {
         console.error('移动分组失败:', error)
         this.$message.error('移动失败')
       })
-    },
-
-    // 整个分组移动
-    handleMoveGroup() {
-
     },
 
     // 重置分组表单
@@ -794,7 +899,7 @@ export default {
         background: #fff5f5;
         border: 2px solid #ff4757;
         border-radius: 8px;
-        padding: 15px 20px;
+        padding: 15px 15px;
         margin-bottom: 15px;
         display: flex;
         align-items: center;

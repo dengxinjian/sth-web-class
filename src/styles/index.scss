@@ -301,3 +301,7 @@ aside {
   text-overflow: inherit;
   -webkit-line-clamp: 100;
 }
+
+.el-collapse-item__content {
+  padding-bottom: 0 !important;
+}

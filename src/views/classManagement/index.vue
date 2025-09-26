@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <div style="color: #999; font-size: 12px; font-weight: 600; padding: 10px 0;">
+      公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
+    </div>
     <div class="schedule-top">
       <WeekRangePicker @week-change="onWeekChange" />
       <div class="schedule-search">
@@ -149,7 +152,6 @@
                 <div
                   class="js-class-drag-container"
                   :key="item.timespan"
-                  style="min-height: 20px"
                 >
                   <div
                     v-for="part in item.classesList"
@@ -274,10 +276,14 @@
                   : 'schedule-table-header-cell'
               "
             >
-              {{ item.name }}
+              {{ item.name }} {{ currentWeek[index]?.commonDate === new Date().toISOString().split('T')[0] ? '（今天）' : '' }}
             </div>
             <div class="schedule-table-header-cell-data">
-              <el-switch
+              <!-- <div style="font-size: 14px; font-weight: 600;">
+                同步开关
+              </div> -->
+              <div style="display: flex; flex-direction: row; gap: 10px;">
+                <el-switch
                 v-for="item in deviceList"
                 :key="item.id"
                 v-model="item.enabled"
@@ -286,6 +292,7 @@
                 "
                 @change="handleDeviceChange(item)"
               ></el-switch>
+              </div>
             </div>
           </div>
           <div class="schedule-table-body">
@@ -295,7 +302,7 @@
               class="schedule-table-cell"
             >
               <div class="schedule-table-cell-title">
-                {{ item?.commonDate }}
+                {{ item?.commonDate }} {{  }}
               </div>
               <!-- {{ item.classSchedule }} -->
               <div
@@ -1582,16 +1589,22 @@ export default {
         this.$message.info("该设备已同步成功");
         return;
       }
-      submitData({
-        url: `/api/classSchedule/retryClassScheduleSync?classScheduleId=${classItem.id}&deviceType=${device.deviceType}`,
-      }).then((res) => {
-        if (res.success) {
-          this.$message.success(res.result);
-          // 更新课表数据
-          this.getScheduleData();
-        } else {
-          this.$message.error(res.message);
-        }
+      this.$confirm("确定要重新同步该课表吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        submitData({
+          url: `/api/classSchedule/retryClassScheduleSync?classScheduleId=${classItem.id}&deviceType=${device.deviceType}`,
+        }).then((res) => {
+          if (res.success) {
+            this.$message.success(res.result);
+            // 更新课表数据
+            this.getScheduleData();
+          } else {
+            this.$message.error(res.message);
+          }
+        });
       });
     },
     // 获取用户已授权设备列表
@@ -2602,13 +2615,14 @@ export default {
     }
     .schedule-table-header-cell-data {
       background-color: #fff;
+      padding: 0 10px;
       flex: 0 0 220px;
       display: flex;
-      flex-direction: row;
-      gap: 15px;
+      flex-direction: column;
+      gap: 5px;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
     }
   }
   .schedule-table-body {

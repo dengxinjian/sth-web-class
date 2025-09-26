@@ -16,8 +16,8 @@
         <div class="month-data-text">
           <span>{{ item.title }}:</span>
           <div>
-            <span>{{ item.actualValue }} {{ item.key === 'totalSTH' ? 'w' : item.unit }}</span>
-            <span style="padding-left: 5px;">{{ item.planValue || 0 }} {{ item.key === 'totalSTH' ? 'w' : item.unit }}</span>
+            <span>{{ item.actualValue }} {{ item.key === 'totalSTH' ? '万' : item.unit }}</span>
+            <span style="padding-left: 5px;">{{ item.planValue || 0 }} {{ item.key === 'totalSTH' ? '万' : item.unit }}</span>
           </div>
         </div>
         <el-progress :percentage="item.percent || 0" :color="item.color" :show-text="false"></el-progress>
