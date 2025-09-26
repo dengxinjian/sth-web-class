@@ -19,9 +19,7 @@
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{ classInfo.duration }}</span>
-          <span v-if="classInfo.mode == 1 || classInfo.mode == 3">{{
-            classInfo.distance
-          }}</span>
+          <span>{{ classInfo.distance }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -157,7 +155,9 @@
                     }}
                     @ {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~
                     {{ secondsToMMSS(part.thresholdSpeedRangeNum[1]) }}/km
-                    {{ part.thresholdSpeedRangeNumZone[0] }}~{{ part.thresholdSpeedRangeNumZone[1] }}
+                    {{ part.thresholdSpeedRangeNumZone[0] }}~{{
+                      part.thresholdSpeedRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -169,7 +169,10 @@
                         : part.targetDistance + part.targetUnit
                     }}
                     @ {{ part.thresholdHeartRateRangeNum[0] }}~
-                    {{ part.thresholdHeartRateRangeNum[1] }}bpm {{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}
+                    {{ part.thresholdHeartRateRangeNum[1] }}bpm
+                    {{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                      part.thresholdHeartRateRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -180,7 +183,8 @@
                         ? part.target
                         : part.targetDistance + part.targetUnit
                     }}
-                    @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km {{ part.thresholdSpeedNumZone }}
+                    @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
+                    {{ part.thresholdSpeedNumZone }}
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -191,7 +195,8 @@
                         ? part.target
                         : part.targetDistance + part.targetUnit
                     }}
-                    @ {{ part.thresholdHeartRateNum }}bpm {{ part.thresholdHeartRateNumZone }}
+                    @ {{ part.thresholdHeartRateNum }}bpm
+                    {{ part.thresholdHeartRateNumZone }}
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -204,7 +209,9 @@
                     }}
                     @ {{ part.targetSpeedRange[0] }}~
                     {{ part.targetSpeedRange[1] }}/km
-                    {{ part.targetSpeedRangeNumZone[0] }}~{{ part.targetSpeedRangeNumZone[1] }}
+                    {{ part.targetSpeedRangeNumZone[0] }}~{{
+                      part.targetSpeedRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -217,7 +224,9 @@
                     }}
                     @ {{ part.targetHeartRateRange[0] }}~
                     {{ part.targetHeartRateRange[1] }}bpm
-                    {{ part.targetHeartRateRangeNumZone[0] }}~{{ part.targetHeartRateRangeNumZone[1] }}
+                    {{ part.targetHeartRateRangeNumZone[0] }}~{{
+                      part.targetHeartRateRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -413,8 +422,7 @@
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit"
-                    >%阈值配速
-                    &nbsp; &nbsp;
+                    >%阈值配速 &nbsp; &nbsp;
                     {{
                       calculateThresholdSpeedRangeNumZone(
                         part.thresholdSpeedRange
@@ -577,7 +585,14 @@
                     :style="{ width: '100px' }"
                     @change="handleTargetChange(index, idx)"
                   ></el-time-picker>
-                  <span class="unit">min/km &nbsp; &nbsp; {{ calculateTargetSpeedRangeNumZone(part.targetSpeedRange).join(" ~ ") }}</span>
+                  <span class="unit"
+                    >min/km &nbsp; &nbsp;
+                    {{
+                      calculateTargetSpeedRangeNumZone(
+                        part.targetSpeedRange
+                      ).join(" ~ ")
+                    }}</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 3 && part.range === 'target'"
@@ -593,7 +608,10 @@
                     :style="{ width: '100px' }"
                     @change="handleTargetChange(index, idx)"
                   ></el-time-picker>
-                  <span class="unit">min/km &nbsp; &nbsp; {{ calculateTargetSpeedNumZone(part.targetSpeed) }}</span>
+                  <span class="unit"
+                    >min/km &nbsp; &nbsp;
+                    {{ calculateTargetSpeedNumZone(part.targetSpeed) }}</span
+                  >
                 </div>
                 <div
                   v-if="classInfo.mode === 4 && part.range === 'range'"
@@ -619,7 +637,14 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">bpm &nbsp; &nbsp; {{ calculateTargetHeartRateRangeNumZone(part.targetHeartRateRange).join(" ~ ") }}</span>
+                  <span class="unit"
+                    >bpm &nbsp; &nbsp;
+                    {{
+                      calculateTargetHeartRateRangeNumZone(
+                        part.targetHeartRateRange
+                      ).join(" ~ ")
+                    }}</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 4 && part.range === 'target'"
@@ -636,7 +661,12 @@
                     :style="{ width: '80px' }"
                     @change="handleTargetChange(index, idx)"
                   />
-                  <span class="unit">bpm &nbsp; &nbsp; {{ calculateTargetHeartRateNumZone(part.targetHeartRate) }}</span>
+                  <span class="unit"
+                    >bpm &nbsp; &nbsp;
+                    {{
+                      calculateTargetHeartRateNumZone(part.targetHeartRate)
+                    }}</span
+                  >
                 </div>
                 <div v-if="part.hasCadence" class="config-item">
                   <el-input-number
@@ -729,10 +759,7 @@ import {
   secondsToMMSS,
   mmssToSeconds,
 } from "@/utils/index";
-import {
-  debounce,
-  CalculateRun
-} from "@/views/classManagement/uilt";
+import { debounce, CalculateRun } from "@/views/classManagement/uilt";
 export default {
   name: "AddRunClassDialog",
   components: {
@@ -1037,8 +1064,11 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.classInfo.sth = res.result?.sth || "";
-          this.classInfo.distance = res.result?.distance ? res.result.distance + 'km' : "";
+          this.classInfo.distance = res.result?.distance
+            ? res.result.distance + "km"
+            : "";
           this.classInfo.duration = this.translateTime(res.result?.time || "");
+          console.log(this.classInfo.distance, "this.classInfo.distance");
         }
       });
     },
