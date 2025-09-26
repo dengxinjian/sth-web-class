@@ -377,7 +377,7 @@
                     >
                       {{ classItem.classesJson.duration }}
                     </div>
-                    <div style="display: flex">
+                    <div style="display: flex" v-if="classItem.classesJson.distance">
                       <div class="keyword">
                         {{ classItem.classesJson.distance
                         }}<span v-if="classItem.sportType === 'SWIM'">{{
@@ -397,12 +397,21 @@
                       <div class="keyword">{{ classItem.classesJson.sth }}</div>
                       <div>&nbsp;&nbsp;STH</div>
                     </div>
-                    <div
+                    <pre
                       v-if="classItem.classesJson.summary"
                       class="stage-details"
                     >
                       {{ classItem.classesJson.summary }}
-                    </div>
+                    </pre>
+                    <!-- <el-input
+                      type="textarea"
+                      v-if="classItem.classesJson.summary"
+                      v-model="classItem.classesJson.summary"
+                      placeholder="请输入概要"
+                      autosize
+                      class="summary-textarea"
+                    >
+                    </el-input> -->
                     <div
                       v-else-if="classItem.sportType === 'CYCLE'"
                       class="stage-details"
@@ -2560,6 +2569,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+::v-deep .el-textarea__inner{
+  border: none !important;
+}
 .container {
   background-color: #fff;
 }
@@ -2959,6 +2971,13 @@ export default {
     padding-left: 2px;
     padding-right: 2px;
     padding-bottom: 5px;
+    .summary-textarea {
+      font-size: 12px;
+      border: none;
+      // .el-textarea__inner {
+      //   border: none !important;
+      // }
+    }
     .body-title {
       display: flex;
       justify-content: space-between;
@@ -2996,6 +3015,10 @@ export default {
       color: #999;
       padding: 5px 5px 0;
       line-height: 16px;
+      // 文本溢出换行
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-line;
       .stage-item {
         margin-bottom: 5px;
         padding-bottom: 5px;
