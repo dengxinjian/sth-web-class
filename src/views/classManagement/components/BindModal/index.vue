@@ -38,8 +38,7 @@
               <div class="card-title">{{ courseData.name }}</div>
               <div class="card-duration">{{ courseData.duration }}</div>
               <div class="card-sth">{{ courseData.sth }} STH</div>
-              <div class="card-distance">{{ courseData.distance }} </div>
-
+              <div class="card-distance">{{ courseData.distance }} <span v-if="courseData.distanceUnit">{{ courseData.distanceUnit }}</span></div>
             </div>
           </div>
         </div>

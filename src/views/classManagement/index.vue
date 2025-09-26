@@ -1543,7 +1543,7 @@ export default {
   },
   data() {
     return {
-      activeName: "athletic",
+      activeName: "class",
       dataLineType: "week",
       teamList: [],
       athleticList: [],
@@ -1698,7 +1698,7 @@ export default {
         url: `/api/classSchedule/updateAuthorizedDevice?deviceId=${item.id}&syncFlag=${syncFlag}`,
       }).then((res) => {
         if (res.success) {
-          this.$message.success(res.message);
+          this.$message.success('操作成功');
           this.getAuthorizedDeviceList();
         }
       });
@@ -1764,7 +1764,7 @@ export default {
             .querySelectorAll(".js-schedule-drag-container")
             .forEach((el) => {
               new Sortable(el, {
-                group: { name: "classDrag" },
+                group: { name: "classDrag"},
                 animation: 150,
                 filter: ".js-sport-container-noDrag",
                 dataIdAttr: "data-id",
@@ -2526,6 +2526,7 @@ export default {
         id: classItem.id,
         classesJson: classItem.classesJson,
         distance: classItem.classesJson.distance,
+        distanceUnit: classItem.classesJson.distanceUnit,
       };
       console.log("exerciseData：", exerciseData, activityItem);
       console.log("courseData：", courseData);
@@ -3036,15 +3037,15 @@ export default {
           font-weight: 700;
           color: #fff;
         }
-        // .sport-type-color1 {
-        //   background-color: #7fb135;
-        // }
-        // .sport-type-color2 {
-        //   background-color: #c72a29;
-        // }
-        // .sport-type-color0 {
-        //   background-color: #aaaaaa;
-        // }
+        .sport-type-color1 {
+          background-color: #7fb135;
+        }
+        .sport-type-color2 {
+          background-color: #c72a29;
+        }
+        .sport-type-color0 {
+          background-color: #aaaaaa;
+        }
       }
     }
     .stage-details {
