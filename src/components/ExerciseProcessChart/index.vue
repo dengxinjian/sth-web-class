@@ -171,7 +171,7 @@ export default {
     min-width: 2px;
 
     .exercise-bar {
-      background-color: rgba(222, 187, 146, 1);
+      background-color: #bbc2d1;
       border-radius: 2px;
       transition: all 0.3s ease;
 

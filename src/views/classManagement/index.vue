@@ -275,7 +275,12 @@
               :key="item.id"
               :class="
                 currentWeek[index]?.commonDate ===
-                new Date().toISOString().split('T')[0]
+                new Date().toLocaleDateString('zh-CN', {
+                  timeZone: 'Asia/Shanghai',
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit'
+                }).replace(/\//g, '-')
                   ? 'schedule-table-header-cell active'
                   : 'schedule-table-header-cell'
               "
@@ -283,7 +288,12 @@
               {{ item.name }}
               {{
                 currentWeek[index]?.commonDate ===
-                new Date().toISOString().split("T")[0]
+                new Date().toLocaleDateString('zh-CN', {
+                  timeZone: 'Asia/Shanghai',
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit'
+                }).replace(/\//g, '-')
                   ? "（今天）"
                   : ""
               }}

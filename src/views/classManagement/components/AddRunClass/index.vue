@@ -21,7 +21,7 @@
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{
-            classInfo.duration == "00:00:00" ? "--：--：--" : classInfo.duration
+            classInfo.duration == "00:00:00" ? "--:--:--" : classInfo.duration
           }}</span>
           <span>{{
             !classInfo.distance || classInfo.distance == "0"
