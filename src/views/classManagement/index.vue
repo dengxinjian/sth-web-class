@@ -1251,18 +1251,42 @@
                           </div>
                         </div>
 
-                        <div class="keyword">
-                          {{ activityItem.classesJson.duration }}
+                        <div
+                          class="keyword"
+                          v-if="
+                            activityItem.classesJson.sportType !== 'REST' &&
+                            activityItem.classesJson.sportType !== 'REMARK' &&
+                            activityItem.classesJson.sportType !== 'OTHER'
+                          "
+                        >
+                          {{
+                            activityItem.classesJson.duration == "00:00:00"
+                              ? "--：--：--"
+                              : activityItem.classesJson.duration
+                          }}
                         </div>
-                        <div style="display: flex">
+                        <div
+                          style="display: flex"
+                          v-if="activityItem.classesJson.distance"
+                        >
                           <div class="keyword">
-                            {{ activityItem.classesJson.distance
+                            {{
+                              activityItem.classesJson.distance == "0"
+                                ? "--km"
+                                : activityItem.classesJson.distance
                             }}<span v-if="activityItem.sportType === 3">{{
                               activityItem.classesJson.distanceUnit
                             }}</span>
                           </div>
                         </div>
-                        <div style="display: flex">
+                        <div
+                          style="display: flex"
+                          v-if="
+                            activityItem.classesJson.sportType !== 'REST' &&
+                            activityItem.classesJson.sportType !== 'REMARK' &&
+                            activityItem.classesJson.sportType !== 'OTHER'
+                          "
+                        >
                           <div class="keyword">
                             {{ activityItem.classesJson.sth }}
                           </div>
