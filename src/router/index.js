@@ -3,6 +3,25 @@ import Router from "vue-router";
 
 Vue.use(Router);
 
+// 环境配置
+const config = {
+  development: {
+    loginComponent: () => import("@/views/login/index")
+  },
+  staging: {
+    loginComponent: () => import("@/views/login-wx/index")
+  },
+  production: {
+    loginComponent: () => import("@/views/login-wx/index")
+  },
+  test: {
+    loginComponent: () => import("@/views/login-wx/index")
+  }
+};
+
+// 获取当前环境配置，默认为开发环境
+const currentConfig = config[process.env.NODE_ENV] || config.development;
+
 /* Layout */
 import Layout from "@/layout";
 import TopLayout from "@/layout/TopLayout.vue";
@@ -54,14 +73,9 @@ export const constantRoutes = [
   },
   {
     path: "/login",
-    component: () => import("@/views/login/index"),
+    component: currentConfig.loginComponent,
     hidden: true,
   },
-  // {
-  //   path: "/login",
-  //   component: () => import("@/views/login-wx/index"),
-  //   hidden: true,
-  // },
   {
     path: "/login-scan",
     component: () => import("@/views/login-wx/scan"),

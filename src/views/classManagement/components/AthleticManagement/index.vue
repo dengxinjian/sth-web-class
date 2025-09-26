@@ -1,11 +1,14 @@
 <template>
     <div class="athletic-management">
-        <div class="athletic-title">运动员</div>
+        <div class="athletic-title">{{ teamName }}</div>
         <div class="athletic-operation">
-            <el-button type="primary" size="mini" @click="handleInviteAthletic">邀请运动员</el-button>
             <el-input size="mini" v-model="searchInput" @input="handleSearch">
                 <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
             </el-input>
+        </div>
+        <div class="athletic-btn">
+          <el-button type="primary" size="mini" @click="handleInviteAthletic">邀请运动员</el-button>
+          <el-button type="primary" size="mini" @click="handleInviteAthletic">邀请执教</el-button>
         </div>
         <el-tree
             :data="filteredAthleticData"
@@ -137,6 +140,60 @@
                 </el-button>
             </div>
         </el-dialog>
+
+        <!-- 邀请执教弹框 -->
+        <el-dialog
+            title="邀请执教"
+            :visible.sync="showInviteDialog"
+            width="500px"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            custom-class="invite-dialog">
+            <div class="invite-content">
+                <!-- 插图 -->
+                <div class="invite-illustration">
+                    <div class="athlete-illustration">
+                        <img src="~@/assets/addClass/athlete-invite.png" alt="">
+                    </div>
+                </div>
+
+                <!-- 主标题 -->
+                <div class="invite-title">执教邀请码已生成</div>
+
+                <!-- 说明文字 -->
+                <div class="invite-description">
+                    <div>请分享给对应执教</div>
+                    <div>运动员可通过邀请码加入团队</div>
+                </div>
+
+                <!-- 邀请码显示 -->
+                <div class="invite-code-container">
+                    <div class="invite-code-label">执教邀请码:</div>
+                    <div class="invite-code-value">{{ invitationCode }}</div>
+                </div>
+
+                <!-- 邀请码说明 -->
+                <div class="invite-code-tip">
+                    此执教邀请码可邀请多人,重新生成执教邀请码后该码失效
+                </div>
+            </div>
+
+            <div slot="footer" class="invite-footer">
+                <el-button
+                    type="primary"
+                    class="copy-btn"
+                    @click="copyInvitationCode"
+                    :loading="copyLoading">
+                    一键复制执教邀请码
+                </el-button>
+                <el-button
+                    class="regenerate-btn"
+                    @click="regenerateInvitationCode"
+                    :loading="regenerateLoading">
+                    重新生成执教邀请码
+                </el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -147,6 +204,10 @@ export default {
   name: 'AthleticManagement',
   props: {
     teamId: {
+      type: String,
+      default: ''
+    },
+    teamName: {
       type: String,
       default: ''
     }
@@ -598,12 +659,19 @@ export default {
         }
     }
 }
-.athletic-operation {
+.athletic-btn {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
     margin-bottom: 20px;
+}
+.athletic-operation {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 // 弹框样式优化
