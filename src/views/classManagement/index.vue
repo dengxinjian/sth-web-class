@@ -302,7 +302,7 @@
               class="schedule-table-cell"
             >
               <div class="schedule-table-cell-title">
-                {{ item?.commonDate }} {{  }}
+                {{ item?.commonDate }} {{ }}
               </div>
               <!-- {{ item.classSchedule }} -->
               <div
