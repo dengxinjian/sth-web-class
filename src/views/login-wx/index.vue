@@ -17,8 +17,8 @@
         <div class="content-overlay">
             <div class="text-content">
                 <h1>强者之心</h1>
-                <p>2025.H2 强者觉醒</p>
-                <p>敬请期待！</p>
+                <p>科学普及训练</p>
+                <!-- <p>敬请期待！</p> -->
                 <div class="contact-info">
                     <h2>联系我们</h2>
                     <!-- <div class="contact-item">
@@ -195,33 +195,77 @@ export default {
       }, 3000);
     },
     initSlider() {
-      const slider = document.querySelector('.slider');
-      let currentImageIndex = 0;
+      // 使用 $nextTick 确保 DOM 完全渲染后再初始化轮播
+      this.$nextTick(() => {
+        const slider = document.querySelector('.slider');
+        if (!slider) {
+          console.error('轮播容器未找到');
+          return;
+        }
 
-      console.log('背景图片数组:', this.backgroundImages);
-      console.log('轮播容器:', slider);
+        let currentImageIndex = 0;
+        let loadedImages = 0;
 
-      // 初始化轮播图片
-      this.backgroundImages.forEach((image, index) => {
-        console.log(`添加图片 ${index}:`, image);
-        const img = document.createElement('img');
-        img.src = image;
-        img.className = index === 0 ? 'active' : '';
-        img.onload = () => console.log(`图片 ${index} 加载成功`);
-        img.onerror = (e) => console.error(`图片 ${index} 加载失败:`, e);
-        slider.appendChild(img);
+        console.log('背景图片数组:', this.backgroundImages);
+        console.log('轮播容器:', slider);
+
+        // 清空容器
+        slider.innerHTML = '';
+
+        // 初始化轮播图片
+        this.backgroundImages.forEach((image, index) => {
+          console.log(`添加图片 ${index}:`, image);
+          const img = document.createElement('img');
+          img.src = image;
+          img.className = index === 0 ? 'active' : '';
+          img.style.objectFit = 'cover';
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.position = 'absolute';
+          img.style.top = '0';
+          img.style.left = '0';
+          img.style.opacity = index === 0 ? '1' : '0';
+          img.style.transition = 'opacity 1s ease-in-out';
+
+          img.onload = () => {
+            console.log(`图片 ${index} 加载成功`);
+            loadedImages++;
+            if (loadedImages === this.backgroundImages.length) {
+              console.log('所有图片加载完成，开始轮播');
+            }
+          };
+
+          img.onerror = (e) => {
+            console.error(`图片 ${index} 加载失败:`, e);
+            console.error('图片路径:', image);
+          };
+
+          slider.appendChild(img);
+        });
+
+        // 切换到下一张图片
+        const nextImage = () => {
+          const imgs = slider.querySelectorAll('img');
+          if (imgs.length === 0) {
+            console.warn('没有找到轮播图片');
+            return;
+          }
+
+          imgs[currentImageIndex].classList.remove('active');
+          imgs[currentImageIndex].style.opacity = '0';
+
+          currentImageIndex = (currentImageIndex + 1) % this.backgroundImages.length;
+
+          imgs[currentImageIndex].classList.add('active');
+          imgs[currentImageIndex].style.opacity = '1';
+
+          console.log(`切换到图片 ${currentImageIndex}`);
+        };
+
+        // 设置自动轮播间隔
+        this.carouselTimer = setInterval(nextImage, 5000);
+        console.log('轮播定时器已启动，间隔5秒');
       });
-
-      // 切换到下一张图片
-      const nextImage = () => {
-        const imgs = slider.querySelectorAll('img');
-        imgs[currentImageIndex].classList.remove('active');
-        currentImageIndex = (currentImageIndex + 1) % this.backgroundImages.length;
-        imgs[currentImageIndex].classList.add('active');
-      };
-
-      // 设置自动轮播间隔
-      this.carouselTimer = setInterval(nextImage, 5000);
     },
     initWxLogin() {
       this.wxLoginStatus = 'loading';
@@ -354,15 +398,20 @@ header {
 
 .slider img {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     opacity: 0;
     transition: opacity 1s ease-in-out;
+    z-index: 1;
 }
 
 .slider img.active {
     opacity: 1;
+    z-index: 2;
 }
 
 /* 内容覆盖层样式 */
