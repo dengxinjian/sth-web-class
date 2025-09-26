@@ -99,7 +99,7 @@
         </div>
         <div class="time-stage-for">
           <div
-            v-for="n in item.times"
+            v-for="n in +item.times"
             :key="`stage-${index}-${n}-${item.duration}`"
             class="time-stage-item"
           >

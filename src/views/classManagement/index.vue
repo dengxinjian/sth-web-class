@@ -241,7 +241,7 @@
                           }"
                         >
                           <div
-                            v-for="n in i.times"
+                            v-for="n in +i.times"
                             :key="n"
                             :style="{ flex: 1 }"
                           >
@@ -791,7 +791,7 @@
                           }"
                         >
                           <div
-                            v-for="n in i.times"
+                            v-for="n in +i.times"
                             :key="n"
                             :style="{ flex: 1 }"
                           >
@@ -1273,7 +1273,7 @@
                               }"
                             >
                               <div
-                                v-for="n in i.times"
+                                v-for="n in +i.times"
                                 :key="n"
                                 :style="{ flex: 1 }"
                               >

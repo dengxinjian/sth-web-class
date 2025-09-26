@@ -211,7 +211,7 @@ export default {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({
-        url: '/api/classes/getClassesById',
+        url: '/api/classSchedule/getClassScheduleById',
         id
       }).then(res => {
         if (res.success) {
