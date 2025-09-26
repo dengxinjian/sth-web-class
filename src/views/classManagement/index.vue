@@ -2569,9 +2569,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-::v-deep .el-textarea__inner{
-  border: none !important;
-}
+
 .container {
   background-color: #fff;
 }
