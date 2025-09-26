@@ -72,7 +72,11 @@ export default {
   },
   watch: {
     selectedYear() {
-      this.recomputeWeeks()
+      this.recomputeWeeks(() => {
+        // 年份改变后，默认选择第1周
+        this.selectedWeekIndex = 0
+        this.emitWeekChange()
+      })
     }
   },
   mounted() {
@@ -121,13 +125,25 @@ export default {
     },
     navigateToDate(targetDate) {
       // 根据目标日期更新 年/月/周
-      this.selectedYear = targetDate.getFullYear()
-      this.selectedMonth = targetDate.getMonth() + 1
-      this.recomputeWeeks(() => {
+      const targetYear = targetDate.getFullYear()
+      const targetMonth = targetDate.getMonth() + 1
+      // 只有当目标年份/月份与当前选择不同时才更新
+      if (this.selectedYear !== targetYear || this.selectedMonth !== targetMonth) {
+        this.selectedYear = targetYear
+        this.selectedMonth = targetMonth
+        this.recomputeWeeks(() => {
+          const idx = this.findWeekIndexContainingDate(targetDate)
+          this.selectedWeekIndex = idx >= 0 ? idx : 0
+          this.emitWeekChange()
+        })
+      } else {
+        // 如果年份月份相同，只需要更新周索引
         const idx = this.findWeekIndexContainingDate(targetDate)
-        this.selectedWeekIndex = idx >= 0 ? idx : 0
-        this.emitWeekChange()
-      })
+        if (idx >= 0 && this.selectedWeekIndex !== idx) {
+          this.selectedWeekIndex = idx
+          this.emitWeekChange()
+        }
+      }
     },
     emitWeekChange() {
       if (!this.monthWeeks.length) return
