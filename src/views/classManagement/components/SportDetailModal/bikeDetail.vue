@@ -7,6 +7,7 @@
     class="add-swim-class-dialog"
     @open="handleOpen"
     :close-on-click-modal="false"
+    custom-class="class-dialog"
   >
     <span slot="title">骑行</span>
     <div class="basic-info">
@@ -142,11 +143,11 @@
             <span>距离：{{ (sportDetail.distance / 1000).toFixed(2) }} km</span>
           </div>
           <div class="sync-params">
-            <span>平均速度：{{ sportDetail.avgSpeed }} m/s</span>
+            <span>平均速度：{{ (sportDetail.avgSpeed * 3.6).toFixed(1) }} km/h</span>
             <span>卡路里：{{ sportDetail.calories }} kcal</span>
           </div>
           <div class="sync-params">
-            <span>爬升：{{ sportDetail.totalAscent }} m</span>
+            <span>爬升：{{ sportDetail.totalAscent || '--' }} m</span>
             <span>STH：{{ sportDetail.sthValue }}</span>
           </div>
           <div class="sync-params">
@@ -1082,21 +1083,21 @@ export default {
         align-items: end;
         border-radius: 6px;
         overflow: hidden;
-        background-color: rgba(255, 251, 240, 1);
+        background-color: #fff;
         .modal-block-warmup {
           flex: 1;
           height: 21px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
         .modal-block-recover {
           flex: 1;
           height: 30px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
         .modal-block-cooling {
           flex: 1;
           height: 10px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
       }
     }

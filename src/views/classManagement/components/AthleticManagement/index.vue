@@ -27,7 +27,7 @@
       :expand-on-click-node="false"
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
-        <span>{{ node.label }}</span>
+        <span>{{ node.label }} <span v-if="node.data.isGroup">({{ node.data.membersCount }})</span></span>
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
@@ -99,7 +99,7 @@
       :expand-on-click-node="false"
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
-        <span>{{ node.label }}</span>
+        <span>{{ node.label }} <span v-if="node.data.isGroup">({{ node.data.membersCount }})</span></span>
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
@@ -206,7 +206,7 @@
         <el-form-item label="当前分组">
           <el-input :value="currentGroup.groupName" disabled></el-input>
         </el-form-item>
-        <el-form-item label="目标分组" required>
+        <el-form-item label="目标分组">
           <el-select
             v-model="targetGroupId"
             placeholder="请选择目标分组"
@@ -452,6 +452,7 @@ export default {
                 description: item.description || "",
                 isGroup: true,
                 groupName: item.groupName,
+                membersCount: item.members.length,
                 triUserId: item.triUserId,
                 children: (item.members || []).map((member) => {
                   return {
@@ -498,6 +499,7 @@ export default {
                   description: "执教团队",
                   isGroup: true,
                   groupName: "我的执教",
+                  membersCount: coachMembers.length,
                   triUserId: null,
                   children: coachMembers,
                 };
@@ -873,10 +875,10 @@ export default {
 
     // 确认移动分组
     confirmMoveGroup() {
-      if (!this.targetGroupId) {
-        this.$message.warning("请选择目标分组");
-        return;
-      }
+      // if (!this.targetGroupId) {
+      //   this.$message.warning("请选择目标分组");
+      //   return;
+      // }
 
       let params = {};
       if (this.moveType === "group") {

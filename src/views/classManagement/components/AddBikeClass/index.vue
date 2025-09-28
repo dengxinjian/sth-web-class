@@ -6,6 +6,7 @@
     append-to-body
     class="add-swim-class-dialog"
     :close-on-click-modal="false"
+    custom-class="class-dialog"
   >
     <span slot="title">{{
       type === "add" ? "新建骑行课程" : "编辑骑行课程"
@@ -14,7 +15,7 @@
       <div class="basic-info-item">
         <div class="basic-info-title">
           <span>标题：</span>
-          <el-input type="text" v-model="classInfo.title" :maxlength="50" />
+          <el-input type="text" v-model="classInfo.title" :disabled="originalType === 'official'" :maxlength="50" />
         </div>
         <div class="basic-info-total">
           <span>
@@ -74,7 +75,7 @@
       <div class="basic-info-item">
         <div>
           <span>模式选择：</span>
-          <el-select v-model="classInfo.mode" class="pill-select short">
+          <el-select v-model="classInfo.mode" :disabled="originalType === 'official'" class="pill-select short">
             <el-option label="跟随阈值功率" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
             <el-option label="固定功率" :value="3" />
@@ -91,7 +92,7 @@
         class="time-stage"
         :style="{ flex: item.duration, minWidth: 0 }"
       >
-        <span class="time-stage-close" @click="handleDeleteStage(index)"
+        <span v-if="originalType === 'my'" class="time-stage-close" @click="handleDeleteStage(index)"
           ><i class="el-icon-close"></i
         ></span>
         <div class="time-stage-title">
@@ -131,6 +132,7 @@
               maxlength="500"
               show-word-limit
               class="summary-textarea"
+              :disabled="originalType === 'official'"
             />
           </div>
         </div>
@@ -219,6 +221,7 @@
                 allow-create
                 filterable
                 style="width: 100%"
+                :disabled="originalType === 'official'"
               >
                 <el-option
                   v-for="tag in existingTags"
@@ -250,6 +253,7 @@
                 size="small"
                 @input="handleTimesChange(index)"
                 @change="calculateTimeline(item.times)"
+                :disabled="originalType === 'official'"
               />
             </div>
             <div
@@ -265,6 +269,7 @@
                     placeholder="请输入阶段名称"
                     size="small"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                 </div>
                 <div class="config-item">
@@ -273,6 +278,7 @@
                     v-model="part.stageMode"
                     placeholder="请选择"
                     size="small"
+                    :disabled="originalType === 'official'"
                   >
                     <el-option label="热身" value="warmup" />
                     <el-option label="骑行" value="bike" />
@@ -286,6 +292,7 @@
                     v-model="part.capacity"
                     placeholder="请选择"
                     size="small"
+                    :disabled="originalType === 'official'"
                   >
                     <el-option label="运动时间" value="time" />
                   </el-select>
@@ -297,6 +304,7 @@
                     placeholder="请选择"
                     size="small"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围" value="range" />
@@ -314,6 +322,7 @@
                     v-model="part.target"
                     size="small"
                     @change="handleTargetChange(index, idx)"
+                    :disabled="originalType === 'official'"
                   />
                 </div>
                 <div
@@ -329,6 +338,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -339,6 +349,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值功率</span>
                 </div>
@@ -356,6 +367,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值功率</span>
                 </div>
@@ -372,6 +384,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -382,6 +395,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值心率</span>
                 </div>
@@ -399,6 +413,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值心率</span>
                 </div>
@@ -415,6 +430,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -425,6 +441,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">w</span>
                 </div>
@@ -442,6 +459,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">w</span>
                 </div>
@@ -458,6 +476,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -468,6 +487,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">bpm</span>
                 </div>
@@ -485,6 +505,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">bpm</span>
                 </div>
@@ -498,6 +519,7 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -509,9 +531,11 @@
                     size="small"
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
+                    :disabled="originalType === 'official'"
                   />
                   <span class="unit">踏频</span>
                   <i
+                    v-if="originalType === 'my'"
                     class="el-icon-close"
                     @click="handleRemoveCadence(index, idx)"
                     style="cursor: pointer"
@@ -527,6 +551,7 @@
                     size="mini"
                     circle
                     @click="handleAddSection(index)"
+                    :disabled="originalType === 'official'"
                   >
                     <i class="el-icon-plus"></i>增加段落
                   </el-button>
@@ -536,6 +561,7 @@
                     size="mini"
                     circle
                     @click="handleRemoveSection(index, idx)"
+                    :disabled="originalType === 'official'"
                   >
                     <i class="el-icon-close"></i>移除段落
                   </el-button>
@@ -545,12 +571,13 @@
                     size="mini"
                     class="add-cadence-btn"
                     @click="handleAddCadence(index, idx)"
+                    :disabled="originalType === 'official'"
                   >
                     <i class="el-icon-plus"></i>添加踏频范围
                   </el-button>
                 </div>
                 <div class="lap-toggle">
-                  <el-switch v-model="part.lap" />
+                  <el-switch v-model="part.lap" :disabled="originalType === 'official'" />
                   <span class="toggle-label">按LAP进入下一段落</span>
                 </div>
               </div>
@@ -561,10 +588,10 @@
     </div>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onDelete" :disabled="!classInfo.id">删除</el-button>
+      <el-button v-if="originalType === 'my'" @click="onDelete" :disabled="!classInfo.id">删除</el-button>
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="warning" @click="onSave(false)">保存</el-button>
-      <el-button type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button v-if="originalType === 'my'" type="warning" @click="onSave(false)">保存</el-button>
+      <el-button v-if="originalType === 'my'" type="danger" @click="onSave(true)">保存并关闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -599,6 +626,10 @@ export default {
       type: String,
       default: "add",
     },
+    originalType: {
+      type: String,
+      default: 'my'
+    }
   },
   data() {
     return {
@@ -868,6 +899,9 @@ export default {
     },
     // 添加段落
     handleAddStage(type) {
+      if (this.originalType === 'official') {
+        return;
+      }
       switch (type) {
         case "warmup":
           this.classInfo.stages.push({
@@ -1115,21 +1149,21 @@ export default {
         align-items: end;
         border-radius: 6px;
         overflow: hidden;
-        background-color: rgba(255, 251, 240, 1);
+        background-color: #fff;
         .modal-block-warmup {
           flex: 1;
           height: 21px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
         .modal-block-recover {
           flex: 1;
           height: 30px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
         .modal-block-cooling {
           flex: 1;
           height: 10px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
       }
     }

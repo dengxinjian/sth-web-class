@@ -35,6 +35,8 @@ export default {
   background-color: #FAFAFA;
   padding: 15px;
   background: #FAFAFA;
+  display: flex;
+  flex-direction: column;
 
 }
 .home {

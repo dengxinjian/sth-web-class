@@ -79,7 +79,11 @@
           ></AthleticManagement>
         </div>
         <div v-else class="class-container">
-          <div class="class-title">课程</div>
+          <!-- <div class="class-title">课程</div> -->
+           <ul class="class-type-list">
+            <li :class="activeClassType === 'my' ? 'active' : ''" @click="handleClassTypeChange('my')">我的课程</li>
+            <li :class="activeClassType === 'official' ? 'active' : ''" @click="handleClassTypeChange('official')">官方课程</li>
+           </ul>
           <div class="class-operation">
             <el-popover placement="bottom" width="100" trigger="click" popper-class="add-class-btn-popover">
               <el-button type="primary" size="mini" slot="reference">新增</el-button>
@@ -102,8 +106,9 @@
               <el-collapse-item v-for="item in classList" :key="item.groupId">
                 <template slot="title">
                   <div class="schedule-class-title">
-                    <div class="group-name">{{ item.groupName }}</div>
+                    <div class="group-name"><span class="group-name-text">{{ item.groupName }}</span>  <span class="group-name-count">({{ item.classesCount }})</span></div>
                     <el-popover
+                      v-if="activeClassType === 'my'"
                       popper-class="athletic-btn-popover"
                       placement="right"
                       width="80"
@@ -116,11 +121,11 @@
                           align-items: center;
                         "
                       >
-                        <!-- <span
-                          ><el-button type="text" @click="handleAddGroup"
-                            >新建分组</el-button
+                        <span
+                          ><el-button type="text" @click="handleAddClass"
+                            >新增课程</el-button
                           ></span
-                        > -->
+                        >
                         <span
                           ><el-button
                             type="text"
@@ -169,16 +174,25 @@
                       <div class="schedule-class-info-item-title">
                         <span>{{ part.classesJson.title }}</span>
                         <div
+                          v-if="activeClassType === 'my'"
                           class="delete"
                           @click.stop="handleMoveClass(part.id, item.groupId)"
                         >
                           <i class="el-icon-set-up"></i>
                         </div>
                         <div
+                          v-if="activeClassType === 'my'"
                           class="delete"
                           @click.stop="handleDeleteClass(part.id)"
                         >
                           <i class="el-icon-delete"></i>
+                        </div>
+                        <div
+                          v-if="activeClassType === 'official'"
+                          class="delete"
+                          @click.stop="handleCopyClassFromOfficial(part.id)"
+                        >
+                          <i class="el-icon-plus"></i>
                         </div>
                       </div>
                       <div class="schedule-class-info-item-content">
@@ -226,6 +240,7 @@
                           }}</span
                           ><span v-else>km</span>
                         </span>
+                        <span v-if="part.classesJson.sth">{{ part.classesJson.sth }} <span><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></span></span>
                       </div>
                     </div>
                     <div
@@ -1431,42 +1446,49 @@
       :data="classModalData"
       @save="onSaveAddSwimClass"
       :type="classModalDataType"
+      :originalType="activeClassType"
     />
     <AddRunClass
       v-model="showAddRunClass"
       :data="classModalData"
       @save="onSaveAddRunClass"
       :type="classModalDataType"
+      :originalType="activeClassType"
     />
     <AddBikeClass
       v-model="showAddBikeClass"
       :data="classModalData"
       @save="onSaveAddBikeClass"
       :type="classModalDataType"
+      :originalType="activeClassType"
     />
     <AddPowerClass
       v-model="showAddPowerClass"
       :data="classModalData"
       @save="onSaveAddPowerClass"
       :type="classModalDataType"
+      :originalType="activeClassType"
     />
     <AddNoteClass
       v-model="showAddNoteClass"
       :data="classModalData"
       @save="onSaveAddNoteClass"
       :type="classModalDataType"
+      :originalType="activeClassType"
     />
     <AddOtherClass
       v-model="showAddOtherClass"
       :data="classModalData"
       @save="onSaveAddOtherClass"
       :type="classModalDataType"
+      :originalType="activeClassType"
     />
     <AddRestClass
       v-model="showAddRestClass"
       :data="classModalData"
       @save="onSaveAddRestClass"
       :type="classModalDataType"
+      :originalType="activeClassType"
     />
     <AddClassTitle
       v-model="showAddClassTitle"
@@ -1504,6 +1526,11 @@
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
     ></ClassDetailModal>
+    <CopyClassFromOfficial
+      v-model="showCopyClassFromOfficial"
+      :class-id="copyClassFromOfficialClassId"
+      @save="onSaveCopyClassFromOfficial"
+    ></CopyClassFromOfficial>
   </div>
 </template>
 <script>
@@ -1527,6 +1554,7 @@ import MoveGroup from "@/views/classManagement/components/MoveGroup";
 import BindModal from "@/views/classManagement/components/BindModal";
 import SportDetailModal from "@/views/classManagement/components/SportDetailModal";
 import ClassDetailModal from "./components/ClassDetailModal";
+import CopyClassFromOfficial from "@/views/classManagement/components/CopyClassFromOfficial";
 import { getLunarDate, secondsToHHMMSS, secondsToMMSS } from "@/utils/index";
 import { getData, submitData } from "@/api/common.js";
 import { MessageBox } from "element-ui";
@@ -1555,6 +1583,7 @@ export default {
     BindModal,
     SportDetailModal,
     ClassDetailModal,
+    CopyClassFromOfficial,
   },
   data() {
     return {
@@ -1654,6 +1683,9 @@ export default {
         5: "OTHER",
       },
       classModalDataType: "",
+      activeClassType: 'my',
+      showCopyClassFromOfficial: false,
+      copyClassFromOfficialClassId: '',
     };
   },
   mounted() {
@@ -1887,8 +1919,12 @@ export default {
     },
     // 获取课程列表
     getClassList() {
+      let url = "/api/classes/getClassesByUserIdGroupedWithName";
+      if (this.activeClassType === "official") {
+        url = "/api/classes/getOfficialGroupedWithName";
+      }
       getData({
-        url: "/api/classes/getClassesByUserIdGroupedWithName",
+        url: url,
         classesTitle: this.classSearchInput,
       }).then((res) => {
         if (res.success) {
@@ -1896,6 +1932,7 @@ export default {
             return {
               timespan: new Date().getTime(),
               ...item,
+              classesCount: item.classesList.length,
               classesList: item.classesList.map((part) => {
                 return {
                   ...part,
@@ -2621,12 +2658,28 @@ export default {
       }
       return ["rgba(199, 199, 199, 1)", "rgba(199, 199, 199, 1)"];
     },
+    // 切换课程类型
+    handleClassTypeChange(type) {
+      this.activeClassType = type;
+      this.getClassList();
+    },
+    // 复制官方课程
+    handleCopyClassFromOfficial(id) {
+      this.copyClassFromOfficialClassId = id;
+      this.showCopyClassFromOfficial = true;
+    },
+    onSaveCopyClassFromOfficial(payload) {
+      this.showCopyClassFromOfficial = false;
+      this.copyClassFromOfficialClassId = '';
+      this.getClassList();
+    },
   },
 };
 </script>
 <style lang="scss" scoped>
 .container {
   background-color: #fff;
+  flex: 1;
 }
 
 .athletic-container {
@@ -2921,6 +2974,22 @@ export default {
 
 .class-container {
   padding: 10px;
+
+  .class-type-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    li {
+      cursor: pointer;
+    }
+    li.active {
+      background-color: #cc2323;
+      color: #fff;
+    }
+  }
 }
 .schedule-class-container {
   padding: 10px 10px;
@@ -2934,10 +3003,16 @@ export default {
     padding: 0 10px;
     .group-name {
       // 文本超出 以...
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 5px;
       width: 80%;
+      .group-name-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
 }
@@ -2984,6 +3059,9 @@ export default {
   align-items: center;
   img {
     width: 20px;
+  }
+  .sth {
+    width: 24px;
   }
 }
 .class-block-title-delete {

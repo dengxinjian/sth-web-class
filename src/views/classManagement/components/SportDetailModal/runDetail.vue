@@ -7,6 +7,7 @@
     class="add-swim-class-dialog"
     @open="handleOpen"
      :close-on-click-modal="false"
+     custom-class="class-dialog"
   >
     <span slot="title">跑步</span>
     <div class="basic-info">
@@ -1309,21 +1310,21 @@ export default {
         align-items: end;
         border-radius: 6px;
         overflow: hidden;
-        background-color: rgba(255, 251, 240, 1);
+        background-color: #fff;
         .modal-block-warmup {
           flex: 1;
           height: 21px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
         .modal-block-recover {
           flex: 1;
           height: 30px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
         .modal-block-cooling {
           flex: 1;
           height: 10px;
-          background-color: rgba(222, 187, 146, 1);
+          background-color: #bbc2d1;
         }
       }
     }

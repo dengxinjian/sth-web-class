@@ -12,7 +12,7 @@
     <div class="form-section">
       <el-form :model="form" label-width="60px">
         <el-form-item label="标题：">
-          <el-input v-model="form.title" placeholder="标题" :maxlength="50" class="pill-input" />
+          <el-input v-model="form.title" placeholder="标题" :maxlength="50" class="pill-input" :disabled="originalType === 'official'" />
         </el-form-item>
 
         <div class="row">
@@ -28,11 +28,11 @@
               placeholder="00:00:00"
               class="pill-time"
             /> -->
-          <TimeInput v-model="form.duration" size="small" />
+          <TimeInput v-model="form.duration" size="small" :disabled="originalType === 'official'" />
           </div>
           <div class="row-item">
             <span class="label">STH</span>
-            <el-input-number :step="1" :min="0" :step-strictly="true" :controls="false" v-model="form.sth" placeholder="" class="pill-input short" />
+            <el-input-number :step="1" :min="0" :step-strictly="true" :controls="false" v-model="form.sth" placeholder="" class="pill-input short" :disabled="originalType === 'official'" />
           </div>
         </div>
 
@@ -47,6 +47,7 @@
               show-word-limit
               placeholder="请输入概要"
               class="summary-textarea"
+              :disabled="originalType === 'official'"
             />
           </div>
         </div>
@@ -59,6 +60,7 @@
               allow-create
               filterable
               style="width: 100%;"
+              :disabled="originalType === 'official'"
           >
           <el-option
               v-for="tag in existingTags"
@@ -72,10 +74,10 @@
     </div>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onDelete" :disabled="!form.id">删除</el-button>
+      <el-button v-if="originalType === 'my'" @click="onDelete" :disabled="!form.id">删除</el-button>
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="warning" @click="onSave(false)">保存</el-button>
-      <el-button type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button v-if="originalType === 'my'" type="warning" @click="onSave(false)">保存</el-button>
+      <el-button v-if="originalType === 'my'" type="danger" @click="onSave(true)">保存并关闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -106,6 +108,10 @@ export default {
     type: {
       type: String,
       default: 'add'
+    },
+    originalType: {
+      type: String,
+      default: 'my'
     }
   },
   data() {

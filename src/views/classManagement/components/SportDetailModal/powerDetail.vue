@@ -20,7 +20,7 @@
             <div class="row-item icon-box">
               <img src="~@/assets/addClass/icon-power.png" width="30" alt="" />
             </div>
-            <div class="row-item">
+            <!-- <div class="row-item">
               <span class="label">距离</span>
               <el-input-number :step="1" :min="1" :step-strictly="true" :controls="false" disabled v-model="form.distance" placeholder="" class="pill-input short" />
             </div>
@@ -29,7 +29,7 @@
                 <el-option label="m" value="m" />
                 <el-option label="km" value="km" />
               </el-select>
-            </div>
+            </div> -->
             <div class="row-item">
               <span class="label">时长</span>
               <el-time-picker
@@ -54,12 +54,12 @@
               <div class="sync-params-left">
                 <div class="sync-params">
                     <span>时间：{{ sportDetail.startTime }}</span>
-                    <span>距离：{{ sportDetail.distance }} m</span>
+                    <span>STH：{{ sportDetail.sthValue }}</span>
                 </div>
-                <div class="sync-params">
+                <!-- <div class="sync-params">
                     <span>STH：{{ sportDetail.sthValue }}</span>
                     <span></span>
-                </div>
+                </div> -->
               </div>
                 <table class="sync-params-table">
                     <tr>
@@ -155,7 +155,7 @@ export default {
           sportType: 'SWIM',
           distance: '',
           distanceUnit: 'm',
-          duration: '01:30:00',
+          duration: '',
           sth: '',
           summary: '',
           tags: ''
@@ -276,7 +276,7 @@ export default {
         sportType: 'SWIM',
         distance: '',
         distanceUnit: 'm',
-        duration: '01:30:00',
+        duration: '',
         sth: '',
         summary: '',
         tips: ''

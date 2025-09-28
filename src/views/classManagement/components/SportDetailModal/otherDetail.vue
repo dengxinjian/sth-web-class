@@ -21,16 +21,6 @@
               <img src="~@/assets/addClass/icon-other.png" width="30" alt="" />
             </div>
             <div class="row-item">
-              <span class="label">距离</span>
-              <el-input-number :step="1" :min="1" :step-strictly="true" :controls="false" disabled v-model="form.distance" placeholder="" class="pill-input short" />
-            </div>
-            <div class="row-item">
-              <el-select v-model="form.distanceUnit" class="pill-select short" disabled>
-                <el-option label="m" value="m" />
-                <el-option label="km" value="km" />
-              </el-select>
-            </div>
-            <div class="row-item">
               <span class="label">时长</span>
               <el-time-picker
                 v-model="form.duration"
@@ -54,7 +44,7 @@
               <div class="sync-params-left">
                 <div class="sync-params">
                     <span>时间：{{ sportDetail.startTime }}</span>
-                    <span>距离：{{ sportDetail.distance }} m</span>
+                    <span>距离：{{ (sportDetail.distance/1000).toFixed(2) }} km</span>
                 </div>
                 <div class="sync-params">
                     <span>STH：{{ sportDetail.sthValue }}</span>
@@ -155,7 +145,7 @@ export default {
           sportType: 'SWIM',
           distance: '',
           distanceUnit: 'm',
-          duration: '01:30:00',
+          duration: '',
           sth: '',
           summary: '',
           tags: ''
@@ -276,7 +266,7 @@ export default {
         sportType: 'SWIM',
         distance: '',
         distanceUnit: 'm',
-        duration: '01:30:00',
+        duration: '',
         sth: '',
         summary: '',
         tips: ''
