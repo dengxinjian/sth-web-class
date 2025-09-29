@@ -1387,7 +1387,10 @@
                 @change="handleDeviceChange(item)"
               ></el-switch>
             </div>
-            <img class="device-filter-icon" src="~@/assets/addClass/icon-filter.png" alt="" slot="reference">
+            <span slot="reference" class="device-filter-reference">
+              <span>运动员课程同步设置</span>
+              <img class="device-filter-icon" src="~@/assets/addClass/icon-filter.png" alt="">
+            </span>
           </el-popover>
         </div>
 
@@ -3313,5 +3316,14 @@ export default {
 .device-brand-icon {
   width: 22px;
   margin-right: 10px;
+}
+
+.device-filter-reference {
+  font-size: 14px;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
 </style>
