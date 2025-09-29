@@ -116,7 +116,7 @@
             <el-button
               v-if="
                 node.data.isGroup &&
-                node.data.id !== 'unGrouped' &&
+                node.data.id &&
                 node.data.id !== 'coach'
               "
               type="text"
@@ -127,7 +127,7 @@
             <el-button
               v-if="
                 node.data.isGroup &&
-                node.data.id !== 'unGrouped' &&
+                node.data.id &&
                 node.data.id !== 'coach'
               "
               type="text"
@@ -452,7 +452,7 @@ export default {
                 description: item.description || "",
                 isGroup: true,
                 groupName: item.groupName,
-                membersCount: item.members.length,
+                membersCount: item.members?.length || 0,
                 triUserId: item.triUserId,
                 children: (item.members || []).map((member) => {
                   return {
@@ -499,7 +499,7 @@ export default {
                   description: "执教团队",
                   isGroup: true,
                   groupName: "我的执教",
-                  membersCount: coachMembers.length,
+                  membersCount: coachMembers?.length || 0,
                   triUserId: null,
                   children: coachMembers,
                 };

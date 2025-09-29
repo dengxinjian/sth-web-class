@@ -1,7 +1,7 @@
 <template>
   <div class="week-range-picker">
-    <span>日期：</span>
-    <el-select v-model="selectedYear" size="mini" placeholder="选择年份" @change="handleSelectionChange" class="mr-8" style="width: 120px">
+    <span style="white-space: nowrap;">日期：</span>
+    <el-select v-model="selectedYear" size="mini" placeholder="选择年份" @change="handleSelectionChange" class="mr-8" style="width: 100px">
       <el-option
         v-for="year in yearOptions"
         :key="year"
@@ -10,7 +10,7 @@
       />
     </el-select>
 
-    <el-select v-model="selectedMonth" size="mini" placeholder="选择月份" @change="handleMonthChange" class="mr-8" style="width: 120px">
+    <el-select v-model="selectedMonth" size="mini" placeholder="选择月份" @change="handleMonthChange" class="mr-8" style="width: 100px">
       <el-option
         v-for="m in 12"
         :key="m"
@@ -19,7 +19,7 @@
       />
     </el-select>
 
-    <el-select class="mr-8" v-model="selectedWeekIndex" size="mini" placeholder="选择第几周" @change="handleSelectionChange" style="width: 120px">
+    <el-select class="mr-8" v-model="selectedWeekIndex" size="mini" placeholder="选择第几周" @change="handleSelectionChange" style="width: 100px">
       <el-option
         v-for="(w, idx) in monthWeeks"
         :key="idx"
