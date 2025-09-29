@@ -15,20 +15,19 @@
       <div class="basic-info-item">
         <div class="basic-info-title">
           <span>标题：</span>
-          <el-input type="text" v-model="classInfo.title" :maxlength="50" :disabled="originalType === 'official'" />
+          <el-input
+            type="text"
+            v-model="classInfo.title"
+            :maxlength="50"
+            :disabled="originalType === 'official'"
+          />
         </div>
         <div class="basic-info-total">
           <span>
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
-          <span>{{
-            classInfo.duration == "00:00:00" ? "--:--:--" : classInfo.duration
-          }}</span>
-          <span>{{
-            !classInfo.distance || classInfo.distance == "0"
-              ? "--km"
-              : classInfo.distance + "km"
-          }}</span>
+          <span> {{ classInfo.duration }}</span>
+          <span> {{ classInfo.distance }}km</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -103,7 +102,10 @@
         class="time-stage"
         :style="{ flex: item.duration, minWidth: 0 }"
       >
-        <span v-if="originalType === 'my'" class="time-stage-close" @click="handleDeleteStage(index)"
+        <span
+          v-if="originalType === 'my'"
+          class="time-stage-close"
+          @click="handleDeleteStage(index)"
           ><i class="el-icon-close"></i
         ></span>
         <div class="time-stage-title">
@@ -155,7 +157,11 @@
           </div>
           <div class="phase-details">
             <div class="phase-item">
-              <div v-for="(item, index) in classInfo.stages" :key="index" class="phase-item-content">
+              <div
+                v-for="(item, index) in classInfo.stages"
+                :key="index"
+                class="phase-item-content"
+              >
                 <div v-if="item.times > 1">重复{{ item.times }}次</div>
                 <div v-for="(part, idx) in item.sections" :key="idx">
                   <div>{{ part.title }}</div>
@@ -652,7 +658,10 @@
                   </el-button>
                 </div>
                 <div class="lap-toggle">
-                  <el-switch v-model="part.lap" :disabled="originalType === 'official'" />
+                  <el-switch
+                    v-model="part.lap"
+                    :disabled="originalType === 'official'"
+                  />
                   <span class="toggle-label">按LAP进入下一段落</span>
                 </div>
               </div>
@@ -663,10 +672,25 @@
     </div>
 
     <span slot="footer" class="dialog-footer">
-      <el-button v-if="originalType === 'my'" @click="onDelete" :disabled="!classInfo.id">删除</el-button>
+      <el-button
+        v-if="originalType === 'my'"
+        @click="onDelete"
+        :disabled="!classInfo.id"
+        >删除</el-button
+      >
       <el-button @click="onCancel">取消</el-button>
-      <el-button v-if="originalType === 'my'" type="warning" @click="onSave(false)">保存</el-button>
-      <el-button v-if="originalType === 'my'" type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button
+        v-if="originalType === 'my'"
+        type="warning"
+        @click="onSave(false)"
+        >保存</el-button
+      >
+      <el-button
+        v-if="originalType === 'my'"
+        type="danger"
+        @click="onSave(true)"
+        >保存并关闭</el-button
+      >
     </span>
   </el-dialog>
 </template>
@@ -704,8 +728,8 @@ export default {
     },
     originalType: {
       type: String,
-      default: 'my'
-    }
+      default: "my",
+    },
   },
   data() {
     return {
@@ -1006,9 +1030,19 @@ export default {
       if (new Set(capacityList).size !== 1 && capacityList.length > 0) {
         this.classInfo.duration = 0;
         this.classInfo.distance = 0;
-        this.classInfo.duration = this.translateTime(this.classInfo.duration);
+        this.classInfo.duration = this.classInfo.duration
+          ? this.translateTime(this.classInfo.duration)
+          : "--:--:--";
+        this.classInfo.distance = this.classInfo.distance
+          ? this.classInfo.distance
+          : "--";
       } else {
-        this.classInfo.duration = this.translateTime(this.classInfo.duration);
+        this.classInfo.duration = this.classInfo.duration
+          ? this.translateTime(this.classInfo.duration)
+          : "--:--:--";
+        this.classInfo.distance = this.classInfo.distance
+          ? this.classInfo.distance
+          : "--";
       }
       console.log(this.classInfo.duration, "this.classInfo.duration");
     },
@@ -1078,7 +1112,7 @@ export default {
     },
     // 添加段落
     handleAddStage(type) {
-      if (this.originalType === 'official') {
+      if (this.originalType === "official") {
         return;
       }
       switch (type) {
