@@ -760,7 +760,7 @@ import {
   secondsToMMSS,
   mmssToSeconds,
 } from "@/utils/index";
-import { debounce, CalculateRun } from "@/views/classManagement/uilt";
+import { debounce, CalculateRun ,checkForm} from "@/views/classManagement/uilt";
 export default {
   name: "AddRunClassDialog",
   components: {
@@ -1050,6 +1050,11 @@ export default {
     },
     // 获取sth值
     getSth() {
+      const validation = checkForm(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       submitData({
         url: "/api/classSchedule/calculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1081,6 +1086,11 @@ export default {
       this.$emit("save", true);
     },
     onSave(closeAfter) {
+      const validation = checkForm(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       console.log(JSON.stringify(this.classInfo));
       if (this.classInfo.id) {
         this.submitUpdateClass(closeAfter);

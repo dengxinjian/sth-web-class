@@ -626,7 +626,8 @@ import TimeInput from "@/views/classManagement/components/timeInpt";
 import {
   debounce,
   calculateThresholdHeartRateNumZoneFollow,
-  CalculateBike
+  CalculateBike,
+  checkFormBike
 } from "@/views/classManagement/uilt";
 
 export default {
@@ -939,6 +940,11 @@ export default {
     },
     // 获取sth值
     getSth() {
+      const validation = checkFormBike(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       submitData({
         url: "/api/classes/calculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -964,7 +970,11 @@ export default {
       this.$emit("cancel", true);
     },
     onSave(closeAfter) {
-      console.log(JSON.stringify(this.classInfo));
+      const validation = checkFormBike(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       if (this.classInfo.id) {
         this.submitUpdateClass(closeAfter);
       } else {

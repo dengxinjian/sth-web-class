@@ -699,7 +699,7 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-import { debounce } from "@/views/classManagement/uilt";
+import { debounce, checkForm } from "@/views/classManagement/uilt";
 import { mmssToSeconds, hhmmssToSeconds } from "@/utils/index";
 
 export default {
@@ -921,6 +921,11 @@ export default {
     },
     // 获取sth值
     getSth() {
+      const validation = checkForm(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       submitData({
         url: "/api/classes/calculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -968,11 +973,6 @@ export default {
               if (section.range === "target") {
                 const timer = mmssToSeconds(section.targetSpeed);
                 const timer1 = hhmmssToSeconds(section.target);
-                console.log(
-                  this.classInfo.distance,
-                  (timer1 / timer).toFixed(2),
-                  "this.classInfo.distance"
-                );
                 this.classInfo.distance =
                   this.classInfo.distance +
                   Number((timer1 / timer).toFixed(2)) *
@@ -993,17 +993,11 @@ export default {
               console.log(section, "section");
 
               if (section.range === "target") {
-                console.log(
-                  section,
-                  "section",
-                  mmssToSeconds(section.targetSpeed)
-                );
                 const timer =
                   section.targetDistance *
                   mmssToSeconds(section.targetSpeed) *
                   Number(stage.times || 1);
                 this.classInfo.duration += timer;
-                console.log(timer, "timer");
               } else {
                 const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
                 const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
@@ -1014,16 +1008,7 @@ export default {
             }
           }
         });
-        console.log(
-          this.classInfo.duration,
-          "this.classInfo.duration",
-          stage.times
-        );
-        console.log(
-          this.classInfo.distance,
-          "this.classInfo.distance",
-          stage.times
-        );
+
         // this.classInfo.duration += stage.times * this.classInfo.duration;
         // this.classInfo.distance += stage.times * this.classInfo.distance;
       });
@@ -1044,7 +1029,6 @@ export default {
           ? this.classInfo.distance
           : "--";
       }
-      console.log(this.classInfo.duration, "this.classInfo.duration");
     },
     handleClose() {
       this.onCancel();
@@ -1054,7 +1038,11 @@ export default {
       this.$emit("cancel");
     },
     onSave(closeAfter) {
-      console.log(JSON.stringify(this.classInfo));
+      const validation = checkForm(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       if (this.classInfo.id) {
         this.submitUpdateClass(closeAfter);
       } else {

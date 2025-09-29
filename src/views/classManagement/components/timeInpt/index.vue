@@ -14,7 +14,7 @@
         <i class="el-icon-time" v-if="!inputValue"></i>
       </template>
     </el-input>
-    <div v-if="errorMessage" class="error-message">
+    <div class="error-message" v-if="errorMessage">
       {{ errorMessage }}
     </div>
   </div>
@@ -76,10 +76,12 @@ export default {
     // 校验和转换输入值
     validateAndConvert() {
       const value = this.inputValue.trim();
-
+      console.log(value, "value");
       if (!value) {
-        this.errorMessage = "";
-        this.$emit("change", "");
+        this.errorMessage = "请输入正确的时间格式";
+        console.log("errorMessage", "00:00:00");
+        this.$emit("input", "00:00:00");
+        this.$emit("change", "00:00:00");
         return;
       }
 
@@ -101,6 +103,11 @@ export default {
         this.$emit("input", formattedTime);
         this.$emit("change", formattedTime);
         this.errorMessage = "";
+      } else {
+        this.errorMessage = "请输入正确的时间格式";
+        console.log("errorMessage", this.errorMessage);
+        this.$emit("input", "00:00:00");
+        this.$emit("change", "00:00:00");
       }
     },
 
@@ -215,6 +222,7 @@ export default {
 
 .el-icon-time {
   color: #c0c4cc;
+  line-height: 32px;
 }
 
 /* 输入框聚焦时的样式 */
