@@ -19,6 +19,7 @@
 
     <!-- 右侧菜单 -->
     <div class="right-menu">
+      <span>{{ name }}</span>
       <el-divider direction="vertical"></el-divider>
       <span style="display: inline-block" @click="logout">{{
         $t("navbar.logOut")
@@ -56,12 +57,13 @@ export default {
   data() {
     return {
       title: "强者之心",
+      name: localStorage.getItem('name'),
     };
   },
   computed: {
     ...mapGetters(["sidebar", "avatar", "device"]),
     ...mapState({
-      name: (state) => state.user.name,
+      // name: (state) => state.user.name,
       shopOptions: (state) => state.userInfo.shopOptions,
       shopName: (state) => state.userInfo.shopName,
       userType: (state) => state.userInfo.userType,

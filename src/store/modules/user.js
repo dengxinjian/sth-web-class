@@ -45,8 +45,10 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: loginAccount.trim() })
         .then((response) => {
-          const { token } = response;
+          const { token, nicknameTag } = response;
           commit("SET_TOKEN", token);
+          commit("SET_NAME", nicknameTag);
+          localStorage.setItem('name', nicknameTag);
           setToken(token);
           resolve();
         })
@@ -90,6 +92,8 @@ const actions = {
       //   .then(() => {
       commit("SET_TOKEN", "");
       commit("SET_ROLES", []);
+      commit("SET_NAME", "");
+      localStorage.removeItem('name');
       store.commit("userInfo/RESET_INFO");
       store.commit("permission/SET_ROLES", []);
       removeToken();

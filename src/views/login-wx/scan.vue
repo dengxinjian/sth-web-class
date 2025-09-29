@@ -157,6 +157,8 @@ export default {
         // 判断返回的res.jwt是否有值
         if (res.result.jwt && res.result.jwt.trim() !== '') {
           this.$store.commit('user/SET_TOKEN', res.result.jwt);
+          this.$store.commit('user/SET_NAME', res.result.nicknameTag);
+          localStorage.setItem('name', res.result.nicknameTag);
           setToken(res.result.jwt);
           this.$router.push('/timeTable/athletic');
         } else {

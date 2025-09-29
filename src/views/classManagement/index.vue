@@ -54,6 +54,7 @@
           </ul>
           <div class="class-operation">
             <el-popover
+              v-if="activeClassType === 'my'"
               placement="bottom"
               width="100"
               trigger="click"
@@ -76,7 +77,7 @@
               </div>
             </el-popover>
 
-            <el-input size="mini" v-model="classSearchInput">
+            <el-input size="mini" v-model="classSearchInput" @input="getClassList">
               <el-button
                 slot="append"
                 icon="el-icon-search"
@@ -177,7 +178,7 @@
                         </div>
                         <div
                           v-if="activeClassType === 'official'"
-                          class="delete"
+                          class="plus"
                           @click.stop="handleCopyClassFromOfficial(part.id)"
                         >
                           <i class="el-icon-circle-plus"></i>
@@ -2403,6 +2404,7 @@ export default {
         this.getClassList();
         this.getAthleticThreshold(this.selectedAthletic);
         this.getAuthorizedDeviceList();
+        this.getScheduleData();
       }
     },
     onWeekChange(payload) {
@@ -2813,7 +2815,7 @@ export default {
   align-items: flex-start;
 
   .left-menu {
-    flex: 0 0 68px;
+    flex: 0 0 52px;
   }
 
   .schedule {
@@ -3149,10 +3151,10 @@ export default {
   > li {
     font-size: 14px;
     cursor: pointer;
-    height: 90px;
+    height: 74px;
     width: 100%;
     background-color: #fff;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
     color: #333;
     display: flex;
@@ -3168,7 +3170,7 @@ export default {
       color: #fff;
     }
     img {
-      width: 42px;
+      width: 28px;
     }
   }
 }
