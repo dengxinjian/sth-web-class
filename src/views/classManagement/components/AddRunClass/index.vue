@@ -169,7 +169,9 @@
                     {{
                       part.capacity === "time"
                         ? part.target
-                        : part.targetDistance + part.targetUnit
+                        : part.targetDistance
+                        ? part.targetDistance + part.targetUnit
+                        : 0 + part.targetUnit
                     }}
                     @ {{ part.thresholdSpeedRange[0] }}~
                     {{ part.thresholdSpeedRange[1] }}% 阈值配速
@@ -193,7 +195,9 @@
                     {{
                       part.capacity === "time"
                         ? part.target
-                        : part.targetDistance + part.targetUnit
+                        : part.targetDistance
+                        ? part.targetDistance + part.targetUnit
+                        : 0 + part.targetUnit
                     }}
                     @ {{ part.thresholdSpeed }}% 阈值配速
                     <span v-if="part.hasCadence"

@@ -425,7 +425,7 @@ export const checkForm = (classInfo) => {
       }
       if (
         classInfo.stages[i].sections[j].capacity === "distance" &&
-        classInfo.stages[i].sections[j].targetDistance === 0
+        !classInfo.stages[i].sections[j].targetDistance
       ) {
         return {
           isValid: false,

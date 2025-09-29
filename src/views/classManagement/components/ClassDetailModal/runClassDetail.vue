@@ -19,8 +19,14 @@
           <span>
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
-          <span>{{ classInfo.duration == "00:00:00" ? "--:--:--" : classInfo.duration }}</span>
-          <span>{{ !classInfo.distance || classInfo.distance == "0" ? "--km" : classInfo.distance }}</span>
+          <span>{{
+            classInfo.duration == "00:00:00" ? "--:--:--" : classInfo.duration
+          }}</span>
+          <span>{{
+            !classInfo.distance || classInfo.distance == "0"
+              ? "--km"
+              : classInfo.distance
+          }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -145,7 +151,11 @@
           </div>
           <div class="phase-details">
             <div class="phase-item">
-              <div v-for="(item, index) in classInfo.stages" :key="index" class="phase-item-content">
+              <div
+                v-for="(item, index) in classInfo.stages"
+                :key="index"
+                class="phase-item-content"
+              >
                 <div v-if="item.times > 1">重复{{ item.times }}次</div>
                 <div v-for="(part, idx) in item.sections" :key="idx">
                   <div>{{ part.title }}</div>
@@ -153,7 +163,9 @@
                     {{
                       part.capacity === "time"
                         ? part.target
-                        : part.targetDistance + part.targetUnit
+                        : part.targetDistance
+                        ? part.targetDistance + part.targetUnit
+                        : 0 + part.targetUnit
                     }}
                     @ {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~
                     {{ secondsToMMSS(part.thresholdSpeedRangeNum[1]) }}/km
@@ -183,7 +195,9 @@
                     {{
                       part.capacity === "time"
                         ? part.target
-                        : part.targetDistance + part.targetUnit
+                        : part.targetDistance
+                        ? part.targetDistance + part.targetUnit
+                        : 0 + part.targetUnit
                     }}
                     @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
                     {{ part.thresholdSpeedNumZone }}
@@ -760,7 +774,11 @@ import {
   secondsToMMSS,
   mmssToSeconds,
 } from "@/utils/index";
-import { debounce, CalculateRun ,checkForm} from "@/views/classManagement/uilt";
+import {
+  debounce,
+  CalculateRun,
+  checkForm,
+} from "@/views/classManagement/uilt";
 export default {
   name: "AddRunClassDialog",
   components: {
