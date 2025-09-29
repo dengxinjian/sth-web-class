@@ -252,7 +252,7 @@
                     size="mini"
                     placeholder="选择团队"
                     @change="handleTeamChange"
-                    style="width: 120px;"
+                    style="width: 160px;"
                   >
                     <el-option
                       v-for="t in teamList"
@@ -269,7 +269,7 @@
                     size="mini"
                     placeholder="选择人员"
                     @change="handleAthleticChange"
-                    style="width: 120px;"
+                    style="width: 100px;"
                   >
                     <el-option
                       v-for="t in athleticList"
