@@ -33,7 +33,7 @@ export default {
   position: relative;
   overflow: hidden;
   background-color: #FAFAFA;
-  padding: 15px;
+  padding: 15px 0 0;
   background: #FAFAFA;
   display: flex;
   flex-direction: column;

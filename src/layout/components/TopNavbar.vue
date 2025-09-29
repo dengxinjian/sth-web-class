@@ -2,13 +2,20 @@
   <div class="top-navbar">
     <!-- Logo区域 -->
     <div class="logo-container">
+      <img :src="logoSth" alt="Logo" class="logoSth" />
       <img :src="logoUrl" alt="Logo" class="logo" />
       <!-- <span class="title">{{ title }}</span> -->
     </div>
 
     <!-- 面包屑导航 -->
     <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" /> -->
-     <div style="flex: 1;"></div>
+     <div style="flex: 1;">
+      <div
+        style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0"
+      >
+        公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
+      </div>
+     </div>
 
     <!-- 右侧菜单 -->
     <div class="right-menu">
@@ -66,6 +73,10 @@ export default {
       // 这里可以设置logo图片路径
       return require("@/assets/logo-text.png");
     },
+    logoSth() {
+      // 这里可以设置logo图片路径
+      return require("@/assets/logo-sth.png");
+    },
     showShop() {
       return this.shopOptions.length > 0;
     },
@@ -113,7 +124,6 @@ export default {
   height: 50px;
   overflow: hidden;
   position: relative;
-  background: #333 !important;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
   display: flex;
   align-items: center;
@@ -125,8 +135,12 @@ export default {
     min-width: 200px;
 
     .logo {
-      height: 26px;
-      margin-right: 12px;
+      height: 17px;
+      margin: 0 12px;
+    }
+
+    .logoSth {
+      width: 32px;
     }
 
     .title {
@@ -147,7 +161,6 @@ export default {
     height: 100%;
     font-size: 14px;
     cursor: pointer;
-    color: #fff;
 
     &:focus {
       outline: none;
