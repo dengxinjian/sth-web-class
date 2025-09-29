@@ -22,6 +22,7 @@ import "./utils/error-log"; // error log
 import * as filters from "./filters"; // global filters
 import * as echarts from "echarts";
 import permission from "@/directive/permission/index.js";
+import { message } from "@/views/classManagement/uilt";
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -53,6 +54,8 @@ Vue.use(Element, {
 Object.keys(filters).forEach((key) => {
   Vue.filter(key, filters[key]);
 });
+
+Vue.prototype.$message = message;
 
 Vue.config.productionTip = false;
 

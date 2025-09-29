@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    
     <div class="athletic-container">
       <div class="left-menu">
         <ul class="type-change-list">
@@ -8,7 +7,11 @@
             :class="activeName === 'athletic' ? 'active' : ''"
             @click="handleTypeChange('athletic')"
           >
-            <img v-if="activeName === 'athletic'" src="~@/assets/addClass/menu-player-active.png" alt="" />
+            <img
+              v-if="activeName === 'athletic'"
+              src="~@/assets/addClass/menu-player-active.png"
+              alt=""
+            />
             <img v-else src="~@/assets/addClass/menu-player.png" alt="" />
             <span>运动员</span>
           </li>
@@ -16,7 +19,11 @@
             :class="activeName === 'class' ? 'active' : ''"
             @click="handleTypeChange('class')"
           >
-            <img v-if="activeName === 'class'" src="~@/assets/addClass/menu-class-active.png" alt="" />
+            <img
+              v-if="activeName === 'class'"
+              src="~@/assets/addClass/menu-class-active.png"
+              alt=""
+            />
             <img v-else src="~@/assets/addClass/menu-class.png" alt="" />
             <span>课程</span>
           </li>
@@ -31,23 +38,44 @@
         </div>
         <div v-else class="class-container">
           <!-- <div class="class-title">课程</div> -->
-           <ul class="class-type-list">
-            <li :class="activeClassType === 'my' ? 'active' : ''" @click="handleClassTypeChange('my')">
+          <ul class="class-type-list">
+            <li
+              :class="activeClassType === 'my' ? 'active' : ''"
+              @click="handleClassTypeChange('my')"
+            >
               <img src="~@/assets/addClass/title-mine.png" alt="" />
             </li>
-            <li :class="activeClassType === 'official' ? 'active' : ''" @click="handleClassTypeChange('official')">
+            <li
+              :class="activeClassType === 'official' ? 'active' : ''"
+              @click="handleClassTypeChange('official')"
+            >
               <img src="~@/assets/addClass/title-official.png" alt="" />
             </li>
-           </ul>
+          </ul>
           <div class="class-operation">
-            <el-popover placement="bottom" width="100" trigger="click" popper-class="add-class-btn-popover">
-              <el-button type="primary" size="mini" slot="reference">新增</el-button>
-              <div style="display: flex; flex-direction: column; gap: 10px;">
-                <span><el-button type="primary" size="mini" @click="handleAddClass">新增课程</el-button></span>
-                <span><el-button type="primary" size="mini" @click="handleAddGroup">新增分组</el-button></span>
+            <el-popover
+              placement="bottom"
+              width="100"
+              trigger="click"
+              popper-class="add-class-btn-popover"
+            >
+              <el-button type="primary" size="mini" slot="reference"
+                >新增</el-button
+              >
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <span
+                  ><el-button type="primary" size="mini" @click="handleAddClass"
+                    >新增课程</el-button
+                  ></span
+                >
+                <span
+                  ><el-button type="primary" size="mini" @click="handleAddGroup"
+                    >新增分组</el-button
+                  ></span
+                >
               </div>
             </el-popover>
-            
+
             <el-input size="mini" v-model="classSearchInput">
               <el-button
                 slot="append"
@@ -61,7 +89,12 @@
               <el-collapse-item v-for="item in classList" :key="item.groupId">
                 <template slot="title">
                   <div class="schedule-class-title">
-                    <div class="group-name"><span class="group-name-text">{{ item.groupName }}</span>  <span class="group-name-count">({{ item.classesCount }})</span></div>
+                    <div class="group-name">
+                      <span class="group-name-text">{{ item.groupName }}</span>
+                      <span class="group-name-count"
+                        >({{ item.classesCount }})</span
+                      >
+                    </div>
                     <el-popover
                       v-if="activeClassType === 'my'"
                       popper-class="athletic-btn-popover"
@@ -195,7 +228,15 @@
                           }}</span
                           ><span v-else>km</span>
                         </span>
-                        <span v-if="part.classesJson.sth"><span><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></span> {{ part.classesJson.sth }}</span>
+                        <span v-if="part.classesJson.sth"
+                          ><span
+                            ><img
+                              class="sth"
+                              src="~@/assets/addClass/sth.png"
+                              alt=""
+                          /></span>
+                          {{ part.classesJson.sth }}</span
+                        >
                       </div>
                     </div>
                     <div
@@ -302,12 +343,14 @@
                 :key="item.id"
                 :class="
                   currentWeek[index]?.commonDate ===
-                  new Date().toLocaleDateString('zh-CN', {
-                    timeZone: 'Asia/Shanghai',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                  }).replace(/\//g, '-')
+                  new Date()
+                    .toLocaleDateString('zh-CN', {
+                      timeZone: 'Asia/Shanghai',
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })
+                    .replace(/\//g, '-')
                     ? 'schedule-table-header-cell active'
                     : 'schedule-table-header-cell'
                 "
@@ -315,12 +358,14 @@
                 {{ item.name }}
                 {{
                   currentWeek[index]?.commonDate ===
-                  new Date().toLocaleDateString('zh-CN', {
-                    timeZone: 'Asia/Shanghai',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                  }).replace(/\//g, '-')
+                  new Date()
+                    .toLocaleDateString("zh-CN", {
+                      timeZone: "Asia/Shanghai",
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })
+                    .replace(/\//g, "-")
                     ? "（今天）"
                     : ""
                 }}
@@ -353,7 +398,10 @@
                     :data-id="classItem.id"
                     :data-date="item.commonDate"
                     @click="
-                      handleClassSchedulaDetail(classItem.id, classItem.sportType)
+                      handleClassSchedulaDetail(
+                        classItem.id,
+                        classItem.sportType
+                      )
                     "
                   >
                     <div class="card-body" style="background-color: white">
@@ -433,7 +481,9 @@
                           classItem.sportType !== 'OTHER'
                         "
                       >
-                        <div class="keyword">{{ classItem.classesJson.sth }}</div>
+                        <div class="keyword">
+                          {{ classItem.classesJson.sth }}
+                        </div>
                         <div>&nbsp;&nbsp;STH</div>
                       </div>
                       <pre
@@ -635,7 +685,9 @@
                                   : part.targetDistance + part.targetUnit
                               }}
                               @
-                              {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~
+                              {{
+                                secondsToMMSS(part.thresholdSpeedRangeNum[0])
+                              }}~
                               {{
                                 secondsToMMSS(part.thresholdSpeedRangeNum[1])
                               }}/km
@@ -836,7 +888,9 @@
                             >
                               <ExerciseProcessChart
                                 :exerciseList="i.stageTimeline"
-                                :maxIntensity="classItem.classesJson.maxIntensity"
+                                :maxIntensity="
+                                  classItem.classesJson.maxIntensity
+                                "
                                 :height="16"
                               />
                             </div>
@@ -885,7 +939,9 @@
                             <el-button
                               v-if="activityItem.classesJson"
                               type="text"
-                              @click="handleUnbind(activityItem.classScheduleId)"
+                              @click="
+                                handleUnbind(activityItem.classScheduleId)
+                              "
                               >解除匹配</el-button
                             >
                             <el-button
@@ -993,7 +1049,8 @@
                                     part.range === 'target'
                                   "
                                 >
-                                  {{ part.target }} @ {{ part.thresholdFtpNum }}w
+                                  {{ part.target }} @
+                                  {{ part.thresholdFtpNum }}w
                                   <span v-if="part?.thresholdFtpNumZone">{{
                                     part.thresholdFtpNumZone
                                   }}</span>
@@ -1011,9 +1068,10 @@
                                 >
                                   {{ part.target }} @
                                   {{ part.thresholdHeartRateNum }}bpm
-                                  <span v-if="part?.thresholdHeartRateNumZone">{{
-                                    part.thresholdHeartRateNumZone
-                                  }}</span>
+                                  <span
+                                    v-if="part?.thresholdHeartRateNumZone"
+                                    >{{ part.thresholdHeartRateNumZone }}</span
+                                  >
                                   <span v-if="part.hasCadence"
                                     >踏频{{ part.cadence[0] }}~{{
                                       part.cadence[1]
@@ -1050,7 +1108,9 @@
                                   {{ part.targetHeartRateRangeNum[0] }}~
                                   {{ part.targetHeartRateRangeNum[1] }}bpm
                                   <span v-if="part.targetHeartRateRangeNumZone"
-                                    >{{ part.targetHeartRateRangeNumZone[0] }}~{{
+                                    >{{
+                                      part.targetHeartRateRangeNumZone[0]
+                                    }}~{{
                                       part.targetHeartRateRangeNumZone[1]
                                     }}</span
                                   >
@@ -1122,10 +1182,14 @@
                                 >
                                   {{ part.target }} @
                                   {{
-                                    secondsToMMSS(part.thresholdSpeedRangeNum[0])
+                                    secondsToMMSS(
+                                      part.thresholdSpeedRangeNum[0]
+                                    )
                                   }}~
                                   {{
-                                    secondsToMMSS(part.thresholdSpeedRangeNum[1])
+                                    secondsToMMSS(
+                                      part.thresholdSpeedRangeNum[1]
+                                    )
                                   }}/km
                                   <span v-if="part?.thresholdSpeedRangeNumZone"
                                     >{{ part.thresholdSpeedRangeNumZone[0] }}~{{
@@ -1186,9 +1250,10 @@
                                 >
                                   {{ part.target }} @
                                   {{ part.thresholdHeartRateNum }}bpm
-                                  <span v-if="part?.thresholdHeartRateNumZone">{{
-                                    part.thresholdHeartRateNumZone
-                                  }}</span>
+                                  <span
+                                    v-if="part?.thresholdHeartRateNumZone"
+                                    >{{ part.thresholdHeartRateNumZone }}</span
+                                  >
                                   <span v-if="part.hasCadence"
                                     >步频{{ part.cadence[0] }}~{{
                                       part.cadence[1]
@@ -1225,7 +1290,9 @@
                                   {{ part.targetHeartRateRange[0] }}~
                                   {{ part.targetHeartRateRange[1] }}bpm
                                   <span v-if="part.targetHeartRateRangeNumZone"
-                                    >{{ part.targetHeartRateRangeNumZone[0] }}~{{
+                                    >{{
+                                      part.targetHeartRateRangeNumZone[0]
+                                    }}~{{
                                       part.targetHeartRateRangeNumZone[1]
                                     }}</span
                                   >
@@ -1368,21 +1435,45 @@
           <!-- <div style="font-size: 14px; font-weight: 600;">
             同步开关
           </div> -->
-          <el-popover
-            placement="bottom-end"
-            width="180"
-            trigger="hover">
-            <div v-for="item in deviceList" :key="item.id" style="display: flex; flex-direction: row; gap: 10px;margin: 10px 0;">
-              <img v-if="item.deviceType === 2 || item.deviceType === 3" src="~@/assets/addClass/device-garmin.png" alt="" class="device-brand-icon">
-              <img v-if="item.deviceType === 1" src="~@/assets/addClass/device-coros.png" alt="" class="device-brand-icon">
-              <img v-if="item.deviceType === 4" src="~@/assets/addClass/device-zepp.png" alt="" class="device-brand-icon">
-              <img v-if="item.deviceType === 5 || item.deviceType === 6" src="~@/assets/addClass/device-suunto.png" alt="" class="device-brand-icon">
+          <el-popover placement="bottom-end" width="180" trigger="hover">
+            <div
+              v-for="item in deviceList"
+              :key="item.id"
+              style="
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                margin: 10px 0;
+              "
+            >
+              <img
+                v-if="item.deviceType === 2 || item.deviceType === 3"
+                src="~@/assets/addClass/device-garmin.png"
+                alt=""
+                class="device-brand-icon"
+              />
+              <img
+                v-if="item.deviceType === 1"
+                src="~@/assets/addClass/device-coros.png"
+                alt=""
+                class="device-brand-icon"
+              />
+              <img
+                v-if="item.deviceType === 4"
+                src="~@/assets/addClass/device-zepp.png"
+                alt=""
+                class="device-brand-icon"
+              />
+              <img
+                v-if="item.deviceType === 5 || item.deviceType === 6"
+                src="~@/assets/addClass/device-suunto.png"
+                alt=""
+                class="device-brand-icon"
+              />
               <el-switch
                 v-model="item.enabled"
                 :inactive-text="
-                  item.deviceType
-                    ? deviceTypeDict[item.deviceType]
-                    : '未知设备'
+                  item.deviceType ? deviceTypeDict[item.deviceType] : '未知设备'
                 "
                 @change="handleDeviceChange(item)"
               ></el-switch>
@@ -1446,7 +1537,6 @@
             ></el-progress>
           </div>
         </div>
-
       </div>
     </div>
     <AthleticInfoDialog
@@ -1713,9 +1803,9 @@ export default {
         5: "OTHER",
       },
       classModalDataType: "",
-      activeClassType: 'my',
+      activeClassType: "my",
       showCopyClassFromOfficial: false,
-      copyClassFromOfficialClassId: '',
+      copyClassFromOfficialClassId: "",
     };
   },
   mounted() {
@@ -1775,7 +1865,7 @@ export default {
         url: `/api/classSchedule/updateAuthorizedDevice?deviceId=${item.id}&syncFlag=${syncFlag}`,
       }).then((res) => {
         if (res.success) {
-          this.$message.success('操作成功');
+          this.$message.success("操作成功");
           this.getAuthorizedDeviceList();
         }
       });
@@ -1841,7 +1931,7 @@ export default {
             .querySelectorAll(".js-schedule-drag-container")
             .forEach((el) => {
               new Sortable(el, {
-                group: { name: "classDrag"},
+                group: { name: "classDrag" },
                 animation: 150,
                 filter: ".js-sport-container-noDrag",
                 dataIdAttr: "data-id",
@@ -2332,8 +2422,7 @@ export default {
 
       // 计算currentWeek第一天的月份
       if (this.currentWeek.length > 0) {
-        const firstDay =
-          this.currentWeek[0].commonDate;
+        const firstDay = this.currentWeek[0].commonDate;
         const date = new Date(firstDay);
         this.currentMonth = `${date.getFullYear()}-${String(
           date.getMonth() + 1
@@ -2700,7 +2789,7 @@ export default {
     },
     onSaveCopyClassFromOfficial(payload) {
       this.showCopyClassFromOfficial = false;
-      this.copyClassFromOfficialClassId = '';
+      this.copyClassFromOfficialClassId = "";
       this.getClassList();
     },
   },
@@ -2734,19 +2823,19 @@ export default {
     overflow: auto;
 
     /* 自定义滚动条样式 */
-  &::-webkit-scrollbar {
+    &::-webkit-scrollbar {
       width: 5px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f1f1;
       border-radius: 2.5px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: #c1c1c1;
       border-radius: 2.5px;
-      
+
       &:hover {
         background: #a8a8a8;
       }
@@ -2836,21 +2925,21 @@ export default {
     gap: 4px;
     flex-direction: row;
     flex: 1;
-    
+
     /* 自定义滚动条样式 */
     &::-webkit-scrollbar {
       width: 5px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f1f1;
       border-radius: 2.5px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: #c1c1c1;
       border-radius: 2.5px;
-      
+
       &:hover {
         background: #a8a8a8;
       }
@@ -3028,21 +3117,21 @@ export default {
   background-color: #f8f8f8;
   overflow-y: auto;
   overflow-x: hidden;
-  
+
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {
     width: 5px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 2.5px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 2.5px;
-    
+
     &:hover {
       background: #a8a8a8;
     }

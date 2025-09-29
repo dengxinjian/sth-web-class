@@ -1,4 +1,5 @@
 import { mmssToSeconds } from "@/utils/index";
+import { Message } from "element-ui";
 export const debounce = (cb, wait) => {
   let timer;
   return function (...args) {
@@ -625,3 +626,24 @@ export const checkFormBike = (classInfo) => {
   }
   return { isValid: true };
 };
+
+// 消息提示
+let messageInstance = null;
+const resetMessage = (options) => {
+  if (messageInstance) {
+    messageInstance.close();
+  }
+  messageInstance = Message(options);
+};
+["error", "success", "info", "warning"].forEach((type) => {
+  resetMessage[type] = (options) => {
+    if (typeof options === "string") {
+      options = {
+        message: options,
+      };
+    }
+    options.type = type;
+    return resetMessage(options);
+  };
+});
+export const message = resetMessage;
