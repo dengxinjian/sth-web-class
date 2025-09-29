@@ -152,7 +152,10 @@
                   <div>{{ part.title }}</div>
                   <div v-if="classInfo.mode === 1 && part.range === 'range'">
                     {{ part.target }} @ {{ part.thresholdFtpRangeNum[0] }}~
-                    {{ part.thresholdFtpRangeNum[1] }}w {{ part.thresholdFtpRangeNumZone[0] }}~{{ part.thresholdFtpRangeNumZone[1] }}
+                    {{ part.thresholdFtpRangeNum[1] }}w
+                    {{ part.thresholdFtpRangeNumZone[0] }}~{{
+                      part.thresholdFtpRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
@@ -160,13 +163,17 @@
                   <div v-if="classInfo.mode === 2 && part.range === 'range'">
                     {{ part.target }} @
                     {{ part.thresholdHeartRateRangeNum[0] }}~
-                    {{ part.thresholdHeartRateRangeNum[1] }}bpm {{ part.thresholdHeartRateRangeNumZone[0] }}~{{ part.thresholdHeartRateRangeNumZone[1] }}
+                    {{ part.thresholdHeartRateRangeNum[1] }}bpm
+                    {{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                      part.thresholdHeartRateRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 1 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.thresholdFtpNum }}w {{ part.thresholdFtpNumZone }}
+                    {{ part.target }} @ {{ part.thresholdFtpNum }}w
+                    {{ part.thresholdFtpNumZone }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}rpm</span
                     >
@@ -180,26 +187,34 @@
                   </div>
                   <div v-if="classInfo.mode === 3 && part.range === 'range'">
                     {{ part.target }} @ {{ part.targetFtpRange[0] }}~
-                    {{ part.targetFtpRange[1] }}w {{ part.targetFtpRangeNumZone[0] }}~{{ part.targetFtpRangeNumZone[1] }}
+                    {{ part.targetFtpRange[1] }}w
+                    {{ part.targetFtpRangeNumZone[0] }}~{{
+                      part.targetFtpRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 4 && part.range === 'range'">
                     {{ part.target }} @ {{ part.targetHeartRateRange[0] }}~
-                    {{ part.targetHeartRateRange[1] }}rpm {{ part.targetHeartRateRangeNumZone[0] }}~{{ part.targetHeartRateRangeNumZone[1] }}
+                    {{ part.targetHeartRateRange[1] }}rpm
+                    {{ part.targetHeartRateRangeNumZone[0] }}~{{
+                      part.targetHeartRateRangeNumZone[1]
+                    }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 3 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.targetFtp }}rpm {{ part.targetFtpNumZone }}
+                    {{ part.target }} @ {{ part.targetFtp }}rpm
+                    {{ part.targetFtpNumZone }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
                   <div v-if="classInfo.mode === 4 && part.range === 'target'">
-                    {{ part.target }} @ {{ part.targetHeartRate }}rpm {{ part.targetHeartRateNumZone }}
+                    {{ part.target }} @ {{ part.targetHeartRate }}rpm
+                    {{ part.targetHeartRateNumZone }}
                     <span v-if="part.hasCadence"
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
@@ -348,14 +363,14 @@
                     >%阈值功率 &nbsp; &nbsp;
                     {{
                       calculateThresholdFtpRangeNumZone(
-                        part.thresholdFtpRange
+                        part.thresholdFtpRange || [0, 0]
                       ).join(" ~ ")
                     }}</span
                   >
                   <span class="label"
                     >{{
                       calculateThresholdFtpRangeNum(
-                        part.thresholdFtpRange
+                        part.thresholdFtpRange || [0, 0]
                       ).join(" ~ ")
                     }}w</span
                   >
@@ -377,10 +392,14 @@
                   />
                   <span class="unit"
                     >%阈值功率 &nbsp; &nbsp;
-                    {{ calculateThresholdFtpNumZone(part.thresholdFtp) }}</span
+                    {{
+                      calculateThresholdFtpNumZone(part.thresholdFtp || 0)
+                    }}</span
                   >
                   <span class="label"
-                    >{{ calculateThresholdFtpNum(part.thresholdFtp) }}w</span
+                    >{{
+                      calculateThresholdFtpNum(part.thresholdFtp || 0)
+                    }}w</span
                   >
                 </div>
                 <div
@@ -411,14 +430,14 @@
                     >%阈值心率 &nbsp; &nbsp;
                     {{
                       calculateThresholdHeartRateRangeNumZone(
-                        part.thresholdHeartRateRange
+                        part.thresholdHeartRateRange || [0, 0]
                       ).join(" ~ ")
                     }}
                   </span>
                   <span class="label"
                     >{{
                       calculateThresholdHeartRateRangeNum(
-                        part.thresholdHeartRateRange
+                        part.thresholdHeartRateRange || [0, 0]
                       ).join(" ~ ")
                     }}bpm</span
                   >
@@ -442,13 +461,15 @@
                     >%阈值心率 &nbsp; &nbsp;
                     {{
                       calculateThresholdHeartRateNumZone(
-                        part.thresholdHeartRate
+                        part.thresholdHeartRate || 0
                       )
                     }}</span
                   >
                   <span class="label"
                     >{{
-                      calculateThresholdHeartRateNum(part.thresholdHeartRate)
+                      calculateThresholdHeartRateNum(
+                        part.thresholdHeartRate || 0
+                      )
                     }}bpm</span
                   >
                 </div>
@@ -476,7 +497,14 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">w &nbsp; &nbsp; {{ calculateTargetFtpRangeNumZone(part.targetFtpRange).join(" ~ ") }}</span>
+                  <span class="unit"
+                    >w &nbsp; &nbsp;
+                    {{
+                      calculateTargetFtpRangeNumZone(part.targetFtpRange || [0, 0]).join(
+                        " ~ "
+                      )
+                    }}</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 3 && part.range === 'target'"
@@ -493,7 +521,10 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">w &nbsp; &nbsp; {{ calculateTargetFtpNumZone(part.targetFtp) }}</span>
+                  <span class="unit"
+                    >w &nbsp; &nbsp;
+                    {{ calculateTargetFtpNumZone(part.targetFtp || 0) }}</span
+                  >
                 </div>
                 <div
                   v-if="classInfo.mode === 4 && part.range === 'range'"
@@ -519,7 +550,14 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">bpm &nbsp; &nbsp; {{ calculateTargetHeartRateRangeNumZone(part.targetHeartRateRange).join(" ~ ") }}</span>
+                  <span class="unit"
+                    >bpm &nbsp; &nbsp;
+                    {{
+                      calculateTargetHeartRateRangeNumZone(
+                        part.targetHeartRateRange || [0, 0]
+                      ).join(" ~ ")
+                    }}</span
+                  >
                 </div>
                 <div
                   v-else-if="classInfo.mode === 4 && part.range === 'target'"
@@ -536,7 +574,12 @@
                     :style="{ width: '80px' }"
                     @change="calculateTimeline"
                   />
-                  <span class="unit">bpm &nbsp; &nbsp; {{ calculateTargetHeartRateNumZone(part.targetHeartRate) }}</span>
+                  <span class="unit"
+                    >bpm &nbsp; &nbsp;
+                    {{
+                      calculateTargetHeartRateNumZone(part.targetHeartRate || 0 )
+                    }}</span
+                  >
                 </div>
                 <div v-if="part.hasCadence" class="config-item">
                   <el-input-number
@@ -627,7 +670,7 @@ import {
   debounce,
   calculateThresholdHeartRateNumZoneFollow,
   CalculateBike,
-  checkFormBike
+  checkFormBike,
 } from "@/views/classManagement/uilt";
 
 export default {
@@ -751,9 +794,9 @@ export default {
       }
     },
     calculateThresholdFtpNum(thresholdFtp) {
-      return new CalculateBike(
-        this.athleticThreshold
-      ).calculateThresholdFtpNum(thresholdFtp);
+      return new CalculateBike(this.athleticThreshold).calculateThresholdFtpNum(
+        thresholdFtp
+      );
     },
     calculateThresholdFtpRangeNum(thresholdFtpRange) {
       return new CalculateBike(
