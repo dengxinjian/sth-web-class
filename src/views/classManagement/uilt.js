@@ -401,7 +401,7 @@ export class CalculateBike {
     return this.classInfo;
   }
 }
-
+// 文本截取
 export function truncateByLines(str, maxLines = 6) {
   const lines = str.split("\n");
   if (lines.length > maxLines) {
@@ -409,3 +409,219 @@ export function truncateByLines(str, maxLines = 6) {
   }
   return str;
 }
+// 跑步数据校验
+export const checkForm = (classInfo) => {
+  for (let i = 0; i < classInfo.stages.length; i++) {
+    for (let j = 0; j < classInfo.stages[i].sections.length; j++) {
+      if (
+        classInfo.stages[i].sections[j].capacity === "time" &&
+        classInfo.stages[i].sections[j].target === "00:00:00"
+      ) {
+        return {
+          isValid: false,
+          message: `阶段${i + 1}的段落${j + 1}的目标时间不能为00:00:00`,
+        };
+      }
+      if (
+        classInfo.stages[i].sections[j].capacity === "distance" &&
+        classInfo.stages[i].sections[j].targetDistance === 0
+      ) {
+        return {
+          isValid: false,
+          message: `阶段${i + 1}的段落${j + 1}的目标距离不能为0`,
+        };
+      }
+      if (classInfo.mode === 1) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].thresholdSpeedRange[0] ||
+            !classInfo.stages[i].sections[j].thresholdSpeedRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值配速范围不能为空或者为0`,
+          };
+        }
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].thresholdSpeed
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值配速不能为空或者为0`,
+          };
+        }
+      }
+      if (classInfo.mode === 2) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].thresholdHeartRateRange[0] ||
+            !classInfo.stages[i].sections[j].thresholdHeartRateRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值心率范围不能为空或者为0`,
+          };
+        }
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].thresholdHeartRate
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值心率不能为空或者为0`,
+          };
+        }
+      }
+      if (classInfo.mode === 3) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].targetSpeedRange[0] ||
+            !classInfo.stages[i].sections[j].targetSpeedRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的配速范围不能为空或者为0`,
+          };
+        }
+        console.log(
+          classInfo.stages[i].sections[j].targetSpeed === "00:00",
+          "aaaa"
+        );
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].targetSpeed
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的配速不能为空或者为0`,
+          };
+        }
+      }
+      if (classInfo.mode === 4) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].targetHeartRateRange[0] ||
+            !classInfo.stages[i].sections[j].targetHeartRateRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的心率范围不能为空或者为0`,
+          };
+        }
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].targetHeartRate
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的心率不能为空或者为0`,
+          };
+        }
+      }
+    }
+  }
+  return { isValid: true };
+};
+// 骑行数据校验
+
+export const checkFormBike = (classInfo) => {
+  for (let i = 0; i < classInfo.stages.length; i++) {
+    for (let j = 0; j < classInfo.stages[i].sections.length; j++) {
+      if (
+        classInfo.stages[i].sections[j].capacity === "time" &&
+        classInfo.stages[i].sections[j].target === "00:00:00"
+      ) {
+        return {
+          isValid: false,
+          message: `阶段${i + 1}的段落${j + 1}的目标时间不能为00:00:00`,
+        };
+      }
+      if (classInfo.mode === 1) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].thresholdFtpRange[0] ||
+            !classInfo.stages[i].sections[j].thresholdFtpRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值功率不能为空或者为0`,
+          };
+        }
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].thresholdFtp
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值功率不能为空或者为0`,
+          };
+        }
+      }
+      if (classInfo.mode === 2) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].thresholdHeartRateRange[0] ||
+            !classInfo.stages[i].sections[j].thresholdHeartRateRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值心率不能为空或者为0`,
+          };
+        }
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].thresholdHeartRate
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的阀值心率不能为空或者为0`,
+          };
+        }
+      }
+      if (classInfo.mode === 3) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].targetFtpRange[0] ||
+            !classInfo.stages[i].sections[j].targetFtpRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的固定功率范围不能为空或者为0`,
+          };
+        }
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].targetFtp
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的固定功率不能为空或者为0`,
+          };
+        }
+      }
+      if (classInfo.mode === 4) {
+        if (
+          classInfo.stages[i].sections[j].range === "range" &&
+          (!classInfo.stages[i].sections[j].targetHeartRateRange[0] ||
+            !classInfo.stages[i].sections[j].targetHeartRateRange[1])
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的心率范围不能为空或者为0`,
+          };
+        }
+        if (
+          classInfo.stages[i].sections[j].range === "target" &&
+          !classInfo.stages[i].sections[j].targetHeartRate
+        ) {
+          return {
+            isValid: false,
+            message: `阶段${i + 1}的段落${j + 1}的心率不能为空或者为0`,
+          };
+        }
+      }
+    }
+  }
+  return { isValid: true };
+};

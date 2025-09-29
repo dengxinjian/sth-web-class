@@ -600,7 +600,7 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-import { debounce } from "@/views/classManagement/uilt";
+import { debounce, checkFormBike } from "@/views/classManagement/uilt";
 
 export default {
   name: "AddBikeClassDialog",
@@ -818,6 +818,11 @@ export default {
     },
     // 获取sth值
     getSth() {
+      const validation = checkFormBike(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       submitData({
         url: "/api/classes/calculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -843,7 +848,11 @@ export default {
       this.$emit("cancel");
     },
     onSave(closeAfter) {
-      console.log(JSON.stringify(this.classInfo));
+      const validation = checkFormBike(this.classInfo);
+      if (!validation.isValid) {
+        this.$message.error(validation.message);
+        return;
+      }
       if (this.classInfo.id) {
         this.submitUpdateClass(closeAfter);
       } else {
