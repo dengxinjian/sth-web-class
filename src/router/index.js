@@ -6,7 +6,7 @@ Vue.use(Router);
 // 环境配置
 const config = {
   development: {
-    loginComponent: () => import("@/views/login/index")
+    loginComponent: () => import("@/views/login-wx/index")
   },
   staging: {
     loginComponent: () => import("@/views/login-wx/index")
@@ -84,6 +84,11 @@ export const constantRoutes = [
   {
     path: "/agreement",
     component: () => import("@/views/agreement/index"),
+    hidden: true,
+  },
+  {
+    path: "/privacy",
+    component: () => import("@/views/privacy/index"),
     hidden: true,
   },
   {

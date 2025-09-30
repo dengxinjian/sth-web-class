@@ -64,7 +64,7 @@
 
     <footer>
         <div class="footer-content">
-             <p><img :src="require('@/views/login-wx/imgs/logo.png')" alt="" width="30">© 2025 武汉强大之心体育有限公司 版权所有 鄂ICP备2024075413号-2 </p>
+             <p><img :src="require('@/views/login-wx/imgs/logo.png')" alt="" width="30">© 2025 武汉强大之心体育有限公司 版权所有 鄂ICP备2024075413号-2 | <router-link to="/privacy">隐私政策</router-link></p>
         </div>
     </footer>
   </div>
