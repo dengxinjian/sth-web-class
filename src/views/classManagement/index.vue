@@ -1936,6 +1936,10 @@ export default {
                 animation: 150,
                 filter: ".js-sport-container-noDrag",
                 dataIdAttr: "data-id",
+                scroll: true,
+                swapThreshold: 0.6,
+                scrollSpeed: 10,
+                easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)", // 缓动函数
                 onEnd: (e) => {
                   console.log("拖拽课程：", e.item.dataset.id);
                   console.log("拖拽日期：", e.to.dataset.date);
