@@ -363,14 +363,14 @@
                     >%阈值功率 &nbsp; &nbsp;
                     {{
                       calculateThresholdFtpRangeNumZone(
-                        part.thresholdFtpRange || [0, 0]
+                        part.thresholdFtpRange
                       ).join(" ~ ")
                     }}</span
                   >
                   <span class="label"
                     >{{
                       calculateThresholdFtpRangeNum(
-                        part.thresholdFtpRange || [0, 0]
+                        part.thresholdFtpRange
                       ).join(" ~ ")
                     }}w</span
                   >
@@ -430,7 +430,7 @@
                     >%阈值心率 &nbsp; &nbsp;
                     {{
                       calculateThresholdHeartRateRangeNumZone(
-                        part.thresholdHeartRateRange || [0, 0]
+                        part.thresholdHeartRateRange
                       ).join(" ~ ")
                     }}
                   </span>
@@ -500,7 +500,7 @@
                   <span class="unit"
                     >w &nbsp; &nbsp;
                     {{
-                      calculateTargetFtpRangeNumZone(part.targetFtpRange || [0, 0]).join(
+                      calculateTargetFtpRangeNumZone(part.targetFtpRange).join(
                         " ~ "
                       )
                     }}</span
