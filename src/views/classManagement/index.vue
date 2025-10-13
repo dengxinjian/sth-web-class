@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="athletic-container">
+    <div class="athletic-container" v-loading="loading">
       <div class="left-menu">
         <ul class="type-change-list">
           <li
@@ -319,7 +319,7 @@
         </div>
       </div>
 
-      <div class="schedule" v-loading="loading">
+      <div class="schedule">
         <div class="schedule-table-container">
           <!-- 日历课表展示 -->
           <div class="schedule-table">
@@ -436,534 +436,538 @@
                   :data-date="item.commonDate"
                 >
                   <!-- 课表循环 -->
-                  <div
-                    v-for="classItem in item.classSchedule"
+                  <div v-for="classItem in item.classSchedule"
                     :key="classItem.id"
-                    class="classScheduleCard"
-                    :style="
-                      item.commonDate < new Date().toISOString().split('T')[0]
-                        ? 'background-color: rgba(204, 35, 35, 1)'
-                        : 'background-color: #fff'
-                    "
                     :data-id="classItem.id"
                     :data-date="item.commonDate"
-                    @click.stop="
-                      handleClassSchedulaDetail(
-                        classItem.id,
-                        classItem.sportType
-                      )
-                    "
-                  >
-                    <div class="card-body" style="background-color: white">
-                      <div class="body-title">
-                        <div class="sport-type-icon">
-                          <img
-                            class="image-icon"
-                            :src="getClassImageIcon(classItem.sportType)"
-                            alt=""
-                          />
-                          <div
-                            :class="[
-                              'sport-type-name',
-                              'sport-type-color' + device.syncStatus,
-                            ]"
-                            v-for="device in classItem.syncStatusList"
-                            :key="device.deviceType + device.syncStatus"
-                            @click.stop="
-                              handleDeviceClick(
-                                classItem,
-                                device,
-                                item.commonDate
-                              )
-                            "
-                          >
-                            {{ deviceTypeIconDict[device.deviceType] }}
-                          </div>
-                        </div>
-                        <el-popover
-                          popper-class="athletic-btn-popover"
-                          placement="right"
-                          trigger="click"
-                          tabindex="9999"
-                        >
-                          <div class="btn-list-hover">
-                            <el-button
-                              type="text"
+                    class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag">
+                    <div
+                      class="classScheduleCard"
+                      :style="
+                        item.commonDate < new Date().toISOString().split('T')[0] && classItem.classesJson.duration && classItem.classesJson.duration !== '00:00:00'
+                          ? 'background-color: rgba(204, 35, 35, 1)'
+                          : 'background-color: #fff'
+                      "
+                      :data-id="classItem.id"
+                      :data-date="item.commonDate"
+                      @click.stop="
+                        handleClassSchedulaDetail(
+                          classItem.id,
+                          classItem.sportType
+                        )
+                      "
+                    >
+                      <div class="card-body class-drap-handle" style="background-color: white">
+                        <div class="body-title">
+                          <div class="sport-type-icon">
+                            <img
+                              class="image-icon"
+                              :src="getClassImageIcon(classItem.sportType)"
+                              alt=""
+                            />
+                            <div
+                              :class="[
+                                'sport-type-name',
+                                'sport-type-color' + device.syncStatus,
+                              ]"
+                              v-for="device in classItem.syncStatusList"
+                              :key="device.deviceType + device.syncStatus"
                               @click.stop="
-                                handleDeleteClassSchedule(classItem.id)
+                                handleDeviceClick(
+                                  classItem,
+                                  device,
+                                  item.commonDate
+                                )
                               "
-                              >删除</el-button
                             >
+                              {{ deviceTypeIconDict[device.deviceType] }}
+                            </div>
                           </div>
-                          <i
-                            class="el-icon-more"
-                            slot="reference"
-                            @click.stop
-                          ></i>
-                        </el-popover>
-                        <!-- <i
-                          class="el-icon-delete"
-                          @click.stop="handleDeleteClassSchedule(classItem.id)"
-                        ></i> -->
-                      </div>
-                      <div class="title">{{ classItem.classesJson.title }}</div>
-                      <div class="keyword">
-                        {{
-                          classItem.sportType == "CYCLE"
-                            ? "BIKE"
-                            : classItem.sportType
-                        }}
-                      </div>
-                      <div
-                        class="keyword"
-                        v-if="
-                          classItem.sportType !== 'REST' &&
-                          classItem.sportType !== 'REMARK' &&
-                          classItem.sportType !== 'OTHER'
-                        "
-                      >
-                        {{
-                          classItem.classesJson.duration == "00:00:00"
-                            ? "--:--:--"
-                            : classItem.classesJson.duration
-                        }}
-                      </div>
-                      <div
-                        style="display: flex"
-                        v-if="classItem.classesJson.distance"
-                      >
+                          <el-popover
+                            popper-class="athletic-btn-popover"
+                            placement="right"
+                            trigger="click"
+                            tabindex="9999"
+                          >
+                            <div class="btn-list-hover">
+                              <el-button
+                                type="text"
+                                @click.stop="
+                                  handleDeleteClassSchedule(classItem.id)
+                                "
+                                >删除</el-button
+                              >
+                            </div>
+                            <i
+                              class="el-icon-more"
+                              slot="reference"
+                              @click.stop
+                            ></i>
+                          </el-popover>
+                          <!-- <i
+                            class="el-icon-delete"
+                            @click.stop="handleDeleteClassSchedule(classItem.id)"
+                          ></i> -->
+                        </div>
+                        <div class="title">{{ classItem.classesJson.title }}</div>
                         <div class="keyword">
                           {{
-                            !classItem.classesJson.distance ||
-                            classItem.classesJson.distance == "0"
-                              ? "--km"
-                              : classItem.classesJson.distance
-                          }}<span v-if="classItem.sportType === 'SWIM'">{{
-                            classItem.classesJson.distanceUnit
-                          }}</span>
+                            classItem.sportType == "CYCLE"
+                              ? "BIKE"
+                              : classItem.sportType
+                          }}
                         </div>
-                        <div>&nbsp;&nbsp;</div>
-                      </div>
-                      <div
-                        style="display: flex"
-                        v-if="
-                          classItem.sportType !== 'REST' &&
-                          classItem.sportType !== 'REMARK' &&
-                          classItem.sportType !== 'OTHER'
-                        "
-                      >
-                        <div class="keyword">
-                          {{ classItem.classesJson.sth }}
-                        </div>
-                        <div>&nbsp;&nbsp;STH</div>
-                      </div>
-                      <pre
-                        v-if="classItem.classesJson.summary"
-                        class="stage-details"
-                      >
-                        {{ truncateByLines(classItem.classesJson.summary) }}
-                      </pre>
-                      <!-- <el-input
-                        type="textarea"
-                        v-if="classItem.classesJson.summary"
-                        v-model="classItem.classesJson.summary"
-                        placeholder="请输入概要"
-                        autosize
-                        class="summary-textarea"
-                      >
-                      </el-input> -->
-                      <div
-                        v-else-if="classItem.sportType === 'CYCLE'"
-                        class="stage-details"
-                      >
                         <div
-                          v-for="(stage, index) in classItem.classesJson.stages"
-                          :key="index"
-                          class="stage-item"
+                          class="keyword"
+                          v-if="
+                            classItem.sportType !== 'REST' &&
+                            classItem.sportType !== 'REMARK' &&
+                            classItem.sportType !== 'OTHER'
+                          "
                         >
-                          <div v-for="(part, idx) in stage.sections" :key="idx">
-                            <div>{{ part.title }}</div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 1 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{ part.target }} @
-                              {{ part.thresholdFtpRangeNum[0] }}~
-                              {{ part.thresholdFtpRangeNum[1] }}w
-                              <span v-if="part?.thresholdFtpRangeNumZone"
-                                >{{ part.thresholdFtpRangeNumZone[0] }}~{{
-                                  part.thresholdFtpRangeNumZone[1]
-                                }}</span
-                              >
-                              <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 2 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{ part.target }} @
-                              {{ part.thresholdHeartRateRangeNum[0] }}~
-                              {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                              <span v-if="part?.thresholdHeartRateRangeNumZone"
-                                >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
-                                  part.thresholdHeartRateRangeNumZone[1]
-                                }}</span
-                              >
-                              <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 1 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{ part.target }} @ {{ part.thresholdFtpNum }}w
-                              <span v-if="part?.thresholdFtpNumZone">{{
-                                part.thresholdFtpNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 2 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{ part.target }} @
-                              {{ part.thresholdHeartRateNum }}bpm
-                              <span v-if="part?.thresholdHeartRateNumZone">{{
-                                part.thresholdHeartRateNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 3 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{ part.target }} @ {{ part.targetFtpRange[0] }}~
-                              {{ part.targetFtpRange[1] }}w
-                              <span v-if="part.targetFtpRangeNumZone"
-                                >{{ part.targetFtpRangeNumZone[0] }}~{{
-                                  part.targetFtpRangeNumZone[1]
-                                }}</span
-                              >
-                              <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 4 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{ part.target }} @
-                              {{ part.targetHeartRateRange[0] }}~
-                              {{ part.targetHeartRateRange[1] }}bpm
-                              <span v-if="part.targetHeartRateRangeNumZone"
-                                >{{ part.targetHeartRateRangeNumZone[0] }}~{{
-                                  part.targetHeartRateRangeNumZone[1]
-                                }}</span
-                              >
-                              <!-- <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span -->
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 3 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{ part.target }} @ {{ part.targetFtp }}w
-                              <span v-if="part.targetFtpNumZone">{{
-                                part.targetFtpNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 4 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{ part.target }} @ {{ part.targetHeartRate }}bpm
-                              <span v-if="part.targetHeartRateNumZone">{{
-                                part.targetHeartRateNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >踏频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                          </div>
-                          <div v-if="stage.times > 1">
-                            重复{{ stage.times }}次
-                          </div>
+                          {{
+                            classItem.classesJson.duration == "00:00:00"
+                              ? "--:--:--"
+                              : classItem.classesJson.duration
+                          }}
                         </div>
-                      </div>
-                      <div
-                        v-else-if="classItem.sportType === 'RUN'"
-                        class="stage-details"
-                      >
                         <div
-                          v-for="(stage, index) in classItem.classesJson.stages"
-                          :key="index"
-                          class="stage-item"
+                          style="display: flex"
+                          v-if="classItem.classesJson.distance"
                         >
-                          <div v-for="(part, idx) in stage.sections" :key="idx">
-                            <div>{{ part.title }}</div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 1 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @
-                              {{
-                                secondsToMMSS(part.thresholdSpeedRangeNum[0])
-                              }}~
-                              {{
-                                secondsToMMSS(part.thresholdSpeedRangeNum[1])
-                              }}/km
-                              <span v-if="part.thresholdSpeedRangeNumZone"
-                                >{{ part.thresholdSpeedRangeNumZone[0] }}~{{
-                                  part.thresholdSpeedRangeNumZone[1]
-                                }}</span
-                              >
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 2 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @ {{ part.thresholdHeartRateRangeNum[0] }}~
-                              {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                              <span v-if="part.thresholdHeartRateRangeNumZone"
-                                >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
-                                  part.thresholdHeartRateRangeNumZone[1]
-                                }}</span
-                              >
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 1 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
-                              <span v-if="part.thresholdSpeedNumZone">{{
-                                part.thresholdSpeedNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 2 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @ {{ part.thresholdHeartRateNum }}bpm
-                              <span v-if="part.thresholdHeartRateNumZone">{{
-                                part.thresholdHeartRateNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 3 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @ {{ part.targetSpeedRange[0] }}~
-                              {{ part.targetSpeedRange[1] }}/km
-                              <span v-if="part.targetSpeedRangeNumZone"
-                                >{{ part.targetSpeedRangeNumZone[0] }}~{{
-                                  part.targetSpeedRangeNumZone[1]
-                                }}</span
-                              >
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 4 &&
-                                part.range === 'range'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @ {{ part.targetHeartRateRange[0] }}~
-                              {{ part.targetHeartRateRange[1] }}bpm
-                              <span v-if="part.targetHeartRateRangeNumZone"
-                                >{{ part.targetHeartRateRangeNumZone[0] }}~{{
-                                  part.targetHeartRateRangeNumZone[1]
-                                }}</span
-                              >
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 3 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @ {{ part.targetSpeed }}/km
-                              <span v-if="part.targetSpeedNumZone">{{
-                                part.targetSpeedNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
-                            <div
-                              v-if="
-                                classItem.classesJson.mode === 4 &&
-                                part.range === 'target'
-                              "
-                            >
-                              {{
-                                part.capacity === "time"
-                                  ? part.target
-                                  : part.targetDistance + part.targetUnit
-                              }}
-                              @ {{ part.targetHeartRate }}bpm
-                              <span v-if="part.targetHeartRateNumZone">{{
-                                part.targetHeartRateNumZone
-                              }}</span>
-                              <span v-if="part.hasCadence"
-                                >步频{{ part.cadence[0] }}~{{
-                                  part.cadence[1]
-                                }}</span
-                              >
-                            </div>
+                          <div class="keyword">
+                            {{
+                              !classItem.classesJson.distance ||
+                              classItem.classesJson.distance == "0"
+                                ? "--km"
+                                : classItem.classesJson.distance
+                            }}<span v-if="classItem.sportType === 'SWIM'">{{
+                              classItem.classesJson.distanceUnit
+                            }}</span>
                           </div>
-                          <div v-if="stage.times > 1">
-                            重复{{ stage.times }}次
-                          </div>
+                          <div>&nbsp;&nbsp;</div>
                         </div>
-                      </div>
-                      <div
-                        v-if="classItem.classesJson.timeline"
-                        style="height: 16px; display: flex; gap: 1px"
-                      >
                         <div
-                          v-for="(i, index) in classItem.classesJson.timeline"
-                          :key="index"
-                          class="time-stage"
-                          :style="{ flex: i.duration }"
+                          style="display: flex"
+                          v-if="
+                            classItem.sportType !== 'REST' &&
+                            classItem.sportType !== 'REMARK' &&
+                            classItem.sportType !== 'OTHER'
+                          "
+                        >
+                          <div class="keyword">
+                            {{ classItem.classesJson.sth }}
+                          </div>
+                          <div>&nbsp;&nbsp;STH</div>
+                        </div>
+                        <pre
+                          v-if="classItem.classesJson.summary"
+                          class="stage-details"
+                        >
+                          {{ truncateByLines(classItem.classesJson.summary) }}
+                        </pre>
+                        <!-- <el-input
+                          type="textarea"
+                          v-if="classItem.classesJson.summary"
+                          v-model="classItem.classesJson.summary"
+                          placeholder="请输入概要"
+                          autosize
+                          class="summary-textarea"
+                        >
+                        </el-input> -->
+                        <div
+                          v-else-if="classItem.sportType === 'CYCLE'"
+                          class="stage-details"
                         >
                           <div
-                            :style="{
-                              display: 'flex',
-                              gap: '1px',
-                              height: '16px',
-                            }"
+                            v-for="(stage, index) in classItem.classesJson.stages"
+                            :key="index"
+                            class="stage-item"
+                          >
+                            <div v-for="(part, idx) in stage.sections" :key="idx">
+                              <div>{{ part.title }}</div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 1 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{ part.target }} @
+                                {{ part.thresholdFtpRangeNum[0] }}~
+                                {{ part.thresholdFtpRangeNum[1] }}w
+                                <span v-if="part?.thresholdFtpRangeNumZone"
+                                  >{{ part.thresholdFtpRangeNumZone[0] }}~{{
+                                    part.thresholdFtpRangeNumZone[1]
+                                  }}</span
+                                >
+                                <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 2 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{ part.target }} @
+                                {{ part.thresholdHeartRateRangeNum[0] }}~
+                                {{ part.thresholdHeartRateRangeNum[1] }}bpm
+                                <span v-if="part?.thresholdHeartRateRangeNumZone"
+                                  >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                                    part.thresholdHeartRateRangeNumZone[1]
+                                  }}</span
+                                >
+                                <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 1 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{ part.target }} @ {{ part.thresholdFtpNum }}w
+                                <span v-if="part?.thresholdFtpNumZone">{{
+                                  part.thresholdFtpNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 2 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{ part.target }} @
+                                {{ part.thresholdHeartRateNum }}bpm
+                                <span v-if="part?.thresholdHeartRateNumZone">{{
+                                  part.thresholdHeartRateNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 3 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{ part.target }} @ {{ part.targetFtpRange[0] }}~
+                                {{ part.targetFtpRange[1] }}w
+                                <span v-if="part.targetFtpRangeNumZone"
+                                  >{{ part.targetFtpRangeNumZone[0] }}~{{
+                                    part.targetFtpRangeNumZone[1]
+                                  }}</span
+                                >
+                                <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 4 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{ part.target }} @
+                                {{ part.targetHeartRateRange[0] }}~
+                                {{ part.targetHeartRateRange[1] }}bpm
+                                <span v-if="part.targetHeartRateRangeNumZone"
+                                  >{{ part.targetHeartRateRangeNumZone[0] }}~{{
+                                    part.targetHeartRateRangeNumZone[1]
+                                  }}</span
+                                >
+                                <!-- <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span -->
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 3 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{ part.target }} @ {{ part.targetFtp }}w
+                                <span v-if="part.targetFtpNumZone">{{
+                                  part.targetFtpNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 4 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{ part.target }} @ {{ part.targetHeartRate }}bpm
+                                <span v-if="part.targetHeartRateNumZone">{{
+                                  part.targetHeartRateNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >踏频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                            </div>
+                            <div v-if="stage.times > 1">
+                              重复{{ stage.times }}次
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          v-else-if="classItem.sportType === 'RUN'"
+                          class="stage-details"
+                        >
+                          <div
+                            v-for="(stage, index) in classItem.classesJson.stages"
+                            :key="index"
+                            class="stage-item"
+                          >
+                            <div v-for="(part, idx) in stage.sections" :key="idx">
+                              <div>{{ part.title }}</div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 1 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @
+                                {{
+                                  secondsToMMSS(part.thresholdSpeedRangeNum[0])
+                                }}~
+                                {{
+                                  secondsToMMSS(part.thresholdSpeedRangeNum[1])
+                                }}/km
+                                <span v-if="part.thresholdSpeedRangeNumZone"
+                                  >{{ part.thresholdSpeedRangeNumZone[0] }}~{{
+                                    part.thresholdSpeedRangeNumZone[1]
+                                  }}</span
+                                >
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 2 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @ {{ part.thresholdHeartRateRangeNum[0] }}~
+                                {{ part.thresholdHeartRateRangeNum[1] }}bpm
+                                <span v-if="part.thresholdHeartRateRangeNumZone"
+                                  >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                                    part.thresholdHeartRateRangeNumZone[1]
+                                  }}</span
+                                >
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 1 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
+                                <span v-if="part.thresholdSpeedNumZone">{{
+                                  part.thresholdSpeedNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 2 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @ {{ part.thresholdHeartRateNum }}bpm
+                                <span v-if="part.thresholdHeartRateNumZone">{{
+                                  part.thresholdHeartRateNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 3 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @ {{ part.targetSpeedRange[0] }}~
+                                {{ part.targetSpeedRange[1] }}/km
+                                <span v-if="part.targetSpeedRangeNumZone"
+                                  >{{ part.targetSpeedRangeNumZone[0] }}~{{
+                                    part.targetSpeedRangeNumZone[1]
+                                  }}</span
+                                >
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 4 &&
+                                  part.range === 'range'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @ {{ part.targetHeartRateRange[0] }}~
+                                {{ part.targetHeartRateRange[1] }}bpm
+                                <span v-if="part.targetHeartRateRangeNumZone"
+                                  >{{ part.targetHeartRateRangeNumZone[0] }}~{{
+                                    part.targetHeartRateRangeNumZone[1]
+                                  }}</span
+                                >
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 3 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @ {{ part.targetSpeed }}/km
+                                <span v-if="part.targetSpeedNumZone">{{
+                                  part.targetSpeedNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                              <div
+                                v-if="
+                                  classItem.classesJson.mode === 4 &&
+                                  part.range === 'target'
+                                "
+                              >
+                                {{
+                                  part.capacity === "time"
+                                    ? part.target
+                                    : part.targetDistance + part.targetUnit
+                                }}
+                                @ {{ part.targetHeartRate }}bpm
+                                <span v-if="part.targetHeartRateNumZone">{{
+                                  part.targetHeartRateNumZone
+                                }}</span>
+                                <span v-if="part.hasCadence"
+                                  >步频{{ part.cadence[0] }}~{{
+                                    part.cadence[1]
+                                  }}</span
+                                >
+                              </div>
+                            </div>
+                            <div v-if="stage.times > 1">
+                              重复{{ stage.times }}次
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          v-if="classItem.classesJson.timeline"
+                          style="height: 16px; display: flex; gap: 1px"
+                        >
+                          <div
+                            v-for="(i, index) in classItem.classesJson.timeline"
+                            :key="index"
+                            class="time-stage"
+                            :style="{ flex: i.duration }"
                           >
                             <div
-                              v-for="n in +i.times"
-                              :key="n"
-                              :style="{ flex: 1 }"
+                              :style="{
+                                display: 'flex',
+                                gap: '1px',
+                                height: '16px',
+                              }"
                             >
-                              <ExerciseProcessChart
-                                :exerciseList="i.stageTimeline"
-                                :maxIntensity="
-                                  classItem.classesJson.maxIntensity
-                                "
-                                :height="16"
-                              />
+                              <div
+                                v-for="n in +i.times"
+                                :key="n"
+                                :style="{ flex: 1 }"
+                              >
+                                <ExerciseProcessChart
+                                  :exerciseList="i.stageTimeline"
+                                  :maxIntensity="
+                                    classItem.classesJson.maxIntensity
+                                  "
+                                  :height="16"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -984,7 +988,9 @@
                     :data-date="item.commonDate"
                   >
                     <div
-                      class="card-body"
+                      class="card-body sport-drap-handle"
+                      :data-id="activityItem.activityId"
+                      :data-date="item.commonDate"
                       :style="{
                         backgroundColor: '#fff',
                       }"
@@ -2014,6 +2020,8 @@ export default {
         console.log(this.currentWeek, "this.currentWeek");
 
         this.$nextTick(() => {
+          const _this = this;
+          // 日历卡片容器拖拽设置 用来排序
           document
             .querySelectorAll(".js-schedule-drag-container")
             .forEach((el) => {
@@ -2026,10 +2034,14 @@ export default {
                 swapThreshold: 0.6,
                 scrollSpeed: 10,
                 easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)", // 缓动函数
-                onEnd: (e) => {
+                onAdd: (e) => {
                   console.log("拖拽课程：", e.item.dataset.id);
                   console.log("拖拽日期：", e.to.dataset.date);
                   console.log("拖拽：", e);
+                  if (e.item.className.indexOf('card-body') > -1) {
+                    _this.getScheduleData();
+                    return;
+                  }
                   let newClassSchedule = {};
                   const sortVoList = [];
                   // 删除原数据
@@ -2095,73 +2107,62 @@ export default {
               });
             });
 
-          const _this = this;
+          // 运动卡片拖拽设置
           document.querySelectorAll(".js-sport-container-put").forEach((el) => {
             new Sortable(el, {
               sort: false,
-              group: { name: "classDrag", pull: false },
+              group: { name: "classDrag", pull: 'clone', put: function(to, from, dragEl, evt) {
+                if (from.element.className.indexOf('js-sport-container-put') > -1) {
+                  return false;
+                } else {
+                  return true
+                }
+              }},
               animation: 150,
               dataIdAttr: "data-id",
               onAdd(e) {
                 console.log("课表id:" + e.item.dataset.id, e.item.dataset.type);
                 console.log("运动id:" + e.to.dataset.id);
+                if (e.item.className === 'card-body') {
+                  _this.getScheduleData();
+                  return;
+                }
                 if (!e.item.dataset.id || !e.to.dataset.id) {
                   return;
                 }
-                let currentClass = {};
-                let currentActivity = {};
-                let activityDate = "";
-                _this.currentWeek.forEach((item) => {
-                  item.activityList.forEach((activity) => {
-                    if (activity.activityId === e.to.dataset.id) {
-                      currentActivity = activity;
-                      activityDate = item.commonDate;
-                    }
-                  });
-                  item.classSchedule.forEach((classItem) => {
-                    if (classItem.id === +e.item.dataset.id) {
-                      currentClass = classItem;
-                    }
-                  });
+                _this.handleMatchClass({
+                  classId: e.item.dataset.id,
+                  activityId: e.to.dataset.id,
+                  type: e.item.dataset.type,
                 });
-                // 判断是否从课程模板中拖拽
-                if (e.item.dataset.type === "classTemplate") {
-                  currentClass = _this.findClassById(e.item.dataset.id);
-                  // alert("该逻辑待补充，暂时先新建课表再合并");
-                  if (
-                    currentClass.sportType ===
-                    _this.currentActivityDict[currentActivity.sportType]
-                  ) {
-                    _this.handleBind(
-                      currentClass,
-                      {
-                        ...currentActivity,
-                        dataDate: activityDate,
-                      },
-                      "classTemplate"
-                    );
-                  } else {
-                    _this.$message.error("该运动类型与课程类型不匹配");
-                  }
-                } else {
-                  if (
-                    currentClass.sportType ===
-                    _this.currentActivityDict[currentActivity.sportType]
-                  ) {
-                    _this.handleBind(currentClass, {
-                      ...currentActivity,
-                      dataDate: activityDate,
-                    });
-                  } else {
-                    _this.$message.error("该运动类型与课程类型不匹配");
-                    // 刷新
-                    _this.getScheduleData();
-                  }
-                }
               },
               onEnd: (e) => {
                 console.log("拖拽结束：", e);
               },
+            });
+          });
+
+          // 课表卡片拖拽设置
+          document.querySelectorAll(".js-class-schedule-card").forEach((el) => {
+            new Sortable(el, {
+              group: { name: "classDrag", put: function(e, b) {
+                console.log(e, b, '运动卡片拖拽到课表中');
+                if (b.el.dataset.id && e.el.dataset.date === b.el.dataset.date && b.el.className.indexOf('sportScheduleCard') !== -1) {
+                  console.log("合并成功");
+                  return true;
+                } else {
+                  return false
+                }
+              } },
+              animation: 150,
+              dataIdAttr: "data-id",
+              onAdd(e) {
+                _this.handleMatchClass({
+                  classId: e.to.dataset.id,
+                  activityId: e.item.dataset.id,
+                  type: '',
+                });
+              }
             });
           });
         });
@@ -2169,7 +2170,59 @@ export default {
         console.error("获取日程数据失败:", res.message || "未知错误");
       }
       this.loading = false;
-      console.log(this.loading, "this.loading");
+    },
+    // 运动和课表匹配
+    handleMatchClass({classId, activityId, type}) {
+      let currentClass = {};
+      let currentActivity = {};
+      let activityDate = "";
+      this.currentWeek.forEach((item) => {
+        item.activityList.forEach((activity) => {
+          if (activity.activityId === activityId) {
+            currentActivity = activity;
+            activityDate = item.commonDate;
+          }
+        });
+        item.classSchedule.forEach((classItem) => {
+          if (classItem.id === +classId) {
+            currentClass = classItem;
+          }
+        });
+      });
+      // 判断是否从课程模板中拖拽
+      if (type === "classTemplate") {
+        currentClass = this.findClassById(classId);
+        // alert("该逻辑待补充，暂时先新建课表再合并");
+        if (
+          currentClass.sportType ===
+          this.currentActivityDict[currentActivity.sportType]
+        ) {
+          this.handleBind(
+            currentClass,
+            {
+              ...currentActivity,
+              dataDate: activityDate,
+            },
+            "classTemplate"
+          );
+        } else {
+          this.$message.error("该运动类型与课程类型不匹配");
+        }
+      } else {
+        if (
+          currentClass.sportType ===
+          this.currentActivityDict[currentActivity.sportType]
+        ) {
+          this.handleBind(currentClass, {
+            ...currentActivity,
+            dataDate: activityDate,
+          });
+        } else {
+          this.$message.error("该运动类型与课程类型不匹配");
+          // 刷新
+          this.getScheduleData();
+        }
+      }
     },
     // 获取课程列表
     getClassList() {
@@ -3138,6 +3191,10 @@ export default {
         cursor: pointer;
         padding-bottom: 20px;
 
+        >.sport-drap-handle{
+          display: none;
+        }
+
         .schedule-class {
           // display: none;
           width: 100%;
@@ -3588,5 +3645,8 @@ export default {
   flex-direction: row;
   align-items: center;
   gap: 5px;
+}
+.class-schedule-card-container > .sport-drap-handle {
+  display: none;
 }
 </style>
