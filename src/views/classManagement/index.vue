@@ -196,7 +196,8 @@
                                 @click.stop="
                                   handleCopyClassFromOfficial(
                                     part.id,
-                                    item.groupId
+                                    item.groupId,
+                                    part
                                   )
                                 "
                                 >复制课程</el-button
@@ -1732,6 +1733,7 @@
       v-model="showCopyClassFromOfficial"
       :class-id="copyClassFromOfficialClassId"
       :group-id="copyClassFromOfficialGroupId"
+      :data="copyClassFromOfficialData"
       :active-class-type="activeClassType"
       @save="onSaveCopyClassFromOfficial"
     ></CopyClassFromOfficial>
@@ -1891,6 +1893,7 @@ export default {
       showCopyClassFromOfficial: false,
       copyClassFromOfficialClassId: "",
       copyClassFromOfficialGroupId: "",
+      copyClassFromOfficialData: {},
     };
   },
   mounted() {
@@ -2947,15 +2950,17 @@ export default {
       this.getClassList();
     },
     // 复制官方课程
-    handleCopyClassFromOfficial(id, groupId) {
+    handleCopyClassFromOfficial(id, groupId, data = {}) {
       this.copyClassFromOfficialClassId = id;
       this.copyClassFromOfficialGroupId = groupId;
+      this.copyClassFromOfficialData = data;
       this.showCopyClassFromOfficial = true;
     },
     onSaveCopyClassFromOfficial(payload) {
       this.showCopyClassFromOfficial = false;
       this.copyClassFromOfficialClassId = "";
       this.copyClassFromOfficialGroupId = "";
+      this.copyClassFromOfficialData = {};
       this.getClassList();
     },
   },
