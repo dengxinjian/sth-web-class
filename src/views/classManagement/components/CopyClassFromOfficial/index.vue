@@ -66,6 +66,8 @@ export default {
     // 当前官方课程ID
     classId: { type: [String, Number], default: "" },
     activeClassType: { type: String, default: "my" },
+    groupId: { type: [String, Number], default: "" },
+    data: { type: Object, default: () => ({}) },
   },
   data() {
     return {
@@ -86,6 +88,9 @@ export default {
     },
     value(val) {
       if (typeof val !== "undefined") this.innerVisible = val;
+    },
+    groupId(val) {
+      this.form.destinationId = val;
     },
     innerVisible(val) {
       if (!val) {
@@ -127,19 +132,38 @@ export default {
     },
     submitClassAdd() {
       if (!this.classId) return;
-      submitData({
-        url: `/api/classes/createOfficial`,
-        classesGroupId: this.form.destinationId,
-        id: this.classId,
-        classesTitle:
-          this.activeClassType === "my" ? this.form.title + " 复制课程" : "",
-      }).then((res) => {
-        if (res.success) {
-          this.$message.success("课程添加成功");
-          this.innerVisible = false;
-          this.$emit("save", { ...this.form });
-        }
-      });
+      if (this.activeClassType !== "my") {
+        submitData({
+          url: `/api/classes/createOfficial`,
+          classesGroupId: this.form.destinationId,
+          id: this.classId,
+        }).then((res) => {
+          if (res.success) {
+            this.$message.success("课程添加成功");
+            this.innerVisible = false;
+            this.$emit("save", { ...this.form });
+          }
+        });
+      } else {
+        const classesJson = JSON.parse(
+          JSON.stringify(this.data.classesJson)
+        );
+        classesJson.title = this.form.title + " 复制课程";
+        submitData({
+          url: "/api/classes/create",
+          classesGroupId: this.form.destinationId,
+          labels: this.data.tags,
+          sportType: this.data.sportType,
+          classesJson: JSON.stringify(classesJson),
+          classesTitle: this.form.title + " 复制课程",
+        }).then((res) => {
+          if (res.success) {
+            this.$message.success("课程添加成功");
+            this.innerVisible = false;
+            this.$emit("save", { ...this.form });
+          }
+        });
+      }
     },
   },
 };

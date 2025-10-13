@@ -195,7 +195,11 @@
                               ><el-button
                                 type="text"
                                 @click.stop="
-                                  handleCopyClassFromOfficial(part.id)
+                                  handleCopyClassFromOfficial(
+                                    part.id,
+                                    item.groupId,
+                                    part
+                                  )
                                 "
                                 >复制课程</el-button
                               ></span
@@ -204,7 +208,10 @@
                               ><el-button
                                 type="text"
                                 @click.stop="
-                                  handleCopyClassFromOfficial(part.id)
+                                  handleCopyClassFromOfficial(
+                                    part.id,
+                                    item.groupId
+                                  )
                                 "
                                 >添加课程</el-button
                               ></span
@@ -368,6 +375,15 @@
                   @click="showMonthStatisticDialog = true"
                   >月度统计</el-button
                 >
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="
+                    getScheduleData();
+                    getStatisticData();
+                  "
+                  >刷新</el-button
+                >
               </div>
             </div>
 
@@ -431,7 +447,7 @@
                     "
                     :data-id="classItem.id"
                     :data-date="item.commonDate"
-                    @click="
+                    @click.stop="
                       handleClassSchedulaDetail(
                         classItem.id,
                         classItem.sportType
@@ -467,16 +483,23 @@
                         <el-popover
                           popper-class="athletic-btn-popover"
                           placement="right"
-                          trigger="hover"
+                          trigger="click"
+                          tabindex="9999"
                         >
                           <div class="btn-list-hover">
                             <el-button
                               type="text"
-                               @click.stop="handleDeleteClassSchedule(classItem.id)"
+                              @click.stop="
+                                handleDeleteClassSchedule(classItem.id)
+                              "
                               >删除</el-button
                             >
                           </div>
-                          <i class="el-icon-more" slot="reference"></i>
+                          <i
+                            class="el-icon-more"
+                            slot="reference"
+                            @click.stop
+                          ></i>
                         </el-popover>
                         <!-- <i
                           class="el-icon-delete"
@@ -958,6 +981,7 @@
                       )[0],
                     }"
                     :data-id="activityItem.activityId"
+                    :data-date="item.commonDate"
                   >
                     <div
                       class="card-body"
@@ -981,7 +1005,7 @@
                         <el-popover
                           popper-class="athletic-btn-popover"
                           placement="right"
-                          trigger="hover"
+                          trigger="click"
                         >
                           <div class="btn-list-hover">
                             <el-button
@@ -1001,7 +1025,11 @@
                               >删除</el-button
                             >
                           </div>
-                          <i class="el-icon-more" slot="reference"></i>
+                          <i
+                            class="el-icon-more"
+                            slot="reference"
+                            @click.stop
+                          ></i>
                         </el-popover>
                       </div>
 
@@ -1015,7 +1043,13 @@
                           )
                         "
                       >
-                        <div class="title">{{ activityItem.activityName }}</div>
+                        <div class="title">
+                          {{
+                            activityItem.classesJson
+                              ? activityItem.classesJson.title
+                              : activityItem.activityName
+                          }}
+                        </div>
                         <div class="keyword">{{ activityItem.duration }}</div>
                         <div style="display: flex">
                           <div class="keyword">{{ activityItem.distance }}</div>
@@ -1697,6 +1731,8 @@
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
       :class-id="copyClassFromOfficialClassId"
+      :group-id="copyClassFromOfficialGroupId"
+      :data="copyClassFromOfficialData"
       :active-class-type="activeClassType"
       @save="onSaveCopyClassFromOfficial"
     ></CopyClassFromOfficial>
@@ -1855,6 +1891,8 @@ export default {
       activeClassType: "my",
       showCopyClassFromOfficial: false,
       copyClassFromOfficialClassId: "",
+      copyClassFromOfficialGroupId: "",
+      copyClassFromOfficialData: {},
     };
   },
   mounted() {
@@ -1982,7 +2020,7 @@ export default {
               new Sortable(el, {
                 group: { name: "classDrag" },
                 animation: 150,
-                filter: ".js-sport-container-noDrag",
+                // filter: ".js-sport-container-noDrag",
                 dataIdAttr: "data-id",
                 scroll: true,
                 swapThreshold: 0.6,
@@ -1991,18 +2029,58 @@ export default {
                 onEnd: (e) => {
                   console.log("拖拽课程：", e.item.dataset.id);
                   console.log("拖拽日期：", e.to.dataset.date);
-                  if (
-                    e.item.dataset.date === e.to.dataset.date ||
-                    !e.to.dataset.date
-                  ) {
-                    return;
-                  }
+                  console.log("拖拽：", e);
+                  let newClassSchedule = {};
+                  const sortVoList = [];
+                  // 删除原数据
+                  this.currentWeek.forEach((item, index) => {
+                    if (item.commonDate === e.item.dataset.date) {
+                      item.classSchedule.forEach((item) => {
+                        if (item.id === +e.item.dataset.id) {
+                          newClassSchedule = item;
+                        }
+                      });
+                      item.classSchedule.splice(e.oldIndex, 1);
+                    }
+                  });
+                  // 插入新数据
+                  this.currentWeek.forEach((item) => {
+                    if (item.commonDate === e.to.dataset.date) {
+                      console.log(newClassSchedule, "newClassSchedule");
+                      item.classSchedule.splice(
+                        e.newIndex,
+                        0,
+                        newClassSchedule
+                      );
+                    }
+                  });
+                  // 重塑后端接口数据
+                  this.currentWeek.forEach((item) => {
+                    if (item.commonDate === e.to.dataset.date) {
+                      item.classSchedule.forEach((item, index) => {
+                        sortVoList.push({
+                          id: item.id,
+                          sort: index,
+                        });
+                      });
+                    }
+                    if (item.commonDate === e.item.dataset.date) {
+                      item.classSchedule.forEach((item, index) => {
+                        sortVoList.push({
+                          id: item.id,
+                          sort: index,
+                        });
+                      });
+                    }
+                  });
+                  console.log("frontId, behindId", this.currentWeek);
                   submitData({
                     url: "/api/classSchedule/classBindingActivity",
                     requestData: {
                       classScheduleId: e.item.dataset.id,
                       classesDate: e.to.dataset.date,
                       triUserId: this.selectedAthletic,
+                      sortVoList,
                     },
                   })
                     .then((res) => {
@@ -2080,6 +2158,9 @@ export default {
                     _this.getScheduleData();
                   }
                 }
+              },
+              onEnd: (e) => {
+                console.log("拖拽结束：", e);
               },
             });
           });
@@ -2186,7 +2267,7 @@ export default {
       return findClass;
     },
     // 课程拖到日历中
-    async AddScheduleClass(data, type = "") {
+    async AddScheduleClass(data, type = "", index = 0) {
       if (!this.selectedAthletic) return;
       const originalClassesJson = JSON.parse(data.classesJson);
       console.log(originalClassesJson, "this.originalClassesJson", data);
@@ -2289,7 +2370,6 @@ export default {
             sth: res.result.sth,
           };
         }
-
         data.classesJson = JSON.stringify(data.classesJson);
       }
 
@@ -2298,9 +2378,37 @@ export default {
         return data;
       }
       console.log(data, "data");
+      const sortVoList = [];
+      let sort = null;
+      // // 插入新数据
+      this.currentWeek.forEach((item) => {
+        if (item.commonDate === data.classesDate) {
+          item.classSchedule.splice(index, 0, data);
+        }
+      });
+      // // 重塑后端接口数据
+      this.currentWeek.forEach((item) => {
+        if (item.commonDate === data.classesDate) {
+          item.classSchedule.forEach((item, index) => {
+            if (item.id) {
+              sortVoList.push({
+                id: item.id,
+                sort: index,
+              });
+            } else {
+              sort = index;
+            }
+          });
+        }
+      });
       submitData({
         url: "/api/classSchedule/create",
-        requestData: { ...data, triUserId: this.selectedAthletic },
+        requestData: {
+          ...data,
+          triUserId: this.selectedAthletic,
+          sortVoList,
+          sort
+        },
       }).then((res) => {
         if (res.success) {
           this.getScheduleData();
@@ -2511,6 +2619,11 @@ export default {
           group: { name: "classDrag", put: false, pull: "clone" },
           animation: 150,
           dataIdAttr: "data-id",
+          scroll: true,
+          swapThreshold: 0.6,
+          scrollSpeed: 10,
+          easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)", // 缓动函数
+
           onEnd: (e) => {
             console.log("课程id:" + e.item.dataset.id);
             console.log("日期:" + e.to.dataset.date);
@@ -2522,7 +2635,7 @@ export default {
                 classesDate: e.to.dataset.date,
                 sportType: classItem.sportType,
               };
-              this.AddScheduleClass(params);
+              this.AddScheduleClass(params, "", e.newIndex);
             }
           },
         });
@@ -2837,13 +2950,17 @@ export default {
       this.getClassList();
     },
     // 复制官方课程
-    handleCopyClassFromOfficial(id) {
+    handleCopyClassFromOfficial(id, groupId, data = {}) {
       this.copyClassFromOfficialClassId = id;
+      this.copyClassFromOfficialGroupId = groupId;
+      this.copyClassFromOfficialData = data;
       this.showCopyClassFromOfficial = true;
     },
     onSaveCopyClassFromOfficial(payload) {
       this.showCopyClassFromOfficial = false;
       this.copyClassFromOfficialClassId = "";
+      this.copyClassFromOfficialGroupId = "";
+      this.copyClassFromOfficialData = {};
       this.getClassList();
     },
   },
@@ -3022,12 +3139,13 @@ export default {
         padding-bottom: 20px;
 
         .schedule-class {
-          display: none;
+          // display: none;
+          width: 100%;
+          overflow: hidden;
         }
 
         .js-sport-container-noDrag {
           .class-block {
-            display: none;
           }
         }
 
@@ -3228,7 +3346,8 @@ export default {
 }
 
 .class-container {
-  padding: 10px;
+  // padding: 10px;
+  border-left: 1px solid #e5e5e5;
 
   .class-type-list {
     list-style: none;
@@ -3260,7 +3379,7 @@ export default {
   }
 }
 .schedule-class-container {
-  padding: 10px 10px;
+  padding: 5px 5px;
   background-color: #fff;
 
   .schedule-class-title {

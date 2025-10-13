@@ -5,26 +5,47 @@
     :before-close="handleClose"
     append-to-body
     class="add-swim-class-dialog"
-     :close-on-click-modal="false"
+    :close-on-click-modal="false"
   >
-    <span slot="title">{{ type === 'add' ? '新建游泳课程' : '编辑游泳课程' }}</span>
+    <span slot="title">{{
+      type === "add" ? "新建游泳课程" : "编辑游泳课程"
+    }}</span>
 
     <div class="form-section">
       <el-form :model="form" label-width="60px">
         <el-form-item label="标题：">
-          <el-input v-model="form.title" placeholder="标题" :maxlength="50" :disabled="originalType === 'official'" class="pill-input" />
+          <el-input
+            v-model="form.title"
+            placeholder="标题"
+            :maxlength="50"
+            :disabled="originalType === 'official'"
+            class="pill-input"
+          />
         </el-form-item>
 
         <div class="row">
           <div class="row-item icon-box">
-            <img src="~@/assets/addClass/icon-swim.png" width="30" alt="">
+            <img src="~@/assets/addClass/icon-swim.png" width="30" alt="" />
           </div>
           <div class="row-item">
             <span class="label">距离</span>
-            <el-input-number :step="1" :min="1" :step-strictly="true" :controls="false" v-model="form.distance" :disabled="originalType === 'official'" placeholder="" class="pill-input short" />
+            <el-input-number
+              :step="1"
+              :min="0"
+              :step-strictly="true"
+              :controls="false"
+              v-model="form.distance"
+              :disabled="originalType === 'official'"
+              placeholder=""
+              class="pill-input short"
+            />
           </div>
           <div class="row-item">
-            <el-select v-model="form.distanceUnit" :disabled="originalType === 'official'" class="pill-select short">
+            <el-select
+              v-model="form.distanceUnit"
+              :disabled="originalType === 'official'"
+              class="pill-select short"
+            >
               <el-option label="m" value="m" />
               <el-option label="km" value="km" />
             </el-select>
@@ -38,11 +59,24 @@
               placeholder="00:00:00"
               class="pill-time"
             /> -->
-          <TimeInput v-model="form.duration" size="small" :disabled="originalType === 'official'" />
+            <TimeInput
+              v-model="form.duration"
+              size="small"
+              :disabled="originalType === 'official'"
+            />
           </div>
           <div class="row-item">
             <span class="label">STH</span>
-            <el-input-number :step="1" :min="0" :step-strictly="true" :controls="false" v-model="form.sth" :disabled="originalType === 'official'" placeholder="" class="pill-input short" />
+            <el-input-number
+              :step="1"
+              :min="0"
+              :step-strictly="true"
+              :controls="false"
+              v-model="form.sth"
+              :disabled="originalType === 'official'"
+              placeholder=""
+              class="pill-input short"
+            />
           </div>
         </div>
 
@@ -52,7 +86,7 @@
             <el-input
               type="textarea"
               v-model="form.summary"
-              :rows="12"
+              :rows="8"
               maxlength="2000"
               show-word-limit
               placeholder="请输入概要"
@@ -61,67 +95,99 @@
             />
           </div>
         </div>
+
+        <div class="summary">
+          <div class="summary-title">训练建议</div>
+          <div class="editor-wrapper">
+            <el-input
+              type="textarea"
+              v-model="form.trainingAdvice"
+              :rows="8"
+              maxlength="2000"
+              show-word-limit
+              placeholder="请输入训练建议"
+              class="summary-textarea"
+              :disabled="originalType === 'official'"
+            />
+          </div>
+        </div>
+
         <el-form-item label="标签：">
           <el-select
-              v-model="form.tags"
-              placeholder="选择或输入标签内容"
-              class="tag-input"
-              multiple
-              allow-create
-              filterable
-              style="width: 100%;"
-              :disabled="originalType === 'official'"
+            v-model="form.tags"
+            placeholder="选择或输入标签内容"
+            class="tag-input"
+            multiple
+            allow-create
+            filterable
+            style="width: 100%"
+            :disabled="originalType === 'official'"
           >
-          <el-option
+            <el-option
               v-for="tag in existingTags"
               :key="tag.label"
               :label="tag.label"
               :value="tag.label"
-          ></el-option>
+            ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
     </div>
 
     <span slot="footer" class="dialog-footer">
-      <el-button v-if="originalType === 'my'" @click="onDelete" :disabled="!form.id">删除</el-button>
+      <el-button
+        v-if="originalType === 'my'"
+        @click="onDelete"
+        :disabled="!form.id"
+        >删除</el-button
+      >
       <el-button @click="onCancel">取消</el-button>
-      <el-button v-if="originalType === 'my'" type="warning" @click="onSave(false)">保存</el-button>
-      <el-button v-if="originalType === 'my'" type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button
+        v-if="originalType === 'my'"
+        type="warning"
+        @click="onSave(false)"
+        >保存</el-button
+      >
+      <el-button
+        v-if="originalType === 'my'"
+        type="danger"
+        @click="onSave(true)"
+        >保存并关闭</el-button
+      >
     </span>
   </el-dialog>
 </template>
 
 <script>
-import {getData, submitData} from '@/api/common.js'
-import TimeInput from '@/views/classManagement/components/timeInpt'
+import { getData, submitData } from "@/api/common.js";
+import TimeInput from "@/views/classManagement/components/timeInpt";
 export default {
-  name: 'AddSwimClassDialog',
+  name: "AddSwimClassDialog",
   components: {
-    TimeInput
+    TimeInput,
   },
   props: {
     visible: {
       type: Boolean,
-      default: false
+      default: false,
     },
     value: {
       // 兼容 v-model
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     data: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     type: {
       type: String,
-      default: 'add'
+      default: "add",
     },
     originalType: {
       type: String,
-      default: 'my'
-    }
+      default: "my",
+    },
   },
   data() {
     return {
@@ -129,200 +195,212 @@ export default {
       existingTags: [], // 现有的标签
       form: Object.assign(
         {
-          id: this.data.id || '',
-          title: this.data.title || '',
-          groupId: this.data.groupId || '',
-          sportType: 'SWIM',
-          distance: '',
-          distanceUnit: 'm',
-          duration: '01:30:00',
-          sth: '',
-          summary: '',
-          tags: ''
+          id: this.data.id || "",
+          title: this.data.title || "",
+          groupId: this.data.groupId || "",
+          sportType: "SWIM",
+          distance: "",
+          distanceUnit: "m",
+          duration: "",
+          sth: "",
+          summary: "",
+          tags: "",
         },
         this.data || {}
-      )
-    }
+      ),
+    };
   },
   computed: {
     canDelete() {
-      return !!(this.data && this.data.id)
+      return !!(this.data && this.data.id);
     },
     summaryLength() {
-      return (this.form.summary || '').length
-    }
+      return (this.form.summary || "").length;
+    },
   },
   watch: {
     visible(val) {
-      this.innerVisible = val
+      this.innerVisible = val;
     },
     value(val) {
-      if (typeof val !== 'undefined') this.innerVisible = val
+      if (typeof val !== "undefined") this.innerVisible = val;
     },
     innerVisible(val) {
-      this.$emit('update:visible', val)
-      this.$emit('input', val)
+      this.$emit("update:visible", val);
+      this.$emit("input", val);
       // 当弹框打开时清空表单
       if (val) {
-        this.resetForm()
-        this.getTagList()
+        this.resetForm();
+        this.getTagList();
         if (this.data.id) {
-          this.getClassInfo(this.data.id)
+          this.getClassInfo(this.data.id);
         }
       }
-    }
+    },
   },
   methods: {
     // 获取标签列表
     getTagList() {
       getData({
-        url: '/api/classesLabel/user/getLabelsByUserId'
-      }).then(res => {
+        url: "/api/classesLabel/user/getLabelsByUserId",
+      }).then((res) => {
         if (res.success) {
-          this.existingTags = res.result || []
+          this.existingTags = res.result || [];
         } else {
-          this.existingTags = []
+          this.existingTags = [];
         }
-      })
+      });
     },
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({
-        url: '/api/classes/getClassesById',
-        id
-      }).then(res => {
+        url: "/api/classes/getClassesById",
+        id,
+      }).then((res) => {
         if (res.success) {
-          this.form = JSON.parse(res.result.classesJson)
-          this.form.id = res.result.id
+          this.form = JSON.parse(res.result.classesJson);
+          this.form.id = res.result.id;
         }
-      })
+      });
     },
     // 新增课程
     submitNewClass(flag) {
       submitData({
-        url: '/api/classes/create',
+        url: "/api/classes/create",
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
         labels: this.form.tags,
-        sportType: 'SWIM',
-        classesJson: JSON.stringify({...this.form})
-      }).then(res => {
+        sportType: "SWIM",
+        classesJson: JSON.stringify({ ...this.form }),
+      }).then((res) => {
         if (res.success) {
-          this.form.id = res.result
-          this.$emit('save', {...this.form})
-          this.$message.success('课程保存成功')
+          this.form.id = res.result;
+          this.$emit("save", { ...this.form });
+          this.$message.success("课程保存成功");
         }
-        if (flag) this.innerVisible = false
-      })
+        if (flag) this.innerVisible = false;
+      });
     },
     // 更新课程
     submitUpdateClass(flag) {
       submitData({
-        url: '/api/classes/update',
+        url: "/api/classes/update",
         id: this.form.id,
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
         labels: this.form.tags,
-        sportType: 'SWIM',
-        classesJson: JSON.stringify({...this.form})
-      }).then(res => {
+        sportType: "SWIM",
+        classesJson: JSON.stringify({ ...this.form }),
+      }).then((res) => {
         if (res.success) {
-          this.$emit('save', {...this.form})
-          this.$message.success('课程保存成功')
+          this.$emit("save", { ...this.form });
+          this.$message.success("课程保存成功");
         }
-        if (flag) this.innerVisible = false
-      })
+        if (flag) this.innerVisible = false;
+      });
     },
     // 删除课程
     submitDeleteClass() {
-      this.$confirm('确认删除该课程？', '提示', {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        submitData({
-          url: '/api/classes/deleteClasses?id=' + this.form.id,
-        }).then(res => {
-          if (res.success) {
-            this.resetForm()
-            this.$emit('save', {...this.form})
-            this.$message.success('课程删除成功')
-            this.innerVisible = false
-          }
+      this.$confirm("确认删除该课程？", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          submitData({
+            url: "/api/classes/deleteClasses?id=" + this.form.id,
+          }).then((res) => {
+            if (res.success) {
+              this.resetForm();
+              this.$emit("save", { ...this.form });
+              this.$message.success("课程删除成功");
+              this.innerVisible = false;
+            }
+          });
         })
-      }).catch(() => {})
+        .catch(() => {});
     },
     handleClose() {
-      this.onCancel()
+      this.onCancel();
     },
     onCancel() {
-      this.innerVisible = false
-      this.$emit('cancel')
+      this.innerVisible = false;
+      this.$emit("cancel");
     },
     onSave(closeAfter) {
-      const payload = { ...this.form }
+      const payload = { ...this.form };
       if (this.form.id) {
-        this.submitUpdateClass(closeAfter)
+        this.submitUpdateClass(closeAfter);
       } else {
-        this.submitNewClass(closeAfter)
+        this.submitNewClass(closeAfter);
       }
     },
     onDelete() {
       if (this.form.id) {
-        this.submitDeleteClass()
+        this.submitDeleteClass();
       } else {
-        this.resetForm()
+        this.resetForm();
       }
-      this.$emit('delete', this.form)
+      this.$emit("delete", this.form);
     },
     resetForm() {
       // 清空表单数据，但保留传入的title
       this.form = {
-        id: this.data?.id || '',
-        title: this.data?.title || '',
-        groupId: this.data?.groupId || '',
-        sportType: 'SWIM',
-        distance: '',
-        distanceUnit: 'm',
-        duration: '01:30:00',
-        sth: '',
-        summary: '',
-        tips: ''
-      }
-    }
-  }
-}
+        id: this.data?.id || "",
+        title: this.data?.title || "",
+        groupId: this.data?.groupId || "",
+        sportType: "SWIM",
+        distance: "",
+        distanceUnit: "m",
+        duration: "",
+        sth: "",
+        summary: "",
+        tips: "",
+      };
+    },
+  },
+};
 </script>
 
 <style scoped>
-.add-swim-class-dialog ::v-deep(.el-dialog__header){
+.add-swim-class-dialog ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
 }
-.add-swim-class-dialog ::v-deep(.el-dialog__body){
+.add-swim-class-dialog ::v-deep(.el-dialog__body) {
   padding: 10px 24px 0 24px;
 }
-.pill-input .el-input__inner{
+.pill-input .el-input__inner {
   border-radius: 22px;
   height: 40px;
   border: 1px solid #e5e6eb;
   background: #fff;
   padding: 0 16px;
 }
-.pill-input.short{ width: 120px; }
-.pill-select ::v-deep(.el-input__inner){
+.pill-input.short {
+  width: 120px;
+}
+.pill-select ::v-deep(.el-input__inner) {
   height: 40px;
 }
-.pill-time ::v-deep(.el-input__inner){
+.pill-time ::v-deep(.el-input__inner) {
   height: 40px;
 }
-.row{
+.row {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
 }
-.row-item{ margin-right: 16px; display: flex; align-items: center; }
-.row-item .label{ margin-right: 8px; color: #666;width: 30px; }
-.icon-box{
+.row-item {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+}
+.row-item .label {
+  margin-right: 8px;
+  color: #666;
+  width: 30px;
+}
+.icon-box {
   width: 40px;
   height: 40px;
   border-radius: 12px;
@@ -331,16 +409,40 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.summary{ margin-top: 10px;margin-bottom: 10px; }
-.summary-title{ margin: 10px 0; font-weight: 600; color: rgb(96, 98, 102);text-indent: 6px; }
-.editor-wrapper{ position: relative; }
-.word-limit{ position: absolute; right: 8px; bottom: 6px; color: #999; font-size: 12px; }
-.dialog-footer{
+.summary {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.summary-title {
+  margin: 10px 0;
+  font-weight: 600;
+  color: rgb(96, 98, 102);
+  text-indent: 6px;
+}
+.editor-wrapper {
+  position: relative;
+}
+.word-limit {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  color: #999;
+  font-size: 12px;
+}
+.dialog-footer {
   display: flex;
   justify-content: center;
 }
-.dialog-footer .el-button{ min-width: 120px; border-radius: 22px; }
-.dialog-footer .el-button--warning{ background: #f5a623; border-color: #f5a623; }
-.dialog-footer .el-button--danger{ background: #d83b36; border-color: #d83b36; }
+.dialog-footer .el-button {
+  min-width: 120px;
+  border-radius: 22px;
+}
+.dialog-footer .el-button--warning {
+  background: #f5a623;
+  border-color: #f5a623;
+}
+.dialog-footer .el-button--danger {
+  background: #d83b36;
+  border-color: #d83b36;
+}
 </style>
-
