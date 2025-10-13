@@ -77,7 +77,11 @@
               </div>
             </el-popover>
 
-            <el-input size="mini" v-model="classSearchInput" @input="getClassList">
+            <el-input
+              size="mini"
+              v-model="classSearchInput"
+              @input="getClassList"
+            >
               <el-button
                 slot="append"
                 icon="el-icon-search"
@@ -334,7 +338,7 @@
                     size="mini"
                     placeholder="选择团队"
                     @change="handleTeamChange"
-                    style="width: 160px;"
+                    style="width: 160px"
                   >
                     <el-option
                       v-for="t in teamList"
@@ -351,7 +355,7 @@
                     size="mini"
                     placeholder="选择人员"
                     @change="handleAthleticChange"
-                    style="width: 100px;"
+                    style="width: 100px"
                   >
                     <el-option
                       v-for="t in athleticList"
@@ -436,15 +440,20 @@
                   :data-date="item.commonDate"
                 >
                   <!-- 课表循环 -->
-                  <div v-for="classItem in item.classSchedule"
+                  <div
+                    v-for="classItem in item.classSchedule"
                     :key="classItem.id"
                     :data-id="classItem.id"
                     :data-date="item.commonDate"
-                    class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag">
+                    class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
+                  >
                     <div
                       class="classScheduleCard"
                       :style="
-                        item.commonDate < new Date().toISOString().split('T')[0] && classItem.classesJson.duration && classItem.classesJson.duration !== '00:00:00'
+                        item.commonDate <
+                          new Date().toISOString().split('T')[0] &&
+                        classItem.classesJson.duration &&
+                        classItem.classesJson.duration !== '00:00:00'
                           ? 'background-color: rgba(204, 35, 35, 1)'
                           : 'background-color: #fff'
                       "
@@ -457,7 +466,10 @@
                         )
                       "
                     >
-                      <div class="card-body class-drap-handle" style="background-color: white">
+                      <div
+                        class="card-body class-drap-handle"
+                        style="background-color: white"
+                      >
                         <div class="body-title">
                           <div class="sport-type-icon">
                             <img
@@ -509,7 +521,9 @@
                             @click.stop="handleDeleteClassSchedule(classItem.id)"
                           ></i> -->
                         </div>
-                        <div class="title">{{ classItem.classesJson.title }}</div>
+                        <div class="title">
+                          {{ classItem.classesJson.title }}
+                        </div>
                         <div class="keyword">
                           {{
                             classItem.sportType == "CYCLE"
@@ -580,11 +594,15 @@
                           class="stage-details"
                         >
                           <div
-                            v-for="(stage, index) in classItem.classesJson.stages"
+                            v-for="(stage, index) in classItem.classesJson
+                              .stages"
                             :key="index"
                             class="stage-item"
                           >
-                            <div v-for="(part, idx) in stage.sections" :key="idx">
+                            <div
+                              v-for="(part, idx) in stage.sections"
+                              :key="idx"
+                            >
                               <div>{{ part.title }}</div>
                               <div
                                 v-if="
@@ -615,8 +633,11 @@
                                 {{ part.target }} @
                                 {{ part.thresholdHeartRateRangeNum[0] }}~
                                 {{ part.thresholdHeartRateRangeNum[1] }}bpm
-                                <span v-if="part?.thresholdHeartRateRangeNumZone"
-                                  >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                                <span
+                                  v-if="part?.thresholdHeartRateRangeNumZone"
+                                  >{{
+                                    part.thresholdHeartRateRangeNumZone[0]
+                                  }}~{{
                                     part.thresholdHeartRateRangeNumZone[1]
                                   }}</span
                                 >
@@ -665,7 +686,8 @@
                                   part.range === 'range'
                                 "
                               >
-                                {{ part.target }} @ {{ part.targetFtpRange[0] }}~
+                                {{ part.target }} @
+                                {{ part.targetFtpRange[0] }}~
                                 {{ part.targetFtpRange[1] }}w
                                 <span v-if="part.targetFtpRangeNumZone"
                                   >{{ part.targetFtpRangeNumZone[0] }}~{{
@@ -720,7 +742,8 @@
                                   part.range === 'target'
                                 "
                               >
-                                {{ part.target }} @ {{ part.targetHeartRate }}bpm
+                                {{ part.target }} @
+                                {{ part.targetHeartRate }}bpm
                                 <span v-if="part.targetHeartRateNumZone">{{
                                   part.targetHeartRateNumZone
                                 }}</span>
@@ -741,11 +764,15 @@
                           class="stage-details"
                         >
                           <div
-                            v-for="(stage, index) in classItem.classesJson.stages"
+                            v-for="(stage, index) in classItem.classesJson
+                              .stages"
                             :key="index"
                             class="stage-item"
                           >
-                            <div v-for="(part, idx) in stage.sections" :key="idx">
+                            <div
+                              v-for="(part, idx) in stage.sections"
+                              :key="idx"
+                            >
                               <div>{{ part.title }}</div>
                               <div
                                 v-if="
@@ -790,7 +817,9 @@
                                 @ {{ part.thresholdHeartRateRangeNum[0] }}~
                                 {{ part.thresholdHeartRateRangeNum[1] }}bpm
                                 <span v-if="part.thresholdHeartRateRangeNumZone"
-                                  >{{ part.thresholdHeartRateRangeNumZone[0] }}~{{
+                                  >{{
+                                    part.thresholdHeartRateRangeNumZone[0]
+                                  }}~{{
                                     part.thresholdHeartRateRangeNumZone[1]
                                   }}</span
                                 >
@@ -1568,7 +1597,11 @@
             </div>
             <span slot="reference" class="device-filter-reference">
               <span>运动员课程同步设置</span>
-              <img class="device-filter-icon" src="~@/assets/addClass/icon-filter.png" alt="">
+              <img
+                class="device-filter-icon"
+                src="~@/assets/addClass/icon-filter.png"
+                alt=""
+              />
             </span>
           </el-popover>
         </div>
@@ -2038,7 +2071,7 @@ export default {
                   console.log("拖拽课程：", e.item.dataset.id);
                   console.log("拖拽日期：", e.to.dataset.date);
                   console.log("拖拽：", e);
-                  if (e.item.className.indexOf('card-body') > -1) {
+                  if (e.item.className.indexOf("card-body") > -1) {
                     _this.getScheduleData();
                     return;
                   }
@@ -2046,46 +2079,46 @@ export default {
                   const sortVoList = [];
                   // 删除原数据
                   this.currentWeek.forEach((item, index) => {
-                    if (item.commonDate === e.item.dataset.date) {
-                      item.classSchedule.forEach((item) => {
-                        if (item.id === +e.item.dataset.id) {
-                          newClassSchedule = item;
+                    if (item.commonDate.includes(e.item.dataset.date)) {
+                      item.classSchedule.forEach((itemClass, oldIndex) => {
+                        console.log(itemClass, "itemClass");
+                        if (itemClass.id === +e.item.dataset.id) {
+                          newClassSchedule = itemClass;
+                          item.classSchedule.splice(oldIndex, 1);
                         }
                       });
-                      item.classSchedule.splice(e.oldIndex, 1);
                     }
                   });
+                  console.log(this.currentWeek, "newClassSchedule");
                   // 插入新数据
+                  let currentData = [];
                   this.currentWeek.forEach((item) => {
-                    if (item.commonDate === e.to.dataset.date) {
+                    if (item.commonDate.includes(e.to.dataset.date)) {
                       console.log(newClassSchedule, "newClassSchedule");
-                      item.classSchedule.splice(
-                        e.newIndex,
-                        0,
-                        newClassSchedule
+                      currentData = JSON.parse(
+                        JSON.stringify(item.classSchedule)
                       );
+                      currentData.splice(e.newIndex, 0, newClassSchedule);
                     }
                   });
                   // 重塑后端接口数据
-                  this.currentWeek.forEach((item) => {
-                    if (item.commonDate === e.to.dataset.date) {
-                      item.classSchedule.forEach((item, index) => {
-                        sortVoList.push({
-                          id: item.id,
-                          sort: index,
-                        });
-                      });
-                    }
-                    if (item.commonDate === e.item.dataset.date) {
-                      item.classSchedule.forEach((item, index) => {
-                        sortVoList.push({
-                          id: item.id,
-                          sort: index,
-                        });
-                      });
-                    }
+                  currentData.forEach((item, index) => {
+                    sortVoList.push({
+                      id: item.id,
+                      sort: index,
+                    });
                   });
-                  console.log("frontId, behindId", this.currentWeek);
+                  // this.currentWeek.forEach((item) => {
+                  //   if (item.commonDate === e.item.dataset.date) {
+                  //     item.classSchedule.forEach((item, index) => {
+                  //       sortVoList.push({
+                  //         id: item.id,
+                  //         sort: index,
+                  //       });
+                  //     });
+                  //   }
+                  // });
+                  console.log("frontId, behindId", sortVoList);
                   submitData({
                     url: "/api/classSchedule/classBindingActivity",
                     requestData: {
@@ -2111,19 +2144,26 @@ export default {
           document.querySelectorAll(".js-sport-container-put").forEach((el) => {
             new Sortable(el, {
               sort: false,
-              group: { name: "classDrag", pull: 'clone', put: function(to, from, dragEl, evt) {
-                if (from.element.className.indexOf('js-sport-container-put') > -1) {
-                  return false;
-                } else {
-                  return true
-                }
-              }},
+              group: {
+                name: "classDrag",
+                pull: "clone",
+                put: function (to, from, dragEl, evt) {
+                  if (
+                    from.element.className.indexOf("js-sport-container-put") >
+                    -1
+                  ) {
+                    return false;
+                  } else {
+                    return true;
+                  }
+                },
+              },
               animation: 150,
               dataIdAttr: "data-id",
               onAdd(e) {
                 console.log("课表id:" + e.item.dataset.id, e.item.dataset.type);
                 console.log("运动id:" + e.to.dataset.id);
-                if (e.item.className === 'card-body') {
+                if (e.item.className === "card-body") {
                   _this.getScheduleData();
                   return;
                 }
@@ -2145,24 +2185,31 @@ export default {
           // 课表卡片拖拽设置
           document.querySelectorAll(".js-class-schedule-card").forEach((el) => {
             new Sortable(el, {
-              group: { name: "classDrag", put: function(e, b) {
-                console.log(e, b, '运动卡片拖拽到课表中');
-                if (b.el.dataset.id && e.el.dataset.date === b.el.dataset.date && b.el.className.indexOf('sportScheduleCard') !== -1) {
-                  console.log("合并成功");
-                  return true;
-                } else {
-                  return false
-                }
-              } },
+              group: {
+                name: "classDrag",
+                put: function (e, b) {
+                  // console.log(e, b, "运动卡片拖拽到课表中");
+                  if (
+                    b.el.dataset.id &&
+                    e.el.dataset.date === b.el.dataset.date &&
+                    b.el.className.indexOf("sportScheduleCard") !== -1
+                  ) {
+                    console.log("合并成功");
+                    return true;
+                  } else {
+                    return false;
+                  }
+                },
+              },
               animation: 150,
               dataIdAttr: "data-id",
               onAdd(e) {
                 _this.handleMatchClass({
                   classId: e.to.dataset.id,
                   activityId: e.item.dataset.id,
-                  type: '',
+                  type: "",
                 });
-              }
+              },
             });
           });
         });
@@ -2172,7 +2219,7 @@ export default {
       this.loading = false;
     },
     // 运动和课表匹配
-    handleMatchClass({classId, activityId, type}) {
+    handleMatchClass({ classId, activityId, type }) {
       let currentClass = {};
       let currentActivity = {};
       let activityDate = "";
@@ -2460,7 +2507,7 @@ export default {
           ...data,
           triUserId: this.selectedAthletic,
           sortVoList,
-          sort
+          sort,
         },
       }).then((res) => {
         if (res.success) {
@@ -3191,7 +3238,7 @@ export default {
         cursor: pointer;
         padding-bottom: 20px;
 
-        >.sport-drap-handle{
+        > .sport-drap-handle {
           display: none;
         }
 
