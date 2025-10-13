@@ -161,28 +161,61 @@
                   >
                     <div class="schedule-class-info">
                       <div class="schedule-class-info-item-title">
-                        <span>{{ part.classesJson.title }}</span>
-                        <div
-                          v-if="activeClassType === 'my'"
-                          class="delete"
-                          @click.stop="handleMoveClass(part.id, item.groupId)"
+                        <div>{{ part.classesJson.title }}</div>
+                        <el-popover
+                          popper-class="athletic-btn-popover"
+                          placement="right"
+                          width="80"
+                          trigger="hover"
                         >
-                          <i class="el-icon-set-up"></i>
-                        </div>
-                        <div
-                          v-if="activeClassType === 'my'"
-                          class="delete"
-                          @click.stop="handleDeleteClass(part.id)"
-                        >
-                          <i class="el-icon-delete"></i>
-                        </div>
-                        <div
-                          v-if="activeClassType === 'official'"
-                          class="plus"
-                          @click.stop="handleCopyClassFromOfficial(part.id)"
-                        >
-                          <i class="el-icon-circle-plus"></i>
-                        </div>
+                          <div
+                            style="
+                              display: flex;
+                              flex-direction: column;
+                              align-items: center;
+                            "
+                          >
+                            <span v-if="activeClassType === 'my'"
+                              ><el-button
+                                type="text"
+                                @click.stop="
+                                  handleMoveClass(part.id, item.groupId)
+                                "
+                                >移动分组</el-button
+                              ></span
+                            >
+                            <span v-if="activeClassType === 'my'"
+                              ><el-button
+                                type="text"
+                                @click.stop="handleDeleteClass(part.id)"
+                                >删除课程</el-button
+                              ></span
+                            >
+                            <span v-if="activeClassType === 'my'"
+                              ><el-button
+                                type="text"
+                                @click.stop="
+                                  handleCopyClassFromOfficial(part.id)
+                                "
+                                >复制课程</el-button
+                              ></span
+                            >
+                            <span v-if="activeClassType === 'official'"
+                              ><el-button
+                                type="text"
+                                @click.stop="
+                                  handleCopyClassFromOfficial(part.id)
+                                "
+                                >添加课程</el-button
+                              ></span
+                            >
+                          </div>
+                          <i
+                            class="el-icon-more"
+                            slot="reference"
+                            @click.stop="handleClassMoreClick"
+                          ></i>
+                        </el-popover>
                       </div>
                       <div class="schedule-class-info-item-content">
                         <span v-if="part.sportType === 'SWIM'">
@@ -431,10 +464,24 @@
                             {{ deviceTypeIconDict[device.deviceType] }}
                           </div>
                         </div>
-                        <i
+                        <el-popover
+                          popper-class="athletic-btn-popover"
+                          placement="right"
+                          trigger="hover"
+                        >
+                          <div class="btn-list-hover">
+                            <el-button
+                              type="text"
+                               @click.stop="handleDeleteClassSchedule(classItem.id)"
+                              >删除</el-button
+                            >
+                          </div>
+                          <i class="el-icon-more" slot="reference"></i>
+                        </el-popover>
+                        <!-- <i
                           class="el-icon-delete"
                           @click.stop="handleDeleteClassSchedule(classItem.id)"
-                        ></i>
+                        ></i> -->
                       </div>
                       <div class="title">{{ classItem.classesJson.title }}</div>
                       <div class="keyword">
@@ -934,7 +981,7 @@
                         <el-popover
                           popper-class="athletic-btn-popover"
                           placement="right"
-                          trigger="click"
+                          trigger="hover"
                         >
                           <div class="btn-list-hover">
                             <el-button
@@ -1650,6 +1697,7 @@
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
       :class-id="copyClassFromOfficialClassId"
+      :active-class-type="activeClassType"
       @save="onSaveCopyClassFromOfficial"
     ></CopyClassFromOfficial>
   </div>
@@ -3246,8 +3294,9 @@ export default {
   .schedule-class-info-item-title {
     display: flex;
     gap: 6px;
+    justify-content: space-between;
 
-    > span {
+    > div {
       flex: 1;
     }
     .delete {
