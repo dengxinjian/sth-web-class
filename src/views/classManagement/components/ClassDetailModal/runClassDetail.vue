@@ -144,6 +144,23 @@
           </div>
         </div>
 
+        <div class="edit-section">
+          <div class="section-header">
+            <span class="section-title">训练建议</span>
+          </div>
+          <div class="summary-input-container">
+            <el-input
+              v-model="classInfo.trainingAdvice"
+              type="textarea"
+              :rows="6"
+              placeholder="请输入训练建议"
+              maxlength="500"
+              show-word-limit
+              class="summary-textarea"
+            />
+          </div>
+        </div>
+
         <!-- 阶段明细部分 -->
         <div class="edit-section">
           <div class="section-header">
@@ -280,7 +297,7 @@
         <!-- 标签部分 -->
         <div class="edit-section">
           <div class="section-header">
-            <span class="section-title required">标签</span>
+            <span class="section-title ">标签</span>
           </div>
           <div class="tags-container">
             <div class="add-tag-input">
@@ -1623,6 +1640,9 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    max-height: 500px;
 
     .edit-section {
       .summary-input-container {
@@ -1740,7 +1760,7 @@ export default {
     flex: 3;
     border-radius: 8px;
     overflow-y: auto;
-    max-height: 600px;
+    max-height: 500px;
 
     .stage-form-item {
       flex: 1;
@@ -1770,9 +1790,10 @@ export default {
 
       .stage-section {
         background-color: #fff;
-        border: 1px solid #e4e7ed;
+        border: 2px solid #e4e7ed;
         padding: 5px;
         margin-bottom: 10px;
+        box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
         .times-input {
           width: 130px;
         }

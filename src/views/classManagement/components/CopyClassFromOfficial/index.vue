@@ -66,6 +66,7 @@ export default {
     // 当前官方课程ID
     classId: { type: [String, Number], default: "" },
     activeClassType: { type: String, default: "my" },
+    groupId: { type: [String, Number], default: "" },
   },
   data() {
     return {
@@ -86,6 +87,9 @@ export default {
     },
     value(val) {
       if (typeof val !== "undefined") this.innerVisible = val;
+    },
+    groupId(val) {
+      this.form.destinationId = val;
     },
     innerVisible(val) {
       if (!val) {

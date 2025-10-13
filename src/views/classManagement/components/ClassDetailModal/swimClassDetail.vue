@@ -52,7 +52,7 @@
               <el-input
                 type="textarea"
                 v-model="form.summary"
-                :rows="12"
+                :rows="8"
                 maxlength="2000"
                 show-word-limit
                 placeholder="请输入概要"
@@ -60,6 +60,20 @@
               />
             </div>
           </div>
+         <div class="summary">
+            <div class="summary-title">训练建议</div>
+            <div class="editor-wrapper">
+              <el-input
+                type="textarea"
+                v-model="form.trainingAdvice"
+                :rows="8"
+                maxlength="2000"
+                show-word-limit
+                placeholder="请输入训练建议"
+                class="summary-textarea"
+              />
+            </div>
+         </div>
           <el-form-item label="标签：">
             <el-select
                 v-model="form.tags"
