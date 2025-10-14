@@ -486,6 +486,7 @@ export default {
               // 更新unGrouped团队，只保留非coach类型的members
               processedData[unGroupIndex] = {
                 ...unGroupData,
+                membersCount: remainingMembers.length,
                 children: remainingMembers,
               };
               console.log(coachMembers, "this.coachingData");
