@@ -68,7 +68,7 @@
               >
                 <div class="group-operations">
                   <span>
-                    <el-button type="text" @click="$emit('add-class')">
+                    <el-button type="text" @click="$emit('add-class', item.groupId)">
                       新增课程
                     </el-button>
                   </span>
@@ -119,7 +119,7 @@
               @click="$emit('class-detail', classItem.id, classItem.sportType)"
               @move="$emit('move-class', classItem.id, item.groupId)"
               @delete="$emit('delete-class', classItem.id)"
-              @copy="$emit('copy-class', classItem, item.groupId)"
+              @copy="$emit('copy-class', classItem, item.groupId, classItem.title)"
             />
           </div>
         </el-collapse-item>
