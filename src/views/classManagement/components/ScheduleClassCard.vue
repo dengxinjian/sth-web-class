@@ -15,12 +15,19 @@
         <!-- 标题栏 -->
         <div class="body-title">
           <div class="sport-type-icon">
-            <img class="image-icon" :src="getSportIcon(classItem.sportType)" alt="" />
+            <img
+              class="image-icon"
+              :src="getSportIcon(classItem.sportType)"
+              alt=""
+            />
             <!-- 设备同步状态 -->
             <div
               v-for="device in classItem.syncStatusList"
               :key="device.deviceType + device.syncStatus"
-              :class="['sport-type-name', 'sport-type-color' + device.syncStatus]"
+              :class="[
+                'sport-type-name',
+                'sport-type-color' + device.syncStatus,
+              ]"
               @click.stop="$emit('device-click', classItem, device)"
             >
               {{ getDeviceIcon(device.deviceType) }}
@@ -33,7 +40,10 @@
             tabindex="9999"
           >
             <div class="btn-list-hover">
-              <el-button type="text" @click.stop="$emit('delete', classItem.id)">
+              <el-button
+                type="text"
+                @click.stop="$emit('delete', classItem.id)"
+              >
                 删除
               </el-button>
             </div>
@@ -46,14 +56,11 @@
 
         <!-- 运动类型 -->
         <div class="keyword">
-          {{ classItem.sportType === 'CYCLE' ? 'BIKE' : classItem.sportType }}
+          {{ classItem.sportType === "CYCLE" ? "BIKE" : classItem.sportType }}
         </div>
 
         <!-- 时长 -->
-        <div
-          class="keyword"
-          v-if="!isRestType(classItem.sportType)"
-        >
+        <div class="keyword" v-if="!isRestType(classItem.sportType)">
           {{ formatDuration(classItem.classesJson.duration) }}
         </div>
 
@@ -70,7 +77,11 @@
 
         <!-- STH -->
         <div style="display: flex" v-if="!isRestType(classItem.sportType)">
-          <div class="keyword">{{ classItem.classesJson.sth }}</div>
+          <div class="keyword">
+            {{
+              classItem.classesJson.sth == 0 ? "--" : classItem.classesJson.sth
+            }}
+          </div>
           <div>&nbsp;&nbsp;STH</div>
         </div>
 
@@ -117,28 +128,28 @@
 </template>
 
 <script>
-import ExerciseProcessChart from '@/components/ExerciseProcessChart'
-import CycleStageDetails from './CycleStageDetails.vue'
-import RunStageDetails from './RunStageDetails.vue'
-import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from '../constants'
-import { truncateByLines, isExpired } from '../utils/helpers'
+import ExerciseProcessChart from "@/components/ExerciseProcessChart";
+import CycleStageDetails from "./CycleStageDetails.vue";
+import RunStageDetails from "./RunStageDetails.vue";
+import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from "../constants";
+import { truncateByLines, isExpired } from "../utils/helpers";
 
 export default {
-  name: 'ScheduleClassCard',
+  name: "ScheduleClassCard",
   components: {
     ExerciseProcessChart,
     CycleStageDetails,
-    RunStageDetails
+    RunStageDetails,
   },
   props: {
     classItem: {
       type: Object,
-      required: true
+      required: true,
     },
     date: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     cardStyle() {
@@ -146,32 +157,32 @@ export default {
       if (
         isExpired(this.date) &&
         this.classItem.classesJson.duration &&
-        this.classItem.classesJson.duration !== '00:00:00'
+        this.classItem.classesJson.duration !== "00:00:00"
       ) {
-        return { backgroundColor: 'rgba(204, 35, 35, 1)' }
+        return { backgroundColor: "rgba(204, 35, 35, 1)" };
       }
-      return { backgroundColor: '#fff' }
-    }
+      return { backgroundColor: "#fff" };
+    },
   },
   methods: {
     truncateByLines,
     getSportIcon(sportType) {
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
+      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
     },
     getDeviceIcon(deviceType) {
-      return DEVICE_TYPE_ICON_DICT[deviceType] || ''
+      return DEVICE_TYPE_ICON_DICT[deviceType] || "";
     },
     isRestType(sportType) {
-      return ['REST', 'REMARK', 'OTHER'].includes(sportType)
+      return ["REST", "REMARK", "OTHER"].includes(sportType);
     },
     formatDuration(duration) {
-      return duration === '00:00:00' ? '--:--:--' : duration
+      return duration === "00:00:00" ? "--:--:--" : duration;
     },
     formatDistance(distance) {
-      return !distance || distance === '0' ? '--km' : distance
-    }
-  }
-}
+      return !distance || distance === "0" ? "--km" : distance;
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -274,4 +285,3 @@ export default {
   height: 16px;
 }
 </style>
-

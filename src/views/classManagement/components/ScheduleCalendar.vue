@@ -86,7 +86,7 @@
           >
             <div class="schedule-table-cell-title">
               <span> {{ item?.commonDate }}</span>
-              <span style="display: inline-block; transform: scale(0.8);"> {{ convertToLunar(item?.commonDate).dateStr }}</span>
+              <span style="display: inline-block; transform: scale(0.8);"> （{{ convertToLunar(item?.commonDate).dateStr }}）</span>
             </div>
             <div
               class="schedule-table-cell-item js-schedule-drag-container"

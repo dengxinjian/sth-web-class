@@ -118,6 +118,7 @@ export default {
   methods: {
     handleClose() {
       this.visible = false
+      this.$emit('cancel')
     },
     handleCancel() {
       this.visible = false
