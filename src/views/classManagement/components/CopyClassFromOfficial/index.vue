@@ -72,7 +72,7 @@ export default {
   data() {
     return {
       innerVisible: this.visible || this.value || false,
-      form: { destinationId: "", title: "" },
+      form: { destinationId: "", title: this.data.title || this.title },
       rules: {
         destinationId: [
           { required: true, message: "请选择目标分组", trigger: "change" },
@@ -91,6 +91,7 @@ export default {
     },
     groupId(val) {
       this.form.destinationId = val;
+      this.form.title = this.data.classesTitle
     },
     innerVisible(val) {
       if (!val) {

@@ -154,6 +154,7 @@
         { id: 1, name: '我的课程' },
         { id: 2, name: '团队课程' },
       ]"
+      :default-group-id="addGroupId"
       @save="onSaveClassTitle"
     />
 
@@ -341,6 +342,7 @@ export default {
       copyClassFromOfficialClassId: "",
       copyClassFromOfficialGroupId: "",
       copyClassFromOfficialData: {},
+      addGroupId: "",
     };
   },
   mounted() {
@@ -673,13 +675,13 @@ export default {
      */
     handleRefresh() {
       this.getScheduleData();
-      this.getStatisticData();
     },
 
     /**
      * 新增课程
      */
-    handleAddClass() {
+    handleAddClass(groupId) {
+      this.addGroupId = groupId;
       this.showAddClassTitle = true;
     },
 
@@ -1012,7 +1014,25 @@ export default {
     /**
      * 绑定课程和运动
      */
-    handleBind(courseData, exerciseData, type = "") {
+    handleBind(classItem, activityItem, type) {
+      const exerciseData = {
+        name: activityItem.activityName,
+        duration: activityItem.duration,
+        sth: activityItem.sthValue,
+        id: activityItem.activityId,
+        dataDate: activityItem.dataDate,
+        distance: activityItem.distance,
+      };
+      // 模拟课程数据 - 这里可以从课程列表中选择
+      const courseData = {
+        name: classItem.classesJson.title,
+        duration: classItem.classesJson.duration,
+        sth: classItem.classesJson.sth,
+        id: classItem.id,
+        classesJson: classItem.classesJson,
+        distance: classItem.classesJson.distance,
+        distanceUnit: classItem.classesJson.distanceUnit,
+      };
       this.bindCourseData = courseData;
       this.bindExerciseData = [exerciseData];
       this.bindType = type;
@@ -1216,8 +1236,53 @@ export default {
     /**
      * 绑定确认
      */
-    onBind() {
-      this.getScheduleData();
+    async onBind(data) {
+      console.log("匹配数据：", data);
+      if (data.type === "classTemplate") {
+        const params = {
+          classesId: data.courseData.id,
+          classesJson: JSON.stringify(data.courseData.classesJson),
+          classesDate: data.exerciseData.dataDate,
+          sportType: data.courseData.classesJson.sportType,
+        };
+        const josnData = await this.AddScheduleClass(params, data.type);
+        scheduleApi
+          .createSchedule({
+            ...josnData,
+            bindingActivityId: data.exerciseData.id,
+            triUserId: this.selectedAthletic,
+          })
+          .then((res) => {
+            if (res.success) {
+              this.$message.success("匹配成功");
+              this.getScheduleData();
+            } else {
+              this.$message.error(res.message);
+              this.getScheduleData();
+            }
+          });
+        return;
+      }
+      // 这里可以调用匹配API
+      scheduleApi
+        .bindActivity({
+          classScheduleId: data.courseData.id,
+          bindingActivityId: data.exerciseData[0].id,
+          classesDate: data.exerciseData[0].dataDate,
+          triUserId: this.selectedAthletic,
+        })
+        .then((res) => {
+          if (res.success) {
+            this.$message.success("匹配成功");
+            this.getScheduleData();
+          } else {
+            this.$message.error(res.message);
+            this.getScheduleData();
+          }
+        })
+        .finally(() => {
+          this.getScheduleData();
+        });
     },
 
     /**
