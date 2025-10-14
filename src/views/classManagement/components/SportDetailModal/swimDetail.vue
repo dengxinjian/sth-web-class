@@ -57,7 +57,7 @@
                     <span>距离：{{ sportDetail.distance }} m</span>
                 </div>
                 <div class="sync-params">
-                    <span>平均配速：{{ convertSpeedToPace(sportDetail.avgSpeed) }}/km</span>
+                    <span>平均配速：{{ convertSpeedToPace(sportDetail.avgSpeed) }}/100m</span>
                     <span>运动消耗：{{ sportDetail.calories }} kcal</span>
                 </div>
                 <div class="sync-params">
@@ -166,7 +166,7 @@ export default {
           sportType: 'SWIM',
           distance: '',
           distanceUnit: 'm',
-          duration: '01:30:00',
+          duration: '',
           sth: '',
           summary: '',
           tags: ''
@@ -287,7 +287,7 @@ export default {
         sportType: 'SWIM',
         distance: '',
         distanceUnit: 'm',
-        duration: '01:30:00',
+        duration: '',
         sth: '',
         summary: '',
         tips: ''
