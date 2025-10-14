@@ -69,11 +69,11 @@
             :key="item.id"
             :class="[
               'schedule-table-header-cell',
-              { active: isToday(currentWeek[index]?.commonDate) }
+              { active: isToday(currentWeek[index]?.commonDate) },
             ]"
           >
             {{ item.name }}
-            {{ isToday(currentWeek[index]?.commonDate) ? '（今天）' : '' }}
+            {{ isToday(currentWeek[index]?.commonDate) ? "（今天）" : "" }}
           </div>
         </div>
 
@@ -97,7 +97,9 @@
                 :key="classItem.id"
                 :class-item="classItem"
                 :date="item.commonDate"
-                @click="$emit('class-detail', classItem.id, classItem.sportType)"
+                @click="
+                  $emit('class-detail', classItem.id, classItem.sportType)
+                "
                 @delete="$emit('delete-schedule', $event)"
                 @device-click="$emit('device-click', $event)"
               />
@@ -121,50 +123,50 @@
 </template>
 
 <script>
-import WeekRangePicker from '@/components/WeekRangePicker'
-import ScheduleClassCard from './ScheduleClassCard.vue'
-import ActivityCard from './ActivityCard.vue'
-import { WEEK_LIST } from '../constants'
-import { isToday } from '../utils/helpers'
+import WeekRangePicker from "@/components/WeekRangePicker";
+import ScheduleClassCard from "./ScheduleClassCard.vue";
+import ActivityCard from "./ActivityCard.vue";
+import { WEEK_LIST } from "../constants";
+import { isToday } from "../utils/helpers";
 
 export default {
-  name: 'ScheduleCalendar',
+  name: "ScheduleCalendar",
   components: {
     WeekRangePicker,
     ScheduleClassCard,
-    ActivityCard
+    ActivityCard,
   },
   props: {
     currentWeek: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     teamList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     athleticList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     selectedTeam: {
       type: [String, Number],
-      default: null
+      default: null,
     },
     selectedAthletic: {
       type: [String, Number],
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      weekList: WEEK_LIST
-    }
+      weekList: WEEK_LIST,
+    };
   },
   methods: {
-    isToday
-  }
-}
+    isToday,
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -188,7 +190,6 @@ export default {
   flex-direction: column;
   overflow: hidden;
   background-color: #fff;
-
 }
 
 .schedule-top {
@@ -242,35 +243,13 @@ export default {
   flex: 1;
   display: flex;
   gap: 4px;
-  padding: 10px 5px;
-  overflow-x: auto;
-  overflow-y: auto;
-
-  /* 自定义滚动条样式 */
-  &::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 2.5px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 2.5px;
-
-    &:hover {
-      background: #a8a8a8;
-    }
-  }
-
+  overflow: auto;
   .schedule-table-cell {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 120px;
+    height: 80vh;
     background-color: #f5f5f5;
 
     .schedule-table-cell-title {
@@ -279,6 +258,7 @@ export default {
       line-height: 30px;
       background-color: #f8f8f8;
       margin: 4px 0;
+      flex-shrink: 0;
     }
 
     .schedule-table-cell-item {
@@ -293,4 +273,3 @@ export default {
   }
 }
 </style>
-
