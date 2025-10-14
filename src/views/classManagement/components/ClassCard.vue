@@ -22,7 +22,10 @@
               </el-button>
             </span>
             <span v-if="showDeleteBtn">
-              <el-button type="text" @click.stop="$emit('delete', classData.id)">
+              <el-button
+                type="text"
+                @click.stop="$emit('delete', classData.id)"
+              >
                 删除课程
               </el-button>
             </span>
@@ -32,11 +35,7 @@
               </el-button>
             </span>
           </div>
-          <i
-            class="el-icon-more"
-            slot="reference"
-            @click.stop
-          ></i>
+          <i class="el-icon-more" slot="reference" @click.stop></i>
         </el-popover>
       </div>
 
@@ -49,16 +48,24 @@
 
         <!-- 时长 -->
         <span
-          v-if="['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(classData.sportType)"
+          v-if="
+            ['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(classData.sportType)
+          "
         >
-          {{ classData.classesJson.duration }}
+          {{
+            classData.classesJson.duration == "00:00:00"
+              ? "--:--:--"
+              : classData.classesJson.duration
+          }}
         </span>
 
         <!-- 距离 -->
-        <span
-          v-if="['RUN', 'CYCLE', 'SWIM'].includes(classData.sportType) && classData.classesJson.distance"
-        >
-          {{ classData.classesJson.distance }}
+        <span v-if="['RUN', 'CYCLE', 'SWIM'].includes(classData.sportType)">
+          {{
+            classData.classesJson.distance == 0
+              ? "--"
+              : classData.classesJson.distance
+          }}
           <span v-if="classData.sportType === 'SWIM'">
             {{ classData.classesJson.distanceUnit }}
           </span>
@@ -66,9 +73,15 @@
         </span>
 
         <!-- STH值 -->
-        <span v-if="classData.classesJson.sth">
+        <span
+          v-if="
+            ['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(classData.sportType)
+          "
+        >
           <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
-          {{ classData.classesJson.sth }}
+          {{
+            classData.classesJson.sth == 0 ? "--" : classData.classesJson.sth
+          }}
         </span>
       </div>
     </div>
@@ -85,11 +98,7 @@
         :style="{ flex: stage.duration }"
       >
         <div style="display: flex; gap: 1px; height: 16px">
-          <div
-            v-for="n in +stage.times"
-            :key="n"
-            :style="{ flex: 1 }"
-          >
+          <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
             <ExerciseProcessChart
               :exerciseList="stage.stageTimeline"
               :maxIntensity="classData.classesJson.maxIntensity"
@@ -103,48 +112,48 @@
 </template>
 
 <script>
-import ExerciseProcessChart from '@/components/ExerciseProcessChart'
-import { SPORT_TYPE_ICONS } from '../constants'
+import ExerciseProcessChart from "@/components/ExerciseProcessChart";
+import { SPORT_TYPE_ICONS } from "../constants";
 
 export default {
-  name: 'ClassCard',
+  name: "ClassCard",
   components: {
-    ExerciseProcessChart
+    ExerciseProcessChart,
   },
   props: {
     classData: {
       type: Object,
-      required: true
+      required: true,
     },
     activeClassType: {
       type: String,
-      default: 'my' // 'my' | 'official'
+      default: "my", // 'my' | 'official'
     },
     groupId: {
       type: [String, Number],
-      default: null
-    }
+      default: null,
+    },
   },
   computed: {
     showMoveBtn() {
-      return this.activeClassType === 'my'
+      return this.activeClassType === "my";
     },
     showDeleteBtn() {
-      return this.activeClassType === 'my'
+      return this.activeClassType === "my";
     },
     showCopyBtn() {
-      return true
+      return true;
     },
     copyBtnText() {
-      return this.activeClassType === 'official' ? '添加课程' : '复制课程'
-    }
+      return this.activeClassType === "official" ? "添加课程" : "复制课程";
+    },
   },
   methods: {
     getSportTypeIcon(sportType) {
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
-    }
-  }
-}
+      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -194,4 +203,3 @@ export default {
   height: 16px;
 }
 </style>
-

@@ -5,7 +5,6 @@
 import { SPORT_TYPE_ICONS, COMPLETION_COLORS } from "../constants";
 import { getLunar } from 'chinese-lunar-calendar'
 
-
 /**
  * 获取运动类型图标
  * @param {String} sportType 运动类型
