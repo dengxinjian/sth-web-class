@@ -2,7 +2,9 @@
  * 辅助工具函数
  */
 
-import { SPORT_TYPE_ICONS, COMPLETION_COLORS } from '../constants'
+import { SPORT_TYPE_ICONS, COMPLETION_COLORS } from "../constants";
+import { getLunar } from 'chinese-lunar-calendar'
+
 
 /**
  * 获取运动类型图标
@@ -10,7 +12,7 @@ import { SPORT_TYPE_ICONS, COMPLETION_COLORS } from '../constants'
  * @returns {String} 图标路径
  */
 export function getSportImageIcon(sportType) {
-  return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
+  return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
 }
 
 /**
@@ -20,14 +22,14 @@ export function getSportImageIcon(sportType) {
  */
 export function getClassImageIcon(sportType) {
   const typeMap = {
-    1: 'CYCLE',
-    2: 'RUN',
-    3: 'SWIM',
-    4: 'STRENGTH',
-    5: 'OTHER'
-  }
-  const type = typeof sportType === 'number' ? typeMap[sportType] : sportType
-  return SPORT_TYPE_ICONS[type] || SPORT_TYPE_ICONS.OTHER
+    1: "CYCLE",
+    2: "RUN",
+    3: "SWIM",
+    4: "STRENGTH",
+    5: "OTHER",
+  };
+  const type = typeof sportType === "number" ? typeMap[sportType] : sportType;
+  return SPORT_TYPE_ICONS[type] || SPORT_TYPE_ICONS.OTHER;
 }
 
 /**
@@ -36,14 +38,14 @@ export function getClassImageIcon(sportType) {
  * @returns {Array} [backgroundColor, textColor]
  */
 export function getSportBackgroundColor(percent) {
-  if (!percent) return ['#fff', '#333']
+  if (!percent) return ["#fff", "#333"];
 
   if (percent >= 80 && percent <= 120) {
-    return ['#83dfa1', '#fff'] // 绿色 - 完成良好
+    return ["#83dfa1", "#fff"]; // 绿色 - 完成良好
   } else if (percent < 60) {
-    return ['#ffd18d', '#333'] // 浅橙色 - 完成不足
+    return ["#ffd18d", "#333"]; // 浅橙色 - 完成不足
   } else {
-    return ['#dc8605', '#fff'] // 深橙色 - 偏离计划
+    return ["#dc8605", "#fff"]; // 深橙色 - 偏离计划
   }
 }
 
@@ -53,14 +55,14 @@ export function getSportBackgroundColor(percent) {
  * @returns {String} 完成度标识
  */
 export function getCompletionStatus(percent) {
-  if (!percent) return ''
+  if (!percent) return "";
 
   if (percent >= 80 && percent <= 120) {
-    return COMPLETION_COLORS.GREEN
+    return COMPLETION_COLORS.GREEN;
   } else if (percent < 60) {
-    return COMPLETION_COLORS.SHALLOW_ORANGE
+    return COMPLETION_COLORS.SHALLOW_ORANGE;
   } else {
-    return COMPLETION_COLORS.DEEP_ORANGE
+    return COMPLETION_COLORS.DEEP_ORANGE;
   }
 }
 
@@ -71,14 +73,14 @@ export function getCompletionStatus(percent) {
  */
 export function isToday(date) {
   const today = new Date()
-    .toLocaleDateString('zh-CN', {
-      timeZone: 'Asia/Shanghai',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
+    .toLocaleDateString("zh-CN", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     })
-    .replace(/\//g, '-')
-  return date === today
+    .replace(/\//g, "-");
+  return date === today;
 }
 
 /**
@@ -88,10 +90,10 @@ export function isToday(date) {
  * @returns {String} 截断后的文本
  */
 export function truncateByLines(text, maxLines = 3) {
-  if (!text) return ''
-  const lines = text.split('\n')
-  if (lines.length <= maxLines) return text
-  return lines.slice(0, maxLines).join('\n') + '...'
+  if (!text) return "";
+  const lines = text.split("\n");
+  if (lines.length <= maxLines) return text;
+  return lines.slice(0, maxLines).join("\n") + "...";
 }
 
 /**
@@ -100,11 +102,11 @@ export function truncateByLines(text, maxLines = 3) {
  * @returns {String}
  */
 export function formatDate(date) {
-  const d = new Date(date)
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 /**
@@ -114,14 +116,14 @@ export function formatDate(date) {
  */
 export function getDeviceBrandIcon(deviceType) {
   const iconMap = {
-    1: require('@/assets/addClass/device-coros.png'),
-    2: require('@/assets/addClass/device-garmin.png'),
-    3: require('@/assets/addClass/device-garmin.png'),
-    4: require('@/assets/addClass/device-zepp.png'),
-    5: require('@/assets/addClass/device-suunto.png'),
-    6: require('@/assets/addClass/device-suunto.png')
-  }
-  return iconMap[deviceType] || ''
+    1: require("@/assets/addClass/device-coros.png"),
+    2: require("@/assets/addClass/device-garmin.png"),
+    3: require("@/assets/addClass/device-garmin.png"),
+    4: require("@/assets/addClass/device-zepp.png"),
+    5: require("@/assets/addClass/device-suunto.png"),
+    6: require("@/assets/addClass/device-suunto.png"),
+  };
+  return iconMap[deviceType] || "";
 }
 
 /**
@@ -130,8 +132,8 @@ export function getDeviceBrandIcon(deviceType) {
  * @returns {Boolean}
  */
 export function isExpired(date) {
-  const today = new Date().toISOString().split('T')[0]
-  return date < today
+  const today = new Date().toISOString().split("T")[0];
+  return date < today;
 }
 
 /**
@@ -141,10 +143,10 @@ export function isExpired(date) {
  */
 export function parseClassesJson(jsonString) {
   try {
-    return typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString
+    return typeof jsonString === "string" ? JSON.parse(jsonString) : jsonString;
   } catch (e) {
-    console.error('解析课程JSON失败:', e)
-    return {}
+    console.error("解析课程JSON失败:", e);
+    return {};
   }
 }
 
@@ -156,13 +158,13 @@ export function parseClassesJson(jsonString) {
  */
 export function isSportTypeMatch(classType, activityType) {
   const activityTypeMap = {
-    1: 'CYCLE',
-    2: 'RUN',
-    3: 'SWIM',
-    4: 'STRENGTH',
-    5: 'OTHER'
-  }
-  return classType === activityTypeMap[activityType]
+    1: "CYCLE",
+    2: "RUN",
+    3: "SWIM",
+    4: "STRENGTH",
+    5: "OTHER",
+  };
+  return classType === activityTypeMap[activityType];
 }
 
 /**
@@ -173,7 +175,21 @@ export function isSportTypeMatch(classType, activityType) {
 export function generateSortData(items) {
   return items.map((item, index) => ({
     id: item.id,
-    sort: index
-  }))
+    sort: index,
+  }));
 }
 
+/**
+ * 转换农历
+ * @param {String} date 日期字符串 YYYY-MM-DD
+ * @returns {String} 农历日期
+ */
+export function convertToLunar(date) {
+  const lunarDate = getLunar(
+    new Date(date).getFullYear(),
+    new Date(date).getMonth() + 1,
+    new Date(date).getDate()
+  );
+  console.log(lunarDate, "lunarDate");
+  return lunarDate;
+}

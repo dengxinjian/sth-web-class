@@ -85,7 +85,8 @@
             class="schedule-table-cell"
           >
             <div class="schedule-table-cell-title">
-              {{ item?.commonDate }}
+              <span> {{ item?.commonDate }}</span>
+              <span style="display: inline-block; transform: scale(0.8);"> {{ convertToLunar(item?.commonDate).dateStr }}</span>
             </div>
             <div
               class="schedule-table-cell-item js-schedule-drag-container"
@@ -127,7 +128,7 @@ import WeekRangePicker from "@/components/WeekRangePicker";
 import ScheduleClassCard from "./ScheduleClassCard.vue";
 import ActivityCard from "./ActivityCard.vue";
 import { WEEK_LIST } from "../constants";
-import { isToday } from "../utils/helpers";
+import { isToday, convertToLunar } from "../utils/helpers";
 
 export default {
   name: "ScheduleCalendar",
@@ -165,6 +166,7 @@ export default {
   },
   methods: {
     isToday,
+    convertToLunar
   },
 };
 </script>
