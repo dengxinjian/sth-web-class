@@ -2479,26 +2479,24 @@ export default {
       }
       console.log(data, "data");
       const sortVoList = [];
+      let classSchedule = [];
       let sort = null;
       // // 插入新数据
       this.currentWeek.forEach((item) => {
         if (item.commonDate === data.classesDate) {
-          item.classSchedule.splice(index, 0, data);
+          classSchedule = JSON.parse(JSON.stringify(item.classSchedule));
+          classSchedule.splice(index, 0, data);
         }
       });
       // // 重塑后端接口数据
-      this.currentWeek.forEach((item) => {
-        if (item.commonDate === data.classesDate) {
-          item.classSchedule.forEach((item, index) => {
-            if (item.id) {
-              sortVoList.push({
-                id: item.id,
-                sort: index,
-              });
-            } else {
-              sort = index;
-            }
+      classSchedule.forEach((item, index) => {
+        if (item.id) {
+          sortVoList.push({
+            id: item.id,
+            sort: index,
           });
+        } else {
+          sort = index;
         }
       });
       submitData({

@@ -32,6 +32,7 @@ export default {
       required: true,
       default: "RUN",
       validator: function (value = "RUN") {
+        console.log(value, "value");
         // 验证type参数是否有效
         return (
           [

@@ -1,0 +1,260 @@
+<template>
+  <div
+    class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
+    :style="{ backgroundColor: bgColor }"
+    :data-id="activity.activityId"
+    :data-date="date"
+  >
+    <div
+      class="card-body sport-drap-handle"
+      :data-id="activity.activityId"
+      :data-date="date"
+      style="background-color: #fff"
+    >
+      <div class="body-title" style="background-color: #fff">
+        <div class="sport-type-icon">
+          <img
+            class="image-icon"
+            :src="getSportIcon(activity.sportType)"
+            alt=""
+          />
+        </div>
+        <el-popover
+          popper-class="athletic-btn-popover"
+          placement="right"
+          trigger="click"
+        >
+          <div class="btn-list-hover">
+            <el-button
+              v-if="activity.classesJson"
+              type="text"
+              @click="$emit('unbind', activity.classScheduleId)"
+            >
+              解除匹配
+            </el-button>
+            <el-button
+              v-if="!activity.classesJson"
+              type="text"
+              @click="$emit('delete', activity.activityId)"
+            >
+              删除
+            </el-button>
+          </div>
+          <i class="el-icon-more" slot="reference" @click.stop></i>
+        </el-popover>
+      </div>
+
+      <div
+        class="sport-record-data"
+        @click="$emit('click', activity.activityId, activity.classScheduleId, activity.sportType)"
+      >
+        <div class="title">
+          {{
+            activity.classesJson
+              ? activity.classesJson.title
+              : activity.activityName
+          }}
+        </div>
+        <div class="keyword">{{ activity.duration }}</div>
+        <div style="display: flex">
+          <div class="keyword">{{ activity.distance }}</div>
+          <div>km</div>
+        </div>
+        <div style="display: flex">
+          <div class="keyword">{{ activity.sthValue }}</div>
+          <div>&nbsp;&nbsp;STH</div>
+        </div>
+
+        <!-- 如果有匹配的课表，显示课表详情 -->
+        <template v-if="activity.classScheduleId && activity.classesJson">
+          <div v-if="activity.classesJson.summary" class="stage-details">
+            {{ activity.classesJson.summary }}
+          </div>
+          <CycleStageDetails
+            v-else-if="activity.sportType === 1"
+            :class-data="activity.classesJson"
+          />
+          <RunStageDetails
+            v-else-if="activity.sportType === 2"
+            :class-data="activity.classesJson"
+          />
+
+          <!-- 时长、距离、STH -->
+          <div
+            class="keyword"
+            v-if="!isRestType(activity.classesJson.sportType)"
+          >
+            {{
+              activity.classesJson.duration === '00:00:00'
+                ? '--:--:--'
+                : activity.classesJson.duration
+            }}
+          </div>
+          <div style="display: flex" v-if="activity.classesJson.distance">
+            <div class="keyword">
+              {{
+                activity.classesJson.distance === '0'
+                  ? '--km'
+                  : activity.classesJson.distance
+              }}
+              <span v-if="activity.sportType === 3">
+                {{ activity.classesJson.distanceUnit }}
+              </span>
+            </div>
+          </div>
+          <div
+            style="display: flex"
+            v-if="!isRestType(activity.classesJson.sportType)"
+          >
+            <div class="keyword">{{ activity.classesJson.sth }}</div>
+            <div>&nbsp;&nbsp;STH</div>
+          </div>
+
+          <!-- 训练强度可视化 -->
+          <div
+            v-if="activity.classesJson.timeline"
+            style="height: 16px; display: flex; gap: 1px"
+          >
+            <div
+              v-for="(stage, index) in activity.classesJson.timeline"
+              :key="index"
+              class="time-stage"
+              :style="{ flex: stage.duration }"
+            >
+              <div style="display: flex; gap: 1px; height: 16px">
+                <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
+                  <ExerciseProcessChart
+                    :exerciseList="stage.stageTimeline"
+                    :maxIntensity="activity.classesJson.maxIntensity"
+                    :height="16"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import ExerciseProcessChart from '@/components/ExerciseProcessChart'
+import CycleStageDetails from './CycleStageDetails.vue'
+import RunStageDetails from './RunStageDetails.vue'
+import { getSportBackgroundColor, getClassImageIcon } from '../utils/helpers'
+
+export default {
+  name: 'ActivityCard',
+  components: {
+    ExerciseProcessChart,
+    CycleStageDetails,
+    RunStageDetails
+  },
+  props: {
+    activity: {
+      type: Object,
+      required: true
+    },
+    date: {
+      type: String,
+      required: true
+    }
+  },
+  computed: {
+    bgColor() {
+      return getSportBackgroundColor(this.activity.percent)[0]
+    }
+  },
+  methods: {
+    getSportIcon(sportType) {
+      return getClassImageIcon(sportType)
+    },
+    isRestType(sportType) {
+      return ['REST', 'REMARK', 'OTHER'].includes(sportType)
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.sportScheduleCard {
+  .classScheduleCard {
+    display: none;
+  }
+}
+
+.classScheduleCard {
+  margin-left: 2px;
+  margin-right: 2px;
+  position: relative;
+  border: 1px solid #e5e5e5;
+  transition: all 0.3s ease;
+  margin-bottom: 5px;
+  overflow: hidden;
+  border-radius: 6px;
+  background-color: #ffffff;
+  padding-top: 10px;
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  .card-body {
+    width: 100%;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 5px;
+
+    .body-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 5px 3px;
+
+      .sport-type-icon {
+        display: flex;
+        align-content: center;
+      }
+    }
+
+    .image-icon {
+      width: 20px;
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .keyword {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .sport-record-data {
+      cursor: pointer;
+    }
+
+    .stage-details {
+      font-size: 12px;
+      color: #999;
+      padding: 5px 5px 0;
+      line-height: 16px;
+    }
+  }
+}
+
+.btn-list-hover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-stage {
+  height: 16px;
+}
+</style>
+
