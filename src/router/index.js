@@ -172,6 +172,11 @@ export const asyncRoutes = [
       },
     ]
   },
+  {
+    path: "/class-management-test",
+    component: () => import("@/views/classManagement/index-refactored.vue"),
+    meta: { title: "课程管理（测试）", icon: "education" },
+  },
   // {
   //   path: "/systemManage",
   //   component: Layout,
