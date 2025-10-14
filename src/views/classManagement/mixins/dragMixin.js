@@ -74,7 +74,7 @@ export default {
               put: function(to, from) {
                 // 只允许从课表拖到运动
                 console.log(from, "to, from");
-                if (from.element.className.indexOf('js-sport-container-put') > -1) {
+                if (from.el.className.indexOf('js-sport-container-put') > -1) {
                   return false
                 } else {
                   return true
