@@ -1170,6 +1170,7 @@ export default {
      * 保存分组
      */
     onSaveAddGroup() {
+      this.showAddGroup = false;
       this.getClassList();
     },
 
@@ -1177,6 +1178,7 @@ export default {
      * 保存移动分组
      */
     onSaveMoveGroup() {
+      this.showMoveGroup = false;
       this.getClassList();
       this.getScheduleData();
     },
@@ -1185,6 +1187,7 @@ export default {
      * 保存复制课程
      */
     onSaveCopyClassFromOfficial() {
+      this.showCopyClassFromOfficial = false;
       this.getClassList();
     },
 
@@ -1193,6 +1196,7 @@ export default {
      */
     onSaveAthleticInfo() {
       // 保存逻辑
+      this.showAthleticInfoDialog = false;
     },
 
     /**
@@ -1243,7 +1247,6 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  height: 100vh;
   background-color: #f5f5f5;
 }
 

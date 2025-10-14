@@ -6,17 +6,17 @@ Vue.use(Router);
 // 环境配置
 const config = {
   development: {
-    loginComponent: () => import("@/views/login-wx/index")
+    loginComponent: () => import("@/views/login-wx/index"),
   },
   staging: {
-    loginComponent: () => import("@/views/login-wx/index")
+    loginComponent: () => import("@/views/login-wx/index"),
   },
   production: {
-    loginComponent: () => import("@/views/login-wx/index")
+    loginComponent: () => import("@/views/login-wx/index"),
   },
   test: {
-    loginComponent: () => import("@/views/login-wx/index")
-  }
+    loginComponent: () => import("@/views/login-wx/index"),
+  },
 };
 
 // 获取当前环境配置，默认为开发环境
@@ -170,13 +170,14 @@ export const asyncRoutes = [
         component: () => import("@/views/classManagement/index"),
         meta: { title: "课表管理" },
       },
-    ]
+      {
+        path: "/class-management-test",
+        component: () => import("@/views/classManagement/index-refactored.vue"),
+        meta: { title: "课程管理（测试）", icon: "education" },
+      },
+    ],
   },
-  {
-    path: "/class-management-test",
-    component: () => import("@/views/classManagement/index-refactored.vue"),
-    meta: { title: "课程管理（测试）", icon: "education" },
-  },
+
   // {
   //   path: "/systemManage",
   //   component: Layout,
