@@ -2,7 +2,7 @@ import axios from "axios";
 import { MessageBox, Message } from "element-ui";
 import store from "@/store";
 import { getToken } from "@/utils/auth";
-let isPoint401 = false;
+const isPoint401 = false;
 
 // create an axios instance
 const service = axios.create({
@@ -86,24 +86,27 @@ service.interceptors.response.use(
         duration: 5 * 1000,
       });
     }
-    if (error.response.status === 401) {
-      if (!isPoint401) {
-        isPoint401 = true;
-        MessageBox.confirm("登录已过期 ", "提示", {
-          confirmButtonText: "重新登录",
-          showCancelButton: false,
-          type: "warning",
-        })
-          .then(() => {
-            isPoint401 = false;
-            store.dispatch("user/resetToken").then(() => {
-              location.reload();
-            });
-          })
-          .catch(() => {
-            isPoint401 = false;
-          });
-      }
+    if (error.response.status === 403) {
+      // if (!isPoint401) {
+      //   isPoint401 = true;
+      //   MessageBox.confirm("登录已过期 ", "提示", {
+      //     confirmButtonText: "重新登录",
+      //     showCancelButton: false,
+      //     type: "warning",
+      //   })
+      //     .then(() => {
+      //       isPoint401 = false;
+      //       store.dispatch("user/resetToken").then(() => {
+      //         location.reload();
+      //       });
+      //     })
+      //     .catch(() => {
+      //       isPoint401 = false;
+      //     });
+      // }
+      store.dispatch("user/resetToken").then(() => {
+        location.reload();
+      });
     } else {
       Message({
         message: error.message,
