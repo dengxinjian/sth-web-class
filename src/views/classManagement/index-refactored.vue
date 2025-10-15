@@ -979,6 +979,10 @@ export default {
         });
       });
 
+      if (currentActivity.classScheduleId) {
+        return
+      }
+
       // 判断是否从课程模板中拖拽
       if (type === "classTemplate") {
         currentClass = this.findClassById(classId);

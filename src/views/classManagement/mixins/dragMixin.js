@@ -68,12 +68,12 @@ export default {
         document.querySelectorAll('.js-sport-container-put').forEach((el) => {
           new Sortable(el, {
             sort: false,
+            filter: '.js-sport-card-noDrag',
             group: {
               name: 'classDrag',
               pull: 'clone',
               put: function(to, from) {
                 // 只允许从课表拖到运动
-                console.log(from, "to, from");
                 if (from.el.className.indexOf('js-sport-container-put') > -1) {
                   return false
                 } else {

@@ -190,7 +190,7 @@ export default {
       flex: 1;
     }
     >span:nth-child(3) {
-      flex: 1.2;
+      flex: 1.3;
       text-align: right;
     }
     >span:nth-child(4) {

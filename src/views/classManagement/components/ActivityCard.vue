@@ -6,7 +6,7 @@
     :data-date="date"
   >
     <div
-      class="card-body sport-drap-handle"
+      :class="['card-body', 'sport-drap-handle', activity.classScheduleId ? 'js-sport-card-noDrag' : '']"
       :data-id="activity.activityId"
       :data-date="date"
       style="background-color: #fff"
