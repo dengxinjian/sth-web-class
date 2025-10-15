@@ -75,7 +75,7 @@
       <div class="basic-info-item">
         <div>
           <span>模式选择：</span>
-          <el-select v-model="classInfo.mode" :disabled="originalType === 'official'" class="pill-select short">
+          <el-select v-model="classInfo.mode" :disabled="originalType === 'official'" class="pill-select short" @change="getSth">
             <el-option label="跟随阈值功率" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
             <el-option label="固定功率" :value="3" />
