@@ -31,7 +31,7 @@
             </div>
             <div class="card-content">
               <div class="card-title">
-                {{ exerciseData[0].name }}{{ exerciseData[0].sportType }}
+                {{ exerciseData[0].name }}
               </div>
               <div class="card-duration">
                 {{
