@@ -1023,6 +1023,7 @@ export default {
         id: activityItem.activityId,
         dataDate: activityItem.dataDate,
         distance: activityItem.distance,
+        sportType: activityItem.sportType,
       };
       // 模拟课程数据 - 这里可以从课程列表中选择
       const courseData = {
@@ -1033,7 +1034,9 @@ export default {
         classesJson: classItem.classesJson,
         distance: classItem.classesJson.distance,
         distanceUnit: classItem.classesJson.distanceUnit,
+        sportType: classItem.sportType,
       };
+      console.log(exerciseData, "exerciseData");
       this.bindCourseData = courseData;
       this.bindExerciseData = [exerciseData];
       this.bindType = type;

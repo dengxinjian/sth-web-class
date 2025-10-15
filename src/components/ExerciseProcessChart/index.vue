@@ -128,7 +128,7 @@ export default {
       const widthPercent = (exercise.duration / this.totalDuration) * 100;
       // 计算高度比例（基于强度）
       const heightPercent = (exercise.intensity / this.actualMaxIntensity) * 100;
-      console.log(widthPercent, heightPercent, "widthPercent, heightPercent",exercise);
+      // console.log(widthPercent, heightPercent, "widthPercent, heightPercent",exercise);
 
       // 最后一个矩形不需要减去gap
       const isLast = index === this.exerciseList.length - 1;
