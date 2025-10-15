@@ -167,7 +167,7 @@ export const asyncRoutes = [
     children: [
       {
         path: "athletic",
-        component: () => import("@/views/classManagement/index"),
+        component: () => import("@/views/classManagement/index-refactored.vue"),
         meta: { title: "课表管理" },
       },
       {

@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="1200px"
+    width="90%"
     :before-close="handleClose"
     append-to-body
     class="add-swim-class-dialog"
@@ -1339,6 +1339,7 @@ export default {
   .time-stage {
     flex: 1;
     position: relative;
+    height: auto;
     &:hover {
       background-color: #e8e8e8;
       .time-stage-close {
@@ -1384,6 +1385,9 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    max-height: 480px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 
     .edit-section {
       .summary-input-container {
@@ -1501,7 +1505,7 @@ export default {
     flex: 3;
     border-radius: 8px;
     overflow-y: auto;
-    max-height: 600px;
+    max-height: 480px;
 
     .stage-form-item {
       flex: 1;
