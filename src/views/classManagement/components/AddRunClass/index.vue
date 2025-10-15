@@ -999,6 +999,7 @@ export default {
                   this.classInfo.distance +
                   Number((timer1 / timer).toFixed(2)) *
                     Number(stage.times || 1);
+                console.log(this.classInfo.distance, "this.classInfo.distance");
               } else {
                 const timer = hhmmssToSeconds(section.target);
                 const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
@@ -1008,6 +1009,7 @@ export default {
                   this.classInfo.distance +
                   Number((timer / timer3).toFixed(2)) *
                     Number(stage.times || 1);
+                console.log(this.classInfo.distance, "this.classInfo.distance");
               }
             } else {
               this.classInfo.distance +=
