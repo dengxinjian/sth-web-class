@@ -25,12 +25,14 @@
               <img
                 width="40"
                 height="40"
-                :src="getSportTypeIcon(exerciseData[0].sportType)"
+                :src="getSportIcon(exerciseData[0].sportType)"
                 alt=""
               />
             </div>
             <div class="card-content">
-              <div class="card-title">{{ exerciseData[0].name }}</div>
+              <div class="card-title">
+                {{ exerciseData[0].name }}{{ exerciseData[0].sportType }}
+              </div>
               <div class="card-duration">
                 {{
                   exerciseData[0].duration == "00:00:00"
@@ -100,7 +102,9 @@
               />
             </div>
             <div class="card-content">
-              <div class="card-title">{{ courseData.name }}</div>
+              <div class="card-title">
+                {{ courseData.name }}
+              </div>
               <div class="card-duration">
                 {{
                   exerciseData[0].duration == "00:00:00"
@@ -127,6 +131,7 @@
 
 <script>
 import { SPORT_TYPE_ICONS } from "../../constants";
+import { getClassImageIcon } from "../../utils/helpers";
 
 export default {
   name: "BindModal",
@@ -171,6 +176,10 @@ export default {
   methods: {
     getSportTypeIcon(sportType) {
       return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+    },
+    getSportIcon(sportType) {
+      console.log(sportType, "sportType");
+      return getClassImageIcon(sportType);
     },
     handleClose() {
       this.visible = false;
