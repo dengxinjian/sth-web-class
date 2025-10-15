@@ -111,7 +111,7 @@
                 :key="activityItem.activityId"
                 :activity="activityItem"
                 :date="item.commonDate"
-                @click="$emit('activity-detail', activityItem.activityId ,item.id ,activityItem.sportType)"
+                @click="$emit('activity-detail', activityItem.activityId ,activityItem.classScheduleId ,activityItem.sportType)"
                 @unbind="$emit('unbind', $event)"
                 @delete="$emit('delete-activity', $event)"
               />
