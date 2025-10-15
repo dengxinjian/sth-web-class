@@ -185,9 +185,12 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .class-schedule-card-container {
   margin-bottom: 5px;
+  .sport-drap-handle {
+    display: none;
+  }
 }
 
 .classScheduleCard {
@@ -204,6 +207,10 @@ export default {
 
   &:hover {
     transform: scale(1.02);
+  }
+
+  >.classScheduleCard {
+    display: none;
   }
 
   .card-body {

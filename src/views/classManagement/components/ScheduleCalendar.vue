@@ -174,24 +174,46 @@ export default {
 <style lang="scss" scoped>
 .schedule {
   flex: 1;
-  display: flex;
+  // display: flex;
   flex-direction: column;
   background-color: #f5f5f5;
+  height: 100%;
 }
 
 .schedule-table-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  // overflow: hidden;
+  height: calc(100vh - 60px);
+  overflow: auto;
+
+  /* 自定义滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2.5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2.5px;
+
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
 }
 
 .schedule-table {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   background-color: #fff;
+  // height: 100%;
 }
 
 .schedule-top {
@@ -245,13 +267,13 @@ export default {
   flex: 1;
   display: flex;
   gap: 4px;
+  flex-direction: row;
   overflow: auto;
   .schedule-table-cell {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 120px;
-    height: 80vh;
     background-color: #f5f5f5;
 
     .schedule-table-cell-title {

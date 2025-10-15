@@ -1320,6 +1320,27 @@ export default {
   display: flex;
   height: 100%;
   max-height: calc(100vh - 60px);
+  overflow-y: hidden;
+  overflow-x: auto;
+
+  /* 自定义滚动条样式 */
+  &::-webkit-scrollbar {
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2.5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2.5px;
+
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
 }
 
 .type-change {
