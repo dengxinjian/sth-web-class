@@ -30,7 +30,7 @@
           <div class="row-item">
             <span class="label">距离</span>
             <el-input-number
-              :step="1"
+              :step="0.1"
               :min="0"
               :step-strictly="true"
               :controls="false"
