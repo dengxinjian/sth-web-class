@@ -55,9 +55,9 @@
               : activity.activityName
           }}
         </div>
-        <div class="keyword">{{ activity.duration }}</div>
+        <div class="keyword">{{ activity.duration ? activity.duration : '--:--:--' }}</div>
         <div style="display: flex">
-          <div class="keyword">{{ activity.distance }}</div>
+          <div class="keyword">{{ activity.distance ? activity.distance : '--' }}</div>
           <div>km</div>
         </div>
         <div style="display: flex; gap: 4px;">
@@ -85,7 +85,7 @@
             v-if="!isRestType(activity.classesJson.sportType)"
           >
             {{
-              activity.classesJson.duration === '00:00:00'
+              !activity.classesJson.duration
                 ? '--:--:--'
                 : activity.classesJson.duration
             }}
@@ -93,7 +93,7 @@
           <div style="display: flex" v-if="activity.classesJson.distance">
             <div class="keyword">
               {{
-                activity.classesJson.distance === '0'
+                !activity.classesJson.distance
                   ? '--km'
                   : activity.classesJson.distance
               }}
@@ -103,11 +103,11 @@
             </div>
           </div>
           <div
-            style="display: flex"
+            style="display: flex; gap: 4px;"
             v-if="!isRestType(activity.classesJson.sportType)"
           >
-            <div class="keyword">{{ activity.classesJson.sth }}</div>
-            <div>&nbsp;&nbsp;STH</div>
+            <div class="keyword">{{ activity.classesJson.sth ? activity.classesJson.sth : '--' }}</div>
+            <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
           </div>
 
           <!-- 训练强度可视化 -->
