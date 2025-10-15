@@ -31,7 +31,7 @@
             </div>
             <div class="card-content">
               <div class="card-title">
-                {{ exerciseData[0].name }}{{ exerciseData[0].sportType }}
+                {{ exerciseData[0].name }}
               </div>
               <div class="card-duration">
                 {{
@@ -87,7 +87,12 @@
 
         <!-- 箭头 -->
         <div class="arrow-container">
-          <div class="arrow"></div>
+          <div
+            class="arrow"
+            :style="{
+              '--arrow-color': getClassIconArrowColor(courseData.sportType),
+            }"
+          ></div>
         </div>
 
         <!-- 右侧课程数据 -->
@@ -131,7 +136,7 @@
 
 <script>
 import { SPORT_TYPE_ICONS } from "../../constants";
-import { getClassImageIcon } from "../../utils/helpers";
+import { getClassImageIcon, getClassIconArrowColor } from "../../utils/helpers";
 
 export default {
   name: "BindModal",
@@ -180,6 +185,9 @@ export default {
     getSportIcon(sportType) {
       console.log(sportType, "sportType");
       return getClassImageIcon(sportType);
+    },
+    getClassIconArrowColor(sportType) {
+      return getClassIconArrowColor(sportType);
     },
     handleClose() {
       this.visible = false;
@@ -296,7 +304,7 @@ export default {
 .arrow {
   width: 0;
   height: 0;
-  border-left: 20px solid #8b5cf6;
+  border-left: 20px solid var(--arrow-color, #8b5cf6);
   border-top: 15px solid transparent;
   border-bottom: 15px solid transparent;
   position: relative;
@@ -308,7 +316,7 @@ export default {
     top: -15px;
     width: 0;
     height: 0;
-    border-left: 20px solid #8b5cf6;
+    border-left: 20px solid var(--arrow-color, #8b5cf6);
     border-top: 15px solid transparent;
     border-bottom: 15px solid transparent;
   }
@@ -320,7 +328,7 @@ export default {
     top: -15px;
     width: 0;
     height: 0;
-    border-left: 20px solid #8b5cf6;
+    border-left: 20px solid var(--arrow-color, #8b5cf6);
     border-top: 15px solid transparent;
     border-bottom: 15px solid transparent;
   }

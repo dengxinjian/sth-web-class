@@ -3,7 +3,7 @@
  */
 
 import { SPORT_TYPE_ICONS, COMPLETION_COLORS } from "../constants";
-import { getLunar } from 'chinese-lunar-calendar'
+import { getLunar } from "chinese-lunar-calendar";
 
 /**
  * 获取运动类型图标
@@ -32,6 +32,36 @@ export function getClassImageIcon(sportType) {
 }
 
 /**
+ * 根据运动类型获取箭头颜色（兼容数字类型）
+ * @param {Number|String} sportType 运动类型
+ * @returns {String} 颜色值
+ */
+export function getClassIconArrowColor(sportType) {
+  //   骑车 #B8A0E8
+  // 跑步 #FF3469
+  // 游泳 #35A9E0
+  // 力量 #B4B4B5
+  // 其他 #B4B4B5
+
+  const colorMap = {
+    // 数字类型映射
+    1: "#B8A0E8", // 骑车
+    2: "#FF3469", // 跑步
+    3: "#35A9E0", // 游泳
+    4: "#B4B4B5", // 力量
+    5: "#B4B4B5", // 其他
+    // 字符串类型映射
+    CYCLE: "#B8A0E8",
+    RUN: "#FF3469",
+    SWIM: "#35A9E0",
+    STRENGTH: "#B4B4B5",
+    OTHER: "#B4B4B5",
+  };
+
+  return colorMap[sportType] || "#B4B4B5";
+}
+
+/**
  * 根据完成百分比获取背景颜色
  * @param {Number} percent 完成百分比
  * @returns {Array} [backgroundColor, textColor]
@@ -41,9 +71,12 @@ export function getSportBackgroundColor(percent) {
 
   if (percent > 80 && percent <= 120) {
     return ["#83dfa1", "#fff"]; // 绿色 - 完成良好
-  } else if (percent > 120 && percent <= 145 || percent <= 80 && percent > 60) {
+  } else if (
+    (percent > 120 && percent <= 145) ||
+    (percent <= 80 && percent > 60)
+  ) {
     return ["#ffd18d", "#333"]; // 浅橙色 - 完成不足
-  } else if (percent > 0 && percent <= 60 || percent > 145) {
+  } else if ((percent > 0 && percent <= 60) || percent > 145) {
     return ["#dc8605", "#fff"]; // 深橙色 - 偏离计划
   }
 }
