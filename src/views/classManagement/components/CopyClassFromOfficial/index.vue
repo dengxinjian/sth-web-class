@@ -72,7 +72,7 @@ export default {
   data() {
     return {
       innerVisible: this.visible || this.value || false,
-      form: { destinationId: "", title: this.data.title || this.title },
+      form: { destinationId: "", title: "" },
       rules: {
         destinationId: [
           { required: true, message: "请选择目标分组", trigger: "change" },
@@ -86,12 +86,17 @@ export default {
     visible(val) {
       this.innerVisible = val;
     },
+    data(val) {
+      console.log(val, "val");
+      this.form.title =
+        this.activeClassType === "my" ? val.classesTitle + "_复制课程" : "";
+      console.log(this.form.title, "this.form.title");
+    },
     value(val) {
       if (typeof val !== "undefined") this.innerVisible = val;
     },
     groupId(val) {
       this.form.destinationId = val;
-      this.form.title = this.data.classesTitle
     },
     innerVisible(val) {
       if (!val) {
@@ -146,17 +151,15 @@ export default {
           }
         });
       } else {
-        const classesJson = JSON.parse(
-          JSON.stringify(this.data.classesJson)
-        );
-        classesJson.title = this.form.title + " 复制课程";
+        const classesJson = JSON.parse(JSON.stringify(this.data.classesJson));
+        classesJson.title = this.form.title;
         submitData({
           url: "/api/classes/create",
           classesGroupId: this.form.destinationId,
           labels: this.data.tags,
           sportType: this.data.sportType,
           classesJson: JSON.stringify(classesJson),
-          classesTitle: this.form.title + " 复制课程",
+          classesTitle: this.form.title,
         }).then((res) => {
           if (res.success) {
             this.$message.success("课程添加成功");
