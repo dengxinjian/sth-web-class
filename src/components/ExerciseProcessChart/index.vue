@@ -140,7 +140,7 @@ export default {
         width,
         height: `${heightPercent}%`,
         animationDelay: this.animated ? `${Math.random() * 0.5}s` : "0s",
-        minWidth: "2px",
+        minWidth: "1px",
       };
     },
     // 添加窗口大小变化监听
