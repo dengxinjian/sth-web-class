@@ -1012,8 +1012,13 @@ export default {
                 console.log(this.classInfo.distance, "this.classInfo.distance");
               }
             } else {
-              this.classInfo.distance +=
-                section.targetDistance * Number(stage.times || 1);
+              if (section.targetUnit === "m") {
+                this.classInfo.distance +=
+                  (section.targetDistance / 1000) * Number(stage.times || 1);
+              } else {
+                this.classInfo.distance +=
+                  section.targetDistance * Number(stage.times || 1);
+              }
               console.log(section, "section");
 
               if (section.range === "target") {
@@ -1043,14 +1048,14 @@ export default {
           ? this.translateTime(this.classInfo.duration)
           : "--:--:--";
         this.classInfo.distance = this.classInfo.distance
-          ? this.classInfo.distance
+          ? this.classInfo.distance.toFixed(2)
           : "--";
       } else {
         this.classInfo.duration = this.classInfo.duration
           ? this.translateTime(this.classInfo.duration)
           : "--:--:--";
         this.classInfo.distance = this.classInfo.distance
-          ? this.classInfo.distance
+          ? this.classInfo.distance.toFixed(2)
           : "--";
       }
     },
