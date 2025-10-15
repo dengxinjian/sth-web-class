@@ -47,22 +47,18 @@
         </span>
 
         <!-- 时长 -->
-        <span
-          v-if="
-            ['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(classData.sportType)
-          "
-        >
+        <span>
           {{
-            classData.classesJson.duration == "00:00:00"
+            classData.classesJson.duration == "00:00:00" || !classData.classesJson.duration
               ? "--:--:--"
               : classData.classesJson.duration
           }}
         </span>
 
         <!-- 距离 -->
-        <span v-if="['RUN', 'CYCLE', 'SWIM'].includes(classData.sportType)">
+        <span>
           {{
-            classData.classesJson.distance == 0
+            !classData.classesJson.distance
               ? "--"
               : classData.classesJson.distance
           }}
@@ -73,11 +69,7 @@
         </span>
 
         <!-- STH值 -->
-        <span
-          v-if="
-            ['RUN', 'CYCLE', 'SWIM', 'STRENGTH'].includes(classData.sportType)
-          "
-        >
+        <span>
           <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
           {{
             classData.classesJson.sth == 0 ? "--" : classData.classesJson.sth
@@ -189,6 +181,20 @@ export default {
     .sth {
       width: 24px;
       vertical-align: middle;
+    }
+
+    >span:nth-child(1) {
+      flex: 0 0 20px;
+    }
+    >span:nth-child(2) {
+      flex: 1;
+    }
+    >span:nth-child(3) {
+      flex: 1;
+      text-align: right;
+    }
+    >span:nth-child(4) {
+      flex: 1.5;
     }
   }
 }
