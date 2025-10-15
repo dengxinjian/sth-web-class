@@ -128,8 +128,7 @@ export default {
       const widthPercent = (exercise.duration / this.totalDuration) * 100;
       // 计算高度比例（基于强度）
       const heightPercent = (exercise.intensity / this.actualMaxIntensity) * 100;
-      // console.log(this.exerciseList.map((item) => item.intensity), "exercise");
-      // console.log(widthPercent, heightPercent, Math.max(...this.exerciseList.map((item) => item.intensity), 0), "widthPercent, heightPercent");
+      console.log(widthPercent, heightPercent, "widthPercent, heightPercent",exercise);
 
       // 最后一个矩形不需要减去gap
       const isLast = index === this.exerciseList.length - 1;
@@ -141,6 +140,7 @@ export default {
         width,
         height: `${heightPercent}%`,
         animationDelay: this.animated ? `${Math.random() * 0.5}s` : "0s",
+        minWidth: "1px",
       };
     },
     // 添加窗口大小变化监听

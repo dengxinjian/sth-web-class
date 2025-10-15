@@ -4,14 +4,16 @@
     :visible.sync="visible"
     width="600px"
     :before-close="handleClose"
-     :close-on-click-modal="false"
+    :close-on-click-modal="false"
     center
   >
     <div class="bind-modal-content">
       <!-- 问题文本 -->
       <div class="question-text">
         <p class="question">你确定将选择的课程和运动数据进行匹配吗？</p>
-        <p class="explanation">匹配后会将完成的运动数据加到课程中。您的所有数据、描述和评论都将保持不变。</p>
+        <p class="explanation">
+          匹配后会将完成的运动数据加到课程中。您的所有数据、描述和评论都将保持不变。
+        </p>
       </div>
 
       <!-- 数据匹配可视化 -->
@@ -20,25 +22,63 @@
         <div class="exercise-data">
           <div class="exercise-card">
             <div class="card-icon">
-              <i class="el-icon-dumbbell"></i>
+              <img
+                width="40"
+                height="40"
+                :src="getSportTypeIcon(exerciseData[0].sportType)"
+                alt=""
+              />
             </div>
             <div class="card-content">
-              <div class="card-title">{{ exerciseData.name }}</div>
-              <div class="card-duration">{{ exerciseData.duration }}</div>
-              <div class="card-sth">{{ exerciseData.sth }} STH</div>
-              <div class="card-distance">{{ exerciseData.distance }}km</div>
+              <div class="card-title">{{ exerciseData[0].name }}</div>
+              <div class="card-duration">
+                {{
+                  exerciseData[0].duration == "00:00:00"
+                    ? "--:--:--"
+                    : exerciseData[0].duration
+                }}
+              </div>
+              <div class="card-sth">
+                {{ exerciseData[0].sth == 0 ? "--" : exerciseData[0].sth }} STH
+              </div>
+              <div class="card-distance">
+                {{
+                  exerciseData[0].distance == 0
+                    ? "--"
+                    : exerciseData[0].distance
+                }}km
+              </div>
             </div>
           </div>
 
           <div class="exercise-card">
             <div class="card-icon">
-              <i class="el-icon-dumbbell"></i>
+              <!-- <i class="el-icon-dumbbell"></i> -->
+              <img
+                width="40"
+                height="40"
+                :src="getSportTypeIcon(courseData.sportType)"
+                alt=""
+              />
             </div>
             <div class="card-content">
               <div class="card-title">{{ courseData.name }}</div>
-              <div class="card-duration">{{ courseData.duration }}</div>
-              <div class="card-sth">{{ courseData.sth }} STH</div>
-              <div class="card-distance">{{ courseData.distance }} <span v-if="courseData.distanceUnit">{{ courseData.distanceUnit }}</span></div>
+              <div class="card-duration">
+                {{
+                  courseData.duration == "00:00:00"
+                    ? "--:--:--"
+                    : courseData.duration
+                }}
+              </div>
+              <div class="card-sth">
+                {{ courseData.sth == 0 ? "--" : courseData.sth }} STH
+              </div>
+              <div class="card-distance">
+                {{ courseData.distance == 0 ? "--" : courseData.distance }}
+                <span v-if="courseData.distanceUnit">{{
+                  courseData.distanceUnit
+                }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -52,12 +92,25 @@
         <div class="course-data">
           <div class="course-card">
             <div class="card-icon">
-              <i class="el-icon-dumbbell"></i>
+              <img
+                width="40"
+                height="40"
+                :src="getSportTypeIcon(courseData.sportType)"
+                alt=""
+              />
             </div>
             <div class="card-content">
-              <div class="card-title">{{ exerciseData.name }}</div>
-              <div class="card-duration">{{ exerciseData.duration }}</div>
-              <div class="card-sth">{{ exerciseData.sth }} STH</div>
+              <div class="card-title">{{ courseData.name }}</div>
+              <div class="card-duration">
+                {{
+                  exerciseData[0].duration == "00:00:00"
+                    ? "--:--:--"
+                    : exerciseData[0].duration
+                }}
+              </div>
+              <div class="card-sth">
+                {{ exerciseData[0].sth == 0 ? "--" : exerciseData[0].sth }} STH
+              </div>
             </div>
           </div>
         </div>
@@ -73,68 +126,71 @@
 </template>
 
 <script>
+import { SPORT_TYPE_ICONS } from "../../constants";
+
 export default {
-  name: 'BindModal',
+  name: "BindModal",
   props: {
     value: {
       type: Boolean,
-      default: false
+      default: false,
     },
     exerciseData: {
       type: Array,
-      default: () => (
-        {
-          name: 'Strength',
-          duration: '0:55:58',
-          sth: '28',
-          id: ''
-        }
-      )
+      default: () => ({
+        name: "Strength",
+        duration: "0:55:58",
+        sth: "28",
+        id: "",
+      }),
     },
     courseData: {
       type: Object,
       default: () => ({
-        name: '肌肉耐力训练(e)',
-        duration: '0:55:58',
-        sth: '28',
-        dataDate: ''
-      })
+        name: "肌肉耐力训练(e)",
+        duration: "0:55:58",
+        sth: "28",
+        dataDate: "",
+      }),
     },
     type: {
       type: String,
-      default: ''
-    }
+      default: "",
+    },
   },
   computed: {
     visible: {
       get() {
-        return this.value
+        return this.value;
       },
       set(val) {
-        this.$emit('input', val)
-      }
-    }
+        this.$emit("input", val);
+      },
+    },
   },
   methods: {
+    getSportTypeIcon(sportType) {
+      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+    },
     handleClose() {
-      this.visible = false
-      this.$emit('cancel')
+      this.visible = false;
+      this.$emit("cancel");
     },
     handleCancel() {
-      this.visible = false
-      this.$emit('cancel')
+      this.visible = false;
+      this.$emit("cancel");
     },
     handleBind() {
       console.log("匹配数据：", this.exerciseData, this.courseData, this.type);
-      this.$emit('bind', {
+      this.$emit("bind", {
         exerciseData: this.exerciseData,
         courseData: this.courseData,
-        type: this.type
-      })
-      this.visible = false
-    }
-  }
-}
+        type: this.type,
+      });
+      this.visible = false;
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -190,7 +246,7 @@ export default {
 .card-icon {
   width: 40px;
   height: 40px;
-  background: #8B5CF6;
+  background: #8b5cf6;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -231,31 +287,31 @@ export default {
 .arrow {
   width: 0;
   height: 0;
-  border-left: 20px solid #8B5CF6;
+  border-left: 20px solid #8b5cf6;
   border-top: 15px solid transparent;
   border-bottom: 15px solid transparent;
   position: relative;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: -25px;
     top: -15px;
     width: 0;
     height: 0;
-    border-left: 20px solid #8B5CF6;
+    border-left: 20px solid #8b5cf6;
     border-top: 15px solid transparent;
     border-bottom: 15px solid transparent;
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     left: -30px;
     top: -15px;
     width: 0;
     height: 0;
-    border-left: 20px solid #8B5CF6;
+    border-left: 20px solid #8b5cf6;
     border-top: 15px solid transparent;
     border-bottom: 15px solid transparent;
   }
