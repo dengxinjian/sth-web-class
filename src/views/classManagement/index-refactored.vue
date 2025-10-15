@@ -824,6 +824,7 @@ export default {
         id: classScheduleId,
         sportType,
       };
+      console.log(this.sportDetailData, "this.sportDetailData");
       this.showSportDetailModal = true;
     },
 
