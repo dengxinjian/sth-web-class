@@ -112,6 +112,7 @@ export default {
           new Sortable(el, {
             group: {
               name: 'classDrag',
+              pull: 'clone',
               put: function(e, b) {
                 // 只允许同一天的运动拖到课表
                 if (

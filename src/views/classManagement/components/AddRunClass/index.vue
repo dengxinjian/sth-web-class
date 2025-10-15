@@ -1548,7 +1548,7 @@ export default {
   .time-stage {
     flex: 1;
     position: relative;
-    height: 32px;
+    height: auto;
     &:hover {
       background-color: #e8e8e8;
       .time-stage-close {

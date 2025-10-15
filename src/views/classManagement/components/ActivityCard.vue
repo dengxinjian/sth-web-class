@@ -60,9 +60,9 @@
           <div class="keyword">{{ activity.distance }}</div>
           <div>km</div>
         </div>
-        <div style="display: flex">
-          <div class="keyword">{{ activity.sthValue }}</div>
-          <div>&nbsp;&nbsp;STH</div>
+        <div style="display: flex; gap: 4px;">
+          <div class="keyword">{{ activity.sthValue ? activity.sthValue : '--' }}</div>
+          <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
         </div>
 
         <!-- 如果有匹配的课表，显示课表详情 -->

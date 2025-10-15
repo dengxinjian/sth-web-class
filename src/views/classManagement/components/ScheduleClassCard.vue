@@ -76,13 +76,13 @@
         </div>
 
         <!-- STH -->
-        <div style="display: flex" v-if="!isRestType(classItem.sportType)">
+        <div style="display: flex; gap: 4px;" v-if="!isRestType(classItem.sportType)">
           <div class="keyword">
             {{
-              classItem.classesJson.sth == 0 ? "--" : classItem.classesJson.sth
+              !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
             }}
           </div>
-          <div>&nbsp;&nbsp;STH</div>
+          <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
         </div>
 
         <!-- 概要 -->

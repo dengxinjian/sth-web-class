@@ -72,7 +72,7 @@
         <span>
           <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
           {{
-            classData.classesJson.sth == 0 ? "--" : classData.classesJson.sth
+            !classData.classesJson.sth ? "--" : classData.classesJson.sth
           }}
         </span>
       </div>
@@ -190,7 +190,7 @@ export default {
       flex: 1;
     }
     >span:nth-child(3) {
-      flex: 1;
+      flex: 1.2;
       text-align: right;
     }
     >span:nth-child(4) {

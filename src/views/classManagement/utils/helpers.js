@@ -37,13 +37,13 @@ export function getClassImageIcon(sportType) {
  * @returns {Array} [backgroundColor, textColor]
  */
 export function getSportBackgroundColor(percent) {
-  if (!percent) return ["#fff", "#333"];
+  if (!percent) return ["rgba(199, 199, 199, 1)", "#333"];
 
-  if (percent >= 80 && percent <= 120) {
+  if (percent > 80 && percent <= 120) {
     return ["#83dfa1", "#fff"]; // 绿色 - 完成良好
-  } else if (percent < 60) {
+  } else if (percent > 120 && percent <= 145 || percent <= 80 && percent > 60) {
     return ["#ffd18d", "#333"]; // 浅橙色 - 完成不足
-  } else {
+  } else if (percent > 0 && percent <= 60 || percent > 145) {
     return ["#dc8605", "#fff"]; // 深橙色 - 偏离计划
   }
 }
