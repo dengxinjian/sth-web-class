@@ -85,18 +85,18 @@
                     <el-button
                       type="text"
                       :disabled="!item.groupId"
-                      @click="$emit('delete-group', item.groupId)"
+                      @click="$emit('move-group', item.groupId)"
                     >
-                      删除分组
+                      移动分组
                     </el-button>
                   </span>
                   <span>
                     <el-button
                       type="text"
                       :disabled="!item.groupId"
-                      @click="$emit('move-group', item.groupId)"
+                      @click="$emit('delete-group', item.groupId)"
                     >
-                      移动分组
+                      删除分组
                     </el-button>
                   </span>
                 </div>

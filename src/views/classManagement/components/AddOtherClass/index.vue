@@ -15,6 +15,63 @@
           <el-input v-model="form.title" placeholder="标题" :maxlength="50" class="pill-input" :disabled="originalType === 'official'" />
         </el-form-item>
 
+        <div class="row">
+          <div class="row-item icon-box">
+            <img src="~@/assets/addClass/icon-other.png" width="30" alt="" />
+          </div>
+          <div class="row-item">
+            <span class="label">距离</span>
+            <el-input-number
+              :step="0.1"
+              :min="0"
+              :step-strictly="true"
+              :controls="false"
+              v-model="form.distance"
+              :disabled="originalType === 'official'"
+              placeholder=""
+              class="pill-input short"
+            />
+          </div>
+          <div class="row-item">
+            <el-select
+              v-model="form.distanceUnit"
+              :disabled="originalType === 'official'"
+              class="pill-select short"
+            >
+              <el-option label="m" value="m" />
+              <el-option label="km" value="km" />
+            </el-select>
+          </div>
+          <div class="row-item">
+            <span class="label">时长</span>
+            <!-- <el-time-picker
+              v-model="form.duration"
+              value-format="HH:mm:ss"
+              format="HH:mm:ss"
+              placeholder="00:00:00"
+              class="pill-time"
+            /> -->
+            <TimeInput
+              v-model="form.duration"
+              size="small"
+              :disabled="originalType === 'official'"
+            />
+          </div>
+          <div class="row-item">
+            <span class="label">STH</span>
+            <el-input-number
+              :step="1"
+              :min="0"
+              :step-strictly="true"
+              :controls="false"
+              v-model="form.sth"
+              :disabled="originalType === 'official'"
+              placeholder=""
+              class="pill-input short"
+            />
+          </div>
+        </div>
+
         <div class="summary">
           <div class="summary-title">概要</div>
           <div class="editor-wrapper">
@@ -44,9 +101,13 @@
 
 <script>
 import {getData, submitData} from '@/api/common.js'
+import TimeInput from "@/views/classManagement/components/timeInpt";
 
 export default {
   name: 'AddSwimClassDialog',
+  components: {
+    TimeInput,
+  },
   props: {
     visible: {
       type: Boolean,

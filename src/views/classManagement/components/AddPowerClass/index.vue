@@ -20,6 +20,29 @@
             <img src="~@/assets/addClass/icon-power.png" width="30" alt="">
           </div>
           <div class="row-item">
+            <span class="label">距离</span>
+            <el-input-number
+              :step="0.1"
+              :min="0"
+              :step-strictly="true"
+              :controls="false"
+              v-model="form.distance"
+              :disabled="originalType === 'official'"
+              placeholder=""
+              class="pill-input short"
+            />
+          </div>
+          <div class="row-item">
+            <el-select
+              v-model="form.distanceUnit"
+              :disabled="originalType === 'official'"
+              class="pill-select short"
+            >
+              <el-option label="m" value="m" />
+              <el-option label="km" value="km" />
+            </el-select>
+          </div>
+          <div class="row-item">
             <span class="label">时长</span>
             <!-- <el-time-picker
               v-model="form.duration"
