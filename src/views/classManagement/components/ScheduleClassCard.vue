@@ -1,129 +1,159 @@
 <template>
-  <div
-    class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
-    :data-id="classItem.id"
-    :data-date="date"
-  >
+  <div>
     <div
-      class="classScheduleCard"
-      :style="cardStyle"
+      class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
       :data-id="classItem.id"
       :data-date="date"
-      @click.stop="$emit('click', classItem.id, classItem.sportType)"
     >
-      <div class="card-body class-drap-handle" style="background-color: white">
-        <!-- 标题栏 -->
-        <div class="body-title">
-          <div class="sport-type-icon">
-            <img
-              class="image-icon"
-              :src="getSportIcon(classItem.sportType)"
-              alt=""
-            />
-            <!-- 设备同步状态 -->
-            <div
-              v-for="device in classItem.syncStatusList"
-              :key="device.deviceType + device.syncStatus"
-              :class="[
-                'sport-type-name',
-                'sport-type-color' + device.syncStatus,
-              ]"
-              @click.stop="$emit('device-click', classItem, device)"
-            >
-              {{ getDeviceIcon(device.deviceType) }}
-            </div>
-          </div>
-          <el-popover
-            popper-class="athletic-btn-popover"
-            placement="right"
-            trigger="click"
-            tabindex="9999"
-          >
-            <div class="btn-list-hover">
-              <el-button
-                type="text"
-                @click.stop="$emit('delete', classItem.id)"
-              >
-                删除
-              </el-button>
-            </div>
-            <i class="el-icon-more" slot="reference" @click.stop></i>
-          </el-popover>
-        </div>
-
-        <!-- 课程标题 -->
-        <div class="title">{{ classItem.classesJson.title }}</div>
-
-        <!-- 运动类型 -->
-        <div class="keyword">
-          {{ classItem.sportType === "CYCLE" ? "BIKE" : classItem.sportType }}
-        </div>
-
-        <!-- 时长 -->
-        <div class="keyword" v-if="!isRestType(classItem.sportType)">
-          {{ formatDuration(classItem.classesJson.duration) }}
-        </div>
-
-        <!-- 距离 -->
-        <div style="display: flex" v-if="classItem.classesJson.distance">
-          <div class="keyword">
-            {{ formatDistance(classItem.classesJson.distance) }}
-            <span v-if="classItem.sportType === 'SWIM'">
-              {{ classItem.classesJson.distanceUnit }}
-            </span>
-          </div>
-          <div>&nbsp;&nbsp;</div>
-        </div>
-
-        <!-- STH -->
-        <div style="display: flex; gap: 4px;" v-if="!isRestType(classItem.sportType)">
-          <div class="keyword">
-            {{
-              !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
-            }}
-          </div>
-          <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
-        </div>
-
-        <!-- 概要 -->
-        <pre v-if="classItem.classesJson.summary" class="stage-details">
-          {{ truncateByLines(classItem.classesJson.summary) }}
-        </pre>
-
-        <!-- 骑行详情 -->
-        <template v-else-if="classItem.sportType === 'CYCLE'">
-          <CycleStageDetails :class-data="classItem.classesJson" />
-        </template>
-
-        <!-- 跑步详情 -->
-        <template v-else-if="classItem.sportType === 'RUN'">
-          <RunStageDetails :class-data="classItem.classesJson" />
-        </template>
-
-        <!-- 训练强度可视化 -->
+      <div
+        class="classScheduleCard"
+        :style="cardStyle"
+        :data-id="classItem.id"
+        :data-date="date"
+        @click.stop="
+          $emit('click', classItem.id, classItem.sportType);
+          hideContextMenu();
+        "
+        @contextmenu.prevent="showContextMenu"
+      >
         <div
-          v-if="classItem.classesJson.timeline"
-          style="height: 16px; display: flex; gap: 1px"
+          class="card-body class-drap-handle"
+          style="background-color: white"
         >
+          <!-- 标题栏 -->
+          <div class="body-title">
+            <div class="sport-type-icon">
+              <img
+                class="image-icon"
+                :src="getSportIcon(classItem.sportType)"
+                alt=""
+              />
+              <!-- 设备同步状态 -->
+              <div
+                v-for="device in classItem.syncStatusList"
+                :key="device.deviceType + device.syncStatus"
+                :class="[
+                  'sport-type-name',
+                  'sport-type-color' + device.syncStatus,
+                ]"
+                @click.stop="$emit('device-click', classItem, device)"
+              >
+                {{ getDeviceIcon(device.deviceType) }}
+              </div>
+            </div>
+            <el-popover
+              popper-class="athletic-btn-popover"
+              placement="right"
+              trigger="click"
+              tabindex="9999"
+            >
+              <div class="btn-list-hover">
+                <el-button
+                  type="text"
+                  @click.stop="$emit('delete', classItem.id)"
+                >
+                  删除
+                </el-button>
+              </div>
+              <i class="el-icon-more" slot="reference" @click.stop></i>
+            </el-popover>
+          </div>
+
+          <!-- 课程标题 -->
+          <div class="title">{{ classItem.classesJson.title }}</div>
+
+          <!-- 运动类型 -->
+          <div class="keyword">
+            {{ classItem.sportType === "CYCLE" ? "BIKE" : classItem.sportType }}
+          </div>
+
+          <!-- 时长 -->
+          <div class="keyword" v-if="!isRestType(classItem.sportType)">
+            {{ formatDuration(classItem.classesJson.duration) }}
+          </div>
+
+          <!-- 距离 -->
+          <div style="display: flex" v-if="classItem.classesJson.distance">
+            <div class="keyword">
+              {{ formatDistance(classItem.classesJson.distance) }}
+              <span v-if="classItem.sportType === 'SWIM'">
+                {{ classItem.classesJson.distanceUnit }}
+              </span>
+            </div>
+            <div>&nbsp;&nbsp;</div>
+          </div>
+
+          <!-- STH -->
           <div
-            v-for="(stage, index) in classItem.classesJson.timeline"
-            :key="index"
-            class="time-stage"
-            :style="{ flex: stage.duration }"
+            style="display: flex; gap: 4px"
+            v-if="!isRestType(classItem.sportType)"
           >
-            <div style="display: flex; gap: 1px; height: 16px">
-              <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
-                <ExerciseProcessChart
-                  :exerciseList="stage.stageTimeline"
-                  :maxIntensity="classItem.classesJson.maxIntensity"
-                  :height="16"
-                />
+            <div class="keyword">
+              {{
+                !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
+              }}
+            </div>
+            <div>
+              <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+            </div>
+          </div>
+
+          <!-- 概要 -->
+          <pre v-if="classItem.classesJson.summary" class="stage-details">
+          {{ truncateByLines(classItem.classesJson.summary) }}
+        </pre
+          >
+
+          <!-- 骑行详情 -->
+          <template v-else-if="classItem.sportType === 'CYCLE'">
+            <CycleStageDetails :class-data="classItem.classesJson" />
+          </template>
+
+          <!-- 跑步详情 -->
+          <template v-else-if="classItem.sportType === 'RUN'">
+            <RunStageDetails :class-data="classItem.classesJson" />
+          </template>
+
+          <!-- 训练强度可视化 -->
+          <div
+            v-if="classItem.classesJson.timeline"
+            style="height: 16px; display: flex; gap: 1px"
+          >
+            <div
+              v-for="(stage, index) in classItem.classesJson.timeline"
+              :key="index"
+              class="time-stage"
+              :style="{ flex: stage.duration }"
+            >
+              <div style="display: flex; gap: 1px; height: 16px">
+                <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
+                  <ExerciseProcessChart
+                    :exerciseList="stage.stageTimeline"
+                    :maxIntensity="classItem.classesJson.maxIntensity"
+                    :height="16"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 自定义右键菜单 -->
+    <transition name="context-menu-fade">
+      <div
+        v-if="contextMenuVisible"
+        class="context-menu"
+        :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
+        @click.stop
+      >
+        <div class="context-menu-item" @click="handleDelete">
+          <i class="el-icon-delete"></i>
+          删除
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -151,6 +181,13 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      contextMenuVisible: false,
+      contextMenuX: 0,
+      contextMenuY: 0,
+    };
+  },
   computed: {
     cardStyle() {
       // 过期且有时长的课程显示为红色
@@ -163,6 +200,12 @@ export default {
       }
       return { backgroundColor: "#fff" };
     },
+  },
+  mounted() {
+    document.addEventListener("click", this.hideContextMenu);
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
     truncateByLines,
@@ -180,6 +223,18 @@ export default {
     },
     formatDistance(distance) {
       return !distance || distance === "0" ? "--km" : distance;
+    },
+    showContextMenu(event) {
+      this.contextMenuVisible = true;
+      this.contextMenuX = event.clientX;
+      this.contextMenuY = event.clientY;
+    },
+    hideContextMenu() {
+      this.contextMenuVisible = false;
+    },
+    handleDelete() {
+      this.hideContextMenu();
+      this.$emit("delete", this.classItem.id);
     },
   },
 };
@@ -209,7 +264,7 @@ export default {
     transform: scale(1.02);
   }
 
-  >.classScheduleCard {
+  > .classScheduleCard {
     display: none;
   }
 
@@ -290,5 +345,46 @@ export default {
 
 .time-stage {
   height: 16px;
+}
+
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 99999;
+  padding: 4px 0;
+  min-width: 120px;
+
+  .context-menu-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #606266;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    i {
+      font-size: 16px;
+    }
+
+    &:hover {
+      background-color: #f5f7fa;
+      color: #cc2323;
+    }
+  }
+}
+
+.context-menu-fade-enter-active,
+.context-menu-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.context-menu-fade-enter,
+.context-menu-fade-leave-to {
+  opacity: 0;
 }
 </style>

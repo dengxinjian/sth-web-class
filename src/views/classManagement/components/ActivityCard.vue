@@ -1,180 +1,255 @@
 <template>
-  <div
-    class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
-    :style="{ backgroundColor: bgColor }"
-    :data-id="activity.activityId"
-    :data-date="date"
-  >
+  <div>
     <div
-      :class="['card-body', 'sport-drap-handle', activity.classScheduleId ? 'js-sport-card-noDrag' : '']"
+      class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
+      :style="{ backgroundColor: bgColor }"
       :data-id="activity.activityId"
       :data-date="date"
-      style="background-color: #fff"
     >
-      <div class="body-title" style="background-color: #fff">
-        <div class="sport-type-icon">
-          <img
-            class="image-icon"
-            :src="getSportIcon(activity.sportType)"
-            alt=""
-          />
-        </div>
-        <el-popover
-          popper-class="athletic-btn-popover"
-          placement="right"
-          trigger="click"
-        >
-          <div class="btn-list-hover">
-            <el-button
-              v-if="activity.classesJson"
-              type="text"
-              @click="$emit('unbind', activity.classScheduleId)"
-            >
-              解除匹配
-            </el-button>
-            <el-button
-              v-if="!activity.classesJson"
-              type="text"
-              @click="$emit('delete', activity.activityId)"
-            >
-              删除
-            </el-button>
-          </div>
-          <i class="el-icon-more" slot="reference" @click.stop></i>
-        </el-popover>
-      </div>
-
       <div
-        class="sport-record-data"
-        @click="$emit('click', activity.activityId, activity.classScheduleId, activity.sportType)"
+        :class="[
+          'card-body',
+          'sport-drap-handle',
+          activity.classScheduleId ? 'js-sport-card-noDrag' : '',
+        ]"
+        :data-id="activity.activityId"
+        :data-date="date"
+        style="background-color: #fff"
+        @contextmenu.prevent="showContextMenu"
       >
-        <div class="title">
-          {{
-            activity.classesJson
-              ? activity.classesJson.title
-              : activity.activityName
-          }}
-        </div>
-        <div class="keyword">{{ activity.duration }}</div>
-        <div style="display: flex">
-          <div class="keyword">{{ activity.distance }}</div>
-          <div>km</div>
-        </div>
-        <div style="display: flex; gap: 4px;">
-          <div class="keyword">{{ activity.sthValue ? activity.sthValue : '--' }}</div>
-          <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
-        </div>
-
-        <!-- 如果有匹配的课表，显示课表详情 -->
-        <template v-if="activity.classScheduleId && activity.classesJson">
-          <div v-if="activity.classesJson.summary" class="stage-details">
-            {{ activity.classesJson.summary }}
+        <div class="body-title" style="background-color: #fff">
+          <div class="sport-type-icon">
+            <img
+              class="image-icon"
+              :src="getSportIcon(activity.sportType)"
+              alt=""
+            />
           </div>
-          <CycleStageDetails
-            v-else-if="activity.sportType === 1"
-            :class-data="activity.classesJson"
-          />
-          <RunStageDetails
-            v-else-if="activity.sportType === 2"
-            :class-data="activity.classesJson"
-          />
-
-          <!-- 时长、距离、STH -->
-          <div
-            class="keyword"
-            v-if="!isRestType(activity.classesJson.sportType)"
+          <el-popover
+            popper-class="athletic-btn-popover"
+            placement="right"
+            trigger="click"
           >
+            <div class="btn-list-hover">
+              <el-button
+                v-if="activity.classesJson"
+                type="text"
+                @click="$emit('unbind', activity.classScheduleId)"
+              >
+                解除匹配
+              </el-button>
+              <el-button
+                v-if="!activity.classesJson"
+                type="text"
+                @click="$emit('delete', activity.activityId)"
+              >
+                删除
+              </el-button>
+            </div>
+            <i class="el-icon-more" slot="reference" @click.stop></i>
+          </el-popover>
+        </div>
+
+        <div
+          class="sport-record-data"
+          @click="
+            $emit(
+              'click',
+              activity.activityId,
+              activity.classScheduleId,
+              activity.sportType
+            );
+            hideContextMenu();
+          "
+        >
+          <div class="title">
             {{
-              activity.classesJson.duration === '00:00:00'
-                ? '--:--:--'
-                : activity.classesJson.duration
+              activity.classesJson
+                ? activity.classesJson.title
+                : activity.activityName
             }}
           </div>
-          <div style="display: flex" v-if="activity.classesJson.distance">
+          <div class="keyword">{{ activity.duration }}</div>
+          <div style="display: flex">
+            <div class="keyword">{{ activity.distance }}</div>
+            <div>km</div>
+          </div>
+          <div style="display: flex; gap: 4px">
             <div class="keyword">
-              {{
-                activity.classesJson.distance === '0'
-                  ? '--km'
-                  : activity.classesJson.distance
-              }}
-              <span v-if="activity.sportType === 3">
-                {{ activity.classesJson.distanceUnit }}
-              </span>
+              {{ activity.sthValue ? activity.sthValue : "--" }}
+            </div>
+            <div>
+              <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
             </div>
           </div>
-          <div
-            style="display: flex"
-            v-if="!isRestType(activity.classesJson.sportType)"
-          >
-            <div class="keyword">{{ activity.classesJson.sth }}</div>
-            <div>&nbsp;&nbsp;STH</div>
-          </div>
 
-          <!-- 训练强度可视化 -->
-          <div
-            v-if="activity.classesJson.timeline"
-            style="height: 16px; display: flex; gap: 1px"
-          >
+          <!-- 如果有匹配的课表，显示课表详情 -->
+          <template v-if="activity.classScheduleId && activity.classesJson">
+            <div v-if="activity.classesJson.summary" class="stage-details">
+              {{ activity.classesJson.summary }}
+            </div>
+            <CycleStageDetails
+              v-else-if="activity.sportType === 1"
+              :class-data="activity.classesJson"
+            />
+            <RunStageDetails
+              v-else-if="activity.sportType === 2"
+              :class-data="activity.classesJson"
+            />
+
+            <!-- 时长、距离、STH -->
             <div
-              v-for="(stage, index) in activity.classesJson.timeline"
-              :key="index"
-              class="time-stage"
-              :style="{ flex: stage.duration }"
+              class="keyword"
+              v-if="!isRestType(activity.classesJson.sportType)"
             >
-              <div style="display: flex; gap: 1px; height: 16px">
-                <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
-                  <ExerciseProcessChart
-                    :exerciseList="stage.stageTimeline"
-                    :maxIntensity="activity.classesJson.maxIntensity"
-                    :height="16"
-                  />
+              {{
+                activity.classesJson.duration === "00:00:00"
+                  ? "--:--:--"
+                  : activity.classesJson.duration
+              }}
+            </div>
+            <div style="display: flex" v-if="activity.classesJson.distance">
+              <div class="keyword">
+                {{
+                  activity.classesJson.distance === "0"
+                    ? "--km"
+                    : activity.classesJson.distance
+                }}
+                <span v-if="activity.sportType === 3">
+                  {{ activity.classesJson.distanceUnit }}
+                </span>
+              </div>
+            </div>
+            <div
+              style="display: flex"
+              v-if="!isRestType(activity.classesJson.sportType)"
+            >
+              <div class="keyword">{{ activity.classesJson.sth }}</div>
+              <div>&nbsp;&nbsp;STH</div>
+            </div>
+
+            <!-- 训练强度可视化 -->
+            <div
+              v-if="activity.classesJson.timeline"
+              style="height: 16px; display: flex; gap: 1px"
+            >
+              <div
+                v-for="(stage, index) in activity.classesJson.timeline"
+                :key="index"
+                class="time-stage"
+                :style="{ flex: stage.duration }"
+              >
+                <div style="display: flex; gap: 1px; height: 16px">
+                  <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
+                    <ExerciseProcessChart
+                      :exerciseList="stage.stageTimeline"
+                      :maxIntensity="activity.classesJson.maxIntensity"
+                      :height="16"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
     </div>
+
+    <!-- 自定义右键菜单 -->
+    <transition name="context-menu-fade">
+      <div
+        v-if="contextMenuVisible"
+        class="context-menu"
+        :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
+        @click.stop
+      >
+        <div
+          v-if="activity.classesJson"
+          class="context-menu-item"
+          @click="handleUnbind"
+        >
+          <i class="el-icon-link"></i>
+          解除匹配
+        </div>
+        <div
+          v-if="!activity.classesJson"
+          class="context-menu-item"
+          @click="handleDelete"
+        >
+          <i class="el-icon-delete"></i>
+          删除
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
-import ExerciseProcessChart from '@/components/ExerciseProcessChart'
-import CycleStageDetails from './CycleStageDetails.vue'
-import RunStageDetails from './RunStageDetails.vue'
-import { getSportBackgroundColor, getClassImageIcon } from '../utils/helpers'
+import ExerciseProcessChart from "@/components/ExerciseProcessChart";
+import CycleStageDetails from "./CycleStageDetails.vue";
+import RunStageDetails from "./RunStageDetails.vue";
+import { getSportBackgroundColor, getClassImageIcon } from "../utils/helpers";
 
 export default {
-  name: 'ActivityCard',
+  name: "ActivityCard",
   components: {
     ExerciseProcessChart,
     CycleStageDetails,
-    RunStageDetails
+    RunStageDetails,
   },
   props: {
     activity: {
       type: Object,
-      required: true
+      required: true,
     },
     date: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
+  },
+  data() {
+    return {
+      contextMenuVisible: false,
+      contextMenuX: 0,
+      contextMenuY: 0,
+    };
   },
   computed: {
     bgColor() {
-      return getSportBackgroundColor(this.activity.percent)[0]
-    }
+      return getSportBackgroundColor(this.activity.percent)[0];
+    },
+  },
+  mounted() {
+    document.addEventListener("click", this.hideContextMenu);
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
     getSportIcon(sportType) {
-      return getClassImageIcon(sportType)
+      return getClassImageIcon(sportType);
     },
     isRestType(sportType) {
-      return ['REST', 'REMARK', 'OTHER'].includes(sportType)
-    }
-  }
-}
+      return ["REST", "REMARK", "OTHER"].includes(sportType);
+    },
+    showContextMenu(event) {
+      this.contextMenuVisible = true;
+      this.contextMenuX = event.clientX;
+      this.contextMenuY = event.clientY;
+    },
+    hideContextMenu() {
+      this.contextMenuVisible = false;
+    },
+    handleUnbind() {
+      this.hideContextMenu();
+      this.$emit("unbind", this.activity.classScheduleId);
+    },
+    handleDelete() {
+      this.hideContextMenu();
+      this.$emit("delete", this.activity.activityId);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -256,5 +331,45 @@ export default {
 .time-stage {
   height: 16px;
 }
-</style>
 
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 99999;
+  padding: 4px 0;
+  min-width: 120px;
+
+  .context-menu-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #606266;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    i {
+      font-size: 16px;
+    }
+
+    &:hover {
+      background-color: #f5f7fa;
+      color: #cc2323;
+    }
+  }
+}
+
+.context-menu-fade-enter-active,
+.context-menu-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.context-menu-fade-enter,
+.context-menu-fade-leave-to {
+  opacity: 0;
+}
+</style>
