@@ -102,7 +102,7 @@
                   $emit('class-detail', classItem.id, classItem.sportType)
                 "
                 @delete="$emit('delete-schedule', $event)"
-                @device-click="$emit('device-click', $event)"
+                @device-click="handleDeviceClick"
               />
 
               <!-- 运动记录卡片 -->
@@ -166,7 +166,10 @@ export default {
   },
   methods: {
     isToday,
-    convertToLunar
+    convertToLunar,
+    handleDeviceClick(classItem, device) {
+      this.$emit("device-click", classItem, device);
+    },
   },
 };
 </script>
