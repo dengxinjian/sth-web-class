@@ -120,6 +120,7 @@
               @move="$emit('move-class', classItem.id, item.groupId)"
               @delete="$emit('delete-class', classItem.id)"
               @copy="$emit('copy-class', classItem, item.groupId, classItem.title)"
+              @view="$emit('view-class', classItem.id)"
             />
           </div>
         </el-collapse-item>

@@ -26,8 +26,16 @@
           <span>
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
-          <span> {{ classInfo.duration }}</span>
-          <span> {{ classInfo.distance }}km</span>
+          <span>{{
+            classInfo.duration == "00:00:00" || !classInfo.duration
+              ? "--:--:--"
+              : classInfo.duration
+          }}</span>
+          <span>{{
+            !classInfo.distance || classInfo.distance == "0"
+              ? "--km"
+              : classInfo.distance + "km"
+          }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -894,7 +902,7 @@ export default {
           this.$emit("save", { ...this.classInfo });
           this.$message.success("课程保存成功");
         }
-        if (flag) this.innerVisible = false;
+        if (flag) this.onCancel();
       });
     },
     // 更新课程
@@ -917,7 +925,7 @@ export default {
           this.$message.success("课程保存成功");
         }
         console.log(flag, "flag");
-        if (flag) this.innerVisible = false;
+        if (flag) this.onCancel();
       });
     },
     // 删除课程
@@ -935,7 +943,7 @@ export default {
               this.resetForm();
               this.$emit("save", { ...this.classInfo });
               this.$message.success("课程删除成功");
-              this.innerVisible = false;
+              this.onCancel();
             }
           });
         })
@@ -1882,5 +1890,4 @@ export default {
   background-color: #efefef;
   padding: 5px 10px;
 }
-
 </style>

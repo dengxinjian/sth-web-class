@@ -10,10 +10,7 @@
         :style="cardStyle"
         :data-id="classItem.id"
         :data-date="date"
-        @click.stop="
-          $emit('click', classItem.id, classItem.sportType);
-          hideContextMenu();
-        "
+        @click.stop="hideContextMenu()"
         @contextmenu.prevent="showContextMenu"
       >
         <div
@@ -48,6 +45,9 @@
               tabindex="9999"
             >
               <div class="btn-list-hover">
+                <el-button type="text" @click.stop="$emit('edit', classItem)">
+                  编辑
+                </el-button>
                 <el-button
                   type="text"
                   @click.stop="$emit('delete', classItem.id)"
@@ -105,7 +105,7 @@
           >
 
           <!-- 骑行详情 -->
-          <template v-else-if="classItem.sportType === 'CYCLE'">
+          <template v-if="classItem.sportType === 'CYCLE'">
             <CycleStageDetails :class-data="classItem.classesJson" />
           </template>
 
@@ -148,6 +148,20 @@
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
       >
+        <div class="context-menu-item" @click="hideContextMenu">
+          <i class="el-icon-close"></i>
+          取消
+        </div>
+        <div
+          class="context-menu-item"
+          @click="
+            $emit('edit', classItem);
+            hideContextMenu();
+          "
+        >
+          <i class="el-icon-edit"></i>
+          编辑
+        </div>
         <div class="context-menu-item" @click="handleDelete">
           <i class="el-icon-delete"></i>
           删除
@@ -240,7 +254,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .class-schedule-card-container {
   margin-bottom: 5px;
   .sport-drap-handle {
@@ -341,6 +355,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  .el-button {
+    margin-left: 0;
+  }
 }
 
 .time-stage {

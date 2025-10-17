@@ -31,6 +31,7 @@
             @delete-class="handleDeleteClass"
             @copy-class="handleCopyClassFromOfficial"
             @collapse-change="classSlideChange"
+            @view-class="handleViewClass"
           />
         </div>
       </div>
@@ -54,6 +55,8 @@
         @unbind="handleUnbind"
         @delete-activity="handleDeleteActivity"
         @device-click="handleDeviceClick"
+        @edit-schedule="handleEditClassSchedule"
+        @edit-activity="handleEditActivity"
       />
 
       <!-- 右侧统计面板 -->
@@ -91,63 +94,6 @@
       :data="sportDetailData"
       @cancel="onCancelSportDetail"
     />
-
-    <AddSwimClass
-      v-model="showAddSwimClass"
-      :data="classModalData"
-      :type="classModalDataType"
-      :originalType="activeClassType"
-      @save="onSaveAddSwimClass"
-    />
-
-    <AddRunClass
-      v-model="showAddRunClass"
-      :data="classModalData"
-      :type="classModalDataType"
-      :originalType="activeClassType"
-      @save="onSaveAddRunClass"
-    />
-
-    <AddBikeClass
-      v-model="showAddBikeClass"
-      :data="classModalData"
-      :type="classModalDataType"
-      :originalType="activeClassType"
-      @save="onSaveAddBikeClass"
-    />
-
-    <AddPowerClass
-      v-model="showAddPowerClass"
-      :data="classModalData"
-      :type="classModalDataType"
-      :originalType="activeClassType"
-      @save="onSaveAddPowerClass"
-    />
-
-    <AddNoteClass
-      v-model="showAddNoteClass"
-      :data="classModalData"
-      :type="classModalDataType"
-      :originalType="activeClassType"
-      @save="onSaveAddNoteClass"
-    />
-
-    <AddOtherClass
-      v-model="showAddOtherClass"
-      :data="classModalData"
-      :type="classModalDataType"
-      :originalType="activeClassType"
-      @save="onSaveAddOtherClass"
-    />
-
-    <AddRestClass
-      v-model="showAddRestClass"
-      :data="classModalData"
-      :type="classModalDataType"
-      :originalType="activeClassType"
-      @save="onSaveAddRestClass"
-    />
-
     <AddClassTitle
       v-model="showAddClassTitle"
       :groups="[
@@ -198,6 +144,37 @@
       :active-class-type="activeClassType"
       @save="onSaveCopyClassFromOfficial"
     />
+
+    <ViewClassCard
+      :visible="showViewClassCard"
+      :class-item="classModalData"
+      :active-class-type="activeClassType"
+      @close="showViewClassCard = false"
+      @move="handleMoveClass"
+      @delete="handleDeleteClass"
+      @copy="handleCopyClassFromOfficial"
+      @save="getClassList"
+    />
+    <AddClassModal
+      v-model="showAddClassModal"
+      :sportType="classModalData.sportType"
+      :type="classModalDataType"
+      :originalType="activeClassType"
+      :data="classModalData"
+      @save="onSaveAddClass"
+      @cancel="showAddClassModal = false"
+    />
+
+    <EditScheduleClass
+      :visible="showEditScheduleClass"
+      :class-item="classDetailData"
+      :is-activity="isActivity"
+      :athleticThreshold="athleticThreshold"
+      :triUserId="selectedAthletic"
+      @close="showEditScheduleClass = false"
+      @save="handleClassDetailSave"
+      @delete="handleDeleteClassSchedule"
+    />
   </div>
 </template>
 
@@ -210,13 +187,7 @@ import StatisticsPanel from "./components/StatisticsPanel.vue";
 import AthleticManagement from "./components/AthleticManagement";
 import AthleticInfoDialog from "./components/AthleticInfo";
 import MonthStatisticDialog from "./components/MonthStatistic";
-import AddSwimClass from "./components/AddSwimClass";
-import AddBikeClass from "./components/AddBikeClass";
-import AddRunClass from "./components/AddRunClass";
-import AddPowerClass from "./components/AddPowerClass";
-import AddNoteClass from "./components/AddNoteClass";
-import AddOtherClass from "./components/AddOtherClass";
-import AddRestClass from "./components/AddRestClass";
+import AddClassModal from "./components/AddClass/index.vue";
 import SportTypeModal from "./components/SportTypeModal";
 import AddClassTitle from "./components/AddClassTitle";
 import AddGroup from "./components/AddGroup";
@@ -225,6 +196,8 @@ import BindModal from "./components/BindModal";
 import SportDetailModal from "./components/SportDetailModal";
 import ClassDetailModal from "./components/ClassDetailModal";
 import CopyClassFromOfficial from "./components/CopyClassFromOfficial";
+import ViewClassCard from "./components/ViewClassCard";
+import EditScheduleClass from "./components/EditScheduleClass";
 
 // 服务和工具导入
 import {
@@ -256,14 +229,8 @@ export default {
     AthleticManagement,
     AthleticInfoDialog,
     MonthStatisticDialog,
-    AddSwimClass,
-    AddBikeClass,
-    AddRunClass,
-    AddPowerClass,
-    AddNoteClass,
-    AddOtherClass,
-    AddRestClass,
     SportTypeModal,
+    AddClassModal,
     AddClassTitle,
     AddGroup,
     MoveGroup,
@@ -271,6 +238,8 @@ export default {
     SportDetailModal,
     ClassDetailModal,
     CopyClassFromOfficial,
+    ViewClassCard,
+    EditScheduleClass,
   },
   mixins: [dragMixin],
   data() {
@@ -312,13 +281,7 @@ export default {
       showMonthStatisticDialog: false,
       showSportTypeModal: false,
       showSportDetailModal: false,
-      showAddSwimClass: false,
-      showAddBikeClass: false,
-      showAddRunClass: false,
-      showAddPowerClass: false,
-      showAddNoteClass: false,
-      showAddOtherClass: false,
-      showAddRestClass: false,
+      showAddClassModal: false,
       showAddClassTitle: false,
       showAddGroup: false,
       showMoveGroup: false,
@@ -343,12 +306,28 @@ export default {
       copyClassFromOfficialGroupId: "",
       copyClassFromOfficialData: {},
       addGroupId: "",
+      // 查看课程
+      showViewClassCard: false,
+      showEditScheduleClass: false,
+      isActivity: false,
     };
   },
   mounted() {
     this.getTeamAndAthleticData();
   },
   methods: {
+    handleEditClassSchedule(classItem) {
+      console.log(classItem, "classItem");
+      this.showEditScheduleClass = true;
+      this.classDetailData = classItem;
+      this.isActivity = false;
+    },
+    handleEditActivity(activity) {
+      console.log(activity, "activity");
+      this.showEditScheduleClass = true;
+      this.classDetailData = activity;
+      this.isActivity = true;
+    },
     /**
      * 获取团队名称
      */
@@ -619,6 +598,7 @@ export default {
         this.$message.error("该课程已过期");
         return;
       }
+      console.log(device, "device");
 
       if (device.syncStatus === 1) {
         this.$message.info("该设备已同步成功");
@@ -740,18 +720,16 @@ export default {
     /**
      * 删除课程
      */
-    async handleDeleteClass(classId) {
-      this.$confirm("确认删除该课程？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
-        const res = await classApi.deleteClass(classId);
-        if (res.success) {
-          this.getClassList();
-          this.$message.success("删除成功");
-        }
-      });
+    handleDeleteClass(classId) {
+      this.getClassList();
+    },
+
+    /**
+     * 查看课程
+     */
+    handleViewClass(classId) {
+      this.showViewClassCard = true;
+      this.classModalData = this.findClassById(classId);
     },
 
     /**
@@ -763,17 +741,7 @@ export default {
       // this.showClassDetailModal = true;
       this.classModalDataType = "edit";
       console.log(sportType, "sportType");
-      const modalMap = {
-        SWIM: "showAddSwimClass",
-        STRENGTH: "showAddPowerClass",
-        REMARK: "showAddNoteClass",
-        OTHER: "showAddOtherClass",
-        REST: "showAddRestClass",
-        CYCLE: "showAddBikeClass",
-        RUN: "showAddRunClass",
-      };
-
-      this[modalMap[sportType]] = true;
+      // this.showAddClassModal = true;
     },
 
     /**
@@ -980,7 +948,7 @@ export default {
       });
 
       if (currentActivity.classScheduleId) {
-        return
+        return;
       }
 
       // 判断是否从课程模板中拖拽
@@ -1155,42 +1123,25 @@ export default {
      */
     onSelectSportType(item) {
       this.classModalDataType = "add";
-      const modalMap = {
-        swim: "showAddSwimClass",
-        strength: "showAddPowerClass",
-        note: "showAddNoteClass",
-        other: "showAddOtherClass",
-        rest: "showAddRestClass",
-        ride: "showAddBikeClass",
-        run: "showAddRunClass",
+      console.log(item, "item");
+      var Map = {
+        swim: "SWIM",
+        strength: "STRENGTH",
+        note: "REMARK",
+        other: "OTHER",
+        rest: "REST",
+        ride: "CYCLE",
+        run: "RUN",
       };
-
-      this[modalMap[item.key]] = true;
+      this.classModalData.sportType = Map[item.key];
+      this.showAddClassModal = true;
       this.showSportTypeModal = false;
     },
 
     /**
      * 保存各类型课程
      */
-    onSaveAddSwimClass() {
-      this.getClassList();
-    },
-    onSaveAddBikeClass() {
-      this.getClassList();
-    },
-    onSaveAddRunClass() {
-      this.getClassList();
-    },
-    onSaveAddPowerClass() {
-      this.getClassList();
-    },
-    onSaveAddNoteClass() {
-      this.getClassList();
-    },
-    onSaveAddOtherClass() {
-      this.getClassList();
-    },
-    onSaveAddRestClass() {
+    onSaveAddClass() {
       this.getClassList();
     },
 
@@ -1309,7 +1260,7 @@ export default {
       if (flag) {
         this.showClassDetailModal = false;
         this.classSportType = "";
-        this.classDetailData = { id: "" };
+        // this.classDetailData = { id: "" };
       }
       this.getScheduleData();
       this.getClassList();

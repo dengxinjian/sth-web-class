@@ -15,14 +15,27 @@
       <div class="basic-info-item">
         <div class="basic-info-title">
           <span>标题：</span>
-          <el-input type="text" v-model="classInfo.title" :disabled="originalType === 'official'" :maxlength="50" />
+          <el-input
+            type="text"
+            v-model="classInfo.title"
+            :disabled="originalType === 'official'"
+            :maxlength="50"
+          />
         </div>
         <div class="basic-info-total">
           <span>
             <img src="~@/assets/addClass/icon-bike.png" width="30" alt="" />
           </span>
-          <span>{{ classInfo.duration }}</span>
-          <span>{{ classInfo.distance }}</span>
+          <span>{{
+            classInfo.duration == "00:00:00" || !classInfo.duration
+              ? "--:--:--"
+              : classInfo.duration
+          }}</span>
+          <span>{{
+            !classInfo.distance || classInfo.distance == "0"
+              ? "--km"
+              : classInfo.distance
+          }}</span>
           <span v-if="classInfo.sth">
             {{ classInfo.sth }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -75,7 +88,12 @@
       <div class="basic-info-item">
         <div>
           <span>模式选择：</span>
-          <el-select v-model="classInfo.mode" :disabled="originalType === 'official'" class="pill-select short" @change="getSth">
+          <el-select
+            v-model="classInfo.mode"
+            :disabled="originalType === 'official'"
+            class="pill-select short"
+            @change="getSth"
+          >
             <el-option label="跟随阈值功率" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
             <el-option label="固定功率" :value="3" />
@@ -92,7 +110,10 @@
         class="time-stage"
         :style="{ flex: item.duration, minWidth: 0 }"
       >
-        <span v-if="originalType === 'my'" class="time-stage-close" @click="handleDeleteStage(index)"
+        <span
+          v-if="originalType === 'my'"
+          class="time-stage-close"
+          @click="handleDeleteStage(index)"
           ><i class="el-icon-close"></i
         ></span>
         <div class="time-stage-title">
@@ -162,7 +183,11 @@
           </div>
           <div class="phase-details">
             <div class="phase-item">
-              <div v-for="(item, index) in classInfo.stages" :key="index" class="phase-item-content">
+              <div
+                v-for="(item, index) in classInfo.stages"
+                :key="index"
+                class="phase-item-content"
+              >
                 <div v-if="item.times > 1">重复{{ item.times }}次</div>
                 <div v-for="(part, idx) in item.sections" :key="idx">
                   <div>{{ part.title }}</div>
@@ -595,7 +620,10 @@
                   </el-button>
                 </div>
                 <div class="lap-toggle">
-                  <el-switch v-model="part.lap" :disabled="originalType === 'official'" />
+                  <el-switch
+                    v-model="part.lap"
+                    :disabled="originalType === 'official'"
+                  />
                   <span class="toggle-label">按LAP进入下一段落</span>
                 </div>
               </div>
@@ -606,10 +634,25 @@
     </div>
 
     <span slot="footer" class="dialog-footer">
-      <el-button v-if="originalType === 'my'" @click="onDelete" :disabled="!classInfo.id">删除</el-button>
+      <el-button
+        v-if="originalType === 'my'"
+        @click="onDelete"
+        :disabled="!classInfo.id"
+        >删除</el-button
+      >
       <el-button @click="onCancel">取消</el-button>
-      <el-button v-if="originalType === 'my'" type="warning" @click="onSave(false)">保存</el-button>
-      <el-button v-if="originalType === 'my'" type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button
+        v-if="originalType === 'my'"
+        type="warning"
+        @click="onSave(false)"
+        >保存</el-button
+      >
+      <el-button
+        v-if="originalType === 'my'"
+        type="danger"
+        @click="onSave(true)"
+        >保存并关闭</el-button
+      >
     </span>
   </el-dialog>
 </template>
@@ -646,8 +689,8 @@ export default {
     },
     originalType: {
       type: String,
-      default: 'my'
-    }
+      default: "my",
+    },
   },
   data() {
     return {
@@ -788,7 +831,7 @@ export default {
           this.$emit("save", { ...this.classInfo });
           this.$message.success("课程保存成功");
         }
-        if (flag) this.innerVisible = false;
+        if (flag) this.onCancel();
       });
     },
     // 更新课程
@@ -810,7 +853,7 @@ export default {
           this.$emit("save", { ...this.classInfo });
           this.$message.success("课程保存成功");
         }
-        if (flag) this.innerVisible = false;
+        if (flag) this.onCancel();
       });
     },
     // 删除课程
@@ -828,7 +871,7 @@ export default {
               this.resetForm();
               this.$emit("save", { ...this.classInfo });
               this.$message.success("课程删除成功");
-              this.innerVisible = false;
+              this.onCancel();
             }
           });
         })
@@ -862,7 +905,6 @@ export default {
       this.onCancel();
     },
     onCancel() {
-      this.innerVisible = false;
       this.$emit("cancel");
     },
     onSave(closeAfter) {
@@ -926,7 +968,7 @@ export default {
     },
     // 添加段落
     handleAddStage(type) {
-      if (this.originalType === 'official') {
+      if (this.originalType === "official") {
         return;
       }
       switch (type) {

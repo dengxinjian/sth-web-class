@@ -20,7 +20,9 @@
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
           </span>
           <span>{{
-            classInfo.duration == "00:00:00" ? "--:--:--" : classInfo.duration
+            classInfo.duration == "00:00:00" || !classInfo.duration
+              ? "--:--:--"
+              : classInfo.duration
           }}</span>
           <span>{{
             !classInfo.distance || classInfo.distance == "0"
@@ -1041,7 +1043,7 @@ export default {
           this.$emit("save", flag);
           this.$message.success("课程保存成功");
         }
-        if (flag) this.innerVisible = false;
+        if (flag) this.onCancel();
       });
     },
     // 更新课表
@@ -1059,7 +1061,7 @@ export default {
           this.$emit("save", flag);
           this.$message.success("课表保存成功");
         }
-        if (flag) this.innerVisible = false;
+        if (flag) this.onCancel();
       });
     },
     // 删除课程
@@ -1077,7 +1079,7 @@ export default {
               this.resetForm();
               this.$emit("save", true);
               this.$message.success("课程删除成功");
-              this.innerVisible = false;
+              this.onCancel();
             }
           });
         })
@@ -1117,8 +1119,7 @@ export default {
       this.onCancel();
     },
     onCancel() {
-      this.innerVisible = false;
-      this.$emit("save", true);
+      this.$emit("cancel");
     },
     onSave(closeAfter) {
       const validation = checkForm(this.classInfo);

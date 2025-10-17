@@ -86,7 +86,9 @@
           >
             <div class="schedule-table-cell-title">
               <span> {{ item?.commonDate }}</span>
-              <span style="display: inline-block; transform: scale(0.8);"> （{{ convertToLunar(item?.commonDate).dateStr }}）</span>
+              <span style="display: inline-block; transform: scale(0.8)">
+                （{{ convertToLunar(item?.commonDate).dateStr }}）</span
+              >
             </div>
             <div
               class="schedule-table-cell-item js-schedule-drag-container"
@@ -103,6 +105,7 @@
                 "
                 @delete="$emit('delete-schedule', $event)"
                 @device-click="$emit('device-click', $event)"
+                @edit="$emit('edit-schedule', $event)"
               />
 
               <!-- 运动记录卡片 -->
@@ -111,9 +114,17 @@
                 :key="activityItem.activityId"
                 :activity="activityItem"
                 :date="item.commonDate"
-                @click="$emit('activity-detail', activityItem.activityId ,activityItem.classScheduleId ,activityItem.sportType)"
+                @click="
+                  $emit(
+                    'activity-detail',
+                    activityItem.activityId,
+                    activityItem.classScheduleId,
+                    activityItem.sportType
+                  )
+                "
                 @unbind="$emit('unbind', $event)"
                 @delete="$emit('delete-activity', $event)"
+                @edit="$emit('edit-activity', activityItem)"
               />
             </div>
           </div>
@@ -166,7 +177,7 @@ export default {
   },
   methods: {
     isToday,
-    convertToLunar
+    convertToLunar,
   },
 };
 </script>

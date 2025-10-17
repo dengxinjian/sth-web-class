@@ -7,7 +7,7 @@
     class="add-swim-class-dialog"
      :close-on-click-modal="false"
   >
-    <span slot="title">{{ type === 'add' ? '新建休息课程' : '编辑休息课程' }}</span>
+    <span slot="title">{{ type === 'add' ? '新建备忘录' : '编辑备忘录' }}</span>
 
     <div class="form-section">
       <el-form :model="form" label-width="60px">
@@ -44,9 +44,8 @@
 
 <script>
 import {getData, submitData} from '@/api/common.js'
-
 export default {
-  name: 'AddRestClassDialog',
+  name: 'AddSwimClassDialog',
   props: {
     visible: {
       type: Boolean,
@@ -78,7 +77,7 @@ export default {
           id: this.data.id || '',
           title: this.data.title || '',
           groupId: this.data.groupId || '',
-          sportType: 'REST',
+          sportType: 'REMARK',
           distance: '',
           distanceUnit: 'm',
           duration: '',
@@ -136,7 +135,7 @@ export default {
         url: '/api/classes/create',
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
-        sportType: 'REST',
+        sportType: 'REMARK',
         classesJson: JSON.stringify({...this.form})
       }).then(res => {
         if (res.success) {
@@ -144,7 +143,7 @@ export default {
           this.$emit('save', {...this.form})
           this.$message.success('课程保存成功')
         }
-        if (flag) this.innerVisible = false
+        if (flag) this.onCancel()
       })
     },
     // 更新课程
@@ -154,14 +153,14 @@ export default {
         id: this.form.id,
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
-        sportType: 'REST',
+        sportType: 'REMARK',
         classesJson: JSON.stringify({...this.form})
       }).then(res => {
         if (res.success) {
           this.$emit('save', {...this.form})
           this.$message.success('课程保存成功')
         }
-        if (flag) this.innerVisible = false
+        if (flag) this.onCancel()
       })
     },
     // 删除课程
@@ -178,7 +177,7 @@ export default {
             this.resetForm()
             this.$emit('save', {...this.form})
             this.$message.success('课程删除成功')
-            this.innerVisible = false
+            this.onCancel()
           }
         })
       }).catch(() => {})
@@ -212,7 +211,7 @@ export default {
         id: this.data?.id || '',
         title: this.data?.title || '',
         groupId: this.data?.groupId || '',
-        sportType: 'REST',
+        sportType: 'REMARK',
         distance: '',
         distanceUnit: 'm',
         duration: '',

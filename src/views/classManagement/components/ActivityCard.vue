@@ -38,6 +38,14 @@
               >
                 解除匹配
               </el-button>
+
+              <el-button
+                type="text"
+                v-if="activity.classesJson"
+                @click="$emit('edit', activity)"
+              >
+                编辑
+              </el-button>
               <el-button
                 v-if="!activity.classesJson"
                 type="text"
@@ -170,6 +178,16 @@
         >
           <i class="el-icon-link"></i>
           解除匹配
+        </div>
+        <div
+          class="context-menu-item"
+          @click="
+            $emit('edit', activity);
+            hideContextMenu();
+          "
+        >
+          <i class="el-icon-edit"></i>
+          编辑
         </div>
         <div
           v-if="!activity.classesJson"

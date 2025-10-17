@@ -3,7 +3,7 @@
     class="schedule-class"
     :data-id="classData.id"
     data-type="classTemplate"
-    @click="$emit('click', classData.id, classData.sportType)"
+    @click="$emit('view', classData.id, classData.sportType)"
   >
     <div class="schedule-class-info">
       <!-- 标题和操作按钮 -->

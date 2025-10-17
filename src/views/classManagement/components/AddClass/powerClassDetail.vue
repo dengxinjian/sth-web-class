@@ -218,7 +218,7 @@ export default {
           this.$emit('save', {...this.form})
           this.$message.success('课程保存成功')
         }
-        if (flag) this.innerVisible = false
+        if (flag) this.onCancel()
       })
     },
     // 更新课程
@@ -236,7 +236,7 @@ export default {
           this.$emit('save', {...this.form})
           this.$message.success('课程保存成功')
         }
-        if (flag) this.innerVisible = false
+        if (flag) this.onCancel()
       })
     },
     // 删除课程
@@ -253,7 +253,7 @@ export default {
             this.resetForm()
             this.$emit('save', {...this.form})
             this.$message.success('课程删除成功')
-            this.innerVisible = false
+            this.onCancel()
           }
         })
       }).catch(() => {})
