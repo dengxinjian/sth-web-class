@@ -21,7 +21,7 @@
           <div class="metric-item">
             <img
               class="sport-icon"
-              :src="getSportIcon(classData.classesJson.sportType)"
+              :src="getSportIcon(classData.sportType)"
               alt=""
             />
           </div>
@@ -32,15 +32,10 @@
           </div>
           <div class="metric-item">
             <div class="metric-value">
-              {{
-                !classData.classesJson.distance
-                  ? "--"
-                  : classData.classesJson.distance
-              }}
+              {{ formatDistance(classData.classesJson.distance) }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.classesJson.distanceUnit }}
               </span>
-              <span v-else>km</span>
             </div>
           </div>
           <div class="metric-item">
@@ -169,6 +164,58 @@
                 </tr>
               </tbody>
             </table>
+            <!-- 运动参数部分 -->
+            <div class="edit-section" v-if="isActivity">
+              <div class="section-header">
+                <span class="section-title">同步参数</span>
+              </div>
+              <div class="sync-params">
+                <span>时间：{{ sportDetail.startTime }}</span>
+                <span
+                  >距离：{{ (sportDetail.distance / 1000).toFixed(2) }} km</span
+                >
+              </div>
+              <div class="sync-params">
+                <span
+                  >平均速度：{{
+                    (sportDetail.avgSpeed * 3.6).toFixed(1)
+                  }}
+                  km/h</span
+                >
+                <span>卡路里：{{ sportDetail.calories }} kcal</span>
+              </div>
+              <div class="sync-params">
+                <span>爬升：{{ sportDetail.totalAscent || "--" }} m</span>
+                <span>STH：{{ sportDetail.sthValue }}</span>
+              </div>
+              <div class="sync-params">
+                <span>功率：{{ sportDetail.maxPower }}</span>
+                <span></span>
+              </div>
+              <table class="sync-params-table">
+                <tr>
+                  <td></td>
+                  <td>最小</td>
+                  <td>平均</td>
+                  <td>最大</td>
+                  <td>单位</td>
+                </tr>
+                <tr>
+                  <td>功率</td>
+                  <td>{{ sportDetail.minPower }}</td>
+                  <td>{{ sportDetail.avgPower }}</td>
+                  <td>{{ sportDetail.maxPower }}</td>
+                  <td>w</td>
+                </tr>
+                <tr>
+                  <td>心率</td>
+                  <td>{{ sportDetail.minHeartRate }}</td>
+                  <td>{{ sportDetail.avgHeartRate }}</td>
+                  <td>{{ sportDetail.maxHeartRate }}</td>
+                  <td>bpm</td>
+                </tr>
+              </table>
+            </div>
           </div>
 
           <div style="flex: 1">
@@ -266,7 +313,7 @@ import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import CycleStageDetails from "./CycleStageDetails.vue";
 import RunStageDetails from "./RunStageDetails.vue";
 import { SPORT_TYPE_ICONS } from "../constants";
-import { submitData } from "@/api/common.js";
+import { submitData, getData } from "@/api/common.js";
 import ClassDetailModal from "./ClassDetailModal/index.vue";
 import { scheduleApi } from "../services/classManagement.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
@@ -316,6 +363,7 @@ export default {
       showClassDetailModal: false,
       type: "edit",
       originalType: "my",
+      sportDetail: {},
     };
   },
   watch: {
@@ -325,6 +373,9 @@ export default {
     classItem(val) {
       console.log(val, "val");
       this.classData = JSON.parse(JSON.stringify(val));
+      if (this.isActivity) {
+        this.getSportDetail();
+      }
     },
   },
   methods: {
@@ -339,6 +390,17 @@ export default {
           this.$message.success("删除成功");
           this.handleClose();
           this.$emit("save", true);
+        }
+      });
+    },
+    // 查询运动详情
+    getSportDetail() {
+      getData({
+        url: "/api/classSchedule/getActivityDetail",
+        activityId: this.classData.activityId,
+      }).then((res) => {
+        if (res.success) {
+          this.sportDetail = res.result;
         }
       });
     },
@@ -362,13 +424,18 @@ export default {
       });
     },
     getSportIcon(sportType) {
+      console.log(sportType, "sportType");
       return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
     },
     formatDuration(duration) {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance) {
-      return !distance || distance === "0" ? "--km" : distance + "km";
+      return !distance || distance === "0"
+        ? this.classData.sportType === "SWIM"
+          ? "--"
+          : "--km"
+        : distance;
     },
   },
 };
@@ -440,6 +507,39 @@ export default {
   .comparison-table {
     margin-bottom: 20px;
     flex: 1;
+    .sync-params {
+      font-size: 12px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-content: center;
+      margin-bottom: 5px;
+      > span {
+        flex: 2;
+      }
+      span:last-child {
+        flex: 1.2;
+      }
+    }
+    .sync-params-table {
+      font-size: 12px;
+      line-height: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      td {
+        flex: 1;
+        text-align: center;
+      }
+      td:last-child {
+        flex: 1;
+      }
+      td:first-child {
+        flex: 1;
+      }
+      tr:first-child {
+        background-color: #f5f5f5;
+      }
+    }
 
     table {
       width: 100%;
@@ -487,7 +587,18 @@ export default {
       }
     }
   }
-
+  .edit-section {
+    margin-top: 10px;
+  }
+  .section-header {
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+  }
   .section {
     margin-bottom: 20px;
 

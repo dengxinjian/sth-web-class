@@ -179,7 +179,7 @@
         <!-- 阶段明细部分 -->
         <div class="edit-section">
           <div class="section-header">
-            <span class="section-title required">阶段明细</span>
+            <span class="section-title">阶段明细</span>
           </div>
           <div class="phase-details">
             <div class="phase-item">
@@ -324,7 +324,7 @@
       <div class="class-edit-right">
         <div class="stages-container">
           <div class="section-header">
-            <span class="section-title required">阶段编辑</span>
+            <span class="section-title">阶段编辑</span>
           </div>
           <!-- 阶段1 -->
           <div

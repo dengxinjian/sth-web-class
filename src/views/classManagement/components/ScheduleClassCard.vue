@@ -4,13 +4,18 @@
       class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
       :data-id="classItem.id"
       :data-date="date"
+      data-type="classSchedule"
     >
       <div
         class="classScheduleCard"
         :style="cardStyle"
         :data-id="classItem.id"
         :data-date="date"
-        @click.stop="hideContextMenu()"
+        data-type="classSchedule"
+        @click.stop="
+          $emit('edit', classItem);
+          hideContextMenu();
+        "
         @contextmenu.prevent="showContextMenu"
       >
         <div

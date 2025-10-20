@@ -759,11 +759,11 @@ export default {
       // this.classDetailData = foundClass;
       // this.classSportType = sportType;
       // this.showClassDetailModal = true;
+      console.log(sportType, "sportType");
       this.classSportType = sportType;
       this.classDetailData = { id: classId };
-      this.$nextTick(() => {
-        this.showClassDetailModal = true;
-      });
+      this.isActivity = false;
+      this.showEditScheduleClass = true;
     },
 
     /**
@@ -873,11 +873,15 @@ export default {
      * 日历拖拽添加
      */
     handleScheduleDragAdd(e) {
+      console.log(e);
       const classId = e.item.dataset.id;
       const date = e.to.dataset.date;
 
       let newClassSchedule = {};
       const sortVoList = [];
+      if (e.item.dataset.type === "classTemplate") {
+        return;
+      }
 
       // 删除原数据
       this.currentWeek.forEach((item) => {
@@ -907,7 +911,6 @@ export default {
           sort: index,
         });
       });
-
       scheduleApi
         .bindActivity({
           classScheduleId: classId,
