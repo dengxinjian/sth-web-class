@@ -83,6 +83,7 @@
           <div
             class="keyword"
             v-if="!isRestType(activity.classesJson.sportType)"
+            style="color: #999;"
           >
             {{
               !activity.classesJson.duration
@@ -91,7 +92,7 @@
             }}
           </div>
           <div style="display: flex" v-if="activity.classesJson.distance">
-            <div class="keyword">
+            <div class="keyword" style="color: #999;">
               {{
                 !activity.classesJson.distance
                   ? '--km'
@@ -106,7 +107,7 @@
             style="display: flex; gap: 4px;"
             v-if="!isRestType(activity.classesJson.sportType)"
           >
-            <div class="keyword">{{ activity.classesJson.sth ? activity.classesJson.sth : '--' }}</div>
+            <div class="keyword" style="color: #999;">{{ activity.classesJson.sth ? activity.classesJson.sth : '--' }}</div>
             <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
           </div>
 
