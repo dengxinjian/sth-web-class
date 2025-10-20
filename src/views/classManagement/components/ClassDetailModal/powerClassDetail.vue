@@ -123,7 +123,7 @@ export default {
           sportType: 'STRENGTH',
           distance: '',
           distanceUnit: 'm',
-          duration: '01:30:00',
+          duration: '',
           sth: '',
           summary: '',
           tags: ''
@@ -270,7 +270,7 @@ export default {
         sportType: 'STRENGTH',
         distance: '',
         distanceUnit: 'm',
-        duration: '01:30:00',
+        duration: '',
         sth: '',
         summary: '',
         tips: ''

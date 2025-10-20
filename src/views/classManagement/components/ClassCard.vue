@@ -21,17 +21,17 @@
                 移动分组
               </el-button>
             </span>
+            <span v-if="showCopyBtn">
+              <el-button type="text" @click.stop="$emit('copy', classData)">
+                {{ copyBtnText }}
+              </el-button>
+            </span>
             <span v-if="showDeleteBtn">
               <el-button
                 type="text"
                 @click.stop="$emit('delete', classData.id)"
               >
                 删除课程
-              </el-button>
-            </span>
-            <span v-if="showCopyBtn">
-              <el-button type="text" @click.stop="$emit('copy', classData)">
-                {{ copyBtnText }}
               </el-button>
             </span>
           </div>
