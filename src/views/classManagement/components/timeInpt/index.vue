@@ -42,7 +42,7 @@ export default {
       handler(newVal) {
         if (newVal !== this.inputValue) {
           this.inputValue = newVal || "";
-          this.validateAndConvert();
+          // this.validateAndConvert();
         }
       },
     },
