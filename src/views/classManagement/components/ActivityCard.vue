@@ -105,36 +105,37 @@
               :class-data="activity.classesJson"
             />
 
-            <!-- 时长、距离、STH -->
-            <div
-              class="keyword"
-              v-if="!isRestType(activity.classesJson.sportType)"
-            >
+          <!-- 时长、距离、STH -->
+          <div
+            class="keyword"
+            v-if="!isRestType(activity.classesJson.sportType)"
+            style="color: #999;"
+          >
+            {{
+              !activity.classesJson.duration
+                ? '--:--:--'
+                : activity.classesJson.duration
+            }}
+          </div>
+          <div style="display: flex" v-if="activity.classesJson.distance">
+            <div class="keyword" style="color: #999;">
               {{
-                activity.classesJson.duration === "00:00:00"
-                  ? "--:--:--"
-                  : activity.classesJson.duration
+                !activity.classesJson.distance
+                  ? '--km'
+                  : activity.classesJson.distance
               }}
+              <span v-if="activity.sportType === 3">
+                {{ activity.classesJson.distanceUnit }}
+              </span>
             </div>
-            <div style="display: flex" v-if="activity.classesJson.distance">
-              <div class="keyword">
-                {{
-                  activity.classesJson.distance === "0"
-                    ? "--km"
-                    : activity.classesJson.distance
-                }}
-                <span v-if="activity.sportType === 3">
-                  {{ activity.classesJson.distanceUnit }}
-                </span>
-              </div>
-            </div>
-            <div
-              style="display: flex"
-              v-if="!isRestType(activity.classesJson.sportType)"
-            >
-              <div class="keyword">{{ activity.classesJson.sth }}</div>
-              <div>&nbsp;&nbsp;STH</div>
-            </div>
+          </div>
+          <div
+            style="display: flex; gap: 4px;"
+            v-if="!isRestType(activity.classesJson.sportType)"
+          >
+            <div class="keyword" style="color: #999;">{{ activity.classesJson.sth ? activity.classesJson.sth : '--' }}</div>
+            <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
+          </div>
 
             <!-- 训练强度可视化 -->
             <div

@@ -64,25 +64,25 @@
         <div class="threshold-form">
           <div v-if="activeSport === 1" class="row">
             <span class="label"><span class="required">*</span>阈值心率</span>
-            <el-input v-model.number="thresholdData.param2" step="1" class="pill-input" />
+            <el-input v-model.number="thresholdData.param2" :key="'hr-param2-' + activeSport" step="1" class="pill-input" />
             <span class="suffix unit-red">bpm</span>
             <span class="label right-gap"><span class="required">*</span>最大心率</span>
-            <el-input v-model.number="thresholdData.param1" step="1" class="pill-input" />
+            <el-input v-model.number="thresholdData.param1" :key="'hr-param1-' + activeSport" step="1" class="pill-input" />
             <span class="suffix unit-red">bpm</span>
           </div>
           <div v-else-if="activeSport === 4" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker v-model="thresholdData.threshold" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
+            <el-time-picker v-model="thresholdData.thresholdTimeValue" :key="'swim-' + activeSport" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
             <span class="suffix unit-red">min/100m</span>
           </div>
           <div v-else-if="activeSport === 2" class="row">
             <span class="label"><span class="required">*</span>阈值功率</span>
-            <el-input v-model.number="thresholdData.threshold" step="1" class="pill-input" />
+            <el-input v-model.number="thresholdData.threshold" :key="'bike-' + activeSport" step="1" class="pill-input" />
             <span class="suffix unit-red">w</span>
           </div>
           <div v-else-if="activeSport === 3" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker v-model="thresholdData.threshold" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
+            <el-time-picker v-model="thresholdData.thresholdTimeValue" :key="'run-' + activeSport" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
             <span class="suffix unit-red">min/km</span>
           </div>
           <div class="zoneContainer">
@@ -197,7 +197,9 @@ export default {
         zone5A: [],
         zone5B: [],
         zone5C: [],
-        unit: ''
+        unit: '',
+        threshold: '',
+        thresholdTimeValue: '00:00',
       }
     };
   },
@@ -272,9 +274,21 @@ export default {
         type: this.activeSport,
         triUserId: this.data.triUserId
       }).then(res => {
-        this.thresholdData = res.result[0]
+        const result = res.result[0]
+        // 处理时间格式转换
         if (this.activeSport === 4 || this.activeSport === 3) {
-          this.thresholdData.threshold = secondsToMMSS(+this.thresholdData.threshold)
+          result.thresholdTimeValue = secondsToMMSS(+result.threshold)
+        }
+        // 使用 Vue.set 确保响应式更新，或者直接赋值新对象
+        this.thresholdData = {
+          ...result,
+          zone1: result.zone1 || [],
+          zone2: result.zone2 || [],
+          zone3: result.zone3 || [],
+          zone4: result.zone4 || [],
+          zone5A: result.zone5A || [],
+          zone5B: result.zone5B || [],
+          zone5C: result.zone5C || [],
         }
       })
     },
@@ -288,7 +302,7 @@ export default {
     onSave() {
       const params = {thresholdType: this.activeSport, param1: '', param2: '', threshold: '', triUserId: this.data.triUserId}
       if (this.activeSport === 4 || this.activeSport === 3) {
-        params.threshold = mmssToSeconds(this.thresholdData.threshold)
+        params.threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue)
       } else if (this.activeSport === 2) {
         params.threshold = this.thresholdData.threshold
       } else if (this.activeSport === 1) {
