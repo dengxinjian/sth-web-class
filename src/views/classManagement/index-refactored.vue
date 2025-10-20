@@ -910,6 +910,9 @@ export default {
 
       let newClassSchedule = {};
       const sortVoList = [];
+      if (e.item.dataset.type === "classTemplate") {
+        return;
+      }
 
       // 删除原数据
       this.currentWeek.forEach((item) => {
