@@ -81,7 +81,7 @@
                       编辑分组
                     </el-button>
                   </span>
-                  <span>
+                  <!-- <span>
                     <el-button
                       type="text"
                       :disabled="!item.groupId"
@@ -89,7 +89,7 @@
                     >
                       移动分组
                     </el-button>
-                  </span>
+                  </span> -->
                   <span>
                     <el-button
                       type="text"

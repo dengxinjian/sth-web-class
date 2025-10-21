@@ -263,7 +263,6 @@ export default {
 .card-icon {
   width: 40px;
   height: 40px;
-  background: #8b5cf6;
   border-radius: 50%;
   display: flex;
   align-items: center;

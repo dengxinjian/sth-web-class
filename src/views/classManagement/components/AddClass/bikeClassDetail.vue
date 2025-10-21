@@ -243,6 +243,7 @@
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
+                  <div v-if="part.lap">按LAP进入下一段落</div>
                 </div>
               </div>
             </div>
@@ -311,7 +312,7 @@
                     v-model="part.title"
                     placeholder="请输入阶段名称"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                 </div>
@@ -346,7 +347,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   >
                     <el-option label="目标值" value="target" />
@@ -380,7 +381,7 @@
                     v-model="part.thresholdFtpRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
@@ -391,7 +392,7 @@
                     v-model="part.thresholdFtpRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值功率</span>
@@ -409,7 +410,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值功率</span>
@@ -426,7 +427,7 @@
                     v-model="part.thresholdHeartRateRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
@@ -437,7 +438,7 @@
                     v-model="part.thresholdHeartRateRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值心率</span>
@@ -455,7 +456,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">%阈值心率</span>
@@ -472,7 +473,7 @@
                     v-model="part.targetFtpRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
@@ -483,7 +484,7 @@
                     v-model="part.targetFtpRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">w</span>
@@ -501,7 +502,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">w</span>
@@ -518,7 +519,7 @@
                     v-model="part.targetHeartRateRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
@@ -529,7 +530,7 @@
                     v-model="part.targetHeartRateRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">bpm</span>
@@ -547,7 +548,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">bpm</span>
@@ -561,7 +562,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">~</span>
@@ -573,7 +574,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                     :disabled="originalType === 'official'"
                   />
                   <span class="unit">踏频</span>
@@ -1269,6 +1270,8 @@ export default {
       text-align: center;
       margin-bottom: 5px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .time-stage-for {
       display: flex;

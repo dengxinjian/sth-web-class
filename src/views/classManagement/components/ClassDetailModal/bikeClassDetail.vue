@@ -244,6 +244,7 @@
                       >踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
+                  <div v-if="part.lap">按LAP进入下一段落</div>
                 </div>
               </div>
             </div>
@@ -310,7 +311,7 @@
                     v-model="part.title"
                     placeholder="请输入阶段名称"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                 </div>
                 <div class="config-item">
@@ -342,7 +343,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围" value="range" />
@@ -372,7 +373,7 @@
                     v-model="part.thresholdFtpRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -382,7 +383,7 @@
                     v-model="part.thresholdFtpRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >%阈值功率 &nbsp; &nbsp;
@@ -413,7 +414,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >%阈值功率 &nbsp; &nbsp;
@@ -439,7 +440,7 @@
                     v-model="part.thresholdHeartRateRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -449,7 +450,7 @@
                     v-model="part.thresholdHeartRateRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >%阈值心率 &nbsp; &nbsp;
@@ -480,7 +481,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >%阈值心率 &nbsp; &nbsp;
@@ -510,7 +511,7 @@
                     v-model="part.targetFtpRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -520,7 +521,7 @@
                     v-model="part.targetFtpRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >w &nbsp; &nbsp;
@@ -544,7 +545,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >w &nbsp; &nbsp;
@@ -563,7 +564,7 @@
                     v-model="part.targetHeartRateRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -573,7 +574,7 @@
                     v-model="part.targetHeartRateRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >bpm &nbsp; &nbsp;
@@ -597,7 +598,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit"
                     >bpm &nbsp; &nbsp;
@@ -615,7 +616,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -626,7 +627,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">踏频</span>
                   <i
@@ -1391,6 +1392,8 @@ export default {
       text-align: center;
       margin-bottom: 5px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .time-stage-for {
       display: flex;

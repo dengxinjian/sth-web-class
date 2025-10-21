@@ -100,6 +100,7 @@
             踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}
           </span>
         </div>
+        <div v-if="part.lap">按LAP进入下一段落</div>
       </div>
       <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
     </div>

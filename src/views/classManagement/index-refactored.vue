@@ -11,6 +11,7 @@
           <AthleticManagement
             :teamId="selectedTeam"
             :teamName="getTeamName(selectedTeam)"
+            @athletic-click="handleAthleticChange"
           />
         </div>
 

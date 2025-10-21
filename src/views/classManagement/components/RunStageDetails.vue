@@ -10,7 +10,7 @@
         <!-- 模式1: 阈值配速 范围 -->
         <div v-if="classData.mode === 1 && part.range === 'range'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -29,7 +29,7 @@
         <!-- 模式2: 阈值心率 范围 -->
         <div v-if="classData.mode === 2 && part.range === 'range'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -48,7 +48,7 @@
         <!-- 模式1: 阈值配速 目标 -->
         <div v-if="classData.mode === 1 && part.range === 'target'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -63,7 +63,7 @@
         <!-- 模式2: 阈值心率 目标 -->
         <div v-if="classData.mode === 2 && part.range === 'target'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -78,7 +78,7 @@
         <!-- 模式3: 目标配速 范围 -->
         <div v-if="classData.mode === 3 && part.range === 'range'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -95,7 +95,7 @@
         <!-- 模式4: 目标心率 范围 -->
         <div v-if="classData.mode === 4 && part.range === 'range'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -114,7 +114,7 @@
         <!-- 模式3: 目标配速 目标 -->
         <div v-if="classData.mode === 3 && part.range === 'target'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -129,7 +129,7 @@
         <!-- 模式4: 目标心率 目标 -->
         <div v-if="classData.mode === 4 && part.range === 'target'">
           {{
-            part.capacity === 'time'
+            part.capacity === "time"
               ? part.target
               : part.targetDistance + part.targetUnit
           }}
@@ -141,6 +141,7 @@
             步频{{ part.cadence[0] }}~{{ part.cadence[1] }}
           </span>
         </div>
+        <div v-if="part.lap">按LAP进入下一段落</div>
       </div>
       <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
     </div>
@@ -148,20 +149,20 @@
 </template>
 
 <script>
-import { secondsToMMSS } from '@/utils/index'
+import { secondsToMMSS } from "@/utils/index";
 
 export default {
-  name: 'RunStageDetails',
+  name: "RunStageDetails",
   props: {
     classData: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   methods: {
-    secondsToMMSS
-  }
-}
+    secondsToMMSS,
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -182,4 +183,3 @@ export default {
   }
 }
 </style>
-

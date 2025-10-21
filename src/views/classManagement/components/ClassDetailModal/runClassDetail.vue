@@ -290,6 +290,7 @@
                       >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
                     >
                   </div>
+                  <div v-if="part.lap">按LAP进入下一段落</div>
                 </div>
               </div>
             </div>
@@ -299,7 +300,7 @@
         <!-- 标签部分 -->
         <div class="edit-section">
           <div class="section-header">
-            <span class="section-title ">标签</span>
+            <span class="section-title">标签</span>
           </div>
           <div class="tags-container">
             <div class="add-tag-input">
@@ -356,7 +357,7 @@
                     v-model="part.title"
                     placeholder="请输入阶段名称"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                 </div>
                 <div class="config-item">
@@ -390,7 +391,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()()"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围" value="range" />
@@ -600,25 +601,17 @@
                   class="config-item"
                 >
                   <span class="label">运动值</span>
-                  <el-time-picker
-                    value-format="mm:ss"
+                  <TimeInput
                     v-model="part.targetSpeedRange[0]"
-                    format="mm:ss"
-                    size="small"
-                    popper-class="hide-hour"
-                    :style="{ width: '100px' }"
+                    timerType="mm:ss"
                     @change="handleTargetChange(index, idx)"
                   />
                   <span class="unit">~</span>
-                  <el-time-picker
+                  <TimeInput
                     v-model="part.targetSpeedRange[1]"
-                    value-format="mm:ss"
-                    format="mm:ss"
-                    size="small"
-                    popper-class="hide-hour"
-                    :style="{ width: '100px' }"
+                    timerType="mm:ss"
                     @change="handleTargetChange(index, idx)"
-                  ></el-time-picker>
+                  />
                   <span class="unit"
                     >min/km &nbsp; &nbsp;
                     {{
@@ -633,15 +626,11 @@
                   class="config-item"
                 >
                   <span class="label">运动值</span>
-                  <el-time-picker
+                  <TimeInput
                     v-model="part.targetSpeed"
-                    value-format="mm:ss"
-                    format="mm:ss"
-                    size="small"
-                    popper-class="hide-hour"
-                    :style="{ width: '100px' }"
+                    timerType="mm:ss"
                     @change="handleTargetChange(index, idx)"
-                  ></el-time-picker>
+                  />
                   <span class="unit"
                     >min/km &nbsp; &nbsp;
                     {{ calculateTargetSpeedNumZone(part.targetSpeed) }}</span
@@ -711,7 +700,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">~</span>
                   <el-input-number
@@ -722,7 +711,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   />
                   <span class="unit">spm</span>
                   <i
@@ -1618,6 +1607,8 @@ export default {
       text-align: center;
       margin-bottom: 5px;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .time-stage-for {
       display: flex;

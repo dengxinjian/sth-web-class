@@ -24,10 +24,15 @@
       :data="coachingData"
       node-key="id"
       default-expand-all
-      :expand-on-click-node="false"
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
-        <span>{{ node.label }} <span v-if="node.data.isGroup">({{ node.data.membersCount }})</span></span>
+        <span
+          >{{ node.label }} {{ node.userType }}
+          <span v-if="node.data.userType && node.data.userType === 1">（主教练）</span>
+          <span v-if="node.data.isGroup"
+            >({{ node.data.membersCount }})</span
+          ></span
+        >
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
@@ -96,10 +101,16 @@
       :data="filteredAthleticData"
       node-key="id"
       default-expand-all
-      :expand-on-click-node="false"
+      @node-click="handleNodeClick"
+      :highlight-current="true"
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
-        <span>{{ node.label }} <span v-if="node.data.isGroup">({{ node.data.membersCount }})</span></span>
+        <span
+          >{{ node.label }}
+          <span v-if="node.data.isGroup"
+            >({{ node.data.membersCount }})</span
+          ></span
+        >
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
@@ -115,9 +126,7 @@
             >
             <el-button
               v-if="
-                node.data.isGroup &&
-                node.data.id &&
-                node.data.id !== 'coach'
+                node.data.isGroup && node.data.id && node.data.id !== 'coach'
               "
               type="text"
               size="mini"
@@ -126,9 +135,7 @@
             >
             <el-button
               v-if="
-                node.data.isGroup &&
-                node.data.id &&
-                node.data.id !== 'coach'
+                node.data.isGroup && node.data.id && node.data.id !== 'coach'
               "
               type="text"
               size="mini"
@@ -434,6 +441,13 @@ export default {
     },
   },
   methods: {
+    handleNodeClick(node) {
+      console.log(node, "node");
+      if (node.triUserId) {
+        this.$emit("athletic-click", node.triUserId);
+      }
+    },
+
     // 获取运动员数据
     getAthleticData() {
       if (!this.teamId) return;
