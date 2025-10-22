@@ -358,7 +358,7 @@ export default {
         param1: "",
         param2: "",
         threshold: "",
-        triUserId: this.data.triUserId,
+        triUserId: this.triUserId,
       };
       if (this.activeSport === 4 || this.activeSport === 3) {
         params.threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue);
