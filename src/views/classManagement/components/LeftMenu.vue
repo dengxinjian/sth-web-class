@@ -41,7 +41,7 @@ export default {
   },
   data() {
     return {
-      loginType: localStorage.getItem("loginType") || "1",
+      loginType: localStorage.getItem("loginType") || "2",
     };
   },
   computed: {

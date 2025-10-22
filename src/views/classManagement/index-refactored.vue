@@ -346,7 +346,7 @@ export default {
     };
   },
   mounted() {
-    if (localStorage.getItem("loginType") === "2") {
+    if (localStorage.getItem("loginType") !== "1") {
       this.getTeamAndAthleticData();
     } else {
       this.selectedAthletic = localStorage.getItem("triUserId");

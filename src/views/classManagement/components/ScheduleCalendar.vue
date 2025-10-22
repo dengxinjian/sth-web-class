@@ -162,7 +162,7 @@ export default {
   data() {
     return {
       weekList: WEEK_LIST,
-      loginType: localStorage.getItem("loginType") || "1",
+      loginType: localStorage.getItem("loginType") || "2",
     };
   },
   methods: {
