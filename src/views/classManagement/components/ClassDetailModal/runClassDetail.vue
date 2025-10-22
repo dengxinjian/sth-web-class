@@ -1410,7 +1410,6 @@ export default {
       let timeFlag = false; // 判断是否可以显示时间，当存在阶段 模式≠3 且 容量=距离 时，不显示时间
       let distanceFlag = false; // 判断是否可以显示距离，当存在阶段 模式≠3 且 容量=时间 时，不显示距离
       this.maxIntensity = 0;
-      console.log(this.classInfo, "this.classInfo.stages");
       this.timeline = this.classInfo.stages.map((stage) => {
         let totalTime = 0;
         let totalDistance = 0;

@@ -177,7 +177,7 @@ export const groupApi = {
   // 删除分组
   deleteGroup(id) {
     return submitData({
-      url: `/api/classesGroup/delete?id=${id}`
+      url: `/api/classesGroup/deleteClassesGroup?id=${id}`
     })
   }
 }

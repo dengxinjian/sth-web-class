@@ -222,6 +222,7 @@ export default {
       }).then(res => {
         if (res.success) {
           this.form = JSON.parse(res.result.classesJson)
+          this.form.groupId = res.result.classesGroupId;
           this.form.id = res.result.id
         }
       })

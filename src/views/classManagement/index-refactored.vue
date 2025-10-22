@@ -233,6 +233,7 @@ import {
   scheduleApi,
   statisticsApi,
   athleteApi,
+  groupApi,
 } from "./services/classManagement";
 import { ACTIVITY_TYPE_DICT } from "./constants";
 import {
@@ -722,7 +723,12 @@ export default {
         type: "warning",
       }).then(() => {
         // 调用删除分组API
-        this.getClassList();
+        groupApi.deleteGroup(groupId).then((res) => {
+          if (res.success) {
+            this.$message.success("删除成功");
+            this.getClassList();
+          }
+        });
       });
     },
 
