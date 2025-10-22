@@ -9,16 +9,17 @@
 
     <!-- 面包屑导航 -->
     <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" /> -->
-     <div style="flex: 1;">
-      <div
-        style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0"
-      >
+    <div style="flex: 1">
+      <div style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0">
         公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
       </div>
-     </div>
+    </div>
 
     <!-- 右侧菜单 -->
     <div class="right-menu">
+      <div @click="changeIdentify" style="margin-right: 10px">
+        切换成{{ loginType == "1" ? "教练" : "运动员" }}
+      </div>
       <span>{{ name }}</span>
       <el-divider direction="vertical"></el-divider>
       <span style="display: inline-block" @click="logout">{{
@@ -57,7 +58,8 @@ export default {
   data() {
     return {
       title: "强者之心",
-      name: localStorage.getItem('name'),
+      name: localStorage.getItem("name"),
+      loginType: localStorage.getItem("loginType"),
     };
   },
   computed: {
@@ -104,7 +106,7 @@ export default {
       });
     },
     changeIdentify() {
-      this.$store.dispatch("user/changeIdentify");
+      localStorage.setItem("loginType", this.loginType === "1" ? "2" : "1");
       this.reload();
     },
     chooseShop(e) {
