@@ -35,7 +35,9 @@
         </div>
       </div>
       <div class="wx-login-block">
-        <div class="elite-title">ELITE</div>
+        <div class="elite-title">
+           <img src="./imgs/PREMIUM.svg" alt="ELITE" width="100%" height="40%">
+        </div>
         <div
           id="wx-login-container"
           :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
