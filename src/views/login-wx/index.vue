@@ -1,77 +1,101 @@
 <template>
   <div class="wx-login-page">
     <header>
-        <div class="logo-container">
-             <div class="logo">
-                 <img :src="require('@/views/login-wx/imgs/logo-move.png')" alt="强者之心">
-             </div>
-            <div class="brand-description">
-                <span>TRI强者，恒心不止。 Try Tri, Timeless Strength.</span>
-            </div>
+      <div class="logo-container">
+        <div class="logo">
+          <img
+            :src="require('@/views/login-wx/imgs/logo-move.png')"
+            alt="强者之心"
+          />
         </div>
+        <div class="brand-description">
+          <span>TRI强者，恒心不止。 Try Tri, Timeless Strength.</span>
+        </div>
+      </div>
     </header>
 
     <div class="slider-container">
-        <div class="slider">
-        </div>
-        <div class="content-overlay">
-            <div class="text-content">
-                <h1>强者之心</h1>
-                <p>让科学普及训练</p>
-                <!-- <p>敬请期待！</p> -->
-                <div class="contact-info">
-                    <h2>联系我们</h2>
-                    <!-- <div class="contact-item">
+      <div class="slider"></div>
+      <div class="content-overlay">
+        <div class="text-content">
+          <h1>强者之心</h1>
+          <p>让科学普及训练</p>
+          <!-- <p>敬请期待！</p> -->
+          <div class="contact-info">
+            <h2>联系我们</h2>
+            <!-- <div class="contact-item">
                         <span class="contact-label">电话：</span>
                         <span class="contact-value">000-0000-0000</span>
                     </div> -->
-                    <div class="contact-item">
-                        <span class="contact-label">邮箱：</span>
-                        <span class="contact-value">service@strongtri.com</span>
-                    </div>
-                </div>
+            <div class="contact-item">
+              <span class="contact-label">邮箱：</span>
+              <span class="contact-value">service@strongtri.com</span>
             </div>
-        </div>
-          <div class="wx-login-block">
-            <div class="elite-title">ELITE</div>
-            <div id="wx-login-container" :class="'wx-login-container '+ (!isAgreement ? ' noAgreement' : '')">
-               <!-- 扫码成功状态 -->
-               <div v-if="hasCode" class="login-success">
-                 <div class="success-icon">✓</div>
-                 <div class="success-text">扫码成功</div>
-                 <div class="success-subtitle">正在跳转...</div>
-               </div>
-               <!-- 加载状态 -->
-               <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
-                 <div class="loading-spinner"></div>
-                 <div class="loading-text">正在加载二维码...</div>
-               </div>
-               <!-- 错误状态 -->
-               <div v-else-if="wxLoginStatus === 'error'" class="login-error">
-                 <div class="error-icon">✗</div>
-                 <div class="error-text">加载失败</div>
-                 <div class="error-subtitle">请刷新重试</div>
-               </div>
-             </div>
-             <div v-if="!isAgreement" class="wx-login-cover"></div>
-             <div style="display: flex; align-items: center;font-size: 14px;">
-                <el-checkbox v-model="isAgreement" label="" style="margin-right: 5px;"></el-checkbox>
-                <span>我已阅读并同意</span>
-                <router-link to="/agreement" style="color: #0924f5;">《课程配置器用户协议》</router-link>
-              </div>
           </div>
+        </div>
+      </div>
+      <div class="wx-login-block">
+        <div class="elite-title">ELITE</div>
+        <div
+          id="wx-login-container"
+          :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
+        >
+          <!-- 扫码成功状态 -->
+          <div v-if="hasCode" class="login-success">
+            <div class="success-icon">✓</div>
+            <div class="success-text">扫码成功</div>
+            <div class="success-subtitle">正在跳转...</div>
+          </div>
+          <!-- 加载状态 -->
+          <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">正在加载二维码...</div>
+          </div>
+          <!-- 错误状态 -->
+          <div v-else-if="wxLoginStatus === 'error'" class="login-error">
+            <div class="error-icon">✗</div>
+            <div class="error-text">加载失败</div>
+            <div class="error-subtitle">请刷新重试</div>
+          </div>
+        </div>
+        <div v-if="!isAgreement" class="wx-login-cover"></div>
+        <div style="margin-bottom: 10px;">
+          <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
+            <el-radio label="1">运动员</el-radio>
+            <el-radio label="2">教练</el-radio>
+          </el-radio-group>
+        </div>
+        <div style="display: flex; align-items: center; font-size: 14px">
+          <el-checkbox
+            v-model="isAgreement"
+            label=""
+            style="margin-right: 5px"
+          ></el-checkbox>
+          <span>我已阅读并同意</span>
+          <router-link to="/agreement" style="color: #0924f5"
+            >《课程配置器用户协议》</router-link
+          >
+        </div>
+      </div>
     </div>
 
     <footer>
-        <div class="footer-content">
-             <p><img :src="require('@/views/login-wx/imgs/logo.png')" alt="" width="30">© 2025 武汉强大之心体育有限公司 版权所有 鄂ICP备2024075413号-2 | <router-link to="/privacy">隐私政策</router-link></p>
-        </div>
+      <div class="footer-content">
+        <p>
+          <img
+            :src="require('@/views/login-wx/imgs/logo.png')"
+            alt=""
+            width="30"
+          />© 2025 武汉强大之心体育有限公司 版权所有 鄂ICP备2024075413号-2 |
+          <router-link to="/privacy">隐私政策</router-link>
+        </p>
+      </div>
     </footer>
   </div>
 </template>
 
 <script>
-import {getData, submitData} from '@/api/common'
+import { getData, submitData } from "@/api/common";
 export default {
   name: "LoginWx",
   data() {
@@ -79,20 +103,23 @@ export default {
       currentSlide: 0,
       backgroundImages: [
         // 图片路径 - 使用绝对路径
-        require('@/views/login-wx/imgs/banner1.jpg'),
-        require('@/views/login-wx/imgs/banner2.jpg'),
-        require('@/views/login-wx/imgs/banner3.webp'),
-        require('@/views/login-wx/imgs/banner4.jpg')
+        require("@/views/login-wx/imgs/banner1.jpg"),
+        require("@/views/login-wx/imgs/banner2.jpg"),
+        require("@/views/login-wx/imgs/banner3.webp"),
+        require("@/views/login-wx/imgs/banner4.jpg"),
       ],
       carouselTimer: null,
       hasCode: false, // 是否包含code参数
-      wxLoginStatus: 'loading', // 微信登录状态：loading, success, error
-      isAgreement: false // 是否同意用户协议
+      wxLoginStatus: "loading", // 微信登录状态：loading, success, error
+      isAgreement: false, // 是否同意用户协议
+      loginType: "1", // 登录类型：1-运动员，2-教练
     };
   },
   mounted() {
     this.checkUrlParams();
     this.initSlider();
+    this.loginType = localStorage.getItem('loginType') || '1';
+    localStorage.setItem('loginType', this.loginType);
   },
   beforeDestroy() {
     clearInterval(this.carouselTimer);
@@ -101,25 +128,25 @@ export default {
     // 检查URL参数
     checkUrlParams() {
       // 添加更详细的调试信息
-      console.log('当前完整URL:', window.location.href);
-      console.log('window.location.search:', window.location.search);
-      console.log('window.location.hash:', window.location.hash);
+      console.log("当前完整URL:", window.location.href);
+      console.log("window.location.search:", window.location.search);
+      console.log("window.location.hash:", window.location.hash);
 
       // 尝试多种方式获取code和state参数
       const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const state = urlParams.get('state');
+      const code = urlParams.get("code");
+      const state = urlParams.get("state");
 
       // 也检查hash中的参数（有些情况下参数可能在hash中）
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const codeFromHash = hashParams.get('code');
-      const stateFromHash = hashParams.get('state');
+      const codeFromHash = hashParams.get("code");
+      const stateFromHash = hashParams.get("state");
 
       // 检查URL中是否包含code字符串
-      const urlContainsCode = window.location.href.includes('code=');
-      const urlContainsState = window.location.href.includes('state=');
+      const urlContainsCode = window.location.href.includes("code=");
+      const urlContainsState = window.location.href.includes("state=");
 
-      console.log('URL参数检测详情:', {
+      console.log("URL参数检测详情:", {
         search: window.location.search,
         hash: window.location.hash,
         codeFromSearch: code,
@@ -129,28 +156,33 @@ export default {
         urlContainsCode: urlContainsCode,
         urlContainsState: urlContainsState,
         allSearchParams: Object.fromEntries(urlParams),
-        allHashParams: Object.fromEntries(hashParams)
+        allHashParams: Object.fromEntries(hashParams),
       });
 
       // 备用方法：使用正则表达式解析URL参数
-      const regexCode = this.getUrlParameter('code');
-      const regexState = this.getUrlParameter('state');
+      const regexCode = this.getUrlParameter("code");
+      const regexState = this.getUrlParameter("state");
 
       // 优先使用search中的参数，如果没有则使用hash中的参数，最后使用正则表达式
       const finalCode = code || codeFromHash || regexCode;
       const finalState = state || stateFromHash || regexState;
 
-      console.log('最终获取到的参数:', { code: finalCode, state: finalState });
+      console.log("最终获取到的参数:", { code: finalCode, state: finalState });
 
       if (finalCode) {
         this.hasCode = true;
-        this.wxLoginStatus = 'success';
-        console.log('检测到code参数，显示扫码成功状态，code值:', finalCode, 'state值:', finalState);
+        this.wxLoginStatus = "success";
+        console.log(
+          "检测到code参数，显示扫码成功状态，code值:",
+          finalCode,
+          "state值:",
+          finalState
+        );
 
         // 可以在这里处理登录成功后的逻辑
         this.handleLoginSuccess(finalCode, finalState);
       } else {
-        console.log('未检测到code参数，开始初始化微信登录');
+        console.log("未检测到code参数，开始初始化微信登录");
         this.initWxLogin();
       }
     },
@@ -158,93 +190,97 @@ export default {
     // 备用URL参数解析方法
     getUrlParameter(name) {
       const url = window.location.href;
-      const regex = new RegExp('[?&]' + name + '=([^&#]*)', 'i');
+      const regex = new RegExp("[?&]" + name + "=([^&#]*)", "i");
       const results = regex.exec(url);
-      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+      return results === null
+        ? ""
+        : decodeURIComponent(results[1].replace(/\+/g, " "));
     },
 
     // 处理登录成功
     handleLoginSuccess(code, state) {
-      console.log('处理登录成功，code:', code, 'state:', state);
+      console.log("处理登录成功，code:", code, "state:", state);
 
       // 调用微信登录回调接口，同时传递code和state参数
       getData({
-        url: '/api/wechat/callback',
+        url: "/api/wechat/callback",
         data: {
           code: code,
-          state: state
-        }
-      }).then(res => {
-        console.log('微信登录回调成功，res:', res);
+          state: state,
+        },
+      })
+        .then((res) => {
+          console.log("微信登录回调成功，res:", res);
 
-        // 根据后端返回结果处理后续逻辑
-        if (res.success) {
-          // 登录成功，可以跳转到主页或保存用户信息
-          console.log('登录成功，准备跳转');
-          // this.$router.push('/dashboard'); // 根据实际路由调整
-        } else {
-          // 登录失败，显示错误信息
-          console.error('登录失败:', res.message);
-          this.$message.error(res.message || '登录失败，请重试');
-        }
-      }).catch(error => {
-        console.error('微信登录回调失败:', error);
-        this.$message.error('登录失败，请重试');
-      });
+          // 根据后端返回结果处理后续逻辑
+          if (res.success) {
+            // 登录成功，可以跳转到主页或保存用户信息
+            console.log("登录成功，准备跳转");
+            // this.$router.push('/dashboard'); // 根据实际路由调整
+          } else {
+            // 登录失败，显示错误信息
+            console.error("登录失败:", res.message);
+            this.$message.error(res.message || "登录失败，请重试");
+          }
+        })
+        .catch((error) => {
+          console.error("微信登录回调失败:", error);
+          this.$message.error("登录失败，请重试");
+        });
 
       // 这里可以添加登录成功后的处理逻辑
       // 比如发送code到后端验证，获取用户信息等
 
       // 示例：3秒后跳转到主页
       setTimeout(() => {
-        console.log('准备跳转到主页');
+        console.log("准备跳转到主页");
         // this.$router.push('/dashboard'); // 根据实际路由调整
       }, 3000);
     },
     initSlider() {
       // 使用 $nextTick 确保 DOM 完全渲染后再初始化轮播
       this.$nextTick(() => {
-        const slider = document.querySelector('.slider');
+        const slider = document.querySelector(".slider");
         if (!slider) {
-          console.error('轮播容器未找到');
+          console.error("轮播容器未找到");
           return;
         }
 
         let currentImageIndex = 0;
         let loadedImages = 0;
 
-        console.log('背景图片数组:', this.backgroundImages);
-        console.log('轮播容器:', slider);
+        console.log("背景图片数组:", this.backgroundImages);
+        console.log("轮播容器:", slider);
 
         // 清空容器
-        slider.innerHTML = '';
+        slider.innerHTML = "";
 
         // 初始化轮播图片
         this.backgroundImages.forEach((image, index) => {
           console.log(`添加图片 ${index}:`, image);
-          const img = document.createElement('img');
+          const img = document.createElement("img");
           img.src = image;
-          img.className = index === 0 ? 'active' : '';
-          img.style.objectFit = 'cover';
-          img.style.width = '100%';
-          img.style.height = '100%';
-          img.style.position = 'absolute';
-          img.style.top = '0';
-          img.style.left = '0';
-          img.style.opacity = index === 0 ? '1' : '0';
-          img.style.transition = 'opacity 1s ease-in-out';
+          img.className = index === 0 ? "active" : "";
+          img.style.objectFit = "cover";
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.position = "absolute";
+          img.style.top = "0";
+          img.style.left = "0";
+          img.style.opacity = index === 0 ? "1" : "0";
+          img.style.transition = "opacity 1s ease-in-out";
 
           img.onload = () => {
             console.log(`图片 ${index} 加载成功`);
             loadedImages++;
             if (loadedImages === this.backgroundImages.length) {
-              console.log('所有图片加载完成，开始轮播');
+              console.log("所有图片加载完成，开始轮播");
             }
           };
 
           img.onerror = (e) => {
             console.error(`图片 ${index} 加载失败:`, e);
-            console.error('图片路径:', image);
+            console.error("图片路径:", image);
           };
 
           slider.appendChild(img);
@@ -252,30 +288,31 @@ export default {
 
         // 切换到下一张图片
         const nextImage = () => {
-          const imgs = slider.querySelectorAll('img');
+          const imgs = slider.querySelectorAll("img");
           if (imgs.length === 0) {
-            console.warn('没有找到轮播图片');
+            console.warn("没有找到轮播图片");
             return;
           }
 
-          imgs[currentImageIndex].classList.remove('active');
-          imgs[currentImageIndex].style.opacity = '0';
+          imgs[currentImageIndex].classList.remove("active");
+          imgs[currentImageIndex].style.opacity = "0";
 
-          currentImageIndex = (currentImageIndex + 1) % this.backgroundImages.length;
+          currentImageIndex =
+            (currentImageIndex + 1) % this.backgroundImages.length;
 
-          imgs[currentImageIndex].classList.add('active');
-          imgs[currentImageIndex].style.opacity = '1';
+          imgs[currentImageIndex].classList.add("active");
+          imgs[currentImageIndex].style.opacity = "1";
 
           console.log(`切换到图片 ${currentImageIndex}`);
         };
 
         // 设置自动轮播间隔
         this.carouselTimer = setInterval(nextImage, 5000);
-        console.log('轮播定时器已启动，间隔5秒');
+        console.log("轮播定时器已启动，间隔5秒");
       });
     },
     initWxLogin() {
-      this.wxLoginStatus = 'loading';
+      this.wxLoginStatus = "loading";
       // 延迟初始化，确保DOM完全加载
       this.$nextTick(() => {
         this.loadWxLoginScript();
@@ -285,20 +322,21 @@ export default {
       const ensureScript = () =>
         new Promise((resolve, reject) => {
           if (window.WxLogin) {
-            console.log('微信登录脚本已存在');
+            console.log("微信登录脚本已存在");
             return resolve();
           }
 
-          console.log('开始加载微信登录脚本...');
+          console.log("开始加载微信登录脚本...");
           const s = document.createElement("script");
-          s.src = "https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js";
+          s.src =
+            "https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js";
           s.async = true;
           s.onload = () => {
-            console.log('微信登录脚本加载成功');
+            console.log("微信登录脚本加载成功");
             resolve();
           };
           s.onerror = (e) => {
-            console.error('微信登录脚本加载失败:', e);
+            console.error("微信登录脚本加载失败:", e);
             reject(e);
           };
           document.head.appendChild(s);
@@ -309,27 +347,34 @@ export default {
           this.createWxLogin();
         })
         .catch((error) => {
-          console.error('微信登录初始化失败:', error);
-          this.wxLoginStatus = 'error';
+          console.error("微信登录初始化失败:", error);
+          this.wxLoginStatus = "error";
           this.$message.error("微信登录初始化失败，请检查网络连接后刷新重试");
         });
     },
     createWxLogin() {
       try {
-        const appId = process.env.NODE_ENV === 'production' ? 'wxe34b400e55bd075b' : 'wx4064cabd6845def1';
-        const state = (Math.random().toString(36).slice(2) + Date.now()).toString();
+        const appId =
+          process.env.NODE_ENV === "production"
+            ? "wxe34b400e55bd075b"
+            : "wx4064cabd6845def1";
+        const state = (
+          Math.random().toString(36).slice(2) + Date.now()
+        ).toString();
         const redirectUri = encodeURIComponent(
-          process.env.NODE_ENV === 'production' ? 'https://web.strongtri.com/#/login-scan' : 'https://webtest.strongtri.com/#/login-scan'
+          process.env.NODE_ENV === "production"
+            ? "https://web.strongtri.com/#/login-scan"
+            : "https://webtest.strongtri.com/#/login-scan"
         );
 
-        console.log('开始创建微信登录二维码...');
-        console.log('AppId:', appId);
-        console.log('RedirectUri:', redirectUri);
+        console.log("开始创建微信登录二维码...");
+        console.log("AppId:", appId);
+        console.log("RedirectUri:", redirectUri);
 
         // 清空容器
-        const container = document.getElementById('wx-login-container');
+        const container = document.getElementById("wx-login-container");
         if (container) {
-          container.innerHTML = '';
+          container.innerHTML = "";
         }
 
         // 创建微信登录二维码
@@ -343,13 +388,16 @@ export default {
           href: "",
         });
 
-        console.log('微信登录二维码创建成功');
-        this.wxLoginStatus = 'success';
+        console.log("微信登录二维码创建成功");
+        this.wxLoginStatus = "success";
       } catch (error) {
-        console.error('创建微信登录二维码时出错:', error);
-        this.wxLoginStatus = 'error';
+        console.error("创建微信登录二维码时出错:", error);
+        this.wxLoginStatus = "error";
         this.$message.error("创建微信登录二维码失败，请刷新重试");
       }
+    },
+    handleLoginTypeChange(value) {
+      localStorage.setItem('loginType', value);
     },
   },
 };
@@ -358,176 +406,176 @@ export default {
 <style lang="scss" scoped>
 /* 头部样式 */
 header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 20px;
 }
 
 .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .logo {
-    width: 200px;
-    margin-top: -6px;
+  width: 200px;
+  margin-top: -6px;
 }
 
 .logo img {
-    width: 100%;
-    height: auto;
+  width: 100%;
+  height: auto;
 }
 
 .brand-description {
-    color: white;
-    font-size: 14px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    font-style: italic;
+  color: white;
+  font-size: 14px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  font-style: italic;
 }
 
 /* 轮播容器样式 */
 .slider-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .slider {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .slider img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  z-index: 1;
 }
 
 .slider img.active {
-    opacity: 1;
-    z-index: 2;
+  opacity: 1;
+  z-index: 2;
 }
 
 /* 内容覆盖层样式 */
 .content-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    padding: 0 10%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  padding: 0 10%;
 }
 
 .text-content {
-    color: white;
-    max-width: 800px;
-    text-align: left;
-    animation: fadeIn 1.5s ease-out;
+  color: white;
+  max-width: 800px;
+  text-align: left;
+  animation: fadeIn 1.5s ease-out;
 }
 
 .text-content h1 {
-    font-size: 4em;
-    margin-bottom: 30px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    transform: translateX(-20px);
-    opacity: 0;
-    animation: slideIn 1s ease-out forwards;
+  font-size: 4em;
+  margin-bottom: 30px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateX(-20px);
+  opacity: 0;
+  animation: slideIn 1s ease-out forwards;
 }
 
 .text-content p {
-    font-size: 1.8em;
-    margin-bottom: 20px;
-    line-height: 1.6;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUp 0.8s ease-out forwards;
-    animation-delay: 0.5s;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s ease-out forwards;
+  animation-delay: 0.5s;
 }
 
 .text-content p:last-child {
-    font-size: 1.4em;
-    font-weight: 300;
-    opacity: 0.9;
-    animation-delay: 1s;
+  font-size: 1.4em;
+  font-weight: 300;
+  opacity: 0.9;
+  animation-delay: 1s;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-    from {
-        transform: translateX(-20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes fadeUp {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* 页脚样式 */
 footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 15px 30px;
-    color: white;
-    text-align: center;
-    font-size: 0.9em;
-    background: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 15px 30px;
+  color: white;
+  text-align: center;
+  font-size: 0.9em;
+  background: rgba(0, 0, 0, 0.7);
 }
 
 .footer-content p {
-    margin: 2px 0;
+  margin: 2px 0;
 }
 
 .footer-content p img {
-    width: 28px;
-    height: 28px;
-    vertical-align: middle;
-    margin: -3px 6px 0 0;
+  width: 28px;
+  height: 28px;
+  vertical-align: middle;
+  margin: -3px 6px 0 0;
 }
 
 .footer-content .icp {
-    font-size: 0.85em;
-    opacity: 0.9;
+  font-size: 0.85em;
+  opacity: 0.9;
 }
 .wx-login-block {
   position: absolute;
@@ -536,7 +584,7 @@ footer {
   z-index: 1000;
   transform: translateY(-50%);
   width: 340px;
-  height: 520px;
+  height: 550px;
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -665,7 +713,8 @@ footer {
 
 /* 动画效果 */
 @keyframes successPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -682,4 +731,3 @@ footer {
   }
 }
 </style>
-

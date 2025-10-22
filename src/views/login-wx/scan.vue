@@ -158,6 +158,7 @@ export default {
         if (res.result.jwt && res.result.jwt.trim() !== '') {
           this.$store.commit('user/SET_TOKEN', res.result.jwt);
           this.$store.commit('user/SET_NAME', res.result.nicknameTag);
+          localStorage.setItem('triUserId', res.result.triUserId);
           localStorage.setItem('name', res.result.nicknameTag);
           setToken(res.result.jwt);
           this.$router.push('/timeTable/athletic');

@@ -6,7 +6,7 @@
         <div class="schedule-top">
           <WeekRangePicker @week-change="$emit('week-change', $event)" />
           <div class="schedule-search">
-            <div>
+            <div v-if="loginType === '2'">
               <span>团队：</span>
               <el-select
                 :value="selectedTeam"
@@ -23,7 +23,7 @@
                 />
               </el-select>
             </div>
-            <div>
+            <div v-if="loginType === '2'">
               <span>运动员：</span>
               <el-select
                 :value="selectedAthletic"
@@ -162,6 +162,7 @@ export default {
   data() {
     return {
       weekList: WEEK_LIST,
+      loginType: localStorage.getItem("loginType") || "1",
     };
   },
   methods: {

@@ -5,14 +5,18 @@
     :before-close="handleClose"
     append-to-body
     class="athletic-info-dialog"
-     :close-on-click-modal="false"
+    :close-on-click-modal="false"
   >
     <span slot="title">运动员信息</span>
     <el-tabs v-model="activeMainTab">
       <el-tab-pane label="基本信息" name="base">
         <el-form :model="baseForm" label-width="80px" class="base-form">
           <el-form-item label="昵称">
-            <el-input v-model="baseForm.nickname" placeholder="请输入昵称" disabled />
+            <el-input
+              v-model="baseForm.nickname"
+              placeholder="请输入昵称"
+              disabled
+            />
           </el-form-item>
           <el-form-item label="头像">
             <div class="avatar-uploader">
@@ -26,7 +30,11 @@
                 accept="image/*"
                 disabled
               >
-                <img v-if="baseForm.avatarUrl" :src="baseForm.avatarUrl" class="avatar" />
+                <img
+                  v-if="baseForm.avatarUrl"
+                  :src="baseForm.avatarUrl"
+                  class="avatar"
+                />
                 <i v-else class="el-icon-plus avatar-uploader-icon" />
               </el-upload>
             </div>
@@ -39,13 +47,21 @@
           </el-form-item>
           <el-form-item label="身高">
             <div class="inline-field">
-              <el-input v-model.number="baseForm.height" placeholder="cm" disabled />
+              <el-input
+                v-model.number="baseForm.height"
+                placeholder="cm"
+                disabled
+              />
               <span class="unit">CM</span>
             </div>
           </el-form-item>
           <el-form-item label="体重">
             <div class="inline-field">
-              <el-input v-model.number="baseForm.weight" placeholder="kg" disabled />
+              <el-input
+                v-model.number="baseForm.weight"
+                placeholder="kg"
+                disabled
+              />
               <span class="unit">KG</span>
             </div>
           </el-form-item>
@@ -64,25 +80,56 @@
         <div class="threshold-form">
           <div v-if="activeSport === 1" class="row">
             <span class="label"><span class="required">*</span>阈值心率</span>
-            <el-input v-model.number="thresholdData.param2" :key="'hr-param2-' + activeSport" step="1" class="pill-input" />
+            <el-input
+              v-model.number="thresholdData.param2"
+              :key="'hr-param2-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
             <span class="suffix unit-red">bpm</span>
-            <span class="label right-gap"><span class="required">*</span>最大心率</span>
-            <el-input v-model.number="thresholdData.param1" :key="'hr-param1-' + activeSport" step="1" class="pill-input" />
+            <span class="label right-gap"
+              ><span class="required">*</span>最大心率</span
+            >
+            <el-input
+              v-model.number="thresholdData.param1"
+              :key="'hr-param1-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
             <span class="suffix unit-red">bpm</span>
           </div>
           <div v-else-if="activeSport === 4" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker v-model="thresholdData.thresholdTimeValue" :key="'swim-' + activeSport" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
+            <el-time-picker
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'swim-' + activeSport"
+              value-format="mm:ss"
+              format="mm:ss"
+              popper-class="hide-hour"
+              class="pill-input"
+            />
             <span class="suffix unit-red">min/100m</span>
           </div>
           <div v-else-if="activeSport === 2" class="row">
             <span class="label"><span class="required">*</span>阈值功率</span>
-            <el-input v-model.number="thresholdData.threshold" :key="'bike-' + activeSport" step="1" class="pill-input" />
+            <el-input
+              v-model.number="thresholdData.threshold"
+              :key="'bike-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
             <span class="suffix unit-red">w</span>
           </div>
           <div v-else-if="activeSport === 3" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker v-model="thresholdData.thresholdTimeValue" :key="'run-' + activeSport" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
+            <el-time-picker
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'run-' + activeSport"
+              value-format="mm:ss"
+              format="mm:ss"
+              popper-class="hide-hour"
+              class="pill-input"
+            />
             <span class="suffix unit-red">min/km</span>
           </div>
           <div class="zoneContainer">
@@ -152,41 +199,41 @@
       <el-button type="primary" @click="onSave">保存</el-button>
     </span>
   </el-dialog>
-  </template>
+</template>
 
 <script>
-import {getData, submitData} from '@/api/common.js'
-import { secondsToMMSS, mmssToSeconds } from '@/utils/index'
+import { getData, submitData } from "@/api/common.js";
+import { secondsToMMSS, mmssToSeconds } from "@/utils/index";
 
 export default {
-  name: 'AthleticInfoDialog',
+  name: "AthleticInfoDialog",
   props: {
     visible: {
       type: Boolean,
-      default: false
+      default: false,
     },
     value: {
       // 兼容 v-model 用法
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     // 初始数据（可选）
     data: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   data() {
     return {
       innerVisible: this.visible || this.value || false,
-      activeMainTab: 'base',
+      activeMainTab: "base",
       activeSport: 1,
       baseForm: {
-        nickname: this.data.nickname || '',
-        avatar: this.data.avatar || '',
+        nickname: this.data.nickname || "",
+        avatar: this.data.avatar || "",
         gender: 1,
         heightCm: this.data.heightCm || null,
-        weightKg: this.data.weightKg || null
+        weightKg: this.data.weightKg || null,
       },
       thresholds: [],
       thresholdData: {
@@ -197,19 +244,20 @@ export default {
         zone5A: [],
         zone5B: [],
         zone5C: [],
-        unit: '',
-        threshold: '',
-        thresholdTimeValue: '00:00',
-      }
+        unit: "",
+        threshold: "",
+        thresholdTimeValue: "00:00",
+      },
+      triUserId: "",
     };
   },
   computed: {
     bmiDisplay() {
       const h = Number(this.baseForm.height);
       const w = Number(this.baseForm.weight);
-      if (!h || !w) return '';
+      if (!h || !w) return "";
       const bmi = w / Math.pow(h / 100, 2);
-      return bmi ? bmi.toFixed(1) : '';
+      return bmi ? bmi.toFixed(1) : "";
     },
     // currentThreshold() {
     //   const find = this.thresholds.find(item => item.thresholdType === this.activeSport)
@@ -241,43 +289,48 @@ export default {
       this.innerVisible = val;
     },
     value(val) {
-      if (typeof val !== 'undefined') this.innerVisible = val;
+      if (typeof val !== "undefined") this.innerVisible = val;
     },
     innerVisible(val) {
-      this.$emit('update:visible', val);
-      this.$emit('input', val);
-      if (val && this.data.triUserId) {
-        this.getAthleticInfo()
-        this.getThresholdData()
+      this.$emit("update:visible", val);
+      this.$emit("input", val);
+      if (val) {
+        if (localStorage.getItem("loginType") === "2") {
+          this.triUserId = this.data.triUserId;
+        } else {
+          this.triUserId = localStorage.getItem("triUserId") || "";
+        }
+        this.getAthleticInfo();
+        this.getThresholdData();
       }
     },
     activeSport(val) {
-      this.getThresholdData()
-    }
+      this.getThresholdData();
+    },
   },
   methods: {
     getAthleticInfo() {
       getData({
-        url: '/api/classSchedule/getUserProfile',
-        triUserId: this.data.triUserId
-      }).then(res => {
+        url: "/api/classSchedule/getUserProfile",
+        triUserId: this.triUserId,
+      }).then((res) => {
         if (res.success) {
-          this.baseForm = res.result
+          this.baseForm = res.result;
           // this.thresholds = res.result.thresholdRecordList
           // this.currentThreshold = this.thresholds.find(item => item.thresholdType === this.activeSport)
         }
-      })
+      });
     },
     getThresholdData() {
       getData({
-        url: '/api/classSchedule/getThresholdDetail',
+        url: "/api/classSchedule/getThresholdDetail",
         type: this.activeSport,
-        triUserId: this.data.triUserId
-      }).then(res => {
-        const result = res.result[0]
+        triUserId: this.triUserId,
+      }).then((res) => {
+        const result = res.result[0];
         // 处理时间格式转换
         if (this.activeSport === 4 || this.activeSport === 3) {
-          result.thresholdTimeValue = secondsToMMSS(+result.threshold)
+          result.thresholdTimeValue = secondsToMMSS(+result.threshold);
         }
         // 使用 Vue.set 确保响应式更新，或者直接赋值新对象
         this.thresholdData = {
@@ -289,36 +342,42 @@ export default {
           zone5A: result.zone5A || [],
           zone5B: result.zone5B || [],
           zone5C: result.zone5C || [],
-        }
-      })
+        };
+      });
     },
     handleClose() {
       this.onCancel();
     },
     onCancel() {
       this.innerVisible = false;
-      this.$emit('cancel');
+      this.$emit("cancel");
     },
     onSave() {
-      const params = {thresholdType: this.activeSport, param1: '', param2: '', threshold: '', triUserId: this.data.triUserId}
+      const params = {
+        thresholdType: this.activeSport,
+        param1: "",
+        param2: "",
+        threshold: "",
+        triUserId: this.data.triUserId,
+      };
       if (this.activeSport === 4 || this.activeSport === 3) {
-        params.threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue)
+        params.threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue);
       } else if (this.activeSport === 2) {
-        params.threshold = this.thresholdData.threshold
+        params.threshold = this.thresholdData.threshold;
       } else if (this.activeSport === 1) {
-        params.param1 = this.thresholdData.param1
-        params.param2 = this.thresholdData.param2
+        params.param1 = this.thresholdData.param1;
+        params.param2 = this.thresholdData.param2;
       }
       submitData({
-        url: '/api/classSchedule/updateThreshold',
-        requestData: params
-      }).then(res => {
+        url: "/api/classSchedule/updateThreshold",
+        requestData: params,
+      }).then((res) => {
         if (res.success) {
-          this.$message.success('阈值保存成功')
+          this.$message.success("阈值保存成功");
           // this.$emit('save', res.result);
           // this.innerVisible = false;
         }
-      })
+      });
     },
     noopRequest() {},
     onAvatarChange(file) {
@@ -329,43 +388,44 @@ export default {
       reader.readAsDataURL(file.raw);
     },
     handleSportChange(val) {
-      console.log(val)
-      this.activeSport = val
-    }
-  }
+      console.log(val);
+      this.activeSport = val;
+    },
+  },
 };
 </script>
 
 <style scoped>
-.athletic-info-dialog ::v-deep(.el-dialog__header){
+.athletic-info-dialog ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
 }
-.athletic-info-dialog ::v-deep(.el-dialog__body){
+.athletic-info-dialog ::v-deep(.el-dialog__body) {
   padding: 10px 36px 0 36px;
 }
-.athletic-info-dialog ::v-deep(.el-tabs__header){
+.athletic-info-dialog ::v-deep(.el-tabs__header) {
   margin-bottom: 16px;
 }
-.base-form .el-input.is-disabled .el-input__inner{
+.base-form .el-input.is-disabled .el-input__inner {
   background: #f5f5f7;
   color: #333;
   border-radius: 24px;
   border: none;
   height: 40px;
 }
-.base-form .el-form-item{
+.base-form .el-form-item {
   margin-bottom: 18px;
 }
-.base-form ::v-deep(.el-radio.is-disabled){
+.base-form ::v-deep(.el-radio.is-disabled) {
   opacity: 1;
 }
-.base-form ::v-deep(.el-radio__input.is-disabled .el-radio__inner){
+.base-form ::v-deep(.el-radio__input.is-disabled .el-radio__inner) {
   border-color: #d9d9d9;
 }
-.base-form ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner){
+.base-form ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner) {
   border-color: #e74c3c;
 }
-.base-form ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner::after){
+.base-form
+  ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner::after) {
   background: #e74c3c;
 }
 .athletic-info-dialog .avatar-uploader {
@@ -418,11 +478,20 @@ export default {
   margin: 0 12px 0 6px;
   color: #666;
 }
-.right-gap { margin-left: 24px; }
-.required{ color: #e65b55; margin-right: 4px; }
-.unit-red{ color: #e65b55; }
-.sport-tabs ::v-deep(.el-tabs__nav-wrap::after){ height: 0; }
-.sport-tabs ::v-deep(.el-tabs__item){
+.right-gap {
+  margin-left: 24px;
+}
+.required {
+  color: #e65b55;
+  margin-right: 4px;
+}
+.unit-red {
+  color: #e65b55;
+}
+.sport-tabs ::v-deep(.el-tabs__nav-wrap::after) {
+  height: 0;
+}
+.sport-tabs ::v-deep(.el-tabs__item) {
   height: 36px;
   line-height: 36px;
   border-radius: 18px;
@@ -439,46 +508,50 @@ export default {
 .sport-tabs ::v-deep(.el-tabs__item:last-child) {
   padding-right: 24px;
 }
-.sport-tabs ::v-deep(.el-tabs__item.is-active){
+.sport-tabs ::v-deep(.el-tabs__item.is-active) {
   background: #e65b55;
   color: #fff;
 }
-.pill-input .el-input__inner{
+.pill-input .el-input__inner {
   border-radius: 22px;
   height: 40px;
   border: 1px solid #e5e6eb;
   background: #fff;
   padding: 0 16px;
 }
-.pill-input{ width: 220px; }
-.zone-table ::v-deep(.el-table__row){
+.pill-input {
+  width: 220px;
+}
+.zone-table ::v-deep(.el-table__row) {
   height: 44px;
 }
-.zone-table ::v-deep(.el-table){
+.zone-table ::v-deep(.el-table) {
   background: transparent;
 }
-.zone-table ::v-deep(.el-table__body tr:hover>td){
+.zone-table ::v-deep(.el-table__body tr:hover > td) {
   background: transparent;
 }
-.zone-table ::v-deep(.el-table__cell){
+.zone-table ::v-deep(.el-table__cell) {
   border-bottom: none;
   font-size: 14px;
   color: #333;
 }
-.zone-table ::v-deep(.el-table__body){ font-weight: 500; }
-.zone-table ::v-deep(.cell){
+.zone-table ::v-deep(.el-table__body) {
+  font-weight: 500;
+}
+.zone-table ::v-deep(.cell) {
   padding-left: 0;
   padding-right: 0;
 }
-.dialog-footer{
+.dialog-footer {
   display: flex;
   justify-content: center;
 }
-.dialog-footer .el-button{
+.dialog-footer .el-button {
   min-width: 120px;
   border-radius: 22px;
 }
-.dialog-footer .el-button--primary{
+.dialog-footer .el-button--primary {
   background: #d83b36;
   border-color: #d83b36;
 }
@@ -494,6 +567,4 @@ export default {
 .zoneTd:nth-child(1) {
   flex: 0 0 140px;
 }
-
 </style>
-

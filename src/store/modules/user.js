@@ -45,10 +45,12 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: loginAccount.trim() })
         .then((response) => {
-          const { token, nicknameTag } = response;
+          const { token, nicknameTag, triUserId } = response;
           commit("SET_TOKEN", token);
           commit("SET_NAME", nicknameTag);
-          localStorage.setItem('name', nicknameTag);
+          localStorage.setItem("name", nicknameTag);
+          localStorage.setItem("triUserId", triUserId);
+
           setToken(token);
           resolve();
         })
@@ -93,7 +95,8 @@ const actions = {
       commit("SET_TOKEN", "");
       commit("SET_ROLES", []);
       commit("SET_NAME", "");
-      localStorage.removeItem('name');
+      localStorage.removeItem("name");
+      localStorage.removeItem("triUserId");
       store.commit("userInfo/RESET_INFO");
       store.commit("permission/SET_ROLES", []);
       removeToken();

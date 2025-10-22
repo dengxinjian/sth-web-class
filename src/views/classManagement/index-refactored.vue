@@ -346,7 +346,15 @@ export default {
     };
   },
   mounted() {
-    this.getTeamAndAthleticData();
+    if (localStorage.getItem("loginType") === "2") {
+      this.getTeamAndAthleticData();
+    } else {
+      this.selectedAthletic = localStorage.getItem("triUserId");
+      this.getScheduleData();
+      this.getAthleticThreshold(this.selectedAthletic);
+      this.getAuthorizedDeviceList();
+      this.getClassList();
+    }
   },
   methods: {
     /**
@@ -983,7 +991,7 @@ export default {
       });
 
       if (currentActivity.classScheduleId) {
-        return
+        return;
       }
 
       // 判断是否从课程模板中拖拽

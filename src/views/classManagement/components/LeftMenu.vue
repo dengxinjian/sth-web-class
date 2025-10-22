@@ -4,6 +4,7 @@
       <li
         :class="{ active: activeName === 'athletic' }"
         @click="handleTypeChange('athletic')"
+        v-if="loginType === '2'"
       >
         <img
           v-if="activeName === 'athletic'"
@@ -31,30 +32,35 @@
 
 <script>
 export default {
-  name: 'LeftMenu',
+  name: "LeftMenu",
   props: {
     value: {
       type: String,
-      default: 'class'
-    }
+      default: "class",
+    },
+  },
+  data() {
+    return {
+      loginType: localStorage.getItem("loginType") || "1",
+    };
   },
   computed: {
     activeName: {
       get() {
-        return this.value
+        return this.value;
       },
       set(val) {
-        this.$emit('input', val)
-      }
-    }
+        this.$emit("input", val);
+      },
+    },
   },
   methods: {
     handleTypeChange(type) {
-      this.activeName = type
-      this.$emit('change', type)
-    }
-  }
-}
+      this.activeName = type;
+      this.$emit("change", type);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -98,4 +104,3 @@ export default {
   }
 }
 </style>
-
