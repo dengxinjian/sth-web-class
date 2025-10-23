@@ -227,16 +227,21 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  max-width: 1640px;
+  flex-wrap: wrap;
+  gap: 10px;
 
   .schedule-search {
     display: flex;
     gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
 
     > div {
       display: flex;
       align-items: center;
       gap: 5px;
+      white-space: nowrap;
 
       span {
         font-size: 14px;
