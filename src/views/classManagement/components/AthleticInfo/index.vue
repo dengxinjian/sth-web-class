@@ -311,7 +311,7 @@
           </div>
 
           <div v-if="preferenceForm.hasRestDay" class="rest-day-config">
-            <div class="form-row">
+            <!-- <div class="form-row">
               <el-select
                 v-model="preferenceForm.restDayCount"
                 placeholder="请选择"
@@ -322,14 +322,14 @@
                 <el-option label="两天" :value="2" />
                 <el-option label="三天" :value="3" />
               </el-select>
-            </div>
+            </div> -->
 
             <div class="form-row">
               <el-select
                 v-model="preferenceForm.restDays"
                 multiple
-                :multiple-limit="preferenceForm.restDayCount"
-                placeholder="请选择休息日"
+                :multiple-limit="3"
+                placeholder="请选择休息日,最多选择3天"
                 class="week-select-multiple"
                 collapse-tags
               >
@@ -412,7 +412,6 @@ export default {
         runLongDays: null,
         cycleLongDays: null,
         hasRestDay: true,
-        restDayCount: 1,
         restDays: [],
       },
       triUserId: "",
@@ -603,6 +602,17 @@ export default {
         this.getAthleticInfo();
       }
     },
+    // 校验选择了有休息必须选择天数
+    checkRestDayCount() {
+      if (
+        this.preferenceForm.hasRestDay &&
+        this.preferenceForm.restDays.length === 0
+      ) {
+        this.$message.error("请选择休息天数");
+        return false;
+      }
+      return true;
+    },
     // 查询偏好数据
     getPreferenceData() {
       request({
@@ -618,17 +628,15 @@ export default {
             this.preferenceForm.restDays &&
             this.preferenceForm.restDays.length > 0
           ) {
-            this.preferenceForm.hasRestDay = true;
-            this.preferenceForm.restDayCount =
-              this.preferenceForm.restDays.length;
+            this.$set(this.preferenceForm, 'hasRestDay', true);
           } else {
-            this.preferenceForm.hasRestDay = false;
+            this.$set(this.preferenceForm, 'hasRestDay', false);
           }
           if (res.result.cycleLongDays && res.result.cycleLongDays.length > 0) {
-            this.preferenceForm.cycleLongDays = res.result.cycleLongDays[0];
+            this.$set(this.preferenceForm, 'cycleLongDays', res.result.cycleLongDays[0]);
           }
           if (res.result.runLongDays && res.result.runLongDays.length > 0) {
-            this.preferenceForm.runLongDays = res.result.runLongDays[0];
+            this.$set(this.preferenceForm, 'runLongDays', res.result.runLongDays[0]);
           }
         } else {
           this.preferenceForm = {};
@@ -637,6 +645,9 @@ export default {
     },
     // 查询preferenceForm没有id 数据时保存需创建运动偏好
     createPreferenceData() {
+      if (!this.checkRestDayCount()) {
+        return;
+      }
       const params = JSON.parse(JSON.stringify(this.preferenceForm));
       params.runLongDays = [params.runLongDays];
       params.cycleLongDays = [params.cycleLongDays];
@@ -656,6 +667,9 @@ export default {
     },
     // 保存运动偏好
     savePreferenceData() {
+      if (!this.checkRestDayCount()) {
+        return;
+      }
       const params = JSON.parse(JSON.stringify(this.preferenceForm));
       params.runLongDays = [params.runLongDays];
       params.cycleLongDays = [params.cycleLongDays];
@@ -764,15 +778,6 @@ export default {
     handleSportChange(val) {
       console.log(val);
       this.activeSport = val;
-    },
-    handleRestDayCountChange(val) {
-      // 当改变休息日数量时，如果已选择的天数超过新的限制，只保留前面的几个
-      if (this.preferenceForm.restDays.length > val) {
-        this.preferenceForm.restDays = this.preferenceForm.restDays.slice(
-          0,
-          val
-        );
-      }
     },
   },
 };
