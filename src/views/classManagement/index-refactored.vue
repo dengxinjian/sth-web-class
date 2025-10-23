@@ -402,6 +402,7 @@ export default {
             id: member.id,
             name: member.userNickname,
             triUserId: member.triUserId,
+            lastMatchType: member.lastMatchType,
           })),
         }));
 
@@ -430,6 +431,7 @@ export default {
       this.athleticInfoData = this.athleticList.find(
         (item) => item.triUserId === athleticId
       );
+      localStorage.setItem("lastMatchType", this.athleticInfoData.lastMatchType);
       this.getScheduleData();
       this.getAthleticThreshold(athleticId);
       this.getAuthorizedDeviceList();
@@ -447,6 +449,7 @@ export default {
       if (this.athleticList.length > 0) {
         this.selectedAthletic = this.athleticList[0].triUserId;
         this.athleticInfoData = this.athleticList[0];
+        localStorage.setItem("lastMatchType", this.athleticInfoData.lastMatchType);
         this.getClassList();
         this.getAthleticThreshold(this.selectedAthletic);
         this.getAuthorizedDeviceList();
@@ -1242,6 +1245,7 @@ export default {
     onSaveAthleticInfo() {
       // 保存逻辑
       this.showAthleticInfoDialog = false;
+      this.getScheduleData();
     },
 
     /**

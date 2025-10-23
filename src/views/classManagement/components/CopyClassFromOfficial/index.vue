@@ -96,7 +96,9 @@ export default {
       if (typeof val !== "undefined") this.innerVisible = val;
     },
     groupId(val) {
-      this.form.destinationId = val;
+      if (this.activeClassType === "my") {
+        this.form.destinationId = val;
+      }
     },
     innerVisible(val) {
       if (!val) {

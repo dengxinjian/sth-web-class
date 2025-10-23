@@ -32,7 +32,10 @@
               </div>
           </div>
             <div class="wx-login-block">
-               <div class="elite-title">ELITE</div>
+               <div class="elite-title">
+                <img src="./imgs/PREMIUM.svg" alt="ELITE" width="100%" height="45%" v-if="loginType === '2'">
+                <span v-else>ELITE</span>
+               </div>
                <div id="wx-login-container" class="wx-login-container">
                  <!-- 扫码成功状态 -->
                  <div v-if="hasCode && !wxLoginStatus" class="login-success">
@@ -89,12 +92,15 @@ export default {
       hasCode: false, // 是否包含code参数
       wxLoginStatus: '', // 微信登录状态：loading, success, error, miniprogram
       showMiniprogramCode: false, // 是否显示小程序码
-      unionid: '' // 微信unionid
+      unionid: '', // 微信unionid
+      loginType: '1', // 登录类型：1-运动员，2-教练
     };
   },
   mounted() {
     this.checkUrlParams();
     this.initSlider();
+    this.loginType = localStorage.getItem('loginType') || '1';
+    localStorage.setItem('loginType', this.loginType);
   },
   beforeDestroy() {
     clearInterval(this.carouselTimer);

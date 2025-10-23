@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
   >
     <span slot="title">运动员信息</span>
-    <el-tabs v-model="activeMainTab">
+    <el-tabs v-model="activeMainTab" @tab-click="handleTabClick">
       <el-tab-pane label="基本信息" name="base">
         <el-form :model="baseForm" label-width="80px" class="base-form">
           <el-form-item label="昵称">
@@ -192,11 +192,167 @@
           </div>
         </div>
       </el-tab-pane>
+      <el-tab-pane label="运动偏好" name="preference">
+        <div class="preference-form">
+          <div class="section-title">{{ matchTypeToName[lastMatchType] }}</div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === '2' || lastMatchType === '3'"
+          >
+            <span class="form-label">游泳训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.swimTimes"
+              :min="0"
+              :max="14"
+              controls-position="right"
+              class="count-input"
+            />
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === '2' || lastMatchType === '4'"
+          >
+            <span class="form-label">骑行训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.cycleTimes"
+              :min="0"
+              :max="14"
+              controls-position="right"
+              class="count-input"
+            />
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === '1' || lastMatchType === '2'"
+          >
+            <span class="form-label">跑步训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.runTimes"
+              :min="0"
+              :max="14"
+              controls-position="right"
+              class="count-input"
+            />
+          </div>
+
+          <div class="form-row">
+            <span class="form-label">力量训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.strengthTimes"
+              :min="0"
+              :max="14"
+              controls-position="right"
+              class="count-input"
+            />
+          </div>
+
+          <div class="form-row total-row">
+            <span class="form-label">综合次数：</span>
+            <span class="total-count">{{ totalTrainingCount }}</span>
+          </div>
+
+          <div
+            class="section-title"
+            v-if="
+              lastMatchType === '1' ||
+              lastMatchType === '2' ||
+              lastMatchType === '4'
+            "
+          >
+            长距离偏好设置
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === '1' || lastMatchType === '2'"
+          >
+            <span class="form-label">长距离跑步</span>
+            <el-select
+              v-model="preferenceForm.longRunDay"
+              placeholder="请选择"
+              class="week-select"
+            >
+              <el-option label="周一" :value="1" />
+              <el-option label="周二" :value="2" />
+              <el-option label="周三" :value="3" />
+              <el-option label="周四" :value="4" />
+              <el-option label="周五" :value="5" />
+              <el-option label="周六" :value="6" />
+              <el-option label="周日" :value="7" />
+            </el-select>
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === '2' || lastMatchType === '4'"
+          >
+            <span class="form-label">长距离骑行</span>
+            <el-select
+              v-model="preferenceForm.longBikeDay"
+              placeholder="请选择"
+              class="week-select"
+            >
+              <el-option label="周一" :value="1" />
+              <el-option label="周二" :value="2" />
+              <el-option label="周三" :value="3" />
+              <el-option label="周四" :value="4" />
+              <el-option label="周五" :value="5" />
+              <el-option label="周六" :value="6" />
+              <el-option label="周日" :value="7" />
+            </el-select>
+          </div>
+
+          <div class="section-title">休息日偏好</div>
+
+          <div class="form-row">
+            <el-radio-group v-model="preferenceForm.hasRestDay">
+              <el-radio :label="false">无休息日</el-radio>
+              <el-radio :label="true">有休息日</el-radio>
+            </el-radio-group>
+          </div>
+
+          <div v-if="preferenceForm.hasRestDay" class="rest-day-config">
+            <div class="form-row">
+              <el-select
+                v-model="preferenceForm.restDayCount"
+                placeholder="请选择"
+                class="week-select"
+                @change="handleRestDayCountChange"
+              >
+                <el-option label="一天" :value="1" />
+                <el-option label="两天" :value="2" />
+              </el-select>
+            </div>
+
+            <div class="form-row">
+              <el-select
+                v-model="preferenceForm.restDays"
+                multiple
+                :multiple-limit="preferenceForm.restDayCount"
+                placeholder="请选择休息日"
+                class="week-select-multiple"
+                collapse-tags
+              >
+                <el-option label="周一" :value="1" />
+                <el-option label="周二" :value="2" />
+                <el-option label="周三" :value="3" />
+                <el-option label="周四" :value="4" />
+                <el-option label="周五" :value="5" />
+                <el-option label="周六" :value="6" />
+                <el-option label="周日" :value="7" />
+              </el-select>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
     </el-tabs>
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onSave">保存</el-button>
+      <el-button type="primary" @click="onSave" :loading="loading">保存</el-button>
     </span>
   </el-dialog>
 </template>
@@ -204,6 +360,7 @@
 <script>
 import { getData, submitData } from "@/api/common.js";
 import { secondsToMMSS, mmssToSeconds } from "@/utils/index";
+import request from "@/utils/request";
 
 export default {
   name: "AthleticInfoDialog",
@@ -225,6 +382,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       innerVisible: this.visible || this.value || false,
       activeMainTab: "base",
       activeSport: 1,
@@ -248,7 +406,26 @@ export default {
         threshold: "",
         thresholdTimeValue: "00:00",
       },
+      preferenceForm: {
+        swimTimes: 3,
+        cycleTimes: 3,
+        runTimes: 3,
+        strengthTimes: 3,
+        longRunDay: null,
+        longBikeDay: null,
+        hasRestDay: true,
+        restDayCount: 1,
+        restDays: [],
+      },
       triUserId: "",
+      loginType: localStorage.getItem("loginType"),
+      lastMatchType: localStorage.getItem("lastMatchType"),
+      matchTypeToName: {
+        1: "跑步模式",
+        2: "铁三模式",
+        3: "游泳模式",
+        4: "骑行模式",
+      },
     };
   },
   computed: {
@@ -259,30 +436,30 @@ export default {
       const bmi = w / Math.pow(h / 100, 2);
       return bmi ? bmi.toFixed(1) : "";
     },
-    // currentThreshold() {
-    //   const find = this.thresholds.find(item => item.thresholdType === this.activeSport)
-    //   return find;
-    // },
-    // zoneRows() {
-    //   const t = Number(this.currentThreshold.threshold) || 0;
-    //   const m = Number(this.currentThreshold.max) || 0;
-    //   const clamp = (v) => (m ? Math.min(v, m) : v);
-    //   const rows = [
-    //     { key: 'z1', label: 'z1:恢复', from: 0, to: Math.max(0, t - 40), unit: 'bpm' },
-    //     { key: 'z2', label: 'z2:有氧', from: Math.max(0, t - 39), to: t - 30 },
-    //     { key: 'z3', label: 'z3:节奏', from: t - 29, to: t - 20},
-    //     { key: 'z4', label: 'z4:阈值门槛', from: t - 19, to: t - 10},
-    //     { key: 'z5a', label: 'z5A:阈值上限', from: t - 9, to: t },
-    //     { key: 'z5b', label: 'z5B:最大摄氧量', from: t + 1, to: t + 10 },
-    //     { key: 'z5c', label: 'z5C:无氧能力', from: t + 11, to: t + 20 }
-    //   ];
-    //   return rows.map((r) => ({
-    //     label: r.label,
-    //     from: clamp(r.from),
-    //     to: clamp(r.to),
-    //     unit: 'bpm'
-    //   }));
-    // }
+    totalTrainingCount() {
+      // 根据matchTypeToName模式来计算综合训练次数
+      let totalTimes = 0;
+      if (this.lastMatchType === "1") {
+        totalTimes =
+          (this.preferenceForm.runTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      } else if (this.lastMatchType === "2") {
+        totalTimes =
+          (this.preferenceForm.swimTimes || 0) +
+          (this.preferenceForm.cycleTimes || 0) +
+          (this.preferenceForm.runTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      } else if (this.lastMatchType === "3") {
+        totalTimes =
+          (this.preferenceForm.swimTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      } else if (this.lastMatchType === "4") {
+        totalTimes =
+          (this.preferenceForm.cycleTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      }
+      return totalTimes;
+    },
   },
   watch: {
     visible(val) {
@@ -300,6 +477,10 @@ export default {
         } else {
           this.triUserId = localStorage.getItem("triUserId") || "";
         }
+        this.lastMatchType = localStorage.getItem("lastMatchType");
+        if (this.activeMainTab === "preference") {
+          this.getPreferenceData();
+        }
         this.getAthleticInfo();
         this.getThresholdData();
       }
@@ -309,6 +490,28 @@ export default {
     },
   },
   methods: {
+    handleTabClick(tab, event) {
+      // this.activeMainTab = tab.name;
+      if (this.activeMainTab === "preference") {
+        this.getPreferenceData();
+      }
+    },
+    // 查询偏好数据
+    getPreferenceData() {
+      request({
+        url: "/sport-preference/by-current-type",
+        method: "get",
+        headers: {
+          requestUserInfoId: this.triUserId,
+        },
+      }).then((res) => {
+        if (res.result) {
+          this.preferenceForm = res.result;
+        } else {
+          this.preferenceForm = {};
+        }
+      });
+    },
     getAthleticInfo() {
       getData({
         url: "/api/classSchedule/getUserProfile",
@@ -353,6 +556,7 @@ export default {
       this.$emit("cancel");
     },
     onSave() {
+      this.loading = true;
       const params = {
         thresholdType: this.activeSport,
         param1: "",
@@ -374,8 +578,8 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.$message.success("阈值保存成功");
-          // this.$emit('save', res.result);
-          // this.innerVisible = false;
+          this.$emit('save', res.result);
+          this.loading = false;
         }
       });
     },
@@ -390,6 +594,15 @@ export default {
     handleSportChange(val) {
       console.log(val);
       this.activeSport = val;
+    },
+    handleRestDayCountChange(val) {
+      // 当改变休息日数量时，如果已选择的天数超过新的限制，只保留前面的几个
+      if (this.preferenceForm.restDays.length > val) {
+        this.preferenceForm.restDays = this.preferenceForm.restDays.slice(
+          0,
+          val
+        );
+      }
     },
   },
 };
@@ -566,5 +779,128 @@ export default {
 }
 .zoneTd:nth-child(1) {
   flex: 0 0 140px;
+}
+
+.preference-form {
+  padding: 10px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  margin-top: 24px;
+}
+
+.section-title:first-child {
+  margin-top: 0;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.form-label {
+  flex: 0 0 200px;
+  color: #333;
+  font-size: 14px;
+}
+
+.count-input {
+  width: 240px;
+}
+
+.count-input ::v-deep(.el-input__inner) {
+  border-radius: 22px;
+  height: 40px;
+  border: 1px solid #e5e6eb;
+  padding: 0 50px 0 16px;
+}
+
+.count-input ::v-deep(.el-input-number__increase),
+.count-input ::v-deep(.el-input-number__decrease) {
+  background: transparent;
+  border: none;
+}
+
+.week-select {
+  width: 240px;
+}
+
+.week-select ::v-deep(.el-input__inner) {
+  border-radius: 22px;
+  height: 40px;
+  border: 1px solid #e5e6eb;
+  padding: 0 36px 0 16px;
+}
+
+.week-select-multiple {
+  width: 300px;
+}
+
+.week-select-multiple ::v-deep(.el-input__inner) {
+  border-radius: 22px;
+  min-height: 40px;
+  border: 1px solid #e5e6eb;
+  padding: 0 36px 0 16px;
+  line-height: 38px;
+}
+
+.week-select-multiple ::v-deep(.el-select__tags) {
+  max-width: calc(100% - 40px);
+  padding-left: 8px;
+}
+
+.week-select-multiple ::v-deep(.el-tag) {
+  background: #e65b55;
+  border-color: #e65b55;
+  color: #fff;
+  border-radius: 12px;
+  height: 24px;
+  line-height: 24px;
+  margin: 7px 4px 7px 0;
+}
+
+.week-select-multiple ::v-deep(.el-tag__close) {
+  background-color: transparent;
+  color: #fff;
+}
+
+.week-select-multiple ::v-deep(.el-tag__close:hover) {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.total-row {
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.total-count {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e65b55;
+}
+
+.rest-day-config {
+  margin-left: 20px;
+  margin-top: 12px;
+}
+
+.preference-form ::v-deep(.el-radio) {
+  margin-right: 30px;
+}
+
+.preference-form ::v-deep(.el-radio__input.is-checked .el-radio__inner) {
+  border-color: #e65b55;
+  background: #e65b55;
+}
+
+.preference-form ::v-deep(.el-radio__input.is-checked + .el-radio__label) {
+  color: #e65b55;
 }
 </style>

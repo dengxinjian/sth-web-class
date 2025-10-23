@@ -1,6 +1,7 @@
 import request from "@/utils/request";
 // 获取数据
 export function getData(params) {
+  console.log(params);
   const { url, responseType = "json", ...reset } = params;
   return request({
     url: url,

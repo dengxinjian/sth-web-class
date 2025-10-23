@@ -17,8 +17,17 @@
 
     <!-- 右侧菜单 -->
     <div class="right-menu">
-      <div @click="changeIdentify" style="margin-right: 10px">
-        切换成{{ loginType == "1" ? "教练" : "运动员" }}
+      <div class="button-with-logo" style="margin-right: 10px">
+        <el-button type="primary" size="small" @click="changeIdentify"
+          >切换成{{ loginType == "1" ? "教练" : "运动员" }}</el-button
+        >
+        <img
+          src="@/views/login-wx/imgs/PREMIUM.svg"
+          alt="logo"
+          class="button-logo"
+          v-if="loginType === '1'"
+        />
+        <span v-else class="elite-title">ELITE</span>
       </div>
       <span>{{ name }}</span>
       <el-divider direction="vertical"></el-divider>
@@ -168,6 +177,30 @@ export default {
 
     &:focus {
       outline: none;
+    }
+
+    .button-with-logo {
+      position: relative;
+      display: inline-block;
+
+      .button-logo {
+        position: absolute;
+        top: -3px;
+        right: -1px;
+        width: 50px;
+        height: 20px;
+        padding: 2px;
+        z-index: 10;
+      }
+      .elite-title {
+        font-size: 12px;
+        transform: scale(0.8);
+        font-weight: bold;
+        color: #0924f5;
+        position: absolute;
+        top: -1px;
+        right: -1px;
+      }
     }
 
     .right-menu-item {

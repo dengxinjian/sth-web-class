@@ -36,7 +36,8 @@
       </div>
       <div class="wx-login-block">
         <div class="elite-title">
-           <img src="./imgs/PREMIUM.svg" alt="ELITE" width="100%" height="40%">
+           <img src="./imgs/PREMIUM.svg" alt="ELITE" width="100%" height="45%" v-if="loginType === '2'">
+           <span v-else>ELITE</span>
         </div>
         <div
           id="wx-login-container"
