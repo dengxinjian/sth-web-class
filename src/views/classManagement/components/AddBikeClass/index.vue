@@ -889,6 +889,7 @@ export default {
       // 清空表单数据，但保留传入的title
       this.classInfo = {
         id: "",
+        sportType: "CYCLE",
         title: this.data.title || "", // 标题
         groupId: this.data.groupId || 0, // 分组
         duration: "", // 时长

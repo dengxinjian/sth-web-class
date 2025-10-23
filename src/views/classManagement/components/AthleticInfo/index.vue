@@ -198,7 +198,7 @@
 
           <div
             class="form-row"
-            v-if="lastMatchType === '2' || lastMatchType === '3'"
+            v-if="lastMatchType === 2 || lastMatchType === 3"
           >
             <span class="form-label">游泳训练次数偏好设置</span>
             <el-input-number
@@ -212,7 +212,7 @@
 
           <div
             class="form-row"
-            v-if="lastMatchType === '2' || lastMatchType === '4'"
+            v-if="lastMatchType === 2 || lastMatchType === 4"
           >
             <span class="form-label">骑行训练次数偏好设置</span>
             <el-input-number
@@ -226,7 +226,7 @@
 
           <div
             class="form-row"
-            v-if="lastMatchType === '1' || lastMatchType === '2'"
+            v-if="lastMatchType === 1 || lastMatchType === 2"
           >
             <span class="form-label">跑步训练次数偏好设置</span>
             <el-input-number
@@ -257,9 +257,7 @@
           <div
             class="section-title"
             v-if="
-              lastMatchType === '1' ||
-              lastMatchType === '2' ||
-              lastMatchType === '4'
+              lastMatchType === 1 || lastMatchType === 2 || lastMatchType === 4
             "
           >
             长距离偏好设置
@@ -267,41 +265,39 @@
 
           <div
             class="form-row"
-            v-if="lastMatchType === '1' || lastMatchType === '2'"
+            v-if="lastMatchType === 1 || lastMatchType === 2"
           >
             <span class="form-label">长距离跑步</span>
             <el-select
-              v-model="preferenceForm.longRunDay"
+              v-model="preferenceForm.runLongDays"
               placeholder="请选择"
               class="week-select"
             >
-              <el-option label="周一" :value="1" />
-              <el-option label="周二" :value="2" />
-              <el-option label="周三" :value="3" />
-              <el-option label="周四" :value="4" />
-              <el-option label="周五" :value="5" />
-              <el-option label="周六" :value="6" />
-              <el-option label="周日" :value="7" />
+              <el-option
+                v-for="day in availableDaysForLongDistance"
+                :key="'run-' + day.value"
+                :label="day.label"
+                :value="day.value"
+              />
             </el-select>
           </div>
 
           <div
             class="form-row"
-            v-if="lastMatchType === '2' || lastMatchType === '4'"
+            v-if="lastMatchType === 2 || lastMatchType === 4"
           >
             <span class="form-label">长距离骑行</span>
             <el-select
-              v-model="preferenceForm.longBikeDay"
+              v-model="preferenceForm.cycleLongDays"
               placeholder="请选择"
               class="week-select"
             >
-              <el-option label="周一" :value="1" />
-              <el-option label="周二" :value="2" />
-              <el-option label="周三" :value="3" />
-              <el-option label="周四" :value="4" />
-              <el-option label="周五" :value="5" />
-              <el-option label="周六" :value="6" />
-              <el-option label="周日" :value="7" />
+              <el-option
+                v-for="day in availableDaysForLongDistance"
+                :key="'bike-' + day.value"
+                :label="day.label"
+                :value="day.value"
+              />
             </el-select>
           </div>
 
@@ -324,6 +320,7 @@
               >
                 <el-option label="一天" :value="1" />
                 <el-option label="两天" :value="2" />
+                <el-option label="三天" :value="3" />
               </el-select>
             </div>
 
@@ -336,13 +333,12 @@
                 class="week-select-multiple"
                 collapse-tags
               >
-                <el-option label="周一" :value="1" />
-                <el-option label="周二" :value="2" />
-                <el-option label="周三" :value="3" />
-                <el-option label="周四" :value="4" />
-                <el-option label="周五" :value="5" />
-                <el-option label="周六" :value="6" />
-                <el-option label="周日" :value="7" />
+                <el-option
+                  v-for="day in availableRestDays"
+                  :key="'rest-' + day.value"
+                  :label="day.label"
+                  :value="day.value"
+                />
               </el-select>
             </div>
           </div>
@@ -352,7 +348,9 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onSave" :loading="loading">保存</el-button>
+      <el-button type="primary" @click="onSave" :loading="loading"
+        >保存</el-button
+      >
     </span>
   </el-dialog>
 </template>
@@ -411,15 +409,15 @@ export default {
         cycleTimes: 3,
         runTimes: 3,
         strengthTimes: 3,
-        longRunDay: null,
-        longBikeDay: null,
+        runLongDays: null,
+        cycleLongDays: null,
         hasRestDay: true,
         restDayCount: 1,
         restDays: [],
       },
       triUserId: "",
       loginType: localStorage.getItem("loginType"),
-      lastMatchType: localStorage.getItem("lastMatchType"),
+      lastMatchType: 2,
       matchTypeToName: {
         1: "跑步模式",
         2: "铁三模式",
@@ -439,26 +437,81 @@ export default {
     totalTrainingCount() {
       // 根据matchTypeToName模式来计算综合训练次数
       let totalTimes = 0;
-      if (this.lastMatchType === "1") {
+      if (this.lastMatchType === 1) {
         totalTimes =
           (this.preferenceForm.runTimes || 0) +
           (this.preferenceForm.strengthTimes || 0);
-      } else if (this.lastMatchType === "2") {
+      } else if (this.lastMatchType === 2) {
         totalTimes =
           (this.preferenceForm.swimTimes || 0) +
           (this.preferenceForm.cycleTimes || 0) +
           (this.preferenceForm.runTimes || 0) +
           (this.preferenceForm.strengthTimes || 0);
-      } else if (this.lastMatchType === "3") {
+      } else if (this.lastMatchType === 3) {
         totalTimes =
           (this.preferenceForm.swimTimes || 0) +
           (this.preferenceForm.strengthTimes || 0);
-      } else if (this.lastMatchType === "4") {
+      } else if (this.lastMatchType === 4) {
         totalTimes =
           (this.preferenceForm.cycleTimes || 0) +
           (this.preferenceForm.strengthTimes || 0);
       }
       return totalTimes;
+    },
+    // 可用于长距离训练的日期（排除休息日）
+    availableDaysForLongDistance() {
+      const allDays = [
+        { label: "周一", value: 1 },
+        { label: "周二", value: 2 },
+        { label: "周三", value: 3 },
+        { label: "周四", value: 4 },
+        { label: "周五", value: 5 },
+        { label: "周六", value: 6 },
+        { label: "周日", value: 7 },
+      ];
+
+      // 如果没有休息日，返回所有日期
+      if (
+        !this.preferenceForm.hasRestDay ||
+        !this.preferenceForm.restDays ||
+        this.preferenceForm.restDays.length === 0
+      ) {
+        return allDays;
+      }
+
+      // 过滤掉休息日
+      return allDays.filter(
+        (day) => !this.preferenceForm.restDays.includes(day.value)
+      );
+    },
+    // 可用于休息日的日期（排除长距离训练日）
+    availableRestDays() {
+      const allDays = [
+        { label: "周一", value: 1 },
+        { label: "周二", value: 2 },
+        { label: "周三", value: 3 },
+        { label: "周四", value: 4 },
+        { label: "周五", value: 5 },
+        { label: "周六", value: 6 },
+        { label: "周日", value: 7 },
+      ];
+
+      // 收集已选择的长距离训练日
+      const longDistanceDays = [];
+      if (this.preferenceForm.runLongDays) {
+        longDistanceDays.push(this.preferenceForm.runLongDays);
+      }
+      if (this.preferenceForm.cycleLongDays) {
+        longDistanceDays.push(this.preferenceForm.cycleLongDays);
+      }
+
+      // 如果没有长距离训练日，返回所有日期
+      if (longDistanceDays.length === 0) {
+        return allDays;
+      }
+
+      // 过滤掉长距离训练日
+      return allDays.filter((day) => !longDistanceDays.includes(day.value));
     },
   },
   watch: {
@@ -477,7 +530,6 @@ export default {
         } else {
           this.triUserId = localStorage.getItem("triUserId") || "";
         }
-        this.lastMatchType = localStorage.getItem("lastMatchType");
         if (this.activeMainTab === "preference") {
           this.getPreferenceData();
         }
@@ -488,12 +540,67 @@ export default {
     activeSport(val) {
       this.getThresholdData();
     },
+    // 监听休息日变化，自动清除与休息日冲突的长距离训练日
+    "preferenceForm.restDays": {
+      handler(newRestDays) {
+        if (!newRestDays || newRestDays.length === 0) {
+          return;
+        }
+
+        // 如果长距离跑步日在休息日中，清除它
+        if (
+          this.preferenceForm.runLongDays &&
+          newRestDays.includes(this.preferenceForm.runLongDays)
+        ) {
+          this.preferenceForm.runLongDays = null;
+        }
+
+        // 如果长距离骑行日在休息日中，清除它
+        if (
+          this.preferenceForm.cycleLongDays &&
+          newRestDays.includes(this.preferenceForm.cycleLongDays)
+        ) {
+          this.preferenceForm.cycleLongDays = null;
+        }
+      },
+      deep: true,
+    },
+    // 监听长距离跑步日变化，从休息日中移除该日期
+    "preferenceForm.runLongDays": function (newDay) {
+      if (!newDay || !this.preferenceForm.restDays) {
+        return;
+      }
+
+      // 如果新选择的长距离跑步日在休息日列表中，从休息日中移除
+      const index = this.preferenceForm.restDays.indexOf(newDay);
+      if (index > -1) {
+        this.preferenceForm.restDays.splice(index, 1);
+      }
+    },
+    // 监听长距离骑行日变化，从休息日中移除该日期
+    "preferenceForm.cycleLongDays": function (newDay) {
+      if (!newDay || !this.preferenceForm.restDays) {
+        return;
+      }
+
+      // 如果新选择的长距离骑行日在休息日列表中，从休息日中移除
+      const index = this.preferenceForm.restDays.indexOf(newDay);
+      if (index > -1) {
+        this.preferenceForm.restDays.splice(index, 1);
+      }
+    },
+    // 监听是否有休息日的开关
+    "preferenceForm.hasRestDay": function (newVal) {
+      // 如果取消了休息日，不需要做任何处理
+      // 长距离训练日可以保持原样
+    },
   },
   methods: {
     handleTabClick(tab, event) {
       // this.activeMainTab = tab.name;
       if (this.activeMainTab === "preference") {
         this.getPreferenceData();
+        this.getAthleticInfo();
       }
     },
     // 查询偏好数据
@@ -507,8 +614,62 @@ export default {
       }).then((res) => {
         if (res.result) {
           this.preferenceForm = res.result;
+          if (
+            this.preferenceForm.restDays &&
+            this.preferenceForm.restDays.length > 0
+          ) {
+            this.preferenceForm.hasRestDay = true;
+            this.preferenceForm.restDayCount =
+              this.preferenceForm.restDays.length;
+          } else {
+            this.preferenceForm.hasRestDay = false;
+          }
+          if (res.result.cycleLongDays && res.result.cycleLongDays.length > 0) {
+            this.preferenceForm.cycleLongDays = res.result.cycleLongDays[0];
+          }
+          if (res.result.runLongDays && res.result.runLongDays.length > 0) {
+            this.preferenceForm.runLongDays = res.result.runLongDays[0];
+          }
         } else {
           this.preferenceForm = {};
+        }
+      });
+    },
+    // 查询preferenceForm没有id 数据时保存需创建运动偏好
+    createPreferenceData() {
+      const params = JSON.parse(JSON.stringify(this.preferenceForm));
+      params.runLongDays = [params.runLongDays];
+      params.cycleLongDays = [params.cycleLongDays];
+      request({
+        url: "/sport-preference/create",
+        method: "post",
+        data: params,
+        headers: {
+          requestUserInfoId: this.triUserId,
+        },
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success("运动偏好创建成功");
+          this.getPreferenceData();
+        }
+      });
+    },
+    // 保存运动偏好
+    savePreferenceData() {
+      const params = JSON.parse(JSON.stringify(this.preferenceForm));
+      params.runLongDays = [params.runLongDays];
+      params.cycleLongDays = [params.cycleLongDays];
+      request({
+        url: `/sport-preference/${this.preferenceForm.id}`,
+        method: "put",
+        data: params,
+        headers: {
+          requestUserInfoId: this.triUserId,
+        },
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success("运动偏好保存成功");
+          this.getPreferenceData();
         }
       });
     },
@@ -519,6 +680,7 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.baseForm = res.result;
+          this.lastMatchType = res.result.lastMatchType;
           // this.thresholds = res.result.thresholdRecordList
           // this.currentThreshold = this.thresholds.find(item => item.thresholdType === this.activeSport)
         }
@@ -556,6 +718,14 @@ export default {
       this.$emit("cancel");
     },
     onSave() {
+      if (this.activeMainTab === "preference") {
+        if (this.preferenceForm.id) {
+          this.savePreferenceData();
+        } else {
+          this.createPreferenceData();
+        }
+        return;
+      }
       this.loading = true;
       const params = {
         thresholdType: this.activeSport,
@@ -578,7 +748,7 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.$message.success("阈值保存成功");
-          this.$emit('save', res.result);
+          this.$emit("save", res.result);
           this.loading = false;
         }
       });
