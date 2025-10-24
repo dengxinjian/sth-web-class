@@ -25,9 +25,7 @@
           src="@/views/login-wx/imgs/PREMIUM.svg"
           alt="logo"
           class="button-logo"
-          v-if="loginType === '1'"
         />
-        <span v-else class="elite-title">ELITE</span>
       </div>
       <span>{{ name }}</span>
       <el-divider direction="vertical"></el-divider>

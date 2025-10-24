@@ -205,8 +205,11 @@
               v-model="preferenceForm.swimTimes"
               :min="0"
               :max="14"
+              :step="1"
+              :precision="0"
               controls-position="right"
               class="count-input"
+              @keydown.native="preventDecimal"
             />
           </div>
 
@@ -219,8 +222,11 @@
               v-model="preferenceForm.cycleTimes"
               :min="0"
               :max="14"
+              :step="1"
+              :precision="0"
               controls-position="right"
               class="count-input"
+              @keydown.native="preventDecimal"
             />
           </div>
 
@@ -233,8 +239,11 @@
               v-model="preferenceForm.runTimes"
               :min="0"
               :max="14"
+              :step="1"
+              :precision="0"
               controls-position="right"
               class="count-input"
+              @keydown.native="preventDecimal"
             />
           </div>
 
@@ -244,8 +253,11 @@
               v-model="preferenceForm.strengthTimes"
               :min="0"
               :max="14"
+              :step="1"
+              :precision="0"
               controls-position="right"
               class="count-input"
+              @keydown.native="preventDecimal"
             />
           </div>
 
@@ -273,6 +285,7 @@
               placeholder="请选择"
               class="week-select"
             >
+              <el-option label="无" :value="0" />
               <el-option
                 v-for="day in availableDaysForLongDistance"
                 :key="'run-' + day.value"
@@ -292,6 +305,8 @@
               placeholder="请选择"
               class="week-select"
             >
+              <el-option label="无" :value="0" />
+
               <el-option
                 v-for="day in availableDaysForLongDistance"
                 :key="'bike-' + day.value"
@@ -359,7 +374,6 @@
 import { getData, submitData } from "@/api/common.js";
 import { secondsToMMSS, mmssToSeconds } from "@/utils/index";
 import request from "@/utils/request";
-
 export default {
   name: "AthleticInfoDialog",
   props: {
@@ -409,8 +423,8 @@ export default {
         cycleTimes: 3,
         runTimes: 3,
         strengthTimes: 3,
-        runLongDays: null,
-        cycleLongDays: null,
+        runLongDays: 0,
+        cycleLongDays: 0,
         hasRestDay: true,
         restDays: [],
       },
@@ -628,18 +642,40 @@ export default {
             this.preferenceForm.restDays &&
             this.preferenceForm.restDays.length > 0
           ) {
-            this.$set(this.preferenceForm, 'hasRestDay', true);
+            this.$set(this.preferenceForm, "hasRestDay", true);
           } else {
-            this.$set(this.preferenceForm, 'hasRestDay', false);
+            this.$set(this.preferenceForm, "hasRestDay", false);
           }
-          if (res.result.cycleLongDays && res.result.cycleLongDays.length > 0) {
-            this.$set(this.preferenceForm, 'cycleLongDays', res.result.cycleLongDays[0]);
+          if (
+            res.result.cycleLongDays &&
+            Array.isArray(res.result.cycleLongDays)
+          ) {
+            this.$set(
+              this.preferenceForm,
+              "cycleLongDays",
+              res.result.cycleLongDays.length > 0
+                ? res.result.cycleLongDays[0]
+                : 0
+            );
           }
-          if (res.result.runLongDays && res.result.runLongDays.length > 0) {
-            this.$set(this.preferenceForm, 'runLongDays', res.result.runLongDays[0]);
+          if (res.result.runLongDays && Array.isArray(res.result.runLongDays)) {
+            this.$set(
+              this.preferenceForm,
+              "runLongDays",
+              res.result.runLongDays.length > 0 ? res.result.runLongDays[0] : 0
+            );
           }
         } else {
-          this.preferenceForm = {};
+          this.preferenceForm = {
+            swimTimes: 0,
+            cycleTimes: 0,
+            runTimes: 0,
+            strengthTimes: 0,
+            runLongDays: 0,
+            cycleLongDays: 0,
+            hasRestDay: false,
+            restDays: [],
+          };
         }
       });
     },
@@ -649,8 +685,9 @@ export default {
         return;
       }
       const params = JSON.parse(JSON.stringify(this.preferenceForm));
-      params.runLongDays = [params.runLongDays];
-      params.cycleLongDays = [params.cycleLongDays];
+      params.runLongDays = params.runLongDays === 0 ? [] : [params.runLongDays];
+      params.cycleLongDays =
+        params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
       request({
         url: "/sport-preference/create",
         method: "post",
@@ -671,8 +708,10 @@ export default {
         return;
       }
       const params = JSON.parse(JSON.stringify(this.preferenceForm));
-      params.runLongDays = [params.runLongDays];
-      params.cycleLongDays = [params.cycleLongDays];
+      console.log(params);
+      params.runLongDays = params.runLongDays === 0 ? [] : [params.runLongDays];
+      params.cycleLongDays =
+        params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
       request({
         url: `/sport-preference/${this.preferenceForm.id}`,
         method: "put",
@@ -778,6 +817,50 @@ export default {
     handleSportChange(val) {
       console.log(val);
       this.activeSport = val;
+    },
+    // 阻止输入小数点和其他非数字字符
+    preventDecimal(event) {
+      // 允许的按键：数字键、退格、删除、方向键、Tab
+      const allowedKeys = [
+        "Backspace",
+        "Delete",
+        "Tab",
+        "Escape",
+        "Enter",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+      ];
+
+      // 允许 Ctrl/Cmd 组合键（复制、粘贴、全选等）
+      if (event.ctrlKey || event.metaKey) {
+        return;
+      }
+
+      // 检查是否是允许的特殊键
+      if (allowedKeys.includes(event.key)) {
+        return;
+      }
+
+      // 阻止小数点、负号和其他非数字字符
+      if (
+        event.key === "." ||
+        event.key === "-" ||
+        event.key === "e" ||
+        event.key === "E" ||
+        event.key === "+"
+      ) {
+        event.preventDefault();
+        return;
+      }
+
+      // 只允许数字0-9
+      if (!/^\d$/.test(event.key)) {
+        event.preventDefault();
+      }
     },
   },
 };
