@@ -743,6 +743,7 @@ export default {
       params.runLongDays = params.runLongDays === 0 ? [] : [params.runLongDays];
       params.cycleLongDays =
         params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
+      params.totalTimes = this.totalTrainingCount;
       request({
         url: "/sport-preference/create",
         method: "post",
@@ -767,6 +768,7 @@ export default {
       params.runLongDays = params.runLongDays === 0 ? [] : [params.runLongDays];
       params.cycleLongDays =
         params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
+      params.totalTimes = this.totalTrainingCount;
       request({
         url: `/sport-preference/${this.preferenceForm.id}`,
         method: "put",
