@@ -331,7 +331,7 @@
           <div class="section-title">休息日偏好</div>
 
           <div class="form-row">
-            <el-radio-group v-model="preferenceForm.hasRestDay">
+            <el-radio-group v-model="preferenceForm.hasRestDay" @change="handleHasRestDayChange">
               <el-radio :label="false">无休息日</el-radio>
               <el-radio :label="true">有休息日</el-radio>
             </el-radio-group>
@@ -358,7 +358,6 @@
                 :multiple-limit="3"
                 placeholder="请选择休息日,最多选择3天"
                 class="week-select-multiple"
-                collapse-tags
               >
                 <el-option
                   v-for="day in availableRestDays"
@@ -638,6 +637,11 @@ export default {
     },
   },
   methods: {
+    handleHasRestDayChange(val) {
+      if (!val) {
+        this.preferenceForm.restDays = [];
+      }
+    },
     // 获取根据运动模式可用的阈值类型
     getAvailableThresholdTypes(matchType) {
       // 1: 心率, 2: 骑车, 3: 跑步, 4: 游泳
