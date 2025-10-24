@@ -1244,6 +1244,7 @@ export default {
       // 保存逻辑
       this.showAthleticInfoDialog = false;
       this.getScheduleData();
+      this.getAthleticThreshold(this.selectedAthletic);
     },
 
     /**

@@ -907,6 +907,9 @@ export default {
     // 删除阶段
     handleDeleteStage(index) {
       this.classInfo.stages.splice(index, 1);
+      if (this.classInfo.stages.length <= 1) {
+        this.classInfo.times = 1
+      }
       this.calculateTimeline();
     },
     // 创建深拷贝的section模板
