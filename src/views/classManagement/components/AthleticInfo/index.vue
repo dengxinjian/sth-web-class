@@ -73,9 +73,21 @@
       <el-tab-pane label="阈值" name="threshold">
         <el-tabs v-model="activeSport" class="sport-tabs">
           <el-tab-pane label="心率" :name="1" />
-          <el-tab-pane label="游泳" :name="4" />
-          <el-tab-pane label="骑车" :name="2" />
-          <el-tab-pane label="跑步" :name="3" />
+          <el-tab-pane
+            v-if="lastMatchType === 2 || lastMatchType === 3"
+            label="游泳"
+            :name="4"
+          />
+          <el-tab-pane
+            v-if="lastMatchType === 2 || lastMatchType === 4"
+            label="骑车"
+            :name="2"
+          />
+          <el-tab-pane
+            v-if="lastMatchType === 1 || lastMatchType === 2"
+            label="跑步"
+            :name="3"
+          />
         </el-tabs>
         <div class="threshold-form">
           <div v-if="activeSport === 1" class="row">
@@ -548,10 +560,27 @@ export default {
         }
         this.getAthleticInfo();
         this.getThresholdData();
+
+        // 检查当前选中的阈值类型是否可用
+        this.$nextTick(() => {
+          const availableTypes = this.getAvailableThresholdTypes(this.lastMatchType);
+          if (!availableTypes.includes(this.activeSport)) {
+            this.activeSport = 1;
+          }
+        });
       }
     },
     activeSport(val) {
       this.getThresholdData();
+    },
+    // 监听运动模式变化，自动切换到可用的阈值类型
+    lastMatchType(newType) {
+      // 检查当前选中的阈值类型是否在可用的类型中
+      const availableTypes = this.getAvailableThresholdTypes(newType);
+      if (!availableTypes.includes(this.activeSport)) {
+        // 如果当前选中的类型不可用，切换到心率(1)
+        this.activeSport = 1;
+      }
     },
     // 监听休息日变化，自动清除与休息日冲突的长距离训练日
     "preferenceForm.restDays": {
@@ -609,6 +638,28 @@ export default {
     },
   },
   methods: {
+    // 获取根据运动模式可用的阈值类型
+    getAvailableThresholdTypes(matchType) {
+      // 1: 心率, 2: 骑车, 3: 跑步, 4: 游泳
+      const types = [1]; // 心率始终可用
+
+      switch (matchType) {
+        case 1: // 跑步模式
+          types.push(3); // 跑步
+          break;
+        case 2: // 铁三模式
+          types.push(4, 2, 3); // 游泳、骑车、跑步
+          break;
+        case 3: // 游泳模式
+          types.push(4); // 游泳
+          break;
+        case 4: // 骑行模式
+          types.push(2); // 骑车
+          break;
+      }
+
+      return types;
+    },
     handleTabClick(tab, event) {
       // this.activeMainTab = tab.name;
       if (this.activeMainTab === "preference") {
