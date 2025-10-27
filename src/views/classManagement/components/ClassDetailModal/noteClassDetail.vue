@@ -15,6 +15,20 @@
             <el-input v-model="form.title" placeholder="标题" class="pill-input" />
           </el-form-item>
 
+          <div class="row">
+          <div class="row-item icon-box">
+            <img src="~@/assets/addClass/icon-note.png" width="30" alt="" />
+          </div>
+          <div class="row-item">
+            <span class="label">时长</span>
+            <TimeInput
+              v-model="form.duration"
+              size="small"
+              :disabled="originalType === 'official'"
+            />
+          </div>
+        </div>
+
           <div class="summary">
             <div class="summary-title">概要</div>
             <div class="editor-wrapper">
@@ -43,9 +57,13 @@
 
 <script>
 import {getData, submitData} from '@/api/common.js'
+import TimeInput from "@/views/classManagement/components/timeInpt";
 
 export default {
   name: 'AddSwimClassDialog',
+  components: {
+    TimeInput,
+  },
   props: {
     visible: {
       type: Boolean,

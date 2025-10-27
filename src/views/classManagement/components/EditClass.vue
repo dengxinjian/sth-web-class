@@ -13,13 +13,6 @@
         <div class="header-title">
           <span>{{ classData.classesJson?.title || "课程标题" }}</span>
         </div>
-        <el-button
-          type="primary"
-          @click="
-            showAddClassModal = true;
-            $emit('close');
-          "
-          >编辑课程详情</el-button
         >
       </div>
 
@@ -56,6 +49,16 @@
               {{ classData.classesJson.sth || "--" }} STH
             </div>
           </div>
+          <div class="metric-item">
+            <el-button
+              type="primary"
+              @click="
+                showAddClassModal = true;
+                $emit('close');
+              "
+              >编辑课程详情</el-button
+            >
+          </div>
         </div>
 
         <!-- 训练强度可视化 -->
@@ -88,7 +91,9 @@
           style="display: flex; max-height: 500px; overflow-y: auto; gap: 10px"
         >
           <!-- 计划 vs 实际 对比表格 -->
-          <div class="comparison-table">
+          <div
+            class="comparison-table"
+          >
             <table>
               <thead>
                 <tr>
@@ -125,7 +130,7 @@
                   </td>
                   <td>h:m:s</td>
                 </tr>
-                <tr>
+                <tr v-if="!isRestType(classData.sportType)">
                   <td>运动距离</td>
                   <td>{{ classData.classesJson.distance || "--" }}</td>
                   <td>
@@ -138,7 +143,7 @@
                   </td>
                   <td>km</td>
                 </tr>
-                <tr>
+                <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
                   <td>{{ classData.classesJson.sth || "--" }}</td>
                   <td>
@@ -151,7 +156,7 @@
                   </td>
                   <td></td>
                 </tr>
-                <tr>
+                <tr v-if="classData.sportType !== 'REMARK'">
                   <td>消耗</td>
                   <td></td>
                   <td>
@@ -187,7 +192,10 @@
             </div>
 
             <!-- 训练建议 -->
-            <div class="section">
+            <div
+              class="section"
+              v-if="!isTrainingAdvice(classData.sportType)"
+            >
               <div class="section-header">
                 <span class="section-title">训练建议</span>
               </div>
@@ -301,6 +309,12 @@ export default {
     },
   },
   methods: {
+    isRestType(sportType) {
+      return ["REST", "REMARK"].includes(sportType);
+    },
+    isTrainingAdvice(sportType) {
+      return ["REMARK", "OTHER", "REST"].includes(sportType);
+    },
     deleteClass(id) {
       this.$confirm("确认删除该课程？", "提示", {
         confirmButtonText: "删除",

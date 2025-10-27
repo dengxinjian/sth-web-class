@@ -73,12 +73,12 @@
           </div>
 
           <!-- 时长 -->
-          <div class="keyword" v-if="!isRestType(classItem.sportType)">
+          <div class="keyword">
             {{ formatDuration(classItem.classesJson.duration) }}
           </div>
 
           <!-- 距离 -->
-          <div style="display: flex" v-if="classItem.classesJson.distance">
+          <div style="display: flex" v-if="!isRestType(classItem.sportType)">
             <div class="keyword">
               {{ formatDistance(classItem.classesJson.distance) }}
               <span v-if="classItem.sportType === 'SWIM'">
@@ -109,10 +109,10 @@
         </pre
           >
 
-        <!-- 骑行详情 -->
-        <template v-if="classItem.sportType === 'CYCLE'">
-          <CycleStageDetails :class-data="classItem.classesJson" />
-        </template>
+          <!-- 骑行详情 -->
+          <template v-else-if="classItem.sportType === 'CYCLE'">
+            <CycleStageDetails :class-data="classItem.classesJson" />
+          </template>
 
           <!-- 跑步详情 -->
           <template v-else-if="classItem.sportType === 'RUN'">
@@ -235,7 +235,7 @@ export default {
       return DEVICE_TYPE_ICON_DICT[deviceType] || "";
     },
     isRestType(sportType) {
-      return ["REST", "REMARK", "OTHER"].includes(sportType);
+      return ["REST", "REMARK"].includes(sportType);
     },
     formatDuration(duration) {
       return duration === "00:00:00" ? "--:--:--" : duration;

@@ -43,6 +43,17 @@
               {{ classData.classesJson.sth || "--" }} STH
             </div>
           </div>
+          <div class="metric-item">
+            <el-button
+              type="primary"
+              v-if="!isActivity"
+              @click="
+                showClassDetailModal = true;
+                $emit('close');
+              "
+              >编辑课程详情</el-button
+            >
+          </div>
         </div>
 
         <!-- 训练强度可视化 -->
@@ -108,7 +119,7 @@
                   </td>
                   <td>h:m:s</td>
                 </tr>
-                <tr>
+                <tr v-if="!isRestType(classData.sportType)">
                   <td>运动距离</td>
                   <td>{{ classData.classesJson.distance || "--" }}</td>
                   <td>
@@ -124,7 +135,7 @@
                   </td>
                   <td>km</td>
                 </tr>
-                <tr>
+                <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
                   <td>{{ classData.classesJson.sth || "--" }}</td>
                   <td>
@@ -146,7 +157,7 @@
                   </td>
                   <td></td>
                 </tr>
-                <tr>
+                <tr v-if="!isRestType(classData.sportType)">
                   <td>消耗</td>
                   <td></td>
                   <td>
@@ -237,7 +248,7 @@
             </div>
 
             <!-- 训练建议 -->
-            <div class="section">
+            <div class="section" v-if="!isTrainingAdvice(classData.sportType)">
               <div class="section-header">
                 <span class="section-title">训练建议</span>
               </div>
@@ -281,15 +292,6 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="deleteClass(classData.id)">删除</el-button>
         <el-button @click="handleClose">取消</el-button>
-        <el-button
-          type="primary"
-          v-if="!isActivity"
-          @click="
-            showClassDetailModal = true;
-            $emit('close');
-          "
-          >编辑课程详情</el-button
-        >
         <el-button type="primary" @click="handleSave(false)">保存</el-button>
         <el-button type="danger" @click="handleSave(true)"
           >保存并关闭</el-button
@@ -379,6 +381,12 @@ export default {
     },
   },
   methods: {
+    isRestType(sportType) {
+      return ["REST", "REMARK"].includes(sportType);
+    },
+    isTrainingAdvice(sportType) {
+      return ["REMARK", "OTHER", "REST"].includes(sportType);
+    },
     deleteClass(id) {
       this.$confirm("确认删除该课程？", "提示", {
         confirmButtonText: "删除",

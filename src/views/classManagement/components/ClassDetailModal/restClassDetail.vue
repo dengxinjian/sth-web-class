@@ -14,6 +14,15 @@
           <el-form-item label="标题：">
             <el-input v-model="form.title" placeholder="标题" class="pill-input" />
           </el-form-item>
+          <div class="row">
+            <div class="row-item icon-box">
+              <img src="~@/assets/addClass/icon-rest.png" width="30" alt="">
+            </div>
+            <div class="row-item">
+              <span class="label">时长</span>
+              <TimeInput v-model="form.duration" size="small" />
+            </div>
+          </div>
 
           <div class="summary">
             <div class="summary-title">概要</div>
@@ -43,9 +52,12 @@
 
 <script>
 import {getData, submitData} from '@/api/common.js'
-
+import TimeInput from "@/views/classManagement/components/timeInpt";
 export default {
   name: 'AddRestClassDialog',
+  components: {
+    TimeInput,
+  },
   props: {
     visible: {
       type: Boolean,
