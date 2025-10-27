@@ -9,201 +9,6 @@
   >
     <span slot="title">运动员信息</span>
     <el-tabs v-model="activeMainTab" @tab-click="handleTabClick">
-      <el-tab-pane label="基本信息" name="base">
-        <el-form :model="baseForm" label-width="80px" class="base-form">
-          <el-form-item label="昵称">
-            <el-input
-              v-model="baseForm.nickname"
-              placeholder="请输入昵称"
-              disabled
-            />
-          </el-form-item>
-          <el-form-item label="头像">
-            <div class="avatar-uploader">
-              <el-upload
-                class="avatar-upload"
-                action=""
-                :http-request="noopRequest"
-                :show-file-list="false"
-                :auto-upload="false"
-                :on-change="onAvatarChange"
-                accept="image/*"
-                disabled
-              >
-                <img
-                  v-if="baseForm.avatarUrl"
-                  :src="baseForm.avatarUrl"
-                  class="avatar"
-                />
-                <i v-else class="el-icon-plus avatar-uploader-icon" />
-              </el-upload>
-            </div>
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-radio-group v-model="baseForm.gender" disabled>
-              <el-radio :label="1">男</el-radio>
-              <el-radio :label="2">女</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="身高">
-            <div class="inline-field">
-              <el-input
-                v-model.number="baseForm.height"
-                placeholder="cm"
-                disabled
-              />
-              <span class="unit">CM</span>
-            </div>
-          </el-form-item>
-          <el-form-item label="体重">
-            <div class="inline-field">
-              <el-input
-                v-model.number="baseForm.weight"
-                placeholder="kg"
-                disabled
-              />
-              <span class="unit">KG</span>
-            </div>
-          </el-form-item>
-          <el-form-item label="BMI">
-            <span>{{ bmiDisplay }}</span>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
-      <el-tab-pane label="阈值" name="threshold">
-        <el-tabs v-model="activeSport" class="sport-tabs">
-          <el-tab-pane label="心率" :name="1" />
-          <el-tab-pane
-            v-if="lastMatchType === 2 || lastMatchType === 3"
-            label="游泳"
-            :name="4"
-          />
-          <el-tab-pane
-            v-if="lastMatchType === 2 || lastMatchType === 4"
-            label="骑车"
-            :name="2"
-          />
-          <el-tab-pane
-            v-if="lastMatchType === 1 || lastMatchType === 2"
-            label="跑步"
-            :name="3"
-          />
-        </el-tabs>
-        <div class="threshold-form">
-          <div v-if="activeSport === 1" class="row">
-            <span class="label"><span class="required">*</span>阈值心率</span>
-            <el-input
-              v-model.number="thresholdData.param2"
-              :key="'hr-param2-' + activeSport"
-              step="1"
-              class="pill-input"
-            />
-            <span class="suffix unit-red">bpm</span>
-            <span class="label right-gap"
-              ><span class="required">*</span>最大心率</span
-            >
-            <el-input
-              v-model.number="thresholdData.param1"
-              :key="'hr-param1-' + activeSport"
-              step="1"
-              class="pill-input"
-            />
-            <span class="suffix unit-red">bpm</span>
-          </div>
-          <div v-else-if="activeSport === 4" class="row">
-            <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker
-              v-model="thresholdData.thresholdTimeValue"
-              :key="'swim-' + activeSport"
-              value-format="mm:ss"
-              format="mm:ss"
-              popper-class="hide-hour"
-              class="pill-input"
-            />
-            <span class="suffix unit-red">min/100m</span>
-          </div>
-          <div v-else-if="activeSport === 2" class="row">
-            <span class="label"><span class="required">*</span>阈值功率</span>
-            <el-input
-              v-model.number="thresholdData.threshold"
-              :key="'bike-' + activeSport"
-              step="1"
-              class="pill-input"
-            />
-            <span class="suffix unit-red">w</span>
-          </div>
-          <div v-else-if="activeSport === 3" class="row">
-            <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker
-              v-model="thresholdData.thresholdTimeValue"
-              :key="'run-' + activeSport"
-              value-format="mm:ss"
-              format="mm:ss"
-              popper-class="hide-hour"
-              class="pill-input"
-            />
-            <span class="suffix unit-red">min/km</span>
-          </div>
-          <div class="zoneContainer">
-            <div class="zoneTr">
-              <div class="zoneTd">热身/冷身</div>
-              <div class="zoneTd">min</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-            <div class="zoneTr">
-              <div class="zoneTd">z1:恢复</div>
-              <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone1[1] }}</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-            <div class="zoneTr">
-              <div class="zoneTd">z2:有氧</div>
-              <div class="zoneTd">{{ thresholdData.zone2[0] }}</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone2[1] }}</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-            <div class="zoneTr">
-              <div class="zoneTd">z3:节奏</div>
-              <div class="zoneTd">{{ thresholdData.zone3[0] }}</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone3[1] }}</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-            <div class="zoneTr">
-              <div class="zoneTd">z4:阈值门槛</div>
-              <div class="zoneTd">{{ thresholdData.zone4[0] }}</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone4[1] }}</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-            <div class="zoneTr">
-              <div class="zoneTd">z5A:阈值上限</div>
-              <div class="zoneTd">{{ thresholdData.zone5A[0] }}</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone5A[1] }}</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-            <div class="zoneTr">
-              <div class="zoneTd">z5B:最大摄氧量</div>
-              <div class="zoneTd">{{ thresholdData.zone5B[0] }}</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">{{ thresholdData.zone5B[1] }}</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-            <div class="zoneTr">
-              <div class="zoneTd">z5C:无氧能力</div>
-              <div class="zoneTd">{{ thresholdData.zone5C[0] }}</div>
-              <div class="zoneTd">~</div>
-              <div class="zoneTd">max</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
-            </div>
-          </div>
-        </div>
-      </el-tab-pane>
       <el-tab-pane label="运动偏好" name="preference">
         <div class="preference-form">
           <div class="section-title">{{ matchTypeToName[lastMatchType] }}</div>
@@ -373,6 +178,201 @@
           </div>
         </div>
       </el-tab-pane>
+      <el-tab-pane label="阈值" name="threshold">
+        <el-tabs v-model="activeSport" class="sport-tabs">
+          <el-tab-pane label="心率" :name="1" />
+          <el-tab-pane
+            v-if="lastMatchType === 2 || lastMatchType === 3"
+            label="游泳"
+            :name="4"
+          />
+          <el-tab-pane
+            v-if="lastMatchType === 2 || lastMatchType === 4"
+            label="骑车"
+            :name="2"
+          />
+          <el-tab-pane
+            v-if="lastMatchType === 1 || lastMatchType === 2"
+            label="跑步"
+            :name="3"
+          />
+        </el-tabs>
+        <div class="threshold-form">
+          <div v-if="activeSport === 1" class="row">
+            <span class="label"><span class="required">*</span>阈值心率</span>
+            <el-input
+              v-model.number="thresholdData.param2"
+              :key="'hr-param2-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
+            <span class="suffix unit-red">bpm</span>
+            <span class="label right-gap"
+              ><span class="required">*</span>最大心率</span
+            >
+            <el-input
+              v-model.number="thresholdData.param1"
+              :key="'hr-param1-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
+            <span class="suffix unit-red">bpm</span>
+          </div>
+          <div v-else-if="activeSport === 4" class="row">
+            <span class="label"><span class="required">*</span>阈值配速</span>
+            <el-time-picker
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'swim-' + activeSport"
+              value-format="mm:ss"
+              format="mm:ss"
+              popper-class="hide-hour"
+              class="pill-input"
+            />
+            <span class="suffix unit-red">min/100m</span>
+          </div>
+          <div v-else-if="activeSport === 2" class="row">
+            <span class="label"><span class="required">*</span>阈值功率</span>
+            <el-input
+              v-model.number="thresholdData.threshold"
+              :key="'bike-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
+            <span class="suffix unit-red">w</span>
+          </div>
+          <div v-else-if="activeSport === 3" class="row">
+            <span class="label"><span class="required">*</span>阈值配速</span>
+            <el-time-picker
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'run-' + activeSport"
+              value-format="mm:ss"
+              format="mm:ss"
+              popper-class="hide-hour"
+              class="pill-input"
+            />
+            <span class="suffix unit-red">min/km</span>
+          </div>
+          <div class="zoneContainer">
+            <div class="zoneTr">
+              <div class="zoneTd">热身/冷身</div>
+              <div class="zoneTd">min</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
+              <div class="zoneTd">z1:恢复</div>
+              <div class="zoneTd">{{ thresholdData.zone1[0] }}</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone1[1] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
+              <div class="zoneTd">z2:有氧</div>
+              <div class="zoneTd">{{ thresholdData.zone2[0] }}</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone2[1] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
+              <div class="zoneTd">z3:节奏</div>
+              <div class="zoneTd">{{ thresholdData.zone3[0] }}</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone3[1] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
+              <div class="zoneTd">z4:阈值门槛</div>
+              <div class="zoneTd">{{ thresholdData.zone4[0] }}</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone4[1] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
+              <div class="zoneTd">z5A:阈值上限</div>
+              <div class="zoneTd">{{ thresholdData.zone5A[0] }}</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone5A[1] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
+              <div class="zoneTd">z5B:最大摄氧量</div>
+              <div class="zoneTd">{{ thresholdData.zone5B[0] }}</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">{{ thresholdData.zone5B[1] }}</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="zoneTr">
+              <div class="zoneTd">z5C:无氧能力</div>
+              <div class="zoneTd">{{ thresholdData.zone5C[0] }}</div>
+              <div class="zoneTd">~</div>
+              <div class="zoneTd">max</div>
+              <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="基本信息" name="base">
+        <el-form :model="baseForm" label-width="80px" class="base-form">
+          <el-form-item label="昵称">
+            <el-input
+              v-model="baseForm.nickname"
+              placeholder="请输入昵称"
+              disabled
+            />
+          </el-form-item>
+          <el-form-item label="头像">
+            <div class="avatar-uploader">
+              <el-upload
+                class="avatar-upload"
+                action=""
+                :http-request="noopRequest"
+                :show-file-list="false"
+                :auto-upload="false"
+                :on-change="onAvatarChange"
+                accept="image/*"
+                disabled
+              >
+                <img
+                  v-if="baseForm.avatarUrl"
+                  :src="baseForm.avatarUrl"
+                  class="avatar"
+                />
+                <i v-else class="el-icon-plus avatar-uploader-icon" />
+              </el-upload>
+            </div>
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-radio-group v-model="baseForm.gender" disabled>
+              <el-radio :label="1">男</el-radio>
+              <el-radio :label="2">女</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="身高">
+            <div class="inline-field">
+              <el-input
+                v-model.number="baseForm.height"
+                placeholder="cm"
+                disabled
+              />
+              <span class="unit">CM</span>
+            </div>
+          </el-form-item>
+          <el-form-item label="体重">
+            <div class="inline-field">
+              <el-input
+                v-model.number="baseForm.weight"
+                placeholder="kg"
+                disabled
+              />
+              <span class="unit">KG</span>
+            </div>
+          </el-form-item>
+          <el-form-item label="BMI">
+            <span>{{ bmiDisplay }}</span>
+          </el-form-item>
+        </el-form>
+      </el-tab-pane>
     </el-tabs>
 
     <span slot="footer" class="dialog-footer">
@@ -410,7 +410,7 @@ export default {
     return {
       loading: false,
       innerVisible: this.visible || this.value || false,
-      activeMainTab: "base",
+      activeMainTab: "preference",
       activeSport: 1,
       baseForm: {
         nickname: this.data.nickname || "",
