@@ -60,6 +60,12 @@
           </span>
         </el-form-item>
       </el-tooltip>
+      <div style="display: flex; align-items: center; font-size: 14px; margin-bottom: 10px;">
+        <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
+          <el-radio label="1">运动员</el-radio>
+          <el-radio label="2">教练</el-radio>
+        </el-radio-group>
+      </div>
 
       <el-button
         :loading="loading"
@@ -122,6 +128,7 @@ export default {
       showDialog: false,
       redirect: undefined,
       otherQuery: {},
+      loginType: "1",
     };
   },
   watch: {
@@ -145,11 +152,16 @@ export default {
     } else if (this.loginForm.password === "") {
       this.$refs.password.focus();
     }
+    this.loginType = localStorage.getItem('loginType') || '1';
+    localStorage.setItem('loginType', this.loginType);
   },
   destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    handleLoginTypeChange(value) {
+      localStorage.setItem('loginType', value);
+    },
     checkCapslock(e) {
       const { key } = e;
       this.capsTooltip = key && key.length === 1 && key >= "A" && key <= "Z";

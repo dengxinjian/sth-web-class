@@ -42,7 +42,6 @@ export class CalculateRun {
   constructor(athleticThreshold, classInfo) {
     this.classInfo = classInfo;
     this.athleticThreshold = athleticThreshold;
-    console.log(this.athleticThreshold, "this.athleticThreshold");
   }
   calculateThresholdSpeedRangeNum(thresholdSpeedRange) {
     if (!thresholdSpeedRange[0] || !thresholdSpeedRange[1]) {
@@ -274,7 +273,6 @@ export class CalculateBike {
     return Math.round(this.athleticThreshold.cycle * (thresholdFtp / 100));
   }
   calculateThresholdFtpRangeNum(thresholdFtpRange) {
-    console.log(thresholdFtpRange, "thresholdFtpRange");
     if (!thresholdFtpRange[0] || !thresholdFtpRange[1]) {
       return [0, 0];
     }
@@ -558,10 +556,6 @@ export const checkForm = (classInfo) => {
             message: `阶段${i + 1}的段落${j + 1}的配速范围不能为空或者为0`,
           };
         }
-        console.log(
-          classInfo.stages[i].sections[j].targetSpeed === "00:00",
-          "aaaa"
-        );
         if (
           classInfo.stages[i].sections[j].range === "target" &&
           !classInfo.stages[i].sections[j].targetSpeed

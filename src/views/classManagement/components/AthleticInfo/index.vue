@@ -5,14 +5,18 @@
     :before-close="handleClose"
     append-to-body
     class="athletic-info-dialog"
-     :close-on-click-modal="false"
+    :close-on-click-modal="false"
   >
     <span slot="title">运动员信息</span>
-    <el-tabs v-model="activeMainTab">
+    <el-tabs v-model="activeMainTab" @tab-click="handleTabClick">
       <el-tab-pane label="基本信息" name="base">
         <el-form :model="baseForm" label-width="80px" class="base-form">
           <el-form-item label="昵称">
-            <el-input v-model="baseForm.nickname" placeholder="请输入昵称" disabled />
+            <el-input
+              v-model="baseForm.nickname"
+              placeholder="请输入昵称"
+              disabled
+            />
           </el-form-item>
           <el-form-item label="头像">
             <div class="avatar-uploader">
@@ -26,7 +30,11 @@
                 accept="image/*"
                 disabled
               >
-                <img v-if="baseForm.avatarUrl" :src="baseForm.avatarUrl" class="avatar" />
+                <img
+                  v-if="baseForm.avatarUrl"
+                  :src="baseForm.avatarUrl"
+                  class="avatar"
+                />
                 <i v-else class="el-icon-plus avatar-uploader-icon" />
               </el-upload>
             </div>
@@ -39,13 +47,21 @@
           </el-form-item>
           <el-form-item label="身高">
             <div class="inline-field">
-              <el-input v-model.number="baseForm.height" placeholder="cm" disabled />
+              <el-input
+                v-model.number="baseForm.height"
+                placeholder="cm"
+                disabled
+              />
               <span class="unit">CM</span>
             </div>
           </el-form-item>
           <el-form-item label="体重">
             <div class="inline-field">
-              <el-input v-model.number="baseForm.weight" placeholder="kg" disabled />
+              <el-input
+                v-model.number="baseForm.weight"
+                placeholder="kg"
+                disabled
+              />
               <span class="unit">KG</span>
             </div>
           </el-form-item>
@@ -57,32 +73,75 @@
       <el-tab-pane label="阈值" name="threshold">
         <el-tabs v-model="activeSport" class="sport-tabs">
           <el-tab-pane label="心率" :name="1" />
-          <el-tab-pane label="游泳" :name="4" />
-          <el-tab-pane label="骑车" :name="2" />
-          <el-tab-pane label="跑步" :name="3" />
+          <el-tab-pane
+            v-if="lastMatchType === 2 || lastMatchType === 3"
+            label="游泳"
+            :name="4"
+          />
+          <el-tab-pane
+            v-if="lastMatchType === 2 || lastMatchType === 4"
+            label="骑车"
+            :name="2"
+          />
+          <el-tab-pane
+            v-if="lastMatchType === 1 || lastMatchType === 2"
+            label="跑步"
+            :name="3"
+          />
         </el-tabs>
         <div class="threshold-form">
           <div v-if="activeSport === 1" class="row">
             <span class="label"><span class="required">*</span>阈值心率</span>
-            <el-input v-model.number="thresholdData.param2" :key="'hr-param2-' + activeSport" step="1" class="pill-input" />
+            <el-input
+              v-model.number="thresholdData.param2"
+              :key="'hr-param2-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
             <span class="suffix unit-red">bpm</span>
-            <span class="label right-gap"><span class="required">*</span>最大心率</span>
-            <el-input v-model.number="thresholdData.param1" :key="'hr-param1-' + activeSport" step="1" class="pill-input" />
+            <span class="label right-gap"
+              ><span class="required">*</span>最大心率</span
+            >
+            <el-input
+              v-model.number="thresholdData.param1"
+              :key="'hr-param1-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
             <span class="suffix unit-red">bpm</span>
           </div>
           <div v-else-if="activeSport === 4" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker v-model="thresholdData.thresholdTimeValue" :key="'swim-' + activeSport" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
+            <el-time-picker
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'swim-' + activeSport"
+              value-format="mm:ss"
+              format="mm:ss"
+              popper-class="hide-hour"
+              class="pill-input"
+            />
             <span class="suffix unit-red">min/100m</span>
           </div>
           <div v-else-if="activeSport === 2" class="row">
             <span class="label"><span class="required">*</span>阈值功率</span>
-            <el-input v-model.number="thresholdData.threshold" :key="'bike-' + activeSport" step="1" class="pill-input" />
+            <el-input
+              v-model.number="thresholdData.threshold"
+              :key="'bike-' + activeSport"
+              step="1"
+              class="pill-input"
+            />
             <span class="suffix unit-red">w</span>
           </div>
           <div v-else-if="activeSport === 3" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker v-model="thresholdData.thresholdTimeValue" :key="'run-' + activeSport" value-format="mm:ss" format="mm:ss" popper-class="hide-hour" class="pill-input" />
+            <el-time-picker
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'run-' + activeSport"
+              value-format="mm:ss"
+              format="mm:ss"
+              popper-class="hide-hour"
+              class="pill-input"
+            />
             <span class="suffix unit-red">min/km</span>
           </div>
           <div class="zoneContainer">
@@ -145,48 +204,220 @@
           </div>
         </div>
       </el-tab-pane>
+      <el-tab-pane label="运动偏好" name="preference">
+        <div class="preference-form">
+          <div class="section-title">{{ matchTypeToName[lastMatchType] }}</div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === 2 || lastMatchType === 3"
+          >
+            <span class="form-label">游泳训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.swimTimes"
+              :min="0"
+              :max="14"
+              :step="1"
+              :precision="0"
+              controls-position="right"
+              class="count-input"
+              @keydown.native="preventDecimal"
+            />
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === 2 || lastMatchType === 4"
+          >
+            <span class="form-label">骑行训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.cycleTimes"
+              :min="0"
+              :max="14"
+              :step="1"
+              :precision="0"
+              controls-position="right"
+              class="count-input"
+              @keydown.native="preventDecimal"
+            />
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === 1 || lastMatchType === 2"
+          >
+            <span class="form-label">跑步训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.runTimes"
+              :min="0"
+              :max="14"
+              :step="1"
+              :precision="0"
+              controls-position="right"
+              class="count-input"
+              @keydown.native="preventDecimal"
+            />
+          </div>
+
+          <div class="form-row">
+            <span class="form-label">力量训练次数偏好设置</span>
+            <el-input-number
+              v-model="preferenceForm.strengthTimes"
+              :min="0"
+              :max="14"
+              :step="1"
+              :precision="0"
+              controls-position="right"
+              class="count-input"
+              @keydown.native="preventDecimal"
+            />
+          </div>
+
+          <div class="form-row total-row">
+            <span class="form-label">综合次数：</span>
+            <span class="total-count">{{ totalTrainingCount }}</span>
+          </div>
+
+          <div
+            class="section-title"
+            v-if="
+              lastMatchType === 1 || lastMatchType === 2 || lastMatchType === 4
+            "
+          >
+            长距离偏好设置
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === 1 || lastMatchType === 2"
+          >
+            <span class="form-label">长距离跑步</span>
+            <el-select
+              v-model="preferenceForm.runLongDays"
+              placeholder="请选择"
+              class="week-select"
+            >
+              <el-option label="无" :value="0" />
+              <el-option
+                v-for="day in availableDaysForLongDistance"
+                :key="'run-' + day.value"
+                :label="day.label"
+                :value="day.value"
+              />
+            </el-select>
+          </div>
+
+          <div
+            class="form-row"
+            v-if="lastMatchType === 2 || lastMatchType === 4"
+          >
+            <span class="form-label">长距离骑行</span>
+            <el-select
+              v-model="preferenceForm.cycleLongDays"
+              placeholder="请选择"
+              class="week-select"
+            >
+              <el-option label="无" :value="0" />
+
+              <el-option
+                v-for="day in availableDaysForLongDistance"
+                :key="'bike-' + day.value"
+                :label="day.label"
+                :value="day.value"
+              />
+            </el-select>
+          </div>
+
+          <div class="section-title">休息日偏好</div>
+
+          <div class="form-row">
+            <el-radio-group
+              v-model="preferenceForm.hasRestDay"
+              @change="handleHasRestDayChange"
+            >
+              <el-radio :label="false">无休息日</el-radio>
+              <el-radio :label="true">有休息日</el-radio>
+            </el-radio-group>
+          </div>
+
+          <div v-if="preferenceForm.hasRestDay" class="rest-day-config">
+            <!-- <div class="form-row">
+              <el-select
+                v-model="preferenceForm.restDayCount"
+                placeholder="请选择"
+                class="week-select"
+                @change="handleRestDayCountChange"
+              >
+                <el-option label="一天" :value="1" />
+                <el-option label="两天" :value="2" />
+                <el-option label="三天" :value="3" />
+              </el-select>
+            </div> -->
+
+            <div class="form-row">
+              <el-select
+                v-model="preferenceForm.restDays"
+                multiple
+                :multiple-limit="3"
+                placeholder="请选择休息日,最多选择3天"
+                class="week-select-multiple"
+              >
+                <el-option
+                  v-for="day in availableRestDays"
+                  :key="'rest-' + day.value"
+                  :label="day.label"
+                  :value="day.value"
+                />
+              </el-select>
+            </div>
+          </div>
+        </div>
+      </el-tab-pane>
     </el-tabs>
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onSave">保存</el-button>
+      <el-button type="primary" @click="onSave" :loading="loading"
+        >保存</el-button
+      >
     </span>
   </el-dialog>
-  </template>
+</template>
 
 <script>
-import {getData, submitData} from '@/api/common.js'
-import { secondsToMMSS, mmssToSeconds } from '@/utils/index'
-
+import { getData, submitData } from "@/api/common.js";
+import { secondsToMMSS, mmssToSeconds } from "@/utils/index";
+import request from "@/utils/request";
 export default {
-  name: 'AthleticInfoDialog',
+  name: "AthleticInfoDialog",
   props: {
     visible: {
       type: Boolean,
-      default: false
+      default: false,
     },
     value: {
       // 兼容 v-model 用法
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     // 初始数据（可选）
     data: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   data() {
     return {
+      loading: false,
       innerVisible: this.visible || this.value || false,
-      activeMainTab: 'base',
+      activeMainTab: "base",
       activeSport: 1,
       baseForm: {
-        nickname: this.data.nickname || '',
-        avatar: this.data.avatar || '',
+        nickname: this.data.nickname || "",
+        avatar: this.data.avatar || "",
         gender: 1,
         heightCm: this.data.heightCm || null,
-        weightKg: this.data.weightKg || null
+        weightKg: this.data.weightKg || null,
       },
       thresholds: [],
       thresholdData: {
@@ -197,87 +428,389 @@ export default {
         zone5A: [],
         zone5B: [],
         zone5C: [],
-        unit: '',
-        threshold: '',
-        thresholdTimeValue: '00:00',
-      }
+        unit: "",
+        threshold: "",
+        thresholdTimeValue: "00:00",
+      },
+      preferenceForm: {
+        swimTimes: 3,
+        cycleTimes: 3,
+        runTimes: 3,
+        strengthTimes: 3,
+        runLongDays: 0,
+        cycleLongDays: 0,
+        hasRestDay: true,
+        restDays: [],
+      },
+      triUserId: "",
+      loginType: localStorage.getItem("loginType"),
+      lastMatchType: 2,
+      matchTypeToName: {
+        1: "跑步模式",
+        2: "铁三模式",
+        3: "游泳模式",
+        4: "骑行模式",
+      },
     };
   },
   computed: {
     bmiDisplay() {
       const h = Number(this.baseForm.height);
       const w = Number(this.baseForm.weight);
-      if (!h || !w) return '';
+      if (!h || !w) return "";
       const bmi = w / Math.pow(h / 100, 2);
-      return bmi ? bmi.toFixed(1) : '';
+      return bmi ? bmi.toFixed(1) : "";
     },
-    // currentThreshold() {
-    //   const find = this.thresholds.find(item => item.thresholdType === this.activeSport)
-    //   return find;
-    // },
-    // zoneRows() {
-    //   const t = Number(this.currentThreshold.threshold) || 0;
-    //   const m = Number(this.currentThreshold.max) || 0;
-    //   const clamp = (v) => (m ? Math.min(v, m) : v);
-    //   const rows = [
-    //     { key: 'z1', label: 'z1:恢复', from: 0, to: Math.max(0, t - 40), unit: 'bpm' },
-    //     { key: 'z2', label: 'z2:有氧', from: Math.max(0, t - 39), to: t - 30 },
-    //     { key: 'z3', label: 'z3:节奏', from: t - 29, to: t - 20},
-    //     { key: 'z4', label: 'z4:阈值门槛', from: t - 19, to: t - 10},
-    //     { key: 'z5a', label: 'z5A:阈值上限', from: t - 9, to: t },
-    //     { key: 'z5b', label: 'z5B:最大摄氧量', from: t + 1, to: t + 10 },
-    //     { key: 'z5c', label: 'z5C:无氧能力', from: t + 11, to: t + 20 }
-    //   ];
-    //   return rows.map((r) => ({
-    //     label: r.label,
-    //     from: clamp(r.from),
-    //     to: clamp(r.to),
-    //     unit: 'bpm'
-    //   }));
-    // }
+    totalTrainingCount() {
+      // 根据matchTypeToName模式来计算综合训练次数
+      let totalTimes = 0;
+      if (this.lastMatchType === 1) {
+        totalTimes =
+          (this.preferenceForm.runTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      } else if (this.lastMatchType === 2) {
+        totalTimes =
+          (this.preferenceForm.swimTimes || 0) +
+          (this.preferenceForm.cycleTimes || 0) +
+          (this.preferenceForm.runTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      } else if (this.lastMatchType === 3) {
+        totalTimes =
+          (this.preferenceForm.swimTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      } else if (this.lastMatchType === 4) {
+        totalTimes =
+          (this.preferenceForm.cycleTimes || 0) +
+          (this.preferenceForm.strengthTimes || 0);
+      }
+      return totalTimes;
+    },
+    // 可用于长距离训练的日期（排除休息日）
+    availableDaysForLongDistance() {
+      const allDays = [
+        { label: "周一", value: 1 },
+        { label: "周二", value: 2 },
+        { label: "周三", value: 3 },
+        { label: "周四", value: 4 },
+        { label: "周五", value: 5 },
+        { label: "周六", value: 6 },
+        { label: "周日", value: 7 },
+      ];
+
+      // 如果没有休息日，返回所有日期
+      if (
+        !this.preferenceForm.hasRestDay ||
+        !this.preferenceForm.restDays ||
+        this.preferenceForm.restDays.length === 0
+      ) {
+        return allDays;
+      }
+
+      // 过滤掉休息日
+      return allDays.filter(
+        (day) => !this.preferenceForm.restDays.includes(day.value)
+      );
+    },
+    // 可用于休息日的日期（排除长距离训练日）
+    availableRestDays() {
+      const allDays = [
+        { label: "周一", value: 1 },
+        { label: "周二", value: 2 },
+        { label: "周三", value: 3 },
+        { label: "周四", value: 4 },
+        { label: "周五", value: 5 },
+        { label: "周六", value: 6 },
+        { label: "周日", value: 7 },
+      ];
+
+      // 收集已选择的长距离训练日
+      const longDistanceDays = [];
+      if (this.preferenceForm.runLongDays) {
+        longDistanceDays.push(this.preferenceForm.runLongDays);
+      }
+      if (this.preferenceForm.cycleLongDays) {
+        longDistanceDays.push(this.preferenceForm.cycleLongDays);
+      }
+
+      // 如果没有长距离训练日，返回所有日期
+      if (longDistanceDays.length === 0) {
+        return allDays;
+      }
+
+      // 过滤掉长距离训练日
+      return allDays.filter((day) => !longDistanceDays.includes(day.value));
+    },
   },
   watch: {
     visible(val) {
       this.innerVisible = val;
     },
     value(val) {
-      if (typeof val !== 'undefined') this.innerVisible = val;
+      if (typeof val !== "undefined") this.innerVisible = val;
     },
     innerVisible(val) {
-      this.$emit('update:visible', val);
-      this.$emit('input', val);
-      if (val && this.data.triUserId) {
-        this.getAthleticInfo()
-        this.getThresholdData()
+      this.$emit("update:visible", val);
+      this.$emit("input", val);
+      if (val) {
+        if (localStorage.getItem("loginType") === "2") {
+          this.triUserId = this.data.triUserId;
+        } else {
+          this.triUserId = localStorage.getItem("triUserId") || "";
+        }
+        if (this.activeMainTab === "preference") {
+          this.getPreferenceData();
+        }
+        this.getAthleticInfo();
+        this.getThresholdData();
+
+        // 检查当前选中的阈值类型是否可用
+        this.$nextTick(() => {
+          const availableTypes = this.getAvailableThresholdTypes(
+            this.lastMatchType
+          );
+          if (!availableTypes.includes(this.activeSport)) {
+            this.activeSport = 1;
+          }
+        });
       }
     },
     activeSport(val) {
-      this.getThresholdData()
-    }
+      this.getThresholdData();
+    },
+    // 监听运动模式变化，自动切换到可用的阈值类型
+    lastMatchType(newType) {
+      // 检查当前选中的阈值类型是否在可用的类型中
+      const availableTypes = this.getAvailableThresholdTypes(newType);
+      if (!availableTypes.includes(this.activeSport)) {
+        // 如果当前选中的类型不可用，切换到心率(1)
+        this.activeSport = 1;
+      }
+    },
+    // 监听休息日变化，自动清除与休息日冲突的长距离训练日
+    "preferenceForm.restDays": {
+      handler(newRestDays) {
+        if (!newRestDays || newRestDays.length === 0) {
+          return;
+        }
+
+        // 如果长距离跑步日在休息日中，清除它
+        if (
+          this.preferenceForm.runLongDays &&
+          newRestDays.includes(this.preferenceForm.runLongDays)
+        ) {
+          this.preferenceForm.runLongDays = null;
+        }
+
+        // 如果长距离骑行日在休息日中，清除它
+        if (
+          this.preferenceForm.cycleLongDays &&
+          newRestDays.includes(this.preferenceForm.cycleLongDays)
+        ) {
+          this.preferenceForm.cycleLongDays = null;
+        }
+      },
+      deep: true,
+    },
+    // 监听长距离跑步日变化，从休息日中移除该日期
+    "preferenceForm.runLongDays": function (newDay) {
+      if (!newDay || !this.preferenceForm.restDays) {
+        return;
+      }
+
+      // 如果新选择的长距离跑步日在休息日列表中，从休息日中移除
+      const index = this.preferenceForm.restDays.indexOf(newDay);
+      if (index > -1) {
+        this.preferenceForm.restDays.splice(index, 1);
+      }
+    },
+    // 监听长距离骑行日变化，从休息日中移除该日期
+    "preferenceForm.cycleLongDays": function (newDay) {
+      if (!newDay || !this.preferenceForm.restDays) {
+        return;
+      }
+
+      // 如果新选择的长距离骑行日在休息日列表中，从休息日中移除
+      const index = this.preferenceForm.restDays.indexOf(newDay);
+      if (index > -1) {
+        this.preferenceForm.restDays.splice(index, 1);
+      }
+    },
+    // 监听是否有休息日的开关
+    "preferenceForm.hasRestDay": function (newVal) {
+      // 如果取消了休息日，不需要做任何处理
+      // 长距离训练日可以保持原样
+    },
   },
   methods: {
+    handleHasRestDayChange(val) {
+      if (!val) {
+        this.preferenceForm.restDays = [];
+      }
+    },
+    // 获取根据运动模式可用的阈值类型
+    getAvailableThresholdTypes(matchType) {
+      // 1: 心率, 2: 骑车, 3: 跑步, 4: 游泳
+      const types = [1]; // 心率始终可用
+
+      switch (matchType) {
+        case 1: // 跑步模式
+          types.push(3); // 跑步
+          break;
+        case 2: // 铁三模式
+          types.push(4, 2, 3); // 游泳、骑车、跑步
+          break;
+        case 3: // 游泳模式
+          types.push(4); // 游泳
+          break;
+        case 4: // 骑行模式
+          types.push(2); // 骑车
+          break;
+      }
+
+      return types;
+    },
+    handleTabClick(tab, event) {
+      // this.activeMainTab = tab.name;
+      if (this.activeMainTab === "preference") {
+        this.getPreferenceData();
+        this.getAthleticInfo();
+      }
+    },
+    // 校验选择了有休息必须选择天数
+    checkRestDayCount() {
+      if (
+        this.preferenceForm.hasRestDay &&
+        this.preferenceForm.restDays.length === 0
+      ) {
+        this.$message.error("请选择休息天数");
+        return false;
+      }
+      return true;
+    },
+    // 查询偏好数据
+    getPreferenceData() {
+      request({
+        url: "/sport-preference/by-current-type",
+        method: "get",
+        headers: {
+          requestUserInfoId: this.triUserId,
+        },
+      }).then((res) => {
+        if (res.result) {
+          this.preferenceForm = res.result;
+          if (
+            this.preferenceForm.restDays &&
+            this.preferenceForm.restDays.length > 0
+          ) {
+            this.$set(this.preferenceForm, "hasRestDay", true);
+          } else {
+            this.$set(this.preferenceForm, "hasRestDay", false);
+          }
+          if (
+            res.result.cycleLongDays &&
+            Array.isArray(res.result.cycleLongDays)
+          ) {
+            this.$set(
+              this.preferenceForm,
+              "cycleLongDays",
+              res.result.cycleLongDays.length > 0
+                ? res.result.cycleLongDays[0]
+                : 0
+            );
+          }
+          if (res.result.runLongDays && Array.isArray(res.result.runLongDays)) {
+            this.$set(
+              this.preferenceForm,
+              "runLongDays",
+              res.result.runLongDays.length > 0 ? res.result.runLongDays[0] : 0
+            );
+          }
+        } else {
+          this.preferenceForm = {
+            swimTimes: 0,
+            cycleTimes: 0,
+            runTimes: 0,
+            strengthTimes: 0,
+            runLongDays: 0,
+            cycleLongDays: 0,
+            hasRestDay: false,
+            restDays: [],
+          };
+        }
+      });
+    },
+    // 查询preferenceForm没有id 数据时保存需创建运动偏好
+    createPreferenceData() {
+      if (!this.checkRestDayCount()) {
+        return;
+      }
+      const params = JSON.parse(JSON.stringify(this.preferenceForm));
+      params.runLongDays = params.runLongDays === 0 ? [] : [params.runLongDays];
+      params.cycleLongDays =
+        params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
+      params.totalTimes = this.totalTrainingCount;
+      request({
+        url: "/sport-preference/create",
+        method: "post",
+        data: params,
+        headers: {
+          requestUserInfoId: this.triUserId,
+        },
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success("运动偏好创建成功");
+          this.getPreferenceData();
+        }
+      });
+    },
+    // 保存运动偏好
+    savePreferenceData() {
+      if (!this.checkRestDayCount()) {
+        return;
+      }
+      const params = JSON.parse(JSON.stringify(this.preferenceForm));
+      console.log(params);
+      params.runLongDays = params.runLongDays === 0 ? [] : [params.runLongDays];
+      params.cycleLongDays =
+        params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
+      params.totalTimes = this.totalTrainingCount;
+      request({
+        url: `/sport-preference/${this.preferenceForm.id}`,
+        method: "put",
+        data: params,
+        headers: {
+          requestUserInfoId: this.triUserId,
+        },
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success("运动偏好保存成功");
+          this.getPreferenceData();
+        }
+      });
+    },
     getAthleticInfo() {
       getData({
-        url: '/api/classSchedule/getUserProfile',
-        triUserId: this.data.triUserId
-      }).then(res => {
+        url: "/api/classSchedule/getUserProfile",
+        triUserId: this.triUserId,
+      }).then((res) => {
         if (res.success) {
-          this.baseForm = res.result
+          this.baseForm = res.result;
+          this.lastMatchType = res.result.lastMatchType;
           // this.thresholds = res.result.thresholdRecordList
           // this.currentThreshold = this.thresholds.find(item => item.thresholdType === this.activeSport)
         }
-      })
+      });
     },
     getThresholdData() {
       getData({
-        url: '/api/classSchedule/getThresholdDetail',
+        url: "/api/classSchedule/getThresholdDetail",
         type: this.activeSport,
-        triUserId: this.data.triUserId
-      }).then(res => {
-        const result = res.result[0]
+        triUserId: this.triUserId,
+      }).then((res) => {
+        const result = res.result[0];
         // 处理时间格式转换
         if (this.activeSport === 4 || this.activeSport === 3) {
-          result.thresholdTimeValue = secondsToMMSS(+result.threshold)
+          result.thresholdTimeValue = secondsToMMSS(+result.threshold);
         }
         // 使用 Vue.set 确保响应式更新，或者直接赋值新对象
         this.thresholdData = {
@@ -289,36 +822,70 @@ export default {
           zone5A: result.zone5A || [],
           zone5B: result.zone5B || [],
           zone5C: result.zone5C || [],
-        }
-      })
+        };
+      });
     },
     handleClose() {
       this.onCancel();
     },
     onCancel() {
       this.innerVisible = false;
-      this.$emit('cancel');
+      this.$emit("cancel");
     },
     onSave() {
-      const params = {thresholdType: this.activeSport, param1: '', param2: '', threshold: '', triUserId: this.data.triUserId}
-      if (this.activeSport === 4 || this.activeSport === 3) {
-        params.threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue)
-      } else if (this.activeSport === 2) {
-        params.threshold = this.thresholdData.threshold
-      } else if (this.activeSport === 1) {
-        params.param1 = this.thresholdData.param1
-        params.param2 = this.thresholdData.param2
-      }
-      submitData({
-        url: '/api/classSchedule/updateThreshold',
-        requestData: params
-      }).then(res => {
-        if (res.success) {
-          this.$message.success('阈值保存成功')
-          // this.$emit('save', res.result);
-          // this.innerVisible = false;
+      if (this.activeMainTab === "preference") {
+        if (this.preferenceForm.id) {
+          this.savePreferenceData();
+        } else {
+          this.createPreferenceData();
         }
-      })
+        return;
+      }
+      this.$confirm(
+        "阈值更新将会影响运动员的相关设置及训练计划, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          this.loading = true;
+          const params = {
+            thresholdType: this.activeSport,
+            param1: "",
+            param2: "",
+            threshold: "",
+            triUserId: this.triUserId,
+          };
+          if (this.activeSport === 4 || this.activeSport === 3) {
+            params.threshold = mmssToSeconds(
+              this.thresholdData.thresholdTimeValue
+            );
+          } else if (this.activeSport === 2) {
+            params.threshold = this.thresholdData.threshold;
+          } else if (this.activeSport === 1) {
+            params.param1 = this.thresholdData.param1;
+            params.param2 = this.thresholdData.param2;
+          }
+          submitData({
+            url: "/api/classSchedule/updateThreshold",
+            requestData: params,
+          }).then((res) => {
+            if (res.success) {
+              this.$message.success("阈值保存成功");
+              this.$emit("save", res.result);
+              this.loading = false;
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消更新",
+          });
+        });
     },
     noopRequest() {},
     onAvatarChange(file) {
@@ -329,43 +896,88 @@ export default {
       reader.readAsDataURL(file.raw);
     },
     handleSportChange(val) {
-      console.log(val)
-      this.activeSport = val
-    }
-  }
+      console.log(val);
+      this.activeSport = val;
+    },
+    // 阻止输入小数点和其他非数字字符
+    preventDecimal(event) {
+      // 允许的按键：数字键、退格、删除、方向键、Tab
+      const allowedKeys = [
+        "Backspace",
+        "Delete",
+        "Tab",
+        "Escape",
+        "Enter",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+      ];
+
+      // 允许 Ctrl/Cmd 组合键（复制、粘贴、全选等）
+      if (event.ctrlKey || event.metaKey) {
+        return;
+      }
+
+      // 检查是否是允许的特殊键
+      if (allowedKeys.includes(event.key)) {
+        return;
+      }
+
+      // 阻止小数点、负号和其他非数字字符
+      if (
+        event.key === "." ||
+        event.key === "-" ||
+        event.key === "e" ||
+        event.key === "E" ||
+        event.key === "+"
+      ) {
+        event.preventDefault();
+        return;
+      }
+
+      // 只允许数字0-9
+      if (!/^\d$/.test(event.key)) {
+        event.preventDefault();
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
-.athletic-info-dialog ::v-deep(.el-dialog__header){
+.athletic-info-dialog ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
 }
-.athletic-info-dialog ::v-deep(.el-dialog__body){
+.athletic-info-dialog ::v-deep(.el-dialog__body) {
   padding: 10px 36px 0 36px;
 }
-.athletic-info-dialog ::v-deep(.el-tabs__header){
+.athletic-info-dialog ::v-deep(.el-tabs__header) {
   margin-bottom: 16px;
 }
-.base-form .el-input.is-disabled .el-input__inner{
+.base-form .el-input.is-disabled .el-input__inner {
   background: #f5f5f7;
   color: #333;
   border-radius: 24px;
   border: none;
   height: 40px;
 }
-.base-form .el-form-item{
+.base-form .el-form-item {
   margin-bottom: 18px;
 }
-.base-form ::v-deep(.el-radio.is-disabled){
+.base-form ::v-deep(.el-radio.is-disabled) {
   opacity: 1;
 }
-.base-form ::v-deep(.el-radio__input.is-disabled .el-radio__inner){
+.base-form ::v-deep(.el-radio__input.is-disabled .el-radio__inner) {
   border-color: #d9d9d9;
 }
-.base-form ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner){
+.base-form ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner) {
   border-color: #e74c3c;
 }
-.base-form ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner::after){
+.base-form
+  ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner::after) {
   background: #e74c3c;
 }
 .athletic-info-dialog .avatar-uploader {
@@ -418,11 +1030,20 @@ export default {
   margin: 0 12px 0 6px;
   color: #666;
 }
-.right-gap { margin-left: 24px; }
-.required{ color: #e65b55; margin-right: 4px; }
-.unit-red{ color: #e65b55; }
-.sport-tabs ::v-deep(.el-tabs__nav-wrap::after){ height: 0; }
-.sport-tabs ::v-deep(.el-tabs__item){
+.right-gap {
+  margin-left: 24px;
+}
+.required {
+  color: #e65b55;
+  margin-right: 4px;
+}
+.unit-red {
+  color: #e65b55;
+}
+.sport-tabs ::v-deep(.el-tabs__nav-wrap::after) {
+  height: 0;
+}
+.sport-tabs ::v-deep(.el-tabs__item) {
   height: 36px;
   line-height: 36px;
   border-radius: 18px;
@@ -439,46 +1060,50 @@ export default {
 .sport-tabs ::v-deep(.el-tabs__item:last-child) {
   padding-right: 24px;
 }
-.sport-tabs ::v-deep(.el-tabs__item.is-active){
+.sport-tabs ::v-deep(.el-tabs__item.is-active) {
   background: #e65b55;
   color: #fff;
 }
-.pill-input .el-input__inner{
+.pill-input .el-input__inner {
   border-radius: 22px;
   height: 40px;
   border: 1px solid #e5e6eb;
   background: #fff;
   padding: 0 16px;
 }
-.pill-input{ width: 220px; }
-.zone-table ::v-deep(.el-table__row){
+.pill-input {
+  width: 220px;
+}
+.zone-table ::v-deep(.el-table__row) {
   height: 44px;
 }
-.zone-table ::v-deep(.el-table){
+.zone-table ::v-deep(.el-table) {
   background: transparent;
 }
-.zone-table ::v-deep(.el-table__body tr:hover>td){
+.zone-table ::v-deep(.el-table__body tr:hover > td) {
   background: transparent;
 }
-.zone-table ::v-deep(.el-table__cell){
+.zone-table ::v-deep(.el-table__cell) {
   border-bottom: none;
   font-size: 14px;
   color: #333;
 }
-.zone-table ::v-deep(.el-table__body){ font-weight: 500; }
-.zone-table ::v-deep(.cell){
+.zone-table ::v-deep(.el-table__body) {
+  font-weight: 500;
+}
+.zone-table ::v-deep(.cell) {
   padding-left: 0;
   padding-right: 0;
 }
-.dialog-footer{
+.dialog-footer {
   display: flex;
   justify-content: center;
 }
-.dialog-footer .el-button{
+.dialog-footer .el-button {
   min-width: 120px;
   border-radius: 22px;
 }
-.dialog-footer .el-button--primary{
+.dialog-footer .el-button--primary {
   background: #d83b36;
   border-color: #d83b36;
 }
@@ -495,5 +1120,126 @@ export default {
   flex: 0 0 140px;
 }
 
-</style>
+.preference-form {
+  padding: 10px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
 
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  margin-top: 24px;
+}
+
+.section-title:first-child {
+  margin-top: 0;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.form-label {
+  flex: 0 0 200px;
+  color: #333;
+  font-size: 14px;
+}
+
+.count-input {
+  width: 240px;
+}
+
+.count-input ::v-deep(.el-input__inner) {
+  border-radius: 22px;
+  height: 40px;
+  border: 1px solid #e5e6eb;
+  padding: 0 50px 0 16px;
+}
+
+.count-input ::v-deep(.el-input-number__increase),
+.count-input ::v-deep(.el-input-number__decrease) {
+  background: transparent;
+  border: none;
+}
+
+.week-select {
+  width: 240px;
+}
+
+.week-select ::v-deep(.el-input__inner) {
+  border-radius: 22px;
+  height: 40px;
+  border: 1px solid #e5e6eb;
+  padding: 0 36px 0 16px;
+}
+
+.week-select-multiple {
+  width: 300px;
+}
+
+.week-select-multiple ::v-deep(.el-input__inner) {
+  border-radius: 22px;
+  min-height: 40px;
+  border: 1px solid #e5e6eb;
+  padding: 0 36px 0 16px;
+  line-height: 38px;
+}
+
+.week-select-multiple ::v-deep(.el-select__tags) {
+  max-width: calc(100% - 40px);
+  padding-left: 8px;
+}
+
+.week-select-multiple ::v-deep(.el-tag) {
+  background: #e65b55;
+  border-color: #e65b55;
+  color: #fff;
+  border-radius: 12px;
+  height: 24px;
+  line-height: 24px;
+  margin: 7px 4px 7px 0;
+}
+
+.week-select-multiple ::v-deep(.el-tag__close) {
+  background-color: transparent;
+  color: #fff;
+}
+
+.week-select-multiple ::v-deep(.el-tag__close:hover) {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.total-row {
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+.total-count {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e65b55;
+}
+
+.rest-day-config {
+  margin-left: 20px;
+  margin-top: 12px;
+}
+
+.preference-form ::v-deep(.el-radio) {
+  margin-right: 30px;
+}
+
+.preference-form ::v-deep(.el-radio__input.is-checked .el-radio__inner) {
+  border-color: #e65b55;
+  background: #e65b55;
+}
+
+.preference-form ::v-deep(.el-radio__input.is-checked + .el-radio__label) {
+  color: #e65b55;
+}
+</style>

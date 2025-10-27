@@ -96,7 +96,10 @@ export default {
       if (typeof val !== "undefined") this.innerVisible = val;
     },
     groupId(val) {
-      this.form.destinationId = val;
+      if (this.activeClassType === "my") {
+        this.form.destinationId = val;
+      }
+      console.log(val, "val");
     },
     innerVisible(val) {
       if (!val) {
@@ -128,6 +131,7 @@ export default {
     },
     onCancel() {
       this.innerVisible = false;
+      this.form = {}
       this.$emit("save");
     },
     onConfirm() {
@@ -147,6 +151,7 @@ export default {
           if (res.success) {
             this.$message.success("课程添加成功");
             this.innerVisible = false;
+            this.form = {}
             this.$emit("save", { ...this.form });
           }
         });

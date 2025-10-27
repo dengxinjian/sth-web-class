@@ -808,7 +808,7 @@ export default {
           this.timeline = JSON.parse(res.result.classesJson).timeline;
           this.classInfo.id = res.result.id;
           this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
-
+          this.classInfo.groupId = res.result.classesGroupId;
           this.handleClassDrag();
         }
       });
@@ -932,6 +932,7 @@ export default {
       // 清空表单数据，但保留传入的title
       this.classInfo = {
         id: "",
+        sportType: "CYCLE",
         title: this.data.title || "", // 标题
         groupId: this.data.groupId || 0, // 分组
         duration: "", // 时长
@@ -949,6 +950,9 @@ export default {
     // 删除阶段
     handleDeleteStage(index) {
       this.classInfo.stages.splice(index, 1);
+      if (this.classInfo.stages.length <= 1) {
+        this.classInfo.times = 1
+      }
       this.calculateTimeline();
     },
     // 创建深拷贝的section模板
@@ -1028,6 +1032,9 @@ export default {
     handleRemoveSection(index, sectionIndex) {
       if (this.classInfo.stages[index].sections.length > 1) {
         this.classInfo.stages[index].sections.splice(sectionIndex, 1);
+        if (this.classInfo.stages[index].sections.length === 1) {
+          this.classInfo.stages[index].times = 1;
+        }
       } else {
         this.classInfo.stages.splice(index, 1);
       }

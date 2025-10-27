@@ -9,16 +9,24 @@
 
     <!-- 面包屑导航 -->
     <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" /> -->
-     <div style="flex: 1;">
-      <div
-        style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0"
-      >
+    <div style="flex: 1">
+      <div style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0">
         公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
       </div>
-     </div>
+    </div>
 
     <!-- 右侧菜单 -->
     <div class="right-menu">
+      <div class="button-with-logo" style="margin-right: 10px">
+        <el-button type="primary" size="small" @click="changeIdentify"
+          >切换成{{ loginType == "1" ? "教练" : "运动员" }}</el-button
+        >
+        <img
+          src="@/views/login-wx/imgs/PREMIUM.svg"
+          alt="logo"
+          class="button-logo"
+        />
+      </div>
       <span>{{ name }}</span>
       <el-divider direction="vertical"></el-divider>
       <span style="display: inline-block" @click="logout">{{
@@ -57,7 +65,8 @@ export default {
   data() {
     return {
       title: "强者之心",
-      name: localStorage.getItem('name'),
+      name: localStorage.getItem("name"),
+      loginType: localStorage.getItem("loginType"),
     };
   },
   computed: {
@@ -104,7 +113,7 @@ export default {
       });
     },
     changeIdentify() {
-      this.$store.dispatch("user/changeIdentify");
+      localStorage.setItem("loginType", this.loginType === "1" ? "2" : "1");
       this.reload();
     },
     chooseShop(e) {
@@ -166,6 +175,30 @@ export default {
 
     &:focus {
       outline: none;
+    }
+
+    .button-with-logo {
+      position: relative;
+      display: inline-block;
+
+      .button-logo {
+        position: absolute;
+        top: -3px;
+        right: -1px;
+        width: 50px;
+        height: 20px;
+        padding: 2px;
+        z-index: 10;
+      }
+      .elite-title {
+        font-size: 12px;
+        transform: scale(0.8);
+        font-weight: bold;
+        color: #0924f5;
+        position: absolute;
+        top: -1px;
+        right: -1px;
+      }
     }
 
     .right-menu-item {

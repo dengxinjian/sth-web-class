@@ -207,6 +207,7 @@ import {
   scheduleApi,
   statisticsApi,
   athleteApi,
+  groupApi,
 } from "./services/classManagement";
 import { ACTIVITY_TYPE_DICT } from "./constants";
 import {
@@ -314,7 +315,15 @@ export default {
     };
   },
   mounted() {
-    this.getTeamAndAthleticData();
+    if (localStorage.getItem("loginType") !== "1") {
+      this.getTeamAndAthleticData();
+    } else {
+      this.selectedAthletic = localStorage.getItem("triUserId");
+      this.getScheduleData();
+      this.getAthleticThreshold(this.selectedAthletic);
+      this.getAuthorizedDeviceList();
+      this.getClassList();
+    }
   },
   methods: {
     handleEditClassSchedule(classItem) {
@@ -373,6 +382,7 @@ export default {
             id: member.id,
             name: member.userNickname,
             triUserId: member.triUserId,
+            lastMatchType: member.lastMatchType,
           })),
         }));
 
@@ -695,7 +705,12 @@ export default {
         type: "warning",
       }).then(() => {
         // 调用删除分组API
-        this.getClassList();
+        groupApi.deleteGroup(groupId).then((res) => {
+          if (res.success) {
+            this.$message.success("删除成功");
+            this.getClassList();
+          }
+        });
       });
     },
 
@@ -748,7 +763,7 @@ export default {
     /**
      * 课表详情
      */
-    handleClassScheduleDetail(classId, sportType) {
+    handleClassScheduleDetail(classItem, sportType) {
       // this.classSportType = sportType;
       // 从currentWeek中查找课表数据
       // let foundClass = null;
@@ -760,11 +775,12 @@ export default {
       // this.classDetailData = foundClass;
       // this.classSportType = sportType;
       // this.showClassDetailModal = true;
-      console.log(sportType, "sportType");
+      console.log(classItem, "classItem");
       this.classSportType = sportType;
-      this.classDetailData = { id: classId };
-      this.isActivity = false;
-      this.showEditScheduleClass = true;
+      this.classDetailData = classItem;
+      this.$nextTick(() => {
+        this.showClassDetailModal = true;
+      });
     },
 
     /**
@@ -1180,6 +1196,8 @@ export default {
     onSaveAthleticInfo() {
       // 保存逻辑
       this.showAthleticInfoDialog = false;
+      this.getScheduleData();
+      this.getAthleticThreshold(this.selectedAthletic);
     },
 
     /**
@@ -1205,7 +1223,7 @@ export default {
         const params = {
           classesId: data.courseData.id,
           classesJson: JSON.stringify(data.courseData.classesJson),
-          classesDate: data.exerciseData.dataDate,
+          classesDate: data.exerciseData[0].dataDate,
           sportType: data.courseData.classesJson.sportType,
         };
         const josnData = await this.AddScheduleClass(params, data.type);
@@ -1217,8 +1235,25 @@ export default {
           })
           .then((res) => {
             if (res.success) {
-              this.$message.success("匹配成功");
-              this.getScheduleData();
+              scheduleApi
+                .bindActivity({
+                  classScheduleId: res.result.id,
+                  bindingActivityId: data.exerciseData[0].id,
+                  classesDate: data.exerciseData[0].dataDate,
+                  triUserId: this.selectedAthletic,
+                })
+                .then((res) => {
+                  if (res.success) {
+                    this.$message.success("匹配成功");
+                    this.getScheduleData();
+                  } else {
+                    this.$message.error(res.message);
+                    this.getScheduleData();
+                  }
+                })
+                .finally(() => {
+                  this.getScheduleData();
+                });
             } else {
               this.$message.error(res.message);
               this.getScheduleData();

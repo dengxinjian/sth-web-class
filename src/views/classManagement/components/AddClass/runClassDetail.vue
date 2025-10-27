@@ -864,7 +864,7 @@ export default {
           this.timeline = JSON.parse(res.result.classesJson).timeline;
           this.classInfo.id = res.result.id;
           this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
-
+          this.classInfo.groupId = res.result.classesGroupId;
           this.handleClassDrag();
         }
       });

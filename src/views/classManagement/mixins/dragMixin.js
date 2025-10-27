@@ -22,7 +22,11 @@ export default {
             scrollSpeed: 10,
             easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
             onEnd: (e) => {
-              if (e.item.dataset.id && e.to.dataset.date) {
+              console.log(e, "e");
+              // 只有拖到日历容器(.js-schedule-drag-container)时才处理
+              // 避免拖到运动卡片(.js-sport-container-put)时也触发
+              if (e.item.dataset.id && e.to.dataset.date &&
+                  e.to.classList.contains('js-schedule-drag-container')) {
                 this.handleClassDragToSchedule(e)
               }
             }
@@ -60,7 +64,7 @@ export default {
     },
 
     /**
-     * 初始化运动卡片拖拽（运动拖到课表匹配）
+     * 初始化运动卡片拖拽（运动匹配）
      */
     initActivityDrag() {
       this.$nextTick(() => {
@@ -72,18 +76,11 @@ export default {
             group: {
               name: 'classDrag',
               pull: 'clone',
-              put: function(to, from) {
-                // 只允许从课表拖到运动
-                if (from.el.className.indexOf('js-sport-container-put') > -1) {
-                  return false
-                } else {
-                  return true
-                }
-              }
             },
             animation: 150,
             dataIdAttr: 'data-id',
             onAdd(e) {
+              console.log(e, "e");
               if (e.item.className === 'card-body') {
                 _this.getScheduleData()
                 return

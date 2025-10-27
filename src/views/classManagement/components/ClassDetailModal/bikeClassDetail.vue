@@ -723,6 +723,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    triUserId: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -1015,7 +1019,7 @@ export default {
         return;
       }
       submitData({
-        url: "/api/classes/calculateTimeDistanceSth",
+        url: "/api/classSchedule/calculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
@@ -1025,6 +1029,7 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
+        triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
           this.classInfo.sth = res.result?.sth || "";
@@ -1078,6 +1083,9 @@ export default {
     // 删除阶段
     handleDeleteStage(index) {
       this.classInfo.stages.splice(index, 1);
+      if (this.classInfo.stages.length <= 1) {
+        this.classInfo.times = 1
+      }
       this.calculateTimeline();
     },
     // 添加段落

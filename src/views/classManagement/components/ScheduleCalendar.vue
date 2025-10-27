@@ -6,7 +6,7 @@
         <div class="schedule-top">
           <WeekRangePicker @week-change="$emit('week-change', $event)" />
           <div class="schedule-search">
-            <div>
+            <div v-if="loginType === '2'">
               <span>团队：</span>
               <el-select
                 :value="selectedTeam"
@@ -23,7 +23,7 @@
                 />
               </el-select>
             </div>
-            <div>
+            <div v-if="loginType === '2'">
               <span>运动员：</span>
               <el-select
                 :value="selectedAthletic"
@@ -101,7 +101,7 @@
                 :class-item="classItem"
                 :date="item.commonDate"
                 @click="
-                  $emit('class-detail', classItem.id, classItem.sportType)
+                  $emit('class-detail', classItem, classItem.sportType)
                 "
                 @delete="$emit('delete-schedule', $event)"
                 @device-click="handleDeviceClick"
@@ -173,6 +173,7 @@ export default {
   data() {
     return {
       weekList: WEEK_LIST,
+      loginType: localStorage.getItem("loginType") || "2",
     };
   },
   methods: {
@@ -237,16 +238,21 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  max-width: 1640px;
+  flex-wrap: wrap;
+  gap: 10px;
 
   .schedule-search {
     display: flex;
     gap: 10px;
     align-items: center;
+    flex-wrap: wrap;
 
     > div {
       display: flex;
       align-items: center;
       gap: 5px;
+      white-space: nowrap;
 
       span {
         font-size: 14px;

@@ -109,10 +109,10 @@
         </pre
           >
 
-          <!-- 骑行详情 -->
-          <template v-if="classItem.sportType === 'CYCLE'">
-            <CycleStageDetails :class-data="classItem.classesJson" />
-          </template>
+        <!-- 骑行详情 -->
+        <template v-if="classItem.sportType === 'CYCLE'">
+          <CycleStageDetails :class-data="classItem.classesJson" />
+        </template>
 
           <!-- 跑步详情 -->
           <template v-else-if="classItem.sportType === 'RUN'">
