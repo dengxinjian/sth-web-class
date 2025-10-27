@@ -220,13 +220,18 @@
           </div>
           <div v-else-if="activeSport === 4" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker
+            <!-- <el-time-picker
               v-model="thresholdData.thresholdTimeValue"
               :key="'swim-' + activeSport"
               value-format="mm:ss"
               format="mm:ss"
               popper-class="hide-hour"
               class="pill-input"
+            /> -->
+            <TimeInput
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'swim-' + activeSport"
+              timerType="mm:ss"
             />
             <span class="suffix unit-red">min/100m</span>
           </div>
@@ -242,13 +247,18 @@
           </div>
           <div v-else-if="activeSport === 3" class="row">
             <span class="label"><span class="required">*</span>阈值配速</span>
-            <el-time-picker
+            <!-- <el-time-picker
               v-model="thresholdData.thresholdTimeValue"
               :key="'run-' + activeSport"
               value-format="mm:ss"
               format="mm:ss"
               popper-class="hide-hour"
               class="pill-input"
+            /> -->
+            <TimeInput
+              v-model="thresholdData.thresholdTimeValue"
+              :key="'run-' + activeSport"
+              timerType="mm:ss"
             />
             <span class="suffix unit-red">min/km</span>
           </div>
@@ -388,8 +398,12 @@
 import { getData, submitData } from "@/api/common.js";
 import { secondsToMMSS, mmssToSeconds } from "@/utils/index";
 import request from "@/utils/request";
+import TimeInput from "../timeInpt/index.vue";
 export default {
   name: "AthleticInfoDialog",
+  components: {
+    TimeInput,
+  },
   props: {
     visible: {
       type: Boolean,
