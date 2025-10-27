@@ -131,10 +131,11 @@ export const statisticsApi = {
  */
 export const athleteApi = {
   // 获取运动员配置
-  getUserProfile(triUserId) {
+  getUserProfile(triUserId,date) {
     return getData({
       url: '/api/classSchedule/getUserProfile',
-      triUserId
+      triUserId,
+      date
     })
   },
 

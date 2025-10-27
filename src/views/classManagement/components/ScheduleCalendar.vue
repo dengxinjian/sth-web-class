@@ -99,7 +99,7 @@
                 :class-item="classItem"
                 :date="item.commonDate"
                 @click="
-                  $emit('class-detail', classItem.id, classItem.sportType)
+                  $emit('class-detail', classItem, classItem.sportType)
                 "
                 @delete="$emit('delete-schedule', $event)"
                 @device-click="handleDeviceClick"

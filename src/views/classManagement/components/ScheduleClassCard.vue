@@ -11,7 +11,7 @@
       :data-id="classItem.id"
       :data-date="date"
       data-type="classSchedule"
-      @click.stop="$emit('click', classItem.id, classItem.sportType)"
+      @click.stop="$emit('click', classItem, classItem.sportType)"
     >
       <div class="card-body class-drap-handle" style="background-color: white">
         <!-- 标题栏 -->

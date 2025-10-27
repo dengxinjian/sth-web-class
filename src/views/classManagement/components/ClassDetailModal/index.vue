@@ -22,6 +22,7 @@ import PowerDetail from "./powerClassDetail.vue";
 import OtherDetail from "./otherClassDetail.vue";
 import NoteDetail from "./noteClassDetail.vue";
 import RestDetail from "./restClassDetail.vue";
+import { athleteApi } from "../../services/classManagement";
 
 export default {
   name: "SportDetailModal",
@@ -59,14 +60,15 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    athleticThreshold: {
-      type: Object,
-      default: () => ({})
-    },
     triUserId: {
       type: String,
       default: "",
     },
+  },
+  data() {
+    return {
+      athleticThreshold: {},
+    };
   },
   computed: {
     // 根据type计算当前应该使用的组件
@@ -81,6 +83,64 @@ export default {
         REST: RestDetail,
       };
       return componentMap[this.type] || RunDetail;
+    },
+  },
+  watch: {
+    visible: {
+      handler(newVal) {
+        if (newVal && this.triUserId) {
+          console.log(newVal, "newVal");
+          this.getAthleticThreshold();
+        }
+      },
+      immediate: false,
+    },
+    value: {
+      handler(newVal) {
+        if (newVal && this.triUserId) {
+          console.log(newVal, "value newVal");
+          this.getAthleticThreshold();
+        }
+      },
+      immediate: false,
+    },
+    // 监听 triUserId 变化，确保有值后再调用
+    triUserId: {
+      handler(newVal) {
+        if (newVal && (this.visible || this.value)) {
+          this.getAthleticThreshold();
+        }
+      },
+      immediate: true,
+    },
+  },
+  methods: {
+    async getAthleticThreshold() {
+      if (!this.triUserId) {
+        console.warn('triUserId is empty, skip getAthleticThreshold');
+        return;
+      }
+      console.log(this.data, "this.data.classesDate");
+      const res = await athleteApi.getUserProfile(this.triUserId,this.data.classesDate);
+      if (res.result && res.result.thresholdRecordList) {
+        res.result.thresholdRecordList.forEach((item) => {
+          switch (item.thresholdType) {
+            case 1:
+              this.athleticThreshold.heartRate = item.threshold;
+              break;
+            case 2:
+              this.athleticThreshold.cycle = item.threshold;
+              break;
+            case 3:
+              this.athleticThreshold.run = item.threshold;
+              break;
+            case 4:
+              this.athleticThreshold.swim = item.threshold;
+              break;
+          }
+        });
+        console.log(this.athleticThreshold, "this.athleticThreshold");
+      }
     },
   },
 };

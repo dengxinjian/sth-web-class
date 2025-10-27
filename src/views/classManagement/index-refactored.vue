@@ -794,7 +794,7 @@ export default {
     /**
      * 课表详情
      */
-    handleClassScheduleDetail(classId, sportType) {
+    handleClassScheduleDetail(classItem, sportType) {
       // this.classSportType = sportType;
       // 从currentWeek中查找课表数据
       // let foundClass = null;
@@ -806,8 +806,9 @@ export default {
       // this.classDetailData = foundClass;
       // this.classSportType = sportType;
       // this.showClassDetailModal = true;
+      console.log(classItem, "classItem");
       this.classSportType = sportType;
-      this.classDetailData = { id: classId };
+      this.classDetailData = classItem;
       this.$nextTick(() => {
         this.showClassDetailModal = true;
       });
