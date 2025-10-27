@@ -93,7 +93,7 @@
         </pre>
 
         <!-- 骑行详情 -->
-        <template v-if="classItem.sportType === 'CYCLE'">
+        <template v-else-if="classItem.sportType === 'CYCLE'">
           <CycleStageDetails :class-data="classItem.classesJson" />
         </template>
 
