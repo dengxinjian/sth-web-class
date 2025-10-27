@@ -1270,7 +1270,7 @@ export default {
         const params = {
           classesId: data.courseData.id,
           classesJson: JSON.stringify(data.courseData.classesJson),
-          classesDate: data.exerciseData.dataDate,
+          classesDate: data.exerciseData[0].dataDate,
           sportType: data.courseData.classesJson.sportType,
         };
         const josnData = await this.AddScheduleClass(params, data.type);
@@ -1282,8 +1282,25 @@ export default {
           })
           .then((res) => {
             if (res.success) {
-              this.$message.success("匹配成功");
-              this.getScheduleData();
+              scheduleApi
+                .bindActivity({
+                  classScheduleId: res.result.id,
+                  bindingActivityId: data.exerciseData[0].id,
+                  classesDate: data.exerciseData[0].dataDate,
+                  triUserId: this.selectedAthletic,
+                })
+                .then((res) => {
+                  if (res.success) {
+                    this.$message.success("匹配成功");
+                    this.getScheduleData();
+                  } else {
+                    this.$message.error(res.message);
+                    this.getScheduleData();
+                  }
+                })
+                .finally(() => {
+                  this.getScheduleData();
+                });
             } else {
               this.$message.error(res.message);
               this.getScheduleData();

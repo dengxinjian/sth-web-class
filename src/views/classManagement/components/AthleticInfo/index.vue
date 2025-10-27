@@ -331,7 +331,10 @@
           <div class="section-title">休息日偏好</div>
 
           <div class="form-row">
-            <el-radio-group v-model="preferenceForm.hasRestDay" @change="handleHasRestDayChange">
+            <el-radio-group
+              v-model="preferenceForm.hasRestDay"
+              @change="handleHasRestDayChange"
+            >
               <el-radio :label="false">无休息日</el-radio>
               <el-radio :label="true">有休息日</el-radio>
             </el-radio-group>
@@ -562,7 +565,9 @@ export default {
 
         // 检查当前选中的阈值类型是否可用
         this.$nextTick(() => {
-          const availableTypes = this.getAvailableThresholdTypes(this.lastMatchType);
+          const availableTypes = this.getAvailableThresholdTypes(
+            this.lastMatchType
+          );
           if (!availableTypes.includes(this.activeSport)) {
             this.activeSport = 1;
           }
@@ -836,32 +841,51 @@ export default {
         }
         return;
       }
-      this.loading = true;
-      const params = {
-        thresholdType: this.activeSport,
-        param1: "",
-        param2: "",
-        threshold: "",
-        triUserId: this.triUserId,
-      };
-      if (this.activeSport === 4 || this.activeSport === 3) {
-        params.threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue);
-      } else if (this.activeSport === 2) {
-        params.threshold = this.thresholdData.threshold;
-      } else if (this.activeSport === 1) {
-        params.param1 = this.thresholdData.param1;
-        params.param2 = this.thresholdData.param2;
-      }
-      submitData({
-        url: "/api/classSchedule/updateThreshold",
-        requestData: params,
-      }).then((res) => {
-        if (res.success) {
-          this.$message.success("阈值保存成功");
-          this.$emit("save", res.result);
-          this.loading = false;
+      this.$confirm(
+        "阈值更新将会影响运动员的相关设置及训练计划, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
-      });
+      )
+        .then(() => {
+          this.loading = true;
+          const params = {
+            thresholdType: this.activeSport,
+            param1: "",
+            param2: "",
+            threshold: "",
+            triUserId: this.triUserId,
+          };
+          if (this.activeSport === 4 || this.activeSport === 3) {
+            params.threshold = mmssToSeconds(
+              this.thresholdData.thresholdTimeValue
+            );
+          } else if (this.activeSport === 2) {
+            params.threshold = this.thresholdData.threshold;
+          } else if (this.activeSport === 1) {
+            params.param1 = this.thresholdData.param1;
+            params.param2 = this.thresholdData.param2;
+          }
+          submitData({
+            url: "/api/classSchedule/updateThreshold",
+            requestData: params,
+          }).then((res) => {
+            if (res.success) {
+              this.$message.success("阈值保存成功");
+              this.$emit("save", res.result);
+              this.loading = false;
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消更新",
+          });
+        });
     },
     noopRequest() {},
     onAvatarChange(file) {
