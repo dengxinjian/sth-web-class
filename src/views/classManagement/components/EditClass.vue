@@ -259,7 +259,7 @@ import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import CycleStageDetails from "./CycleStageDetails.vue";
 import RunStageDetails from "./RunStageDetails.vue";
 import { SPORT_TYPE_ICONS } from "../constants";
-import { submitData } from "@/api/common.js";
+import { submitData, getData } from "@/api/common.js";
 import AddClassModal from "./AddClass/index.vue";
 import { classApi } from "../services/classManagement.js";
 export default {
@@ -299,9 +299,6 @@ export default {
   watch: {
     visible(val) {
       this.innerVisible = val;
-      if (val && this.classItem) {
-        this.classData = JSON.parse(JSON.stringify(this.classItem));
-      }
     },
     innerVisible(val) {
       // 对话框完全关闭后重置数据
@@ -318,10 +315,26 @@ export default {
             calories: "",
           };
         });
+      } else {
+        this.getClassInfo(this.classItem.id);
       }
     },
   },
   methods: {
+    getClassInfo(id) {
+      getData({
+        url: "/api/classes/getClassesById",
+        id,
+      }).then((res) => {
+        if (res.success) {
+          const classData = JSON.parse(res.result.classesJson);
+          this.classData = {
+            ...res.result,
+            classesJson: classData,
+          };
+        }
+      });
+    },
     isRestType(sportType) {
       return ["REST", "REMARK"].includes(sportType);
     },
@@ -349,6 +362,7 @@ export default {
     handleAddClassModalClose() {
       // 子对话框关闭时的回调
       this.showAddClassModal = false;
+      this.getClassInfo(this.classItem.id);
     },
     handleClose() {
       console.log("handleClose");

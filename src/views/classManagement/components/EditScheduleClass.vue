@@ -124,10 +124,7 @@
                   <td>运动时长</td>
                   <td></td>
                   <td>
-                    <TimeInput
-                      v-model="actualData.netDuration"
-                      size="small"
-                    />
+                    <TimeInput v-model="actualData.netDuration" size="small" />
                   </td>
                   <td>h:m:s</td>
                 </tr>
@@ -399,7 +396,7 @@ export default {
       if (!val) {
         this.$nextTick(() => {
           this.classData = {
-            classesJson: {}
+            classesJson: {},
           };
           this.actualData = {
             totalDuration: "00:00:00",
@@ -409,17 +406,31 @@ export default {
             calories: "",
           };
         });
-      }
-    },
-    async classItem(val) {
-      console.log(val, "val");
-      this.classData = JSON.parse(JSON.stringify(val));
-      if (this.isActivity) {
-        this.getSportDetail();
+      } else {
+        if (this.isActivity) {
+          this.getSportDetail();
+        } else {
+          this.getClassScheduleInfo(this.classItem.id);
+        }
       }
     },
   },
   methods: {
+    // 编辑进入弹框时，查询课程数据
+    getClassScheduleInfo(id) {
+      getData({
+        url: "/api/classSchedule/getClassScheduleById",
+        id,
+      }).then((res) => {
+        if (res.success) {
+          const classData = JSON.parse(res.result.classesJson);
+          this.classData = {
+            ...res.result,
+            classesJson: classData,
+          };
+        }
+      });
+    },
     isRestType(sportType) {
       return ["REST", "REMARK"].includes(sportType);
     },
@@ -465,6 +476,7 @@ export default {
     handleClassDetailClose() {
       // 子对话框关闭时的回调
       this.showClassDetailModal = false;
+      this.getClassScheduleInfo(this.classItem.id);
     },
     handleClose() {
       console.log("handleClose");
