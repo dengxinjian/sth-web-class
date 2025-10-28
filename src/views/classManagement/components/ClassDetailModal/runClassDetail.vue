@@ -154,7 +154,7 @@
             <el-input
               v-model="classInfo.trainingAdvice"
               type="textarea"
-              :rows="6"
+              :rows="4"
               placeholder="请输入训练建议"
               maxlength="500"
               show-word-limit

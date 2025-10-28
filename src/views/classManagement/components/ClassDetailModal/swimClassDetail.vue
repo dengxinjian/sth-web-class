@@ -86,7 +86,7 @@
             <el-input
               type="textarea"
               v-model="form.trainingAdvice"
-              :rows="8"
+              :rows="4"
               maxlength="2000"
               show-word-limit
               placeholder="请输入训练建议"

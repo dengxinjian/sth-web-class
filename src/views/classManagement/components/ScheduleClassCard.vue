@@ -16,7 +16,7 @@
           $emit('edit', classItem);
           hideContextMenu();
         "
-        @contextmenu.prevent="showContextMenu"
+        @contextmenu.stop.prevent="showContextMenu"
       >
         <div
           class="card-body class-drap-handle"
@@ -157,6 +157,10 @@
           <i class="el-icon-close"></i>
           取消
         </div>
+        <div class="context-menu-item" @click="handleCopy">
+          <i class="el-icon-crop"></i>
+          复制
+        </div>
         <div
           class="context-menu-item"
           @click="
@@ -244,9 +248,12 @@ export default {
       return !distance || distance === "0" ? "--km" : distance;
     },
     showContextMenu(event) {
-      this.contextMenuVisible = true;
-      this.contextMenuX = event.clientX;
-      this.contextMenuY = event.clientY;
+      // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
+      this.$nextTick(() => {
+        this.contextMenuVisible = true;
+        this.contextMenuX = event.clientX;
+        this.contextMenuY = event.clientY;
+      });
     },
     hideContextMenu() {
       this.contextMenuVisible = false;
@@ -254,6 +261,10 @@ export default {
     handleDelete() {
       this.hideContextMenu();
       this.$emit("delete", this.classItem.id);
+    },
+    handleCopy() {
+      this.hideContextMenu();
+      this.$emit("copy", this.classItem);
     },
   },
 };

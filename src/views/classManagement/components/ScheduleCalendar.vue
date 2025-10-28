@@ -93,6 +93,7 @@
             <div
               class="schedule-table-cell-item js-schedule-drag-container"
               :data-date="item.commonDate"
+              @contextmenu.stop.prevent="showContextMenu($event, item.commonDate)"
             >
               <!-- 课表卡片 -->
               <ScheduleClassCard
@@ -100,12 +101,11 @@
                 :key="classItem.id"
                 :class-item="classItem"
                 :date="item.commonDate"
-                @click="
-                  $emit('class-detail', classItem, classItem.sportType)
-                "
+                @click="$emit('class-detail', classItem, classItem.sportType)"
                 @delete="$emit('delete-schedule', $event)"
                 @device-click="handleDeviceClick"
                 @edit="$emit('edit-schedule', $event)"
+                @copy="handleCopyClass"
               />
 
               <!-- 运动记录卡片 -->
@@ -131,6 +131,27 @@
         </div>
       </div>
     </div>
+    <transition name="context-menu-fade">
+      <div
+        v-if="contextMenuVisible"
+        class="context-menu"
+        :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
+        @click.stop
+      >
+        <div class="context-menu-item" @click="hideContextMenu()">
+          <i class="el-icon-close"></i>
+          <span>取消</span>
+        </div>
+        <div
+          v-if="hasCopiedClass"
+          class="context-menu-item"
+          @click="handlePaste"
+        >
+          <i class="el-icon-document-copy"></i>
+          <span>粘贴</span>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -174,13 +195,55 @@ export default {
     return {
       weekList: WEEK_LIST,
       loginType: localStorage.getItem("loginType") || "2",
+      contextMenuVisible: false,
+      contextMenuX: 0,
+      contextMenuY: 0,
+      contextMenuDate: null, // 保存右键点击的日期
+      hasCopiedClass: false, // 是否已复制过课程
+      copiedClass: null, // 保存复制的课程数据
     };
+  },
+  mounted() {
+    document.addEventListener("click", this.hideContextMenu);
+  },
+  beforeDestroy() {
+    document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
     isToday,
     convertToLunar,
     handleDeviceClick(classItem, device) {
-      this.$emit('device-click', classItem, device);
+      this.$emit("device-click", classItem, device);
+    },
+    showContextMenu(event, date) {
+      // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
+      this.$nextTick(() => {
+        this.contextMenuVisible = true;
+        this.contextMenuX = event.clientX;
+        this.contextMenuY = event.clientY;
+        this.contextMenuDate = date;
+      });
+    },
+    hideContextMenu() {
+      this.contextMenuVisible = false;
+      this.contextMenuDate = null;
+      // 不要清除 copiedClass 和 hasCopiedClass，这样复制状态会保留
+    },
+    handlePaste() {
+      this.$emit("paste-class", this.contextMenuDate, this.copiedClass);
+      this.hideContextMenu();
+      // 粘贴完成后清除复制状态
+      this.hasCopiedClass = false;
+      this.copiedClass = null;
+    },
+    handleCopyClass(classItem) {
+      this.copiedClass = { ...classItem };
+      this.hasCopiedClass = true;
+      this.$message({
+        message: '课程已复制，右键点击目标日期可粘贴',
+        type: 'success',
+        duration: 2000
+      });
     },
   },
 };
@@ -315,5 +378,45 @@ export default {
       padding-bottom: 20px;
     }
   }
+}
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  z-index: 99999;
+  padding: 4px 0;
+  min-width: 120px;
+
+  .context-menu-item {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #606266;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+
+    i {
+      font-size: 16px;
+    }
+
+    &:hover {
+      background-color: #f5f7fa;
+      color: #cc2323;
+    }
+  }
+}
+
+.context-menu-fade-enter-active,
+.context-menu-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.context-menu-fade-enter,
+.context-menu-fade-leave-to {
+  opacity: 0;
 }
 </style>
