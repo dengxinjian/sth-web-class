@@ -93,7 +93,9 @@
             <div
               class="schedule-table-cell-item js-schedule-drag-container"
               :data-date="item.commonDate"
-              @contextmenu.stop.prevent="showContextMenu($event, item.commonDate)"
+              @contextmenu.stop.prevent="
+                showContextMenu($event, item.commonDate)
+              "
             >
               <!-- 课表卡片 -->
               <ScheduleClassCard
@@ -114,14 +116,7 @@
                 :key="activityItem.activityId"
                 :activity="activityItem"
                 :date="item.commonDate"
-                @click="
-                  $emit(
-                    'activity-detail',
-                    activityItem.activityId,
-                    activityItem.classScheduleId,
-                    activityItem.sportType
-                  )
-                "
+                @click="$emit('activity-detail', activityItem)"
                 @unbind="$emit('unbind', $event)"
                 @delete="$emit('delete-activity', $event)"
                 @edit="$emit('edit-activity', activityItem)"
@@ -240,9 +235,9 @@ export default {
       this.copiedClass = { ...classItem };
       this.hasCopiedClass = true;
       this.$message({
-        message: '课程已复制，右键点击目标日期可粘贴',
-        type: 'success',
-        duration: 2000
+        message: "课程已复制，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
       });
     },
   },

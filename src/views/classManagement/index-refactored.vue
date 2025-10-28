@@ -172,7 +172,7 @@
       :is-activity="isActivity"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
-      @close="showEditScheduleClass = false"
+      @close="showEditScheduleClass = false; classDetailData = {};"
       @save="handleClassDetailSave"
       @delete="handleDeleteClassSchedule"
     />
@@ -475,7 +475,6 @@ export default {
         end: this.currentWeek[6].commonDate + " 23:59:59",
         triUserId: this.selectedAthletic,
       });
-
       if (res.success && res.result) {
         this.getStatisticData();
         this.currentWeek = this.currentWeek.map((item) => {
@@ -803,14 +802,17 @@ export default {
     /**
      * 运动详情
      */
-    handleSportDetail(activityId, classScheduleId, sportType) {
-      this.sportDetailData = {
-        activityId,
-        id: classScheduleId,
-        sportType,
-      };
+    handleSportDetail(activity) {
+      // this.sportDetailData = {
+      //   activityId,
+      //   id: classScheduleId,
+      //   sportType,
+      // };
       console.log(this.sportDetailData, "this.sportDetailData");
-      this.showSportDetailModal = true;
+      this.classDetailData = activity;
+      // this.showSportDetailModal = true;
+      this.showEditScheduleClass = true;
+      this.isActivity = true;
     },
 
     /**
@@ -1299,7 +1301,7 @@ export default {
       if (flag) {
         this.showClassDetailModal = false;
         this.classSportType = "";
-        // this.classDetailData = { id: "" };
+        this.classDetailData = {};
       }
       this.getScheduleData();
       this.getClassList();

@@ -27,8 +27,9 @@
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
         <span
-          >{{ node.label }} {{ node.userType }}
-          <span v-if="node.data.userType && node.data.userType === 1">（主教练）</span>
+          >{{ node.label }}
+          <span v-if="!node.data.isGroup && node.data.userType === 1">（主教练）</span>
+          <span v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)">（我）</span>
           <span v-if="node.data.isGroup"
             >({{ node.data.membersCount }})</span
           ></span
@@ -441,6 +442,12 @@ export default {
     },
   },
   methods: {
+    // 判断是否为当前用户
+    isCurrentUser(triUserId) {
+      const currentTriUserId = localStorage.getItem('triUserId');
+      return currentTriUserId && triUserId && currentTriUserId === triUserId;
+    },
+
     handleNodeClick(node) {
       console.log(node, "node");
       if (node.triUserId) {
@@ -705,7 +712,7 @@ export default {
     // 删除分组
     handleDeleteGroup(node) {
       MessageBox.confirm(
-        `确定要删除分组"${node.label}"吗？删除后该分组下的所有运动员将移至我的运动员分组。`,
+        `确定要删除分组"${node.label}"吗？删除后该分组下的所有运动员将移至未分类分组。`,
         "删除确认",
         {
           confirmButtonText: "确定删除",
@@ -1012,7 +1019,7 @@ export default {
   }
 }
 .athletic-tree {
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 8px solid #f0f0f0;
 }
 
 // 搜索框样式

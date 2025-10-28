@@ -11,11 +11,13 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <span>{{ classData.classesJson?.title || "课程标题" }}</span>
+          <span>{{
+            classData.classesJson?.title || classData.activityName
+          }}</span>
         </div>
       </div>
 
-      <div class="class-detail-content" v-if="classData.classesJson">
+      <div class="class-detail-content">
         <!-- 顶部关键指标 -->
         <div class="key-metrics">
           <div class="metric-item">
@@ -26,31 +28,41 @@
             />
           </div>
           <div class="metric-item">
-            <div class="metric-value">
-              {{ formatDuration(classData.classesJson.duration) }}
+            <div class="metric-value" v-if="!isActivity">
+              {{ formatDuration(classData.classesJson?.duration) }}
+            </div>
+            <div class="metric-value" v-else>
+              {{ formatDuration(classData.duration) }}
             </div>
           </div>
           <div class="metric-item">
-            <div class="metric-value">
-              {{ formatDistance(classData.classesJson.distance) }}
+            <div class="metric-value" v-if="!isActivity">
+              {{ formatDistance(classData.classesJson?.distance) }}
               <span v-if="classData.sportType === 'SWIM'">
-                {{ classData.classesJson.distanceUnit }}
+                {{ classData.classesJson?.distanceUnit }}
               </span>
             </div>
+            <div class="metric-value" v-else>
+              {{ formatDistance(classData.distance) }}
+              <span v-if="classData.sportType === 'SWIM'">
+                {{ classData.unit }}
+              </span>
+              <span v-else>km</span>
+            </div>
           </div>
           <div class="metric-item">
-            <div class="metric-value">
-              {{ classData.classesJson.sth || "--" }} STH
+            <div class="metric-value" v-if="!isActivity">
+              {{ classData.classesJson?.sth || "--" }} STH
+            </div>
+            <div class="metric-value" v-else>
+              {{ classData.sthValue || "--" }} STH
             </div>
           </div>
           <div class="metric-item">
             <el-button
               type="primary"
               v-if="!isActivity"
-              @click="
-                showClassDetailModal = true;
-                $emit('close');
-              "
+              @click="handleEditClassDetail"
               >编辑课程详情</el-button
             >
           </div>
@@ -59,7 +71,7 @@
         <!-- 训练强度可视化 -->
         <div
           v-if="
-            classData.classesJson.timeline &&
+            classData.classesJson?.timeline &&
             classData.classesJson.timeline.length > 0
           "
           class="intensity-chart"
@@ -99,7 +111,7 @@
               <tbody>
                 <tr>
                   <td>总时长</td>
-                  <td>{{ formatDuration(classData.classesJson.duration) }}</td>
+                  <td>{{ formatDuration(classData.classesJson?.duration) }}</td>
                   <td>
                     <TimeInput
                       v-model="actualData.totalDuration"
@@ -113,7 +125,7 @@
                   <td></td>
                   <td>
                     <TimeInput
-                      v-model="actualData.exerciseDuration"
+                      v-model="actualData.netDuration"
                       size="small"
                     />
                   </td>
@@ -121,7 +133,7 @@
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>运动距离</td>
-                  <td>{{ classData.classesJson.distance || "--" }}</td>
+                  <td>{{ classData.classesJson?.distance || "--" }}</td>
                   <td>
                     <el-input-number
                       v-model="actualData.distance"
@@ -137,7 +149,7 @@
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
-                  <td>{{ classData.classesJson.sth || "--" }}</td>
+                  <td>{{ classData.classesJson?.sth || "--" }}</td>
                   <td>
                     <!-- <el-input
                       v-model="actualData.sth"
@@ -171,7 +183,7 @@
                       :controls="false"
                     />
                   </td>
-                  <td>Cal</td>
+                  <td>Kcal</td>
                 </tr>
               </tbody>
             </table>
@@ -229,7 +241,7 @@
             </div>
           </div>
 
-          <div style="flex: 1">
+          <div style="flex: 1" v-if="classData.classesJson">
             <!-- 概要 -->
             <div class="section">
               <div class="section-header">
@@ -266,7 +278,7 @@
             <div
               class="section"
               v-if="
-                classData.classesJson.timeline &&
+                classData.classesJson?.timeline &&
                 classData.classesJson.timeline.length > 0
               "
             >
@@ -275,12 +287,20 @@
               </div>
               <div class="section-content">
                 <!-- 骑行详情 -->
-                <template v-if="classData.sportType === 'CYCLE'">
+                <template
+                  v-if="
+                    classData.sportType === 'CYCLE' || classData.sportType === 1
+                  "
+                >
                   <CycleStageDetails :class-data="classData.classesJson" />
                 </template>
 
                 <!-- 跑步详情 -->
-                <template v-else-if="classData.sportType === 'RUN'">
+                <template
+                  v-else-if="
+                    classData.sportType === 'RUN' || classData.sportType === 2
+                  "
+                >
                   <RunStageDetails :class-data="classData.classesJson" />
                 </template>
               </div>
@@ -290,7 +310,9 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="deleteClass(classData.id)">删除</el-button>
+        <el-button @click="deleteClass(classData.id)" v-if="!isActivity"
+          >删除</el-button
+        >
         <el-button @click="handleClose">取消</el-button>
         <el-button type="primary" @click="handleSave(false)">保存</el-button>
         <el-button type="danger" @click="handleSave(true)"
@@ -305,7 +327,7 @@
       :athleticThreshold="athleticThreshold"
       :triUserId="triUserId"
       @save="$emit('save', $event)"
-      @cancel="handleClose"
+      @cancel="handleClassDetailClose"
     />
   </div>
 </template>
@@ -319,7 +341,7 @@ import { submitData, getData } from "@/api/common.js";
 import ClassDetailModal from "./ClassDetailModal/index.vue";
 import { scheduleApi } from "../services/classManagement.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-
+import { getClassImageIcon } from "../utils/helpers";
 export default {
   name: "EditClass",
   components: {
@@ -357,7 +379,7 @@ export default {
       classData: {},
       actualData: {
         totalDuration: "00:00:00",
-        exerciseDuration: "00:00:00",
+        netDuration: "00:00:00",
         distance: "",
         sth: "",
         calories: "",
@@ -372,7 +394,24 @@ export default {
     visible(val) {
       this.innerVisible = val;
     },
-    classItem(val) {
+    innerVisible(val) {
+      // 对话框完全关闭后重置数据
+      if (!val) {
+        this.$nextTick(() => {
+          this.classData = {
+            classesJson: {}
+          };
+          this.actualData = {
+            totalDuration: "00:00:00",
+            netDuration: "00:00:00",
+            distance: "",
+            sth: "",
+            calories: "",
+          };
+        });
+      }
+    },
+    async classItem(val) {
       console.log(val, "val");
       this.classData = JSON.parse(JSON.stringify(val));
       if (this.isActivity) {
@@ -409,8 +448,23 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.sportDetail = res.result;
+          this.actualData = {
+            totalDuration: this.classData.duration,
+            netDuration: this.sportDetail.netDuration,
+            distance: this.classData.distance,
+            sth: this.classData.sthValue,
+            calories: this.sportDetail.calories,
+          };
         }
       });
+    },
+    handleEditClassDetail() {
+      // 只打开子对话框，不关闭当前对话框
+      this.showClassDetailModal = true;
+    },
+    handleClassDetailClose() {
+      // 子对话框关闭时的回调
+      this.showClassDetailModal = false;
     },
     handleClose() {
       console.log("handleClose");
@@ -433,7 +487,11 @@ export default {
     },
     getSportIcon(sportType) {
       console.log(sportType, "sportType");
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+      if (!this.isActivity) {
+        return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+      } else {
+        return getClassImageIcon(sportType);
+      }
     },
     formatDuration(duration) {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;

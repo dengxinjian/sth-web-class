@@ -56,6 +56,16 @@ export const scheduleApi = {
     })
   },
 
+  // 获取健康数据
+  getHealthData({ deviceType, date, deviceUserId }) {
+    return getData({
+      url: '/api/health',
+      deviceType,
+      date,
+      deviceUserId
+    })
+  },
+
   // 创建课表
   createSchedule(data) {
     return submitData({

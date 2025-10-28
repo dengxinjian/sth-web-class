@@ -36,8 +36,8 @@
               ? "--km"
               : classInfo.distance
           }}</span>
-          <span v-if="classInfo.sth">
-            {{ classInfo.sth }}
+          <span>
+            {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
           </span>
         </div>
@@ -951,7 +951,7 @@ export default {
     handleDeleteStage(index) {
       this.classInfo.stages.splice(index, 1);
       if (this.classInfo.stages.length <= 1) {
-        this.classInfo.times = 1
+        this.classInfo.times = 1;
       }
       this.calculateTimeline();
     },

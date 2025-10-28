@@ -15,7 +15,7 @@
         :data-id="activity.activityId"
         :data-date="date"
         style="background-color: #fff"
-        @contextmenu.prevent="showContextMenu"
+        @contextmenu.prevent.stop="showContextMenu"
       >
         <div class="body-title" style="background-color: #fff">
           <div class="sport-type-icon">
@@ -39,11 +39,7 @@
                 解除匹配
               </el-button>
 
-              <el-button
-                type="text"
-                v-if="activity.classesJson"
-                @click="$emit('edit', activity)"
-              >
+              <el-button type="text" @click="$emit('edit', activity)">
                 编辑
               </el-button>
               <el-button
@@ -61,12 +57,7 @@
         <div
           class="sport-record-data"
           @click="
-            $emit(
-              'click',
-              activity.activityId,
-              activity.classScheduleId,
-              activity.sportType
-            );
+            $emit('click', activity);
             hideContextMenu();
           "
         >
@@ -99,43 +90,49 @@
             <CycleStageDetails
               v-else-if="activity.sportType === 1"
               :class-data="activity.classesJson"
+              :max-stages="3"
             />
             <RunStageDetails
               v-else-if="activity.sportType === 2"
               :class-data="activity.classesJson"
+              :max-stages="3"
             />
 
-          <!-- 时长、距离、STH -->
-          <div
-            class="keyword"
-            v-if="!isRestType(activity.classesJson.sportType)"
-            style="color: #999;"
-          >
-            {{
-              !activity.classesJson.duration
-                ? '--:--:--'
-                : activity.classesJson.duration
-            }}
-          </div>
-          <div style="display: flex" v-if="activity.classesJson.distance">
-            <div class="keyword" style="color: #999;">
+            <!-- 时长、距离、STH -->
+            <div
+              class="keyword"
+              v-if="!isRestType(activity.classesJson.sportType)"
+              style="color: #999"
+            >
               {{
-                !activity.classesJson.distance
-                  ? '--km'
-                  : activity.classesJson.distance
+                !activity.classesJson.duration
+                  ? "--:--:--"
+                  : activity.classesJson.duration
               }}
-              <span v-if="activity.sportType === 3">
-                {{ activity.classesJson.distanceUnit }}
-              </span>
             </div>
-          </div>
-          <div
-            style="display: flex; gap: 4px;"
-            v-if="!isRestType(activity.classesJson.sportType)"
-          >
-            <div class="keyword" style="color: #999;">{{ activity.classesJson.sth ? activity.classesJson.sth : '--' }}</div>
-            <div><img class="sth" src="~@/assets/addClass/sth.png" alt="" /></div>
-          </div>
+            <div style="display: flex" v-if="activity.classesJson.distance">
+              <div class="keyword" style="color: #999">
+                {{
+                  !activity.classesJson.distance
+                    ? "--km"
+                    : activity.classesJson.distance
+                }}
+                <span v-if="activity.sportType === 3">
+                  {{ activity.classesJson.distanceUnit }}
+                </span>
+              </div>
+            </div>
+            <div
+              style="display: flex; gap: 4px"
+              v-if="!isRestType(activity.classesJson.sportType)"
+            >
+              <div class="keyword" style="color: #999">
+                {{ activity.classesJson.sth ? activity.classesJson.sth : "--" }}
+              </div>
+              <div>
+                <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+              </div>
+            </div>
 
             <!-- 训练强度可视化 -->
             <div
@@ -172,6 +169,10 @@
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
       >
+        <div class="context-menu-item" @click="hideContextMenu">
+          <i class="el-icon-close"></i>
+          取消
+        </div>
         <div
           v-if="activity.classesJson"
           class="context-menu-item"
@@ -345,6 +346,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  .el-button {
+    margin-left: 0;
+  }
 }
 
 .time-stage {

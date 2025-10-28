@@ -36,8 +36,8 @@
               ? "--km"
               : classInfo.distance + "km"
           }}</span>
-          <span v-if="classInfo.sth">
-            {{ classInfo.sth }}
+          <span>
+            {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
           </span>
         </div>

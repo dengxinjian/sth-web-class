@@ -80,6 +80,7 @@
                 <span v-if="courseData.distanceUnit">{{
                   courseData.distanceUnit
                 }}</span>
+                <span v-else>km</span>
               </div>
             </div>
           </div>
@@ -116,6 +117,13 @@
                     ? "--:--:--"
                     : exerciseData[0].duration
                 }}
+              </div>
+              <div class="card-distance">
+                {{ exerciseData[0].distance == 0 ? "--" : exerciseData[0].distance }}
+                <span v-if="exerciseData[0].distanceUnit">{{
+                  exerciseData[0].distanceUnit
+                }}</span>
+                <span v-else>km</span>
               </div>
               <div class="card-sth">
                 {{ exerciseData[0].sth == 0 ? "--" : exerciseData[0].sth }} STH

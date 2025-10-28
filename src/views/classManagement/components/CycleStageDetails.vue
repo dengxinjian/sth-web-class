@@ -1,7 +1,7 @@
 <template>
   <div class="stage-details">
     <div
-      v-for="(stage, index) in classData.stages"
+      v-for="(stage, index) in displayStages"
       :key="index"
       class="stage-item"
     >
@@ -104,6 +104,7 @@
       </div>
       <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
     </div>
+    <div v-if="hasMoreStages" class="stage-ellipsis">...</div>
   </div>
 </template>
 
@@ -114,8 +115,27 @@ export default {
     classData: {
       type: Object,
       required: true
-    }
-  }
+    },
+    maxStages: {
+      type: Number,
+      default: null, // null 表示显示全部
+    },
+  },
+  computed: {
+    displayStages() {
+      if (!this.classData.stages) return [];
+      if (this.maxStages === null || this.maxStages <= 0) {
+        return this.classData.stages;
+      }
+      return this.classData.stages.slice(0, this.maxStages);
+    },
+    hasMoreStages() {
+      if (!this.classData.stages || this.maxStages === null || this.maxStages <= 0) {
+        return false;
+      }
+      return this.classData.stages.length > this.maxStages;
+    },
+  },
 }
 </script>
 
@@ -134,6 +154,13 @@ export default {
     &:last-child {
       border-bottom: none;
     }
+  }
+
+  .stage-ellipsis {
+    text-align: center;
+    color: #999;
+    padding: 5px 0;
+    letter-spacing: 2px;
   }
 }
 </style>

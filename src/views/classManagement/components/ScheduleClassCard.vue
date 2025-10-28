@@ -53,6 +53,9 @@
                 <el-button type="text" @click.stop="$emit('edit', classItem)">
                   编辑
                 </el-button>
+                <el-button type="text" @click.stop="$emit('copy', classItem)">
+                  复制
+                </el-button>
                 <el-button
                   type="text"
                   @click.stop="$emit('delete', classItem.id)"
@@ -102,21 +105,37 @@
               <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
             </div>
           </div>
-
-          <!-- 概要 -->
-          <pre v-if="classItem.classesJson.summary" class="stage-details">
+          <template
+            v-if="
+              classItem.classesJson.summary ||
+              classItem.classesJson.trainingAdvice
+            "
+          >
+            <!-- 概要 -->
+            <pre v-if="classItem.classesJson.summary" class="stage-details">
           {{ truncateByLines(classItem.classesJson.summary) }}
         </pre
-          >
+            >
+            <!-- 训练建议 -->
+            <pre class="stage-details">
+  {{ truncateByLines(classItem.classesJson.trainingAdvice) }}</pre
+            >
+          </template>
 
           <!-- 骑行详情 -->
           <template v-else-if="classItem.sportType === 'CYCLE'">
-            <CycleStageDetails :class-data="classItem.classesJson" />
+            <CycleStageDetails
+              :class-data="classItem.classesJson"
+              :max-stages="3"
+            />
           </template>
 
           <!-- 跑步详情 -->
           <template v-else-if="classItem.sportType === 'RUN'">
-            <RunStageDetails :class-data="classItem.classesJson" />
+            <RunStageDetails
+              :class-data="classItem.classesJson"
+              :max-stages="3"
+            />
           </template>
 
           <!-- 训练强度可视化 -->

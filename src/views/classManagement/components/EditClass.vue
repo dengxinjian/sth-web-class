@@ -13,7 +13,6 @@
         <div class="header-title">
           <span>{{ classData.classesJson?.title || "课程标题" }}</span>
         </div>
-        >
       </div>
 
       <div class="class-detail-content" v-if="classData.classesJson">
@@ -28,34 +27,31 @@
           </div>
           <div class="metric-item">
             <div class="metric-value">
-              {{ formatDuration(classData.classesJson.duration) }}
+              {{ formatDuration(classData.classesJson?.duration) }}
             </div>
           </div>
           <div class="metric-item">
             <div class="metric-value">
               {{
-                !classData.classesJson.distance
+                !classData.classesJson?.distance
                   ? "--"
                   : classData.classesJson.distance
               }}
               <span v-if="classData.sportType === 'SWIM'">
-                {{ classData.classesJson.distanceUnit }}
+                {{ classData.classesJson?.distanceUnit }}
               </span>
               <span v-else>km</span>
             </div>
           </div>
           <div class="metric-item">
             <div class="metric-value">
-              {{ classData.classesJson.sth || "--" }} STH
+              {{ classData.classesJson?.sth || "--" }} STH
             </div>
           </div>
           <div class="metric-item">
             <el-button
               type="primary"
-              @click="
-                showAddClassModal = true;
-                $emit('close');
-              "
+              @click="handleEditClassDetail"
               >编辑课程详情</el-button
             >
           </div>
@@ -64,7 +60,7 @@
         <!-- 训练强度可视化 -->
         <div
           v-if="
-            classData.classesJson.timeline &&
+            classData.classesJson?.timeline &&
             classData.classesJson.timeline.length > 0
           "
           class="intensity-chart"
@@ -106,7 +102,7 @@
               <tbody>
                 <tr>
                   <td>总时长</td>
-                  <td>{{ formatDuration(classData.classesJson.duration) }}</td>
+                  <td>{{ formatDuration(classData.classesJson?.duration) }}</td>
                   <td>
                     <el-input
                       v-model="actualData.totalDuration"
@@ -132,7 +128,7 @@
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>运动距离</td>
-                  <td>{{ classData.classesJson.distance || "--" }}</td>
+                  <td>{{ classData.classesJson?.distance || "--" }}</td>
                   <td>
                     <el-input
                       v-model="actualData.distance"
@@ -145,7 +141,7 @@
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
-                  <td>{{ classData.classesJson.sth || "--" }}</td>
+                  <td>{{ classData.classesJson?.sth || "--" }}</td>
                   <td>
                     <el-input
                       v-model="actualData.sth"
@@ -167,7 +163,7 @@
                       :disabled="true"
                     ></el-input>
                   </td>
-                  <td>Cal</td>
+                  <td>Kcal</td>
                 </tr>
               </tbody>
             </table>
@@ -213,7 +209,7 @@
             <div
               class="section"
               v-if="
-                classData.classesJson.timeline &&
+                classData.classesJson?.timeline &&
                 classData.classesJson.timeline.length > 0
               "
             >
@@ -252,7 +248,7 @@
       :originalType="originalType"
       :data="classData"
       @save="$emit('save', $event)"
-      @cancel="handleClose"
+      @cancel="handleAddClassModalClose"
       @delete="deleteClass(classData.id)"
     />
   </div>
@@ -307,6 +303,23 @@ export default {
         this.classData = JSON.parse(JSON.stringify(this.classItem));
       }
     },
+    innerVisible(val) {
+      // 对话框完全关闭后重置数据
+      if (!val) {
+        this.$nextTick(() => {
+          this.classData = {
+            classesJson: {}
+          };
+          this.actualData = {
+            totalDuration: "",
+            exerciseDuration: "",
+            distance: "",
+            sth: "",
+            calories: "",
+          };
+        });
+      }
+    },
   },
   methods: {
     isRestType(sportType) {
@@ -328,6 +341,14 @@ export default {
           this.$emit("delete", id);
         }
       });
+    },
+    handleEditClassDetail() {
+      // 只打开子对话框，不关闭当前对话框
+      this.showAddClassModal = true;
+    },
+    handleAddClassModalClose() {
+      // 子对话框关闭时的回调
+      this.showAddClassModal = false;
     },
     handleClose() {
       console.log("handleClose");
