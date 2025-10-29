@@ -570,8 +570,8 @@ export default {
     /**
      * 获取运动员阈值
      */
-    async getAthleticThreshold(id) {
-      const res = await athleteApi.getUserProfile(id);
+    async getAthleticThreshold(id, date) {
+      const res = await athleteApi.getUserProfile(id, date);
       res.result.thresholdRecordList.forEach((item) => {
         switch (item.thresholdType) {
           case 1:
@@ -1071,8 +1071,10 @@ export default {
      */
     async AddScheduleClass(data, type = "", index = 0) {
       if (!this.selectedAthletic) return;
-
+      console.log(this.athleticThreshold, "old athleticThreshold");
       const originalClassesJson = parseClassesJson(data.classesJson);
+      await this.getAthleticThreshold(this.selectedAthletic, data.classesDate);
+      console.log(this.athleticThreshold, "new athleticThreshold");
 
       // 根据运动类型计算阈值
       if (data.sportType === "RUN") {
