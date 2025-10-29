@@ -113,10 +113,7 @@
                   <td>总时长</td>
                   <td>{{ formatDuration(classData.classesJson?.duration) }}</td>
                   <td>
-                    <TimeInput
-                      v-model="actualData.totalDuration"
-                      size="small"
-                    />
+                    <TimeInput v-model="actualData.duration" size="small" />
                   </td>
                   <td>h:m:s</td>
                 </tr>
@@ -155,7 +152,7 @@
                       :disabled="true"
                     ></el-input> -->
                     <el-input-number
-                      v-model="actualData.sth"
+                      v-model="actualData.sthValue"
                       size="small"
                       placeholder=""
                       :step="1"
@@ -375,10 +372,10 @@ export default {
       innerVisible: this.visible || false,
       classData: {},
       actualData: {
-        totalDuration: "00:00:00",
+        duration: "00:00:00",
         netDuration: "00:00:00",
         distance: "",
-        sth: "",
+        sthValue: "",
         calories: "",
       },
       showClassDetailModal: false,
@@ -399,15 +396,16 @@ export default {
             classesJson: {},
           };
           this.actualData = {
-            totalDuration: "00:00:00",
+            duration: "00:00:00",
             netDuration: "00:00:00",
             distance: "",
-            sth: "",
+            sthValue: "",
             calories: "",
           };
         });
       } else {
         if (this.isActivity) {
+          this.classData = this.classItem;
           this.getSportDetail();
         } else {
           this.getClassScheduleInfo(this.classItem.id);
@@ -451,6 +449,18 @@ export default {
         }
       });
     },
+    // s转换成hh:mm:ss
+    translateSecondsToFormat(seconds) {
+      // 计算小时、分钟和剩余秒数
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+
+      // 格式化各部分为两位数
+      const pad = (num) => num.toString().padStart(2, "0");
+
+      return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+    },
     // 查询运动详情
     getSportDetail() {
       getData({
@@ -460,10 +470,10 @@ export default {
         if (res.success) {
           this.sportDetail = res.result;
           this.actualData = {
-            totalDuration: this.classData.duration,
-            netDuration: this.sportDetail.netDuration,
+            duration: this.classData.duration,
+            netDuration: this.translateSecondsToFormat(this.sportDetail.netDuration),
             distance: this.classData.distance,
-            sth: this.classData.sthValue,
+            sthValue: this.classData.sthValue,
             calories: this.sportDetail.calories,
           };
         }

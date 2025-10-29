@@ -480,6 +480,7 @@ export default {
         this.currentWeek = this.currentWeek.map((item) => {
           let activityList = [];
           let classSchedule = [];
+          let healthInfos = [];
 
           res.result.forEach((part) => {
             if (item.commonDate === part.dataDate) {
@@ -500,6 +501,10 @@ export default {
                   classesJson: parseClassesJson(i.classesJson),
                 }))
                 .filter((i) => !i.bindingActivityId);
+
+              // 处理健康数据
+              console.log(part.healthInfos, "part.healthInfos");
+              healthInfos = part.healthInfos || [];
             }
           });
 
@@ -507,9 +512,11 @@ export default {
             ...item,
             activityList,
             classSchedule,
+            healthInfos,
             timesp: new Date().getTime(),
           };
         });
+        console.log(this.currentWeek, "this.currentWeek");
 
         // 初始化拖拽
         this.initAllDrag();

@@ -97,6 +97,14 @@
                 showContextMenu($event, item.commonDate)
               "
             >
+              <!-- 健康数据 -->
+              <HealthDataCard
+                v-for="(healthDataItem, index) in item.healthInfos"
+                :key="healthDataItem.date || index"
+                :health-data="healthDataItem"
+                :date="item.commonDate"
+                @click="$emit('view-health-data', $event)"
+              />
               <!-- 课表卡片 -->
               <ScheduleClassCard
                 v-for="classItem in item.classSchedule"
@@ -154,6 +162,7 @@
 import WeekRangePicker from "@/components/WeekRangePicker";
 import ScheduleClassCard from "./ScheduleClassCard.vue";
 import ActivityCard from "./ActivityCard.vue";
+import HealthDataCard from "./HealthDataCard.vue";
 import { WEEK_LIST } from "../constants";
 import { isToday, convertToLunar } from "../utils/helpers";
 
@@ -163,6 +172,7 @@ export default {
     WeekRangePicker,
     ScheduleClassCard,
     ActivityCard,
+    HealthDataCard,
   },
   props: {
     currentWeek: {
