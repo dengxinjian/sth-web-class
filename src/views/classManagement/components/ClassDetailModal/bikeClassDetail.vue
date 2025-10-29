@@ -73,7 +73,11 @@
       <div class="basic-info-item">
         <div>
           <span>模式选择：</span>
-          <el-select v-model="classInfo.mode" class="pill-select short">
+          <el-select
+            v-model="classInfo.mode"
+            @change="handleModeChange"
+            class="pill-select short"
+          >
             <el-option label="跟随阈值功率" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
             <el-option label="固定功率" :value="3" />
@@ -334,7 +338,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围" value="range" />
@@ -594,7 +598,7 @@
                   <span class="unit"
                     >bpm &nbsp; &nbsp;
                     {{
-                      calculateTargetHeartRateNumZone(part.targetHeartRate || 0 )
+                      calculateTargetHeartRateNumZone(part.targetHeartRate || 0)
                     }}</span
                   >
                 </div>
@@ -923,6 +927,17 @@ export default {
         }
       });
     },
+    // 模式变更时重新计算时间
+    handleModeChange() {
+      if (this.classInfo.mode === 3) {
+        this.classInfo.stages.forEach((stage, index) => {
+          stage.sections.forEach((section, idx) => {
+            this.handleTargetChange(index, idx);
+          });
+        });
+      }
+      this.calculateTimeline();
+    },
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({
@@ -1076,7 +1091,7 @@ export default {
     handleDeleteStage(index) {
       this.classInfo.stages.splice(index, 1);
       if (this.classInfo.stages.length <= 1) {
-        this.classInfo.times = 1
+        this.classInfo.times = 1;
       }
       this.calculateTimeline();
     },
@@ -1225,6 +1240,8 @@ export default {
       } else if (!Number.isInteger(timesNum)) {
         return;
       }
+      console.log("calculateTimeline");
+
       this.updateClassInfoCalculatedValues(); // 更新计算值
       this.getSth();
       let duration = 0;

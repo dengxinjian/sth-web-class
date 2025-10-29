@@ -388,7 +388,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline"
+                    @change="calculateTimeline()"
                   >
                     <el-option label="目标值" value="target" />
                     <el-option label="范围" value="range" />
