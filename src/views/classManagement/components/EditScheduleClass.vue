@@ -121,7 +121,10 @@
                   <td>运动时长</td>
                   <td></td>
                   <td>
-                    <TimeInput v-model="actualData.netDuration" size="small" />
+                    <TimeInput
+                      v-model="actualData.activityDuration"
+                      size="small"
+                    />
                   </td>
                   <td>h:m:s</td>
                 </tr>
@@ -182,7 +185,7 @@
               </tbody>
             </table>
             <!-- 运动参数部分 -->
-            <div class="edit-section" v-if="isActivity">
+            <div class="edit-section" v-if="isActivity && classData.activityId">
               <div class="section-header">
                 <span class="section-title">同步参数</span>
               </div>
@@ -336,6 +339,7 @@ import ClassDetailModal from "./ClassDetailModal/index.vue";
 import { scheduleApi } from "../services/classManagement.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
 import { getClassImageIcon } from "../utils/helpers";
+import { hhmmssToSeconds } from "@/utils/index";
 export default {
   name: "EditClass",
   components: {
@@ -373,10 +377,10 @@ export default {
       classData: {},
       actualData: {
         duration: "00:00:00",
-        netDuration: "00:00:00",
-        distance: "",
-        sthValue: "",
-        calories: "",
+        activityDuration: "00:00:00",
+        distance: 0,
+        sthValue: 0,
+        calories: 0,
       },
       showClassDetailModal: false,
       type: "edit",
@@ -397,16 +401,18 @@ export default {
           };
           this.actualData = {
             duration: "00:00:00",
-            netDuration: "00:00:00",
-            distance: "",
-            sthValue: "",
-            calories: "",
+            activityDuration: "00:00:00",
+            distance: 0,
+            sthValue: 0,
+            calories: 0,
           };
         });
       } else {
         if (this.isActivity) {
           this.classData = this.classItem;
-          this.getSportDetail();
+          if (this.classData.activityId) {
+            this.getSportDetail();
+          }
         } else {
           this.getClassScheduleInfo(this.classItem.id);
         }
@@ -471,7 +477,9 @@ export default {
           this.sportDetail = res.result;
           this.actualData = {
             duration: this.classData.duration,
-            netDuration: this.translateSecondsToFormat(this.sportDetail.netDuration),
+            activityDuration: this.translateSecondsToFormat(
+              this.sportDetail.netDuration
+            ),
             distance: this.classData.distance,
             sthValue: this.classData.sthValue,
             calories: this.sportDetail.calories,
@@ -493,12 +501,46 @@ export default {
       this.showClassDetailModal = false;
       this.$emit("close");
     },
+    // 判断actualData是否被修改过（不是默认值）
+    isActualDataModified() {
+      const defaultData = {
+        duration: "00:00:00",
+        activityDuration: "00:00:00",
+        distance: 0,
+        sthValue: 0,
+        calories: 0,
+      };
+
+      // 判断是否有任何字段不等于默认值
+      return (
+        this.actualData.duration !== defaultData.duration ||
+        this.actualData.activityDuration !== defaultData.activityDuration ||
+        (this.actualData.distance !== defaultData.distance &&
+          this.actualData.distance !== null &&
+          this.actualData.distance !== undefined) ||
+        (this.actualData.sthValue !== defaultData.sthValue &&
+          this.actualData.sthValue !== null &&
+          this.actualData.sthValue !== undefined) ||
+        (this.actualData.calories !== defaultData.calories &&
+          this.actualData.calories !== null &&
+          this.actualData.calories !== undefined)
+      );
+    },
     handleSave(flag) {
       console.log(this.classData, "classData");
+      // 判断actualData是否被修改过，决定flag的值
+      const isModified = this.isActualDataModified();
       submitData({
         url: "/api/classSchedule/updateClassSchedule",
         id: this.classData.id,
         classesJson: JSON.stringify(this.classData.classesJson),
+        activityDuration:
+          hhmmssToSeconds(this.actualData.activityDuration) || null,
+        duration: hhmmssToSeconds(this.actualData.duration) || null,
+        distance: this.actualData.distance || null,
+        sthValue: this.actualData.sthValue || null,
+        calories: this.actualData.calories || null,
+        flag: isModified, // 如果修改过为true，否则为false
       }).then((res) => {
         if (res.success) {
           this.$message.success("课程保存成功");

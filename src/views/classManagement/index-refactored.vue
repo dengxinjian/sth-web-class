@@ -172,7 +172,10 @@
       :is-activity="isActivity"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
-      @close="showEditScheduleClass = false; classDetailData = {};"
+      @close="
+        showEditScheduleClass = false;
+        classDetailData = {};
+      "
       @save="handleClassDetailSave"
       @delete="handleDeleteClassSchedule"
     />
@@ -492,15 +495,28 @@ export default {
                   : "",
                 completion: i.classesJson ? getCompletionStatus(i.percent) : "",
                 distance: Math.round(i.distance / 100) / 10,
-              }));
+              })).filter((i) => !i.bindingManualActivityId);
 
+              // 处理虚拟运动记录
+              part.manualDeviceActivityVoList.forEach((i) => {
+                if (!i.activityId) {
+                  activityList.push({
+                    ...i,
+                    classesJson: i.classesJson
+                      ? parseClassesJson(i.classesJson)
+                      : "",
+                  });
+                }
+              });
               // 处理课表
               classSchedule = (part.classScheduleVoList || [])
                 .map((i) => ({
                   ...i,
                   classesJson: parseClassesJson(i.classesJson),
                 }))
-                .filter((i) => !i.bindingActivityId);
+                .filter(
+                  (i) => !i.bindingActivityId && !i.bindingManualActivityId
+                );
 
               // 处理健康数据
               console.log(part.healthInfos, "part.healthInfos");
