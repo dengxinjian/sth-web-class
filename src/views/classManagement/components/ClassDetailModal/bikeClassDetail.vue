@@ -1156,6 +1156,9 @@ export default {
     handleRemoveSection(index, sectionIndex) {
       if (this.classInfo.stages[index].sections.length > 1) {
         this.classInfo.stages[index].sections.splice(sectionIndex, 1);
+        if (this.classInfo.stages[index].sections.length === 1) {
+          this.classInfo.stages[index].times = 1;
+        }
       } else {
         this.classInfo.stages.splice(index, 1);
       }
