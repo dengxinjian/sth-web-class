@@ -85,12 +85,10 @@ export default {
                 _this.getScheduleData()
                 return
               }
-              if (!e.item.dataset.id || !e.to.dataset.id) {
-                return
-              }
               _this.handleMatchClass({
                 classId: e.item.dataset.id,
-                activityId: e.to.dataset.id,
+                activityId: e.to.dataset.activityid,
+                manualActivityId: e.to.dataset.manualactivityid,
                 type: e.item.dataset.type
               })
             }

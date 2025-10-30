@@ -3,7 +3,8 @@
     <div
       class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
       :style="{ backgroundColor: bgColor }"
-      :data-id="activity.activityId"
+      :data-activityId="activity.activityId"
+      :data-manualActivityId="activity.manualActivityId"
       :data-date="date"
     >
       <div
@@ -12,7 +13,8 @@
           'sport-drap-handle',
           activity.classScheduleId ? 'js-sport-card-noDrag' : '',
         ]"
-        :data-id="activity.activityId"
+        :data-activityId="activity.activityId"
+        :data-manualActivityId="activity.manualActivityId"
         :data-date="date"
         style="background-color: #fff"
         @contextmenu.prevent.stop="showContextMenu"
@@ -45,7 +47,7 @@
               <el-button
                 v-if="!activity.classesJson"
                 type="text"
-                @click="$emit('delete', activity.activityId)"
+                @click="$emit('delete', activity)"
               >
                 删除
               </el-button>
@@ -61,17 +63,19 @@
             hideContextMenu();
           "
         >
-          <div class="title">
+          <div class="title" v-if="activity.classesJson.title || activity.activityName">
             {{
               activity.classesJson
                 ? activity.classesJson.title
                 : activity.activityName
             }}
           </div>
+          <div class="title" v-else> {{ getSportTypeName(activity.sportType) }}_手动录入</div>
           <div class="keyword">{{ activity.duration }}</div>
           <div style="display: flex">
-            <div class="keyword">{{ activity.distance }}</div>
-            <div>km</div>
+            <div class="keyword">
+              {{ formatDistance(activity.distance) }}
+            </div>
           </div>
           <div style="display: flex; gap: 4px">
             <div class="keyword">
@@ -208,7 +212,7 @@
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import CycleStageDetails from "./CycleStageDetails.vue";
 import RunStageDetails from "./RunStageDetails.vue";
-import { getSportBackgroundColor, getClassImageIcon } from "../utils/helpers";
+import { getSportBackgroundColor, getClassImageIcon, getSportTypeName } from "../utils/helpers";
 
 export default {
   name: "ActivityCard",
@@ -246,8 +250,14 @@ export default {
     document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
+    formatDistance(distance) {
+      return !distance || distance === "0" ? "--km" : distance + "km";
+    },
     getSportIcon(sportType) {
       return getClassImageIcon(sportType);
+    },
+    getSportTypeName(sportType) {
+      return getSportTypeName(sportType);
     },
     isRestType(sportType) {
       return ["REST", "REMARK", "OTHER"].includes(sportType);
@@ -266,7 +276,7 @@ export default {
     },
     handleDelete() {
       this.hideContextMenu();
-      this.$emit("delete", this.activity.activityId);
+      this.$emit("delete", this.activity);
     },
   },
 };

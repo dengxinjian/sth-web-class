@@ -2,7 +2,7 @@
  * 辅助工具函数
  */
 
-import { SPORT_TYPE_ICONS, COMPLETION_COLORS } from "../constants";
+import { SPORT_TYPE_ICONS, COMPLETION_COLORS, SPORT_TYPE_NAMES } from "../constants";
 import { getLunar } from "chinese-lunar-calendar";
 
 /**
@@ -29,6 +29,25 @@ export function getClassImageIcon(sportType) {
   };
   const type = typeof sportType === "number" ? typeMap[sportType] : sportType;
   return SPORT_TYPE_ICONS[type] || SPORT_TYPE_ICONS.OTHER;
+}
+
+/**
+ * 根据运动类型获取运动类型名称
+ * @param {Number|String} sportType 运动类型
+ * @returns {String} 运动类型名称
+ */
+export function getSportTypeName(sportType) {
+  const typeMap = {
+    1: "CYCLE",
+    2: "RUN",
+    3: "SWIM",
+    4: "STRENGTH",
+    5: "OTHER",
+  };
+  const type = typeof sportType === "number" ? typeMap[sportType] : sportType;
+  console.log(type, "type");
+  console.log(SPORT_TYPE_NAMES[type], "SPORT_TYPE_NAMES[type]");
+  return SPORT_TYPE_NAMES[type] || SPORT_TYPE_NAMES.OTHER;
 }
 
 /**
@@ -222,6 +241,5 @@ export function convertToLunar(date) {
     new Date(date).getMonth() + 1,
     new Date(date).getDate()
   );
-  console.log(lunarDate, "lunarDate");
   return lunarDate;
 }

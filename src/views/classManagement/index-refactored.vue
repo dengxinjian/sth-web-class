@@ -488,17 +488,22 @@ export default {
           res.result.forEach((part) => {
             if (item.commonDate === part.dataDate) {
               // 处理运动记录
-              activityList = (part.activityOverviewList || []).map((i) => ({
-                ...i,
-                classesJson: i.classesJson
-                  ? parseClassesJson(i.classesJson)
-                  : "",
-                completion: i.classesJson ? getCompletionStatus(i.percent) : "",
-                distance: Math.round(i.distance / 100) / 10,
-              })).filter((i) => !i.bindingManualActivityId);
+              activityList = (part.activityOverviewList || [])
+                .map((i) => ({
+                  ...i,
+                  classesJson: i.classesJson
+                    ? parseClassesJson(i.classesJson)
+                    : "",
+                  completion: i.classesJson
+                    ? getCompletionStatus(i.percent)
+                    : "",
+                  distance: Math.round(i.distance / 100) / 10,
+                }))
+                .filter((i) => !i.bindingManualActivityId);
 
               // 处理虚拟运动记录
               part.manualDeviceActivityVoList.forEach((i) => {
+                console.log(i, "i");
                 if (!i.activityId) {
                   activityList.push({
                     ...i,
@@ -506,8 +511,22 @@ export default {
                       ? parseClassesJson(i.classesJson)
                       : "",
                   });
+                  console.log(activityList, "activityList");
+                } else {
+                  activityList.forEach((item, index) => {
+                    if (item.manualActivityId === i.manualActivityId) {
+                      activityList[index] = {
+                        ...i,
+                        activityName: item.activityName,
+                        classesJson: i.classesJson
+                          ? parseClassesJson(i.classesJson)
+                          : "",
+                      };
+                    }
+                  });
                 }
               });
+              console.log(activityList, "activityList");
               // 处理课表
               classSchedule = (part.classScheduleVoList || [])
                 .map((i) => ({
@@ -520,7 +539,8 @@ export default {
 
               // 处理健康数据
               console.log(part.healthInfos, "part.healthInfos");
-              healthInfos = part.healthInfos || [];
+              // healthInfos = part.healthInfos || [];
+              healthInfos = [];
             }
           });
 
@@ -858,13 +878,17 @@ export default {
     /**
      * 删除运动
      */
-    handleDeleteActivity(activityId) {
+    handleDeleteActivity(activity) {
       this.$confirm("确认删除该运动？", "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await scheduleApi.deleteActivity(activityId);
+        const type = activity.manualActivityId ? 2 : 1;
+        const activityId = activity.manualActivityId
+          ? activity.manualActivityId
+          : activity.id;
+        const res = await scheduleApi.deleteActivity(activityId, type);
         if (res.success) {
           this.$message.success("删除成功");
           this.getScheduleData();
@@ -973,14 +997,18 @@ export default {
     /**
      * 运动和课表匹配
      */
-    handleMatchClass({ classId, activityId, type }) {
+    handleMatchClass({ classId, activityId, manualActivityId, type }) {
       let currentClass = {};
       let currentActivity = {};
       let activityDate = "";
+      console.log(activityId, manualActivityId, "activityId, manualActivityId");
 
       this.currentWeek.forEach((item) => {
         item.activityList.forEach((activity) => {
           if (activity.activityId === activityId) {
+            currentActivity = activity;
+            activityDate = item.commonDate;
+          } else if (activity.manualActivityId === manualActivityId) {
             currentActivity = activity;
             activityDate = item.commonDate;
           }
@@ -991,6 +1019,7 @@ export default {
           }
         });
       });
+      console.log(currentActivity, "currentActivity");
 
       if (currentActivity.classScheduleId) {
         return;
@@ -1024,7 +1053,7 @@ export default {
           });
         } else {
           this.$message.error("该运动类型与课程类型不匹配");
-          this.getScheduleData();
+          // this.getScheduleData();
         }
       }
     },
@@ -1037,7 +1066,8 @@ export default {
         name: activityItem.activityName,
         duration: activityItem.duration,
         sth: activityItem.sthValue,
-        id: activityItem.activityId,
+        activityId: activityItem.activityId,
+        manualActivityId: activityItem.manualActivityId,
         dataDate: activityItem.dataDate,
         distance: activityItem.distance,
         sportType: activityItem.sportType,
@@ -1251,21 +1281,25 @@ export default {
           classesId: data.courseData.id,
           classesJson: JSON.stringify(data.courseData.classesJson),
           classesDate: data.exerciseData[0].dataDate,
-          sportType: data.courseData.classesJson.sportType,
+          sportType: data.courseData.sportType,
         };
         const josnData = await this.AddScheduleClass(params, data.type);
         scheduleApi
           .createSchedule({
             ...josnData,
-            bindingActivityId: data.exerciseData.id,
             triUserId: this.selectedAthletic,
           })
           .then((res) => {
             if (res.success) {
+              const type = data.exerciseData[0].manualActivityId ? 2 : 1;
+              const bindingActivityId = data.exerciseData[0].manualActivityId
+                ? data.exerciseData[0].manualActivityId
+                : data.exerciseData[0].activityId;
               scheduleApi
                 .bindActivity({
                   classScheduleId: res.result.id,
-                  bindingActivityId: data.exerciseData[0].id,
+                  bindingActivityId: bindingActivityId,
+                  type: type,
                   classesDate: data.exerciseData[0].dataDate,
                   triUserId: this.selectedAthletic,
                 })
@@ -1277,22 +1311,23 @@ export default {
                     this.$message.error(res.message);
                     this.getScheduleData();
                   }
-                })
-                .finally(() => {
-                  this.getScheduleData();
                 });
             } else {
               this.$message.error(res.message);
-              this.getScheduleData();
             }
           });
         return;
       }
+      const type = data.exerciseData[0].manualActivityId ? 2 : 1;
+      const bindingActivityId = data.exerciseData[0].manualActivityId
+        ? data.exerciseData[0].manualActivityId
+        : data.exerciseData[0].activityId;
       // 这里可以调用匹配API
       scheduleApi
         .bindActivity({
           classScheduleId: data.courseData.id,
-          bindingActivityId: data.exerciseData[0].id,
+          bindingActivityId: bindingActivityId,
+          type: type,
           classesDate: data.exerciseData[0].dataDate,
           triUserId: this.selectedAthletic,
         })
@@ -1304,9 +1339,6 @@ export default {
             this.$message.error(res.message);
             this.getScheduleData();
           }
-        })
-        .finally(() => {
-          this.getScheduleData();
         });
     },
 

@@ -245,7 +245,7 @@ export default {
       this.copiedClass = { ...classItem };
       this.hasCopiedClass = true;
       this.$message({
-        message: "课程已复制，右键点击目标日期可粘贴",
+        message: "课表已复制，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
       });

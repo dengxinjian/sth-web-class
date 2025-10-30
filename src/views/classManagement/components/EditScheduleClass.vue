@@ -11,9 +11,10 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <span>{{
+          <span v-if="classData.classesJson.title || classData.activityName">{{
             classData.classesJson?.title || classData.activityName
           }}</span>
+          <span v-else>手动运动数据</span>
         </div>
       </div>
 
@@ -63,7 +64,7 @@
               type="primary"
               v-if="!isActivity"
               @click="handleEditClassDetail"
-              >编辑课程详情</el-button
+              >编辑课表详情</el-button
             >
           </div>
         </div>
@@ -111,76 +112,232 @@
               <tbody>
                 <tr>
                   <td>总时长</td>
-                  <td>{{ formatDuration(classData.classesJson?.duration) }}</td>
                   <td>
-                    <TimeInput v-model="actualData.duration" size="small" />
+                    <div>
+                      {{ formatDuration(classData.classesJson?.duration) }}
+                    </div>
                   </td>
-                  <td>h:m:s</td>
+                  <td>
+                    <div class="input-with-actions">
+                      <span
+                        v-if="
+                          classData.activityId &&
+                          actualData.duration !== originalData.duration
+                        "
+                        >*</span
+                      >
+                      <TimeInput v-model="actualData.duration" size="small" />
+                      <div class="action-buttons">
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="restoreField('duration')"
+                          v-if="
+                            classData.activityId &&
+                            actualData.duration !== originalData.duration
+                          "
+                          >还原</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.manualActivityId &&
+                            actualData.duration !== defaultData.duration
+                          "
+                          @click="resetField('duration')"
+                          >重置</el-button
+                        >
+                      </div>
+                    </div>
+                  </td>
+                  <td class="unit-cell">h:m:s</td>
                 </tr>
                 <tr>
-                  <td>运动时长</td>
+                  <td>
+                    <div>运动时长</div>
+                  </td>
                   <td></td>
                   <td>
-                    <TimeInput
-                      v-model="actualData.activityDuration"
-                      size="small"
-                    />
+                    <div class="input-with-actions">
+                      <span
+                        v-if="
+                          classData.activityId &&
+                          actualData.activityDuration !== originalData.activityDuration
+                        "
+                        >*</span
+                      >
+                      <TimeInput
+                        v-model="actualData.activityDuration"
+                        size="small"
+                      />
+                      <div class="action-buttons">
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.activityId &&
+                            actualData.activityDuration !==
+                              originalData.activityDuration
+                          "
+                          @click="restoreField('activityDuration')"
+                          >还原</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.manualActivityId &&
+                            actualData.activityDuration !==
+                              defaultData.activityDuration
+                          "
+                          @click="resetField('activityDuration')"
+                          >重置</el-button
+                        >
+                      </div>
+                    </div>
                   </td>
-                  <td>h:m:s</td>
+                  <td class="unit-cell">h:m:s</td>
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>运动距离</td>
                   <td>{{ classData.classesJson?.distance || "--" }}</td>
                   <td>
-                    <el-input-number
-                      v-model="actualData.distance"
-                      size="small"
-                      placeholder=""
-                      :step="0.1"
-                      :min="0"
-                      :step-strictly="true"
-                      :controls="false"
-                    />
+                    <div class="input-with-actions">
+                      <span
+                        v-if="
+                          classData.activityId &&
+                          actualData.distance !== originalData.distance
+                        "
+                        >*</span
+                      >
+                      <el-input-number
+                        v-model="actualData.distance"
+                        size="small"
+                        placeholder=""
+                        :step="0.1"
+                        :min="0"
+                        :controls="false"
+                      />
+                      <div class="action-buttons">
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.activityId &&
+                            actualData.distance !== originalData.distance
+                          "
+                          @click="restoreField('distance')"
+                          >还原</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.manualActivityId &&
+                            actualData.distance !== defaultData.distance
+                          "
+                          @click="resetField('distance')"
+                          >重置</el-button
+                        >
+                      </div>
+                    </div>
                   </td>
-                  <td>km</td>
+                  <td class="unit-cell">km</td>
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
                   <td>{{ classData.classesJson?.sth || "--" }}</td>
                   <td>
-                    <!-- <el-input
-                      v-model="actualData.sth"
-                      size="small"
-                      placeholder=""
-                      :disabled="true"
-                    ></el-input> -->
-                    <el-input-number
-                      v-model="actualData.sthValue"
-                      size="small"
-                      placeholder=""
-                      :step="1"
-                      :min="0"
-                      :step-strictly="true"
-                      :controls="false"
-                    />
+                    <div class="input-with-actions">
+                      <span
+                        v-if="
+                          classData.activityId &&
+                          actualData.sthValue !== originalData.sthValue
+                        "
+                        >*</span
+                      >
+                      <el-input-number
+                        v-model="actualData.sthValue"
+                        size="small"
+                        placeholder=""
+                        :step="1"
+                        :min="0"
+                        :step-strictly="true"
+                        :controls="false"
+                      />
+                      <div class="action-buttons">
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.activityId &&
+                            actualData.sthValue !== originalData.sthValue
+                          "
+                          @click="restoreField('sthValue')"
+                          >还原</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.manualActivityId &&
+                            actualData.sthValue !== defaultData.sthValue
+                          "
+                          @click="resetField('sthValue')"
+                          >重置</el-button
+                        >
+                      </div>
+                    </div>
                   </td>
-                  <td></td>
+                  <td class="unit-cell"></td>
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>消耗</td>
                   <td></td>
                   <td>
-                    <el-input-number
-                      v-model="actualData.calories"
-                      size="small"
-                      placeholder=""
-                      :step="1"
-                      :min="0"
-                      :step-strictly="true"
-                      :controls="false"
-                    />
+                    <div class="input-with-actions">
+                      <span
+                        v-if="
+                          classData.activityId &&
+                          actualData.calories !== originalData.calories
+                        "
+                        >*</span
+                      >
+                      <el-input-number
+                        v-model="actualData.calories"
+                        size="small"
+                        placeholder=""
+                        :step="1"
+                        :min="0"
+                        :step-strictly="true"
+                        :controls="false"
+                      />
+                      <div class="action-buttons">
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.activityId &&
+                            actualData.calories !== originalData.calories
+                          "
+                          @click="restoreField('calories')"
+                          >还原</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          v-if="
+                            classData.manualActivityId &&
+                            actualData.calories !== defaultData.calories
+                          "
+                          @click="resetField('calories')"
+                          >重置</el-button
+                        >
+                      </div>
+                    </div>
                   </td>
-                  <td>Kcal</td>
+                  <td class="unit-cell">Kcal</td>
                 </tr>
               </tbody>
             </table>
@@ -382,6 +539,22 @@ export default {
         sthValue: 0,
         calories: 0,
       },
+      // 存储原始数据，用于还原功能
+      originalData: {
+        duration: "00:00:00",
+        activityDuration: "00:00:00",
+        distance: 0,
+        sthValue: 0,
+        calories: 0,
+      },
+      // 存储默认数据，用于重置功能
+      defaultData: {
+        duration: "00:00:00",
+        activityDuration: "00:00:00",
+        distance: 0,
+        sthValue: 0,
+        calories: 0,
+      },
       showClassDetailModal: false,
       type: "edit",
       originalType: "my",
@@ -406,12 +579,41 @@ export default {
             sthValue: 0,
             calories: 0,
           };
+          this.originalData = {
+            duration: "00:00:00",
+            activityDuration: "00:00:00",
+            distance: 0,
+            sthValue: 0,
+            calories: 0,
+          };
         });
       } else {
         if (this.isActivity) {
           this.classData = this.classItem;
+          console.log(this.classData, "classData");
           if (this.classData.activityId) {
             this.getSportDetail();
+          } else {
+            this.actualData = {
+              duration: this.classData.duration || "00:00:00",
+              activityDuration:
+                this.translateSecondsToFormat(
+                  this.classData.activityDuration
+                ) || "00:00:00",
+              distance: this.classData.distance || 0,
+              sthValue: this.classData.sthValue || 0,
+              calories: this.classData.calories || 0,
+            };
+            this.defaultData = {
+              duration: this.classData.duration || "00:00:00",
+              activityDuration:
+                this.translateSecondsToFormat(
+                  this.classData.activityDuration
+                ) || "00:00:00",
+              distance: this.classData.distance || 0,
+              sthValue: this.classData.sthValue || 0,
+              calories: this.classData.calories || 0,
+            };
           }
         } else {
           this.getClassScheduleInfo(this.classItem.id);
@@ -420,7 +622,7 @@ export default {
     },
   },
   methods: {
-    // 编辑进入弹框时，查询课程数据
+    // 编辑进入弹框时，查询课表数据
     getClassScheduleInfo(id) {
       getData({
         url: "/api/classSchedule/getClassScheduleById",
@@ -442,7 +644,7 @@ export default {
       return ["REMARK", "OTHER", "REST"].includes(sportType);
     },
     deleteClass(id) {
-      this.$confirm("确认删除该课程？", "提示", {
+      this.$confirm("确认删除该课表？", "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
@@ -469,23 +671,64 @@ export default {
     },
     // 查询运动详情
     getSportDetail() {
-      getData({
-        url: "/api/classSchedule/getActivityDetail",
-        activityId: this.classData.activityId,
-      }).then((res) => {
+      scheduleApi.getActivityDetail(this.classData.activityId).then((res) => {
         if (res.success) {
           this.sportDetail = res.result;
-          this.actualData = {
-            duration: this.classData.duration,
+          const actualData = {
+            duration: this.translateSecondsToFormat(this.sportDetail.duration),
             activityDuration: this.translateSecondsToFormat(
               this.sportDetail.netDuration
             ),
-            distance: this.classData.distance,
-            sthValue: this.classData.sthValue,
+            distance: parseFloat((this.sportDetail.distance / 1000).toFixed(2)),
+            sthValue: this.sportDetail.sthValue,
             calories: this.sportDetail.calories,
           };
+          this.defaultData = {
+            duration: this.translateSecondsToFormat(this.sportDetail.duration),
+            activityDuration: this.translateSecondsToFormat(
+              this.sportDetail.netDuration
+            ),
+            distance: parseFloat((this.sportDetail.distance / 1000).toFixed(2)),
+            sthValue: this.sportDetail.sthValue,
+            calories: this.sportDetail.calories,
+          };
+          if (!this.classData.manualActivityId) {
+            this.actualData = actualData;
+          } else {
+            this.actualData = {
+              duration: this.classData.duration,
+              activityDuration: this.translateSecondsToFormat(
+                this.classData.activityDuration
+              ),
+              distance: this.classData.distance,
+              sthValue: this.classData.sthValue,
+              calories: this.classData.calories,
+            };
+            this.defaultData = {
+              duration: this.classData.duration || "00:00:00",
+              activityDuration:
+                this.translateSecondsToFormat(
+                  this.classData.activityDuration
+                ) || "00:00:00",
+              distance: this.classData.distance || 0,
+              sthValue: this.classData.sthValue || 0,
+              calories: this.classData.calories || 0,
+            };
+          }
+          // 保存原始数据
+          this.originalData = JSON.parse(JSON.stringify(actualData));
+          console.log(this.originalData, "originalData");
         }
       });
+    },
+    // 还原字段到原始值
+    restoreField(field) {
+      this.actualData[field] = this.originalData[field];
+      console.log(this.actualData[field], "actualData[field]");
+    },
+    // 重置字段到默认值
+    resetField(field) {
+      this.actualData[field] = this.defaultData[field];
     },
     handleEditClassDetail() {
       // 只打开子对话框，不关闭当前对话框
@@ -501,7 +744,7 @@ export default {
       this.showClassDetailModal = false;
       this.$emit("close");
     },
-    // 判断actualData是否被修改过（不是默认值）
+    // 判断是课表时 actualData是否被修改过（不是默认值）
     isActualDataModified() {
       const defaultData = {
         duration: "00:00:00",
@@ -510,7 +753,6 @@ export default {
         sthValue: 0,
         calories: 0,
       };
-
       // 判断是否有任何字段不等于默认值
       return (
         this.actualData.duration !== defaultData.duration ||
@@ -526,13 +768,30 @@ export default {
           this.actualData.calories !== undefined)
       );
     },
-    handleSave(flag) {
-      console.log(this.classData, "classData");
-      // 判断actualData是否被修改过，决定flag的值
+    // 判断 运动数据时 actualData是否被修改过（不是原始值）
+    isActualDataModifiedForActivity() {
+      // 判断是否有任何字段不等于原始值
+      console.log(
+        this.actualData,
+        this.defaultData,
+        "this.actualData.duration, this.defaultData.duration"
+      );
+      return (
+        this.actualData.duration === this.defaultData.duration &&
+        this.actualData.activityDuration ===
+          this.defaultData.activityDuration &&
+        this.actualData.distance === this.defaultData.distance &&
+        this.actualData.sthValue === this.defaultData.sthValue &&
+        this.actualData.calories === this.defaultData.calories
+      );
+    },
+    saveClassSchedule(flag) {
       const isModified = this.isActualDataModified();
       submitData({
         url: "/api/classSchedule/updateClassSchedule",
-        id: this.classData.id,
+        id: this.isActivity
+          ? this.classData.classScheduleId
+          : this.classData.id,
         classesJson: JSON.stringify(this.classData.classesJson),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
@@ -543,11 +802,56 @@ export default {
         flag: isModified, // 如果修改过为true，否则为false
       }).then((res) => {
         if (res.success) {
-          this.$message.success("课程保存成功");
+          this.$message.success("课表保存成功");
+          if (isModified) {
+            this.handleClose();
+            this.$emit("save", flag);
+            return;
+          }
           if (flag) this.handleClose();
           this.$emit("save", flag);
         }
       });
+    },
+    saveActivitySchedule(flag) {
+      if (this.isActualDataModifiedForActivity()) {
+        this.$message.error("运动数据未修改，无需保存");
+        return;
+      }
+      submitData({
+        url: "/api/classSchedule/updateActivityDetail",
+        activityId: this.classData.activityId,
+        classesJson: JSON.stringify(this.classData.classesJson),
+        activityDuration:
+          hhmmssToSeconds(this.actualData.activityDuration) || null,
+        duration: hhmmssToSeconds(this.actualData.duration) || null,
+        distance: this.actualData.distance || null,
+        sthValue: this.actualData.sthValue || null,
+        calories: this.actualData.calories || null,
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success("运动记录保存成功");
+          this.handleClose();
+          this.$emit("save", flag);
+        }
+      });
+    },
+    handleSave(flag) {
+      console.log(this.classData, "classData");
+      // if (!this.isActivity || !this.classData.activityId) {
+      //   this.saveClassSchedule(flag);
+      // } else {
+      //   this.saveActivitySchedule(flag);
+      // }
+      if (
+        this.isActivity &&
+        this.classData.activityId &&
+        !this.classData.classScheduleId
+      ) {
+        this.saveActivitySchedule(flag);
+      } else {
+        this.saveClassSchedule(flag);
+      }
     },
     getSportIcon(sportType) {
       console.log(sportType, "sportType");
@@ -637,6 +941,38 @@ export default {
   .comparison-table {
     margin-bottom: 20px;
     flex: 1;
+
+    .input-with-actions {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+
+      .el-input-number--small {
+        width: 110px !important;
+        flex-shrink: 0;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 2px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        min-width: 80px;
+        justify-content: flex-start;
+
+        .el-button--text {
+          padding: 2px 6px;
+          font-size: 11px;
+          color: #409eff;
+
+          &:hover {
+            color: #66b1ff;
+          }
+        }
+      }
+    }
+
     .sync-params {
       font-size: 12px;
       display: flex;
@@ -678,8 +1014,9 @@ export default {
       th,
       td {
         padding: 10px;
-        text-align: left;
+        text-align: center;
         border-bottom: 1px solid #e5e5e5;
+        vertical-align: middle;
       }
 
       th {
@@ -700,11 +1037,20 @@ export default {
       }
 
       td:nth-child(3) {
-        width: 120px;
+        width: 240px;
+        min-width: 240px;
+        max-width: 240px;
       }
 
       td:last-child {
-        width: 50px;
+        width: 60px;
+        color: #909399;
+      }
+
+      .unit-cell {
+        text-align: left !important;
+        padding-left: 15px !important;
+        width: 60px;
         color: #909399;
       }
 
@@ -712,8 +1058,16 @@ export default {
         border: 1px solid #dcdfe6;
       }
 
-      ::v-deep .el-input {
-        max-width: 120px;
+      ::v-deep .el-input,
+      ::v-deep .el-input-number,
+      ::v-deep .time-input {
+        width: 110px !important;
+        max-width: 110px;
+        flex-shrink: 0;
+      }
+
+      ::v-deep .time-input .el-input {
+        width: 110px !important;
       }
     }
   }
