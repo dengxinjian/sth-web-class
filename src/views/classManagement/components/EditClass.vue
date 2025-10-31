@@ -376,7 +376,7 @@ export default {
         id: this.classData.id,
         classesTitle: this.classData.classesJson.title,
         classesGroupId: this.classData.classesGroupId,
-        labels: this.classData.classesJson.tags,
+        labels: this.classData.labels,
         sportType: this.classData.sportType,
         classesJson: JSON.stringify(this.classData.classesJson),
       }).then((res) => {
