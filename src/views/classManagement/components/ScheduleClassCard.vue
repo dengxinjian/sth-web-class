@@ -83,7 +83,7 @@
           <!-- 距离 -->
           <div style="display: flex" v-if="!isRestType(classItem.sportType)">
             <div class="keyword">
-              {{ formatDistance(classItem.classesJson.distance, classItem.sportType) }}
+              {{ formatDistance(classItem.classesJson.distance, classItem.sportType) || "--" }}
               <span v-if="classItem.sportType === 'SWIM'">
                 {{ classItem.classesJson.distanceUnit }}
               </span>
@@ -269,7 +269,7 @@ export default {
         return distance;
       } else if (typeof distance === "string" && distance === "0km") {
         return "--km";
-      } else if (sportType === "SWIM") {
+      } else if (sportType === "SWIM" && distance !== "0") {
         return distance;
       }
       return !distance || distance === "0" ? "--km" : distance + "km";

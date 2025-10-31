@@ -42,14 +42,16 @@
                 formatDistance(
                   classData.classesJson?.distance,
                   classData.classesJson?.sportType
-                )
+                ) || "--"
               }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.classesJson?.distanceUnit }}
               </span>
             </div>
             <div class="metric-value" v-else>
-              {{ formatDistance(classData.distance, classData.sportType) }}
+              {{
+                formatDistance(classData.distance, classData.sportType) || "--"
+              }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.unit }}
               </span>
@@ -117,7 +119,7 @@
                 <tr>
                   <td>总时长</td>
                   <td>
-                    <div style="width: 100px;">
+                    <div style="width: 100px">
                       {{ formatDuration(classData.classesJson?.duration) }}
                     </div>
                   </td>
@@ -162,7 +164,7 @@
                     </div>
                   </td>
                   <td class="unit-cell">
-                    <div style="width: 60px;">h:m:s</div>
+                    <div style="width: 60px">h:m:s</div>
                   </td>
                 </tr>
                 <tr>
@@ -217,7 +219,18 @@
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>运动距离</td>
-                  <td>{{ classData.classesJson?.distance || "--" }}</td>
+                  <td>
+                    <div v-if="classData.classesJson?.sportType !== 'SWIM'">
+                      {{ classData.classesJson?.distance || "--" }}
+                    </div>
+                    <div v-else>
+                      {{
+                        classData.classesJson?.distanceUnit === "m"
+                          ? classData.classesJson?.distance / 1000
+                          : classData.classesJson?.distance
+                      }}
+                    </div>
+                  </td>
                   <td>
                     <div class="input-with-actions">
                       <span
