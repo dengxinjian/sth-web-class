@@ -424,6 +424,9 @@ export default {
   }
 }
 
+::v-deep .el-dialog__body {
+  padding-top: 0px;
+}
 .class-detail-content {
   .key-metrics {
     display: flex;

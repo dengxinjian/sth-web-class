@@ -197,10 +197,6 @@
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
       >
-        <div class="context-menu-item" @click="hideContextMenu">
-          <i class="el-icon-close"></i>
-          取消
-        </div>
         <div
           v-if="activity.classesJson"
           class="context-menu-item"

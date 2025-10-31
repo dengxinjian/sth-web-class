@@ -38,13 +38,18 @@
           </div>
           <div class="metric-item">
             <div class="metric-value" v-if="!isActivity">
-              {{ formatDistance(classData.classesJson?.distance) }}
+              {{
+                formatDistance(
+                  classData.classesJson?.distance,
+                  classData.classesJson?.sportType
+                )
+              }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.classesJson?.distanceUnit }}
               </span>
             </div>
             <div class="metric-value" v-else>
-              {{ formatDistance(classData.distance) }}
+              {{ formatDistance(classData.distance, classData.sportType) }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.unit }}
               </span>
@@ -125,7 +130,11 @@
                         "
                         >*</span
                       >
-                      <TimeInput v-model="actualData.duration" size="small" />
+                      <TimeInput
+                        v-model="actualData.duration"
+                        size="small"
+                        :disabled="isInputDisabled"
+                      />
                       <div class="action-buttons">
                         <el-button
                           type="text"
@@ -135,6 +144,7 @@
                             classData.activityId &&
                             actualData.duration !== originalData.duration
                           "
+                          :disabled="isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
@@ -145,6 +155,7 @@
                             actualData.duration !== defaultData.duration
                           "
                           @click="resetField('duration')"
+                          :disabled="isInputDisabled"
                           >重置</el-button
                         >
                       </div>
@@ -170,6 +181,7 @@
                       <TimeInput
                         v-model="actualData.activityDuration"
                         size="small"
+                        :disabled="isInputDisabled"
                       />
                       <div class="action-buttons">
                         <el-button
@@ -181,6 +193,7 @@
                               originalData.activityDuration
                           "
                           @click="restoreField('activityDuration')"
+                          :disabled="isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
@@ -192,6 +205,7 @@
                               defaultData.activityDuration
                           "
                           @click="resetField('activityDuration')"
+                          :disabled="isInputDisabled"
                           >重置</el-button
                         >
                       </div>
@@ -218,6 +232,7 @@
                         :step="0.1"
                         :min="0"
                         :controls="false"
+                        :disabled="isInputDisabled"
                       />
                       <div class="action-buttons">
                         <el-button
@@ -228,6 +243,7 @@
                             actualData.distance !== originalData.distance
                           "
                           @click="restoreField('distance')"
+                          :disabled="isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
@@ -238,12 +254,19 @@
                             actualData.distance !== defaultData.distance
                           "
                           @click="resetField('distance')"
+                          :disabled="isInputDisabled"
                           >重置</el-button
                         >
                       </div>
                     </div>
                   </td>
-                  <td class="unit-cell">km</td>
+                  <td class="unit-cell">
+                    {{
+                      classData.sportType === "SWIM"
+                        ? classData.classesJson?.distanceUnit
+                        : "km"
+                    }}
+                  </td>
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
@@ -265,6 +288,7 @@
                         :min="0"
                         :step-strictly="true"
                         :controls="false"
+                        :disabled="isInputDisabled"
                       />
                       <div class="action-buttons">
                         <el-button
@@ -275,6 +299,7 @@
                             actualData.sthValue !== originalData.sthValue
                           "
                           @click="restoreField('sthValue')"
+                          :disabled="isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
@@ -285,6 +310,7 @@
                             actualData.sthValue !== defaultData.sthValue
                           "
                           @click="resetField('sthValue')"
+                          :disabled="isInputDisabled"
                           >重置</el-button
                         >
                       </div>
@@ -312,6 +338,7 @@
                         :min="0"
                         :step-strictly="true"
                         :controls="false"
+                        :disabled="isInputDisabled"
                       />
                       <div class="action-buttons">
                         <el-button
@@ -322,6 +349,7 @@
                             actualData.calories !== originalData.calories
                           "
                           @click="restoreField('calories')"
+                          :disabled="isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
@@ -332,6 +360,7 @@
                             actualData.calories !== defaultData.calories
                           "
                           @click="resetField('calories')"
+                          :disabled="isInputDisabled"
                           >重置</el-button
                         >
                       </div>
@@ -560,6 +589,16 @@ export default {
       originalType: "my",
       sportDetail: {},
     };
+  },
+  computed: {
+    // 判断是否应该禁用输入（当课表日期大于当前时间时禁用）
+    isInputDisabled() {
+      if (!this.classData.classesDate) return false;
+      const classDate = new Date(this.classData.classesDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return classDate > today;
+    },
   },
   watch: {
     visible(val) {
@@ -841,7 +880,8 @@ export default {
       submitData({
         url: "/api/manualDeviceActivity/update",
         manualActivityId: this.classData.manualActivityId,
-        activityDuration: hhmmssToSeconds(this.actualData.activityDuration) || null,
+        activityDuration:
+          hhmmssToSeconds(this.actualData.activityDuration) || null,
         duration: hhmmssToSeconds(this.actualData.duration) || null,
         distance: this.actualData.distance || null,
         sthValue: this.actualData.sthValue || 0,
@@ -888,7 +928,8 @@ export default {
     formatDuration(duration) {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
-    formatDistance(distance) {
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
       if (
         distance &&
         typeof distance === "string" &&
@@ -898,6 +939,8 @@ export default {
         return distance;
       } else if (typeof distance === "string" && distance === "0km") {
         return "--km";
+      } else if (sportType === "SWIM") {
+        return distance;
       }
       return !distance || distance === "0" ? "--km" : distance + "km";
     },
@@ -927,6 +970,9 @@ export default {
       color: #333;
     }
   }
+}
+::v-deep .el-dialog__body {
+  padding-top: 0px;
 }
 
 .class-detail-content {

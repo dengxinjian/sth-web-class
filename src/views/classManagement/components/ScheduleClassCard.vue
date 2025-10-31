@@ -172,10 +172,6 @@
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
       >
-        <div class="context-menu-item" @click="hideContextMenu">
-          <i class="el-icon-close"></i>
-          取消
-        </div>
         <div class="context-menu-item" @click="handleCopy">
           <i class="el-icon-crop"></i>
           复制

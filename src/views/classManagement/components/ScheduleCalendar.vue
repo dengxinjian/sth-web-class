@@ -136,15 +136,16 @@
     </div>
     <transition name="context-menu-fade">
       <div
-        v-if="contextMenuVisible"
+        v-if="contextMenuVisible && hasCopiedClass"
         class="context-menu"
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
+
       >
-        <div class="context-menu-item" @click="hideContextMenu()">
+        <!-- <div class="context-menu-item" @click="hideContextMenu()">
           <i class="el-icon-close"></i>
           <span>取消</span>
-        </div>
+        </div> -->
         <div
           v-if="hasCopiedClass"
           class="context-menu-item"
