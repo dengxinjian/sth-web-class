@@ -1,10 +1,11 @@
 <template>
-  <div class="stage-details">
+  <div class="stage-details" v-if="type === 'schedule'">
     <div
       v-for="(stage, index) in displayStages"
       :key="index"
       class="stage-item"
     >
+      <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
       <div v-for="(part, idx) in stage.sections" :key="idx">
         <div>{{ part.title }}</div>
         <!-- 模式1: 阈值配速 范围 -->
@@ -143,9 +144,112 @@
         </div>
         <div v-if="part.lap">按LAP进入下一段落</div>
       </div>
-      <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
     </div>
     <div v-if="hasMoreStages" class="stage-ellipsis">...</div>
+  </div>
+  <div v-else>
+    <div v-for="(stage, index) in classData.stages" :key="index">
+      <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
+      <div v-for="(part, idx) in stage.sections" :key="idx">
+        <div>{{ part.title }}</div>
+        <div v-if="classData.mode === 1 && part.range === 'range'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance
+              ? part.targetDistance + part.targetUnit
+              : 0 + part.targetUnit
+          }}
+          @ {{ part.thresholdSpeedRange[0] }}~
+          {{ part.thresholdSpeedRange[1] }}% 阈值配速
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="classData.mode === 2 && part.range === 'range'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance + part.targetUnit
+          }}
+          @ {{ part.thresholdHeartRateRange[0] }}~
+          {{ part.thresholdHeartRateRange[1] }}% 阈值心率
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="classData.mode === 1 && part.range === 'target'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance
+              ? part.targetDistance + part.targetUnit
+              : 0 + part.targetUnit
+          }}
+          @ {{ part.thresholdSpeed }}% 阈值配速
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="classData.mode === 2 && part.range === 'target'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance + part.targetUnit
+          }}
+          @ {{ part.thresholdHeartRate }}% 阈值心率
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="classData.mode === 3 && part.range === 'range'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance + part.targetUnit
+          }}
+          @ {{ part.targetSpeedRange[0] }}~ {{ part.targetSpeedRange[1] }}/km
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="classData.mode === 4 && part.range === 'range'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance + part.targetUnit
+          }}
+          @ {{ part.targetHeartRateRange[0] }}~
+          {{ part.targetHeartRateRange[1] }}bpm
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="classData.mode === 3 && part.range === 'target'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance + part.targetUnit
+          }}
+          @ {{ part.targetSpeed }}/km
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="classData.mode === 4 && part.range === 'target'">
+          {{
+            part.capacity === "time"
+              ? part.target
+              : part.targetDistance + part.targetUnit
+          }}
+          @ {{ part.targetHeartRate }}bpm
+          <span v-if="part.hasCadence"
+            >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
+          >
+        </div>
+        <div v-if="part.lap">按LAP进入下一段落</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -163,6 +267,10 @@ export default {
       type: Number,
       default: null, // null 表示显示全部
     },
+    type: {
+      type: String,
+      default: "schedule",
+    },
   },
   computed: {
     displayStages() {
@@ -173,7 +281,11 @@ export default {
       return this.classData.stages.slice(0, this.maxStages);
     },
     hasMoreStages() {
-      if (!this.classData.stages || this.maxStages === null || this.maxStages <= 0) {
+      if (
+        !this.classData.stages ||
+        this.maxStages === null ||
+        this.maxStages <= 0
+      ) {
         return false;
       }
       return this.classData.stages.length > this.maxStages;

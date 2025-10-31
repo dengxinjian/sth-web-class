@@ -63,14 +63,19 @@
             hideContextMenu();
           "
         >
-          <div class="title" v-if="activity.classesJson.title || activity.activityName">
+          <div
+            class="title"
+            v-if="activity.classesJson.title || activity.activityName"
+          >
             {{
               activity.classesJson
                 ? activity.classesJson.title
                 : activity.activityName
             }}
           </div>
-          <div class="title" v-else> {{ getSportTypeName(activity.sportType) }}_手动录入</div>
+          <div class="title" v-else>
+            {{ getSportTypeName(activity.sportType) }}_手动录入
+          </div>
           <div class="keyword">{{ activity.duration }}</div>
           <div style="display: flex">
             <div class="keyword">
@@ -85,22 +90,41 @@
               <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
             </div>
           </div>
-
           <!-- 如果有匹配的课表，显示课表详情 -->
-          <template v-if="activity.classScheduleId && activity.classesJson">
-            <div v-if="activity.classesJson.summary" class="stage-details">
-              {{ activity.classesJson.summary }}
-            </div>
-            <CycleStageDetails
-              v-else-if="activity.sportType === 1"
-              :class-data="activity.classesJson"
-              :max-stages="3"
-            />
-            <RunStageDetails
-              v-else-if="activity.sportType === 2"
-              :class-data="activity.classesJson"
-              :max-stages="3"
-            />
+          <template v-if="activity.classesJson">
+            <template
+              v-if="
+                activity.classesJson.summary ||
+                activity.classesJson.trainingAdvice
+              "
+            >
+              <pre v-if="activity.classesJson.summary" class="stage-details">
+                {{ truncateByLines(activity.classesJson.summary) }}
+              </pre>
+              <pre class="stage-details">
+                {{ truncateByLines(activity.classesJson.trainingAdvice) }}
+              </pre>
+            </template>
+            <template
+              v-else-if="
+                activity.sportType === 'CYCLE' || activity.sportType === 1
+              "
+            >
+              <CycleStageDetails
+                :class-data="activity.classesJson"
+                :max-stages="3"
+              />
+            </template>
+            <template
+              v-else-if="
+                activity.sportType === 'RUN' || activity.sportType === 2
+              "
+            >
+              <RunStageDetails
+                :class-data="activity.classesJson"
+                :max-stages="3"
+              />
+            </template>
 
             <!-- 时长、距离、STH -->
             <div
@@ -212,7 +236,12 @@
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import CycleStageDetails from "./CycleStageDetails.vue";
 import RunStageDetails from "./RunStageDetails.vue";
-import { getSportBackgroundColor, getClassImageIcon, getSportTypeName } from "../utils/helpers";
+import {
+  getSportBackgroundColor,
+  getClassImageIcon,
+  getSportTypeName,
+  truncateByLines,
+} from "../utils/helpers";
 
 export default {
   name: "ActivityCard",
@@ -250,6 +279,7 @@ export default {
     document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
+    truncateByLines,
     formatDistance(distance) {
       return !distance || distance === "0" ? "--km" : distance + "km";
     },
@@ -348,6 +378,9 @@ export default {
       color: #999;
       padding: 5px 5px 0;
       line-height: 16px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-line;
     }
   }
 }

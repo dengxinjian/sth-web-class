@@ -58,17 +58,7 @@
                         编辑课程
                       </el-button>
                     </span>
-                    <span v-if="showDeleteBtn">
-                      <el-button
-                        type="text"
-                        @click.stop="
-                          $emit('delete', classItem.id);
-                          handleClose();
-                        "
-                      >
-                        删除课程
-                      </el-button>
-                    </span>
+
                     <span v-if="showCopyBtn">
                       <el-button
                         type="text"
@@ -78,6 +68,17 @@
                         "
                       >
                         {{ copyBtnText }}
+                      </el-button>
+                    </span>
+                    <span v-if="showDeleteBtn">
+                      <el-button
+                        type="text"
+                        @click.stop="
+                          $emit('delete', classItem.id);
+                          handleClose();
+                        "
+                      >
+                        删除课程
                       </el-button>
                     </span>
                   </div>
@@ -175,15 +176,29 @@
               >
                 阶段明细
               </div>
-
               <!-- 骑行详情 -->
-              <template v-if="classItem.sportType === 'CYCLE'">
-                <CycleStageDetails :class-data="classItem.classesJson" />
+              <template
+                v-if="
+                  classItem.sportType === 'CYCLE' || classItem.sportType === 1
+                "
+              >
+                <CycleStageDetails
+                  :class-data="classItem.classesJson"
+                  :max-stages="99"
+                  type="class"
+                />
               </template>
-
               <!-- 跑步详情 -->
-              <template v-else-if="classItem.sportType === 'RUN'">
-                <RunStageDetails :class-data="classItem.classesJson" />
+              <template
+                v-else-if="
+                  classItem.sportType === 'RUN' || classItem.sportType === 2
+                "
+              >
+                <RunStageDetails
+                  :class-data="classItem.classesJson"
+                  :max-stages="99"
+                  type="class"
+                />
               </template>
 
               <!-- 训练建议 -->
@@ -312,7 +327,7 @@ export default {
   padding-top: 0 !important;
 }
 ::v-deep(.el-dialog) {
- margin-left: 320px!important;
+  margin-left: 320px !important;
 }
 
 .classScheduleCard {

@@ -264,7 +264,7 @@ export default {
       return duration === "00:00:00" ? "--:--:--" : duration;
     },
     formatDistance(distance) {
-      return !distance || distance === "0" || distance === 'km' ? "--km" : distance;
+      return !distance || distance === "0" || distance === 'km' || distance === "0km" ? "--km" : distance;
     },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单

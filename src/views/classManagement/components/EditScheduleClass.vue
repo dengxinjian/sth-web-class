@@ -48,7 +48,6 @@
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.unit }}
               </span>
-              <span v-else>km</span>
             </div>
           </div>
           <div class="metric-item">
@@ -163,7 +162,8 @@
                       <span
                         v-if="
                           classData.activityId &&
-                          actualData.activityDuration !== originalData.activityDuration
+                          actualData.activityDuration !==
+                            originalData.activityDuration
                         "
                         >*</span
                       >
@@ -865,11 +865,7 @@ export default {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance) {
-      return !distance || distance === "0"
-        ? this.classData.sportType === "SWIM"
-          ? "--"
-          : "--km"
-        : distance;
+      return !distance || distance === "0" ? "--km" : distance + "km";
     },
   },
 };
@@ -1014,7 +1010,7 @@ export default {
       th,
       td {
         padding: 10px;
-        text-align: center;
+        text-align: left;
         border-bottom: 1px solid #e5e5e5;
         vertical-align: middle;
       }

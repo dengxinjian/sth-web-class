@@ -219,12 +219,12 @@
               <div class="section-content">
                 <!-- 骑行详情 -->
                 <template v-if="classData.sportType === 'CYCLE'">
-                  <CycleStageDetails :class-data="classData.classesJson" />
+                  <CycleStageDetails :class-data="classData.classesJson" type="class" />
                 </template>
 
                 <!-- 跑步详情 -->
                 <template v-else-if="classData.sportType === 'RUN'">
-                  <RunStageDetails :class-data="classData.classesJson" />
+                  <RunStageDetails :class-data="classData.classesJson" type="class" />
                 </template>
               </div>
             </div>
