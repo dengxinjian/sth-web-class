@@ -47,6 +47,10 @@ export class CalculateRun {
     if (!thresholdSpeedRange[0] || !thresholdSpeedRange[1]) {
       return [0, 0];
     }
+    // 检查 run 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.run) {
+      return [0, 0];
+    }
     return [
       Math.round(
         this.athleticThreshold.run * (1 / (thresholdSpeedRange[0] / 100))
@@ -60,12 +64,20 @@ export class CalculateRun {
     if (!thresholdSpeed) {
       return 0;
     }
+    // 检查 run 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.run) {
+      return 0;
+    }
     return Math.round(
       this.athleticThreshold.run * (1 / (thresholdSpeed / 100))
     );
   }
   calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
     if (!thresholdHeartRateRange[0] || !thresholdHeartRateRange[1]) {
+      return [0, 0];
+    }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
       return [0, 0];
     }
     return [
@@ -79,6 +91,10 @@ export class CalculateRun {
   }
   calculateThresholdHeartRateNum(thresholdHeartRate) {
     if (!thresholdHeartRate) {
+      return 0;
+    }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
       return 0;
     }
     return Math.round(
@@ -156,6 +172,10 @@ export class CalculateRun {
     if (!targetSpeedRange[0] || !targetSpeedRange[1]) {
       return ["", ""];
     }
+    // 检查 run 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.run) {
+      return ["", ""];
+    }
     const timer1 = mmssToSeconds(targetSpeedRange[0]);
     const timer2 = mmssToSeconds(targetSpeedRange[1]);
     return [
@@ -171,6 +191,10 @@ export class CalculateRun {
     if (!targetSpeed) {
       return "";
     }
+    // 检查 run 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.run) {
+      return "";
+    }
     const timer1 = mmssToSeconds(targetSpeed);
     return this.calculateThresholdSpeedNumZoneFollow(
       (timer1 / this.athleticThreshold.run).toFixed(4)
@@ -178,6 +202,10 @@ export class CalculateRun {
   }
   calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
     if (!targetHeartRateRange[0] || !targetHeartRateRange[1]) {
+      return ["", ""];
+    }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
       return ["", ""];
     }
     return [
@@ -191,6 +219,10 @@ export class CalculateRun {
   }
   calculateTargetHeartRateNumZone(targetHeartRate) {
     if (!targetHeartRate) {
+      return "";
+    }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
       return "";
     }
     return calculateThresholdHeartRateNumZoneFollow(
@@ -270,10 +302,18 @@ export class CalculateBike {
     if (!thresholdFtp) {
       return 0;
     }
+    // 检查 cycle 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.cycle) {
+      return 0;
+    }
     return Math.round(this.athleticThreshold.cycle * (thresholdFtp / 100));
   }
   calculateThresholdFtpRangeNum(thresholdFtpRange) {
     if (!thresholdFtpRange[0] || !thresholdFtpRange[1]) {
+      return [0, 0];
+    }
+    // 检查 cycle 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.cycle) {
       return [0, 0];
     }
     return [
@@ -285,12 +325,20 @@ export class CalculateBike {
     if (!thresholdHeartRate) {
       return 0;
     }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
+      return 0;
+    }
     return Math.round(
       this.athleticThreshold.heartRate * (thresholdHeartRate / 100)
     );
   }
   calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
     if (!thresholdHeartRateRange[0] || !thresholdHeartRateRange[1]) {
+      return [0, 0];
+    }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
       return [0, 0];
     }
     return [
@@ -374,6 +422,10 @@ export class CalculateBike {
     if (!targetFtpRange[0] || !targetFtpRange[1]) {
       return ["", ""];
     }
+    // 检查 cycle 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.cycle) {
+      return ["", ""];
+    }
     return [
       this.calculateThresholdFtpRangeNumZoneFollow(
         (targetFtpRange[0] / this.athleticThreshold.cycle).toFixed(4)
@@ -387,12 +439,20 @@ export class CalculateBike {
     if (!targetFtp) {
       return "";
     }
+    // 检查 cycle 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.cycle) {
+      return "";
+    }
     return this.calculateThresholdFtpRangeNumZoneFollow(
       (targetFtp / this.athleticThreshold.cycle).toFixed(4)
     );
   }
   calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
     if (!targetHeartRateRange[0] || !targetHeartRateRange[1]) {
+      return ["", ""];
+    }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
       return ["", ""];
     }
     return [
@@ -406,6 +466,10 @@ export class CalculateBike {
   }
   calculateTargetHeartRateNumZone(targetHeartRate) {
     if (!targetHeartRate) {
+      return "";
+    }
+    // 检查 heartRate 是否存在，避免 NaN
+    if (!this.athleticThreshold || !this.athleticThreshold.heartRate) {
       return "";
     }
     return calculateThresholdHeartRateNumZoneFollow(

@@ -58,6 +58,7 @@
         @device-click="handleDeviceClick"
         @edit-schedule="handleEditClassSchedule"
         @edit-activity="handleEditActivity"
+        @paste-class="handlePasteClass"
       />
 
       <!-- 右侧统计面板 -->
@@ -329,6 +330,58 @@ export default {
     }
   },
   methods: {
+    async handlePasteClass(date, classItem) {
+      console.log(date, classItem, "date, classItem");
+      await this.getAthleticThreshold(this.selectedAthletic, date);
+      const newData = JSON.parse(JSON.stringify(classItem));
+      newData.classesDate = date + " 00:00:00";
+      // 根据运动类型计算阈值
+      if (newData.sportType === "RUN") {
+        newData.classesJson = new CalculateRun(
+          this.athleticThreshold,
+          classItem.classesJson
+        ).updateClassInfoCalculatedValues();
+      } else if (newData.sportType === "CYCLE") {
+        newData.classesJson = new CalculateBike(
+          this.athleticThreshold,
+          classItem.classesJson
+        ).updateClassInfoCalculatedValues();
+      }
+      // 计算时间距离STH
+      if (["RUN", "CYCLE"].includes(newData.sportType)) {
+        const res = await scheduleApi.calculateTimeDistanceSth({
+          ...newData,
+          classesJson: JSON.stringify(newData.classesJson),
+          triUserId: this.selectedAthletic,
+        });
+
+        if (newData.sportType === "RUN") {
+          newData.classesJson = {
+            ...newData.classesJson,
+            duration: secondsToHHMMSS(res.result.time || 0),
+            distance: (res.result.distance || 0) + "km",
+            sth: res.result.sth,
+          };
+        } else if (newData.sportType === "CYCLE") {
+          newData.classesJson = {
+            ...newData.classesJson,
+            duration: newData.classesJson.duration,
+            distance: newData.classesJson.distance,
+            sth: res.result.sth,
+          };
+        }
+      }
+      newData.classesJson = JSON.stringify(newData.classesJson);
+      const res = await scheduleApi.createSchedule({
+        ...newData,
+        triUserId: this.selectedAthletic,
+      });
+
+      if (res.success) {
+        this.getScheduleData();
+        this.getClassList();
+      }
+    },
     handleEditClassSchedule(classItem) {
       console.log(classItem, "classItem");
       this.showEditScheduleClass = true;
@@ -898,7 +951,8 @@ export default {
         const type = activity.manualActivityId ? 2 : 1;
         const activityId = activity.manualActivityId
           ? activity.manualActivityId
-          : activity.id;
+          : activity.activityId;
+        console.log(activity, activityId, type, "activityId, type");
         const res = await scheduleApi.deleteActivity(activityId, type);
         if (res.success) {
           this.$message.success("删除成功");

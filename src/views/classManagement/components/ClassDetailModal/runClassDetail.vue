@@ -787,6 +787,7 @@ import {
   CalculateRun,
   checkForm,
 } from "@/views/classManagement/uilt";
+import { athleteApi } from "../../services/classManagement";
 export default {
   name: "AddRunClassDialog",
   components: {
@@ -804,10 +805,6 @@ export default {
       default: undefined,
     },
     data: {
-      type: Object,
-      default: () => ({}),
-    },
-    athleticThreshold: {
       type: Object,
       default: () => ({}),
     },
@@ -862,6 +859,7 @@ export default {
         lap: false,
         targetSeconds: 20 * 60, // 计算出来的秒数
       },
+      athleticThreshold: {},
     };
   },
   computed: {
@@ -897,6 +895,36 @@ export default {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);
   },
   methods: {
+    async getAthleticThreshold() {
+      if (!this.triUserId) {
+        console.warn("triUserId is empty, skip getAthleticThreshold");
+        return;
+      }
+      console.log(this.data, "this.data.classesDate");
+      const res = await athleteApi.getUserProfile(
+        this.triUserId,
+        this.data.classesDate
+      );
+      if (res.result && res.result.thresholdRecordList) {
+        res.result.thresholdRecordList.forEach((item) => {
+          switch (item.thresholdType) {
+            case 1:
+              this.athleticThreshold.heartRate = item.threshold;
+              break;
+            case 2:
+              this.athleticThreshold.cycle = item.threshold;
+              break;
+            case 3:
+              this.athleticThreshold.run = item.threshold;
+              break;
+            case 4:
+              this.athleticThreshold.swim = item.threshold;
+              break;
+          }
+        });
+        console.log(this.athleticThreshold, "this.athleticThreshold");
+      }
+    },
     handleTimesChange(stageIndex) {
       const stage = this.classInfo.stages[stageIndex];
       console.log(stage, "stage", stageIndex);
@@ -1003,13 +1031,16 @@ export default {
         id,
       }).then((res) => {
         if (res.success) {
-          this.classInfo = JSON.parse(res.result.classesJson);
-          this.timeline = JSON.parse(res.result.classesJson).timeline;
-          this.classInfo.id = res.result.id;
-          this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
-          console.log(this.classInfo, "this.classInfo");
-          this.updateClassInfoCalculatedValues(); // 更新计算值
-          this.handleClassDrag();
+          this.$nextTick(async () => {
+            await this.getAthleticThreshold();
+            this.classInfo = JSON.parse(res.result.classesJson);
+            this.timeline = JSON.parse(res.result.classesJson).timeline;
+            this.classInfo.id = res.result.id;
+            this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
+            console.log(this.classInfo, "this.classInfo");
+            this.updateClassInfoCalculatedValues(); // 更新计算值
+            this.handleClassDrag();
+          });
         }
       });
     },

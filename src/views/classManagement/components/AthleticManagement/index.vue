@@ -28,7 +28,7 @@
       <span class="athletic-btn-list" slot-scope="{ node }">
         <span
           >{{ node.label }}
-          <span v-if="!node.data.isGroup && node.data.userType === 1">（主教练）</span>
+          <span v-if="!node.data.isGroup && node.data.userType === 1 && !isCurrentUser(node.data.triUserId)">（主教练）</span>
           <span v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)">（我）</span>
           <span v-if="node.data.isGroup"
             >({{ node.data.membersCount }})</span

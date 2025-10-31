@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       :visible.sync="innerVisible"
-      width="80%"
+      width="60%"
       :before-close="handleClose"
       append-to-body
       :close-on-click-modal="false"
@@ -431,6 +431,7 @@ export default {
     gap: 30px;
     margin-bottom: 20px;
     padding: 15px 0;
+    padding-top: 0;
 
     .metric-item {
       display: flex;

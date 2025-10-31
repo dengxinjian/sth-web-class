@@ -6,7 +6,6 @@
       :visible="visible"
       :value="value"
       :data="data"
-      :athleticThreshold="athleticThreshold"
       :triUserId="triUserId"
       v-on="$listeners"
     />
@@ -115,33 +114,7 @@ export default {
     },
   },
   methods: {
-    async getAthleticThreshold() {
-      if (!this.triUserId) {
-        console.warn('triUserId is empty, skip getAthleticThreshold');
-        return;
-      }
-      console.log(this.data, "this.data.classesDate");
-      const res = await athleteApi.getUserProfile(this.triUserId,this.data.classesDate);
-      if (res.result && res.result.thresholdRecordList) {
-        res.result.thresholdRecordList.forEach((item) => {
-          switch (item.thresholdType) {
-            case 1:
-              this.athleticThreshold.heartRate = item.threshold;
-              break;
-            case 2:
-              this.athleticThreshold.cycle = item.threshold;
-              break;
-            case 3:
-              this.athleticThreshold.run = item.threshold;
-              break;
-            case 4:
-              this.athleticThreshold.swim = item.threshold;
-              break;
-          }
-        });
-        console.log(this.athleticThreshold, "this.athleticThreshold");
-      }
-    },
+
   },
 };
 </script>

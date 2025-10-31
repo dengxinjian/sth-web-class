@@ -9,6 +9,64 @@
       :modal="false"
       top="20vh"
     >
+      <div slot="title" style="display: flex; justify-content: end; align-items: center;">
+        <el-popover
+          popper-class="athletic-btn-popover"
+          placement="right"
+          trigger="hover"
+          :tabindex="999"
+        >
+          <div class="btn-list-hover">
+            <span v-if="showMoveBtn">
+              <el-button
+                type="text"
+                @click.stop="
+                  $emit('move', classItem.id);
+                  handleClose();
+                "
+              >
+                移动分组
+              </el-button>
+            </span>
+
+            <span v-if="showDeleteBtn">
+              <el-button
+                type="text"
+                @click.stop="
+                  showEditClass = true;
+                  handleClose();
+                "
+              >
+                编辑课程
+              </el-button>
+            </span>
+
+            <span v-if="showCopyBtn">
+              <el-button
+                type="text"
+                @click.stop="
+                  $emit('copy', classItem);
+                  handleClose();
+                "
+              >
+                {{ copyBtnText }}
+              </el-button>
+            </span>
+            <span v-if="showDeleteBtn">
+              <el-button
+                type="text"
+                @click.stop="
+                  $emit('delete', classItem.id);
+                  handleClose();
+                "
+              >
+                删除课程
+              </el-button>
+            </span>
+          </div>
+          <i class="el-icon-more" slot="reference" @click.stop></i>
+        </el-popover>
+      </div>
       <div>
         <div class="class-schedule-card-container">
           <div
@@ -28,62 +86,6 @@
                   <!-- 课程标题 -->
                   <div class="title">{{ classItem.classesJson.title }}</div>
                 </div>
-                <el-popover
-                  popper-class="athletic-btn-popover"
-                  placement="right"
-                  trigger="hover"
-                  :tabindex="999"
-                >
-                  <div class="btn-list-hover">
-                    <span v-if="showMoveBtn">
-                      <el-button
-                        type="text"
-                        @click.stop="
-                          $emit('move', classItem.id);
-                          handleClose();
-                        "
-                      >
-                        移动分组
-                      </el-button>
-                    </span>
-
-                    <span v-if="showDeleteBtn">
-                      <el-button
-                        type="text"
-                        @click.stop="
-                          showEditClass = true;
-                          handleClose();
-                        "
-                      >
-                        编辑课程
-                      </el-button>
-                    </span>
-
-                    <span v-if="showCopyBtn">
-                      <el-button
-                        type="text"
-                        @click.stop="
-                          $emit('copy', classItem);
-                          handleClose();
-                        "
-                      >
-                        {{ copyBtnText }}
-                      </el-button>
-                    </span>
-                    <span v-if="showDeleteBtn">
-                      <el-button
-                        type="text"
-                        @click.stop="
-                          $emit('delete', classItem.id);
-                          handleClose();
-                        "
-                      >
-                        删除课程
-                      </el-button>
-                    </span>
-                  </div>
-                  <i class="el-icon-more" slot="reference" @click.stop></i>
-                </el-popover>
               </div>
 
               <div
@@ -337,7 +339,6 @@ export default {
   overflow: hidden;
   border-radius: 6px;
   background-color: #ffffff;
-  padding-top: 10px;
   .card-body {
     width: 100%;
     padding-left: 2px;

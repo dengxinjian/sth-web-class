@@ -9,34 +9,6 @@
       <!-- 标题和操作按钮 -->
       <div class="schedule-class-info-item-title">
         <div>{{ classData.classesJson.title }}</div>
-        <el-popover
-          popper-class="athletic-btn-popover"
-          placement="right"
-          width="80"
-          trigger="hover"
-        >
-          <div class="btn-list-hover">
-            <span v-if="showMoveBtn">
-              <el-button type="text" @click.stop="$emit('move', classData.id)">
-                移动分组
-              </el-button>
-            </span>
-            <span v-if="showCopyBtn">
-              <el-button type="text" @click.stop="$emit('copy', classData)">
-                {{ copyBtnText }}
-              </el-button>
-            </span>
-            <span v-if="showDeleteBtn">
-              <el-button
-                type="text"
-                @click.stop="$emit('delete', classData.id)"
-              >
-                删除课程
-              </el-button>
-            </span>
-          </div>
-          <i class="el-icon-more" slot="reference" @click.stop></i>
-        </el-popover>
       </div>
 
       <!-- 课程信息 -->

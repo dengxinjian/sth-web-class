@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       :visible.sync="innerVisible"
-      width="80%"
+      width="60%"
       :before-close="handleClose"
       append-to-body
       :close-on-click-modal="false"
@@ -738,6 +738,7 @@ export default {
       // 子对话框关闭时的回调
       this.showClassDetailModal = false;
       this.getClassScheduleInfo(this.classItem.id);
+      this.handleClose();
     },
     handleClose() {
       console.log("handleClose");
@@ -836,6 +837,23 @@ export default {
         }
       });
     },
+    saveActivityScheduleForManual(flag) {
+      submitData({
+        url: "/api/manualDeviceActivity/update",
+        manualActivityId: this.classData.manualActivityId,
+        activityDuration: hhmmssToSeconds(this.actualData.activityDuration) || null,
+        duration: hhmmssToSeconds(this.actualData.duration) || null,
+        distance: this.actualData.distance || null,
+        sthValue: this.actualData.sthValue || 0,
+        calories: this.actualData.calories || 0,
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success("运动记录保存成功");
+          this.handleClose();
+          this.$emit("save", flag);
+        }
+      });
+    },
     handleSave(flag) {
       console.log(this.classData, "classData");
       // if (!this.isActivity || !this.classData.activityId) {
@@ -849,6 +867,12 @@ export default {
         !this.classData.classScheduleId
       ) {
         this.saveActivitySchedule(flag);
+      } else if (
+        this.isActivity &&
+        !this.classData.activityId &&
+        !this.classData.classScheduleId
+      ) {
+        this.saveActivityScheduleForManual(flag);
       } else {
         this.saveClassSchedule(flag);
       }
@@ -865,6 +889,16 @@ export default {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance) {
+      if (
+        distance &&
+        typeof distance === "string" &&
+        distance.includes("km") &&
+        distance !== "0km"
+      ) {
+        return distance;
+      } else if (typeof distance === "string" && distance === "0km") {
+        return "--km";
+      }
       return !distance || distance === "0" ? "--km" : distance + "km";
     },
   },
