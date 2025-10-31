@@ -363,6 +363,7 @@ export default {
       // 子对话框关闭时的回调
       this.showAddClassModal = false;
       this.getClassInfo(this.classItem.id);
+      this.handleClose();
     },
     handleClose() {
       console.log("handleClose");
