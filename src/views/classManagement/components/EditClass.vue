@@ -111,7 +111,7 @@
                       :disabled="true"
                     ></el-input>
                   </td>
-                  <td>h:m:s</td>
+                  <td style="width: 60px;">h:m:s</td>
                 </tr>
                 <tr>
                   <td>运动时长</td>

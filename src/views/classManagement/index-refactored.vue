@@ -948,10 +948,10 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const type = activity.manualActivityId ? 2 : 1;
-        const activityId = activity.manualActivityId
-          ? activity.manualActivityId
-          : activity.activityId;
+        const type = activity.activityId ? 1 : 2;
+        const activityId = activity.activityId
+          ? activity.activityId
+          : activity.manualActivityId;
         console.log(activity, activityId, type, "activityId, type");
         const res = await scheduleApi.deleteActivity(activityId, type);
         if (res.success) {
@@ -1357,10 +1357,10 @@ export default {
           })
           .then((res) => {
             if (res.success) {
-              const type = data.exerciseData[0].manualActivityId ? 2 : 1;
-              const bindingActivityId = data.exerciseData[0].manualActivityId
-                ? data.exerciseData[0].manualActivityId
-                : data.exerciseData[0].activityId;
+              const type = data.exerciseData[0].activityId ? 1 : 2;
+              const bindingActivityId = data.exerciseData[0].activityId
+                ? data.exerciseData[0].activityId
+                : data.exerciseData[0].manualActivityId;
               scheduleApi
                 .bindActivity({
                   classScheduleId: res.result.id,

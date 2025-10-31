@@ -25,9 +25,7 @@
               : classInfo.duration
           }}</span>
           <span>{{
-            !classInfo.distance || classInfo.distance == "0"
-              ? "--km"
-              : classInfo.distance
+          formatDistance(classInfo.distance, classInfo.sportType)
           }}</span>
           <span>
             {{ classInfo.sth || "--" }}
@@ -895,6 +893,22 @@ export default {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);
   },
   methods: {
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
+      if (
+        distance &&
+        typeof distance === "string" &&
+        distance.includes("km") &&
+        distance !== "0km"
+      ) {
+        return distance;
+      } else if (typeof distance === "string" && distance === "0km") {
+        return "--km";
+      } else if (sportType === "SWIM") {
+        return distance;
+      }
+      return !distance || distance === "0" ? "--km" : distance + "km";
+    },
     async getAthleticThreshold() {
       if (!this.triUserId) {
         console.warn("triUserId is empty, skip getAthleticThreshold");

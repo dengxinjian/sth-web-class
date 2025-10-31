@@ -117,7 +117,7 @@
                 <tr>
                   <td>总时长</td>
                   <td>
-                    <div>
+                    <div style="width: 100px;">
                       {{ formatDuration(classData.classesJson?.duration) }}
                     </div>
                   </td>
@@ -161,7 +161,9 @@
                       </div>
                     </div>
                   </td>
-                  <td class="unit-cell">h:m:s</td>
+                  <td class="unit-cell">
+                    <div style="width: 60px;">h:m:s</div>
+                  </td>
                 </tr>
                 <tr>
                   <td>
@@ -1034,7 +1036,6 @@ export default {
         gap: 2px;
         white-space: nowrap;
         flex-shrink: 0;
-        min-width: 80px;
         justify-content: flex-start;
 
         .el-button--text {
@@ -1112,12 +1113,6 @@ export default {
         color: #333;
       }
 
-      td:nth-child(3) {
-        width: 240px;
-        min-width: 240px;
-        max-width: 240px;
-      }
-
       td:last-child {
         width: 60px;
         color: #909399;
@@ -1126,7 +1121,6 @@ export default {
       .unit-cell {
         text-align: left !important;
         padding-left: 15px !important;
-        width: 60px;
         color: #909399;
       }
 
