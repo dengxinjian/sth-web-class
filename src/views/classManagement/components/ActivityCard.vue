@@ -30,7 +30,7 @@
           <el-popover
             popper-class="athletic-btn-popover"
             placement="right"
-            trigger="click"
+            trigger="hover"
           >
             <div class="btn-list-hover">
               <el-button

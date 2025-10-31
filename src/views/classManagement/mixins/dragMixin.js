@@ -3,7 +3,7 @@
  * 封装Sortable.js的拖拽逻辑
  */
 
-import Sortable from 'sortablejs'
+import Sortable from "sortablejs";
 
 export default {
   methods: {
@@ -12,27 +12,30 @@ export default {
      */
     initClassDrag() {
       this.$nextTick(() => {
-        document.querySelectorAll('.js-class-drag-container').forEach((el) => {
+        document.querySelectorAll(".js-class-drag-container").forEach((el) => {
           new Sortable(el, {
-            group: { name: 'classDrag', put: false, pull: 'clone' },
+            group: { name: "classDrag", put: false, pull: "clone" },
             animation: 150,
-            dataIdAttr: 'data-id',
+            dataIdAttr: "data-id",
             scroll: true,
             swapThreshold: 0.6,
             scrollSpeed: 10,
-            easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
             onEnd: (e) => {
               console.log(e, "e");
               // 只有拖到日历容器(.js-schedule-drag-container)时才处理
               // 避免拖到运动卡片(.js-sport-container-put)时也触发
-              if (e.item.dataset.id && e.to.dataset.date &&
-                  e.to.classList.contains('js-schedule-drag-container')) {
-                this.handleClassDragToSchedule(e)
+              if (
+                e.item.dataset.id &&
+                e.to.dataset.date &&
+                e.to.classList.contains("js-schedule-drag-container")
+              ) {
+                this.handleClassDragToSchedule(e);
               }
-            }
-          })
-        })
-      })
+            },
+          });
+        });
+      });
     },
 
     /**
@@ -40,27 +43,29 @@ export default {
      */
     initScheduleDrag() {
       this.$nextTick(() => {
-        const _this = this
-        document.querySelectorAll('.js-schedule-drag-container').forEach((el) => {
-          new Sortable(el, {
-            group: { name: 'classDrag' },
-            animation: 150,
-            dataIdAttr: 'data-id',
-            scroll: true,
-            swapThreshold: 0.6,
-            scrollSpeed: 10,
-            easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            onAdd: (e) => {
-              // 防止拖拽错误元素
-              if (e.item.className.indexOf('card-body') > -1) {
-                _this.getScheduleData()
-                return
-              }
-              _this.handleScheduleDragAdd(e)
-            }
-          })
-        })
-      })
+        const _this = this;
+        document
+          .querySelectorAll(".js-schedule-drag-container")
+          .forEach((el) => {
+            new Sortable(el, {
+              group: { name: "classDrag" },
+              animation: 150,
+              dataIdAttr: "data-id",
+              scroll: true,
+              swapThreshold: 0.6,
+              scrollSpeed: 10,
+              easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+              onAdd: (e) => {
+                // 防止拖拽错误元素
+                if (e.item.className.indexOf("card-body") > -1) {
+                  _this.getScheduleData();
+                  return;
+                }
+                _this.handleScheduleDragAdd(e);
+              },
+            });
+          });
+      });
     },
 
     /**
@@ -68,33 +73,33 @@ export default {
      */
     initActivityDrag() {
       this.$nextTick(() => {
-        const _this = this
-        document.querySelectorAll('.js-sport-container-put').forEach((el) => {
+        const _this = this;
+        document.querySelectorAll(".js-sport-container-put").forEach((el) => {
           new Sortable(el, {
             sort: false,
-            filter: '.js-sport-card-noDrag',
+            filter: ".js-sport-card-noDrag",
             group: {
-              name: 'classDrag',
-              pull: 'clone',
+              name: "classDrag",
+              pull: "clone",
             },
             animation: 150,
-            dataIdAttr: 'data-id',
+            dataIdAttr: "data-id",
             onAdd(e) {
               console.log(e, "e");
-              if (e.item.className === 'card-body') {
-                _this.getScheduleData()
-                return
+              if (e.item.className === "card-body") {
+                _this.getScheduleData();
+                return;
               }
               _this.handleMatchClass({
                 classId: e.item.dataset.id,
                 activityId: e.to.dataset.activityid,
                 manualActivityId: e.to.dataset.manualactivityid,
-                type: e.item.dataset.type
-              })
-            }
-          })
-        })
-      })
+                type: e.item.dataset.type,
+              });
+            },
+          });
+        });
+      });
     },
 
     /**
@@ -102,48 +107,48 @@ export default {
      */
     initClassScheduleCardDrag() {
       this.$nextTick(() => {
-        const _this = this
-        document.querySelectorAll('.js-class-schedule-card').forEach((el) => {
+        const _this = this;
+        document.querySelectorAll(".js-class-schedule-card").forEach((el) => {
           new Sortable(el, {
             group: {
-              name: 'classDrag',
-              pull: 'clone',
-              put: function(e, b) {
+              name: "classDrag",
+              pull: "clone",
+              put: function (e, b) {
                 // 只允许同一天的运动拖到课表
                 if (
-                  b.el.dataset.id &&
                   e.el.dataset.date === b.el.dataset.date &&
-                  b.el.className.indexOf('sportScheduleCard') !== -1
+                  b.el.className.indexOf("sportScheduleCard") !== -1
                 ) {
-                  return true
+                  return true;
                 } else {
-                  return false
+                  return false;
                 }
-              }
+              },
             },
             animation: 150,
-            dataIdAttr: 'data-id',
+            dataIdAttr: "data-activityId",
             onAdd(e) {
+              console.log(e, "e");
               _this.handleMatchClass({
                 classId: e.to.dataset.id,
-                activityId: e.item.dataset.id,
-                type: ''
-              })
-            }
-          })
-        })
-      })
+                activityId: e.item.dataset.activityid,
+                manualActivityId: e.item.dataset.manualactivityid,
+                type: "",
+              });
+            },
+          });
+        });
+      });
     },
 
     /**
      * 初始化所有拖拽功能
      */
     initAllDrag() {
-      this.initClassDrag()
-      this.initScheduleDrag()
-      this.initActivityDrag()
-      this.initClassScheduleCardDrag()
-    }
-  }
-}
-
+      this.initClassDrag();
+      this.initScheduleDrag();
+      this.initActivityDrag();
+      this.initClassScheduleCardDrag();
+    },
+  },
+};

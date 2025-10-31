@@ -1053,6 +1053,7 @@ export default {
           );
         } else {
           this.$message.error("该运动类型与课程类型不匹配");
+          this.getScheduleData();
         }
       } else {
         if (
@@ -1064,7 +1065,7 @@ export default {
           });
         } else {
           this.$message.error("该运动类型与课程类型不匹配");
-          // this.getScheduleData();
+          this.getScheduleData();
         }
       }
     },

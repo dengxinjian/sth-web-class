@@ -46,7 +46,7 @@
             <el-popover
               popper-class="athletic-btn-popover"
               placement="right"
-              trigger="click"
+              trigger="hover"
               tabindex="9999"
             >
               <div class="btn-list-hover">
