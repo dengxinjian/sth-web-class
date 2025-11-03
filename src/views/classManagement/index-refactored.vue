@@ -59,6 +59,7 @@
         @edit-schedule="handleEditClassSchedule"
         @edit-activity="handleEditActivity"
         @paste-class="handlePasteClass"
+        @view-health-data="handleViewHealthData"
       />
 
       <!-- 右侧统计面板 -->
@@ -180,6 +181,23 @@
       @save="handleClassDetailSave"
       @delete="handleDeleteClassSchedule"
     />
+
+    <!-- 健康数据查看弹窗 -->
+    <el-dialog
+      title=""
+      :visible.sync="showHealthViewDialog"
+      width="90%"
+      :close-on-click-modal="false"
+      custom-class="health-view-dialog"
+    >
+      <HealthView
+        v-if="showHealthViewDialog"
+        :health-data="healthViewData"
+        :date="healthViewDate"
+        :device-list="deviceList"
+        @close="showHealthViewDialog = false"
+      />
+    </el-dialog>
   </div>
 </template>
 
@@ -203,6 +221,7 @@ import ClassDetailModal from "./components/ClassDetailModal";
 import CopyClassFromOfficial from "./components/CopyClassFromOfficial";
 import ViewClassCard from "./components/ViewClassCard";
 import EditScheduleClass from "./components/EditScheduleClass";
+import HealthView from "./components/HealthView.vue";
 
 // 服务和工具导入
 import {
@@ -246,6 +265,7 @@ export default {
     CopyClassFromOfficial,
     ViewClassCard,
     EditScheduleClass,
+    HealthView,
   },
   mixins: [dragMixin],
   data() {
@@ -294,6 +314,7 @@ export default {
       showBindModal: false,
       showClassDetailModal: false,
       showCopyClassFromOfficial: false,
+      showHealthViewDialog: false,
 
       // 对话框数据
       classModalData: { title: "", groupId: "" },
@@ -316,6 +337,9 @@ export default {
       showViewClassCard: false,
       showEditScheduleClass: false,
       isActivity: false,
+      // 健康数据
+      healthViewData: {},
+      healthViewDate: '',
     };
   },
   mounted() {
@@ -592,8 +616,7 @@ export default {
 
               // 处理健康数据
               console.log(part.healthInfos, "part.healthInfos");
-              // healthInfos = part.healthInfos || [];
-              healthInfos = [];
+              healthInfos = part.healthInfos || [];
             }
           });
 
@@ -920,6 +943,16 @@ export default {
       // this.showSportDetailModal = true;
       this.showEditScheduleClass = true;
       this.isActivity = true;
+    },
+
+    /**
+     * 查看健康数据
+     */
+    handleViewHealthData(healthData) {
+      console.log('healthData:', healthData);
+      this.healthViewData = healthData;
+      this.healthViewDate = healthData.date || new Date().toISOString().split('T')[0];
+      this.showHealthViewDialog = true;
     },
 
     /**
@@ -1497,5 +1530,21 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+</style>
+
+<style lang="scss">
+.health-view-dialog {
+  margin-top: 10vh !important;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .el-dialog__header {
+    padding: 0;
+  }
+
+  .el-dialog__body {
+    padding: 0;
+  }
 }
 </style>

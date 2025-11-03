@@ -164,7 +164,7 @@
                     </div>
                   </td>
                   <td class="unit-cell">
-                    <div style="width: 60px">h:m:s</div>
+                    <div style="width: 60px;">h:m:s</div>
                   </td>
                 </tr>
                 <tr>
@@ -1116,18 +1116,15 @@ export default {
       }
 
       td:first-child {
-        width: 80px;
         color: #606266;
         white-space: nowrap;
       }
 
       td:nth-child(2) {
-        width: 100px;
         color: #333;
       }
 
       td:last-child {
-        width: 60px;
         color: #909399;
       }
 

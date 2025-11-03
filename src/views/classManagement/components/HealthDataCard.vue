@@ -1,7 +1,8 @@
 <template>
   <div class="health-data-card" @click="handleClick">
     <div class="health-data-header">
-      <span class="health-data-title">健康指标</span>
+      <img src="@/assets/addClass/health.png" alt="" class="health-data-icon">
+      <span class="health-data-title">指标</span>
     </div>
     <div class="health-data-content">
       <div class="health-data-item">
@@ -15,6 +16,7 @@
       <div class="health-data-item">
         <span class="item-label">HRV:</span>
         <span class="item-value">{{ healthData.hrv }}</span>
+        <span>更多</span>
       </div>
     </div>
   </div>
@@ -72,6 +74,11 @@ export default {
       font-size: 13px;
       font-weight: 600;
       color: #333;
+    }
+    .health-data-icon {
+      width: 20px;
+      height: 15px;
+      margin-right: 5px;
     }
   }
 
