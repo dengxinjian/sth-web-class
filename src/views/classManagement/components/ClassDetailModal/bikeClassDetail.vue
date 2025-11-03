@@ -25,7 +25,7 @@
               : classInfo.duration
           }}</span>
           <span>{{
-            !classInfo.distance || classInfo.distance == "0"
+            !classInfo.distance || classInfo.distance == "0" || classInfo.distance == "km"
               ? "--km"
               : classInfo.distance
           }}</span>

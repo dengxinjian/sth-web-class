@@ -126,6 +126,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
+                        class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.duration !== originalData.duration
@@ -142,29 +143,21 @@
                           type="text"
                           size="small"
                           @click="restoreField('duration')"
-                          v-if="
-                            classData.activityId &&
-                            actualData.duration !== originalData.duration
-                          "
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.activityId && actualData.duration !== originalData.duration) || isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.manualActivityId &&
-                            actualData.duration !== defaultData.duration
-                          "
                           @click="resetField('duration')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.manualActivityId && actualData.duration !== defaultData.duration) || isInputDisabled"
                           >重置</el-button
                         >
                       </div>
                     </div>
                   </td>
                   <td class="unit-cell">
-                    <div style="width: 60px;">h:m:s</div>
+                    <div style="width: 60px">h:m:s</div>
                   </td>
                 </tr>
                 <tr>
@@ -175,6 +168,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
+                       class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.activityDuration !==
@@ -191,25 +185,15 @@
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.activityId &&
-                            actualData.activityDuration !==
-                              originalData.activityDuration
-                          "
                           @click="restoreField('activityDuration')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.activityId && actualData.activityDuration !== originalData.activityDuration) || isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.manualActivityId &&
-                            actualData.activityDuration !==
-                              defaultData.activityDuration
-                          "
                           @click="resetField('activityDuration')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.manualActivityId && actualData.activityDuration !== defaultData.activityDuration) || isInputDisabled"
                           >重置</el-button
                         >
                       </div>
@@ -234,6 +218,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
+                       class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.distance !== originalData.distance
@@ -253,35 +238,21 @@
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.activityId &&
-                            actualData.distance !== originalData.distance
-                          "
                           @click="restoreField('distance')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.activityId && actualData.distance !== originalData.distance) || isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.manualActivityId &&
-                            actualData.distance !== defaultData.distance
-                          "
                           @click="resetField('distance')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.manualActivityId && actualData.distance !== defaultData.distance) || isInputDisabled"
                           >重置</el-button
                         >
                       </div>
                     </div>
                   </td>
-                  <td class="unit-cell">
-                    {{
-                      classData.sportType === "SWIM"
-                        ? classData.classesJson?.distanceUnit
-                        : "km"
-                    }}
-                  </td>
+                  <td class="unit-cell">km</td>
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
@@ -289,6 +260,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
+                       class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.sthValue !== originalData.sthValue
@@ -309,23 +281,15 @@
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.activityId &&
-                            actualData.sthValue !== originalData.sthValue
-                          "
                           @click="restoreField('sthValue')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.activityId && actualData.sthValue !== originalData.sthValue) || isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.manualActivityId &&
-                            actualData.sthValue !== defaultData.sthValue
-                          "
                           @click="resetField('sthValue')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.manualActivityId && actualData.sthValue !== defaultData.sthValue) || isInputDisabled"
                           >重置</el-button
                         >
                       </div>
@@ -339,6 +303,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
+                       class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.calories !== originalData.calories
@@ -359,23 +324,15 @@
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.activityId &&
-                            actualData.calories !== originalData.calories
-                          "
                           @click="restoreField('calories')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.activityId && actualData.calories !== originalData.calories) || isInputDisabled"
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
-                          v-if="
-                            classData.manualActivityId &&
-                            actualData.calories !== defaultData.calories
-                          "
                           @click="resetField('calories')"
-                          :disabled="isInputDisabled"
+                          :disabled="!(classData.manualActivityId && actualData.calories !== defaultData.calories) || isInputDisabled"
                           >重置</el-button
                         >
                       </div>
@@ -944,20 +901,19 @@ export default {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
       if (
         distance &&
         typeof distance === "string" &&
         distance.includes("km") &&
-        distance !== "0km"
+        distance !== "0km" && distance !== "km"
       ) {
         return distance;
       } else if (typeof distance === "string" && distance === "0km") {
         return "--km";
-      } else if (sportType === "SWIM") {
+      } else if (sportType === "SWIM" && distance !== "0") {
         return distance;
       }
-      return !distance || distance === "0" ? "--km" : distance + "km";
+      return !distance || distance === "0" || distance === "km" ? "--km" : distance + "km";
     },
   },
 };
@@ -1038,7 +994,11 @@ export default {
       align-items: center;
       justify-content: center;
       gap: 4px;
-
+      position: relative;
+      .modified-indicator {
+        position: absolute;
+        left: -10px;
+      }
       .el-input-number--small {
         width: 110px !important;
         flex-shrink: 0;
@@ -1058,6 +1018,15 @@ export default {
 
           &:hover {
             color: #66b1ff;
+          }
+
+          &.is-disabled {
+            color: #c0c4cc !important;
+            cursor: not-allowed;
+
+            &:hover {
+              color: #c0c4cc !important;
+            }
           }
         }
       }

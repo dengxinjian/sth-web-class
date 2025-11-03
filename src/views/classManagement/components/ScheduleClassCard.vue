@@ -264,7 +264,7 @@ export default {
         distance &&
         typeof distance === "string" &&
         distance.includes("km") &&
-        distance !== "0km"
+        distance !== "0km" && distance !== "km"
       ) {
         return distance;
       } else if (typeof distance === "string" && distance === "0km") {
@@ -272,7 +272,7 @@ export default {
       } else if (sportType === "SWIM" && distance !== "0") {
         return distance;
       }
-      return !distance || distance === "0" ? "--km" : distance + "km";
+      return !distance || distance === "0" || distance === "km" ? "--km" : distance + "km";
     },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单

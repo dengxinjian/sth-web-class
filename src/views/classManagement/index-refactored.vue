@@ -195,6 +195,7 @@
         :health-data="healthViewData"
         :date="healthViewDate"
         :device-list="deviceList"
+        :device-type="healthViewDeviceType"
         @close="showHealthViewDialog = false"
       />
     </el-dialog>
@@ -340,6 +341,7 @@ export default {
       // 健康数据
       healthViewData: {},
       healthViewDate: '',
+      healthViewDeviceType: null,
     };
   },
   mounted() {
@@ -952,6 +954,7 @@ export default {
       console.log('healthData:', healthData);
       this.healthViewData = healthData;
       this.healthViewDate = healthData.date || new Date().toISOString().split('T')[0];
+      this.healthViewDeviceType = healthData.deviceType || null;
       this.showHealthViewDialog = true;
     },
 

@@ -116,6 +116,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    deviceType: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -128,11 +132,7 @@ export default {
   },
   mounted() {
     this.initCharts();
-    // 默认选择第一个设备
-    if (this.deviceList.length > 0) {
-      this.selectedDeviceId = this.deviceList[0].id;
-      this.fetchHealthData();
-    }
+    this.selectInitialDevice();
   },
   beforeDestroy() {
     if (this.hrvChart) {
@@ -196,6 +196,31 @@ export default {
         console.error("获取健康数据失败:", error);
         this.$message.error("获取健康数据失败");
       }
+    },
+
+    /**
+     * 选择初始设备
+     */
+    selectInitialDevice() {
+      if (this.deviceList.length === 0) return;
+
+      // 如果传入了 deviceType，根据 deviceType 选择设备
+      if (this.deviceType) {
+        const targetDevice = this.deviceList.find(
+          (d) => d.deviceType === this.deviceType
+        );
+        if (targetDevice) {
+          this.selectedDeviceId = targetDevice.id;
+        } else {
+          // 如果找不到对应的设备，选择第一个
+          this.selectedDeviceId = this.deviceList[0].id;
+        }
+      } else {
+        // 如果没有传入 deviceType，默认选择第一个设备
+        this.selectedDeviceId = this.deviceList[0].id;
+      }
+
+      this.fetchHealthData();
     },
 
     /**
