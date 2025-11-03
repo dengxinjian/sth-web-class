@@ -258,7 +258,7 @@
         <!-- 标签部分 -->
         <div class="edit-section">
           <div class="section-header">
-            <span class="section-title required">标签</span>
+            <span class="section-title">标签</span>
           </div>
           <div class="tags-container">
             <div class="add-tag-input">

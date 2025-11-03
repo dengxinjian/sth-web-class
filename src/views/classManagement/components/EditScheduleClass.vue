@@ -226,7 +226,7 @@
                     <div v-else>
                       {{
                         classData.classesJson?.distanceUnit === "m"
-                          ? classData.classesJson?.distance / 1000
+                          ? classData.classesJson?.distance / 1000 || "--"
                           : classData.classesJson?.distance
                       }}
                     </div>
