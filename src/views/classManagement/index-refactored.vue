@@ -196,6 +196,7 @@
         :date="healthViewDate"
         :device-list="deviceList"
         :device-type="healthViewDeviceType"
+        :triUserId="selectedAthletic"
         @close="showHealthViewDialog = false"
       />
     </el-dialog>

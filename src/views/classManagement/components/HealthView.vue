@@ -120,6 +120,10 @@ export default {
       type: Number,
       default: null,
     },
+    triUserId: {
+      type: String,
+      default: null,
+    },
   },
   data() {
     return {
@@ -180,7 +184,7 @@ export default {
         const params = {
           deviceType: currentDevice.deviceType,
           date: this.date,
-          deviceUserId: currentDevice.deviceUserId,
+          triUserId: this.triUserId,
         };
         console.log("请求健康数据参数:", params);
 
@@ -241,10 +245,16 @@ export default {
      * 更新图表
      */
     updateCharts(data) {
-      // 处理日期格式
+      // 处理日期格式 - x轴显示简写月/日
       const dates = (data.hrvBarChatData || []).map((item) => {
         const date = new Date(item.date);
         return `${date.getMonth() + 1}/${date.getDate()}`;
+      });
+
+      // tooltip显示完整年/月/日
+      const fullDates = (data.hrvBarChatData || []).map((item) => {
+        const date = new Date(item.date);
+        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
       });
 
       // HRV 图表
@@ -264,7 +274,8 @@ export default {
         tooltip: {
           trigger: "axis",
           formatter: (params) => {
-            let result = params[0].name + "<br/>";
+            const dataIndex = params[0].dataIndex;
+            let result = fullDates[dataIndex] + "<br/>";
             params.forEach((item) => {
               const value =
                 item.value !== null && item.value !== undefined
@@ -334,7 +345,8 @@ export default {
         tooltip: {
           trigger: "axis",
           formatter: (params) => {
-            let result = params[0].name + "<br/>";
+            const dataIndex = params[0].dataIndex;
+            let result = fullDates[dataIndex] + "<br/>";
             params.forEach((item) => {
               const value =
                 item.value !== null && item.value !== undefined
@@ -408,7 +420,8 @@ export default {
         tooltip: {
           trigger: "axis",
           formatter: (params) => {
-            let result = params[0].name + "<br/>";
+            const dataIndex = params[0].dataIndex;
+            let result = fullDates[dataIndex] + "<br/>";
             params.forEach((item) => {
               if (item.value !== null && item.value !== undefined) {
                 result += `${item.seriesName}: ${parseFloat(item.value).toFixed(

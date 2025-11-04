@@ -57,12 +57,12 @@ export const scheduleApi = {
   },
 
   // 获取健康数据
-  getHealthData({ deviceType, date, deviceUserId }) {
+  getHealthData({ deviceType, date, triUserId }) {
     return getData({
       url: "/api/health",
       deviceType,
       date,
-      deviceUserId,
+      triUserId,
     });
   },
 
