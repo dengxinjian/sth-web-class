@@ -64,6 +64,8 @@ export default {
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
   cursor: pointer;
+  // 禁用拖拽选择，健康数据卡片不可拖拽
+  user-select: none;
 
   &:hover {
     transform: scale(1.02);

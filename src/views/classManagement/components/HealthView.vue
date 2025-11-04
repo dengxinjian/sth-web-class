@@ -1,7 +1,7 @@
 <template>
   <div class="health-view-container">
     <div class="health-header">
-      <h3 class="health-title">健康数据查看</h3>
+      <h3 class="health-title">健康数据</h3>
       <el-select
         v-model="selectedDeviceId"
         placeholder="请选择设备"
@@ -206,6 +206,7 @@ export default {
      * 选择初始设备
      */
     selectInitialDevice() {
+      console.log(this.deviceList, "this.deviceList");
       if (this.deviceList.length === 0) return;
 
       // 如果传入了 deviceType，根据 deviceType 选择设备

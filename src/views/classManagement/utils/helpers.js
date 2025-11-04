@@ -45,8 +45,6 @@ export function getSportTypeName(sportType) {
     5: "OTHER",
   };
   const type = typeof sportType === "number" ? typeMap[sportType] : sportType;
-  console.log(type, "type");
-  console.log(SPORT_TYPE_NAMES[type], "SPORT_TYPE_NAMES[type]");
   return SPORT_TYPE_NAMES[type] || SPORT_TYPE_NAMES.OTHER;
 }
 

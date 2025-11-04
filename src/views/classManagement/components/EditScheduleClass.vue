@@ -531,7 +531,7 @@
     </el-dialog>
     <ClassDetailModal
       :visible="showClassDetailModal"
-      :type="classData.sportType"
+      :type="normalizedSportType"
       :data="classData"
       :athleticThreshold="athleticThreshold"
       :triUserId="triUserId"
@@ -545,7 +545,7 @@
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import CycleStageDetails from "./CycleStageDetails.vue";
 import RunStageDetails from "./RunStageDetails.vue";
-import { SPORT_TYPE_ICONS } from "../constants";
+import { SPORT_TYPE_ICONS, ACTIVITY_TYPE_DICT } from "../constants";
 import { submitData, getData } from "@/api/common.js";
 import ClassDetailModal from "./ClassDetailModal/index.vue";
 import { scheduleApi } from "../services/classManagement.js";
@@ -624,6 +624,18 @@ export default {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       return classDate > today;
+    },
+    // 将sportType从数字转换为字符串类型
+    normalizedSportType() {
+      if (!this.classData.sportType) return "RUN";
+
+      // 如果已经是字符串类型，直接返回
+      if (typeof this.classData.sportType === "string") {
+        return this.classData.sportType;
+      }
+
+      // 如果是数字类型，使用常量映射转换为字符串
+      return ACTIVITY_TYPE_DICT[this.classData.sportType] || "RUN";
     },
   },
   watch: {

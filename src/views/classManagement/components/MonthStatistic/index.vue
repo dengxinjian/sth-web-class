@@ -20,7 +20,7 @@
             <span style="padding-left: 5px;">{{ item.planValue || 0 }} {{ item.key === 'totalSTH' ? '万' : item.unit }}</span>
           </div>
         </div>
-        <el-progress :percentage="item.percent || 0" :color="item.color" :show-text="false"></el-progress>
+        <el-progress :percentage="normalizePercentage(item.percent)" :color="item.color" :show-text="false"></el-progress>
       </div>
     </div>
 
@@ -143,6 +143,17 @@ export default {
     onCancel() {
       this.innerVisible = false
       this.$emit('cancel')
+    },
+    // 规范化百分比值，确保是 0-100 之间的有效数字
+    normalizePercentage(value) {
+      // 转换为数字
+      const num = Number(value)
+      // 如果不是有效数字，返回 0
+      if (isNaN(num) || !isFinite(num)) {
+        return 0
+      }
+      // 限制在 0-100 之间
+      return Math.max(0, Math.min(100, num))
     }
   }
 }

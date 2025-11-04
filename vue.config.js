@@ -36,6 +36,8 @@ module.exports = {
       warnings: false,
       errors: true,
     },
+    // 禁用主机检查（仅开发环境）
+    disableHostCheck: true,
     // proxy: {
     //   // change xxx-api/login => mock/login
     //   // detail: https://cli.vuejs.org/config/#devserver-proxy
@@ -55,6 +57,17 @@ module.exports = {
       sass: {
         sassOptions: {
           outputStyle: "expanded",
+          // 禁用 SASS 弃用警告
+          quietDeps: true,
+          silenceDeprecations: ['slash-div'],
+        },
+      },
+      scss: {
+        sassOptions: {
+          outputStyle: "expanded",
+          // 禁用 SASS 弃用警告
+          quietDeps: true,
+          silenceDeprecations: ['slash-div'],
         },
       },
     },

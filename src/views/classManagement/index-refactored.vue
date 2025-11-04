@@ -583,7 +583,6 @@ export default {
 
               // 处理虚拟运动记录
               part.manualDeviceActivityVoList.forEach((i) => {
-                console.log(i, "i");
                 if (!i.activityId) {
                   activityList.push({
                     ...i,
@@ -1132,7 +1131,9 @@ export default {
       });
       console.log(currentActivity, "currentActivity");
 
+      // 检查运动是否已经匹配过课表
       if (currentActivity.classScheduleId) {
+        this.$message.warning("该运动已经匹配过课表");
         return;
       }
 
@@ -1152,6 +1153,7 @@ export default {
             "classTemplate"
           );
         } else {
+          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }
@@ -1164,6 +1166,7 @@ export default {
             dataDate: activityDate,
           });
         } else {
+          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }
@@ -1427,15 +1430,32 @@ export default {
                 .then((res) => {
                   if (res.success) {
                     this.$message.success("匹配成功");
-                    this.getScheduleData();
                   } else {
                     this.$message.error(res.message);
-                    this.getScheduleData();
                   }
+                  // 关闭对话框并刷新数据
+                  this.showBindModal = false;
+                  this.$nextTick(() => {
+                    this.getScheduleData();
+                  });
+                })
+                .catch((error) => {
+                  console.error("绑定失败:", error);
+                  this.$message.error("绑定失败");
+                  this.showBindModal = false;
+                  this.$nextTick(() => {
+                    this.getScheduleData();
+                  });
                 });
             } else {
               this.$message.error(res.message);
+              this.showBindModal = false;
             }
+          })
+          .catch((error) => {
+            console.error("创建课表失败:", error);
+            this.$message.error("创建课表失败");
+            this.showBindModal = false;
           });
         return;
       }
@@ -1455,11 +1475,22 @@ export default {
         .then((res) => {
           if (res.success) {
             this.$message.success("匹配成功");
-            this.getScheduleData();
           } else {
             this.$message.error(res.message);
-            this.getScheduleData();
           }
+          // 关闭对话框并刷新数据
+          this.showBindModal = false;
+          this.$nextTick(() => {
+            this.getScheduleData();
+          });
+        })
+        .catch((error) => {
+          console.error("绑定失败:", error);
+          this.$message.error("绑定失败");
+          this.showBindModal = false;
+          this.$nextTick(() => {
+            this.getScheduleData();
+          });
         });
     },
 

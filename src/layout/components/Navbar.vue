@@ -39,10 +39,8 @@
 import { mapGetters, mapState, mapMutations } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
-import ErrorLog from "@/components/ErrorLog";
 import Screenfull from "@/components/Screenfull";
 import SizeSelect from "@/components/SizeSelect";
-import LangSelect from "@/components/LangSelect";
 import Search from "@/components/HeaderSearch";
 import { getData } from "@/api/common";
 
@@ -52,10 +50,8 @@ export default {
   components: {
     Breadcrumb,
     Hamburger,
-    ErrorLog,
     Screenfull,
     SizeSelect,
-    LangSelect,
     Search,
   },
   data() {

@@ -103,6 +103,7 @@
                 :key="`health-${item.commonDate}-${
                   healthDataItem.date || index
                 }`"
+                class="js-health-data-no-drag"
                 :health-data="healthDataItem"
                 :date="item.commonDate"
                 @click="$emit('view-health-data', $event)"
@@ -123,7 +124,7 @@
               <!-- 运动记录卡片 -->
               <ActivityCard
                 v-for="activityItem in item.activityList"
-                :key="`activity-${item.commonDate}-${activityItem.activityId}`"
+                :key="`activity-${item.commonDate}-${activityItem.activityId}-${activityItem.classScheduleId}`"
                 :activity="activityItem"
                 :date="item.commonDate"
                 @click="$emit('activity-detail', activityItem)"

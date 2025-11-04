@@ -94,7 +94,6 @@ export default {
   watch: {
     exerciseList: {
       handler() {
-        console.log(this.exerciseList, "this.exerciseList");
         this.$nextTick(() => {
           this.updateContainerSize();
         });
