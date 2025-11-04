@@ -90,6 +90,10 @@ export default {
                 _this.getScheduleData();
                 return;
               }
+              // 移除拖拽产生的DOM元素，避免显示重复的课表
+              if (e.item && e.item.parentNode) {
+                e.item.parentNode.removeChild(e.item);
+              }
               _this.handleMatchClass({
                 classId: e.item.dataset.id,
                 activityId: e.to.dataset.activityid,
@@ -129,6 +133,10 @@ export default {
             dataIdAttr: "data-activityId",
             onAdd(e) {
               console.log(e, "e");
+              // 移除拖拽产生的DOM元素，避免显示重复的运动卡片
+              if (e.item && e.item.parentNode) {
+                e.item.parentNode.removeChild(e.item);
+              }
               _this.handleMatchClass({
                 classId: e.to.dataset.id,
                 activityId: e.item.dataset.activityid,

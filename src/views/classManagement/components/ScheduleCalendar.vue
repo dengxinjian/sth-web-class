@@ -80,8 +80,8 @@
         <!-- 日程内容 -->
         <div class="schedule-table-body">
           <div
-            v-for="item in currentWeek"
-            :key="item.timesp"
+            v-for="(item, index) in currentWeek"
+            :key="`day-${item.commonDate || index}`"
             class="schedule-table-cell"
           >
             <div class="schedule-table-cell-title">
@@ -100,7 +100,9 @@
               <!-- 健康数据 -->
               <HealthDataCard
                 v-for="(healthDataItem, index) in item.healthInfos"
-                :key="healthDataItem.date || index"
+                :key="`health-${item.commonDate}-${
+                  healthDataItem.date || index
+                }`"
                 :health-data="healthDataItem"
                 :date="item.commonDate"
                 @click="$emit('view-health-data', $event)"
@@ -108,7 +110,7 @@
               <!-- 课表卡片 -->
               <ScheduleClassCard
                 v-for="classItem in item.classSchedule"
-                :key="classItem.id"
+                :key="`class-${item.commonDate}-${classItem.id}`"
                 :class-item="classItem"
                 :date="item.commonDate"
                 @click="$emit('class-detail', classItem, classItem.sportType)"
@@ -121,7 +123,7 @@
               <!-- 运动记录卡片 -->
               <ActivityCard
                 v-for="activityItem in item.activityList"
-                :key="activityItem.activityId"
+                :key="`activity-${item.commonDate}-${activityItem.activityId}`"
                 :activity="activityItem"
                 :date="item.commonDate"
                 @click="$emit('activity-detail', activityItem)"
@@ -140,7 +142,6 @@
         class="context-menu"
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
-
       >
         <!-- <div class="context-menu-item" @click="hideContextMenu()">
           <i class="el-icon-close"></i>
@@ -256,6 +257,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.schedule-class {
+  display: none !important;
+}
 .schedule {
   flex: 1;
   // display: flex;
@@ -358,6 +362,7 @@ export default {
   gap: 4px;
   flex-direction: row;
   overflow: auto;
+
   .schedule-table-cell {
     flex: 1;
     display: flex;

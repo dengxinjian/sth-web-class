@@ -1034,6 +1034,10 @@ export default {
         classesDate: e.to.dataset.date,
         sportType: classItem.sportType,
       };
+      // 移除克隆的DOM元素，避免显示课程模板
+      if (e.item && e.item.parentNode) {
+        e.item.parentNode.removeChild(e.item);
+      }
       this.AddScheduleClass(params, "", e.newIndex);
     },
 
@@ -1049,6 +1053,11 @@ export default {
       const sortVoList = [];
       if (e.item.dataset.type === "classTemplate") {
         return;
+      }
+
+      // 移除拖拽产生的DOM元素，避免显示重复的课表
+      if (e.item && e.item.parentNode) {
+        e.item.parentNode.removeChild(e.item);
       }
 
       // 删除原数据
@@ -1204,13 +1213,14 @@ export default {
       console.log(this.athleticThreshold, "new athleticThreshold");
 
       // 根据运动类型计算阈值
+      let calculatedClassesJson = originalClassesJson;
       if (data.sportType === "RUN") {
-        data.classesJson = new CalculateRun(
+        calculatedClassesJson = new CalculateRun(
           this.athleticThreshold,
           originalClassesJson
         ).updateClassInfoCalculatedValues();
       } else if (data.sportType === "CYCLE") {
-        data.classesJson = new CalculateBike(
+        calculatedClassesJson = new CalculateBike(
           this.athleticThreshold,
           originalClassesJson
         ).updateClassInfoCalculatedValues();
@@ -1220,30 +1230,38 @@ export default {
       if (["RUN", "CYCLE"].includes(data.sportType)) {
         const res = await scheduleApi.calculateTimeDistanceSth({
           ...data,
-          classesJson: JSON.stringify(data.classesJson),
+          classesJson: JSON.stringify(calculatedClassesJson),
           triUserId: this.selectedAthletic,
         });
 
         if (data.sportType === "RUN") {
-          data.classesJson = {
-            ...data.classesJson,
+          calculatedClassesJson = {
+            ...calculatedClassesJson,
             duration: secondsToHHMMSS(res.result.time || 0),
             distance: (res.result.distance || 0) + "km",
             sth: res.result.sth,
           };
         } else if (data.sportType === "CYCLE") {
-          data.classesJson = {
-            ...data.classesJson,
-            duration: data.classesJson.duration,
-            distance: data.classesJson.distance,
+          calculatedClassesJson = {
+            ...calculatedClassesJson,
+            duration: calculatedClassesJson.duration,
+            distance: calculatedClassesJson.distance,
             sth: res.result.sth,
           };
         }
-        data.classesJson = JSON.stringify(data.classesJson);
       }
 
+      // 将计算后的classesJson字符串化
+      const finalClassesJsonString = JSON.stringify(calculatedClassesJson);
+
+      // 创建更新后的data对象
+      const updatedData = {
+        ...data,
+        classesJson: finalClassesJsonString,
+      };
+
       if (type === "classTemplate") {
-        return data;
+        return updatedData;
       }
 
       // 生成排序数据
@@ -1252,9 +1270,9 @@ export default {
       let sort = null;
 
       this.currentWeek.forEach((item) => {
-        if (item.commonDate === data.classesDate) {
+        if (item.commonDate === updatedData.classesDate) {
           classSchedule = JSON.parse(JSON.stringify(item.classSchedule));
-          classSchedule.splice(index, 0, data);
+          classSchedule.splice(index, 0, updatedData);
         }
       });
 
@@ -1270,7 +1288,7 @@ export default {
       });
 
       const res = await scheduleApi.createSchedule({
-        ...data,
+        ...updatedData,
         triUserId: this.selectedAthletic,
         sortVoList,
         sort,

@@ -29,12 +29,12 @@ export default {
     // 运动类型，用于决定引入哪个组件
     type: {
       type: String,
-      required: true,
       default: "RUN",
-      validator: function (value = "RUN") {
+      validator: function (value) {
         console.log(value, "value");
-        // 验证type参数是否有效
+        // 验证type参数是否有效，允许空字符串（modal未激活时）
         return (
+          value === "" ||
           [
             "SWIM",
             "CYCLE",
@@ -84,37 +84,6 @@ export default {
       return componentMap[this.type] || RunDetail;
     },
   },
-  watch: {
-    visible: {
-      handler(newVal) {
-        if (newVal && this.triUserId) {
-          console.log(newVal, "newVal");
-          this.getAthleticThreshold();
-        }
-      },
-      immediate: false,
-    },
-    value: {
-      handler(newVal) {
-        if (newVal && this.triUserId) {
-          console.log(newVal, "value newVal");
-          this.getAthleticThreshold();
-        }
-      },
-      immediate: false,
-    },
-    // 监听 triUserId 变化，确保有值后再调用
-    triUserId: {
-      handler(newVal) {
-        if (newVal && (this.visible || this.value)) {
-          this.getAthleticThreshold();
-        }
-      },
-      immediate: true,
-    },
-  },
-  methods: {
-
-  },
+  methods: {},
 };
 </script>

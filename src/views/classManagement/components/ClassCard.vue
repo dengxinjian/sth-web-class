@@ -64,7 +64,7 @@
         <div style="display: flex; gap: 1px; height: 16px">
           <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
             <ExerciseProcessChart
-              :exerciseList="stage.stageTimeline"
+              :exerciseList="stage.stageTimeline || []"
               :maxIntensity="classData.classesJson.maxIntensity"
               :height="16"
             />

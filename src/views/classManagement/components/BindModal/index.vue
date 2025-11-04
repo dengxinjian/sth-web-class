@@ -17,7 +17,7 @@
       </div>
 
       <!-- 数据匹配可视化 -->
-      <div class="binding-visualization">
+      <div v-if="exerciseData && exerciseData.length > 0 && courseData" class="binding-visualization">
         <!-- 左侧运动数据 -->
         <div class="exercise-data">
           <div class="exercise-card">
@@ -155,12 +155,15 @@ export default {
     },
     exerciseData: {
       type: Array,
-      default: () => ({
-        name: "Strength",
-        duration: "0:55:58",
-        sth: "28",
-        id: "",
-      }),
+      default: () => [
+        {
+          name: "Strength",
+          duration: "0:55:58",
+          sth: "28",
+          id: "",
+          sportType: "",
+        },
+      ],
     },
     courseData: {
       type: Object,
@@ -169,6 +172,7 @@ export default {
         duration: "0:55:58",
         sth: "28",
         dataDate: "",
+        sportType: "",
       }),
     },
     type: {

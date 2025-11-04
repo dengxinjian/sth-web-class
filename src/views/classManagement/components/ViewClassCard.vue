@@ -84,7 +84,7 @@
                     alt=""
                   />
                   <!-- 课程标题 -->
-                  <div class="title">{{ classItem.classesJson.title }}</div>
+                  <div class="title">{{ classItem.classesJson ? classItem.classesJson.title : '--' }}</div>
                 </div>
               </div>
 
@@ -99,18 +99,18 @@
               >
                 <!-- 时长 -->
                 <div class="keyword">
-                  {{ formatDuration(classItem.classesJson.duration) }}
+                  {{ classItem.classesJson ? formatDuration(classItem.classesJson.duration) : '--:--:--' }}
                 </div>
 
                 <!-- 距离 -->
                 <div style="display: flex">
                   <div class="keyword">
                     {{
-                      !classItem.classesJson.distance
+                      !classItem.classesJson || !classItem.classesJson.distance
                         ? "--"
                         : classItem.classesJson.distance
                     }}
-                    <span v-if="classItem.sportType === 'SWIM'">
+                    <span v-if="classItem.classesJson && classItem.sportType === 'SWIM'">
                       {{ classItem.classesJson.distanceUnit }}
                     </span>
                     <span v-else>km</span>
@@ -122,7 +122,7 @@
                 <div style="display: flex; gap: 4px">
                   <div class="keyword">
                     {{
-                      !classItem.classesJson.sth
+                      !classItem.classesJson || !classItem.classesJson.sth
                         ? "--"
                         : classItem.classesJson.sth
                     }}
@@ -132,19 +132,19 @@
                   </div>
                 </div>
               </div>
-              <div class="section-title" v-if="classItem.classesJson.summary">
+              <div class="section-title" v-if="classItem.classesJson && classItem.classesJson.summary">
                 概要
               </div>
 
               <!-- 概要 -->
-              <pre v-if="classItem.classesJson.summary" class="stage-details">
+              <pre v-if="classItem.classesJson && classItem.classesJson.summary" class="stage-details">
           {{ classItem.classesJson.summary }}
         </pre
               >
               <!-- 训练强度可视化 -->
 
               <div
-                v-if="classItem.classesJson.timeline"
+                v-if="classItem.classesJson && classItem.classesJson.timeline"
                 style="height: 16px; display: flex; gap: 1px"
               >
                 <div
@@ -172,6 +172,7 @@
                 class="section-title"
                 style="margin-bottom: 10px"
                 v-if="
+                  classItem.classesJson &&
                   classItem.classesJson.timeline &&
                   classItem.classesJson.timeline.length > 0
                 "
@@ -181,7 +182,8 @@
               <!-- 骑行详情 -->
               <template
                 v-if="
-                  classItem.sportType === 'CYCLE' || classItem.sportType === 1
+                  classItem.classesJson &&
+                  (classItem.sportType === 'CYCLE' || classItem.sportType === 1)
                 "
               >
                 <CycleStageDetails
@@ -193,7 +195,8 @@
               <!-- 跑步详情 -->
               <template
                 v-else-if="
-                  classItem.sportType === 'RUN' || classItem.sportType === 2
+                  classItem.classesJson &&
+                  (classItem.sportType === 'RUN' || classItem.sportType === 2)
                 "
               >
                 <RunStageDetails
@@ -206,12 +209,12 @@
               <!-- 训练建议 -->
               <div
                 class="section-title"
-                v-if="classItem.classesJson.trainingAdvice"
+                v-if="classItem.classesJson && classItem.classesJson.trainingAdvice"
               >
                 训练建议
               </div>
               <pre
-                v-if="classItem.classesJson.trainingAdvice"
+                v-if="classItem.classesJson && classItem.classesJson.trainingAdvice"
                 class="stage-details"
               >
           {{ classItem.classesJson.trainingAdvice }}
@@ -271,6 +274,7 @@ export default {
       // 过期且有时长的课程显示为红色
       if (
         isExpired(this.date) &&
+        this.classItem.classesJson &&
         this.classItem.classesJson.duration &&
         this.classItem.classesJson.duration !== "00:00:00"
       ) {

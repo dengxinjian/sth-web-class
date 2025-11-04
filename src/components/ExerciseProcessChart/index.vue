@@ -17,17 +17,23 @@ export default {
   props: {
     // 运动过程列表，每个元素包含 duration（时长，单位：分钟）和 intensity（强度，0-100）
     exerciseList: {
-      type: [Number, null],
+      type: Array,
       default: () => [],
       validator: (value) => {
-        return value.every(
+        // 允许空数组或null/undefined
+        if (!value || value.length === 0) {
+          return true;
+        }
+        // 验证每个元素的格式
+        const isValid = value.every(
           (item) =>
+            item &&
             typeof item.duration === "number" &&
             typeof item.intensity === "number" &&
             item.duration > 0 &&
-            item.intensity >= 0 &&
-            item.intensity <= 100
+            item.intensity >= 0
         );
+        return isValid;
       },
     },
     // 图表高度，默认200px

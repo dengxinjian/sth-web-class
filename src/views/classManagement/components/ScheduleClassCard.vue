@@ -47,7 +47,7 @@
               popper-class="athletic-btn-popover"
               placement="right"
               trigger="hover"
-              tabindex="9999"
+              :tabindex="9999"
             >
               <div class="btn-list-hover">
                 <el-button type="text" @click.stop="$emit('edit', classItem)">

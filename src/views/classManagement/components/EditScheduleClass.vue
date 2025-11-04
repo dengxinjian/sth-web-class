@@ -11,7 +11,7 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <span v-if="classData.classesJson.title || classData.activityName">{{
+          <span v-if="classData.classesJson?.title || classData.activityName">{{
             classData.classesJson?.title || classData.activityName
           }}</span>
           <span v-else>手动运动数据</span>
@@ -93,7 +93,7 @@
               <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
                 <ExerciseProcessChart
                   :exerciseList="stage.stageTimeline"
-                  :maxIntensity="classData.classesJson.maxIntensity"
+                  :maxIntensity="classData.classesJson?.maxIntensity"
                   :height="30"
                 />
               </div>
@@ -143,14 +143,24 @@
                           type="text"
                           size="small"
                           @click="restoreField('duration')"
-                          :disabled="!(classData.activityId && actualData.duration !== originalData.duration) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.activityId &&
+                              actualData.duration !== originalData.duration
+                            ) || isInputDisabled
+                          "
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('duration')"
-                          :disabled="!(classData.manualActivityId && actualData.duration !== defaultData.duration) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.manualActivityId &&
+                              actualData.duration !== defaultData.duration
+                            ) || isInputDisabled
+                          "
                           >重置</el-button
                         >
                       </div>
@@ -168,7 +178,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
-                       class="modified-indicator"
+                        class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.activityDuration !==
@@ -186,14 +196,26 @@
                           type="text"
                           size="small"
                           @click="restoreField('activityDuration')"
-                          :disabled="!(classData.activityId && actualData.activityDuration !== originalData.activityDuration) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.activityId &&
+                              actualData.activityDuration !==
+                                originalData.activityDuration
+                            ) || isInputDisabled
+                          "
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('activityDuration')"
-                          :disabled="!(classData.manualActivityId && actualData.activityDuration !== defaultData.activityDuration) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.manualActivityId &&
+                              actualData.activityDuration !==
+                                defaultData.activityDuration
+                            ) || isInputDisabled
+                          "
                           >重置</el-button
                         >
                       </div>
@@ -218,7 +240,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
-                       class="modified-indicator"
+                        class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.distance !== originalData.distance
@@ -239,14 +261,24 @@
                           type="text"
                           size="small"
                           @click="restoreField('distance')"
-                          :disabled="!(classData.activityId && actualData.distance !== originalData.distance) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.activityId &&
+                              actualData.distance !== originalData.distance
+                            ) || isInputDisabled
+                          "
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('distance')"
-                          :disabled="!(classData.manualActivityId && actualData.distance !== defaultData.distance) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.manualActivityId &&
+                              actualData.distance !== defaultData.distance
+                            ) || isInputDisabled
+                          "
                           >重置</el-button
                         >
                       </div>
@@ -260,7 +292,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
-                       class="modified-indicator"
+                        class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.sthValue !== originalData.sthValue
@@ -282,14 +314,24 @@
                           type="text"
                           size="small"
                           @click="restoreField('sthValue')"
-                          :disabled="!(classData.activityId && actualData.sthValue !== originalData.sthValue) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.activityId &&
+                              actualData.sthValue !== originalData.sthValue
+                            ) || isInputDisabled
+                          "
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('sthValue')"
-                          :disabled="!(classData.manualActivityId && actualData.sthValue !== defaultData.sthValue) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.manualActivityId &&
+                              actualData.sthValue !== defaultData.sthValue
+                            ) || isInputDisabled
+                          "
                           >重置</el-button
                         >
                       </div>
@@ -303,7 +345,7 @@
                   <td>
                     <div class="input-with-actions">
                       <span
-                       class="modified-indicator"
+                        class="modified-indicator"
                         v-if="
                           classData.activityId &&
                           actualData.calories !== originalData.calories
@@ -325,14 +367,24 @@
                           type="text"
                           size="small"
                           @click="restoreField('calories')"
-                          :disabled="!(classData.activityId && actualData.calories !== originalData.calories) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.activityId &&
+                              actualData.calories !== originalData.calories
+                            ) || isInputDisabled
+                          "
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('calories')"
-                          :disabled="!(classData.manualActivityId && actualData.calories !== defaultData.calories) || isInputDisabled"
+                          :disabled="
+                            !(
+                              classData.manualActivityId &&
+                              actualData.calories !== defaultData.calories
+                            ) || isInputDisabled
+                          "
                           >重置</el-button
                         >
                       </div>
@@ -404,6 +456,7 @@
               </div>
               <div class="section-content">
                 <el-input
+                  v-if="classData.classesJson"
                   type="textarea"
                   :rows="8"
                   v-model="classData.classesJson.summary"
@@ -421,6 +474,7 @@
               </div>
               <div class="section-content">
                 <el-input
+                  v-if="classData.classesJson"
                   type="textarea"
                   :rows="4"
                   v-model="classData.classesJson.trainingAdvice"
@@ -905,7 +959,8 @@ export default {
         distance &&
         typeof distance === "string" &&
         distance.includes("km") &&
-        distance !== "0km" && distance !== "km"
+        distance !== "0km" &&
+        distance !== "km"
       ) {
         return distance;
       } else if (typeof distance === "string" && distance === "0km") {
@@ -913,7 +968,9 @@ export default {
       } else if (sportType === "SWIM" && distance !== "0") {
         return distance;
       }
-      return !distance || distance === "0" || distance === "km" ? "--km" : distance + "km";
+      return !distance || distance === "0" || distance === "km"
+        ? "--km"
+        : distance + "km";
     },
   },
 };
