@@ -30,9 +30,7 @@
         <!-- 距离 -->
         <span>
           {{
-            !classData.classesJson.distance
-              ? "--"
-              : classData.classesJson.distance
+            formatDistance(classData.classesJson.distance, classData.sportType)
           }}
           <span v-if="classData.sportType === 'SWIM'">
             {{ classData.classesJson.distanceUnit }}
@@ -113,6 +111,20 @@ export default {
     },
   },
   methods: {
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
+    },
     getSportTypeIcon(sportType) {
       return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
     },

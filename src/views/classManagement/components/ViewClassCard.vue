@@ -106,9 +106,7 @@
                 <div style="display: flex">
                   <div class="keyword">
                     {{
-                      !classItem.classesJson || !classItem.classesJson.distance
-                        ? "--"
-                        : classItem.classesJson.distance
+                      formatDistance(classItem.classesJson.distance, classItem.sportType)
                     }}
                     <span v-if="classItem.classesJson && classItem.sportType === 'SWIM'">
                       {{ classItem.classesJson.distanceUnit }}
@@ -319,8 +317,19 @@ export default {
     formatDuration(duration) {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
-    formatDistance(distance) {
-      return !distance || distance === "0" ? "--km" : distance;
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
     },
     handleDelete() {
       this.$emit("delete", this.classItem.id);

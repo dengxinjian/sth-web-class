@@ -25,8 +25,8 @@
               : classInfo.duration
           }}</span>
           <span>{{
-          formatDistance(classInfo.distance, classInfo.sportType)
-          }}</span>
+            formatDistance(classInfo.distance, classInfo.sportType)
+          }}km</span>
           <span>
             {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -895,19 +895,17 @@ export default {
   methods: {
     formatDistance(distance, sportType) {
       console.log(distance, sportType, "distance, sportType");
-      if (
-        distance &&
-        typeof distance === "string" &&
-        distance.includes("km") &&
-        distance !== "0km"
-      ) {
-        return distance;
-      } else if (typeof distance === "string" && distance === "0km") {
-        return "--km";
-      } else if (sportType === "SWIM") {
-        return distance;
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
       }
-      return !distance || distance === "0" ? "--km" : distance + "km";
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
     },
     async getAthleticThreshold() {
       if (!this.triUserId) {

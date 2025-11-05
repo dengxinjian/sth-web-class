@@ -79,7 +79,11 @@
           <div class="keyword">{{ activity.duration }}</div>
           <div style="display: flex">
             <div class="keyword">
-              {{ formatDistance(activity.distance) }}
+              {{ formatDistance(activity.distance, activity.sportType) }}
+              <span v-if="activity.sportType === 'SWIM'">
+                {{ activity.unit }}
+              </span>
+              <span v-else>km</span>
             </div>
           </div>
           <div style="display: flex; gap: 4px">
@@ -276,8 +280,19 @@ export default {
   },
   methods: {
     truncateByLines,
-    formatDistance(distance) {
-      return !distance || distance === "0" ? "--km" : distance + "km";
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
     },
     getSportIcon(sportType) {
       return getClassImageIcon(sportType);

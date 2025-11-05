@@ -44,11 +44,11 @@
                 {{ exerciseData[0].sth == 0 ? "--" : exerciseData[0].sth }} STH
               </div>
               <div class="card-distance">
-                {{
-                  exerciseData[0].distance == 0
-                    ? "--"
-                    : exerciseData[0].distance
-                }}km
+                {{ formatDistance(exerciseData[0].distance, exerciseData[0].sportType) }}
+                <span v-if="exerciseData[0].sportType === 'SWIM'">{{
+                  exerciseData[0].distanceUnit
+                }}</span>
+                <span v-else>km</span>
               </div>
             </div>
           </div>
@@ -76,8 +76,8 @@
                 {{ courseData.sth == 0 ? "--" : courseData.sth }} STH
               </div>
               <div class="card-distance">
-                {{ courseData.distance == 0 ? "--" : courseData.distance }}
-                <span v-if="courseData.distanceUnit">{{
+                {{ formatDistance(courseData.distance, courseData.sportType) }}
+                <span v-if="courseData.sportType === 'SWIM'">{{
                   courseData.distanceUnit
                 }}</span>
                 <span v-else>km</span>
@@ -119,8 +119,8 @@
                 }}
               </div>
               <div class="card-distance">
-                {{ exerciseData[0].distance == 0 ? "--" : exerciseData[0].distance }}
-                <span v-if="exerciseData[0].distanceUnit">{{
+                {{ formatDistance(exerciseData[0].distance, exerciseData[0].sportType) }}
+                <span v-if="exerciseData[0].sportType === 'SWIM'">{{
                   exerciseData[0].distanceUnit
                 }}</span>
                 <span v-else>km</span>
@@ -191,6 +191,20 @@ export default {
     },
   },
   methods: {
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
+    },
     getSportTypeIcon(sportType) {
       return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
     },

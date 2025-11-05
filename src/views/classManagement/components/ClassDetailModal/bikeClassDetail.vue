@@ -25,10 +25,8 @@
               : classInfo.duration
           }}</span>
           <span>{{
-            !classInfo.distance || classInfo.distance == "0" || classInfo.distance == "km"
-              ? "--km"
-              : classInfo.distance
-          }}</span>
+            formatDistance(classInfo.distance, classInfo.sportType)
+          }}km</span>
           <span>
             {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -812,6 +810,20 @@ export default {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);
   },
   methods: {
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
+    },
     async getAthleticThreshold() {
       if (!this.triUserId) {
         console.warn("triUserId is empty, skip getAthleticThreshold");
