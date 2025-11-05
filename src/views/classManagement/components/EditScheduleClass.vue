@@ -42,19 +42,19 @@
                 formatDistance(
                   classData.classesJson?.distance,
                   classData.classesJson?.sportType
-                ) || "--"
+                )
               }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.classesJson?.distanceUnit }}
               </span>
+              <span v-else>km</span>
             </div>
             <div class="metric-value" v-else>
-              {{
-                formatDistance(classData.distance, classData.sportType) || "--"
-              }}
+              {{ formatDistance(classData.distance, classData.sportType) }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.unit }}
               </span>
+              <span v-else>km</span>
             </div>
           </div>
           <div class="metric-item">
@@ -227,7 +227,12 @@
                   <td>运动距离</td>
                   <td>
                     <div v-if="classData.classesJson?.sportType !== 'SWIM'">
-                      {{ classData.classesJson?.distance || "--" }}
+                      {{
+                        formatDistance(
+                          classData.classesJson?.distance,
+                          classData.classesJson?.sportType
+                        )
+                      }}
                     </div>
                     <div v-else>
                       {{
@@ -967,22 +972,18 @@ export default {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      if (
-        distance &&
-        typeof distance === "string" &&
-        distance.includes("km") &&
-        distance !== "0km" &&
-        distance !== "km"
-      ) {
-        return distance;
-      } else if (typeof distance === "string" && distance === "0km") {
-        return "--km";
-      } else if (sportType === "SWIM" && distance !== "0") {
-        return distance;
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
       }
-      return !distance || distance === "0" || distance === "km"
-        ? "--km"
-        : distance + "km";
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
     },
   },
 };

@@ -83,10 +83,11 @@
           <!-- 距离 -->
           <div style="display: flex" v-if="!isRestType(classItem.sportType)">
             <div class="keyword">
-              {{ formatDistance(classItem.classesJson.distance, classItem.sportType) || "--" }}
+              {{ formatDistance(classItem.classesJson.distance, classItem.sportType) }}
               <span v-if="classItem.sportType === 'SWIM'">
                 {{ classItem.classesJson.distanceUnit }}
               </span>
+              <span v-else>km</span>
             </div>
             <div>&nbsp;&nbsp;</div>
           </div>
@@ -260,19 +261,18 @@ export default {
       return duration === "00:00:00" ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      if (
-        distance &&
-        typeof distance === "string" &&
-        distance.includes("km") &&
-        distance !== "0km" && distance !== "km"
-      ) {
-        return distance;
-      } else if (typeof distance === "string" && distance === "0km") {
-        return "--km";
-      } else if (sportType === "SWIM" && distance !== "0") {
-        return distance;
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
       }
-      return !distance || distance === "0" || distance === "km" ? "--km" : distance + "km";
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
     },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单

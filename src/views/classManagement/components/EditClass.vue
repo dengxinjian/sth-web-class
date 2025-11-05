@@ -33,9 +33,7 @@
           <div class="metric-item">
             <div class="metric-value">
               {{
-                !classData.classesJson?.distance
-                  ? "--"
-                  : classData.classesJson.distance
+                formatDistance(classData.classesJson?.distance, classData.sportType)
               }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.classesJson?.distanceUnit }}
@@ -49,9 +47,7 @@
             </div>
           </div>
           <div class="metric-item">
-            <el-button
-              type="primary"
-              @click="handleEditClassDetail"
+            <el-button type="primary" @click="handleEditClassDetail"
               >编辑课程详情</el-button
             >
           </div>
@@ -87,9 +83,7 @@
           style="display: flex; max-height: 500px; overflow-y: auto; gap: 10px"
         >
           <!-- 计划 vs 实际 对比表格 -->
-          <div
-            class="comparison-table"
-          >
+          <div class="comparison-table">
             <table>
               <thead>
                 <tr>
@@ -111,7 +105,7 @@
                       :disabled="true"
                     ></el-input>
                   </td>
-                  <td style="width: 60px;">h:m:s</td>
+                  <td style="width: 60px">h:m:s</td>
                 </tr>
                 <tr>
                   <td>运动时长</td>
@@ -188,10 +182,7 @@
             </div>
 
             <!-- 训练建议 -->
-            <div
-              class="section"
-              v-if="!isTrainingAdvice(classData.sportType)"
-            >
+            <div class="section" v-if="!isTrainingAdvice(classData.sportType)">
               <div class="section-header">
                 <span class="section-title">训练建议</span>
               </div>
@@ -219,12 +210,18 @@
               <div class="section-content">
                 <!-- 骑行详情 -->
                 <template v-if="classData.sportType === 'CYCLE'">
-                  <CycleStageDetails :class-data="classData.classesJson" type="class" />
+                  <CycleStageDetails
+                    :class-data="classData.classesJson"
+                    type="class"
+                  />
                 </template>
 
                 <!-- 跑步详情 -->
                 <template v-else-if="classData.sportType === 'RUN'">
-                  <RunStageDetails :class-data="classData.classesJson" type="class" />
+                  <RunStageDetails
+                    :class-data="classData.classesJson"
+                    type="class"
+                  />
                 </template>
               </div>
             </div>
@@ -305,7 +302,7 @@ export default {
       if (!val) {
         this.$nextTick(() => {
           this.classData = {
-            classesJson: {}
+            classesJson: {},
           };
           this.actualData = {
             totalDuration: "",
@@ -394,8 +391,19 @@ export default {
     formatDuration(duration) {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
-    formatDistance(distance) {
-      return !distance || distance === "0" ? "--km" : distance + "km";
+    formatDistance(distance, sportType) {
+      console.log(distance, sportType, "distance, sportType");
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance.toString();
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
     },
   },
 };
