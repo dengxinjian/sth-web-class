@@ -60,14 +60,7 @@
           </span>
         </el-form-item>
       </el-tooltip>
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          font-size: 14px;
-          margin-bottom: 10px;
-        "
-      >
+      <div style="display: flex; align-items: center; font-size: 14px; margin-bottom: 10px;">
         <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
           <el-radio label="1">运动员</el-radio>
           <el-radio label="2">教练</el-radio>
@@ -158,15 +151,15 @@ export default {
     } else if (this.loginForm.password === "") {
       this.$refs.password.focus();
     }
-    this.loginType = localStorage.getItem("loginType") || "1";
-    localStorage.setItem("loginType", this.loginType);
+    this.loginType = localStorage.getItem('loginType') || '1';
+    localStorage.setItem('loginType', this.loginType);
   },
   destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
     handleLoginTypeChange(value) {
-      localStorage.setItem("loginType", value);
+      localStorage.setItem('loginType', value);
     },
     checkCapslock(e) {
       const { key } = e;
@@ -195,17 +188,10 @@ export default {
               password: ps,
             })
             .then(() => {
-              console.log(
-                localStorage.getItem("loginType"),
-                "localStorage.getItem('loginType')"
-              );
-              // 路由跳转，使用安全的错误处理
-              if (this.$router) {
-                const pushResult = this.$router.push("/timeTable/class");
-                if (pushResult && typeof pushResult.catch === "function") {
-                  pushResult.catch(() => {});
-                }
-              }
+              this.$router.push({
+                path: "/",
+                query: this.otherQuery,
+              });
               this.loading = false;
             })
             .catch(() => {

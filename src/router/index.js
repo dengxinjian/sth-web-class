@@ -152,12 +152,12 @@ export const asyncRoutes = [
   {
     path: "/",
     component: Layout,
-    redirect: "/timeTable/athletic",
+    redirect: "/timeTable/class",
   },
   {
     path: "/timeTable",
     component: TopLayout,
-    redirect: "/timeTable/athletic",
+    redirect: "/timeTable/class",
     alwaysShow: false,
     meta: { title: "课表查看", icon: "el-icon-setting" },
     children: [
