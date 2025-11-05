@@ -167,6 +167,11 @@ export const asyncRoutes = [
         meta: { title: "课表管理" },
       },
       {
+        path: "class",
+        component: () => import("@/views/classManagement/index-refactored.vue"),
+        meta: { title: "课程管理" },
+      },
+      {
         path: "/class-management-test",
         component: () => import("@/views/classManagement/index-refactored.vue"),
         meta: { title: "课程管理（测试）", icon: "education" },

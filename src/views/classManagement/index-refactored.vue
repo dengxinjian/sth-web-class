@@ -2,7 +2,7 @@
   <div class="container">
     <div class="athletic-container" v-loading="loading">
       <!-- 左侧菜单 -->
-      <LeftMenu v-model="activeName" @change="handleTypeChange" />
+      <!-- <LeftMenu v-model="activeName" @change="handleTypeChange" /> -->
 
       <!-- 中间内容区 -->
       <div class="type-change">
@@ -345,7 +345,19 @@ export default {
       healthViewDeviceType: null,
     };
   },
+  watch: {
+    // 监听路由变化，同步菜单状态
+    $route: {
+      handler(to) {
+        this.initMenuFromRoute();
+      },
+      immediate: false,
+    },
+  },
   mounted() {
+    // 根据路由初始化菜单状态
+    this.initMenuFromRoute();
+
     if (localStorage.getItem("loginType") !== "1") {
       this.getTeamAndAthleticData();
     } else {
@@ -429,6 +441,17 @@ export default {
       return team ? team.name : "";
     },
 
+    /**
+     * 根据路由初始化菜单状态
+     */
+    initMenuFromRoute() {
+      const path = this.$route.path;
+      if (path.includes("athletic")) {
+        this.activeName = "athletic";
+      } else if (path.includes("class") || path.includes("timeTable")) {
+        this.activeName = "class";
+      }
+    },
     /**
      * 类型切换（运动员/课程）
      */

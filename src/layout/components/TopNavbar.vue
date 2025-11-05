@@ -114,7 +114,18 @@ export default {
     },
     changeIdentify() {
       localStorage.setItem("loginType", this.loginType === "1" ? "2" : "1");
-      this.reload();
+      if (this.loginType === "2") {
+        // 路由跳转，使用安全的错误处理
+        if (this.$router) {
+          const pushResult = this.$router.push("/timeTable/class");
+          if (pushResult && typeof pushResult.catch === "function") {
+            pushResult.catch(() => {});
+          }
+        }
+        this.reload();
+      } else {
+        this.reload();
+      }
     },
     chooseShop(e) {
       const name = this.shopOptions.find((item) => item.value === e).label;
