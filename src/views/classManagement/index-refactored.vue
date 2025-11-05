@@ -1590,7 +1590,7 @@ export default {
 
 <style lang="scss">
 .health-view-dialog {
-  margin-top: 10vh !important;
+  margin-top: 5vh !important;
   border-radius: 8px;
   overflow: hidden;
 
