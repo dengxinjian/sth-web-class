@@ -106,7 +106,7 @@
                 <div style="display: flex">
                   <div class="keyword">
                     {{
-                      formatDistance(classItem.classesJson.distance, classItem.sportType)
+                      formatDistance(classItem.classesJson?.distance, classItem.sportType)
                     }}
                     <span v-if="classItem.classesJson && classItem.sportType === 'SWIM'">
                       {{ classItem.classesJson.distanceUnit }}
