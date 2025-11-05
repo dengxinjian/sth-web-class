@@ -2,6 +2,7 @@
   <div class="health-view-container">
     <div class="health-header">
       <h3 class="health-title">健康数据</h3>
+      <div class="date-info"> {{ date }}</div>
       <el-select
         v-model="selectedDeviceId"
         placeholder="请选择设备"
@@ -272,6 +273,14 @@ export default {
             fontWeight: "bold",
           },
         },
+        legend: {
+          data: ["HRV", "7天平均"],
+          top: 10,
+          right: 10,
+          textStyle: {
+            fontSize: 12,
+          },
+        },
         tooltip: {
           trigger: "axis",
           formatter: (params) => {
@@ -341,6 +350,14 @@ export default {
           textStyle: {
             fontSize: 14,
             fontWeight: "bold",
+          },
+        },
+        legend: {
+          data: ["静息心率", "7天平均"],
+          top: 10,
+          right: 10,
+          textStyle: {
+            fontSize: 12,
           },
         },
         tooltip: {
@@ -416,6 +433,14 @@ export default {
           textStyle: {
             fontSize: 14,
             fontWeight: "bold",
+          },
+        },
+        legend: {
+          data: ["睡眠时长", "7天平均"],
+          top: 10,
+          right: 10,
+          textStyle: {
+            fontSize: 12,
           },
         },
         tooltip: {
@@ -516,6 +541,12 @@ export default {
       font-weight: bold;
       color: #333;
       margin-right: 20px;
+    }
+    .date-info {
+      margin-right: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
     }
 
     .device-select {

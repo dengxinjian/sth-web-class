@@ -1583,6 +1583,8 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid #e5e5e5;
+  background-color: #fff;
 }
 </style>
 

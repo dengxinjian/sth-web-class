@@ -24,9 +24,11 @@
               ? "--:--:--"
               : classInfo.duration
           }}</span>
-          <span>{{
-            formatDistance(classInfo.distance, classInfo.sportType)
-          }}km</span>
+          <span
+            >{{
+              formatDistance(classInfo.distance, classInfo.sportType)
+            }}km</span
+          >
           <span>
             {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -1140,7 +1142,7 @@ export default {
         if (res.success) {
           this.classInfo.sth = res.result?.sth || "";
           this.classInfo.distance = res.result?.distance
-            ? res.result.distance + "km"
+            ? res.result.distance
             : "";
           this.classInfo.duration = this.translateTime(res.result?.time || "");
           console.log(this.classInfo.distance, "this.classInfo.distance");
