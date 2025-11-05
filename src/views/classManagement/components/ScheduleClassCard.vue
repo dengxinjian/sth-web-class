@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="position: relative">
     <div
       class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
       :data-id="classItem.id"
@@ -276,10 +276,17 @@ export default {
     },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
+      console.log(event, "event");
+      console.log(event.clientX, event.clientY, "event.clientX, event.clientY");
       this.$nextTick(() => {
+        // 获取组件根元素
+        const rootElement = this.$el;
+        const rootRect = rootElement.getBoundingClientRect();
+
+        // 计算相对于组件根元素的坐标
+        this.contextMenuX = event.clientX - rootRect.left;
+        this.contextMenuY = event.clientY - rootRect.top;
         this.contextMenuVisible = true;
-        this.contextMenuX = event.clientX;
-        this.contextMenuY = event.clientY;
       });
     },
     hideContextMenu() {
@@ -408,7 +415,7 @@ export default {
 }
 
 .context-menu {
-  position: fixed;
+  position: absolute;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 4px;

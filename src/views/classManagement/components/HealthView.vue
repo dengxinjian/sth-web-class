@@ -2,6 +2,7 @@
   <div class="health-view-container">
     <div class="health-header">
       <h3 class="health-title">健康数据</h3>
+      <div class="date-info"> {{ date }}</div>
       <el-select
         v-model="selectedDeviceId"
         placeholder="请选择设备"
@@ -247,17 +248,31 @@ export default {
      */
     updateCharts(data) {
       // 处理日期格式 - x轴显示简写月/日
-      const dates = (data.hrvBarChatData || []).map((item) => {
+      const hrvBarChatData = (data.hrvBarChatData || []).map((item) => {
         const date = new Date(item.date);
         return `${date.getMonth() + 1}/${date.getDate()}`;
       });
-
+      const rhrBarChatData = (data.rhrBarChatData || []).map((item) => {
+        const date = new Date(item.date);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      });
+      const sleepTimeBarChatData = (data.sleepTimeBarChatData || []).map((item) => {
+        const date = new Date(item.date);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      });
       // tooltip显示完整年/月/日
-      const fullDates = (data.hrvBarChatData || []).map((item) => {
+      const hrvBarChatDataAll = (data.hrvBarChatData || []).map((item) => {
         const date = new Date(item.date);
         return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
       });
-
+      const rhrBarChatDataAll = (data.rhrBarChatData || []).map((item) => {
+        const date = new Date(item.date);
+        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+      });
+      const sleepTimeBarChatDataAll = (data.sleepTimeBarChatData || []).map((item) => {
+        const date = new Date(item.date);
+        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+      });
       // HRV 图表
       const hrvData = (data.hrvBarChatData || []).map((item) => item.value);
       const hrvAvg = (data.hrvBarChatData || []).map((item) => item.aveValue);
@@ -272,11 +287,19 @@ export default {
             fontWeight: "bold",
           },
         },
+        legend: {
+          data: ["HRV", "7天平均"],
+          top: 10,
+          right: 10,
+          textStyle: {
+            fontSize: 12,
+          },
+        },
         tooltip: {
           trigger: "axis",
           formatter: (params) => {
             const dataIndex = params[0].dataIndex;
-            let result = fullDates[dataIndex] + "<br/>";
+            let result = hrvBarChatDataAll[dataIndex] + "<br/>";
             params.forEach((item) => {
               const value =
                 item.value !== null && item.value !== undefined
@@ -295,7 +318,7 @@ export default {
         },
         xAxis: {
           type: "category",
-          data: dates,
+          data: hrvBarChatData,
           axisLabel: {
             rotate: 45,
             fontSize: 10,
@@ -343,11 +366,19 @@ export default {
             fontWeight: "bold",
           },
         },
+        legend: {
+          data: ["静息心率", "7天平均"],
+          top: 10,
+          right: 10,
+          textStyle: {
+            fontSize: 12,
+          },
+        },
         tooltip: {
           trigger: "axis",
           formatter: (params) => {
             const dataIndex = params[0].dataIndex;
-            let result = fullDates[dataIndex] + "<br/>";
+            let result = rhrBarChatDataAll[dataIndex] + "<br/>";
             params.forEach((item) => {
               const value =
                 item.value !== null && item.value !== undefined
@@ -366,7 +397,7 @@ export default {
         },
         xAxis: {
           type: "category",
-          data: dates,
+          data: rhrBarChatData,
           axisLabel: {
             rotate: 45,
             fontSize: 10,
@@ -418,11 +449,19 @@ export default {
             fontWeight: "bold",
           },
         },
+        legend: {
+          data: ["睡眠时长", "7天平均"],
+          top: 10,
+          right: 10,
+          textStyle: {
+            fontSize: 12,
+          },
+        },
         tooltip: {
           trigger: "axis",
           formatter: (params) => {
             const dataIndex = params[0].dataIndex;
-            let result = fullDates[dataIndex] + "<br/>";
+            let result = sleepTimeBarChatDataAll[dataIndex] + "<br/>";
             params.forEach((item) => {
               if (item.value !== null && item.value !== undefined) {
                 result += `${item.seriesName}: ${parseFloat(item.value).toFixed(
@@ -443,7 +482,7 @@ export default {
         },
         xAxis: {
           type: "category",
-          data: dates,
+          data: sleepTimeBarChatData,
           axisLabel: {
             rotate: 45,
             fontSize: 10,
@@ -516,6 +555,12 @@ export default {
       font-weight: bold;
       color: #333;
       margin-right: 20px;
+    }
+    .date-info {
+      margin-right: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
     }
 
     .device-select {

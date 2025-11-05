@@ -1606,12 +1606,14 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid #e5e5e5;
+  background-color: #fff;
 }
 </style>
 
 <style lang="scss">
 .health-view-dialog {
-  margin-top: 10vh !important;
+  margin-top: 5vh !important;
   border-radius: 8px;
   overflow: hidden;
 

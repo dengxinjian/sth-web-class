@@ -31,7 +31,11 @@
               ? "--:--:--"
               : classInfo.duration
           }}</span>
-          <span>{{ formatDistance(classInfo.distance, classInfo.sportType) }}km</span>
+          <span
+            >{{
+              formatDistance(classInfo.distance, classInfo.sportType)
+            }}km</span
+          >
           <span>
             {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -991,6 +995,7 @@ export default {
                 this.classInfo.distance +=
                   section.targetDistance * Number(stage.times || 1);
               }
+              console.log(this.classInfo.distance, "this.classInfo.distance");
             }
           } else {
             if (section.capacity === "time") {
@@ -1045,22 +1050,25 @@ export default {
         // this.classInfo.duration += stage.times * this.classInfo.duration;
         // this.classInfo.distance += stage.times * this.classInfo.distance;
       });
+      console.log(this.classInfo.distance, "this.classInfo.distance");
       if (new Set(capacityList).size !== 1 && capacityList.length > 0) {
-        this.classInfo.duration = 0;
+        console.log(this.classInfo.duration, "this.classInfo.duration");
+        this.classInfo.duration = "";
         this.classInfo.distance = 0;
         this.classInfo.duration = this.classInfo.duration
           ? this.translateTime(this.classInfo.duration)
-          : "--:--:--";
+          : "00:00:00";
         this.classInfo.distance = this.classInfo.distance
-          ? this.classInfo.distance.toFixed(2)
-          : "--";
+          ? this.classInfo.distance
+          : "";
       } else {
         this.classInfo.duration = this.classInfo.duration
           ? this.translateTime(this.classInfo.duration)
-          : "--:--:--";
+          : "00:00:00";
         this.classInfo.distance = this.classInfo.distance
-          ? this.classInfo.distance.toFixed(2)
-          : "--";
+          ? this.classInfo.distance
+          : "";
+        console.log(this.classInfo.distance, "this.classInfo.duration");
       }
     },
     handleClose() {
@@ -1574,7 +1582,7 @@ export default {
       text-align: center;
       margin-bottom: 5px;
       white-space: nowrap;
-       overflow: hidden;
+      overflow: hidden;
       text-overflow: ellipsis;
     }
     .time-stage-for {
