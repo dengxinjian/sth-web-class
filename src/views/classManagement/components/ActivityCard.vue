@@ -277,7 +277,9 @@ export default {
   methods: {
     truncateByLines,
     formatDistance(distance) {
-      return !distance || distance === "0" ? "--km" : distance + "km";
+      return !distance || distance === "0" || distance === "km"
+        ? "--km"
+        : distance + "km";
     },
     getSportIcon(sportType) {
       return getClassImageIcon(sportType);
