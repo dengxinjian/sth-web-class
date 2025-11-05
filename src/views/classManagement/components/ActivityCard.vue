@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="position: relative">
     <div
       class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
       :style="{ backgroundColor: bgColor }"
@@ -304,9 +304,15 @@ export default {
       return ["REST", "REMARK", "OTHER"].includes(sportType);
     },
     showContextMenu(event) {
+      console.log(event, "event");
+      // 获取组件根元素
+      const rootElement = this.$el;
+      const rootRect = rootElement.getBoundingClientRect();
+
+      // 计算相对于组件根元素的坐标
+      this.contextMenuX = event.clientX - rootRect.left;
+      this.contextMenuY = event.clientY - rootRect.top;
       this.contextMenuVisible = true;
-      this.contextMenuX = event.clientX;
-      this.contextMenuY = event.clientY;
     },
     hideContextMenu() {
       this.contextMenuVisible = false;
@@ -410,7 +416,7 @@ export default {
 }
 
 .context-menu {
-  position: fixed;
+  position: absolute;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
