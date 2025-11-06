@@ -178,10 +178,6 @@
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
       >
-        <div class="context-menu-item" @click="handleCopy">
-          <i class="el-icon-crop"></i>
-          复制
-        </div>
         <div
           class="context-menu-item"
           @click="
@@ -191,6 +187,10 @@
         >
           <i class="el-icon-edit"></i>
           编辑
+        </div>
+        <div class="context-menu-item" @click="handleCopy">
+          <i class="el-icon-crop"></i>
+          复制
         </div>
         <div class="context-menu-item" @click="handleDelete">
           <i class="el-icon-delete"></i>
@@ -297,7 +297,7 @@ export default {
 
         // 等待菜单渲染完成后再计算边界并调整位置
         this.$nextTick(() => {
-          const menuElement = this.$el.querySelector('.context-menu');
+          const menuElement = this.$el.querySelector(".context-menu");
           if (!menuElement) return;
 
           const menuRect = menuElement.getBoundingClientRect();
@@ -316,7 +316,10 @@ export default {
 
           // 限制右边界（优先考虑视口，然后考虑容器）
           if (menuAbsoluteX + menuWidth > viewportWidth) {
-            x = Math.min(containerWidth - menuWidth - 5, viewportWidth - rootRect.left - menuWidth - 5);
+            x = Math.min(
+              containerWidth - menuWidth - 5,
+              viewportWidth - rootRect.left - menuWidth - 5
+            );
           } else if (x + menuWidth > containerWidth) {
             x = containerWidth - menuWidth - 5;
           }
@@ -328,7 +331,10 @@ export default {
 
           // 限制下边界（优先考虑视口，然后考虑容器）
           if (menuAbsoluteY + menuHeight > viewportHeight) {
-            y = Math.min(containerHeight - menuHeight - 5, viewportHeight - rootRect.top - menuHeight - 5);
+            y = Math.min(
+              containerHeight - menuHeight - 5,
+              viewportHeight - rootRect.top - menuHeight - 5
+            );
           } else if (y + menuHeight > containerHeight) {
             y = containerHeight - menuHeight - 5;
           }
