@@ -141,6 +141,7 @@ export default {
   flex-direction: column;
   max-height: calc(100vh - 60px);
   overflow-y: auto;
+  border-left: 1px solid #e5e5e5;
 
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {

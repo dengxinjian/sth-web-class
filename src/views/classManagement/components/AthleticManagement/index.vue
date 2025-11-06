@@ -1,22 +1,24 @@
 <template>
   <div class="athletic-management">
-    <div class="athletic-title">{{ teamName }}</div>
-    <div class="athletic-operation">
-      <el-input size="mini" v-model="searchInput" @input="handleSearch">
-        <el-button
-          slot="append"
-          icon="el-icon-search"
-          @click="handleSearch"
-        ></el-button>
-      </el-input>
-    </div>
-    <div class="athletic-btn">
-      <el-button type="primary" size="mini" @click="handleInviteAthletic"
-        >邀请运动员</el-button
-      >
-      <el-button type="primary" size="mini" @click="handleInviteCoach"
-        >邀请执教</el-button
-      >
+    <div style="padding: 10px;">
+      <div class="athletic-title">{{ teamName }}</div>
+      <div class="athletic-operation">
+        <el-input size="mini" v-model="searchInput" @input="handleSearch">
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="handleSearch"
+          ></el-button>
+        </el-input>
+      </div>
+      <div class="athletic-btn">
+        <el-button type="primary" size="mini" @click="handleInviteAthletic"
+          >邀请运动员</el-button
+        >
+        <el-button type="primary" size="mini" @click="handleInviteCoach"
+          >邀请执教</el-button
+        >
+      </div>
     </div>
     <el-tree
       class="athletic-tree"
@@ -28,8 +30,17 @@
       <span class="athletic-btn-list" slot-scope="{ node }">
         <span
           >{{ node.label }}
-          <span v-if="!node.data.isGroup && node.data.userType === 1 && !isCurrentUser(node.data.triUserId)">（主教练）</span>
-          <span v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)">（我）</span>
+          <span
+            v-if="
+              !node.data.isGroup &&
+              node.data.userType === 1 &&
+              !isCurrentUser(node.data.triUserId)
+            "
+            >（主教练）</span
+          >
+          <span v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)"
+            >（我）</span
+          >
           <span v-if="node.data.isGroup"
             >({{ node.data.membersCount }})</span
           ></span
@@ -444,7 +455,7 @@ export default {
   methods: {
     // 判断是否为当前用户
     isCurrentUser(triUserId) {
-      const currentTriUserId = localStorage.getItem('triUserId');
+      const currentTriUserId = localStorage.getItem("triUserId");
       return currentTriUserId && triUserId && currentTriUserId === triUserId;
     },
 
@@ -955,7 +966,6 @@ export default {
 <style lang="scss" scoped>
 .athletic-management {
   flex: 0 0 280px;
-  padding: 10px;
   .athletic-title {
     font-size: 16px;
     font-weight: 600;
@@ -990,7 +1000,6 @@ export default {
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
 }
 .athletic-operation {
   display: flex;
