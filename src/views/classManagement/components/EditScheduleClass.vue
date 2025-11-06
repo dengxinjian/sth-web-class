@@ -7,7 +7,7 @@
       append-to-body
       :close-on-click-modal="false"
       custom-class="edit-class-dialog"
-      top="1vh"
+      top="5vh"
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
@@ -101,9 +101,7 @@
           </div>
         </div>
 
-        <div
-          style="display: flex; max-height: 500px; overflow-y: auto; gap: 10px"
-        >
+        <div class="scrollable-content">
           <!-- 计划 vs 实际 对比表格 -->
           <div class="comparison-table">
             <table>
@@ -1221,6 +1219,43 @@ export default {
         line-height: 1.6;
       }
     }
+  }
+
+  .scrollable-content {
+    display: flex;
+    max-height: 500px;
+    overflow-y: auto;
+    gap: 10px;
+    padding-right: 8px;
+
+    /* 自定义滚动条样式 */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f5f7fa;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #c1c1c1 0%, #a8a8a8 100%);
+      border-radius: 10px;
+      border: 2px solid #f5f7fa;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(180deg, #a8a8a8 0%, #909090 100%);
+      }
+
+      &:active {
+        background: linear-gradient(180deg, #909090 0%, #787878 100%);
+      }
+    }
+
+    /* Firefox 滚动条样式 */
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f5f7fa;
   }
 }
 

@@ -1492,6 +1492,36 @@ export default {
     max-height: 480px;
     overflow-y: scroll;
     overflow-x: hidden;
+    padding-right: 8px;
+
+    /* 自定义滚动条样式 */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f5f7fa;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #c1c1c1 0%, #a8a8a8 100%);
+      border-radius: 10px;
+      border: 2px solid #f5f7fa;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(180deg, #a8a8a8 0%, #909090 100%);
+      }
+
+      &:active {
+        background: linear-gradient(180deg, #909090 0%, #787878 100%);
+      }
+    }
+
+    /* Firefox 滚动条样式 */
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f5f7fa;
 
     .edit-section {
       .summary-input-container {
@@ -1610,6 +1640,36 @@ export default {
     border-radius: 8px;
     overflow-y: auto;
     max-height: 480px;
+    padding-right: 8px;
+
+    /* 自定义滚动条样式 */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f5f7fa;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #c1c1c1 0%, #a8a8a8 100%);
+      border-radius: 10px;
+      border: 2px solid #f5f7fa;
+      transition: background 0.3s ease;
+
+      &:hover {
+        background: linear-gradient(180deg, #a8a8a8 0%, #909090 100%);
+      }
+
+      &:active {
+        background: linear-gradient(180deg, #909090 0%, #787878 100%);
+      }
+    }
+
+    /* Firefox 滚动条样式 */
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f5f7fa;
 
     .stage-form-item {
       flex: 1;
