@@ -19,7 +19,7 @@
     <!-- 操作栏 -->
     <div class="class-operation">
       <el-popover
-        v-if="activeClassType === 'my'"
+        v-if="activeClassType === 'my' && showAddClassBtn"
         placement="bottom"
         width="100"
         trigger="click"
@@ -60,7 +60,7 @@
                 <span class="group-name-count">({{ item.classesCount }})</span>
               </div>
               <el-popover
-                v-if="activeClassType === 'my'"
+                v-if="activeClassType === 'my' && showAddClassBtn"
                 popper-class="athletic-btn-popover"
                 placement="right"
                 width="80"
@@ -145,6 +145,10 @@ export default {
     activeClassType: {
       type: String,
       default: 'my'
+    },
+    showAddClassBtn: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
