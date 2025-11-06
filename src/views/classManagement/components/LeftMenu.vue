@@ -16,20 +16,23 @@
         class="menu-item-custom"
         data-menu-index="athletic"
       >
-        <img
-          :src="athleticIconSrc"
-          alt=""
-          class="menu-icon"
-        />
+        <img :src="athleticIconSrc" alt="" class="menu-icon" />
         <span slot="title">运动员</span>
       </el-menu-item>
-      <el-menu-item index="class" class="menu-item-custom" data-menu-index="class">
-        <img
-          :src="classIconSrc"
-          alt=""
-          class="menu-icon"
-        />
+      <el-menu-item
+        index="class"
+        class="menu-item-custom"
+        data-menu-index="class"
+      >
+        <img :src="classIconSrc" alt="" class="menu-icon" />
         <span slot="title">课程</span>
+      </el-menu-item>
+      <el-menu-item
+        index="plan"
+        class="menu-item-custom"
+        data-menu-index="plan"
+      >
+        <span slot="title">计划</span>
       </el-menu-item>
     </el-menu>
   </div>
@@ -52,17 +55,10 @@ export default {
       menuBg: "#fff",
       menuText: "#333",
       menuActiveText: "#fff",
+      activeName: localStorage.getItem("activeName") || "class",
     };
   },
   computed: {
-    activeName: {
-      get() {
-        return this.value;
-      },
-      set(val) {
-        this.$emit("input", val);
-      },
-    },
     athleticIconSrc() {
       return this.activeName === "athletic"
         ? require("@/assets/addClass/menu-player-active.png")
@@ -75,19 +71,22 @@ export default {
     },
   },
   watch: {
-    value: {
+    activeName: {
       handler(newVal) {
         // 当 value prop 变化时，更新 el-menu 的激活项
         this.$nextTick(() => {
           if (this.$refs.menu && this.$refs.menu.$el) {
             // 通过 DOM 操作确保菜单项正确高亮
-            const menuItems = this.$refs.menu.$el.querySelectorAll('.el-menu-item');
-            menuItems.forEach(item => {
-              const index = item.getAttribute('data-menu-index') || item.getAttribute('index');
+            const menuItems =
+              this.$refs.menu.$el.querySelectorAll(".el-menu-item");
+            menuItems.forEach((item) => {
+              const index =
+                item.getAttribute("data-menu-index") ||
+                item.getAttribute("index");
               if (index === newVal) {
-                item.classList.add('is-active');
+                item.classList.add("is-active");
               } else {
-                item.classList.remove('is-active');
+                item.classList.remove("is-active");
               }
             });
           }
@@ -102,6 +101,7 @@ export default {
     },
     handleTypeChange(type) {
       this.activeName = type;
+      localStorage.setItem("activeName", type);
       this.$emit("change", type);
     },
   },

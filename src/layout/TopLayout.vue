@@ -20,10 +20,7 @@
     <div class="main-container">
       <!-- 左侧菜单（el-menu导航菜单） -->
       <div v-if="showLeftMenu" class="left-menu-container">
-        <left-menu
-          v-model="activeMenuType"
-          @change="handleMenuChange"
-        />
+        <left-menu v-model="activeMenuType" @change="handleMenuChange" />
       </div>
 
       <!-- 主内容区 -->
@@ -85,14 +82,8 @@ export default {
     showLeftMenu() {
       // 可以在需要显示菜单的路由中添加 meta.showLeftMenu 标识
       // 或者根据路由路径判断
-      const routesWithMenu = [
-        "/timeTable",
-        "/classManagement",
-        "/athletic",
-      ];
-      return routesWithMenu.some((route) =>
-        this.$route.path.startsWith(route)
-      );
+      const routesWithMenu = ["/timeTable", "/classManagement", "/athletic"];
+      return routesWithMenu.some((route) => this.$route.path.startsWith(route));
     },
   },
   watch: {
@@ -132,7 +123,7 @@ export default {
       this.$emit("menu-change", type);
 
       // 获取目标路由
-      const targetPath = type === "athletic" ? "/timeTable/athletic" : "/timeTable/class";
+      const targetPath = `/timeTable/${type}`;
 
       // 如果当前路由和目标路由相同，不进行跳转
       if (this.$route.path === targetPath) {
