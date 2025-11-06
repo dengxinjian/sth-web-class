@@ -304,15 +304,71 @@ export default {
       return ["REST", "REMARK", "OTHER"].includes(sportType);
     },
     showContextMenu(event) {
-      console.log(event, "event");
-      // 获取组件根元素
-      const rootElement = this.$el;
-      const rootRect = rootElement.getBoundingClientRect();
+      // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
+      this.$nextTick(() => {
+        // 获取组件根元素
+        const rootElement = this.$el;
+        const rootRect = rootElement.getBoundingClientRect();
 
-      // 计算相对于组件根元素的坐标
-      this.contextMenuX = event.clientX - rootRect.left;
-      this.contextMenuY = event.clientY - rootRect.top;
-      this.contextMenuVisible = true;
+        // 计算相对于组件根元素的初始坐标
+        let x = event.clientX - rootRect.left;
+        let y = event.clientY - rootRect.top;
+
+        // 先设置菜单可见，以便获取菜单尺寸
+        this.contextMenuX = x;
+        this.contextMenuY = y;
+        this.contextMenuVisible = true;
+
+        // 等待菜单渲染完成后再计算边界并调整位置
+        this.$nextTick(() => {
+          const menuElement = this.$el.querySelector('.context-menu');
+          if (!menuElement) return;
+
+          const menuRect = menuElement.getBoundingClientRect();
+          const menuWidth = menuRect.width;
+          const menuHeight = menuRect.height;
+
+          // 获取视口和容器边界
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+          const containerWidth = rootRect.width;
+          const containerHeight = rootRect.height;
+
+          // 计算菜单在视口中的绝对位置
+          const menuAbsoluteX = rootRect.left + x;
+          const menuAbsoluteY = rootRect.top + y;
+
+          // 限制右边界（优先考虑视口，然后考虑容器）
+          if (menuAbsoluteX + menuWidth > viewportWidth) {
+            x = Math.min(containerWidth - menuWidth - 5, viewportWidth - rootRect.left - menuWidth - 5);
+          } else if (x + menuWidth > containerWidth) {
+            x = containerWidth - menuWidth - 5;
+          }
+
+          // 限制左边界（确保不会超出容器左边界）
+          if (x < 0) {
+            x = 5;
+          }
+
+          // 限制下边界（优先考虑视口，然后考虑容器）
+          if (menuAbsoluteY + menuHeight > viewportHeight) {
+            y = Math.min(containerHeight - menuHeight - 5, viewportHeight - rootRect.top - menuHeight - 5);
+          } else if (y + menuHeight > containerHeight) {
+            y = containerHeight - menuHeight - 5;
+          }
+
+          // 限制上边界（确保不会超出容器上边界）
+          if (y < 0) {
+            y = 5;
+          }
+
+          // 更新菜单位置（仅在需要调整时更新，避免不必要的闪烁）
+          if (this.contextMenuX !== x || this.contextMenuY !== y) {
+            this.contextMenuX = x;
+            this.contextMenuY = y;
+          }
+        });
+      });
     },
     hideContextMenu() {
       this.contextMenuVisible = false;

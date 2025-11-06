@@ -284,6 +284,12 @@
               <div class="zoneTd">{{ thresholdData.zone2[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
+            <div class="LT">
+              <div style="margin-left: 5px;margin-right: 5px;">
+                ............................................................................... LT1:
+              </div>
+              <div>{{ thresholdData.zone2[1] }} {{ thresholdData.unit }}</div>
+            </div>
             <div class="zoneTr">
               <div class="zoneTd">z3:节奏</div>
               <div class="zoneTd">{{ thresholdData.zone3[0] }}</div>
@@ -297,6 +303,12 @@
               <div class="zoneTd">~</div>
               <div class="zoneTd">{{ thresholdData.zone4[1] }}</div>
               <div class="zoneTd">{{ thresholdData.unit }}</div>
+            </div>
+            <div class="LT">
+              <div style="margin-left: 5px;margin-right: 5px;">
+                ............................................................................... LT2:
+              </div>
+              <div>{{ thresholdData.zone4[1] }} {{ thresholdData.unit }}</div>
             </div>
             <div class="zoneTr">
               <div class="zoneTd">z5A:阈值上限</div>
@@ -1126,6 +1138,12 @@ export default {
   display: flex;
   flex-direction: row;
   line-height: 34px;
+}
+.LT {
+  display: flex;
+  flex-direction: row;
+  line-height: 34px;
+  color: #c7483e;
 }
 .zoneTd {
   flex: 0 0 80px;
