@@ -99,10 +99,8 @@
             >
               <!-- 健康数据 -->
               <HealthDataCard
-                v-for="(healthDataItem, index) in item.healthInfos"
-                :key="`health-${item.commonDate}-${
-                  healthDataItem.date || index
-                }`"
+                v-for="healthDataItem in item.healthInfos"
+                :key="`health-${item.commonDate}-${healthDataItem.date}`"
                 class="js-health-data-no-drag"
                 :health-data="healthDataItem"
                 :date="item.commonDate"
