@@ -10,7 +10,7 @@
     <!-- 面包屑导航 -->
     <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" /> -->
     <div style="flex: 1">
-      <div style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0">
+      <div style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0;">
         公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
       </div>
     </div>

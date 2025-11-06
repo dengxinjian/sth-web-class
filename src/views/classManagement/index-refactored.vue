@@ -1581,6 +1581,8 @@ export default {
   background-color: #f8f8f8;
   overflow-y: auto;
   overflow-x: hidden;
+  border-left: 1px solid #e5e5e5;
+  border-right: 1px solid #e5e5e5;
 
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {

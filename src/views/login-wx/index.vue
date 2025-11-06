@@ -36,8 +36,14 @@
       </div>
       <div class="wx-login-block">
         <div class="elite-title">
-           <img src="./imgs/PREMIUM.svg" alt="ELITE" width="100%" height="45%" v-if="loginType === '2'">
-           <span v-else>ELITE</span>
+          <img
+            src="./imgs/PREMIUM.svg"
+            alt="ELITE"
+            width="100%"
+            height="45%"
+            v-if="loginType === '2'"
+          />
+          <span v-else>ELITE</span>
         </div>
         <div
           id="wx-login-container"
@@ -62,7 +68,7 @@
           </div>
         </div>
         <div v-if="!isAgreement" class="wx-login-cover"></div>
-        <div style="margin-bottom: 10px;">
+        <div style="margin-bottom: 10px">
           <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
             <el-radio label="1">运动员</el-radio>
             <el-radio label="2">教练</el-radio>
@@ -84,13 +90,22 @@
 
     <footer>
       <div class="footer-content">
-        <p>
+        <p style="margin-right: 30px">
           <img
             :src="require('@/views/login-wx/imgs/logo.png')"
             alt=""
             width="30"
           />© 2025 武汉强大之心体育有限公司 版权所有 鄂ICP备2024075413号-2 |
           <router-link to="/privacy">隐私政策</router-link>
+        </p>
+        <p>
+          <el-link
+            type="info"
+            href="https://dailysync.vyzt.dev/"
+            target="_blank"
+          >
+            友情链接: 用'dailysync'同步你的佳明中国与佳明国际数据</el-link
+          >
         </p>
       </div>
     </footer>
@@ -121,8 +136,8 @@ export default {
   mounted() {
     this.checkUrlParams();
     this.initSlider();
-    this.loginType = localStorage.getItem('loginType') || '1';
-    localStorage.setItem('loginType', this.loginType);
+    this.loginType = localStorage.getItem("loginType") || "1";
+    localStorage.setItem("loginType", this.loginType);
   },
   beforeDestroy() {
     clearInterval(this.carouselTimer);
@@ -400,7 +415,7 @@ export default {
       }
     },
     handleLoginTypeChange(value) {
-      localStorage.setItem('loginType', value);
+      localStorage.setItem("loginType", value);
     },
   },
 };
@@ -560,9 +575,9 @@ footer {
   width: 100%;
   padding: 15px 30px;
   color: white;
-  text-align: center;
   font-size: 0.9em;
   background: rgba(0, 0, 0, 0.7);
+  text-align: center;
 }
 
 .footer-content p {

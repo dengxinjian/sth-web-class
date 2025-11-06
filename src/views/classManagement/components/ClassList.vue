@@ -166,7 +166,6 @@ export default {
 
 <style lang="scss" scoped>
 .class-container {
-  border-left: 1px solid #e5e5e5;
   height: 100%;
   display: flex;
   flex-direction: column;
