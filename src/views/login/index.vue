@@ -189,7 +189,7 @@ export default {
             })
             .then(() => {
               this.$router.push({
-                path: this.redirect || "/",
+                path: "/",
                 query: this.otherQuery,
               });
               this.loading = false;

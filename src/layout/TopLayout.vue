@@ -18,10 +18,18 @@
 
     <!-- 主内容区域 -->
     <div class="main-container">
-      <app-main />
-      <right-panel v-if="showSettings">
-        <settings />
-      </right-panel>
+      <!-- 左侧菜单（el-menu导航菜单） -->
+      <div v-if="showLeftMenu" class="left-menu-container">
+        <left-menu v-model="activeMenuType" @change="handleMenuChange" />
+      </div>
+
+      <!-- 主内容区 -->
+      <div class="content-wrapper">
+        <app-main />
+        <right-panel v-if="showSettings">
+          <settings />
+        </right-panel>
+      </div>
     </div>
   </div>
 </template>
@@ -31,6 +39,7 @@ import RightPanel from "@/components/RightPanel";
 import { AppMain, Settings } from "./components";
 import TopNavbar from "./components/TopNavbar.vue";
 import TopMenu from "./components/TopMenu.vue";
+import LeftMenu from "@/views/classManagement/components/LeftMenu.vue";
 import ResizeMixin from "./mixin/ResizeHandler";
 import { mapState } from "vuex";
 
@@ -43,10 +52,13 @@ export default {
     Settings,
     TopNavbar,
     TopMenu,
+    LeftMenu,
   },
   mixins: [ResizeMixin],
   data() {
-    return {};
+    return {
+      activeMenuType: "class", // 默认选中课程
+    };
   },
   computed: {
     ...mapState({
@@ -66,11 +78,65 @@ export default {
         mobile: this.device === "mobile",
       };
     },
+    // 根据路由判断是否显示左侧菜单
+    showLeftMenu() {
+      // 可以在需要显示菜单的路由中添加 meta.showLeftMenu 标识
+      // 或者根据路由路径判断
+      const routesWithMenu = ["/timeTable", "/classManagement", "/athletic"];
+      return routesWithMenu.some((route) => this.$route.path.startsWith(route));
+    },
+  },
+  watch: {
+    // 监听路由变化，同步菜单状态
+    $route: {
+      handler(to) {
+        this.syncMenuFromRoute(to);
+      },
+      immediate: true,
+    },
   },
   created() {},
   methods: {
     handleClickOutside() {
       this.$store.dispatch("app/closeSideBar", { withoutAnimation: false });
+    },
+    /**
+     * 根据路由同步菜单状态
+     */
+    syncMenuFromRoute(route) {
+      const path = route.path;
+      // 根据路由路径设置菜单项
+      if (path.includes("/athletic") || path.endsWith("/athletic")) {
+        this.activeMenuType = "athletic";
+      } else if (path.includes("/class") || path.endsWith("/class")) {
+        this.activeMenuType = "class";
+      } else if (path.includes("/timeTable")) {
+        // 如果是 /timeTable 但没有指定具体路径，默认根据路由重定向判断
+        // 默认重定向到 /timeTable/athletic，所以默认选中运动员
+        this.activeMenuType = "athletic";
+      }
+    },
+    handleMenuChange(type) {
+      // 先更新菜单状态
+      this.activeMenuType = type;
+      // 触发菜单切换事件
+      this.$emit("menu-change", type);
+
+      // 获取目标路由
+      const targetPath = `/timeTable/${type}`;
+
+      // 如果当前路由和目标路由相同，不进行跳转
+      if (this.$route.path === targetPath) {
+        return;
+      }
+
+      // 路由跳转，使用安全的错误处理
+      if (this.$router) {
+        const pushResult = this.$router.push(targetPath);
+        if (pushResult && typeof pushResult.catch === "function") {
+          pushResult.catch(() => {});
+        }
+      }
     },
   },
 };
@@ -128,12 +194,33 @@ export default {
 }
 
 .main-container {
-  margin-top: 40px; /* 50px navbar + 50px menu */
+  margin-top: 50px; /* 顶部导航栏高度 */
   margin-left: 0 !important;
   flex: 1;
   width: 100%;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: row;
+}
+
+.left-menu-container {
+  flex: 0 0 68px;
+  width: 68px;
+  background-color: #fff;
+  border-right: 1px solid #e6e6e6;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  position: relative;
+}
+
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
 .mobile {
@@ -144,6 +231,20 @@ export default {
 
   .main-container {
     margin-top: 0;
+  }
+
+  .left-menu-container {
+    position: fixed;
+    left: 0;
+    top: 50px;
+    bottom: 0;
+    z-index: 998;
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+
+    &.open {
+      transform: translateX(0);
+    }
   }
 }
 </style>

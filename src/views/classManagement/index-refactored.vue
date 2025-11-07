@@ -2,7 +2,7 @@
   <div class="container">
     <div class="athletic-container" v-loading="loading">
       <!-- 左侧菜单 -->
-      <LeftMenu v-model="activeName" @change="handleTypeChange" />
+      <!-- <LeftMenu v-model="activeName" @change="handleTypeChange" /> -->
 
       <!-- 中间内容区 -->
       <div class="type-change">
@@ -156,7 +156,7 @@
       @move="handleMoveClass"
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
-      @save="getClassList"
+      @save="handleUpdateClass"
     />
     <AddClassModal
       v-model="showAddClassModal"
@@ -341,11 +341,23 @@ export default {
       isActivity: false,
       // 健康数据
       healthViewData: {},
-      healthViewDate: '',
+      healthViewDate: "",
       healthViewDeviceType: null,
     };
   },
+  watch: {
+    // 监听路由变化，同步菜单状态
+    $route: {
+      handler(to) {
+        this.initMenuFromRoute();
+      },
+      immediate: false,
+    },
+  },
   mounted() {
+    // 根据路由初始化菜单状态
+    this.initMenuFromRoute();
+
     if (localStorage.getItem("loginType") !== "1") {
       this.getTeamAndAthleticData();
     } else {
@@ -429,6 +441,17 @@ export default {
       return team ? team.name : "";
     },
 
+    /**
+     * 根据路由初始化菜单状态
+     */
+    initMenuFromRoute() {
+      const path = this.$route.path;
+      if (path.includes("athletic")) {
+        this.activeName = "athletic";
+      } else if (path.includes("class") || path.includes("timeTable")) {
+        this.activeName = "class";
+      }
+    },
     /**
      * 类型切换（运动员/课程）
      */
@@ -856,16 +879,17 @@ export default {
     /**
      * 删除课程
      */
-    handleDeleteClass(classId) {
-      console.log(classId, "classId");
-      this.$confirm("确认删除该课程？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
-        const res = await classApi.deleteClass(classId);
+    async handleDeleteClass(classId) {
+      const res = await classApi.deleteClass(classId);
+      if (res.success) {
+        this.$message.success("删除成功");
+        this.getClassList();
+      }
+    },
+    async handleUpdateClass(classData) {
+      classApi.updateClass(classData).then((res) => {
         if (res.success) {
-          this.$message.success("删除成功");
+          this.$message.success("更新成功");
           this.getClassList();
         }
       });
@@ -951,9 +975,10 @@ export default {
      * 查看健康数据
      */
     handleViewHealthData(healthData) {
-      console.log('healthData:', healthData);
+      console.log("healthData:", healthData);
       this.healthViewData = healthData;
-      this.healthViewDate = healthData.date || new Date().toISOString().split('T')[0];
+      this.healthViewDate =
+        healthData.date || new Date().toISOString().split("T")[0];
       this.healthViewDeviceType = healthData.deviceType || null;
       this.showHealthViewDialog = true;
     },
@@ -1153,7 +1178,11 @@ export default {
             "classTemplate"
           );
         } else {
-          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
+          console.log(
+            currentClass.sportType,
+            currentActivity.sportType,
+            "currentClass.sportType, currentActivity.sportType"
+          );
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }
@@ -1166,7 +1195,11 @@ export default {
             dataDate: activityDate,
           });
         } else {
-          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
+          console.log(
+            currentClass.sportType,
+            currentActivity.sportType,
+            "currentClass.sportType, currentActivity.sportType"
+          );
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }

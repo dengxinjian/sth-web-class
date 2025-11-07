@@ -40,6 +40,12 @@ export const classApi = {
       url: `/api/classes/deleteClasses?id=${id}`,
     });
   },
+  updateClass(data) {
+    return submitData({
+      url: "/api/classes/update",
+      requestData: data,
+    });
+  },
 };
 
 /**

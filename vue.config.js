@@ -72,15 +72,48 @@ module.exports = {
       },
     },
   },
-  configureWebpack: {
+  configureWebpack: (config) => {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
-    name: name,
-    resolve: {
+    config.name = name;
+    config.resolve = {
+      ...config.resolve,
       alias: {
+        ...config.resolve?.alias,
         "@": resolve("src"),
       },
-    },
+    };
+
+    // 配置文件指纹（生产环境和 staging 环境）
+    if (process.env.NODE_ENV !== "development") {
+      const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+      config.output = {
+        ...config.output,
+        // 注意：publicPath 应该在 Vue CLI 顶层配置，不能在这里修改
+        filename: "static/js/[name].[contenthash].js",
+        chunkFilename: "static/js/[name].[contenthash].js",
+      };
+
+      // 查找并更新 MiniCssExtractPlugin 配置
+      const miniCssExtractPlugin = config.plugins.find(
+        (plugin) => plugin instanceof MiniCssExtractPlugin
+      );
+      if (miniCssExtractPlugin) {
+        miniCssExtractPlugin.options.filename =
+          "static/css/[name].[contenthash].css";
+        miniCssExtractPlugin.options.chunkFilename =
+          "static/css/[name].[contenthash].css";
+      } else {
+        // 如果没有找到，添加新的插件
+        config.plugins.push(
+          new MiniCssExtractPlugin({
+            filename: "static/css/[name].[contenthash].css",
+            chunkFilename: "static/css/[name].[contenthash].css",
+          })
+        );
+      }
+    }
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -113,6 +146,8 @@ module.exports = {
       .end();
 
     config.when(process.env.NODE_ENV !== "development", (config) => {
+      // 文件指纹配置已在 configureWebpack 中统一处理，这里不再重复配置
+
       config
         .plugin("ScriptExtHtmlWebpackPlugin")
         .after("html")

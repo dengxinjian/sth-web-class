@@ -152,12 +152,12 @@ export const asyncRoutes = [
   {
     path: "/",
     component: Layout,
-    redirect: "/timeTable/athletic",
+    redirect: "/timeTable/class",
   },
   {
     path: "/timeTable",
     component: TopLayout,
-    redirect: "/timeTable/athletic",
+    redirect: "/timeTable/class",
     alwaysShow: false,
     meta: { title: "课表查看", icon: "el-icon-setting" },
     children: [
@@ -165,6 +165,16 @@ export const asyncRoutes = [
         path: "athletic",
         component: () => import("@/views/classManagement/index-refactored.vue"),
         meta: { title: "课表管理" },
+      },
+      {
+        path: "class",
+        component: () => import("@/views/classManagement/index-refactored.vue"),
+        meta: { title: "课程管理" },
+      },
+      {
+        path: "plan",
+        component: () => import("@/views/plan/planView.vue"),
+        meta: { title: "计划管理" },
       },
       {
         path: "/class-management-test",
