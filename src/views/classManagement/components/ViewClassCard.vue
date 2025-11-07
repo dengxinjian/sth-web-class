@@ -56,8 +56,7 @@
               <el-button
                 type="text"
                 @click.stop="
-                  $emit('delete', classItem.id);
-                  handleClose();
+                  handleDelete();
                 "
               >
                 删除课程
@@ -332,7 +331,14 @@ export default {
       return result;
     },
     handleDelete() {
-      this.$emit("delete", this.classItem.id);
+      this.$confirm("确认删除该课程？", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        this.handleClose()
+        this.$emit("delete", this.classItem.id);
+      });
     },
   },
 };

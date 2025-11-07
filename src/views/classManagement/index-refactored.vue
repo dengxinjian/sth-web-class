@@ -156,7 +156,7 @@
       @move="handleMoveClass"
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
-      @save="getClassList"
+      @save="handleUpdateClass"
     />
     <AddClassModal
       v-model="showAddClassModal"
@@ -341,7 +341,7 @@ export default {
       isActivity: false,
       // 健康数据
       healthViewData: {},
-      healthViewDate: '',
+      healthViewDate: "",
       healthViewDeviceType: null,
     };
   },
@@ -879,16 +879,17 @@ export default {
     /**
      * 删除课程
      */
-    handleDeleteClass(classId) {
-      console.log(classId, "classId");
-      this.$confirm("确认删除该课程？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
-        const res = await classApi.deleteClass(classId);
+    async handleDeleteClass(classId) {
+      const res = await classApi.deleteClass(classId);
+      if (res.success) {
+        this.$message.success("删除成功");
+        this.getClassList();
+      }
+    },
+    async handleUpdateClass(classData) {
+      classApi.updateClass(classData).then((res) => {
         if (res.success) {
-          this.$message.success("删除成功");
+          this.$message.success("更新成功");
           this.getClassList();
         }
       });
@@ -974,9 +975,10 @@ export default {
      * 查看健康数据
      */
     handleViewHealthData(healthData) {
-      console.log('healthData:', healthData);
+      console.log("healthData:", healthData);
       this.healthViewData = healthData;
-      this.healthViewDate = healthData.date || new Date().toISOString().split('T')[0];
+      this.healthViewDate =
+        healthData.date || new Date().toISOString().split("T")[0];
       this.healthViewDeviceType = healthData.deviceType || null;
       this.showHealthViewDialog = true;
     },
@@ -1176,7 +1178,11 @@ export default {
             "classTemplate"
           );
         } else {
-          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
+          console.log(
+            currentClass.sportType,
+            currentActivity.sportType,
+            "currentClass.sportType, currentActivity.sportType"
+          );
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }
@@ -1189,7 +1195,11 @@ export default {
             dataDate: activityDate,
           });
         } else {
-          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
+          console.log(
+            currentClass.sportType,
+            currentActivity.sportType,
+            "currentClass.sportType, currentActivity.sportType"
+          );
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }

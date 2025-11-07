@@ -33,7 +33,10 @@
           <div class="metric-item">
             <div class="metric-value">
               {{
-                formatDistance(classData.classesJson?.distance, classData.sportType)
+                formatDistance(
+                  classData.classesJson?.distance,
+                  classData.sportType
+                )
               }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.classesJson?.distanceUnit }}
@@ -311,25 +314,26 @@ export default {
           };
         });
       } else {
-        this.getClassInfo(this.classItem.id);
+        // this.getClassInfo(this.classItem.id);
+        this.classData = this.classItem;
       }
     },
   },
   methods: {
-    getClassInfo(id) {
-      getData({
-        url: "/api/classes/getClassesById",
-        id,
-      }).then((res) => {
-        if (res.success) {
-          const classData = JSON.parse(res.result.classesJson);
-          this.classData = {
-            ...res.result,
-            classesJson: classData,
-          };
-        }
-      });
-    },
+    // getClassInfo(id) {
+    //   getData({
+    //     url: "/api/classes/getClassesById",
+    //     id,
+    //   }).then((res) => {
+    //     if (res.success) {
+    //       const classData = JSON.parse(res.result.classesJson);
+    //       this.classData = {
+    //         ...res.result,
+    //         classesJson: classData,
+    //       };
+    //     }
+    //   });
+    // },
     isRestType(sportType) {
       return ["REST", "REMARK"].includes(sportType);
     },
@@ -342,12 +346,8 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await classApi.deleteClass(id);
-        if (res.success) {
-          this.$message.success("删除成功");
-          this.handleClose();
-          this.$emit("delete", id);
-        }
+        this.handleClose();
+        this.$emit("delete", id);
       });
     },
     handleEditClassDetail() {
@@ -357,7 +357,7 @@ export default {
     handleAddClassModalClose() {
       // 子对话框关闭时的回调
       this.showAddClassModal = false;
-      this.getClassInfo(this.classItem.id);
+      // this.getClassInfo(this.classItem.id);
       this.handleClose();
     },
     handleClose() {
@@ -367,21 +367,11 @@ export default {
     },
     handleSave(flag) {
       console.log(this.classData, "classData");
-      submitData({
-        url: "/api/classes/update",
-        id: this.classData.id,
-        classesTitle: this.classData.classesJson.title,
-        classesGroupId: this.classData.classesGroupId,
-        labels: this.classData.labels,
-        sportType: this.classData.sportType,
-        classesJson: JSON.stringify(this.classData.classesJson),
-      }).then((res) => {
-        if (res.success) {
-          this.$message.success("课程保存成功");
-          if (flag) this.handleClose();
-          this.$emit("save", this.classData);
-        }
-      });
+
+      const data = JSON.parse(JSON.stringify(this.classData));
+      data.classesJson = JSON.stringify(data.classesJson);
+      if (flag) this.handleClose();
+      this.$emit("save", data);
     },
     getSportIcon(sportType) {
       return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
