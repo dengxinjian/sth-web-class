@@ -101,6 +101,7 @@
 import * as echarts from "echarts";
 import { scheduleApi } from "../services/classManagement";
 import { DEVICE_TYPE_DICT } from '../constants'
+import { secondsToHHMM } from '@/utils'
 
 export default {
   name: "HealthView",
@@ -464,9 +465,11 @@ export default {
             let result = sleepTimeBarChatDataAll[dataIndex] + "<br/>";
             params.forEach((item) => {
               if (item.value !== null && item.value !== undefined) {
-                result += `${item.seriesName}: ${parseFloat(item.value).toFixed(
-                  2
-                )}小时<br/>`;
+                // 将小时数转换为秒数，然后格式化为 hh:mm
+                const hours = parseFloat(item.value);
+                const seconds = hours * 3600;
+                const formattedTime = secondsToHHMM(seconds);
+                result += `${item.seriesName}: ${formattedTime}<br/>`;
               } else {
                 result += `${item.seriesName}: --<br/>`;
               }

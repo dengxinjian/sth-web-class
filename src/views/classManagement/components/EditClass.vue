@@ -172,7 +172,7 @@
                   type="textarea"
                   :rows="8"
                   v-model="classData.classesJson.summary"
-                  maxlength="500"
+                  :maxlength="classData.sportType === 'REMARK' ? 2000 : 500"
                   show-word-limit
                   placeholder="请输入概要内容"
                 ></el-input>
