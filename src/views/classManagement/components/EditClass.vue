@@ -33,7 +33,10 @@
           <div class="metric-item">
             <div class="metric-value">
               {{
-                formatDistance(classData.classesJson?.distance, classData.sportType)
+                formatDistance(
+                  classData.classesJson?.distance,
+                  classData.sportType
+                )
               }}
               <span v-if="classData.sportType === 'SWIM'">
                 {{ classData.classesJson?.distanceUnit }}
@@ -46,7 +49,7 @@
               {{ classData.classesJson?.sth || "--" }} STH
             </div>
           </div>
-          <div class="metric-item">
+          <div class="metric-item" v-if="!isRestType(classData.sportType)">
             <el-button type="primary" @click="handleEditClassDetail"
               >编辑课程详情</el-button
             >
@@ -81,7 +84,7 @@
 
         <div class="scrollable-content">
           <!-- 计划 vs 实际 对比表格 -->
-          <div class="comparison-table">
+          <div class="comparison-table" v-if="!isRestType(classData.sportType)">
             <table>
               <thead>
                 <tr>

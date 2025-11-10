@@ -65,11 +65,11 @@
               {{ classData.sthValue || "--" }} STH
             </div>
           </div>
-          <div class="metric-item">
-            <el-button
-              type="primary"
-              v-if="!isActivity && !isRestType(classData.sportType)"
-              @click="handleEditClassDetail"
+          <div
+            class="metric-item"
+            v-if="!isActivity && !isRestType(classData.sportType)"
+          >
+            <el-button type="primary" @click="handleEditClassDetail"
               >编辑课表详情</el-button
             >
           </div>
