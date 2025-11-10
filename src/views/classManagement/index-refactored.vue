@@ -60,6 +60,7 @@
         @edit-activity="handleEditActivity"
         @paste-class="handlePasteClass"
         @view-health-data="handleViewHealthData"
+        @add-schedule="handleAddSchedule"
       />
 
       <!-- 右侧统计面板 -->
@@ -330,7 +331,9 @@ export default {
       bindType: "",
       sportDetailData: {},
       classSportType: "",
+      classType: "class",
       classDetailData: {},
+      addScheduleDate: "",
       copyClassFromOfficialClassId: "",
       copyClassFromOfficialGroupId: "",
       copyClassFromOfficialData: {},
@@ -369,6 +372,12 @@ export default {
     }
   },
   methods: {
+    handleAddSchedule(date) {
+      this.classModalDataType = "addSchedule";
+      this.addScheduleDate = date;
+      this.showSportTypeModal = true;
+      console.log(date, "date");
+    },
     async handlePasteClass(date, classItem) {
       console.log(date, classItem, "date, classItem");
       await this.getAthleticThreshold(this.selectedAthletic, date);
@@ -1356,7 +1365,9 @@ export default {
      * 选择运动类型
      */
     onSelectSportType(item) {
-      this.classModalDataType = "add";
+      if (this.classModalDataType !== "addSchedule") {
+        this.classModalDataType = "add";
+      }
       console.log(item, "item");
       var Map = {
         swim: "SWIM",

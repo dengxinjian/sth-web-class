@@ -6,6 +6,7 @@
       :visible="visible"
       :value="value"
       :data="data"
+      :class-type="classType"
       :type="type"
       :originalType="originalType"
       v-on="$listeners"
@@ -66,6 +67,10 @@ export default {
     originalType: {
       type: String,
       default: "my",
+    },
+    classType: {
+      type: String,
+      default: "class",
     },
   },
   computed: {

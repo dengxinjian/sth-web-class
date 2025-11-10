@@ -130,6 +130,13 @@
                 @delete="$emit('delete-activity', $event)"
                 @edit="$emit('edit-activity', activityItem)"
               />
+
+              <!-- 添加课表 -->
+              <div class="box-content">
+                <div class="box-plus-circle" @click="handleAddSchedule(item.commonDate)">
+                  <div class="box-plus">+</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -220,6 +227,10 @@ export default {
     convertToLunar,
     handleDeviceClick(classItem, device) {
       this.$emit("device-click", classItem, device);
+    },
+    // 添加课表
+    handleAddSchedule(date) {
+      this.$emit("add-schedule", date);
     },
     showContextMenu(event, date) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
@@ -387,6 +398,51 @@ export default {
       padding-bottom: 20px;
       transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
       will-change: transform; /* 提示浏览器优化渲染 */
+      .box-content {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 20px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          .box-plus-circle {
+            border-color: #409eff;
+
+            .box-plus {
+              color: #409eff;
+            }
+          }
+        }
+
+        &:active {
+          opacity: 0.8;
+        }
+
+        .box-plus-circle {
+          width: 40px;
+          height: 40px;
+          border: 1px solid #303133;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+
+          .box-plus {
+            font-size: 22px;
+            color: #303133;
+            font-weight: 300;
+            user-select: none;
+            line-height: 1;
+            margin-bottom: 5px;
+            transition: all 0.2s ease;
+          }
+        }
+      }
     }
   }
 }

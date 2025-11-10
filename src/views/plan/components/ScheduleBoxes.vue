@@ -1,8 +1,6 @@
 <template>
   <div class="schedule-boxes-wrapper">
-    <div class="week-header">
-      <span class="week-text">Week {{ weekNumber }}</span>
-    </div>
+    <div class="week-header">第 {{ weekNumber }}周</div>
     <div class="schedule-boxes-container">
       <div
         v-for="(box, index) in boxes"
@@ -11,11 +9,11 @@
         :class="{ 'last-item': index === boxes.length - 1 }"
       >
         <div class="box-header">
-          <div class="box-day-text">Day {{ box.number }}</div>
+          <div class="box-day-text">Day {{ (weekNumber - 1) * 7 + box.number }}</div>
         </div>
         <div class="box-content-classes">
           <ClassCard
-            v-for="(classItem, classIndex) in dayClassesMap[box.number] || []"
+            v-for="(classItem, classIndex) in dayClassesMap[(weekNumber - 1) * 7 + box.number] || []"
             :key="classIndex"
             :class-item="classItem"
             :date="''"
@@ -68,7 +66,8 @@ export default {
     },
     /**
      * 按天数组织的课程数据映射
-     * key: 天数 (1-7), value: 处理后的课程列表
+     * key: 全局天数 (跨周的天数，如第1周是1-7，第2周是8-14), value: 处理后的课程列表
+     * 注意：weekData 中的 day 字段已经是全局天数
      */
     dayClassesMap() {
       if (!this.weekData || !Array.isArray(this.weekData)) {
@@ -86,6 +85,7 @@ export default {
           return;
         }
 
+        // dayData.day 已经是全局天数，直接作为 key 使用
         // 处理每个课程，解析 classesJson 字符串为对象
         map[dayData.day] = dayData.classes.map((classItem) => {
           const processedItem = { ...classItem };
@@ -103,7 +103,6 @@ export default {
               processedItem.classesJson = {};
             }
           }
-
           return processedItem;
         });
       });
@@ -132,13 +131,7 @@ export default {
   padding: 10px 0;
   border-bottom: 1px solid #fff;
   margin-bottom: 10px;
-
-  .week-text {
-    font-size: 14px;
-    color: #c24a43;
-    font-weight: 500;
-    margin-left: 5.5%;
-  }
+  text-align: center;
 }
 
 .schedule-boxes-container {

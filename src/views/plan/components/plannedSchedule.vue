@@ -68,7 +68,7 @@ export default {
         ],
         [
           {
-            day: 1,
+            day: 8,
             classes: [
               {
                 classesJson:
