@@ -174,10 +174,7 @@
       :is-activity="isActivity"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
-      @close="
-        showEditScheduleClass = false;
-        classDetailData = {};
-      "
+      @close="showEditScheduleClass = false"
       @save="handleClassDetailSave"
       @delete="handleDeleteClassSchedule"
     />
@@ -341,7 +338,7 @@ export default {
       isActivity: false,
       // 健康数据
       healthViewData: {},
-      healthViewDate: '',
+      healthViewDate: "",
       healthViewDeviceType: null,
     };
   },
@@ -951,9 +948,10 @@ export default {
      * 查看健康数据
      */
     handleViewHealthData(healthData) {
-      console.log('healthData:', healthData);
+      console.log("healthData:", healthData);
       this.healthViewData = healthData;
-      this.healthViewDate = healthData.date || new Date().toISOString().split('T')[0];
+      this.healthViewDate =
+        healthData.date || new Date().toISOString().split("T")[0];
       this.healthViewDeviceType = healthData.deviceType || null;
       this.showHealthViewDialog = true;
     },
@@ -1153,7 +1151,11 @@ export default {
             "classTemplate"
           );
         } else {
-          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
+          console.log(
+            currentClass.sportType,
+            currentActivity.sportType,
+            "currentClass.sportType, currentActivity.sportType"
+          );
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }
@@ -1166,7 +1168,11 @@ export default {
             dataDate: activityDate,
           });
         } else {
-          console.log(currentClass.sportType, currentActivity.sportType, "currentClass.sportType, currentActivity.sportType");
+          console.log(
+            currentClass.sportType,
+            currentActivity.sportType,
+            "currentClass.sportType, currentActivity.sportType"
+          );
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }
