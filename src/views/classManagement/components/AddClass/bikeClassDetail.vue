@@ -815,8 +815,7 @@ export default {
     },
     // 新增课程
     submitNewClass(flag) {
-      submitData({
-        url: "/api/classes/create",
+      const saveData = {
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
@@ -826,19 +825,14 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
-      }).then((res) => {
-        if (res.success) {
-          this.classInfo.id = res.result;
-          this.$emit("save", { ...this.classInfo });
-          this.$message.success("课程保存成功");
-        }
-        if (flag) this.onCancel();
-      });
+      };
+
+      this.$emit("save", saveData);
+      if (flag) this.onCancel();
     },
     // 更新课程
     submitUpdateClass(flag) {
-      submitData({
-        url: "/api/classes/update",
+      const saveData = {
         id: this.classInfo.id,
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
@@ -849,13 +843,10 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
-      }).then((res) => {
-        if (res.success) {
-          this.$emit("save", { ...this.classInfo });
-          this.$message.success("课程保存成功");
-        }
-        if (flag) this.onCancel();
-      });
+      };
+
+      this.$emit("save", saveData);
+      if (flag) this.onCancel();
     },
     // 删除课程
     submitDeleteClass() {
