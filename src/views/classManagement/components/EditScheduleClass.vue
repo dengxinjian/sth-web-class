@@ -103,7 +103,7 @@
 
         <div class="scrollable-content">
           <!-- 计划 vs 实际 对比表格 -->
-          <div class="comparison-table">
+          <div class="comparison-table" >
             <table>
               <thead>
                 <tr>

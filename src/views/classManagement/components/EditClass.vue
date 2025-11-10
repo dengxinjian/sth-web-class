@@ -144,7 +144,7 @@
                   </td>
                   <td></td>
                 </tr>
-                <tr v-if="classData.sportType !== 'REMARK'">
+                <tr v-if="!isRestType(classData.sportType)">
                   <td>消耗</td>
                   <td></td>
                   <td>
