@@ -9,17 +9,21 @@
         :class="{ 'last-item': index === boxes.length - 1 }"
       >
         <div class="box-header">
-          <div class="box-day-text">Day {{ (weekNumber - 1) * 7 + box.number }}</div>
+          <div class="box-day-text">
+            Day {{ (weekNumber - 1) * 7 + box.number }}
+          </div>
         </div>
         <div class="box-content-classes">
           <ClassCard
-            v-for="(classItem, classIndex) in dayClassesMap[(weekNumber - 1) * 7 + box.number] || []"
+            v-for="(classItem, classIndex) in dayClassesMap[
+              (weekNumber - 1) * 7 + box.number
+            ] || []"
             :key="classIndex"
             :class-item="classItem"
             :date="''"
           />
-          <div class="box-content">
-            <div class="box-plus-circle" @click="handleBoxClick(box)">
+          <div class="box-content" @click="handleBoxClick(box)">
+            <div class="box-plus-circle">
               <div class="box-plus">+</div>
             </div>
           </div>
@@ -186,21 +190,24 @@ export default {
   }
 
   .box-content {
-    flex: 1;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     padding: 20px;
-    transition: all 0.2s ease;
+    border: 2px solid #e5e5e5;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    opacity: 0;
 
     &:hover {
+      opacity: 1;
       .box-plus-circle {
-        border-color: #409eff;
+        border-color: #bc362e;
 
         .box-plus {
-          color: #409eff;
+          color: #bc362e;
         }
       }
     }
@@ -210,15 +217,6 @@ export default {
     }
 
     .box-plus-circle {
-      width: 40px;
-      height: 40px;
-      border: 1px solid #303133;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-
       .box-plus {
         font-size: 22px;
         color: #303133;

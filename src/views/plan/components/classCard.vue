@@ -2,12 +2,16 @@
   <div style="position: relative">
     <div
       class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
-      data-type="class"
+      :data-id="classItem.id"
+      :data-date="date"
+      data-type="classSchedule"
     >
       <div
         class="classScheduleCard"
         :style="cardStyle"
-        data-type="class"
+        :data-id="classItem.id"
+        :data-date="date"
+        data-type="classSchedule"
         @click.stop="
           $emit('edit', classItem);
           hideContextMenu();
@@ -26,6 +30,18 @@
                 :src="getSportIcon(classItem.sportType)"
                 alt=""
               />
+              <!-- 设备同步状态 -->
+              <div
+                v-for="device in classItem.syncStatusList"
+                :key="device.deviceType + device.syncStatus"
+                :class="[
+                  'sport-type-name',
+                  'sport-type-color' + device.syncStatus,
+                ]"
+                @click.stop="$emit('device-click', classItem, device)"
+              >
+                {{ getDeviceIcon(device.deviceType) }}
+              </div>
             </div>
             <el-popover
               popper-class="athletic-btn-popover"

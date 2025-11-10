@@ -132,8 +132,11 @@
               />
 
               <!-- 添加课表 -->
-              <div class="box-content">
-                <div class="box-plus-circle" @click="handleAddSchedule(item.commonDate)">
+              <div
+                class="box-content"
+                @click="handleAddSchedule(item.commonDate)"
+              >
+                <div class="box-plus-circle">
                   <div class="box-plus">+</div>
                 </div>
               </div>
@@ -399,21 +402,25 @@ export default {
       transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
       will-change: transform; /* 提示浏览器优化渲染 */
       .box-content {
-        flex: 1;
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         padding: 20px;
-        transition: all 0.2s ease;
+        // margin: 10px;
+        border: 2px solid #e5e5e5;
+        background-color: #fff;
+        transition: all 0.3s ease;
+        opacity: 0;
 
         &:hover {
+          opacity: 1;
           .box-plus-circle {
-            border-color: #409eff;
+            border-color: #bc362e;
 
             .box-plus {
-              color: #409eff;
+              color: #bc362e;
             }
           }
         }
@@ -423,15 +430,6 @@ export default {
         }
 
         .box-plus-circle {
-          width: 40px;
-          height: 40px;
-          border: 1px solid #303133;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s ease;
-
           .box-plus {
             font-size: 22px;
             color: #303133;
