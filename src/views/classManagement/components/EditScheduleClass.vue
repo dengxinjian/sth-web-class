@@ -18,7 +18,6 @@
             <el-input
               type="text"
               v-model="classData.classesJson.title"
-              :disabled="isActivity"
               :maxlength="50"
             />
           </div>
@@ -470,7 +469,6 @@
                   v-if="classData.classesJson"
                   type="textarea"
                   :rows="8"
-                  :disabled="isActivity"
                   v-model="classData.classesJson.summary"
                   :maxlength="classData.sportType === 'REMARK' ? 2000 : 500"
                   show-word-limit
@@ -488,7 +486,6 @@
                 <el-input
                   v-if="classData.classesJson"
                   type="textarea"
-                  :disabled="isActivity"
                   :rows="4"
                   v-model="classData.classesJson.trainingAdvice"
                   placeholder="请输入训练建议"
