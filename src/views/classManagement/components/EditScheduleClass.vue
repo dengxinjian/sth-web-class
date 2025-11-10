@@ -68,7 +68,7 @@
           <div class="metric-item">
             <el-button
               type="primary"
-              v-if="!isActivity"
+              v-if="!isActivity && !isRestType(classData.sportType)"
               @click="handleEditClassDetail"
               >编辑课表详情</el-button
             >
