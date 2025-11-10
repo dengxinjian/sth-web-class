@@ -11,10 +11,18 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <span v-if="classData.classesJson?.title || classData.activityName">{{
-            classData.classesJson?.title || classData.activityName
-          }}</span>
-          <span v-else>手动运动数据</span>
+          <div
+            v-if="classData.classesJson?.title || classData.activityName"
+          >
+            <span>标题：</span>
+            <el-input
+              type="text"
+              v-model="classData.classesJson.title"
+              :disabled="isActivity"
+              :maxlength="50"
+            />
+          </div>
+          <span v-else>{{ getSportTypeName(classData.sportType) }}手动运动数据</span>
         </div>
       </div>
 
@@ -462,6 +470,7 @@
                   v-if="classData.classesJson"
                   type="textarea"
                   :rows="8"
+                  :disabled="isActivity"
                   v-model="classData.classesJson.summary"
                   :maxlength="classData.sportType === 'REMARK' ? 2000 : 500"
                   show-word-limit
@@ -479,6 +488,7 @@
                 <el-input
                   v-if="classData.classesJson"
                   type="textarea"
+                  :disabled="isActivity"
                   :rows="4"
                   v-model="classData.classesJson.trainingAdvice"
                   placeholder="请输入训练建议"
@@ -553,7 +563,7 @@ import { submitData, getData } from "@/api/common.js";
 import ClassDetailModal from "./ClassDetailModal/index.vue";
 import { scheduleApi } from "../services/classManagement.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-import { getClassImageIcon } from "../utils/helpers";
+import { getClassImageIcon, getSportTypeName } from "../utils/helpers";
 import { hhmmssToSeconds } from "@/utils/index";
 export default {
   name: "EditClass",
@@ -702,6 +712,9 @@ export default {
     },
   },
   methods: {
+    getSportTypeName(sportType) {
+      return getSportTypeName(sportType);
+    },
     // 编辑进入弹框时，查询课表数据
     getClassScheduleInfo(id) {
       getData({
@@ -998,6 +1011,16 @@ export default {
     font-size: 16px;
     font-weight: 600;
     color: #333;
+    gap: 10px;
+    div {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      > span {
+        flex: 1;
+        white-space: nowrap;
+      }
+    }
   }
 
   .header-close {

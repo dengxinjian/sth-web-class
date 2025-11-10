@@ -11,7 +11,12 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <span>{{ classData.classesJson?.title || "课程标题" }}</span>
+          <span>标题：</span>
+          <el-input
+            type="text"
+            v-model="classData.classesJson.title"
+            :maxlength="50"
+          />
         </div>
       </div>
 
@@ -421,6 +426,13 @@ export default {
     font-size: 16px;
     font-weight: 600;
     color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    > span {
+        flex: 1;
+        white-space: nowrap;
+      }
   }
 
   .header-close {
