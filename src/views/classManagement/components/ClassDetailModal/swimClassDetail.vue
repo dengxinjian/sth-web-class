@@ -73,7 +73,7 @@
               type="textarea"
               v-model="form.summary"
               :rows="8"
-              maxlength="2000"
+              maxlength="500"
               show-word-limit
               placeholder="请输入概要"
               class="summary-textarea"

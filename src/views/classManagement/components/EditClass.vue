@@ -11,7 +11,12 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <span>{{ classData.classesJson?.title || "课程标题" }}</span>
+          <span>标题：</span>
+          <el-input
+            type="text"
+            v-model="classData.classesJson.title"
+            :maxlength="50"
+          />
         </div>
       </div>
 
@@ -49,7 +54,7 @@
               {{ classData.classesJson?.sth || "--" }} STH
             </div>
           </div>
-          <div class="metric-item">
+          <div class="metric-item" v-if="!isRestType(classData.sportType)">
             <el-button type="primary" @click="handleEditClassDetail"
               >编辑课程详情</el-button
             >
@@ -84,7 +89,7 @@
 
         <div class="scrollable-content">
           <!-- 计划 vs 实际 对比表格 -->
-          <div class="comparison-table">
+          <div class="comparison-table" v-if="!isRestType(classData.sportType)">
             <table>
               <thead>
                 <tr>
@@ -147,7 +152,7 @@
                   </td>
                   <td></td>
                 </tr>
-                <tr v-if="classData.sportType !== 'REMARK'">
+                <tr v-if="!isRestType(classData.sportType)">
                   <td>消耗</td>
                   <td></td>
                   <td>
@@ -175,7 +180,7 @@
                   type="textarea"
                   :rows="8"
                   v-model="classData.classesJson.summary"
-                  maxlength="500"
+                  :maxlength="classData.sportType === 'REMARK' ? 2000 : 500"
                   show-word-limit
                   placeholder="请输入概要内容"
                 ></el-input>
@@ -412,6 +417,13 @@ export default {
     font-size: 16px;
     font-weight: 600;
     color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    > span {
+        flex: 1;
+        white-space: nowrap;
+      }
   }
 
   .header-close {

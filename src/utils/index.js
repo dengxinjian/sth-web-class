@@ -784,3 +784,24 @@ export function secondsToHHMMSS(seconds) {
 
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
+
+/**
+ * 将秒数转换为 hh:mm 格式
+ * @param {number} seconds - 秒数
+ * @returns {string} 返回 hh:mm 格式的时间字符串
+ */
+export function secondsToHHMM(seconds) {
+  if (typeof seconds !== 'number' || seconds < 0 || !isFinite(seconds)) {
+    return '00:00';
+  }
+
+  const totalSeconds = Math.floor(seconds);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.ceil((totalSeconds % 3600) / 60);
+
+  // 如果分钟数向上取整后等于60，需要进位到小时
+  const finalHours = minutes === 60 ? hours + 1 : hours;
+  const finalMinutes = minutes === 60 ? 0 : minutes;
+
+  return `${finalHours.toString().padStart(2, '0')}:${finalMinutes.toString().padStart(2, '0')}`;
+}

@@ -10,7 +10,7 @@
     <!-- 面包屑导航 -->
     <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" /> -->
     <div style="flex: 1">
-      <div style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0;">
+      <div style="color: rgba(0, 0, 0, 0.61); font-size: 12px; padding: 10px 0">
         公告：2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
       </div>
     </div>
@@ -25,6 +25,7 @@
           src="@/views/login-wx/imgs/PREMIUM.svg"
           alt="logo"
           class="button-logo"
+          @click="changeIdentify"
         />
       </div>
       <span>{{ name }}</span>
@@ -113,19 +114,31 @@ export default {
       });
     },
     changeIdentify() {
-      localStorage.setItem("loginType", this.loginType === "1" ? "2" : "1");
-      if (this.loginType === "2") {
-        // 路由跳转，使用安全的错误处理
-        if (this.$router) {
-          const pushResult = this.$router.push("/timeTable/class");
-          if (pushResult && typeof pushResult.catch === "function") {
-            pushResult.catch(() => {});
-          }
+      this.$confirm(
+        `确定切换成${this.loginType === "1" ? "教练" : "运动员"}身份吗?`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
-        this.reload();
-      } else {
-        this.reload();
-      }
+      )
+        .then(() => {
+          localStorage.setItem("loginType", this.loginType === "1" ? "2" : "1");
+          if (this.loginType === "2") {
+            // 路由跳转，使用安全的错误处理
+            if (this.$router) {
+              const pushResult = this.$router.push("/timeTable/class");
+              if (pushResult && typeof pushResult.catch === "function") {
+                pushResult.catch(() => {});
+              }
+            }
+            this.reload();
+          } else {
+            this.reload();
+          }
+        })
+        .catch(() => {});
     },
     chooseShop(e) {
       const name = this.shopOptions.find((item) => item.value === e).label;

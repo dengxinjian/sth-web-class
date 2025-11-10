@@ -175,10 +175,7 @@
       :is-activity="isActivity"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
-      @close="
-        showEditScheduleClass = false;
-        classDetailData = {};
-      "
+      @close="showEditScheduleClass = false"
       @save="handleClassDetailSave"
       @delete="handleDeleteClassSchedule"
     />
