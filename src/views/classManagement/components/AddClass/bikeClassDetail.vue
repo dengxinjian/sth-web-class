@@ -827,8 +827,7 @@ export default {
         }),
       };
 
-      this.$emit("save", saveData);
-      if (flag) this.onCancel();
+      this.$emit("save", saveData, flag);
     },
     // 更新课程
     submitUpdateClass(flag) {
@@ -845,8 +844,7 @@ export default {
         }),
       };
 
-      this.$emit("save", saveData);
-      if (flag) this.onCancel();
+      this.$emit("save", saveData, flag);
     },
     // 删除课程
     submitDeleteClass() {

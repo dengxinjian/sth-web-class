@@ -226,7 +226,7 @@
       :visible="showEditClass"
       :class-item="classItem"
       @close="showEditClass = false"
-      @save="$emit('save', $event)"
+      @save="handleEditSave"
       @delete="$emit('delete', $event)"
     />
   </div>
@@ -339,6 +339,11 @@ export default {
         this.handleClose()
         this.$emit("delete", this.classItem.id);
       });
+    },
+    handleEditSave(saveData, flag) {
+      console.log(saveData, flag, "saveData, flag");
+      if (flag) this.showEditClass = false;
+      this.$emit("save", saveData, flag);
     },
   },
 };

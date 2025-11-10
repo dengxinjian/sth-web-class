@@ -382,17 +382,18 @@ export default {
       console.log(date, classItem, "date, classItem");
       await this.getAthleticThreshold(this.selectedAthletic, date);
       const newData = JSON.parse(JSON.stringify(classItem));
+      newData.classesJson = JSON.parse(newData.classesJson);
       newData.classesDate = date + " 00:00:00";
       // 根据运动类型计算阈值
       if (newData.sportType === "RUN") {
         newData.classesJson = new CalculateRun(
           this.athleticThreshold,
-          classItem.classesJson
+          newData.classesJson
         ).updateClassInfoCalculatedValues();
       } else if (newData.sportType === "CYCLE") {
         newData.classesJson = new CalculateBike(
           this.athleticThreshold,
-          classItem.classesJson
+          newData.classesJson
         ).updateClassInfoCalculatedValues();
       }
       // 计算时间距离STH
@@ -895,10 +896,11 @@ export default {
         this.getClassList();
       }
     },
-    async handleUpdateClass(classData) {
+    async handleUpdateClass(classData, flag) {
       classApi.updateClass(classData).then((res) => {
         if (res.success) {
           this.$message.success("更新成功");
+          if (flag) this.showViewClassCard = false;
           this.getClassList();
         }
       });
@@ -1386,8 +1388,32 @@ export default {
     /**
      * 保存各类型课程
      */
-    onSaveAddClass() {
-      this.getClassList();
+    onSaveAddClass(saveData, flag) {
+      if (this.classModalDataType === "add") {
+        classApi.createClass(saveData).then((res) => {
+          if (res.success) {
+            this.$message.success("课程保存成功");
+            if (flag) this.showAddClassModal = false;
+            this.getClassList();
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      } else if (this.classModalDataType === "edit") {
+        classApi.updateClass(saveData).then((res) => {
+          if (res.success) {
+            this.$message.success("课程保存成功");
+            if (flag) this.showAddClassModal = false;
+            this.getClassList();
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      } else if (this.classModalDataType === "addSchedule") {
+        console.log(saveData, flag, this.classModalData, this.addScheduleDate, "saveData, flag, classModalData, addScheduleDate");
+        if (flag) this.showAddClassModal = false;
+        this.handlePasteClass(this.addScheduleDate, saveData);
+      }
     },
 
     /**

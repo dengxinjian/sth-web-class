@@ -233,8 +233,10 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="deleteClass(classData.id)">删除</el-button>
         <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleSave(false)">保存</el-button>
-        <el-button type="danger" @click="handleSave(true)"
+        <el-button type="primary" @click="handleEditSave(false)"
+          >保存</el-button
+        >
+        <el-button type="danger" @click="handleEditSave(true)"
           >保存并关闭</el-button
         >
       </div>
@@ -245,7 +247,7 @@
       :type="type"
       :originalType="originalType"
       :data="classData"
-      @save="$emit('save', $event)"
+      @save="handleSave"
       @cancel="handleAddClassModalClose"
       @delete="deleteClass(classData.id)"
     />
@@ -365,13 +367,15 @@ export default {
       this.showAddClassModal = false;
       this.$emit("close");
     },
-    handleSave(flag) {
-      console.log(this.classData, "classData");
-
+    handleEditSave(flag) {
       const data = JSON.parse(JSON.stringify(this.classData));
       data.classesJson = JSON.stringify(data.classesJson);
+      this.$emit("save", data, flag);
+    },
+    handleSave(saveData, flag) {
+      console.log(saveData, flag, "saveData, flag");
       if (flag) this.handleClose();
-      this.$emit("save", data);
+      this.$emit("save", saveData, flag);
     },
     getSportIcon(sportType) {
       return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
