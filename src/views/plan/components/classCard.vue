@@ -13,7 +13,6 @@
         :data-date="date"
         data-type="classSchedule"
         @click.stop="
-          $emit('edit', classItem);
           hideContextMenu();
         "
         @contextmenu.stop.prevent="showContextMenu"
@@ -30,24 +29,13 @@
                 :src="getSportIcon(classItem.sportType)"
                 alt=""
               />
-              <!-- 设备同步状态 -->
-              <div
-                v-for="device in classItem.syncStatusList"
-                :key="device.deviceType + device.syncStatus"
-                :class="[
-                  'sport-type-name',
-                  'sport-type-color' + device.syncStatus,
-                ]"
-                @click.stop="$emit('device-click', classItem, device)"
-              >
-                {{ getDeviceIcon(device.deviceType) }}
-              </div>
             </div>
             <el-popover
               popper-class="athletic-btn-popover"
               placement="right"
               trigger="hover"
               :tabindex="9999"
+              v-if="type === 'edit'"
             >
               <div class="btn-list-hover">
                 <el-button type="text" @click.stop="$emit('edit', classItem)">
@@ -171,7 +159,7 @@
     </div>
 
     <!-- 自定义右键菜单 -->
-    <transition name="context-menu-fade">
+    <transition name="context-menu-fade" v-if="type === 'edit'">
       <div
         v-if="contextMenuVisible"
         class="context-menu"
@@ -229,6 +217,13 @@ export default {
     date: {
       type: String,
       required: true,
+    },
+    type: {
+      type: String,
+      default: "edit",
+      validator(value) {
+        return ["view", "edit"].includes(value);
+      },
     },
   },
   data() {

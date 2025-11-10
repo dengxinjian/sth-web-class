@@ -22,6 +22,7 @@
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
       @save="handleUpdateClass"
+      type="edit"
     />
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"

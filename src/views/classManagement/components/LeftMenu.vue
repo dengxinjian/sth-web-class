@@ -32,6 +32,7 @@
         class="menu-item-custom"
         data-menu-index="plan"
       >
+        <img :src="planIconSrc" alt="" class="menu-icon" />
         <span slot="title">计划</span>
       </el-menu-item>
     </el-menu>
@@ -68,6 +69,11 @@ export default {
       return this.activeName === "class"
         ? require("@/assets/addClass/menu-class-active.png")
         : require("@/assets/addClass/menu-class.png");
+    },
+    planIconSrc() {
+      return this.activeName === "plan"
+        ? require("@/assets/addClass/menu-plan-active.png")
+        : require("@/assets/addClass/menu-plan.png");
     },
   },
   watch: {

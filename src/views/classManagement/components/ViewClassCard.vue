@@ -15,6 +15,7 @@
           placement="right"
           trigger="hover"
           :tabindex="999"
+          v-if="type === 'edit'"
         >
           <div class="btn-list-hover">
             <span v-if="showMoveBtn">
@@ -258,6 +259,13 @@ export default {
     activeClassType: {
       type: String,
       default: "my",
+    },
+    type: {
+      type: String,
+      default: "edit",
+      validator(value) {
+        return ["view", "edit"].includes(value);
+      },
     },
   },
   data() {
