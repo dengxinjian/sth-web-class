@@ -172,37 +172,32 @@ export default {
     },
     // 新增课程
     submitNewClass(flag) {
-      submitData({
-        url: "/api/classes/create",
+      const saveData = {
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
+        labels: this.form.tags,
         sportType: "REMARK",
-        classesJson: JSON.stringify({ ...this.form }),
-      }).then((res) => {
-        if (res.success) {
-          this.form.id = res.result;
-          this.$emit("save", { ...this.form });
-          this.$message.success("课程保存成功");
-        }
-        if (flag) this.onCancel();
-      });
+        classesJson: JSON.stringify({
+          ...this.form,
+        }),
+      };
+
+      this.$emit("save", saveData, flag);
     },
     // 更新课程
     submitUpdateClass(flag) {
-      submitData({
-        url: "/api/classes/update",
+      const saveData = {
         id: this.form.id,
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
+        labels: this.form.tags,
         sportType: "REMARK",
-        classesJson: JSON.stringify({ ...this.form }),
-      }).then((res) => {
-        if (res.success) {
-          this.$emit("save", { ...this.form });
-          this.$message.success("课程保存成功");
-        }
-        if (flag) this.onCancel();
-      });
+        classesJson: JSON.stringify({
+          ...this.form,
+        }),
+      };
+
+      this.$emit("save", saveData, flag);
     },
     // 删除课程
     submitDeleteClass() {
