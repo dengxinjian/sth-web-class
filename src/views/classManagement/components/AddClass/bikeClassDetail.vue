@@ -111,7 +111,7 @@
         :style="{ flex: item.duration, minWidth: 0 }"
       >
         <span
-          v-if="originalType === 'my'"
+          v-if="originalType !== 'official'"
           class="time-stage-close"
           @click="handleDeleteStage(index)"
           ><i class="el-icon-close"></i
@@ -579,7 +579,7 @@
                   />
                   <span class="unit">踏频</span>
                   <i
-                    v-if="originalType === 'my'"
+                    v-if="originalType !== 'official'"
                     class="el-icon-close"
                     @click="handleRemoveCadence(index, idx)"
                     style="cursor: pointer"
@@ -636,20 +636,20 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         @click="onDelete"
-        :disabled="!classInfo.id"
+        :disabled="originalType === 'my'"
         >删除</el-button
       >
       <el-button @click="onCancel">取消</el-button>
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         type="warning"
         @click="onSave(false)"
         >保存</el-button
       >
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         type="danger"
         @click="onSave(true)"
         >保存并关闭</el-button
@@ -760,9 +760,16 @@ export default {
       // 当弹框打开时清空表单
       if (val) {
         this.getTagList();
-        this.resetForm();
-        if (this.data.id) {
+        if (this.data.id && this.originalType === "my") {
           this.getClassInfo(this.data.id);
+        } else if (this.originalType === "my") {
+          this.resetForm();
+        } else {
+          this.classInfo = this.data.classesJson;
+          this.timeline = this.data.classesJson.timeline;
+          this.maxIntensity = this.data.classesJson.maxIntensity;
+          this.classInfo.groupId = this.data.groupId;
+          this.handleClassDrag();
         }
       }
     },
@@ -877,7 +884,6 @@ export default {
       submitData({
         url: "/api/classes/calculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
-        classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
         sportType: "CYCLE",
         classesJson: JSON.stringify({
@@ -910,12 +916,7 @@ export default {
       }
     },
     onDelete() {
-      if (this.classInfo.id) {
-        this.submitDeleteClass();
-      } else {
-        this.resetForm();
-      }
-      this.$emit("delete", this.form);
+      this.$emit("delete");
     },
     resetForm() {
       // 清空表单数据，但保留传入的title

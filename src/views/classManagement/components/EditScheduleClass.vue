@@ -11,9 +11,7 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <div
-            v-if="classData.classesJson?.title || classData.activityName"
-          >
+          <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input
               type="text"
@@ -21,7 +19,9 @@
               :maxlength="50"
             />
           </div>
-          <span v-else>{{ getSportTypeName(classData.sportType) }}手动运动数据</span>
+          <span v-else
+            >{{ getSportTypeName(classData.sportType) }}手动运动数据</span
+          >
         </div>
       </div>
 
@@ -980,7 +980,6 @@ export default {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");

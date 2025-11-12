@@ -111,7 +111,7 @@
         :style="{ flex: item.duration, minWidth: 0 }"
       >
         <span
-          v-if="originalType === 'my'"
+          v-if="originalType !== 'official'"
           class="time-stage-close"
           @click="handleDeleteStage(index)"
           ><i class="el-icon-close"></i
@@ -632,7 +632,7 @@
                   />
                   <span class="unit">spm</span>
                   <i
-                    v-if="originalType === 'my'"
+                    v-if="originalType !== 'official'"
                     class="el-icon-close"
                     @click="handleRemoveCadence(index, idx)"
                     style="cursor: pointer"
@@ -689,20 +689,20 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
+        :disabled="originalType === 'my'"
         @click="onDelete"
-        :disabled="!classInfo.id"
         >删除</el-button
       >
       <el-button @click="onCancel">取消</el-button>
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         type="warning"
         @click="onSave(false)"
         >保存</el-button
       >
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         type="danger"
         @click="onSave(true)"
         >保存并关闭</el-button
@@ -815,10 +815,17 @@ export default {
       this.$emit("input", val);
       // 当弹框打开时清空表单
       if (val) {
-        this.resetForm();
         this.getTagList();
-        if (this.data.id) {
+        if (this.data.id && this.originalType === "my") {
           this.getClassInfo(this.data.id);
+        } else if (this.originalType === "my") {
+          this.resetForm();
+        } else {
+          console.log(this.data, "this.data");
+          this.classInfo = this.data.classesJson;
+          this.timeline = this.data.classesJson.timeline;
+          this.maxIntensity = this.data.classesJson.maxIntensity;
+          this.classInfo.groupId = this.data.classesGroupId;
         }
       }
     },
@@ -828,7 +835,6 @@ export default {
   },
   methods: {
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
@@ -878,7 +884,7 @@ export default {
           this.timeline = JSON.parse(res.result.classesJson).timeline;
           this.classInfo.id = res.result.id;
           this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
-          this.classInfo.groupId = res.result.classesGroupId;
+          this.classInfo.groupId = res.result.groupId;
           this.handleClassDrag();
         }
       });
@@ -1079,12 +1085,7 @@ export default {
       }
     },
     onDelete() {
-      if (this.classInfo.id) {
-        this.submitDeleteClass();
-      } else {
-        this.resetForm();
-      }
-      this.$emit("delete", this.form);
+      this.$emit("delete");
     },
     resetForm() {
       // 清空表单数据，但保留传入的title

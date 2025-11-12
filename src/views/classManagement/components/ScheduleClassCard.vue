@@ -266,7 +266,6 @@ export default {
       return duration === "00:00:00" ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");

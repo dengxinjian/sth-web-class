@@ -23,6 +23,9 @@ import * as filters from "./filters"; // global filters
 import * as echarts from "echarts";
 import permission from "@/directive/permission/index.js";
 import { message } from "@/views/classManagement/uilt";
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import VueVirtualScroller from 'vue-virtual-scroller'
+Vue.use(VueVirtualScroller)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
