@@ -29,11 +29,14 @@ export default {
   props: {
     // 运动类型，用于决定引入哪个组件
     sportType: {
-      type: String,
-      required: true,
+      type: [String, null],
+      required: false,
       default: "RUN",
-      validator: function (value = "RUN") {
-        console.log(value, "value");
+      validator: function (value) {
+        // 如果值为 null 或 undefined，允许通过（会在 computed 中处理）
+        if (value === null || value === undefined) {
+          return true;
+        }
         // 验证type参数是否有效
         return (
           [
@@ -85,7 +88,9 @@ export default {
         REMARK: NoteDetail,
         REST: RestDetail,
       };
-      return componentMap[this.sportType] || RunDetail;
+      // 如果 sportType 为 null 或 undefined，使用默认值
+      const sportType = this.sportType || "RUN";
+      return componentMap[sportType] || RunDetail;
     },
   },
 };

@@ -109,7 +109,21 @@
             </div>
           </template>
 
-          <div class="js-class-drag-container" :key="item.timespan">
+          <draggable
+            class="js-class-drag-container"
+            :list="item.classesList"
+            :group="{ name: 'planDrag', put: false, pull: 'clone' }"
+            :animation="180"
+            :sort="false"
+            :force-fallback="true"
+            :fallback-on-body="true"
+            :fallback-tolerance="5"
+            :scroll="true"
+            :scroll-sensitivity="40"
+            :scroll-speed="10"
+            ghost-class="is-plan-drag-ghost"
+            :key="item.timespan"
+          >
             <ClassCard
               v-for="classItem in item.classesList"
               :key="classItem.id"
@@ -122,7 +136,7 @@
               @copy="$emit('copy-class', classItem, item.groupId, classItem.title)"
               @view="$emit('view-class', classItem.id)"
             />
-          </div>
+          </draggable>
         </el-collapse-item>
       </el-collapse>
     </div>
@@ -131,11 +145,13 @@
 
 <script>
 import ClassCard from './ClassCard.vue'
+import draggable from 'vuedraggable'
 
 export default {
   name: 'ClassList',
   components: {
-    ClassCard
+    ClassCard,
+    draggable
   },
   props: {
     classList: {

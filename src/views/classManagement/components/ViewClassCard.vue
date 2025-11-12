@@ -9,7 +9,10 @@
       :modal="false"
       top="20vh"
     >
-      <div slot="title" style="display: flex; justify-content: end; align-items: center;">
+      <div
+        slot="title"
+        style="display: flex; justify-content: end; align-items: center"
+      >
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
@@ -54,12 +57,7 @@
               </el-button>
             </span>
             <span v-if="showDeleteBtn">
-              <el-button
-                type="text"
-                @click.stop="
-                  handleDelete();
-                "
-              >
+              <el-button type="text" @click.stop="handleDelete()">
                 删除课程
               </el-button>
             </span>
@@ -84,7 +82,11 @@
                     alt=""
                   />
                   <!-- 课程标题 -->
-                  <div class="title">{{ classItem.classesJson ? classItem.classesJson.title : '--' }}</div>
+                  <div class="title">
+                    {{
+                      classItem.classesJson ? classItem.classesJson.title : "--"
+                    }}
+                  </div>
                 </div>
               </div>
 
@@ -99,16 +101,27 @@
               >
                 <!-- 时长 -->
                 <div class="keyword">
-                  {{ classItem.classesJson ? formatDuration(classItem.classesJson.duration) : '--:--:--' }}
+                  {{
+                    classItem.classesJson
+                      ? formatDuration(classItem.classesJson.duration)
+                      : "--:--:--"
+                  }}
                 </div>
 
                 <!-- 距离 -->
                 <div style="display: flex">
                   <div class="keyword">
                     {{
-                      formatDistance(classItem.classesJson?.distance, classItem.sportType)
+                      formatDistance(
+                        classItem.classesJson?.distance,
+                        classItem.sportType
+                      )
                     }}
-                    <span v-if="classItem.classesJson && classItem.sportType === 'SWIM'">
+                    <span
+                      v-if="
+                        classItem.classesJson && classItem.sportType === 'SWIM'
+                      "
+                    >
                       {{ classItem.classesJson.distanceUnit }}
                     </span>
                     <span v-else>km</span>
@@ -130,12 +143,18 @@
                   </div>
                 </div>
               </div>
-              <div class="section-title" v-if="classItem.classesJson && classItem.classesJson.summary">
+              <div
+                class="section-title"
+                v-if="classItem.classesJson && classItem.classesJson.summary"
+              >
                 概要
               </div>
 
               <!-- 概要 -->
-              <pre v-if="classItem.classesJson && classItem.classesJson.summary" class="stage-details">
+              <pre
+                v-if="classItem.classesJson && classItem.classesJson.summary"
+                class="stage-details"
+              >
           {{ classItem.classesJson.summary }}
         </pre
               >
@@ -207,12 +226,16 @@
               <!-- 训练建议 -->
               <div
                 class="section-title"
-                v-if="classItem.classesJson && classItem.classesJson.trainingAdvice"
+                v-if="
+                  classItem.classesJson && classItem.classesJson.trainingAdvice
+                "
               >
                 训练建议
               </div>
               <pre
-                v-if="classItem.classesJson && classItem.classesJson.trainingAdvice"
+                v-if="
+                  classItem.classesJson && classItem.classesJson.trainingAdvice
+                "
                 class="stage-details"
               >
           {{ classItem.classesJson.trainingAdvice }}
@@ -228,7 +251,7 @@
       :class-item="classItem"
       @close="showEditClass = false"
       @save="handleEditSave"
-      @delete="$emit('delete', $event)"
+      @delete="$emit('delete', classItem)"
     />
   </div>
 </template>
@@ -325,7 +348,6 @@ export default {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
@@ -344,7 +366,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        this.handleClose()
+        this.handleClose();
         this.$emit("delete", this.classItem.id);
       });
     },

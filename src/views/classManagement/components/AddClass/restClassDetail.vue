@@ -64,20 +64,20 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         @click="onDelete"
-        :disabled="!form.id"
+        :disabled="originalType === 'my'"
         >删除</el-button
       >
       <el-button @click="onCancel">取消</el-button>
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         type="warning"
         @click="onSave(false)"
         >保存</el-button
       >
       <el-button
-        v-if="originalType === 'my'"
+        v-if="originalType !== 'official'"
         type="danger"
         @click="onSave(true)"
         >保存并关闭</el-button
@@ -158,9 +158,12 @@ export default {
       this.$emit("input", val);
       // 当弹框打开时清空表单
       if (val) {
-        this.resetForm();
-        if (this.data.id) {
+        if (this.data.id && this.originalType === "my") {
           this.getClassInfo(this.data.id);
+        } else if (this.originalType === "my") {
+          this.resetForm();
+        } else {
+          this.form = this.data.classesJson;
         }
       }
     },
@@ -245,11 +248,6 @@ export default {
       }
     },
     onDelete() {
-      if (this.form.id) {
-        this.submitDeleteClass();
-      } else {
-        this.resetForm();
-      }
       this.$emit("delete", this.form);
     },
     resetForm() {

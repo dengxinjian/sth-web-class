@@ -24,8 +24,7 @@ export default {
             swapThreshold: 0.6,
             scrollSpeed: 10,
             easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-            onStart: (e) => {
-            },
+            onStart: (e) => {},
             onEnd: (e) => {
               console.log(e, "e");
               // 只有拖到日历容器(.js-schedule-drag-container)时才处理
@@ -66,22 +65,6 @@ export default {
               scrollSensitivity: 200, // 增加敏感度
               bubbleScroll: true,
               forceFallback: false,
-              scrollFn: function (
-                offsetX,
-                offsetY,
-                originalEvent,
-                touchEvt,
-                hoverTargetEl
-              ) {
-                console.log(
-                  offsetX,
-                  offsetY,
-                  originalEvent,
-                  touchEvt,
-                  hoverTargetEl,
-                  "offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl"
-                );
-              },
               easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
               // 过滤掉健康数据卡片，使其不可拖拽
               filter: ".js-health-data-no-drag",
@@ -91,36 +74,6 @@ export default {
               onEnd: (e) => {
                 console.log("onEnd", e);
               },
-              onChoose: (e) => {
-                console.log("onChoose - 开始选择元素", e);
-              },
-              onUnchoose: (e) => {
-                console.log("onUnchoose - 取消选择", e);
-              },
-              onMove: (evt, originalEvent) => {
-                console.log("onMove event triggered", {
-                  related: evt.related,
-                  dragged: evt.dragged,
-                  relatedRect: evt.relatedRect,
-                  draggedRect: evt.draggedRect,
-                  willInsertAfter: evt.willInsertAfter,
-                  originalEvent: originalEvent
-                });
-                // onMove 需要返回值：返回 -1 取消移动，返回 1 允许移动
-                // 返回 true 或 1 表示允许移动
-                return true;
-              },
-              onChange: (evt) => {
-                console.log("onChange - 元素位置发生变化", {
-                  item: evt.item,
-                  oldIndex: evt.oldIndex,
-                  newIndex: evt.newIndex
-                });
-              },
-              onUpdate: (e) => {
-                // 同一容器内排序时触发
-                console.log("onUpdate - 同一容器内排序", e);
-              },
               onAdd: (e) => {
                 console.log("onAdd - 元素添加到容器", e);
                 // 防止拖拽错误元素
@@ -129,9 +82,6 @@ export default {
                   return;
                 }
                 _this.handleScheduleDragAdd(e);
-              },
-              onRemove: (e) => {
-                console.log("onRemove - 元素从容器移除", e);
               },
             });
           });
@@ -163,8 +113,7 @@ export default {
             scrollSensitivity: 30, // 增加敏感度
             bubbleScroll: true,
             onStart: (e) => {},
-            onMove: (evt) => {
-            },
+            onMove: (evt) => {},
             onAdd(e) {
               console.log(e, "e");
               if (e.item.className === "card-body") {

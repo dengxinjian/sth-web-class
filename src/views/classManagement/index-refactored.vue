@@ -86,11 +86,7 @@
       @cancel="onCancelMonthStatistic"
     />
 
-    <SportTypeModal
-      v-model="showSportTypeModal"
-      :data="classModalData"
-      @select="onSelectSportType"
-    />
+    <SportTypeModal v-model="showSportTypeModal" @select="onSelectSportType" />
 
     <SportDetailModal
       v-model="showSportDetailModal"
@@ -887,11 +883,17 @@ export default {
      * 删除课程
      */
     async handleDeleteClass(classId) {
-      const res = await classApi.deleteClass(classId);
-      if (res.success) {
-        this.$message.success("删除成功");
-        this.getClassList();
-      }
+      this.$confirm("确认删除该课程？", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        const res = await classApi.deleteClass(classId);
+        if (res.success) {
+          this.$message.success("删除成功");
+          this.getClassList();
+        }
+      });
     },
     async handleUpdateClass(classData, flag) {
       classApi.updateClass(classData).then((res) => {
@@ -1407,7 +1409,13 @@ export default {
           }
         });
       } else if (this.classModalDataType === "addSchedule") {
-        console.log(saveData, flag, this.classModalData, this.addScheduleDate, "saveData, flag, classModalData, addScheduleDate");
+        console.log(
+          saveData,
+          flag,
+          this.classModalData,
+          this.addScheduleDate,
+          "saveData, flag, classModalData, addScheduleDate"
+        );
         if (flag) this.showAddClassModal = false;
         this.handlePasteClass(this.addScheduleDate, saveData);
       }

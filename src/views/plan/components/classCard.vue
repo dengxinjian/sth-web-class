@@ -1,7 +1,13 @@
 <template>
-  <div style="position: relative">
+  <div
+    class="plan-class-card-wrapper"
+    style="position: relative"
+    :data-id="classItem.id"
+    :data-day="date"
+    data-type="planClass"
+  >
     <div
-      class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
+      class="class-schedule-card-container js-plan-class-card "
       :data-id="classItem.id"
       :data-date="date"
       data-type="classSchedule"
@@ -12,9 +18,7 @@
         :data-id="classItem.id"
         :data-date="date"
         data-type="classSchedule"
-        @click.stop="
-          hideContextMenu();
-        "
+        @click.stop="hideContextMenu()"
         @contextmenu.stop.prevent="showContextMenu"
       >
         <div
@@ -260,7 +264,6 @@ export default {
       return duration === "00:00:00" ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");

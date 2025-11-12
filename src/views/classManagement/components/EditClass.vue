@@ -12,11 +12,7 @@
       <div slot="title" class="dialog-header">
         <div class="header-title">
           <span>标题：</span>
-          <el-input
-            type="text"
-            v-model="classData.classesJson.title"
-            :maxlength="50"
-          />
+          <el-input type="text" v-model="classTitle" :maxlength="50" />
         </div>
       </div>
 
@@ -267,6 +263,7 @@ import { SPORT_TYPE_ICONS } from "../constants";
 import { submitData, getData } from "@/api/common.js";
 import AddClassModal from "./AddClass/index.vue";
 import { classApi } from "../services/classManagement.js";
+import { parseClassesJson } from "../utils/helpers";
 export default {
   name: "EditClass",
   components: {
@@ -284,11 +281,17 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    originalType: {
+      type: String,
+      default: "my",
+    },
   },
   data() {
     return {
       innerVisible: this.visible || false,
-      classData: {},
+      classData: {
+        classesJson: {},
+      },
       actualData: {
         totalDuration: "",
         exerciseDuration: "",
@@ -298,8 +301,22 @@ export default {
       },
       showAddClassModal: false,
       type: "edit",
-      originalType: "my",
     };
+  },
+  computed: {
+    classTitle: {
+      get() {
+        return (
+          (this.classData.classesJson && this.classData.classesJson.title) || ""
+        );
+      },
+      set(value) {
+        if (!this.classData.classesJson) {
+          this.$set(this.classData, "classesJson", {});
+        }
+        this.$set(this.classData.classesJson, "title", value);
+      },
+    },
   },
   watch: {
     visible(val) {
@@ -322,7 +339,14 @@ export default {
         });
       } else {
         // this.getClassInfo(this.classItem.id);
-        this.classData = this.classItem;
+        // 确保 classesJson 被正确解析
+        const classData = { ...this.classItem };
+        if (classData.classesJson) {
+          classData.classesJson = parseClassesJson(classData.classesJson);
+        } else {
+          classData.classesJson = {};
+        }
+        this.classData = classData;
       }
     },
   },
@@ -348,14 +372,8 @@ export default {
       return ["REMARK", "OTHER", "REST"].includes(sportType);
     },
     deleteClass(id) {
-      this.$confirm("确认删除该课程？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
-        this.handleClose();
-        this.$emit("delete", id);
-      });
+      this.handleClose();
+      this.$emit("delete", id);
     },
     handleEditClassDetail() {
       // 只打开子对话框，不关闭当前对话框
@@ -389,7 +407,6 @@ export default {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
@@ -421,9 +438,9 @@ export default {
     align-items: center;
     gap: 10px;
     > span {
-        flex: 1;
-        white-space: nowrap;
-      }
+      flex: 1;
+      white-space: nowrap;
+    }
   }
 
   .header-close {
