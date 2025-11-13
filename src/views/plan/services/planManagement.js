@@ -38,6 +38,14 @@ export const planApi = {
       requestData: data,
     });
   },
+
+  // 添加计划
+  addPlan(data) {
+    return submitData({
+      url: "/api/planClasses/createPlanClasses",
+      requestData: data,
+    });
+  },
 };
 
 /**

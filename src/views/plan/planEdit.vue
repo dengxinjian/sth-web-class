@@ -13,7 +13,7 @@
         />
       </div>
       <PlannedSchedule
-        :planList="planList"
+        :planList="planData.dayDetails || []"
         @box-click="handleBoxClick"
         @delete-class="handleDeletePlanClass"
         @edit-class="handleEditPlanClass"
@@ -21,6 +21,7 @@
         @add-week="handleAddWeek"
         @plan-item-move="handlePlanItemMove"
         @plan-library-drop="handlePlanLibraryDrop"
+        @save="handleSave"
       />
     </div>
     <ViewClassCard
@@ -79,6 +80,7 @@ import PlannedSchedule from "./components/plannedSchedule.vue";
 import SportTypeModal from "../classManagement/components/SportTypeModal/index.vue";
 import AddClassModal from "../classManagement/components/AddClass/index.vue";
 import EditClassModal from "../classManagement/components/EditClass.vue";
+import { planApi } from "./services/planManagement";
 export default {
   name: "PlanView",
   components: {
@@ -158,15 +160,69 @@ export default {
       editPlanClassIndex: null,
       editPlanClassWeekNumber: null,
       editPlanClassGlobalDay: null,
+      planType: "add",
+      planData: {
+        dayDetails: [],
+      },
     };
   },
   mounted() {
     this.getClassList();
+    console.log(this.$route.query, "this.$route.query");
+    this.planType = this.$route.query.type;
+    // 获取 store plan.js planData数据
+    this.planData = this.$store.state.plan.planData;
+    console.log(this.planData, "this.planData");
+    // this.$store.dispatch("plan", this.planType);
+    // this.$route.query.planId && this.getPlanData();
   },
 
   methods: {
     planSlideChange() {
       // 拖拽功能已由 vuedraggable 处理，无需手动初始化
+    },
+    handleSave() {
+      console.log(this.planData, "this.planData");
+      const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
+      const planList = [];
+      dayDetails.forEach((item) => {
+        item.forEach((week) => {
+          if (week.details.length > 0) {
+            planList.push(week);
+          }
+        });
+      });
+      planList.forEach((item) => {
+        item.details.forEach((day) => {
+          day.classesJson = JSON.stringify(day.classesJson);
+        });
+      });
+      if (this.planType === "add") {
+        this.addPlan(planList);
+      }
+      console.log(planList, "planList");
+    },
+    // 添加计划
+    async addPlan(planList) {
+      const res = await planApi.addPlan({
+        planTitle: this.planData.planTitle,
+        planGroupId: this.planData.planGroupId,
+        teamId: this.planData.teamId,
+        email: this.planData.email,
+        weChat: this.planData.weChat,
+        description: this.planData.description,
+        dayDetails: planList,
+      });
+      if (res.success) {
+        this.$message.success("添加成功");
+        this.$router.replace({
+          path: "/timeTable/plan",
+          query: {
+            id: res.result.id,
+            planGroupId: this.planData.planGroupId,
+          },
+        });
+      }
     },
     handleClassTypeChange(type) {
       this.activeClassType = type;
@@ -270,7 +326,7 @@ export default {
     },
     handlePlanItemMove(payload) {
       console.log(payload, "payload");
-      console.log(this.planList, "this.planList");
+      console.log(this.planList, "this.planList", this.planData.dayDetails);
     },
     handlePlanLibraryDrop(payload) {},
     relocatePlanClass(payload) {},
@@ -312,12 +368,12 @@ export default {
       const globalDay = this.selectedDay.globalDay;
 
       // 确保周数据存在
-      if (!this.planList[weekIndex]) {
-        this.$set(this.planList, weekIndex, []);
+      if (!this.planData.dayDetails[weekIndex]) {
+        this.$set(this.planData.dayDetails, weekIndex, []);
       }
 
       // 查找该天是否已存在数据
-      let dayData = this.planList[weekIndex].find(
+      let dayData = this.planData.dayDetails[weekIndex].find(
         (item) => item.day === globalDay
       );
 
@@ -327,7 +383,7 @@ export default {
           day: globalDay,
           details: [],
         };
-        this.planList[weekIndex].push(dayData);
+        this.planData.dayDetails[weekIndex].push(dayData);
       }
 
       // 确保 details 数组存在
@@ -366,13 +422,13 @@ export default {
         const weekIndex = weekNumber - 1;
 
         // 检查周数据是否存在
-        if (!this.planList[weekIndex]) {
+        if (!this.planData.dayDetails[weekIndex]) {
           console.error(`第 ${weekNumber} 周数据不存在`);
           return;
         }
 
         // 查找该天的数据对象
-        const dayData = this.planList[weekIndex].find(
+        const dayData = this.planData.dayDetails[weekIndex].find(
           (item) => item.day === globalDay
         );
         console.log(dayData, "dayData");
@@ -399,11 +455,11 @@ export default {
 
         // 如果删除后该天的 details 数组为空，可以选择删除该天的数据对象
         if (dayData.details.length === 0) {
-          const dayIndex = this.planList[weekIndex].findIndex(
+          const dayIndex = this.planData.dayDetails[weekIndex].findIndex(
             (item) => item.day === globalDay
           );
           if (dayIndex !== -1) {
-            this.planList[weekIndex].splice(dayIndex, 1);
+            this.planData.dayDetails[weekIndex].splice(dayIndex, 1);
           }
         }
 
@@ -463,14 +519,14 @@ export default {
       const weekIndex = this.editPlanClassWeekNumber - 1;
 
       // 检查周数据是否存在
-      if (!this.planList[weekIndex]) {
+      if (!this.planData.dayDetails[weekIndex]) {
         console.error(`第 ${this.editPlanClassWeekNumber} 周数据不存在`);
         this.$message.error(`第 ${this.editPlanClassWeekNumber} 周数据不存在`);
         return;
       }
 
       // 查找该天的数据对象
-      const dayData = this.planList[weekIndex].find(
+      const dayData = this.planData.dayDetails[weekIndex].find(
         (item) => item.day === this.editPlanClassGlobalDay
       );
 
@@ -529,7 +585,7 @@ export default {
      * 添加周
      */
     handleAddWeek() {
-      this.planList.push([]);
+      this.planData.dayDetails.push([]);
     },
   },
 };
