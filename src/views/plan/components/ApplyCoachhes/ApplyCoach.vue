@@ -57,43 +57,39 @@
         </el-radio-group>
       </el-form-item>
 
-      <el-row>
-        <el-col :span="24">
-          <el-row>
-            <el-col :span="8">成员</el-col>
-            <el-col :span="8">方式</el-col>
-            <el-col :span="8">时间</el-col>
-          </el-row>
-        </el-col>
-        <el-col :span="24">
-          <el-row>
-            <el-col :span="4">成员1</el-col>
-            <el-col :span="6">
-              <el-select
-                v-model="form.type"
-                placeholder="请选择方式"
-                filterable
-                clearable
-                style="width: 100%"
-              >
-                <el-option :label="1" :value="1">以开始时间</el-option>
-                <el-option :label="1" :value="1">以结束时间</el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="10">
-              <el-date-picker
-                v-model="value1"
-                type="date"
-                placeholder="选择日期"
-              >
-              </el-date-picker>
-            </el-col>
-            <el-col :span="4">
-              <el-button type="primary" @click="onConfirm">保存</el-button>
-            </el-col>
-          </el-row>
-        </el-col>
-      </el-row>
+      <el-form-item label="成员">
+        <el-row :gutter="8">
+          <el-col :span="5">方式</el-col>
+          <el-col :span="8">时间</el-col>
+        </el-row>
+      </el-form-item>
+      <el-form-item
+        :label="item.name"
+        v-for="(item, index) in members"
+        :key="index"
+        :rules="[
+          { required: true, message: '请选择方式', trigger: 'change' },
+          { required: true, message: '请选择时间', trigger: 'change' },
+        ]"
+      >
+        <el-row :gutter="8" style="width: 100%;">
+          <el-col :span="5">
+            <el-select v-model="item.type" placeholder="请选择">
+              <el-option label="以时间开始" value="1"></el-option>
+              <el-option label="以时介绍" value="2"></el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="11">
+            <el-date-picker v-model="item.time" type="date" placeholder="选择日期">
+            </el-date-picker>
+          </el-col>
+          <el-col :span="4">
+            <!-- <span>2</span> -->
+            <i class="el-icon-delete" @click="removeMember(index)"></i>
+            <!-- <i class="el-icon-share"></i> -->
+          </el-col>
+        </el-row>
+      </el-form-item>
     </el-form>
 
     <span slot="footer" class="dialog-footer">
@@ -131,6 +127,23 @@ export default {
         ],
       },
       groups: [],
+      members: [
+        {
+          name: "成员1",
+          type: 1,
+          time: "2025-01-01",
+        },
+        {
+          name: "成员2",
+          type: 2,
+          time: "2025-01-01",
+        },
+        {
+          name: "成员3",
+          type: undefined,
+          time: "",
+        },
+      ],
     };
   },
   computed: {
@@ -193,6 +206,9 @@ export default {
         }
       });
     },
+    removeMember(index) {
+      this.members.splice(index, 1);
+    },
   },
 };
 </script>
@@ -213,5 +229,14 @@ export default {
 }
 .statistics-divider-wrapper ::v-deep(.el-divider__text) {
   font-size: 12px;
+}
+.delete-icon {
+  cursor: pointer;
+  color: #909399;
+  font-size: 16px;
+  line-height: 32px;
+}
+.delete-icon:hover {
+  color: #f56c6c;
 }
 </style>

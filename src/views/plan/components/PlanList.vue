@@ -6,13 +6,13 @@
         :class="{ active: activeClassType === 'my' }"
         @click="handleClassTypeChange('my')"
       >
-        <img src="~@/assets/addClass/title-mine.png" alt="" />
+        <img src="~@/assets/plan/plan-title.png" alt="" />
       </li>
       <li
         :class="{ active: activeClassType === 'official' }"
         @click="handleClassTypeChange('official')"
       >
-        <img src="~@/assets/addClass/title-official.png" alt="" />
+        <img src="~@/assets/plan/plan-demo.png" alt="" />
       </li>
     </ul>
 

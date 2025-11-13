@@ -7,7 +7,7 @@
     class="add-class-title-modal"
     :close-on-click-modal="false"
   >
-    <span slot="title">复制</span>
+    <span slot="title">应用</span>
 
     <el-form
       ref="formRef"
@@ -16,31 +16,16 @@
       label-width="90px"
       size="small"
     >
-      <el-form-item label="计划名称" prop="title">
-        <el-input
-          v-model="form.title"
-          maxlength="50"
-          show-word-limit
-          placeholder="请输入课程标题"
-          clearable
-        />
+      <el-form-item label="方式" prop="type">
+        <el-select v-model="form.type" placeholder="请选择">
+          <el-option label="以时间开始" value="1"></el-option>
+          <el-option label="以时介绍" value="2"></el-option>
+        </el-select>
       </el-form-item>
 
-      <el-form-item label="分组名" prop="groupId">
-        <el-select
-          v-model="form.groupId"
-          placeholder="请选择分组"
-          filterable
-          clearable
-          style="width: 100%"
-        >
-          <el-option
-            v-for="g in groupOptions"
-            :key="g.id"
-            :label="g.classesGroupName"
-            :value="g.id"
-          />
-        </el-select>
+      <el-form-item label="时间" prop="time">
+        <el-date-picker v-model="form.time" type="date" placeholder="选择日期">
+        </el-date-picker>
       </el-form-item>
     </el-form>
 
@@ -66,16 +51,16 @@ export default {
     return {
       innerVisible: this.visible || this.value || false,
       form: {
-        title: this.defaultTitle,
+        type: this.defaultTitle,
         groupId: this.defaultGroupId,
       },
       rules: {
-        title: [
+        type: [
           { required: true, message: "请输入课程标题", trigger: "blur" },
           { min: 1, max: 50, message: "长度在1到50个字符", trigger: "blur" },
         ],
-        groupId: [
-          { required: false, message: "请选择分组", trigger: "change" },
+        time: [
+          { required: true, message: "请选择分组", trigger: "change" },
         ],
       },
       groups: [],

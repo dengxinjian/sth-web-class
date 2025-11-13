@@ -16,10 +16,10 @@
       label-width="80px"
       size="small"
     >
-      <el-form-item label="分组名称" prop="classesGroupName">
+      <el-form-item label="分组名称" prop="groupName">
         <el-input
-          v-model="form.classesGroupName"
-          maxlength="50"
+          v-model="form.groupName"
+          maxlength="20"
           show-word-limit
           placeholder="请输入分组名称"
           clearable
@@ -50,12 +50,12 @@ export default {
       innerVisible: this.visible || this.value || false,
       form: {
         id: this.data?.id || "",
-        classesGroupName: this.data?.classesGroupName || "",
+        groupName: this.data?.groupName || "",
       },
       rules: {
-        classesGroupName: [
+        groupName: [
           { required: true, message: "请输入分组名称", trigger: "blur" },
-          { min: 1, max: 50, message: "长度在1到50个字符", trigger: "blur" },
+          { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
         ],
       },
     };
@@ -87,7 +87,7 @@ export default {
         // 当传入数据变化时，同步更新表单
         this.form = {
           id: this.data?.id || "",
-          classesGroupName: this.data?.classesGroupName || "",
+          groupName: this.data?.groupName || "",
         };
       },
     },
@@ -103,7 +103,7 @@ export default {
         // 由父组件决定具体新增/编辑接口，此处只派发规范化数据
         if (this.form.id) {
           submitData({
-            url: "/api/classesGroup/update",
+            url: "/api/planClassesGroup/updatePlanClassesGroup",
             requestData: { ...this.form },
           }).then((res) => {
             if (res.success) {
@@ -113,7 +113,7 @@ export default {
           });
         } else {
           submitData({
-            url: "/api/classesGroup/create",
+            url: "/api/planClassesGroup/createPlanClassesGroup",
             requestData: { ...this.form },
           }).then((res) => {
             if (res.success) {
@@ -127,7 +127,7 @@ export default {
     resetForm() {
       this.form = {
         id: this.data?.id || "",
-        classesGroupName: this.data?.classesGroupName || "",
+        groupName: this.data?.groupName || "",
       };
       this.$nextTick(() => {
         if (this.$refs.formRef) {

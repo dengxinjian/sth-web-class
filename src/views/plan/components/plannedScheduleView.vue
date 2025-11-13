@@ -32,29 +32,36 @@
     <div class="planned-schedule-container-planned">
       <div class="planned-schedule-container-plan">
         <ScheduleBoxesView
-          v-for="(week, index) in classList"
-          :key="index"
+          :plan-list="planList"
           :box-count="7"
           :start-number="1"
-          :week-data="week"
-          :week-number="index + 1"
-          @box-click="handleBoxClick"
+          @box-click="$emit('box-click', $event)"
+          @delete-class="handleDeleteClass"
+          @edit-class="handleEditClass"
+          @paste-class="handlePasteClass"
+          @plan-item-move="$emit('plan-item-move', $event)"
+          @plan-item-reorder="$emit('plan-item-reorder', $event)"
+          @plan-library-drop="$emit('plan-library-drop', $event)"
         />
       </div>
-      <div class="planned-schedule-container-statistics"></div>
+      <!-- <div class="planned-schedule-container-statistics"></div> -->
     </div>
   </div>
 </template>
 
 <script>
 import ScheduleBoxesView from "./ScheduleBoxesView.vue";
-
+import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils";
 export default {
   name: "PlannedScheduleView",
   components: {
     ScheduleBoxesView,
   },
   props: {
+    planList: {
+      type: Array,
+      default: () => [],
+    },
     classList: {
       type: Array,
       default: () => [
@@ -131,7 +138,115 @@ export default {
       console.log("Box clicked:", box);
       // 在这里处理框的点击事件
       this.$message.info(`点击了编号为 ${box.number} 的框`);
-    }
+    },
+    secondsToHHMMSS,
+    getTotalSth() {
+      return this.planList.reduce((total, week) => {
+        return (
+          total +
+          week.reduce((weekTotal, item) => {
+            return (
+              weekTotal +
+              item.details.reduce((classTotal, classItem) => {
+                if (!classItem) {
+                  return classTotal;
+                }
+                let classesJson = classItem.classesJson;
+                if (typeof classesJson === "string") {
+                  try {
+                    classesJson = JSON.parse(classesJson);
+                  } catch (error) {
+                    console.error("解析 classesJson 失败:", error);
+                    return classTotal;
+                  }
+                }
+                if (!classesJson.sth) {
+                  return classTotal;
+                }
+                return classTotal + Number(classesJson.sth);
+              }, 0)
+            );
+          }, 0)
+        );
+      }, 0);
+    },
+    getTotalDistance() {
+      return this.planList.reduce((total, week) => {
+        return (
+          total +
+          week.reduce((weekTotal, item) => {
+            return (
+              weekTotal +
+              item.details.reduce((classTotal, classItem) => {
+                if (!classItem) {
+                  return classTotal;
+                }
+                let classesJson = classItem.classesJson;
+                if (typeof classesJson === "string") {
+                  try {
+                    classesJson = JSON.parse(classesJson);
+                  } catch (error) {
+                    console.error("解析 classesJson 失败:", error);
+                    return classTotal;
+                  }
+                }
+                if (!classesJson.distance) {
+                  return classTotal;
+                }
+                return classTotal + Number(classesJson.distance);
+              }, 0)
+            );
+          }, 0)
+        );
+      }, 0);
+    },
+    getTotalDuration() {
+      return this.planList.reduce((total, week) => {
+        return (
+          total +
+          week.reduce((weekTotal, item) => {
+            return (
+              weekTotal +
+              item.details.reduce((classTotal, classItem) => {
+                console.log(classItem, "classItem");
+                if (!classItem) {
+                  return classTotal;
+                }
+                let classesJson = classItem.classesJson;
+                if (typeof classesJson === "string") {
+                  try {
+                    classesJson = JSON.parse(classesJson);
+                  } catch (error) {
+                    console.error("解析 classesJson 失败:", error);
+                    return classTotal;
+                  }
+                }
+                if (
+                  !classesJson.duration ||
+                  classesJson.duration === "00:00:00" ||
+                  classesJson.duration === "--:--:--"
+                ) {
+                  return classTotal;
+                }
+                return classTotal + hhmmssToSeconds(classesJson.duration);
+              }, 0)
+            );
+          }, 0)
+        );
+      }, 0);
+    },
+    handleDeleteClass(classItem, classIndex, weekNumber, globalDay) {
+      this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
+    },
+    handleEditClass(classItem, classIndex, weekNumber, globalDay) {
+      this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
+    },
+    handlePasteClass(globalDay, weekNumber, classItem) {
+      this.$emit("paste-class", globalDay, weekNumber, classItem);
+    },
+    handleAddWeek() {
+      this.$emit("add-week");
+    },
   },
 };
 </script>
