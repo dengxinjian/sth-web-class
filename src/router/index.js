@@ -173,6 +173,11 @@ export const asyncRoutes = [
       },
       {
         path: "plan",
+        component: () => import("@/views/plan/planView.vue"),
+        meta: { title: "计划管理" },
+      },
+      {
+        path: "plan/add",
         component: () => import("@/views/plan/planEdit.vue"),
         meta: { title: "计划管理" },
       },
