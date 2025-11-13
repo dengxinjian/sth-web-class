@@ -604,6 +604,7 @@ export default {
                     ? getCompletionStatus(i.percent)
                     : "",
                   distance: Math.round(i.distance / 100) / 10,
+                  preciseDistance: i.distance,
                 }))
                 .filter((i) => !i.bindingManualActivityId);
 
@@ -615,6 +616,8 @@ export default {
                     classesJson: i.classesJson
                       ? parseClassesJson(i.classesJson)
                       : "",
+                    distance: Math.round(i.distance / 100) / 10,
+                    preciseDistance: i.distance,
                   });
                   console.log(activityList, "activityList");
                 } else {
@@ -626,6 +629,8 @@ export default {
                         classesJson: i.classesJson
                           ? parseClassesJson(i.classesJson)
                           : "",
+                        distance: Math.round(i.distance / 100) / 10,
+                        preciseDistance: i.distance,
                       };
                     }
                   });
