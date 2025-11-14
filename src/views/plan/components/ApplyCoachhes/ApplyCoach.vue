@@ -16,10 +16,27 @@
       label-width="90px"
       size="small"
     >
-      <el-form-item label="团队选择" prop="groupId">
+      <el-form-item label="团队选择" prop="teamId">
         <el-select
-          v-model="form.groupId"
-          placeholder="请选择分组"
+          v-model="form.teamId"
+          placeholder="请选择团队"
+          filterable
+          clearable
+          style="width: 100%"
+        >
+          <el-option
+            v-for="g in teamOptions"
+            :key="g.id"
+            :label="g.teamName"
+            :value="g.id"
+          />
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="人员选择" prop="personId">
+        <el-select
+          v-model="form.personId"
+          placeholder="请选择人员"
           filterable
           clearable
           style="width: 100%"
@@ -33,24 +50,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="人员选择" prop="groupId">
-        <el-select
-          v-model="form.groupId"
-          placeholder="请选择分组"
-          filterable
-          clearable
-          style="width: 100%"
-        >
-          <el-option
-            v-for="g in groupOptions"
-            :key="g.id"
-            :label="g.classesGroupName"
-            :value="g.id"
-          />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item label="类型" prop="groupId">
+      <el-form-item label="类型" prop="type">
         <el-radio-group v-model="form.type">
           <el-radio :label="1">批量设置</el-radio>
           <el-radio :label="2">单独设置</el-radio>
@@ -75,8 +75,8 @@
         <el-row :gutter="8" style="width: 100%;">
           <el-col :span="5">
             <el-select v-model="item.type" placeholder="请选择">
-              <el-option label="以时间开始" value="1"></el-option>
-              <el-option label="以时介绍" value="2"></el-option>
+              <el-option label="以开始日期" :value="1"></el-option>
+              <el-option label="以结束日期" :value="2"></el-option>
             </el-select>
           </el-col>
           <el-col :span="11">
@@ -84,9 +84,7 @@
             </el-date-picker>
           </el-col>
           <el-col :span="4">
-            <!-- <span>2</span> -->
             <i class="el-icon-delete" @click="removeMember(index)"></i>
-            <!-- <i class="el-icon-share"></i> -->
           </el-col>
         </el-row>
       </el-form-item>
@@ -103,7 +101,7 @@
 import { getData, submitData } from "@/api/common.js";
 
 export default {
-  name: "SummaryPreview",
+  name: "ApplyCoach",
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
@@ -115,18 +113,37 @@ export default {
       innerVisible: this.visible || this.value || false,
       form: {
         title: this.defaultTitle,
-        groupId: this.defaultGroupId,
+        teamId: undefined,
+        personId: undefined,
+        type: 1,
+        members: [
+          {
+            name: "成员1",
+            type: 1,
+            time: "2025-01-01",
+          },
+        ],
       },
       rules: {
         title: [
           { required: true, message: "请输入课程标题", trigger: "blur" },
           { min: 1, max: 50, message: "长度在1到50个字符", trigger: "blur" },
         ],
-        groupId: [
-          { required: false, message: "请选择分组", trigger: "change" },
+        teamId: [
+          { required: true, message: "请选择团队", trigger: "change" },
+        ],
+        personId: [
+          { required: true, message: "请选择人员", trigger: "change" },
+        ],
+        type: [
+          { required: true, message: "请选择类型", trigger: "change" },
+        ],
+        members: [
+          { required: true, message: "请选择方式", trigger: "change" },
+          { required: true, message: "请选择时间", trigger: "change" },
         ],
       },
-      groups: [],
+      teams: [],
       members: [
         {
           name: "成员1",
@@ -147,8 +164,8 @@ export default {
     };
   },
   computed: {
-    groupOptions() {
-      return Array.isArray(this.groups) ? this.groups : [];
+    teamOptions() {
+      return Array.isArray(this.teams) ? this.teams : [];
     },
   },
   watch: {
@@ -164,7 +181,7 @@ export default {
       if (val) {
         // reset form when opening
         this.resetForm();
-        this.getGroupList();
+        this.getTeamList();
       } else {
         // clear validation when closing
         this.$nextTick(
@@ -177,11 +194,11 @@ export default {
     },
   },
   methods: {
-    getGroupList() {
+    getTeamList() {
       getData({
-        url: "/api/classesGroup/user/getClassesGroupsByUserId",
+        url: "/api/team/coach/all-teams",
       }).then((res) => {
-        this.groups = res.result;
+        this.teams = res.result;
       });
     },
     onCancel() {

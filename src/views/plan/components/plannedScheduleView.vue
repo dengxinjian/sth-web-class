@@ -42,6 +42,7 @@
           @plan-item-move="$emit('plan-item-move', $event)"
           @plan-item-reorder="$emit('plan-item-reorder', $event)"
           @plan-library-drop="$emit('plan-library-drop', $event)"
+          @view-class="handleViewClass"
         />
       </div>
       <!-- <div class="planned-schedule-container-statistics"></div> -->
@@ -246,6 +247,10 @@ export default {
     },
     handleAddWeek() {
       this.$emit("add-week");
+    },
+    handleViewClass(classItem) {
+      console.log("handleViewClass-classItem", classItem);
+      this.$emit("view-class", classItem);
     },
   },
 };

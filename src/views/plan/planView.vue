@@ -13,24 +13,21 @@
           @add-group="handleAddGroup"
           @edit-group="handleEditGroup"
           @delete-group="handleDeleteGroup"
+          @choose-plan="handlePlanDayDetail"
         />
       </div>
       <PlannedScheduleView
         :planList="planList"
         @options-click="handleOptionsClick"
+        @view-class="handleViewPlanClass"
       />
-      <!-- <PlannedSchedule /> -->
     </div>
-    <ViewClassCard
+    <ViewPlanCard
       :visible="showViewClassCard"
       :class-item="classModalData"
       :active-class-type="activeClassType"
       @close="showViewClassCard = false"
-      @move="handleMoveClass"
-      @delete="handleDeleteClass"
-      @copy="handleCopyClassFromOfficial"
-      @save="handleUpdateClass"
-      type="edit"
+      type="view"
     />
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
@@ -56,17 +53,11 @@
 </template>
 
 <script>
-// import {
-//   classApi,
-//   groupApi,
-// } from "../classManagement/services/classManagement";
 import { parseClassesJson } from "../classManagement/utils/helpers";
-// import ClassList from "../classManagement/components/ClassList.vue";
 import PlanList from "./components/PlanList.vue";
-import ViewClassCard from "../classManagement/components/ViewClassCard.vue";
+import ViewPlanCard from "./components/ViewPlanCard/index.vue";
 import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOfficial/index.vue";
 import PlannedScheduleView from "./components/plannedScheduleView.vue";
-// import PlannedSchedule from "./components/plannedSchedule.vue";
 import AddPlan from "./components/AddPlan";
 import AddGroup from "./components/AddGroup";
 import SummaryPreview from "./components/SummaryPreview/index.vue";
@@ -76,13 +67,13 @@ import ApplyAthlete from "./components/ApplyCoachhes/ApplyAthletes.vue";
 import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue";
 
 // 服务和工具导入
-import { planApi,groupApi } from "./services/planManagement";
+import { planApi, groupApi } from "./services/planManagement";
 
 export default {
   name: "PlanView",
   components: {
     PlanList,
-    ViewClassCard,
+    ViewPlanCard,
     CopyClassFromOfficial,
     PlannedScheduleView,
     // PlannedSchedule,
@@ -118,6 +109,8 @@ export default {
       showApplyCoach: false,
       showApplyAthlete: false,
       showApplyHistory: false,
+      currentPlanId: "",
+      currentPlanGroupId: "",
       planList: [
         [
           {
@@ -168,9 +161,114 @@ export default {
     };
   },
   mounted() {
+    // 判断路由是否有值
+    if (Object.keys(this.$route.query).length > 0) {
+      const { id, planGroupId } = this.$route.query;
+      console.log(id, planGroupId, "id, planGroupId");
+      this.currentPlanId = id;
+      this.currentPlanGroupId = planGroupId;
+      this.getPlanDetail(id);
+      this.getPlanDayDetail(id);
+    }
     this.getPlanList();
   },
   methods: {
+    async handlePlanDayDetail(id) {
+      this.getPlanDetail(id);
+      this.getPlanDayDetail(id);
+    },
+    /**
+     * 获取计划详情
+     */
+    async getPlanDetail(id) {
+      const res = await planApi.getPlanDetail(id);
+      console.log("日常详情-res",res);
+    },
+    /**
+     * 处理计划日常详情数据，重组为按天分组的格式，并按每7天一组组成二维数组
+     * @param {Array} data - getPlanDayDetail接口返回的数据
+     * @returns {Array} 重组后的数据格式 [[{day: 1, details: [...]}, ...], [{day: 8, details: [...]}, ...], ...]
+     */
+    formatPlanDayDetail(data) {
+      if (!Array.isArray(data) || data.length === 0) {
+        // 如果数据为空，返回28天的空数据，按每7天一组组成二维数组
+        const result = [];
+        for (let week = 0; week < 4; week++) {
+          const weekData = [];
+          for (let day = week * 7 + 1; day <= (week + 1) * 7; day++) {
+            weekData.push({
+              day: day,
+              details: [],
+            });
+          }
+          result.push(weekData);
+        }
+        return result;
+      }
+
+      // 按day分组
+      const dayMap = new Map();
+      data.forEach((item) => {
+        const day = item.day;
+        if (!dayMap.has(day)) {
+          dayMap.set(day, []);
+        }
+
+        // 解析classesJson获取title和tags
+        let classesTitle = "";
+        let label = null;
+        try {
+          const classesData = JSON.parse(item.classesJson || "{}");
+          classesTitle = classesData.title || "";
+          label = classesData.tags && classesData.tags.length > 0
+            ? JSON.stringify(classesData.tags)
+            : null;
+        } catch (e) {
+          console.warn("解析classesJson失败:", e);
+        }
+
+        // 转换为目标格式
+        dayMap.get(day).push({
+          classesJson: item.classesJson,
+          classesTitle: classesTitle,
+          label: label,
+          sportType: item.sportType,
+        });
+      });
+
+      // 构建结果数组（1-28天），按每7天一组重组为二维数组
+      const result = [];
+      for (let week = 0; week < 4; week++) {
+        const weekData = [];
+        for (let day = week * 7 + 1; day <= (week + 1) * 7; day++) {
+          if (dayMap.has(day)) {
+            weekData.push({
+              day: day,
+              details: dayMap.get(day),
+            });
+          } else {
+            weekData.push({
+              day: day,
+              details: [],
+            });
+          }
+        }
+        result.push(weekData);
+      }
+
+      return result;
+    },
+    async getPlanDayDetail(id) {
+      const resDayDetail = await planApi.getPlanDayDetail(id);
+      console.log("日常详情-resDayDetail", resDayDetail);
+
+      // 处理并重组数据
+      const formattedData = this.formatPlanDayDetail(resDayDetail.result);
+      console.log("重组后的数据-formattedData", formattedData);
+
+      // return formattedData;
+      this.planList = formattedData;
+    },
     handleClassTypeChange(type) {
       this.activeClassType = type;
       this.getPlanList();
@@ -217,30 +315,26 @@ export default {
     },
 
     /**
-     * 删除课程
-     */
-    async handleDeleteClass(classId) {
-      const res = await classApi.deleteClass(classId);
-      if (res.success) {
-        this.$message.success("删除成功");
-        this.getPlanList();
-      }
-    },
-    async handleUpdateClass(classData) {
-      classApi.updateClass(classData).then((res) => {
-        if (res.success) {
-          this.$message.success("更新成功");
-          this.getPlanList();
-        }
-      });
-    },
-
-    /**
      * 查看课程
      */
     handleViewClass(classId) {
       this.showViewClassCard = true;
       this.classModalData = this.findClassById(classId);
+    },
+    handleViewPlanClass(cardInfo) {
+      console.log("handleViewPlanClass-cardInfo", cardInfo);
+      // cardInfo 包含完整的卡片信息：
+      // {
+      //   classItem: 课程项数据,
+      //   classIndex: 课程在当前天的索引,
+      //   weekIndex: 周索引（从0开始）,
+      //   weekNumber: 周数（从1开始）,
+      //   globalDay: 全局天数（1-28）,
+      //   boxIndex: 盒子索引（0-6）
+      // }
+      this.showViewClassCard = true;
+      // 使用 classItem 作为课程数据
+      this.classModalData = cardInfo?.classItem || cardInfo;
     },
     /**
      * 通过ID查找课程
