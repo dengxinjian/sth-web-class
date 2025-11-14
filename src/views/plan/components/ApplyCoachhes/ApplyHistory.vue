@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="540px"
+    width="680px"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -9,16 +9,23 @@
   >
     <span slot="title">历史</span>
 
-    <el-table :data="tableData" style="width: 100%">
+    <custom-table
+      :data="tableData"
+      :columns="columns"
+      :total="total"
+      :getList="getApplyHistory"
+    />
+    <!-- <el-table :data="tableData" style="width: 100%">
       <el-table-column prop="teamName" label="团队名称" width="180" />
-      <el-table-column prop="nickname" label="昵称" width="180" />
-      <el-table-column prop="applyTime" label="应用时间" />
-    </el-table>
+        <el-table-column prop="nickname" label="昵称" width="180" />
+        <el-table-column prop="applyTime" label="应用时间" />
+      </el-table> -->
+    <!-- </custom-table> -->
 
-    <el-row>
+    <!-- <el-row>
       <el-col>应用时间</el-col>
       <el-col v-for="item in tableData" :key="item.teamName">{{ item.applyTime }}</el-col>
-    </el-row>
+    </el-row> -->
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">关闭</el-button>
     </span>
@@ -27,29 +34,33 @@
 
 <script>
 import { getData, submitData } from "@/api/common.js";
-
+import CustomTable from "@/components/customTable/index.vue";
 export default {
-  name: "SummaryPreview",
+  name: "ApplyHistory",
+  components: {
+    CustomTable,
+  },
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
     type: { type: String, default: "" },
-    defaultTitle: { type: String, default: "" },
+    planInfo: { type: Object, default: () => {} },
   },
   data() {
     return {
       innerVisible: this.visible || this.value || false,
-      tableData: [
-        { teamName: '团队1', nickname: '昵称1', applyTime: '2025-01-01 10:00:00' },
-        { teamName: '团队2', nickname: '昵称2', applyTime: '2025-01-01 10:00:00' },
-        { teamName: '团队3', nickname: '昵称3', applyTime: '2025-01-01 10:00:00' },
-      ]
+      tableData: [],
+      total: 0,
+      columns: [
+        { prop: "teamName", label: "团队名称", width: 180 },
+        { prop: "applyNickname", label: "昵称", width: 180 },
+        { prop: "applyTimeRange", label: "应用时间", width: 260 },
+      ],
+      pagination: {
+        page: 1,
+        limit: 10,
+      },
     };
-  },
-  computed: {
-    groupOptions() {
-      return Array.isArray(this.groups) ? this.groups : [];
-    },
   },
   watch: {
     visible(val) {
@@ -64,7 +75,7 @@ export default {
       if (val) {
         // reset form when opening
         this.resetForm();
-        this.getGroupList();
+        this.getApplyHistory();
       } else {
         // clear validation when closing
         this.$nextTick(
@@ -77,11 +88,15 @@ export default {
     },
   },
   methods: {
-    getGroupList() {
+    getApplyHistory() {
       getData({
-        url: "/api/classesGroup/user/getClassesGroupsByUserId",
+        url: "/api/plan/getApplyHistory",
+        planClassesId: this.planInfo.id,
+        pageNum: this.pagination.page,
+        pageSize: this.pagination.limit,
       }).then((res) => {
-        this.groups = res.result;
+        this.tableData = res.data.list;
+        this.total = res.data.total;
       });
     },
     onCancel() {

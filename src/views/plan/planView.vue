@@ -48,7 +48,7 @@
     <Copy v-model="showCopy" />
     <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail" @cancel="handleApplyCoachCancel" />
     <!-- <ApplyAthlete v-model="showApplyAthlete" /> -->
-    <ApplyHistory v-model="showApplyHistory" />
+    <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
   </div>
 </template>
 
