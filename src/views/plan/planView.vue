@@ -46,8 +46,8 @@
     />
     <SummaryPreview v-model="showSummaryPreview" />
     <Copy v-model="showCopy" />
-    <ApplyCoach v-model="showApplyCoach" />
-    <ApplyAthlete v-model="showApplyAthlete" />
+    <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail" @cancel="handleApplyCoachCancel" />
+    <!-- <ApplyAthlete v-model="showApplyAthlete" /> -->
     <ApplyHistory v-model="showApplyHistory" />
   </div>
 </template>
@@ -63,7 +63,7 @@ import AddGroup from "./components/AddGroup";
 import SummaryPreview from "./components/SummaryPreview/index.vue";
 import Copy from "./components/Copy/index.vue";
 import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue";
-import ApplyAthlete from "./components/ApplyCoachhes/ApplyAthletes.vue";
+// import ApplyAthlete from "./components/ApplyCoachhes/ApplyAthletes.vue";
 import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue";
 
 // 服务和工具导入
@@ -82,7 +82,6 @@ export default {
     SummaryPreview,
     Copy,
     ApplyCoach,
-    ApplyAthlete,
     ApplyHistory,
   },
   data() {
@@ -158,6 +157,8 @@ export default {
 
       // 计划列表数据
       planSearchInput: "",
+      currentPlanDetail: {},
+      currentPlanDayDetail: [],
     };
   },
   mounted() {
@@ -173,9 +174,13 @@ export default {
     this.getPlanList();
   },
   methods: {
+    handleApplyCoachCancel(payload) {
+      this.showApplyCoach = false;
+      // this.getPlanList();
+    },
     async handlePlanDayDetail(id) {
-      this.getPlanDetail(id);
-      this.getPlanDayDetail(id);
+      await this.getPlanDetail(id);
+      await this.getPlanDayDetail(id);
     },
     /**
      * 获取计划详情
@@ -183,6 +188,7 @@ export default {
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
       console.log("日常详情-res",res);
+      this.currentPlanDetail = res.result;
     },
     /**
      * 处理计划日常详情数据，重组为按天分组的格式，并按每7天一组组成二维数组
@@ -437,15 +443,9 @@ export default {
           this.showApplyCoach = true;
           break;
         case 4:
-          this.showApplyAthlete = true;
+          this.showApplyHistory = true;
           break;
         case 5:
-          this.showApplyHistory = true;
-          break;
-        case 6:
-          this.showApplyHistory = true;
-          break;
-        case 7:
           this.handleDeleteGroup();
           break;
         default:

@@ -7,7 +7,7 @@
         <el-popover
           placement="bottom"
           width="110"
-          trigger="click"
+          trigger="hover"
           popper-class="add-class-btn-popover-planned-schedule"
         >
           <div class="add-class-btn-popover-more-list">
@@ -21,7 +21,7 @@
             </div>
           </div>
           <i
-            style="display: inline-block; cursor: pointer"
+            style="display: inline-block; cursor: pointer;"
             class="el-icon-more"
             slot="reference"
             @click.stop
@@ -126,10 +126,8 @@ export default {
         "概要",
         "编辑",
         "复制",
-        "应用(教练)",
-        "应用(运动员)",
-        "历史(教练)",
-        "历史(运动员)",
+        "应用",
+        "历史",
         "删除",
       ],
     };
