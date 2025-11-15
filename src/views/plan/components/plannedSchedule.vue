@@ -3,12 +3,12 @@
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
         <div class="planned-schedule-header-title-left-title">
-          Planned Schedule
+          {{ planTitle }}
         </div>
         <div class="planned-schedule-header-title-left-button">
           <el-button type="primary" @click="handleSave">保存</el-button>
           <el-button type="primary" @click="handleAddWeek">添加周</el-button>
-          <el-button type="info">取消</el-button>
+          <el-button type="info" @click="handleCancel">取消</el-button>
         </div>
       </div>
       <div class="planned-schedule-header-title-right">
@@ -63,6 +63,10 @@ export default {
     planList: {
       type: Array,
       default: () => [],
+    },
+    planTitle: {
+      type: String,
+      default: "",
     },
   },
   methods: {
@@ -120,6 +124,12 @@ export default {
                 if (!classesJson.distance) {
                   return classTotal;
                 }
+                if (
+                  classesJson.sportType === "SWIM" &&
+                  classesJson.distanceUnit === "m"
+                ) {
+                  return classTotal + Number(classesJson.distance) / 1000;
+                }
                 return classTotal + Number(classesJson.distance);
               }, 0)
             );
@@ -128,6 +138,7 @@ export default {
       }, 0);
     },
     getTotalDuration() {
+      console.log(this.planList, "this.planList");
       return this.planList.reduce((total, week) => {
         return (
           total +
@@ -173,6 +184,9 @@ export default {
     },
     handleAddWeek() {
       this.$emit("add-week");
+    },
+    handleCancel() {
+      this.$router.replace("/timeTable/plan");
     },
     handleSave() {
       this.$emit("save");

@@ -46,6 +46,13 @@ export const planApi = {
       requestData: data,
     });
   },
+  // 更新计划
+  updatePlan(data) {
+    return submitData({
+      url: "/api/planClasses/updatePlanClassesDayDetail",
+      requestData: data,
+    });
+  },
 
   // 获取计划详情
   getPlanDetail(id) {
