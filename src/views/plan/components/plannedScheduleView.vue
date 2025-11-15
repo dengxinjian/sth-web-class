@@ -3,7 +3,7 @@
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title">
         <div></div>
-        <div>Planned Schedule</div>
+        <div>{{ planTitle }}</div>
         <el-popover
           placement="bottom"
           width="110"
@@ -59,6 +59,10 @@ export default {
     ScheduleBoxesView,
   },
   props: {
+    planTitle: {
+      type: String,
+      default: "",
+    },
     planList: {
       type: Array,
       default: () => [],

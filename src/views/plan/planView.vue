@@ -18,6 +18,7 @@
       </div>
       <PlannedScheduleView
         :planList="planList"
+        :planTitle="currentPlanDetail.planTitle"
         @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass"
       />
@@ -49,7 +50,7 @@
     <!-- 概要 -->
     <SummaryPreview v-model="showSummaryPreview" :planInfo="currentPlanDetail" :planClasses="planList" />
     <!-- 复制 -->
-    <Copy v-model="showCopy" />
+    <Copy :defaultTitle="`${currentPlanDetail.planTitle}_复制`" :defaultGroupId="currentPlanDetail.planGroupId" v-model="showCopy" :planInfo="currentPlanDetail" :planClasses="planList" @save="onSaveCopy" />
     <!-- 应用教练 -->
     <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail" @cancel="handleApplyCoachCancel" />
     <!-- 应用历史 -->
@@ -178,6 +179,10 @@ export default {
     this.getPlanList();
   },
   methods: {
+    onSaveCopy(payload) {
+      this.showCopy = false;
+      this.getPlanList();
+    },
     handleApplyCoachCancel(payload) {
       this.showApplyCoach = false;
       // this.getPlanList();
