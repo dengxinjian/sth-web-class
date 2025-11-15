@@ -14,6 +14,7 @@
       </div>
       <PlannedSchedule
         :planList="planData.dayDetails || []"
+        :planTitle="planData.planTitle"
         @box-click="handleBoxClick"
         @delete-class="handleDeletePlanClass"
         @edit-class="handleEditPlanClass"

@@ -211,3 +211,32 @@ export const groupApi = {
     });
   },
 };
+
+/**
+ * 赛事相关API
+ */
+export const competitionApi = {
+  // 获取比赛类型和距离下拉框数据
+  getDropdownOptions() {
+    return getData({
+      url: "/api/competition/dropdown-options",
+    });
+  },
+
+  // 创建赛事
+  createCompetition(data) {
+    return submitData({
+      url: "/api/competition",
+      requestData: data,
+    });
+  },
+
+  // 更新赛事
+  updateCompetition(data) {
+    return submitData({
+      url: "/api/competition",
+      method: "put",
+      requestData: data,
+    });
+  },
+};

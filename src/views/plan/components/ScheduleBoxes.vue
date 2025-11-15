@@ -1098,7 +1098,6 @@ function parseNumber(value) {
   display: flex;
   align-items: stretch;
   width: 100%;
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
 }
 
 .schedule-box-item {
@@ -1143,6 +1142,7 @@ function parseNumber(value) {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    background-color: #fff;
   }
 
   .box-content {

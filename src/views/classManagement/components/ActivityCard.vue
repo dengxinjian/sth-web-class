@@ -76,13 +76,15 @@
           <div class="title" v-else>
             {{ getSportTypeName(activity.sportType) }}_手动录入
           </div>
-          <div class="keyword">{{ activity.duration }}</div>
+          <div class="keyword">
+            {{ restoreVerification("duration") ? "" : "*" }}
+            {{ activity.duration }}
+          </div>
           <div style="display: flex">
             <div class="keyword">
+              {{ restoreVerification("preciseDistance") ? "" : "*" }}
               {{ formatDistance(activity.distance, activity.sportType) }}
-              <span v-if="activity.sportType === 'SWIM'">
-                {{ activity.unit }}
-              </span>
+              <span v-if="activity.sportType === 3"> m </span>
               <span v-else>km</span>
             </div>
           </div>
@@ -280,16 +282,33 @@ export default {
   },
   methods: {
     truncateByLines,
+    restoreVerification(field) {
+      if (!this.activity.oldActivityDistance) {
+        return true;
+      }
+      if (field === "preciseDistance") {
+        let distance = 0;
+
+        distance = this.activity.preciseDistance;
+        console.log(distance, this.activity.oldActivityDistance, "distance");
+        return distance === this.activity.oldActivityDistance;
+      } else {
+        return this.activity[field] === this.activity.oldActivityDuration;
+      }
+    },
     formatDistance(distance, sportType) {
-      let result = "";
+      let result = distance;
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+        result = distance;
       }
       if (!result || result === "0") {
         result = "--";
+      }
+      if (sportType === 3 && result > 0) {
+        result = this.activity.preciseDistance;
       }
       return result;
     },
