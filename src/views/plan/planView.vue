@@ -185,12 +185,19 @@ export default {
   mounted() {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
-      const { id, planGroupId } = this.$route.query;
-      console.log(id, planGroupId, "id, planGroupId");
-      this.currentPlanId = id;
-      this.currentPlanGroupId = planGroupId;
-      this.getPlanDetail(id);
-      this.getPlanDayDetail(id);
+      const { id, planGroupId, type } = this.$route.query;
+      if (id && planGroupId) {
+        console.log(id, planGroupId,type , "id, planGroupId, type");
+        this.currentPlanId = id;
+        this.currentPlanGroupId = planGroupId;
+        this.getPlanDetail(id);
+        this.getPlanDayDetail(id);
+      }
+
+      if (type === 'edit') {
+        this.getPlanDetail(this.currentPlanDetail.id);
+        this.getPlanDayDetail(this.currentPlanDetail.id);
+      }
     }
     this.getPlanList();
   },
