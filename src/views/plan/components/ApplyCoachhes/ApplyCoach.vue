@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    :width="loginType === 2 ? '680px' : '420px'"
+    :width="loginType === '2' ? '680px' : '420px'"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -16,7 +16,7 @@
       label-width="90px"
       size="small"
     >
-      <template v-if="loginType === 2">
+      <template v-if="loginType === '2'">
         <el-form-item label="团队选择" prop="teamId">
           <el-select
             v-model="form.teamId"
@@ -61,7 +61,31 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="成员">
+        <el-form-item
+          v-if="form.athleteType === 1"
+          label="方式"
+          prop="applyMode"
+        >
+          <el-select v-model="form.applyMode" placeholder="请选择">
+            <el-option label="以开始日期" :value="1"></el-option>
+            <el-option label="以结束日期" :value="2"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item
+          v-if="form.athleteType === 1"
+          label="时间"
+          prop="applyDate"
+        >
+          <el-date-picker
+            v-model="form.applyDate"
+            value-format="yyyy-MM-dd"
+            type="date"
+            placeholder="选择日期"
+          >
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item v-if="form.athleteType === 2" label="成员">
           <el-row :gutter="8">
             <el-col :span="6">方式</el-col>
             <el-col :span="8">时间</el-col>
@@ -76,49 +100,53 @@
           { required: true, message: '请选择时间', trigger: 'change' },
         ]"
       > -->
-        <el-row
-          :gutter="8"
-          class="member-row"
-          v-for="(item, index) in members"
-          :key="index"
-        >
-          <el-col :span="4">
-            <span class="member-name">{{ item.userNickname }}</span>
-          </el-col>
-          <el-col :span="6">
-            <el-select v-model="item.applyMode" placeholder="请选择">
-              <el-option label="以开始日期" :value="1"></el-option>
-              <el-option label="以结束日期" :value="2"></el-option>
-            </el-select>
-          </el-col>
-          <el-col :span="10">
-            <el-date-picker
-              v-model="item.applyDate"
-              type="date"
-              placeholder="选择日期"
-            >
-            </el-date-picker>
-          </el-col>
-          <el-col :span="4">
-            <i
-              class="el-icon-circle-close delete-icon"
-              @click="removeMember(index)"
-            ></i>
-          </el-col>
-        </el-row>
+        <template v-if="form.athleteType === 2 && members.length > 0">
+          <el-row
+            :gutter="8"
+            class="member-row"
+            v-for="(item, index) in members"
+            :key="index"
+          >
+            <el-col :span="4">
+              <span class="member-name">{{ item.userNickname }}</span>
+            </el-col>
+            <el-col :span="6">
+              <el-select v-model="item.applyMode" placeholder="请选择">
+                <el-option label="以开始日期" :value="1"></el-option>
+                <el-option label="以结束日期" :value="2"></el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="10">
+              <el-date-picker
+                v-model="item.applyDate"
+                value-format="yyyy-MM-dd"
+                type="date"
+                placeholder="选择日期"
+              >
+              </el-date-picker>
+            </el-col>
+            <el-col :span="4">
+              <i
+                class="el-icon-circle-close delete-icon"
+                @click="removeMember(item, index)"
+              ></i>
+            </el-col>
+          </el-row>
+        </template>
       </template>
       <!-- </el-form-item> -->
       <template v-else>
         <el-form-item label="方式" prop="applyMode">
           <el-select v-model="form.applyMode" placeholder="请选择">
             <el-option label="以开始日期" :value="1"></el-option>
-              <el-option label="以结束日期" :value="2"></el-option>
+            <el-option label="以结束日期" :value="2"></el-option>
           </el-select>
         </el-form-item>
 
         <el-form-item label="时间" prop="applyDate">
           <el-date-picker
             v-model="form.applyDate"
+            value-format="yyyy-MM-dd"
             type="date"
             placeholder="选择日期"
           >
@@ -184,9 +212,6 @@ export default {
     };
   },
   computed: {
-    userInfo() {
-      return this.$store.state.user.userInfo;
-    },
     teamOptions() {
       return Array.isArray(this.teams) ? this.teams : [];
     },
@@ -227,7 +252,7 @@ export default {
   },
   methods: {
     handleAthleteChange(value) {
-      this.members = value.map((item) => {
+      const memberList = value.map((item) => {
         const findItem = this.athletesList.find((el) => el.triUserId === item);
         return {
           ...findItem,
@@ -235,6 +260,19 @@ export default {
           applyDate: undefined,
         };
       });
+      const newMembers =
+        this.members.length > 0
+          ? memberList.map((item) => {
+              const findItem = this.members.find(
+                (el) => el.triUserId === item.triUserId
+              );
+              return {
+                ...item,
+                ...findItem,
+              };
+            })
+          : memberList;
+      this.members = newMembers;
     },
     getTeamList() {
       getData({
@@ -248,7 +286,6 @@ export default {
         url: `/api/team/info/${teamId}`,
         teamId: teamId,
       }).then((res) => {
-        console.log("getMembersList-res", res);
         this.athletesList = res.result.athletes || [];
       });
     },
@@ -260,22 +297,35 @@ export default {
       const _this = this;
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
-        console.log("loginType", _this.loginType);
         // 根据登录类型构建 targets 数组
-        const targets =
-          _this.loginType === "2"
-            ? _this.members.map((item) => ({
-              triUserId: item.triUserId,
-              applyDate: item.applyDate,
-              applyMode: item.applyMode,
-            }))
-            : [
-              {
-                triUserId: _this.triUserId,
-                applyDate: _this.form.applyDate,
-                applyMode: _this.form.applyMode,
-              },
-            ];
+        let targets = [];
+        if (_this.loginType === "2") {
+          targets =
+            _this.form.athleteType === 1
+              ? _this.form.athleteIds.map((item) => ({
+                  triUserId: item,
+                  applyDate: _this.form.applyDate,
+                  applyMode: _this.form.applyMode,
+                }))
+              : _this.members.map((item) => ({
+                  triUserId: item.triUserId,
+                  applyDate: item.applyDate,
+                  applyMode: item.applyMode,
+                }));
+        } else {
+          targets = [
+            {
+              triUserId: _this.triUserId,
+              applyDate: _this.form.applyDate,
+              applyMode: _this.form.applyMode,
+            },
+          ];
+          targets.push({
+            triUserId: _this.triUserId,
+            applyDate: _this.form.applyDate,
+            applyMode: _this.form.applyMode,
+          });
+        }
 
         const params = {
           planClassesId: _this.planInfo.id,
@@ -307,7 +357,10 @@ export default {
         }
       });
     },
-    removeMember(index) {
+    removeMember(item, index) {
+      this.form.athleteIds = this.form.athleteIds.filter(
+        (el) => el !== item.triUserId
+      );
       this.members.splice(index, 1);
     },
   },
@@ -342,9 +395,12 @@ export default {
   color: #f56c6c;
 }
 .member-name {
+  display: inline-block;
+  width: 100%;
   font-size: 14px;
   font-weight: bold;
   vertical-align: middle;
+  text-align: right;
 }
 .member-row {
   display: flex;
