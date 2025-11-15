@@ -1,9 +1,9 @@
 <template>
   <div class="planned-schedule-container">
-    <div class="planned-schedule-header">
+    <!-- <div class="planned-schedule-header">
       <div class="planned-schedule-header-title">
         <div></div>
-        <div>Planned Schedule</div>
+        <div>{{ planTitle || 'Planned Schedule' }}</div>
         <el-popover
           placement="bottom"
           width="110"
@@ -27,6 +27,55 @@
             @click.stop
           ></i>
         </el-popover>
+      </div>
+    </div> -->
+    <div class="planned-schedule-header">
+      <div class="planned-schedule-header-title-left">
+        <div class="planned-schedule-header-title-left-title">
+          {{ planTitle || 'Planned Schedule' }}
+        </div>
+        <el-popover
+          placement="bottom"
+          width="110"
+          trigger="hover"
+          popper-class="add-class-btn-popover-planned-schedule"
+        >
+          <div class="add-class-btn-popover-more-list">
+            <div
+              class="add-class-btn-popover-more-list-item"
+              v-for="(item, index) in optionsArray"
+              :key="index"
+              @click="$emit('options-click', item, index)"
+            >
+              {{ item }}
+            </div>
+          </div>
+          <i
+            style="display: inline-block; cursor: pointer;font-size: 20px;margin-right: 40px;"
+            class="el-icon-more"
+            slot="reference"
+            @click.stop
+          ></i>
+        </el-popover>
+      </div>
+      <div class="planned-schedule-header-title-right">
+        <!-- 总运动时长距离sth总值 -->
+        <div class="planned-schedule-header-title-right-total">
+          <span class="label">总运动时长:</span>
+          <span class="value">{{
+            secondsToHHMMSS(getTotalDuration()) === "00:00:00"
+              ? "--:--:--"
+              : secondsToHHMMSS(getTotalDuration())
+          }}</span>
+        </div>
+        <div class="planned-schedule-header-title-right-total">
+          <span class="label">总运动距离:</span>
+          <span class="value">{{ getTotalDistance() || "--" }}km</span>
+        </div>
+        <div class="planned-schedule-header-title-right-total">
+          <span class="label">总STH:</span>
+          <span class="value">{{ getTotalSth() || "--" }}</span>
+        </div>
       </div>
     </div>
     <div class="planned-schedule-container-planned">
@@ -126,14 +175,7 @@ export default {
   },
   data() {
     return {
-      optionsArray: [
-        "概要",
-        "编辑",
-        "复制",
-        "应用",
-        "历史",
-        "删除",
-      ],
+      optionsArray: ["概要", "编辑", "复制", "应用", "历史", "删除"],
     };
   },
   methods: {
@@ -196,6 +238,12 @@ export default {
                 if (!classesJson.distance) {
                   return classTotal;
                 }
+                if (
+                  classesJson.sportType === "SWIM" &&
+                  classesJson.distanceUnit === "m"
+                ) {
+                  return classTotal + Number(classesJson.distance) / 1000;
+                }
                 return classTotal + Number(classesJson.distance);
               }, 0)
             );
@@ -204,6 +252,7 @@ export default {
       }, 0);
     },
     getTotalDuration() {
+      console.log(this.planList, "this.planList");
       return this.planList.reduce((total, week) => {
         return (
           total +
@@ -313,6 +362,9 @@ export default {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     position: relative;
+    display: flex;
+    align-items: center;
+    position: relative;
 
     &::after {
       content: "";
@@ -325,34 +377,73 @@ export default {
       opacity: 0.3;
     }
 
-    .planned-schedule-header-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #303133;
-      text-align: center;
-      letter-spacing: 0.5px;
-      position: relative;
-      padding-right: 220px;
-      box-sizing: border-box;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      div {
-        display: inline-block;
-        padding: 4px 0;
-        position: relative;
+    // .planned-schedule-header-title {
+    //   font-size: 18px;
+    //   font-weight: 600;
+    //   color: #303133;
+    //   text-align: center;
+    //   letter-spacing: 0.5px;
+    //   position: relative;
+    //   padding-right: 220px;
+    //   box-sizing: border-box;
+    //   display: flex;
+    //   justify-content: space-between;
+    //   align-items: center;
+    //   div {
+    //     display: inline-block;
+    //     padding: 4px 0;
+    //     position: relative;
+    //   }
+    // }
 
-        // &::after {
-        //   content: "";
-        //   position: absolute;
-        //   bottom: 0;
-        //   left: 50%;
-        //   transform: translateX(-50%);
-        //   width: 40px;
-        //   height: 3px;
-        //   background: linear-gradient(90deg, #409eff, #66b1ff);
-        //   border-radius: 2px;
-        // }
+    .planned-schedule-header-title-left {
+      flex: 0.85;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+
+      .planned-schedule-header-title-left-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #303133;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .planned-schedule-header-title-left-button {
+        margin-left: auto;
+        margin-right: 20px;
+      }
+    }
+
+    .planned-schedule-header-title-right {
+      flex: 0.15;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      gap: 5px;
+
+      .planned-schedule-header-title-right-total {
+        margin-bottom: 2px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .label {
+          font-weight: 600;
+          color: #303133;
+          font-size: 14px;
+        }
+
+        .value {
+          color: #303133;
+          font-size: 14px;
+          font-weight: 500;
+        }
       }
     }
   }

@@ -18,7 +18,7 @@
       </div>
       <PlannedScheduleView
         :planList="planList"
-        :planTitle="currentPlanDetail.planTitle"
+        :planTitle="planTitle"
         @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass"
       />
@@ -131,6 +131,7 @@ export default {
       showApplyHistory: false,
       currentPlanId: "",
       currentPlanGroupId: "",
+      planTitle: "",
       planList: [
         // [
         //   {
@@ -181,6 +182,14 @@ export default {
       currentPlanDetail: {},
       currentPlanDayDetail: [],
     };
+  },
+  watch: {
+    currentPlanDetail: {
+      handler(newVal) {
+        this.planTitle = newVal?.planTitle || '';
+      },
+      deep: true,
+    },
   },
   mounted() {
     // 判断路由是否有值
