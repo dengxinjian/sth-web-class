@@ -200,8 +200,33 @@ export default {
       });
       if (this.planType === "add") {
         this.addPlan(planList);
+      } else {
+        this.updatePlan(planList);
       }
       console.log(planList, "planList");
+    },
+    async updatePlan(planList) {
+      const res = await planApi.updatePlan({
+        planTitle: this.planData.planTitle,
+        planGroupId: this.planData.planGroupId,
+        teamId: this.planData.teamId,
+        email: this.planData.email,
+        weChat: this.planData.weChat,
+        description: this.planData.description,
+        dayDetails: planList,
+        planClassesId: this.planData.id,
+      });
+      if (res.success) {
+        this.$message.success("更新成功");
+        this.$router.replace({
+          path: "/timeTable/plan",
+          query: {
+            id: this.planData.id,
+            planGroupId: this.planData.planGroupId,
+            type: "edit",
+          },
+        });
+      }
     },
     // 添加计划
     async addPlan(planList) {
