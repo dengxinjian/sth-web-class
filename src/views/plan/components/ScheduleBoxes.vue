@@ -500,6 +500,12 @@ export default {
             if (!classesJson.distance || classItem.sportType !== "SWIM") {
               return classAcc;
             }
+            if (
+              classesJson.sportType === "SWIM" &&
+              classesJson.distanceUnit === "km"
+            ) {
+              return classAcc + Number(classesJson.distance) * 1000;
+            }
             return classAcc + Number(classesJson.distance);
           }, 0)
         );
