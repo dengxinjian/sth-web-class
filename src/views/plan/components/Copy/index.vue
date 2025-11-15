@@ -16,19 +16,19 @@
       label-width="90px"
       size="small"
     >
-      <el-form-item label="计划名称" prop="title">
+      <el-form-item label="计划标题" prop="planTitle">
         <el-input
-          v-model="form.title"
-          maxlength="50"
+          v-model="form.planTitle"
+          maxlength="20"
           show-word-limit
-          placeholder="请输入课程标题"
+          placeholder="请输入计划标题"
           clearable
         />
       </el-form-item>
 
-      <el-form-item label="分组名" prop="groupId">
+      <el-form-item label="分组名" prop="planGroupId">
         <el-select
-          v-model="form.groupId"
+          v-model="form.planGroupId"
           placeholder="请选择分组"
           filterable
           clearable
@@ -37,7 +37,7 @@
           <el-option
             v-for="g in groupOptions"
             :key="g.id"
-            :label="g.classesGroupName"
+            :label="g.planClassesGroup"
             :value="g.id"
           />
         </el-select>
@@ -61,21 +61,23 @@ export default {
     value: { type: Boolean, default: undefined },
     defaultTitle: { type: String, default: "" },
     defaultGroupId: { type: [String, Number], default: undefined },
+    planInfo: { type: Object, default: () => ({}) },
+    planClasses: { type: Array, default: () => [] },
   },
   data() {
     return {
       innerVisible: this.visible || this.value || false,
       form: {
-        title: this.defaultTitle,
-        groupId: this.defaultGroupId,
+        planTitle: this.defaultTitle,
+        planGroupId: this.defaultGroupId,
       },
       rules: {
-        title: [
-          { required: true, message: "请输入课程标题", trigger: "blur" },
-          { min: 1, max: 50, message: "长度在1到50个字符", trigger: "blur" },
+        planTitle: [
+          { required: true, message: "请输入计划标题", trigger: "blur" },
+          { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
         ],
-        groupId: [
-          { required: false, message: "请选择分组", trigger: "change" },
+        planGroupId: [
+          { required: true, message: "请选择分组", trigger: "change" },
         ],
       },
       groups: [],
@@ -114,7 +116,7 @@ export default {
   methods: {
     getGroupList() {
       getData({
-        url: "/api/classesGroup/user/getClassesGroupsByUserId",
+        url: "/api/planClassesGroup/option",
       }).then((res) => {
         this.groups = res.result;
       });
@@ -126,14 +128,37 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
-        this.$emit("save", { ...this.form });
-        this.innerVisible = false;
+        // this.$emit("save", { ...this.form });
+        // this.innerVisible = false;
+        console.log(this.planClasses, "this.planClasses");
+        console.log(this.form, "this.form");
+        console.log(this.planInfo, "this.planInfo");
+        const params = {
+          ...this.form,
+          teamId: this.planInfo.teamId,
+          email: this.planInfo.email,
+          weChat: this.planInfo.weChat,
+          description: this.planInfo.description,
+          dayDetails: this.planClasses.flat(),
+          sourcePlanId: this.planInfo.planGroupId,
+        };
+        console.log(params, "params");
+        submitData({
+          url: "/api/planClasses/copyPlanClasses",
+          requestData: params,
+        }).then((res) => {
+          if (res.success) {
+            this.$message.success("复制成功");
+            this.innerVisible = false;
+            this.$emit("save", res.result);
+          }
+        });
       });
     },
     resetForm() {
       this.form = {
-        title: this.defaultTitle,
-        groupId: this.defaultGroupId,
+        planTitle: this.defaultTitle,
+        planGroupId: this.defaultGroupId,
       };
       this.$nextTick(() => {
         if (this.$refs.formRef) {

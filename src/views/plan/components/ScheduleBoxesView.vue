@@ -36,7 +36,7 @@
                       )
                     "
                   >
-                    <draggable
+                    <!-- <draggable
                       class="js-plan-drag-container"
                       :list="
                         getDayClassesArray(
@@ -65,7 +65,7 @@
                       "
                       @add="handleDragAdd($event, item.weekIndex, boxIndex)"
                       @unchoose="handleDragUnchoose"
-                    >
+                    > -->
                       <ClassCard
                         v-for="(classItem, classIndex) in getDayClasses(
                           item.weekData,
@@ -98,8 +98,19 @@
                         "
                         @copy="handleCopyClass"
                         type="view"
+                        @view-class="
+                          handleCardClick(
+                            $event,
+                            classItem,
+                            classIndex,
+                            item.weekIndex,
+                            item.weekIndex + 1,
+                            item.weekIndex * 7 + boxIndex + 1,
+                            boxIndex
+                          )
+                        "
                       />
-                    </draggable>
+                    <!-- </draggable> -->
                     <!-- <div
                       class="box-content"
                       @click="
@@ -1027,6 +1038,31 @@ export default {
         type: "success",
         duration: 2000,
       });
+    },
+    /**
+     * 处理ClassCard点击事件
+     * @param {Object} eventClassItem - 从ClassCard的view-class事件传递过来的课程项数据
+     * @param {Object} classItem - 课程项数据（从v-for循环中获取）
+     * @param {Number} classIndex - 课程在当前天的索引
+     * @param {Number} weekIndex - 周索引（从0开始）
+     * @param {Number} weekNumber - 周数（从1开始）
+     * @param {Number} globalDay - 全局天数（1-28）
+     * @param {Number} boxIndex - 盒子索引（0-6）
+     */
+    handleCardClick(eventClassItem, classItem, classIndex, weekIndex, weekNumber, globalDay, boxIndex) {
+      // 使用从事件中传递过来的classItem，确保数据是最新的
+      const finalClassItem = eventClassItem || classItem;
+      const cardInfo = {
+        classItem: finalClassItem, // 课程项数据
+        classIndex, // 课程在当前天的索引
+        weekIndex, // 周索引（从0开始）
+        weekNumber, // 周数（从1开始）
+        globalDay, // 全局天数（1-28）
+        boxIndex, // 盒子索引（0-6）
+      };
+      console.log("点击的ClassCard信息:", cardInfo);
+      // 触发事件，传递完整的card信息
+      this.$emit("view-class", cardInfo);
     },
   },
 };

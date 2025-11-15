@@ -7,7 +7,7 @@
         <el-popover
           placement="bottom"
           width="110"
-          trigger="click"
+          trigger="hover"
           popper-class="add-class-btn-popover-planned-schedule"
         >
           <div class="add-class-btn-popover-more-list">
@@ -21,7 +21,7 @@
             </div>
           </div>
           <i
-            style="display: inline-block; cursor: pointer"
+            style="display: inline-block; cursor: pointer;"
             class="el-icon-more"
             slot="reference"
             @click.stop
@@ -42,6 +42,7 @@
           @plan-item-move="$emit('plan-item-move', $event)"
           @plan-item-reorder="$emit('plan-item-reorder', $event)"
           @plan-library-drop="$emit('plan-library-drop', $event)"
+          @view-class="handleViewClass"
         />
       </div>
       <!-- <div class="planned-schedule-container-statistics"></div> -->
@@ -58,6 +59,10 @@ export default {
     ScheduleBoxesView,
   },
   props: {
+    planTitle: {
+      type: String,
+      default: "",
+    },
     planList: {
       type: Array,
       default: () => [],
@@ -125,10 +130,8 @@ export default {
         "概要",
         "编辑",
         "复制",
-        "应用(教练)",
-        "应用(运动员)",
-        "历史(教练)",
-        "历史(运动员)",
+        "应用",
+        "历史",
         "删除",
       ],
     };
@@ -246,6 +249,10 @@ export default {
     },
     handleAddWeek() {
       this.$emit("add-week");
+    },
+    handleViewClass(classItem) {
+      console.log("handleViewClass-classItem", classItem);
+      this.$emit("view-class", classItem);
     },
   },
 };

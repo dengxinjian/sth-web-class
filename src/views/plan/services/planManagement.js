@@ -46,6 +46,20 @@ export const planApi = {
       requestData: data,
     });
   },
+
+  // 获取计划详情
+  getPlanDetail(id) {
+    return getData({
+      url: `/api/planClasses/getPlanClassesById?id=${id}`,
+    });
+  },
+
+  // 获取计划详情
+  getPlanDayDetail(id) {
+    return getData({
+      url: `/api/planClasses/getPlanClassesDayDetail?planClassesId=${id}`,
+    });
+  },
 };
 
 /**

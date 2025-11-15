@@ -110,7 +110,7 @@
           </template>
 
           <div class="js-class-drag-container" :key="item.timespan">
-            <ClassCard
+            <!-- <ClassCard
               v-for="classItem in item.classesList"
               :key="classItem.id"
               :class-data="classItem"
@@ -121,7 +121,10 @@
               @delete="$emit('delete-class', classItem.id)"
               @copy="$emit('copy-class', classItem, item.groupId, classItem.title)"
               @view="$emit('view-class', classItem.id)"
-            />
+            /> -->
+            <div class="plan-item" v-for="classItem in item.classesList" :key="classItem.id" @click="$emit('choose-plan', classItem.id)">
+              <span>{{ classItem.planTitle }}</span>
+            </div>
           </div>
         </el-collapse-item>
       </el-collapse>
@@ -268,6 +271,29 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.plan-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #f1f1f1;
+  background-color: #f9f9f9;
+}
+.plan-item:first-child {
+  border-top: 1px solid #f1f1f1;
+}
+.plan-item:last-child {
+  border-bottom: none;
+}
+.plan-item:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+.plan-item:active {
+  background-color: #f1f1f1;
+  cursor: pointer;
 }
 </style>
 

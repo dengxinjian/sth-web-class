@@ -19,9 +19,9 @@
       <el-form-item label="计划标题" prop="planTitle">
         <el-input
           v-model="form.planTitle"
-          maxlength="50"
+          maxlength="20"
           show-word-limit
-          placeholder="请输入课程标题"
+          placeholder="请输入计划标题"
           clearable
         />
       </el-form-item>
@@ -107,7 +107,7 @@ export default {
       rules: {
         planTitle: [
           { required: true, message: "请输入计划标题", trigger: "blur" },
-          { min: 1, max: 50, message: "长度在1到50个字符", trigger: "blur" },
+          { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
         ],
         planGroupId: [
           { required: true, message: "请选择分组", trigger: "change" },
@@ -175,7 +175,6 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
-        console.log(this.form, "form");
         const params = {
           ...this.form,
           dayDetails: this.emptyPlanClasses,

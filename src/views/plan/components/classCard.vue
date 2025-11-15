@@ -7,7 +7,7 @@
     data-type="planClass"
   >
     <div
-      class="class-schedule-card-container js-plan-class-card "
+      class="class-schedule-card-container js-plan-class-card"
       :data-id="classItem.id"
       :data-date="date"
       data-type="classSchedule"
@@ -18,7 +18,7 @@
         :data-id="classItem.id"
         :data-date="date"
         data-type="classSchedule"
-        @click.stop="hideContextMenu()"
+        @click.stop="handleClick"
         @contextmenu.stop.prevent="showContextMenu"
       >
         <div
@@ -349,6 +349,12 @@ export default {
         });
       });
     },
+    handleClick() {
+      this.hideContextMenu();
+      if (this.type === "view") {
+        this.$emit("view-class", this.classItem);
+      }
+    },
     hideContextMenu() {
       this.contextMenuVisible = false;
     },
@@ -360,6 +366,12 @@ export default {
       this.hideContextMenu();
       this.$emit("copy", this.classItem);
     },
+    handleViewClass() {
+      console.log("handleViewClass-classItem-1", this.classItem);
+      if (this.type === "view") {
+        this.$emit("view-class", this.classItem);
+      }
+    },
   },
 };
 </script>
@@ -367,6 +379,7 @@ export default {
 <style lang="scss" scoped>
 .class-schedule-card-container {
   margin-bottom: 5px;
+  cursor: pointer;
   .sport-drap-handle {
     display: none;
   }

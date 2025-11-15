@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="680px"
+    :width="loginType === 2 ? '680px' : '420px'"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -16,80 +16,115 @@
       label-width="90px"
       size="small"
     >
-      <el-form-item label="团队选择" prop="groupId">
-        <el-select
-          v-model="form.groupId"
-          placeholder="请选择分组"
-          filterable
-          clearable
-          style="width: 100%"
-        >
-          <el-option
-            v-for="g in groupOptions"
-            :key="g.id"
-            :label="g.classesGroupName"
-            :value="g.id"
-          />
-        </el-select>
-      </el-form-item>
+      <template v-if="loginType === 2">
+        <el-form-item label="团队选择" prop="teamId">
+          <el-select
+            v-model="form.teamId"
+            placeholder="请选择团队"
+            filterable
+            clearable
+            style="width: 100%"
+            @change="getMembersList(form.teamId)"
+          >
+            <el-option
+              v-for="g in teamOptions"
+              :key="g.id"
+              :label="g.teamName"
+              :value="g.id"
+            />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item label="人员选择" prop="groupId">
-        <el-select
-          v-model="form.groupId"
-          placeholder="请选择分组"
-          filterable
-          clearable
-          style="width: 100%"
-        >
-          <el-option
-            v-for="g in groupOptions"
-            :key="g.id"
-            :label="g.classesGroupName"
-            :value="g.id"
-          />
-        </el-select>
-      </el-form-item>
+        <el-form-item label="人员选择" prop="athleteIds">
+          <el-select
+            v-model="form.athleteIds"
+            placeholder="请选择人员"
+            filterable
+            clearable
+            multiple
+            style="width: 100%"
+            @change="handleAthleteChange"
+          >
+            <el-option
+              v-for="g in athletesOptions"
+              :key="g.triUserId"
+              :label="g.userNickname"
+              :value="g.triUserId"
+            />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item label="类型" prop="groupId">
-        <el-radio-group v-model="form.type">
-          <el-radio :label="1">批量设置</el-radio>
-          <el-radio :label="2">单独设置</el-radio>
-        </el-radio-group>
-      </el-form-item>
+        <el-form-item label="类型" prop="athleteType">
+          <el-radio-group v-model="form.athleteType">
+            <el-radio :label="1">批量设置</el-radio>
+            <el-radio :label="2">单独设置</el-radio>
+          </el-radio-group>
+        </el-form-item>
 
-      <el-form-item label="成员">
-        <el-row :gutter="8">
-          <el-col :span="5">方式</el-col>
-          <el-col :span="8">时间</el-col>
-        </el-row>
-      </el-form-item>
-      <el-form-item
-        :label="item.name"
+        <el-form-item label="成员">
+          <el-row :gutter="8">
+            <el-col :span="6">方式</el-col>
+            <el-col :span="8">时间</el-col>
+          </el-row>
+        </el-form-item>
+        <!-- <el-form-item
+        :label="item.userNickname"
         v-for="(item, index) in members"
         :key="index"
         :rules="[
           { required: true, message: '请选择方式', trigger: 'change' },
           { required: true, message: '请选择时间', trigger: 'change' },
         ]"
-      >
-        <el-row :gutter="8" style="width: 100%;">
-          <el-col :span="5">
-            <el-select v-model="item.type" placeholder="请选择">
-              <el-option label="以时间开始" value="1"></el-option>
-              <el-option label="以时介绍" value="2"></el-option>
+      > -->
+        <el-row
+          :gutter="8"
+          class="member-row"
+          v-for="(item, index) in members"
+          :key="index"
+        >
+          <el-col :span="4">
+            <span class="member-name">{{ item.userNickname }}</span>
+          </el-col>
+          <el-col :span="6">
+            <el-select v-model="item.applyMode" placeholder="请选择">
+              <el-option label="以开始日期" :value="1"></el-option>
+              <el-option label="以结束日期" :value="2"></el-option>
             </el-select>
           </el-col>
-          <el-col :span="11">
-            <el-date-picker v-model="item.time" type="date" placeholder="选择日期">
+          <el-col :span="10">
+            <el-date-picker
+              v-model="item.applyDate"
+              type="date"
+              placeholder="选择日期"
+            >
             </el-date-picker>
           </el-col>
           <el-col :span="4">
-            <!-- <span>2</span> -->
-            <i class="el-icon-delete" @click="removeMember(index)"></i>
-            <!-- <i class="el-icon-share"></i> -->
+            <i
+              class="el-icon-circle-close delete-icon"
+              @click="removeMember(index)"
+            ></i>
           </el-col>
         </el-row>
-      </el-form-item>
+      </template>
+      <!-- </el-form-item> -->
+      <template v-else>
+        <el-form-item label="方式" prop="applyMode">
+          <el-select v-model="form.applyMode" placeholder="请选择">
+            <el-option label="以开始日期" :value="1"></el-option>
+              <el-option label="以结束日期" :value="2"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="时间" prop="applyDate">
+          <el-date-picker
+            v-model="form.applyDate"
+            type="date"
+            placeholder="选择日期"
+          >
+          </el-date-picker>
+        </el-form-item>
+      </template>
     </el-form>
 
     <span slot="footer" class="dialog-footer">
@@ -101,54 +136,68 @@
 
 <script>
 import { getData, submitData } from "@/api/common.js";
-
 export default {
-  name: "SummaryPreview",
+  name: "ApplyCoach",
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
     defaultTitle: { type: String, default: "" },
     defaultGroupId: { type: [String, Number], default: undefined },
+    planInfo: { type: Object, default: () => {} },
   },
   data() {
     return {
       innerVisible: this.visible || this.value || false,
       form: {
-        title: this.defaultTitle,
-        groupId: this.defaultGroupId,
+        teamId: undefined,
+        athleteIds: [],
+        athleteType: 2,
+        applyMode: undefined,
+        applyDate: undefined,
       },
       rules: {
         title: [
           { required: true, message: "请输入课程标题", trigger: "blur" },
           { min: 1, max: 50, message: "长度在1到50个字符", trigger: "blur" },
         ],
-        groupId: [
-          { required: false, message: "请选择分组", trigger: "change" },
+        teamId: [{ required: true, message: "请选择团队", trigger: "change" }],
+        athleteIds: [
+          { required: true, message: "请选择人员", trigger: "change" },
+        ],
+        athleteType: [
+          { required: true, message: "请选择类型", trigger: "change" },
+        ],
+        members: [
+          { required: true, message: "请选择方式", trigger: "change" },
+          { required: true, message: "请选择时间", trigger: "change" },
+        ],
+        applyMode: [
+          { required: true, message: "请选择方式", trigger: "change" },
+        ],
+        applyDate: [
+          { required: true, message: "请选择时间", trigger: "change" },
         ],
       },
-      groups: [],
-      members: [
-        {
-          name: "成员1",
-          type: 1,
-          time: "2025-01-01",
-        },
-        {
-          name: "成员2",
-          type: 2,
-          time: "2025-01-01",
-        },
-        {
-          name: "成员3",
-          type: undefined,
-          time: "",
-        },
-      ],
+      teams: [],
+      athletesList: [],
+      members: [],
     };
   },
   computed: {
-    groupOptions() {
-      return Array.isArray(this.groups) ? this.groups : [];
+    userInfo() {
+      return this.$store.state.user.userInfo;
+    },
+    teamOptions() {
+      return Array.isArray(this.teams) ? this.teams : [];
+    },
+    athletesOptions() {
+      return Array.isArray(this.athletesList) ? this.athletesList : [];
+    },
+    loginType() {
+      return localStorage.getItem("loginType");
+    },
+    triUserId() {
+      return localStorage.getItem("triUserId");
     },
   },
   watch: {
@@ -164,7 +213,7 @@ export default {
       if (val) {
         // reset form when opening
         this.resetForm();
-        this.getGroupList();
+        this.getTeamList();
       } else {
         // clear validation when closing
         this.$nextTick(
@@ -177,11 +226,30 @@ export default {
     },
   },
   methods: {
-    getGroupList() {
+    handleAthleteChange(value) {
+      this.members = value.map((item) => {
+        const findItem = this.athletesList.find((el) => el.triUserId === item);
+        return {
+          ...findItem,
+          applyMode: undefined,
+          applyDate: undefined,
+        };
+      });
+    },
+    getTeamList() {
       getData({
-        url: "/api/classesGroup/user/getClassesGroupsByUserId",
+        url: "/api/team/coach/all-teams",
       }).then((res) => {
-        this.groups = res.result;
+        this.teams = res.result;
+      });
+    },
+    getMembersList(teamId) {
+      getData({
+        url: `/api/team/info/${teamId}`,
+        teamId: teamId,
+      }).then((res) => {
+        console.log("getMembersList-res", res);
+        this.athletesList = res.result.athletes || [];
       });
     },
     onCancel() {
@@ -189,17 +257,50 @@ export default {
       this.$emit("cancel");
     },
     onConfirm() {
+      const _this = this;
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
-        this.$emit("save", { ...this.form });
-        this.innerVisible = false;
+        console.log("loginType", _this.loginType);
+        // 根据登录类型构建 targets 数组
+        const targets =
+          _this.loginType === "2"
+            ? _this.members.map((item) => ({
+              triUserId: item.triUserId,
+              applyDate: item.applyDate,
+              applyMode: item.applyMode,
+            }))
+            : [
+              {
+                triUserId: _this.triUserId,
+                applyDate: _this.form.applyDate,
+                applyMode: _this.form.applyMode,
+              },
+            ];
+
+        const params = {
+          planClassesId: _this.planInfo.id,
+          teamId: _this.planInfo.teamId,
+          targets,
+        };
+        submitData({
+          url: "/api/planClasses/applyPlanClasses",
+          requestData: params,
+        }).then((res) => {
+          if (res.success) {
+            _this.$message.success("应用成功");
+            _this.innerVisible = false;
+            _this.$emit("cancel", true);
+          }
+        });
       });
     },
     resetForm() {
       this.form = {
-        title: this.defaultTitle,
-        groupId: this.defaultGroupId,
+        teamId: undefined,
+        athleteIds: [],
+        athleteType: 2,
       };
+      this.members = [];
       this.$nextTick(() => {
         if (this.$refs.formRef) {
           this.$refs.formRef.clearValidate();
@@ -232,11 +333,27 @@ export default {
 }
 .delete-icon {
   cursor: pointer;
-  color: #909399;
-  font-size: 16px;
+  /* color: #909399; */
+  color: #f56c6c;
+  font-size: 18px;
   line-height: 32px;
 }
 .delete-icon:hover {
   color: #f56c6c;
+}
+.member-name {
+  font-size: 14px;
+  font-weight: bold;
+  vertical-align: middle;
+}
+.member-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.member-row ::v-deep(.el-col) {
+  display: flex;
+  align-items: center;
 }
 </style>
