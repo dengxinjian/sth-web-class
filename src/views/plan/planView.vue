@@ -52,6 +52,7 @@
       v-model="showSummaryPreview"
       :planInfo="currentPlanDetail"
       :planClasses="planList"
+      @cancel="handleSummaryPreviewCancel"
     />
     <!-- 复制 -->
     <Copy
@@ -201,6 +202,18 @@ export default {
     handleApplyCoachCancel(payload) {
       this.showApplyCoach = false;
       // this.getPlanList();
+    },
+    /**
+     * 处理概要预览取消事件
+     * @param {boolean} payload - 是否需要重新获取计划列表
+     */
+    async handleSummaryPreviewCancel(payload) {
+      this.showSummaryPreview = false;
+      if (payload) {
+        await this.getPlanList();
+        // await this.getPlanDetail(this.currentPlanId);
+        // await this.getPlanDayDetail(this.currentPlanId);
+      }
     },
     async handlePlanDayDetail(id) {
       await this.getPlanDetail(id);

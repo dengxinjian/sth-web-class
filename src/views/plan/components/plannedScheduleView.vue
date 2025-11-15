@@ -3,7 +3,7 @@
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title">
         <div></div>
-        <div>{{ planTitle }}</div>
+        <div>Planned Schedule</div>
         <el-popover
           placement="bottom"
           width="110"

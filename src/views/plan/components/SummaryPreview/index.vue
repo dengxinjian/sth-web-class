@@ -136,11 +136,7 @@
               >
               <el-col :span="8"
                 >{{ getweekCycleDistance() > 0 ? getweekCycleDistance() : ""
-                }}{{
-                  getweekCycleDistance() > 0
-                    ? " km/周"
-                    : "NA"
-                }}
+                }}{{ getweekCycleDistance() > 0 ? " km/周" : "NA" }}
               </el-col>
             </el-row>
           </el-col>
@@ -154,7 +150,10 @@
                     : secondsToHHMMSS(getweekRunDuration())
                 }}/周</el-col
               >
-              <el-col :span="8">{{ getweekRunDistance() > 0 ? getweekRunDistance() : "" }}{{ getweekRunDistance() > 0 ? " km/周" : "NA" }}</el-col>
+              <el-col :span="8"
+                >{{ getweekRunDistance() > 0 ? getweekRunDistance() : ""
+                }}{{ getweekRunDistance() > 0 ? " km/周" : "NA" }}</el-col
+              >
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -194,13 +193,16 @@
                 }}
                 /周</el-col
               >
-              <el-col :span="8">{{ getweekDistance() > 0 ? getweekDistance() : "" }}{{
+              <el-col :span="8"
+                >{{ getweekDistance() > 0 ? getweekDistance() : ""
+                }}{{
                   getweekSwimmingDistance() > 0
                     ? getweekSwimmingDistance() > 1000
                       ? " km/周"
                       : " m/周"
                     : "NA"
-                }}</el-col>
+                }}</el-col
+              >
             </el-row>
           </el-col>
         </el-row>
@@ -209,7 +211,6 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <!-- <el-button type="primary" @click="onConfirm">确定</el-button> -->
       <el-button type="primary" @click="onConfirm">确定</el-button>
     </span>
   </el-dialog>
@@ -351,8 +352,21 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
-        this.$emit("save", { ...this.form });
-        this.innerVisible = false;
+        const params = {
+          ...this.planInfo,
+          ...this.form,
+        };
+        console.log(params, "params");
+        submitData({
+          url: "/api/planClasses/updatePlanClasses",
+          requestData: params,
+        }).then((res) => {
+          if (res.success) {
+            this.$message.success("更新成功");
+            this.innerVisible = false;
+            this.$emit("cancel", true);
+          }
+        });
       });
     },
     resetForm() {
