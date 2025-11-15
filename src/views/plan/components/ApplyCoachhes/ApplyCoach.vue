@@ -111,8 +111,8 @@
       <template v-else>
         <el-form-item label="方式" prop="applyMode">
           <el-select v-model="form.applyMode" placeholder="请选择">
-            <el-option label="以时间开始" value="1"></el-option>
-            <el-option label="以时介绍" value="2"></el-option>
+            <el-option label="以开始日期" :value="1"></el-option>
+              <el-option label="以结束日期" :value="2"></el-option>
           </el-select>
         </el-form-item>
 
@@ -283,8 +283,8 @@ export default {
           targets,
         };
         submitData({
-          url: "/api/plan/applyCoach",
-          data: params,
+          url: "/api/planClasses/applyPlanClasses",
+          requestData: params,
         }).then((res) => {
           if (res.success) {
             _this.$message.success("应用成功");
