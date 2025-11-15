@@ -124,6 +124,12 @@ export default {
                 if (!classesJson.distance) {
                   return classTotal;
                 }
+                if (
+                  classesJson.sportType === "SWIM" &&
+                  classesJson.distanceUnit === "m"
+                ) {
+                  return classTotal + Number(classesJson.distance) / 1000;
+                }
                 return classTotal + Number(classesJson.distance);
               }, 0)
             );
@@ -132,6 +138,7 @@ export default {
       }, 0);
     },
     getTotalDuration() {
+      console.log(this.planList, "this.planList");
       return this.planList.reduce((total, week) => {
         return (
           total +
