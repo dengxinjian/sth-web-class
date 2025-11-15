@@ -48,11 +48,26 @@
       @save="handleAddGroupSave"
     />
     <!-- 概要 -->
-    <SummaryPreview v-model="showSummaryPreview" :planInfo="currentPlanDetail" :planClasses="planList" />
+    <SummaryPreview
+      v-model="showSummaryPreview"
+      :planInfo="currentPlanDetail"
+      :planClasses="planList"
+    />
     <!-- 复制 -->
-    <Copy :defaultTitle="`${currentPlanDetail.planTitle}_复制`" :defaultGroupId="currentPlanDetail.planGroupId" v-model="showCopy" :planInfo="currentPlanDetail" :planClasses="planList" @save="onSaveCopy" />
+    <Copy
+      :defaultTitle="`${currentPlanDetail.planTitle}_复制`"
+      :defaultGroupId="currentPlanDetail.planGroupId"
+      v-model="showCopy"
+      :planInfo="currentPlanDetail"
+      :planClasses="planList"
+      @save="onSaveCopy"
+    />
     <!-- 应用教练 -->
-    <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail" @cancel="handleApplyCoachCancel" />
+    <ApplyCoach
+      v-model="showApplyCoach"
+      :planInfo="currentPlanDetail"
+      @cancel="handleApplyCoachCancel"
+    />
     <!-- 应用历史 -->
     <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
   </div>
@@ -196,7 +211,7 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
-      console.log("日常详情-res",res);
+      console.log("日常详情-res", res);
       this.currentPlanDetail = res.result;
     },
     /**
@@ -235,9 +250,10 @@ export default {
         try {
           const classesData = JSON.parse(item.classesJson || "{}");
           classesTitle = classesData.title || "";
-          label = classesData.tags && classesData.tags.length > 0
-            ? JSON.stringify(classesData.tags)
-            : null;
+          label =
+            classesData.tags && classesData.tags.length > 0
+              ? JSON.stringify(classesData.tags)
+              : null;
         } catch (e) {
           console.warn("解析classesJson失败:", e);
         }
@@ -435,51 +451,63 @@ export default {
      * 处理选项的点击事件
      */
     handleOptionsClick(item, index) {
-      // console.log("Options clicked:", item, index);
-      // 在这里处理选项的点击事件
-      // this.$message.info(`点击了选项 ${item} 的第 ${index + 1} 个`);
-      switch (index) {
-        case 0:
-          this.showSummaryPreview = true;
-          break;
-        case 1:
-          this.handleEditClick(item);
-          break;
-        case 2:
-          this.showCopy = true;
-          break;
-        case 3:
-          this.showApplyCoach = true;
-          break;
-        case 4:
-          this.showApplyHistory = true;
-          break;
-        case 5:
-          this.handleDeleteGroup();
-          break;
-        default:
-          break;
-      }
+      const _this = this;
+      const optMap = {
+        0: () => {
+          _this.showSummaryPreview = true;
+        },
+        1: () => {
+          _this.handleEditPlan();
+        },
+        2: () => {
+          _this.showCopy = true;
+        },
+        3: () => {
+          _this.showApplyCoach = true;
+        },
+        4: () => {
+          _this.showApplyHistory = true;
+        },
+        5: () => {
+          _this.handleDeleteGroup();
+        },
+      };
+      optMap[index]();
     },
-    handlePlanLibraryDrop(payload) {},
-  },
-  /**
-   * 删除计划
-   */
-  handleDeleteGroup(groupId) {
-    this.$confirm("确认删除该计划？", "提示", {
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: "warning",
-    }).then(() => {
-      // 调用删除分组API
-      // groupApi.deleteGroup(groupId).then((res) => {
-      //   if (res.success) {
-      //     this.$message.success("删除成功");
-      //     this.getPlanList();
-      //   }
-      // });
-    });
+    handleEditPlan() {
+      const params = {
+        ...this.currentPlanDetail,
+        dayDetails: this.planList,
+      };
+      console.log("params-编辑", params);
+      // 将 params 保存到 planStore 中的 planData
+      this.$store.dispatch("plan/savePlanData", params);
+      // 跳转到 planEdit 页面
+      this.$router.push({
+        path: "/timeTable/plan/add",
+        query: {
+          type: "edit",
+        },
+      });
+    },
+    /**
+     * 删除计划
+     */
+    handleDeletePlan(groupId) {
+      this.$confirm("确认删除该计划？", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        // 调用删除分组API
+        // groupApi.deleteGroup(groupId).then((res) => {
+        //   if (res.success) {
+        //     this.$message.success("删除成功");
+        //     this.getPlanList();
+        //   }
+        // });
+      });
+    },
   },
 };
 </script>

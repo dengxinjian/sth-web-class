@@ -175,7 +175,6 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
-        console.log(this.form, "form");
         const params = {
           ...this.form,
           dayDetails: this.emptyPlanClasses,
