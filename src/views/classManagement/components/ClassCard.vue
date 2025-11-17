@@ -21,7 +21,8 @@
         <!-- 时长 -->
         <span>
           {{
-            classData.classesJson.duration == "00:00:00" || !classData.classesJson.duration
+            classData.classesJson.duration == "00:00:00" ||
+            !classData.classesJson.duration
               ? "--:--:--"
               : classData.classesJson.duration
           }}
@@ -41,9 +42,7 @@
         <!-- STH值 -->
         <span>
           <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
-          {{
-            !classData.classesJson.sth ? "--" : classData.classesJson.sth
-          }}
+          {{ !classData.classesJson.sth ? "--" : classData.classesJson.sth }}
         </span>
       </div>
     </div>
@@ -112,7 +111,6 @@ export default {
   },
   methods: {
     formatDistance(distance, sportType) {
-
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
@@ -167,17 +165,17 @@ export default {
       vertical-align: middle;
     }
 
-    >span:nth-child(1) {
+    > span:nth-child(1) {
       flex: 0 0 20px;
     }
-    >span:nth-child(2) {
+    > span:nth-child(2) {
       flex: 1;
     }
-    >span:nth-child(3) {
+    > span:nth-child(3) {
       flex: 1.3;
       text-align: right;
     }
-    >span:nth-child(4) {
+    > span:nth-child(4) {
       flex: 1.5;
     }
   }
