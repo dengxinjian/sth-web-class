@@ -99,14 +99,15 @@
                         @copy="handleCopyClass"
                         type="view"
                         @view-class="
-                          handleCardClick(
-                            $event,
+                          (classItemData, clickPosition) => handleCardClick(
+                            classItemData,
                             classItem,
                             classIndex,
                             item.weekIndex,
                             item.weekIndex + 1,
                             item.weekIndex * 7 + boxIndex + 1,
-                            boxIndex
+                            boxIndex,
+                            clickPosition
                           )
                         "
                       />
@@ -1061,7 +1062,7 @@ export default {
      * @param {Number} globalDay - 全局天数（1-28）
      * @param {Number} boxIndex - 盒子索引（0-6）
      */
-    handleCardClick(eventClassItem, classItem, classIndex, weekIndex, weekNumber, globalDay, boxIndex) {
+    handleCardClick(eventClassItem, classItem, classIndex, weekIndex, weekNumber, globalDay, boxIndex, clickPosition) {
       // 使用从事件中传递过来的classItem，确保数据是最新的
       const finalClassItem = eventClassItem || classItem;
       const cardInfo = {
@@ -1071,6 +1072,7 @@ export default {
         weekNumber, // 周数（从1开始）
         globalDay, // 全局天数（1-28）
         boxIndex, // 盒子索引（0-6）
+        clickPosition, // 点击位置
       };
       console.log("点击的ClassCard信息:", cardInfo);
       // 触发事件，传递完整的card信息

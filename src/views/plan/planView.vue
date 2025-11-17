@@ -31,6 +31,12 @@
       @close="showViewClassCard = false"
       type="view"
     />
+    <ViewPlanDetail
+      :visible="showViewPlanDetail"
+      :class-item="classModalData"
+      :click-position="clickPosition"
+      @close="showViewPlanDetail = false"
+    />
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
       :class-id="copyClassFromOfficialClassId"
@@ -79,6 +85,7 @@
 import { parseClassesJson } from "../classManagement/utils/helpers";
 import PlanList from "./components/PlanList.vue";
 import ViewPlanCard from "./components/ViewPlanCard/index.vue";
+import ViewPlanDetail from "./components/ViewPlanDetail/index.vue";
 import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOfficial/index.vue";
 import PlannedScheduleView from "./components/plannedScheduleView.vue";
 import AddPlan from "./components/AddPlan";
@@ -96,6 +103,7 @@ export default {
   components: {
     PlanList,
     ViewPlanCard,
+    ViewPlanDetail,
     CopyClassFromOfficial,
     PlannedScheduleView,
     // PlannedSchedule,
@@ -112,6 +120,8 @@ export default {
       activeClassType: "my",
       showViewClassCard: false,
       classModalData: {},
+      showViewPlanDetail: false,
+      clickPosition: null,
       moveClassId: "",
       moveGroupId: "",
       moveType: "",
@@ -400,11 +410,14 @@ export default {
       //   weekIndex: 周索引（从0开始）,
       //   weekNumber: 周数（从1开始）,
       //   globalDay: 全局天数（1-28）,
-      //   boxIndex: 盒子索引（0-6）
+      //   boxIndex: 盒子索引（0-6）,
+      //   clickPosition: 点击位置 { clientX, clientY }
       // }
-      this.showViewClassCard = true;
+      this.showViewPlanDetail = true;
       // 使用 classItem 作为课程数据
       this.classModalData = cardInfo?.classItem || cardInfo;
+      // 保存点击位置
+      this.clickPosition = cardInfo?.clickPosition || null;
     },
     /**
      * 通过ID查找课程
