@@ -15,7 +15,15 @@
             <span>标题：</span>
             <el-input
               type="text"
+              v-if="classData.classesJson?.title"
               v-model="classData.classesJson.title"
+              :maxlength="50"
+            />
+            <el-input
+              type="text"
+              v-else
+              v-model="classData.activityName"
+              disabled
               :maxlength="50"
             />
           </div>
@@ -46,7 +54,7 @@
           <div class="metric-item">
             <div class="metric-value" v-if="!isActivity">
               {{
-                formatDistance(
+                scheduleFormatDistance(
                   classData.classesJson?.distance,
                   classData.classesJson?.sportType
                 )
@@ -57,10 +65,13 @@
               <span v-else>km</span>
             </div>
             <div class="metric-value" v-else>
-              {{ formatDistance(classData.distance, classData.sportType) }}
-              <span v-if="classData.sportType === 'SWIM'">
-                {{ classData.unit }}
-              </span>
+              {{
+                actualformatDistance(
+                  classData.preciseDistance,
+                  classData.sportType
+                )
+              }}
+              <span v-if="classData.sportType === 3"> m </span>
               <span v-else>km</span>
             </div>
           </div>
@@ -231,19 +242,12 @@
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>运动距离</td>
                   <td>
-                    <div v-if="classData.classesJson?.sportType !== 'SWIM'">
+                    <div>
                       {{
                         formatDistance(
                           classData.classesJson?.distance,
-                          classData.classesJson?.sportType
+                          actualData.distanceUnit
                         )
-                      }}
-                    </div>
-                    <div v-else>
-                      {{
-                        classData.classesJson?.distanceUnit === "m"
-                          ? classData.classesJson?.distance / 1000 || "--"
-                          : classData.classesJson?.distance
                       }}
                     </div>
                   </td>
@@ -251,50 +255,50 @@
                     <div class="input-with-actions">
                       <span
                         class="modified-indicator"
-                        v-if="
-                          classData.activityId &&
-                          actualData.distance !== originalData.distance
-                        "
+                        v-if="!restoreVerification('distance')"
                         >*</span
                       >
                       <el-input-number
                         v-model="actualData.distance"
                         size="small"
                         placeholder=""
-                        :step="0.1"
                         :min="0"
                         :controls="false"
                         :disabled="isInputDisabled"
+                        :precision="
+                          actualData.distanceUnit === 'm' ? 0 : undefined
+                        "
+                        @input="handleDistanceInput"
                       />
                       <div class="action-buttons">
                         <el-button
                           type="text"
                           size="small"
                           @click="restoreField('distance')"
-                          :disabled="
-                            !(
-                              classData.activityId &&
-                              actualData.distance !== originalData.distance
-                            ) || isInputDisabled
-                          "
+                          :disabled="restoreVerification('distance')"
                           >还原</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('distance')"
-                          :disabled="
-                            !(
-                              classData.manualActivityId &&
-                              actualData.distance !== defaultData.distance
-                            ) || isInputDisabled
-                          "
+                          :disabled="resetVerification('distance')"
                           >重置</el-button
                         >
                       </div>
                     </div>
                   </td>
-                  <td class="unit-cell">km</td>
+                  <td class="unit-cell">
+                    <el-select
+                      v-model="actualData.distanceUnit"
+                      :disabled="isInputDisabled"
+                      placeholder="请选择"
+                      @change="handleDistanceUnitChange"
+                    >
+                      <el-option label="km" value="km"></el-option>
+                      <el-option label="m" value="m"></el-option>
+                    </el-select>
+                  </td>
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
@@ -412,7 +416,13 @@
               <div class="sync-params">
                 <span>时间：{{ sportDetail.startTime }}</span>
                 <span
-                  >距离：{{ (sportDetail.distance / 1000).toFixed(2) }} km</span
+                  >距离：{{
+                    actualformatDistance(
+                      sportDetail.distance,
+                      sportDetail.sportType
+                    )
+                  }}
+                  {{ sportDetail.sportType === 3 ? "m" : "km" }}</span
                 >
               </div>
               <div class="sync-params">
@@ -601,6 +611,7 @@ export default {
         duration: "00:00:00",
         activityDuration: "00:00:00",
         distance: 0,
+        distanceUnit: "km",
         sthValue: 0,
         calories: 0,
       },
@@ -622,7 +633,6 @@ export default {
       },
       showClassDetailModal: false,
       type: "edit",
-      originalType: "my",
       sportDetail: {},
     };
   },
@@ -665,6 +675,7 @@ export default {
             distance: 0,
             sthValue: 0,
             calories: 0,
+            distanceUnit: "km",
           };
           this.originalData = {
             duration: "00:00:00",
@@ -672,6 +683,7 @@ export default {
             distance: 0,
             sthValue: 0,
             calories: 0,
+            distanceUnit: "km",
           };
         });
       } else {
@@ -690,6 +702,11 @@ export default {
               distance: this.classData.distance || 0,
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
+              distanceUnit:
+                this.classData.sportType === "SWIM" ||
+                this.classData.sportType === 3
+                  ? "m"
+                  : "km",
             };
             this.defaultData = {
               duration: this.classData.duration || "00:00:00",
@@ -700,6 +717,11 @@ export default {
               distance: this.classData.distance || 0,
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
+              distanceUnit:
+                this.classData.sportType === "SWIM" ||
+                this.classData.sportType === 3
+                  ? "m"
+                  : "km",
             };
           }
         } else {
@@ -709,6 +731,52 @@ export default {
     },
   },
   methods: {
+    restoreVerification(field) {
+      if (this.isInputDisabled) {
+        return true;
+      }
+      const distance =
+        this.actualData.distanceUnit === "km"
+          ? this.actualData[field] * 1000
+          : this.actualData[field];
+      if (this.classData.activityId) {
+        return distance === this.originalData[field];
+      } else {
+        return true;
+      }
+    },
+    resetVerification(field) {
+      if (this.isInputDisabled) {
+        return true;
+      }
+      let distance = 0;
+      if (
+        this.defaultData.distanceUnit === "km" &&
+        this.actualData.distanceUnit === "km"
+      ) {
+        distance = this.defaultData.distance;
+      } else if (
+        this.defaultData.distanceUnit === "m" &&
+        this.actualData.distanceUnit === "m"
+      ) {
+        distance = this.defaultData.distance;
+      } else if (
+        this.defaultData.distanceUnit === "m" &&
+        this.actualData.distanceUnit === "km"
+      ) {
+        distance = this.defaultData.distance / 1000;
+      } else if (
+        this.defaultData.distanceUnit === "km" &&
+        this.actualData.distanceUnit === "m"
+      ) {
+        distance = this.defaultData.distance * 1000;
+      }
+      if (this.classData.manualActivityId) {
+        return distance === this.actualData[field];
+      } else {
+        return true;
+      }
+    },
     getSportTypeName(sportType) {
       return getSportTypeName(sportType);
     },
@@ -723,6 +791,14 @@ export default {
           this.classData = {
             ...res.result,
             classesJson: classData,
+          };
+          this.actualData = {
+            duration: this.classData.duration || "00:00:00",
+            activityDuration: "00:00:00",
+            distance: this.classData.distance || 0,
+            sthValue: this.classData.sthValue || 0,
+            calories: this.classData.calories || 0,
+            distanceUnit: this.classData.sportType === "SWIM" ? "m" : "km",
           };
         }
       });
@@ -769,19 +845,16 @@ export default {
             activityDuration: this.translateSecondsToFormat(
               this.sportDetail.netDuration
             ),
-            distance: parseFloat((this.sportDetail.distance / 1000).toFixed(2)),
+            distance: parseFloat(this.sportDetail.distance.toFixed(0)),
             sthValue: this.sportDetail.sthValue,
             calories: this.sportDetail.calories,
+            distanceUnit: this.sportDetail.sportType === 3 ? "m" : "km",
           };
-          this.defaultData = {
-            duration: this.translateSecondsToFormat(this.sportDetail.duration),
-            activityDuration: this.translateSecondsToFormat(
-              this.sportDetail.netDuration
-            ),
-            distance: parseFloat((this.sportDetail.distance / 1000).toFixed(2)),
-            sthValue: this.sportDetail.sthValue,
-            calories: this.sportDetail.calories,
-          };
+          actualData.distance =
+            actualData.distanceUnit === "km"
+              ? actualData.distance / 1000
+              : actualData.distance;
+          this.defaultData = JSON.parse(JSON.stringify(actualData));
           if (!this.classData.manualActivityId) {
             this.actualData = actualData;
           } else {
@@ -790,35 +863,122 @@ export default {
               activityDuration: this.translateSecondsToFormat(
                 this.classData.activityDuration
               ),
-              distance: this.classData.distance,
               sthValue: this.classData.sthValue,
               calories: this.classData.calories,
             };
-            this.defaultData = {
-              duration: this.classData.duration || "00:00:00",
-              activityDuration:
-                this.translateSecondsToFormat(
-                  this.classData.activityDuration
-                ) || "00:00:00",
-              distance: this.classData.distance || 0,
-              sthValue: this.classData.sthValue || 0,
-              calories: this.classData.calories || 0,
-            };
+            if (!this.classData.distanceUnit) {
+              this.$set(
+                this.actualData,
+                "distanceUnit",
+                this.sportDetail.sportType === 3 ? "m" : "km"
+              );
+            } else {
+              this.$set(
+                this.actualData,
+                "distanceUnit",
+                this.classData.distanceUnit
+              );
+            }
+            this.$set(
+              this.actualData,
+              "distance",
+              this.actualData.distanceUnit === "km"
+                ? this.classData.preciseDistance / 1000
+                : this.classData.preciseDistance
+            );
+            console.log(this.actualData, "this.actualData");
+            this.defaultData = JSON.parse(JSON.stringify(this.actualData));
           }
           // 保存原始数据
           this.originalData = JSON.parse(JSON.stringify(actualData));
+          this.originalData.distance = parseFloat(
+            this.sportDetail.distance.toFixed(0)
+          );
           console.log(this.originalData, "originalData");
         }
       });
     },
     // 还原字段到原始值
     restoreField(field) {
-      this.actualData[field] = this.originalData[field];
-      console.log(this.actualData[field], "actualData[field]");
+      if (field === "distance") {
+        this.$set(
+          this.actualData,
+          "distance",
+          this.actualData.distanceUnit === "km"
+            ? this.originalData[field] / 1000
+            : this.originalData[field]
+        );
+      } else {
+        this.$set(this.actualData, field, this.originalData[field]);
+      }
     },
     // 重置字段到默认值
     resetField(field) {
-      this.actualData[field] = this.defaultData[field];
+      if (field === "distance") {
+        if (
+          this.actualData.distanceUnit === "km" &&
+          this.defaultData.distanceUnit === "km"
+        ) {
+          this.$set(this.actualData, "distance", this.defaultData.distance);
+        } else if (
+          this.actualData.distanceUnit === "m" &&
+          this.defaultData.distanceUnit === "m"
+        ) {
+          this.$set(this.actualData, "distance", this.defaultData.distance);
+        } else if (
+          this.actualData.distanceUnit === "m" &&
+          this.defaultData.distanceUnit === "km"
+        ) {
+          this.$set(
+            this.actualData,
+            "distance",
+            this.defaultData.distance * 1000
+          );
+        } else if (
+          this.actualData.distanceUnit === "km" &&
+          this.defaultData.distanceUnit === "m"
+        ) {
+          this.$set(
+            this.actualData,
+            "distance",
+            this.defaultData.distance / 1000
+          );
+        } else {
+          this.$set(this.actualData, "distance", this.defaultData.distance);
+        }
+      } else {
+        this.$set(this.actualData, field, this.defaultData[field]);
+      }
+    },
+    handleDistanceUnitChange(value) {
+      console.log(value, "value");
+      if (value === "km") {
+        this.$set(
+          this.actualData,
+          "distance",
+          parseFloat(this.actualData.distance / 1000)
+        );
+      } else {
+        // 当切换为米时，确保距离是整数
+        const distanceInMeters = parseFloat(this.actualData.distance * 1000);
+        this.$set(this.actualData, "distance", Math.round(distanceInMeters));
+      }
+      console.log(this.actualData, "this.actualData");
+      console.log(this.originalData, "this.originalData");
+      console.log(this.defaultData, "this.defaultData");
+    },
+    handleDistanceInput(value) {
+      // 当单位为米时，确保输入的值是整数
+      if (
+        this.actualData.distanceUnit === "m" &&
+        value !== null &&
+        value !== undefined
+      ) {
+        const intValue = Math.round(value);
+        if (intValue !== value) {
+          this.$set(this.actualData, "distance", intValue);
+        }
+      }
     },
     handleEditClassDetail() {
       // 只打开子对话框，不关闭当前对话框
@@ -887,9 +1047,13 @@ export default {
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
         duration: hhmmssToSeconds(this.actualData.duration) || null,
-        distance: this.actualData.distance || null,
+        distance:
+          this.actualData.distanceUnit === "km"
+            ? this.actualData.distance * 1000
+            : this.actualData.distance || null,
         sthValue: this.actualData.sthValue || null,
         calories: this.actualData.calories || null,
+        distanceUnit: this.actualData.distanceUnit || null,
         flag: isModified, // 如果修改过为true，否则为false
       }).then((res) => {
         if (res.success) {
@@ -916,9 +1080,13 @@ export default {
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
         duration: hhmmssToSeconds(this.actualData.duration) || null,
-        distance: this.actualData.distance || null,
+        distance:
+          this.actualData.distanceUnit === "km"
+            ? this.actualData.distance * 1000
+            : this.actualData.distance || null,
         sthValue: this.actualData.sthValue || null,
         calories: this.actualData.calories || null,
+        distanceUnit: this.actualData.distanceUnit,
       }).then((res) => {
         if (res.success) {
           this.$message.success("运动记录保存成功");
@@ -934,9 +1102,13 @@ export default {
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
         duration: hhmmssToSeconds(this.actualData.duration) || null,
-        distance: this.actualData.distance || null,
+        distance:
+          this.actualData.distanceUnit === "km"
+            ? this.actualData.distance * 1000
+            : this.actualData.distance || null,
         sthValue: this.actualData.sthValue || 0,
         calories: this.actualData.calories || 0,
+        distanceUnit: this.actualData.distanceUnit,
       }).then((res) => {
         if (res.success) {
           this.$message.success("运动记录保存成功");
@@ -979,16 +1151,60 @@ export default {
     formatDuration(duration) {
       return duration === "00:00:00" || !duration ? "--:--:--" : duration;
     },
-    formatDistance(distance, sportType) {
+    actualformatDistance(distance, sportType) {
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+        result = distance;
+      }
+      if (sportType === 3) {
+        result = distance;
+      } else {
+        result = Math.round(result / 10) / 100;
       }
       if (!result || result === "0") {
         result = "--";
+      }
+      return result;
+    },
+    scheduleFormatDistance(distance, sportType) {
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance;
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      return result;
+    },
+    formatDistance(distance, distanceUnit) {
+      let result = "";
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance;
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      if (
+        distanceUnit === "m" &&
+        result !== "--" &&
+        this.classData.classesJson.sportType !== "SWIM"
+      ) {
+        result = result * 1000;
+      } else if (
+        distanceUnit === "km" &&
+        result !== "--" &&
+        this.classData.classesJson.sportType === "SWIM"
+      ) {
+        result = result / 1000;
       }
       return result;
     },

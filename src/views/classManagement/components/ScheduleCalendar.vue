@@ -372,7 +372,6 @@ export default {
 .schedule-table-body {
   flex: 1;
   display: flex;
-  gap: 4px;
   flex-direction: row;
   overflow: auto;
 
@@ -381,7 +380,8 @@ export default {
     display: flex;
     flex-direction: column;
     min-width: 120px;
-    background-color: #f5f5f5;
+    background-color: #fff;
+    border-left: 1px solid #e5e5e5;
 
     .schedule-table-cell-title {
       font-size: 12px;

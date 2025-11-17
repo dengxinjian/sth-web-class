@@ -86,7 +86,11 @@
       @cancel="onCancelMonthStatistic"
     />
 
-    <SportTypeModal v-model="showSportTypeModal" @select="onSelectSportType" />
+    <SportTypeModal
+      v-model="showSportTypeModal"
+      @select="onSelectSportType"
+      @addEvent="handleAddEvent"
+    />
 
     <SportDetailModal
       v-model="showSportDetailModal"
@@ -194,6 +198,14 @@
         @close="showHealthViewDialog = false"
       />
     </el-dialog>
+
+    <!-- 添加/编辑赛事弹窗 -->
+    <AddEvent
+      :visible.sync="showAddEvent"
+      :event-data="currentEventData"
+      @confirm="handleEventConfirm"
+      @cancel="handleEventCancel"
+    />
   </div>
 </template>
 
@@ -218,6 +230,7 @@ import CopyClassFromOfficial from "./components/CopyClassFromOfficial";
 import ViewClassCard from "./components/ViewClassCard";
 import EditScheduleClass from "./components/EditScheduleClass";
 import HealthView from "./components/HealthView.vue";
+import AddEvent from "./components/addEvent.vue";
 
 // 服务和工具导入
 import {
@@ -227,6 +240,7 @@ import {
   statisticsApi,
   athleteApi,
   groupApi,
+  competitionApi,
 } from "./services/classManagement";
 import { ACTIVITY_TYPE_DICT } from "./constants";
 import {
@@ -262,6 +276,7 @@ export default {
     ViewClassCard,
     EditScheduleClass,
     HealthView,
+    AddEvent,
   },
   mixins: [dragMixin],
   data() {
@@ -339,6 +354,10 @@ export default {
       healthViewData: {},
       healthViewDate: "",
       healthViewDeviceType: null,
+
+      // 添加/编辑赛事
+      showAddEvent: false,
+      currentEventData: null,
     };
   },
   watch: {
@@ -365,6 +384,40 @@ export default {
     }
   },
   methods: {
+    /**
+     * 添加赛事
+     */
+    handleAddEvent(eventData = null) {
+      this.currentEventData = eventData; // 如果有数据则是编辑模式，否则是添加模式
+      this.showAddEvent = true;
+    },
+    /**
+     * 赛事确认
+     */
+    handleEventConfirm(data) {
+      console.log("赛事数据:", data);
+      data.competitionTime = this.addScheduleDate;
+      if (!this.currentEventData.id) {
+        competitionApi.createCompetition(data).then((res) => {
+          if (res.success) {
+            this.$message.success("赛事保存成功");
+            this.showAddEvent = false;
+            // this.getScheduleData();
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      }
+      // 这里可以添加保存成功后的处理逻辑，比如刷新列表等
+      // 如果需要刷新日程数据，可以调用 this.getScheduleData();
+    },
+    /**
+     * 赛事取消
+     */
+    handleEventCancel() {
+      this.currentEventData = null;
+      this.showAddEvent = false;
+    },
     handleAddSchedule(date) {
       this.classModalDataType = "addSchedule";
       this.addScheduleDate = date;
@@ -603,7 +656,10 @@ export default {
                   completion: i.classesJson
                     ? getCompletionStatus(i.percent)
                     : "",
-                  distance: Math.round(i.distance / 100) / 10,
+                  distance: Math.round(i.distance / 10) / 100,
+                  oldActivityDuration: i.duration,
+                  oldActivityDistance: Math.round(i.distance),
+                  preciseDistance: Math.round(i.distance),
                 }))
                 .filter((i) => !i.bindingManualActivityId);
 
@@ -615,18 +671,28 @@ export default {
                     classesJson: i.classesJson
                       ? parseClassesJson(i.classesJson)
                       : "",
+                    distance: Math.round(i.distance / 10) / 100,
+                    preciseDistance: i.distance,
                   });
                   console.log(activityList, "activityList");
                 } else {
                   activityList.forEach((item, index) => {
                     if (item.manualActivityId === i.manualActivityId) {
+                      console.log(i);
                       activityList[index] = {
                         ...i,
                         activityName: item.activityName,
                         classesJson: i.classesJson
                           ? parseClassesJson(i.classesJson)
                           : "",
+                        distance: Math.round(i.distance / 10) / 100,
+                        preciseDistance: Math.round(i.distance),
+                        oldActivityDuration: item.oldActivityDuration,
+                        oldActivityDistance: Math.round(
+                          item.oldActivityDistance
+                        ),
                       };
+                      console.log(activityList[index], "activityList[index]");
                     }
                   });
                 }

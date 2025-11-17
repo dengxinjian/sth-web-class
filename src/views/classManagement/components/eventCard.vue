@@ -1,22 +1,16 @@
 <template>
   <div
-    class="plan-class-card-wrapper"
+    class="plan-class-card-wrapper js-plan-drag-no-drag"
     style="position: relative"
-    :data-id="classItem.id"
-    :data-day="date"
     data-type="planClass"
   >
     <div
       class="class-schedule-card-container js-plan-class-card"
-      :data-id="classItem.id"
-      :data-date="date"
       data-type="classSchedule"
     >
       <div
         class="classScheduleCard"
         :style="cardStyle"
-        :data-id="classItem.id"
-        :data-date="date"
         data-type="classSchedule"
         @click.stop="handleClick"
         @contextmenu.stop.prevent="showContextMenu"
@@ -30,7 +24,7 @@
             <div class="sport-type-icon">
               <img
                 class="image-icon"
-                :src="getSportIcon(classItem.sportType)"
+                src="~@/assets/addClass/eventIcon.png"
                 alt=""
               />
             </div>
@@ -42,15 +36,12 @@
               v-if="type === 'edit'"
             >
               <div class="btn-list-hover">
-                <el-button type="text" @click.stop="$emit('edit', classItem)">
+                <el-button type="text" @click.stop="$emit('edit', eventItem)">
                   编辑
-                </el-button>
-                <el-button type="text" @click.stop="$emit('copy', classItem)">
-                  复制
                 </el-button>
                 <el-button
                   type="text"
-                  @click.stop="$emit('delete', classItem.id)"
+                  @click.stop="$emit('delete', eventItem.id)"
                 >
                   删除
                 </el-button>
@@ -58,110 +49,11 @@
               <i class="el-icon-more" slot="reference" @click.stop></i>
             </el-popover>
           </div>
-
-          <!-- 课程标题 -->
-          <div class="title">{{ classItem.classesJson.title }}</div>
-
-          <!-- 运动类型 -->
-          <div class="keyword">
-            {{ classItem.sportType === "CYCLE" ? "BIKE" : classItem.sportType }}
-          </div>
-
-          <!-- 时长 -->
-          <div class="keyword">
-            {{ formatDuration(classItem.classesJson.duration) }}
-          </div>
-
-          <!-- 距离 -->
-          <div style="display: flex" v-if="!isRestType(classItem.sportType)">
-            <div class="keyword">
-              {{
-                formatDistance(
-                  classItem.classesJson.distance,
-                  classItem.sportType
-                )
-              }}
-              <span v-if="classItem.sportType === 'SWIM'">
-                {{ classItem.classesJson.distanceUnit }}
-              </span>
-              <span v-else>km</span>
-            </div>
-            <div>&nbsp;&nbsp;</div>
-          </div>
-
-          <!-- STH -->
-          <div
-            style="display: flex; gap: 4px"
-            v-if="!isRestType(classItem.sportType)"
-          >
-            <div class="keyword">
-              {{
-                !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
-              }}
-            </div>
-            <div>
-              <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
-            </div>
-          </div>
-          <template
-            v-if="
-              classItem.classesJson.summary ||
-              classItem.classesJson.trainingAdvice
-            "
-          >
-            <!-- 概要 -->
-            <pre v-if="classItem.classesJson.summary" class="stage-details">
-          {{ truncateByLines(classItem.classesJson.summary) }}
-        </pre
-            >
-            <!-- 训练建议 -->
-            <pre class="stage-details">
-  {{ truncateByLines(classItem.classesJson.trainingAdvice) }}</pre
-            >
-          </template>
-
-          <!-- 骑行详情 -->
-          <template v-else-if="classItem.sportType === 'CYCLE'">
-            <CycleStageDetails
-              :class-data="classItem.classesJson"
-              :max-stages="3"
-            />
-          </template>
-
-          <!-- 跑步详情 -->
-          <template v-else-if="classItem.sportType === 'RUN'">
-            <RunStageDetails
-              :class-data="classItem.classesJson"
-              :max-stages="3"
-            />
-          </template>
-
-          <!-- 训练强度可视化 -->
-          <div
-            v-if="classItem.classesJson.timeline"
-            style="height: 16px; display: flex; gap: 1px"
-          >
-            <div
-              v-for="(stage, index) in classItem.classesJson.timeline"
-              :key="index"
-              class="time-stage"
-              :style="{ flex: stage.duration }"
-            >
-              <div style="display: flex; gap: 1px; height: 16px">
-                <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
-                  <ExerciseProcessChart
-                    :exerciseList="stage.stageTimeline"
-                    :maxIntensity="classItem.classesJson.maxIntensity"
-                    :height="16"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+           <!-- 课程标题 -->
+           <div class="title">{{ eventItem.competitionName }}</div>
         </div>
       </div>
     </div>
-
     <!-- 自定义右键菜单 -->
     <transition name="context-menu-fade" v-if="type === 'edit'">
       <div
@@ -172,17 +64,13 @@
       >
         <div
           class="context-menu-item"
-          @click="
-            $emit('edit', classItem);
+          @click.stop="
+            $emit('edit', eventItem);
             hideContextMenu();
           "
         >
           <i class="el-icon-edit"></i>
           编辑
-        </div>
-        <div class="context-menu-item" @click="handleCopy">
-          <i class="el-icon-crop"></i>
-          复制
         </div>
         <div class="context-menu-item" @click="handleDelete">
           <i class="el-icon-delete"></i>
@@ -194,27 +82,10 @@
 </template>
 
 <script>
-import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import CycleStageDetails from "@/views/classManagement/components/CycleStageDetails.vue";
-import RunStageDetails from "@/views/classManagement/components/RunStageDetails.vue";
-import {
-  SPORT_TYPE_ICONS,
-  DEVICE_TYPE_ICON_DICT,
-} from "@/views/classManagement/constants";
-import {
-  truncateByLines,
-  isExpired,
-} from "@/views/classManagement/utils/helpers";
-
 export default {
-  name: "ClassCard",
-  components: {
-    ExerciseProcessChart,
-    CycleStageDetails,
-    RunStageDetails,
-  },
+  name: "EventCard",
   props: {
-    classItem: {
+    eventItem: {
       type: Object,
       required: true,
     },
@@ -250,32 +121,6 @@ export default {
     document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
-    truncateByLines,
-    getSportIcon(sportType) {
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
-    },
-    getDeviceIcon(deviceType) {
-      return DEVICE_TYPE_ICON_DICT[deviceType] || "";
-    },
-    isRestType(sportType) {
-      return ["REST", "REMARK"].includes(sportType);
-    },
-    formatDuration(duration) {
-      return duration === "00:00:00" ? "--:--:--" : duration;
-    },
-    formatDistance(distance, sportType) {
-      let result = "";
-      if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "");
-      }
-      if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
-      }
-      if (!result || result === "0") {
-        result = "--";
-      }
-      return result;
-    },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
       this.$nextTick(() => {
@@ -352,7 +197,7 @@ export default {
     handleClick() {
       this.hideContextMenu();
       if (this.type === "view") {
-        this.$emit("view-class", this.classItem);
+        this.$emit("view-class", this.eventItem);
       }
     },
     hideContextMenu() {
@@ -360,16 +205,16 @@ export default {
     },
     handleDelete() {
       this.hideContextMenu();
-      this.$emit("delete", this.classItem.id);
+      this.$emit("delete", this.eventItem.id);
     },
     handleCopy() {
       this.hideContextMenu();
-      this.$emit("copy", this.classItem);
+      this.$emit("copy", this.eventItem);
     },
     handleViewClass() {
-      console.log("handleViewClass-classItem-1", this.classItem);
+      console.log("handleViewClass-classItem-1", this.eventItem);
       if (this.type === "view") {
-        this.$emit("view-class", this.classItem);
+        this.$emit("view-class", this.eventItem);
       }
     },
   },

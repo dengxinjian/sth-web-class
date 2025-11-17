@@ -100,6 +100,14 @@ export default {
       },
       immediate: true,
     },
+    "$route.path": {
+      handler(newVal) {
+        console.log(newVal, "newVal");
+        this.activeName = newVal.split("/")[2];
+        localStorage.setItem("activeName", this.activeName);
+      },
+      immediate: true,
+    },
   },
   methods: {
     handleMenuSelect(index) {

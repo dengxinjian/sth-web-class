@@ -31,7 +31,6 @@
               :step-strictly="true"
               :controls="false"
               v-model="form.distance"
-              :disabled="originalType === 'official'"
               placeholder=""
               class="pill-input short"
             />
@@ -39,7 +38,6 @@
           <div class="row-item">
             <el-select
               v-model="form.distanceUnit"
-              :disabled="originalType === 'official'"
               class="pill-select short"
             >
               <el-option label="m" value="m" />
@@ -58,7 +56,6 @@
             <TimeInput
               v-model="form.duration"
               size="small"
-              :disabled="originalType === 'official'"
             />
           </div>
           <div class="row-item">
@@ -69,7 +66,6 @@
               :step-strictly="true"
               :controls="false"
               v-model="form.sth"
-              :disabled="originalType === 'official'"
               placeholder=""
               class="pill-input short"
             />

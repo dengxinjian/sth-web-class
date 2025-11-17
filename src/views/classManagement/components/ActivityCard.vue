@@ -76,13 +76,15 @@
           <div class="title" v-else>
             {{ getSportTypeName(activity.sportType) }}_手动录入
           </div>
-          <div class="keyword">{{ activity.duration }}</div>
+          <div class="keyword">
+            {{ restoreVerification("duration") ? "" : "*" }}
+            {{ activity.duration }}
+          </div>
           <div style="display: flex">
             <div class="keyword">
+              {{ restoreVerification("preciseDistance") ? "" : "*" }}
               {{ formatDistance(activity.distance, activity.sportType) }}
-              <span v-if="activity.sportType === 'SWIM'">
-                {{ activity.unit }}
-              </span>
+              <span v-if="activity.sportType === 3"> m </span>
               <span v-else>km</span>
             </div>
           </div>
@@ -280,17 +282,33 @@ export default {
   },
   methods: {
     truncateByLines,
-    formatDistance(distance, sportType) {
+    restoreVerification(field) {
+      if (!this.activity.oldActivityDistance) {
+        return true;
+      }
+      if (field === "preciseDistance") {
+        let distance = 0;
 
-      let result = "";
+        distance = this.activity.preciseDistance;
+        console.log(distance, this.activity.oldActivityDistance, "distance");
+        return distance === this.activity.oldActivityDistance;
+      } else {
+        return this.activity[field] === this.activity.oldActivityDuration;
+      }
+    },
+    formatDistance(distance, sportType) {
+      let result = distance;
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+        result = distance;
       }
       if (!result || result === "0") {
         result = "--";
+      }
+      if (sportType === 3 && result > 0) {
+        result = this.activity.preciseDistance;
       }
       return result;
     },
@@ -321,7 +339,7 @@ export default {
 
         // 等待菜单渲染完成后再计算边界并调整位置
         this.$nextTick(() => {
-          const menuElement = this.$el.querySelector('.context-menu');
+          const menuElement = this.$el.querySelector(".context-menu");
           if (!menuElement) return;
 
           const menuRect = menuElement.getBoundingClientRect();
@@ -340,7 +358,10 @@ export default {
 
           // 限制右边界（优先考虑视口，然后考虑容器）
           if (menuAbsoluteX + menuWidth > viewportWidth) {
-            x = Math.min(containerWidth - menuWidth - 5, viewportWidth - rootRect.left - menuWidth - 5);
+            x = Math.min(
+              containerWidth - menuWidth - 5,
+              viewportWidth - rootRect.left - menuWidth - 5
+            );
           } else if (x + menuWidth > containerWidth) {
             x = containerWidth - menuWidth - 5;
           }
@@ -352,7 +373,10 @@ export default {
 
           // 限制下边界（优先考虑视口，然后考虑容器）
           if (menuAbsoluteY + menuHeight > viewportHeight) {
-            y = Math.min(containerHeight - menuHeight - 5, viewportHeight - rootRect.top - menuHeight - 5);
+            y = Math.min(
+              containerHeight - menuHeight - 5,
+              viewportHeight - rootRect.top - menuHeight - 5
+            );
           } else if (y + menuHeight > containerHeight) {
             y = containerHeight - menuHeight - 5;
           }

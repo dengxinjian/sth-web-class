@@ -36,28 +36,7 @@
                       )
                     "
                   >
-                    <EventCard
-                      v-for="(eventItem, eventIndex) in getDayEvents(
-                        item.weekData,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )"
-                      :key="`${
-                        item.weekIndex * 7 + boxIndex + 1
-                      }-${eventIndex}-${
-                        eventItem.competitionName || eventIndex
-                      }`"
-                      :event-item="eventItem"
-                      :date="String(item.weekIndex * 7 + boxIndex + 1)"
-                      @delete="
-                        handleDeleteEvent(
-                          eventItem,
-                          eventIndex,
-                          item.weekIndex + 1,
-                          item.weekIndex * 7 + boxIndex + 1
-                        )
-                      "
-                    />
-                    <draggable
+                    <!-- <draggable
                       class="js-plan-drag-container"
                       :list="
                         getDayClassesArray(
@@ -74,7 +53,6 @@
                       :scroll="true"
                       :scroll-sensitivity="60"
                       :scroll-speed="20"
-                      :filter="'.js-plan-drag-no-drag'"
                       :empty-insert-threshold="10"
                       ghost-class="is-plan-drag-ghost"
                       chosen-class="is-plan-drag-chosen"
@@ -87,7 +65,7 @@
                       "
                       @add="handleDragAdd($event, item.weekIndex, boxIndex)"
                       @unchoose="handleDragUnchoose"
-                    >
+                    > -->
                       <ClassCard
                         v-for="(classItem, classIndex) in getDayClasses(
                           item.weekData,
@@ -119,9 +97,21 @@
                           )
                         "
                         @copy="handleCopyClass"
+                        type="view"
+                        @view-class="
+                          handleCardClick(
+                            $event,
+                            classItem,
+                            classIndex,
+                            item.weekIndex,
+                            item.weekIndex + 1,
+                            item.weekIndex * 7 + boxIndex + 1,
+                            boxIndex
+                          )
+                        "
                       />
-                    </draggable>
-                    <div
+                    <!-- </draggable> -->
+                    <!-- <div
                       class="box-content"
                       @click="
                         handleBoxClick(
@@ -133,7 +123,7 @@
                       <div class="box-plus-circle">
                         <div class="box-plus">+</div>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -252,19 +242,17 @@
 
 <script>
 import ClassCard from "./classCard.vue";
-import EventCard from "../../classManagement/components/eventCard.vue";
 import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 import draggable from "vuedraggable";
 import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils/index";
 export default {
-  name: "ScheduleBoxes",
+  name: "ScheduleBoxesView",
   components: {
     ClassCard,
     DynamicScroller,
     DynamicScrollerItem,
     draggable,
-    EventCard,
   },
   props: {
     // 起始编号
@@ -843,21 +831,12 @@ export default {
                 sourceDayData.details.splice(sourceIndex, 1);
 
                 // 如果删除后该天的 details 数组为空，可以选择删除该天的数据对象
-                // 但是需要检查是否有 events 数据，如果有则保留 dayData 对象
                 if (sourceDayData.details.length === 0) {
-                  // 检查是否有 events 数据
-                  const hasEvents = sourceDayData.events &&
-                    Array.isArray(sourceDayData.events) &&
-                    sourceDayData.events.length > 0;
-
-                  // 只有当没有 events 数据时才删除整个 dayData 对象
-                  if (!hasEvents) {
-                    const dayIndex = sourceWeek.findIndex(
-                      (item) => item && item.day === sourceDay
-                    );
-                    if (dayIndex !== -1) {
-                      sourceWeek.splice(dayIndex, 1);
-                    }
+                  const dayIndex = sourceWeek.findIndex(
+                    (item) => item && item.day === sourceDay
+                  );
+                  if (dayIndex !== -1) {
+                    sourceWeek.splice(dayIndex, 1);
                   }
                 }
               }
@@ -1022,27 +1001,6 @@ export default {
         return processedItem;
       });
     },
-    /**
-     * 获取指定天的赛事列表
-     * @param {Array} week - 周数据数组
-     * @param {Number} globalDay - 全局天数
-     * @returns {Array} 处理后的赛事列表
-     */
-    getDayEvents(week, globalDay) {
-      if (!week || !Array.isArray(week)) {
-        return [];
-      }
-
-      // 查找该天的数据对象
-      const dayData = week.find((item) => item && item.day === globalDay);
-
-      if (!dayData || !dayData.events || !Array.isArray(dayData.events)) {
-        return [];
-      }
-      console.log(dayData.events, "dayData.events");
-
-      return dayData.events;
-    },
     handleBoxClick(globalDay, weekIndex) {
       this.$emit("box-click", {
         weekNumber: weekIndex + 1,
@@ -1054,12 +1012,6 @@ export default {
     },
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
       this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
-    },
-    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
-      this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay);
-    },
-    handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
-      this.$emit("edit-event", eventItem, eventIndex, weekNumber, globalDay);
     },
     showContextMenu(event, globalDay, weekIndex, boxIndex) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
@@ -1098,6 +1050,31 @@ export default {
         type: "success",
         duration: 2000,
       });
+    },
+    /**
+     * 处理ClassCard点击事件
+     * @param {Object} eventClassItem - 从ClassCard的view-class事件传递过来的课程项数据
+     * @param {Object} classItem - 课程项数据（从v-for循环中获取）
+     * @param {Number} classIndex - 课程在当前天的索引
+     * @param {Number} weekIndex - 周索引（从0开始）
+     * @param {Number} weekNumber - 周数（从1开始）
+     * @param {Number} globalDay - 全局天数（1-28）
+     * @param {Number} boxIndex - 盒子索引（0-6）
+     */
+    handleCardClick(eventClassItem, classItem, classIndex, weekIndex, weekNumber, globalDay, boxIndex) {
+      // 使用从事件中传递过来的classItem，确保数据是最新的
+      const finalClassItem = eventClassItem || classItem;
+      const cardInfo = {
+        classItem: finalClassItem, // 课程项数据
+        classIndex, // 课程在当前天的索引
+        weekIndex, // 周索引（从0开始）
+        weekNumber, // 周数（从1开始）
+        globalDay, // 全局天数（1-28）
+        boxIndex, // 盒子索引（0-6）
+      };
+      console.log("点击的ClassCard信息:", cardInfo);
+      // 触发事件，传递完整的card信息
+      this.$emit("view-class", cardInfo);
     },
   },
 };
@@ -1170,6 +1147,7 @@ function parseNumber(value) {
   display: flex;
   align-items: stretch;
   width: 100%;
+  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
 }
 
 .schedule-box-item {
@@ -1214,7 +1192,6 @@ function parseNumber(value) {
     display: flex;
     flex-direction: column;
     min-height: 0;
-    background-color: #fff;
   }
 
   .box-content {

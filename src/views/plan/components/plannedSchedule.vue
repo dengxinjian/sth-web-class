@@ -3,12 +3,12 @@
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
         <div class="planned-schedule-header-title-left-title">
-          Planned Schedule
+          {{ planTitle }}
         </div>
         <div class="planned-schedule-header-title-left-button">
-          <el-button type="primary">保存</el-button>
+          <el-button type="primary" @click="handleSave">保存</el-button>
           <el-button type="primary" @click="handleAddWeek">添加周</el-button>
-          <el-button type="info">取消</el-button>
+          <el-button type="info" @click="handleCancel">取消</el-button>
         </div>
       </div>
       <div class="planned-schedule-header-title-right">
@@ -41,6 +41,8 @@
           @delete-class="handleDeleteClass"
           @edit-class="handleEditClass"
           @paste-class="handlePasteClass"
+          @delete-event="handleDeleteEvent"
+          @edit-event="handleEditEvent"
           @plan-item-move="$emit('plan-item-move', $event)"
           @plan-item-reorder="$emit('plan-item-reorder', $event)"
           @plan-library-drop="$emit('plan-library-drop', $event)"
@@ -63,6 +65,10 @@ export default {
     planList: {
       type: Array,
       default: () => [],
+    },
+    planTitle: {
+      type: String,
+      default: "",
     },
   },
   methods: {
@@ -120,6 +126,12 @@ export default {
                 if (!classesJson.distance) {
                   return classTotal;
                 }
+                if (
+                  classesJson.sportType === "SWIM" &&
+                  classesJson.distanceUnit === "m"
+                ) {
+                  return classTotal + Number(classesJson.distance) / 1000;
+                }
                 return classTotal + Number(classesJson.distance);
               }, 0)
             );
@@ -135,7 +147,6 @@ export default {
             return (
               weekTotal +
               item.details.reduce((classTotal, classItem) => {
-                console.log(classItem, "classItem");
                 if (!classItem) {
                   return classTotal;
                 }
@@ -171,8 +182,20 @@ export default {
     handlePasteClass(globalDay, weekNumber, classItem) {
       this.$emit("paste-class", globalDay, weekNumber, classItem);
     },
+    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay);
+    },
+    handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      this.$emit("edit-event", eventItem, eventIndex, weekNumber, globalDay);
+    },
     handleAddWeek() {
       this.$emit("add-week");
+    },
+    handleCancel() {
+      this.$router.replace("/timeTable/plan?type=cancel");
+    },
+    handleSave() {
+      this.$emit("save");
     },
   },
 };
