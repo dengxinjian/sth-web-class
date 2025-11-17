@@ -2,8 +2,9 @@
   <div class="planned-schedule-container">
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
+        <div></div>
         <div class="planned-schedule-header-title-left-title">
-          {{ planTitle || 'Planned Schedule' }}
+          {{ planTitle || "Planned Schedule" }}
         </div>
         <el-popover
           placement="bottom"
@@ -22,7 +23,12 @@
             </div>
           </div>
           <i
-            style="display: inline-block; cursor: pointer;font-size: 20px;margin-right: 40px;"
+            style="
+              display: inline-block;
+              cursor: pointer;
+              font-size: 20px;
+              margin-right: 40px;
+            "
             class="el-icon-more"
             slot="reference"
             @click.stop
@@ -333,12 +339,12 @@ export default {
   .planned-schedule-header {
     width: 100%;
     border-bottom: 1px solid rgba(228, 231, 237, 0.8);
-    padding: 16px 20px;
+    // padding: 16px 20px;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     position: relative;
 
     &::after {
@@ -374,17 +380,19 @@ export default {
     .planned-schedule-header-title-left {
       flex: 0.85;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
       position: relative;
 
       .planned-schedule-header-title-left-title {
         font-size: 18px;
         font-weight: 600;
+        margin-bottom: 10px;
+        box-sizing: border-box;
         color: #303133;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        // position: absolute;
+        // left: 50%;
+        // transform: translateX(-50%);
       }
 
       .planned-schedule-header-title-left-button {

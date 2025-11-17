@@ -1137,6 +1137,7 @@ function parseNumber(value) {
 .week-header {
   width: 100%;
   background-color: #f9f0ef;
+  // background-color: #fff !important;
   padding: 10px 0;
   border-bottom: 1px solid #fff;
   margin-bottom: 10px;
@@ -1157,6 +1158,7 @@ function parseNumber(value) {
   border-left: 1px solid #e5e5e5;
   border-right: 1px solid #e5e5e5;
   background-color: #f8f8f8;
+  // background-color: #fff !important;
   min-height: 200px;
   margin-bottom: 10px;
   display: flex;
@@ -1170,7 +1172,8 @@ function parseNumber(value) {
     flex-direction: column;
     align-items: center;
     border-bottom: 1px solid #e5e5e5;
-    background-color: #f5f5f5;
+    // background-color: #f5f5f5;
+    background-color: #fff !important;
 
     .box-day-text {
       font-size: 14px;
@@ -1178,6 +1181,7 @@ function parseNumber(value) {
       font-weight: 600;
       margin-bottom: 8px;
       text-align: center;
+      background-color: #fff !important;
     }
 
     .box-divider {
@@ -1192,6 +1196,7 @@ function parseNumber(value) {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    background-color: #fff !important;
   }
 
   .box-content {

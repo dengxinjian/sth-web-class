@@ -195,6 +195,7 @@ export default {
   mounted() {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
+      console.log("this.$route.query", this.$route.query);
       const { id, planGroupId, type } = this.$route.query;
       if (id && planGroupId) {
         this.currentPlanId = id;
@@ -203,10 +204,10 @@ export default {
         this.getPlanDayDetail(id);
       }
 
-      if (type === "edit") {
-        this.getPlanDetail(this.currentPlanDetail.id);
-        this.getPlanDayDetail(this.currentPlanDetail.id);
-      }
+      // if (type === "edit") {
+      //   this.getPlanDetail(this.currentPlanDetail.id);
+      //   this.getPlanDayDetail(this.currentPlanDetail.id);
+      // }
 
       if (type === "cancel" && this.$store.state.plan.planData?.id) {
         this.currentPlanId = this.$store.state.plan.planData?.id;
