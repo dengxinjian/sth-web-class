@@ -18,6 +18,8 @@
         @box-click="handleBoxClick"
         @delete-class="handleDeletePlanClass"
         @edit-class="handleEditPlanClass"
+        @delete-event="handleDeleteEvent"
+        @edit-event="handleEditEvent"
         @paste-class="handlePasteClass"
         @add-week="handleAddWeek"
         @plan-item-move="handlePlanItemMove"
@@ -44,7 +46,11 @@
       :active-class-type="activeClassType"
       @save="onSaveCopyClassFromOfficial"
     />
-    <SportTypeModal v-model="showSportTypeModal" @select="onSelectSportType" />
+    <SportTypeModal
+      v-model="showSportTypeModal"
+      @select="onSelectSportType"
+      @addEvent="handleAddEvent"
+    />
     <AddClassModal
       v-model="showAddClassModal"
       :sportType="selectedSportType"
@@ -68,6 +74,12 @@
       "
       @save="handleEditPlanClassSave"
     />
+    <AddEvent
+      :visible="showAddEvent"
+      :event-data="currentEventData"
+      @confirm="handleEventConfirm"
+      @cancel="handleEventCancel"
+    />
   </div>
 </template>
 
@@ -82,6 +94,7 @@ import SportTypeModal from "../classManagement/components/SportTypeModal/index.v
 import AddClassModal from "../classManagement/components/AddClass/index.vue";
 import EditClassModal from "../classManagement/components/EditClass.vue";
 import { planApi } from "./services/planManagement";
+import AddEvent from "../classManagement/components/addEvent.vue";
 export default {
   name: "PlanView",
   components: {
@@ -92,6 +105,7 @@ export default {
     SportTypeModal,
     AddClassModal,
     EditClassModal,
+    AddEvent,
   },
   data() {
     return {
@@ -165,6 +179,8 @@ export default {
       planData: {
         dayDetails: [],
       },
+      showAddEvent: false,
+      currentEventData: {},
     };
   },
   mounted() {
@@ -179,6 +195,53 @@ export default {
   },
 
   methods: {
+    /**
+     * 赛事确认
+     */
+    handleEventConfirm(data) {
+      console.log("赛事数据:", data);
+      const weekIndex = this.selectedDay.weekNumber - 1;
+      const globalDay = this.selectedDay.globalDay;
+
+      // 确保周数据存在
+      if (!this.planData.dayDetails[weekIndex]) {
+        this.$set(this.planData.dayDetails, weekIndex, []);
+      }
+      // 查找该天是否已存在数据
+      let dayData = this.planData.dayDetails[weekIndex].find(
+        (item) => item.day === globalDay
+      );
+      if (!dayData) {
+        // 如果该天不存在，创建新的数据对象
+        dayData = {
+          day: globalDay,
+          details: [],
+          events: [],
+        };
+        this.planData.dayDetails[weekIndex].push(dayData);
+      }
+      // 确保 events 数组存在
+      if (!dayData.events) {
+        this.$set(dayData, "events", []);
+      }
+      // 添加课程到 details 数组
+      dayData.events.push(data);
+      console.log(this.planData, "this.planData");
+      // 触发响应式更新
+      this.$forceUpdate();
+
+      this.showAddEvent = false;
+    },
+    /**
+     * 赛事取消
+     */
+    handleEventCancel() {
+      this.currentEventData = null;
+      this.showAddEvent = false;
+    },
+    handleAddEvent() {
+      this.showAddEvent = true;
+    },
     planSlideChange() {
       // 拖拽功能已由 vuedraggable 处理，无需手动初始化
     },
@@ -408,6 +471,7 @@ export default {
         dayData = {
           day: globalDay,
           details: [],
+          events: [],
         };
         this.planData.dayDetails[weekIndex].push(dayData);
       }
@@ -612,6 +676,34 @@ export default {
      */
     handleAddWeek() {
       this.planData.dayDetails.push([]);
+    },
+    /**
+     * 删除赛事
+     */
+    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      console.log(eventItem, eventIndex, weekNumber, globalDay, "eventItem, eventIndex, weekNumber, globalDay");
+      this.$confirm("确认删除该赛事？", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        console.log("删除赛事");
+        const weekIndex = weekNumber - 1;
+        const dayData = this.planData.dayDetails[weekIndex].find(
+          (item) => item.day === globalDay
+        );
+        if (dayData) {
+          dayData.events.splice(eventIndex, 1);
+        }
+        this.$forceUpdate();
+        this.$message.success("删除成功");
+      });
+    },
+    /**
+     * 编辑赛事
+     */
+    handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      console.log(eventItem, eventIndex, weekNumber, globalDay, "eventItem, eventIndex, weekNumber, globalDay");
     },
   },
 };
