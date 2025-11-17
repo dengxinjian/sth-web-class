@@ -41,6 +41,8 @@
           @delete-class="handleDeleteClass"
           @edit-class="handleEditClass"
           @paste-class="handlePasteClass"
+          @delete-event="handleDeleteEvent"
+          @edit-event="handleEditEvent"
           @plan-item-move="$emit('plan-item-move', $event)"
           @plan-item-reorder="$emit('plan-item-reorder', $event)"
           @plan-library-drop="$emit('plan-library-drop', $event)"
@@ -138,7 +140,6 @@ export default {
       }, 0);
     },
     getTotalDuration() {
-      console.log(this.planList, "this.planList");
       return this.planList.reduce((total, week) => {
         return (
           total +
@@ -146,7 +147,6 @@ export default {
             return (
               weekTotal +
               item.details.reduce((classTotal, classItem) => {
-                console.log(classItem, "classItem");
                 if (!classItem) {
                   return classTotal;
                 }
@@ -181,6 +181,12 @@ export default {
     },
     handlePasteClass(globalDay, weekNumber, classItem) {
       this.$emit("paste-class", globalDay, weekNumber, classItem);
+    },
+    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay);
+    },
+    handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      this.$emit("edit-event", eventItem, eventIndex, weekNumber, globalDay);
     },
     handleAddWeek() {
       this.$emit("add-week");

@@ -416,6 +416,7 @@ export default {
      */
     handleEventCancel() {
       this.currentEventData = null;
+      this.showAddEvent = false;
     },
     handleAddSchedule(date) {
       this.classModalDataType = "addSchedule";

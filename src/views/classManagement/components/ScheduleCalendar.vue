@@ -106,18 +106,40 @@
                 :date="item.commonDate"
                 @click="$emit('view-health-data', $event)"
               />
-              <!-- 课表卡片 -->
-              <ScheduleClassCard
-                v-for="classItem in item.classSchedule"
-                :key="`class-${item.commonDate}-${classItem.id}`"
-                :class-item="classItem"
-                :date="item.commonDate"
-                @click="$emit('class-detail', classItem, classItem.sportType)"
-                @delete="$emit('delete-schedule', $event)"
-                @device-click="handleDeviceClick"
-                @edit="$emit('edit-schedule', $event)"
-                @copy="handleCopyClass"
-              />
+              <draggable
+                class="js-class-drag-container"
+                :list="item.classSchedule"
+                :group="{ name: 'classDrag', pull: true, put: true }"
+                :animation="180"
+                :handle="'.class-drap-handle'"
+                :force-fallback="true"
+                :fallback-on-body="true"
+                :fallback-tolerance="5"
+                :scroll="true"
+                :scroll-sensitivity="60"
+                :scroll-speed="20"
+                :empty-insert-threshold="50"
+                :swap-threshold="0.65"
+                :invert-swap="false"
+                ghost-class="is-class-drag-ghost"
+                chosen-class="is-class-drag-chosen"
+                drag-class="is-class-drag-dragging"
+                :data-day="item.commonDate"
+                @move="handleDragMove"
+              >
+                <!-- 课表卡片 -->
+                <ScheduleClassCard
+                  v-for="classItem in item.classSchedule"
+                  :key="`class-${item.commonDate}-${classItem.id}`"
+                  :class-item="classItem"
+                  :date="item.commonDate"
+                  @click="$emit('class-detail', classItem, classItem.sportType)"
+                  @delete="$emit('delete-schedule', $event)"
+                  @device-click="handleDeviceClick"
+                  @edit="$emit('edit-schedule', $event)"
+                  @copy="handleCopyClass"
+                />
+              </draggable>
 
               <!-- 运动记录卡片 -->
               <ActivityCard
@@ -176,6 +198,7 @@ import ActivityCard from "./ActivityCard.vue";
 import HealthDataCard from "./HealthDataCard.vue";
 import { WEEK_LIST } from "../constants";
 import { isToday, convertToLunar } from "../utils/helpers";
+import draggable from "vuedraggable";
 
 export default {
   name: "ScheduleCalendar",
@@ -184,6 +207,7 @@ export default {
     ScheduleClassCard,
     ActivityCard,
     HealthDataCard,
+    draggable,
   },
   props: {
     currentWeek: {
@@ -264,6 +288,27 @@ export default {
         type: "success",
         duration: 2000,
       });
+    },
+    handleDragMove(evt) {
+      // 处理拖拽移动事件，确保空容器也能接收拖拽
+      // 返回 true 允许移动，返回 false 阻止移动
+      try {
+        // 检查目标容器是否存在且有效
+        if (evt && evt.to) {
+          // 确保目标容器有有效的 Sortable 实例
+          const sortableInstance = evt.to.sortableInstance;
+          if (sortableInstance && sortableInstance.options) {
+            return true;
+          }
+          // 即使没有实例，也允许移动（vuedraggable 会自动处理）
+          return true;
+        }
+        return false;
+      } catch (error) {
+        // 如果出现错误，允许移动以避免阻塞拖拽功能
+        console.warn("拖拽移动事件处理出错:", error);
+        return true;
+      }
     },
   },
 };
@@ -444,6 +489,26 @@ export default {
     }
   }
 }
+::v-deep .is-class-drag-ghost {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+::v-deep .js-class-drag-container {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 40px; /* 确保空容器也有足够的高度以被检测到 */
+  position: relative; /* 确保定位上下文正确 */
+}
+
+::v-deep .js-class-drag-container.is-class-drop-target {
+  background-color: rgba(64, 158, 255, 0.08);
+}
+
+::v-deep .js-class-drag-container.is-class-drop-active {
+  background-color: rgba(64, 158, 255, 0.16);
+  box-shadow: inset 0 0 0 2px rgba(64, 158, 255, 0.25);
+}
+
 .context-menu {
   position: fixed;
   background: white;

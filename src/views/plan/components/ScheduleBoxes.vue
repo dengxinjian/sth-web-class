@@ -36,6 +36,27 @@
                       )
                     "
                   >
+                    <EventCard
+                      v-for="(eventItem, eventIndex) in getDayEvents(
+                        item.weekData,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )"
+                      :key="`${
+                        item.weekIndex * 7 + boxIndex + 1
+                      }-${eventIndex}-${
+                        eventItem.competitionName || eventIndex
+                      }`"
+                      :event-item="eventItem"
+                      :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                      @delete="
+                        handleDeleteEvent(
+                          eventItem,
+                          eventIndex,
+                          item.weekIndex + 1,
+                          item.weekIndex * 7 + boxIndex + 1
+                        )
+                      "
+                    />
                     <draggable
                       class="js-plan-drag-container"
                       :list="
@@ -53,7 +74,10 @@
                       :scroll="true"
                       :scroll-sensitivity="60"
                       :scroll-speed="20"
-                      :empty-insert-threshold="10"
+                      :empty-insert-threshold="50"
+                      :swap-threshold="0.65"
+                      :invert-swap="false"
+                      :filter="'.js-plan-drag-no-drag'"
                       ghost-class="is-plan-drag-ghost"
                       chosen-class="is-plan-drag-chosen"
                       drag-class="is-plan-drag-dragging"
@@ -65,6 +89,7 @@
                       "
                       @add="handleDragAdd($event, item.weekIndex, boxIndex)"
                       @unchoose="handleDragUnchoose"
+                      @move="handleDragMove"
                     >
                       <ClassCard
                         v-for="(classItem, classIndex) in getDayClasses(
@@ -230,6 +255,7 @@
 
 <script>
 import ClassCard from "./classCard.vue";
+import EventCard from "../../classManagement/components/eventCard.vue";
 import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
 import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 import draggable from "vuedraggable";
@@ -241,6 +267,7 @@ export default {
     DynamicScroller,
     DynamicScrollerItem,
     draggable,
+    EventCard,
   },
   props: {
     // 起始编号
@@ -819,12 +846,22 @@ export default {
                 sourceDayData.details.splice(sourceIndex, 1);
 
                 // 如果删除后该天的 details 数组为空，可以选择删除该天的数据对象
+                // 但是需要检查是否有 events 数据，如果有则保留 dayData 对象
                 if (sourceDayData.details.length === 0) {
-                  const dayIndex = sourceWeek.findIndex(
-                    (item) => item && item.day === sourceDay
-                  );
-                  if (dayIndex !== -1) {
-                    sourceWeek.splice(dayIndex, 1);
+                  // 检查是否有 events 数据
+                  const hasEvents =
+                    sourceDayData.events &&
+                    Array.isArray(sourceDayData.events) &&
+                    sourceDayData.events.length > 0;
+
+                  // 只有当没有 events 数据时才删除整个 dayData 对象
+                  if (!hasEvents) {
+                    const dayIndex = sourceWeek.findIndex(
+                      (item) => item && item.day === sourceDay
+                    );
+                    if (dayIndex !== -1) {
+                      sourceWeek.splice(dayIndex, 1);
+                    }
                   }
                 }
               }
@@ -989,6 +1026,27 @@ export default {
         return processedItem;
       });
     },
+    /**
+     * 获取指定天的赛事列表
+     * @param {Array} week - 周数据数组
+     * @param {Number} globalDay - 全局天数
+     * @returns {Array} 处理后的赛事列表
+     */
+    getDayEvents(week, globalDay) {
+      if (!week || !Array.isArray(week)) {
+        return [];
+      }
+
+      // 查找该天的数据对象
+      const dayData = week.find((item) => item && item.day === globalDay);
+
+      if (!dayData || !dayData.events || !Array.isArray(dayData.events)) {
+        return [];
+      }
+      console.log(dayData.events, "dayData.events");
+
+      return dayData.events;
+    },
     handleBoxClick(globalDay, weekIndex) {
       this.$emit("box-click", {
         weekNumber: weekIndex + 1,
@@ -1000,6 +1058,12 @@ export default {
     },
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
       this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
+    },
+    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay);
+    },
+    handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      this.$emit("edit-event", eventItem, eventIndex, weekNumber, globalDay);
     },
     showContextMenu(event, globalDay, weekIndex, boxIndex) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
@@ -1038,6 +1102,27 @@ export default {
         type: "success",
         duration: 2000,
       });
+    },
+    handleDragMove(evt) {
+      // 处理拖拽移动事件，确保空容器也能接收拖拽
+      // 返回 true 允许移动，返回 false 阻止移动
+      try {
+        // 检查目标容器是否存在且有效
+        if (evt && evt.to) {
+          // 确保目标容器有有效的 Sortable 实例
+          const sortableInstance = evt.to.sortableInstance;
+          if (sortableInstance && sortableInstance.options) {
+            return true;
+          }
+          // 即使没有实例，也允许移动（vuedraggable 会自动处理）
+          return true;
+        }
+        return false;
+      } catch (error) {
+        // 如果出现错误，允许移动以避免阻塞拖拽功能
+        console.warn("拖拽移动事件处理出错:", error);
+        return true;
+      }
     },
   },
 };
