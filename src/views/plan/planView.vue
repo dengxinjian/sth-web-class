@@ -14,11 +14,12 @@
           @edit-group="handleEditGroup"
           @delete-group="handleDeleteGroup"
           @choose-plan="handlePlanDayDetail"
+          :selected-plan-id="currentPlanId"
         />
       </div>
       <PlannedScheduleView
         :planList="planList"
-        :planTitle="currentPlanDetail.planTitle"
+        :planTitle="planTitle"
         @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass"
       />
@@ -131,6 +132,7 @@ export default {
       showApplyHistory: false,
       currentPlanId: "",
       currentPlanGroupId: "",
+      planTitle: "",
       planList: [
         // [
         //   {
@@ -182,15 +184,37 @@ export default {
       currentPlanDayDetail: [],
     };
   },
+  watch: {
+    currentPlanDetail: {
+      handler(newVal) {
+        this.planTitle = newVal?.planTitle || "";
+      },
+      deep: true,
+    },
+  },
   mounted() {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
-      const { id, planGroupId } = this.$route.query;
-      console.log(id, planGroupId, "id, planGroupId");
-      this.currentPlanId = id;
-      this.currentPlanGroupId = planGroupId;
-      this.getPlanDetail(id);
-      this.getPlanDayDetail(id);
+      const { id, planGroupId, type } = this.$route.query;
+      if (id && planGroupId) {
+        this.currentPlanId = id;
+        this.currentPlanGroupId = planGroupId;
+        this.getPlanDetail(id);
+        this.getPlanDayDetail(id);
+      }
+
+      if (type === "edit") {
+        this.getPlanDetail(this.currentPlanDetail.id);
+        this.getPlanDayDetail(this.currentPlanDetail.id);
+      }
+
+      if (type === "cancel" && this.$store.state.plan.planData?.id) {
+        this.currentPlanId = this.$store.state.plan.planData?.id;
+        if (this.currentPlanId) {
+          this.getPlanDetail(this.currentPlanId);
+          this.getPlanDayDetail(this.currentPlanId);
+        }
+      }
     }
     this.getPlanList();
   },
@@ -216,6 +240,7 @@ export default {
       }
     },
     async handlePlanDayDetail(id) {
+      this.currentPlanId = id;
       await this.getPlanDetail(id);
       await this.getPlanDayDetail(id);
     },

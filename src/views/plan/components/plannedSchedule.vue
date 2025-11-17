@@ -192,7 +192,7 @@ export default {
       this.$emit("add-week");
     },
     handleCancel() {
-      this.$router.replace("/timeTable/plan");
+      this.$router.replace("/timeTable/plan?type=cancel");
     },
     handleSave() {
       this.$emit("save");

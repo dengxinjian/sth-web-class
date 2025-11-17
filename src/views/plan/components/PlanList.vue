@@ -110,19 +110,7 @@
           </template>
 
           <div class="js-class-drag-container" :key="item.timespan">
-            <!-- <ClassCard
-              v-for="classItem in item.classesList"
-              :key="classItem.id"
-              :class-data="classItem"
-              :active-class-type="activeClassType"
-              :group-id="item.groupId"
-              @click="$emit('class-detail', classItem.id, classItem.sportType)"
-              @move="$emit('move-class', classItem.id, item.groupId)"
-              @delete="$emit('delete-class', classItem.id)"
-              @copy="$emit('copy-class', classItem, item.groupId, classItem.title)"
-              @view="$emit('view-class', classItem.id)"
-            /> -->
-            <div class="plan-item" v-for="classItem in item.classesList" :key="classItem.id" @click="$emit('choose-plan', classItem.id)">
+            <div class="plan-item" :class="{ active: selectedPlanId === classItem.id }" v-for="classItem in item.classesList" :key="classItem.id" @click="$emit('choose-plan', classItem.id)">
               <span>{{ classItem.planTitle }}</span>
             </div>
           </div>
@@ -133,13 +121,8 @@
 </template>
 
 <script>
-import ClassCard from '../../classManagement/components/ClassCard.vue'
-
 export default {
   name: 'PlanList',
-  components: {
-    ClassCard
-  },
   props: {
     classList: {
       type: Array,
@@ -152,6 +135,10 @@ export default {
     showAddClassBtn: {
       type: Boolean,
       default: true
+    },
+    selectedPlanId: {
+      type: [String, Number],
+      default: null
     }
   },
   data() {
@@ -294,6 +281,10 @@ export default {
 .plan-item:active {
   background-color: #f1f1f1;
   cursor: pointer;
+}
+.plan-item.active {
+  color: #cc2323;
+  background-color: rgba(204, 35, 35, 0.15);
 }
 </style>
 

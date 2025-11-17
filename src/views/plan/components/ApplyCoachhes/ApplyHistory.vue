@@ -14,6 +14,8 @@
       :columns="columns"
       :total="total"
       :getList="getApplyHistory"
+      :pagination="pagination"
+      @pagination-change="handlePaginationChange"
     />
     <!-- <el-table :data="tableData" style="width: 100%">
       <el-table-column prop="teamName" label="团队名称" width="180" />
@@ -90,13 +92,13 @@ export default {
   methods: {
     getApplyHistory() {
       getData({
-        url: "/api/plan/getApplyHistory",
+        url: "/api/applyPlanClassesHistory/listByPlanId",
         planClassesId: this.planInfo.id,
-        pageNum: this.pagination.page,
+        pageNo: this.pagination.page,
         pageSize: this.pagination.limit,
       }).then((res) => {
-        this.tableData = res.data.list;
-        this.total = res.data.total;
+        this.tableData = res.result.records;
+        this.total = res.result.total;
       });
     },
     onCancel() {
@@ -120,6 +122,11 @@ export default {
           this.$refs.formRef.clearValidate();
         }
       });
+    },
+    handlePaginationChange(page, limit) {
+      this.pagination.page = page;
+      this.pagination.limit = limit;
+      this.getApplyHistory();
     },
   },
 };
