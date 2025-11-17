@@ -112,7 +112,7 @@
           <draggable
             class="js-class-drag-container"
             :list="item.classesList"
-            :group="{ name: 'planDrag', put: false, pull: 'clone' }"
+            :group="{ name: groupName, put: false, pull: 'clone' }"
             :animation="180"
             :sort="false"
             :force-fallback="true"
@@ -165,6 +165,10 @@ export default {
     showAddClassBtn: {
       type: Boolean,
       default: true
+    },
+    groupName: {
+      type: String,
+      default: 'classDrag'
     }
   },
   data() {

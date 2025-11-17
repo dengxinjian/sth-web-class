@@ -74,8 +74,10 @@
                       :scroll="true"
                       :scroll-sensitivity="60"
                       :scroll-speed="20"
+                      :empty-insert-threshold="50"
+                      :swap-threshold="0.65"
+                      :invert-swap="false"
                       :filter="'.js-plan-drag-no-drag'"
-                      :empty-insert-threshold="10"
                       ghost-class="is-plan-drag-ghost"
                       chosen-class="is-plan-drag-chosen"
                       drag-class="is-plan-drag-dragging"
@@ -87,6 +89,7 @@
                       "
                       @add="handleDragAdd($event, item.weekIndex, boxIndex)"
                       @unchoose="handleDragUnchoose"
+                      @move="handleDragMove"
                     >
                       <ClassCard
                         v-for="(classItem, classIndex) in getDayClasses(
@@ -846,7 +849,8 @@ export default {
                 // 但是需要检查是否有 events 数据，如果有则保留 dayData 对象
                 if (sourceDayData.details.length === 0) {
                   // 检查是否有 events 数据
-                  const hasEvents = sourceDayData.events &&
+                  const hasEvents =
+                    sourceDayData.events &&
                     Array.isArray(sourceDayData.events) &&
                     sourceDayData.events.length > 0;
 
@@ -1098,6 +1102,27 @@ export default {
         type: "success",
         duration: 2000,
       });
+    },
+    handleDragMove(evt) {
+      // 处理拖拽移动事件，确保空容器也能接收拖拽
+      // 返回 true 允许移动，返回 false 阻止移动
+      try {
+        // 检查目标容器是否存在且有效
+        if (evt && evt.to) {
+          // 确保目标容器有有效的 Sortable 实例
+          const sortableInstance = evt.to.sortableInstance;
+          if (sortableInstance && sortableInstance.options) {
+            return true;
+          }
+          // 即使没有实例，也允许移动（vuedraggable 会自动处理）
+          return true;
+        }
+        return false;
+      } catch (error) {
+        // 如果出现错误，允许移动以避免阻塞拖拽功能
+        console.warn("拖拽移动事件处理出错:", error);
+        return true;
+      }
     },
   },
 };

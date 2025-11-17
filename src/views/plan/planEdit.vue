@@ -10,6 +10,7 @@
           :show-add-class-btn="false"
           @view-class="handleViewClass"
           @collapse-change="planSlideChange"
+          group-name="planDrag"
         />
       </div>
       <PlannedSchedule
