@@ -56,6 +56,7 @@
                       item.weekIndex * 7 + boxIndex + 1
                     )
                   "
+                  type="view"
                 />
                 <!-- <draggable
                   :key="`draggable-${item.weekIndex}-${boxIndex}`"
@@ -119,6 +120,7 @@
                       )
                     "
                     @copy="handleCopyClass"
+                    type="view"
                   />
                   <!-- <div
                     class="box-content"
