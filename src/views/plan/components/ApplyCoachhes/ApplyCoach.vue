@@ -322,13 +322,8 @@ export default {
               triUserId: _this.triUserId,
               applyDate: _this.form.applyDate,
               applyMode: _this.form.applyMode,
-            },
+            }
           ];
-          targets.push({
-            triUserId: _this.triUserId,
-            applyDate: _this.form.applyDate,
-            applyMode: _this.form.applyMode,
-          });
         }
 
         const params = {
