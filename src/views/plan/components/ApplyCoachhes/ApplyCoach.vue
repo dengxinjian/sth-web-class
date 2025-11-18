@@ -66,7 +66,7 @@
           label="方式"
           prop="applyMode"
         >
-          <el-select v-model="form.applyMode" placeholder="请选择">
+          <el-select v-model="form.applyMode" placeholder="请选择" style="width: 100%;">
             <el-option label="以开始日期" :value="1"></el-option>
             <el-option label="以结束日期" :value="2"></el-option>
           </el-select>
@@ -82,6 +82,7 @@
             value-format="yyyy-MM-dd"
             type="date"
             placeholder="选择日期"
+            style="width: 100%;"
           >
           </el-date-picker>
         </el-form-item>
@@ -137,7 +138,7 @@
       <!-- </el-form-item> -->
       <template v-else>
         <el-form-item label="方式" prop="applyMode">
-          <el-select v-model="form.applyMode" placeholder="请选择">
+          <el-select v-model="form.applyMode" placeholder="请选择" style="width: 100%;">
             <el-option label="以开始日期" :value="1"></el-option>
             <el-option label="以结束日期" :value="2"></el-option>
           </el-select>
@@ -149,6 +150,7 @@
             value-format="yyyy-MM-dd"
             type="date"
             placeholder="选择日期"
+            style="width: 100%;"
           >
           </el-date-picker>
         </el-form-item>
