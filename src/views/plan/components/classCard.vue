@@ -14,6 +14,7 @@
     >
       <div
         class="classScheduleCard"
+        :class="{ 'is-dragging': isDragging }"
         :style="cardStyle"
         :data-id="classItem.id"
         :data-date="date"
@@ -229,6 +230,10 @@ export default {
         return ["view", "edit"].includes(value);
       },
     },
+    isDragging: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -397,8 +402,12 @@ export default {
   padding-top: 10px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
 
-  &:hover {
+  &:hover:not(.is-dragging) {
     transform: scale(1.02);
+  }
+
+  &.is-dragging {
+    pointer-events: none;
   }
 
   > .classScheduleCard {
