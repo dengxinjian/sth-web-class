@@ -66,7 +66,11 @@
           label="方式"
           prop="applyMode"
         >
-          <el-select v-model="form.applyMode" placeholder="请选择" style="width: 100%;">
+          <el-select
+            v-model="form.applyMode"
+            placeholder="请选择"
+            style="width: 100%"
+          >
             <el-option label="以开始日期" :value="1"></el-option>
             <el-option label="以结束日期" :value="2"></el-option>
           </el-select>
@@ -82,16 +86,16 @@
             value-format="yyyy-MM-dd"
             type="date"
             placeholder="选择日期"
-            style="width: 100%;"
+            style="width: 100%"
           >
           </el-date-picker>
         </el-form-item>
-        <el-form-item v-if="form.athleteType === 2" label="成员">
+        <!-- <el-form-item v-if="form.athleteType === 2" label="成员">
           <el-row :gutter="8">
             <el-col :span="6">方式</el-col>
             <el-col :span="8">时间</el-col>
           </el-row>
-        </el-form-item>
+        </el-form-item> -->
         <!-- <el-form-item
         :label="item.userNickname"
         v-for="(item, index) in members"
@@ -101,32 +105,39 @@
           { required: true, message: '请选择时间', trigger: 'change' },
         ]"
       > -->
+        <el-row :gutter="24" class="member-row" v-if="form.athleteType === 2">
+          <el-col :span="4" align="right"><span class="member-name">成员</span></el-col>
+          <el-col :span="8" align="left"><span class="member-name">方式</span></el-col>
+          <el-col :span="11" align="left"><span class="member-name">时间</span></el-col>
+          <el-col :span="1" align="left"><span class="member-name"></span></el-col>
+        </el-row>
         <template v-if="form.athleteType === 2 && members.length > 0">
           <el-row
-            :gutter="8"
+            :gutter="24"
             class="member-row"
             v-for="(item, index) in members"
             :key="index"
           >
-            <el-col :span="4">
+            <el-col :span="4" align="right">
               <span class="member-name">{{ item.userNickname }}</span>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="8" align="left">
               <el-select v-model="item.applyMode" placeholder="请选择">
                 <el-option label="以开始日期" :value="1"></el-option>
                 <el-option label="以结束日期" :value="2"></el-option>
               </el-select>
             </el-col>
-            <el-col :span="10">
+            <el-col :span="11" align="left">
               <el-date-picker
                 v-model="item.applyDate"
                 value-format="yyyy-MM-dd"
                 type="date"
                 placeholder="选择日期"
+                style="width: 100%;"
               >
               </el-date-picker>
             </el-col>
-            <el-col :span="4">
+            <el-col :span="1" align="left">
               <i
                 class="el-icon-circle-close delete-icon"
                 @click="removeMember(item, index)"
@@ -138,7 +149,11 @@
       <!-- </el-form-item> -->
       <template v-else>
         <el-form-item label="方式" prop="applyMode">
-          <el-select v-model="form.applyMode" placeholder="请选择" style="width: 100%;">
+          <el-select
+            v-model="form.applyMode"
+            placeholder="请选择"
+            style="width: 100%"
+          >
             <el-option label="以开始日期" :value="1"></el-option>
             <el-option label="以结束日期" :value="2"></el-option>
           </el-select>
@@ -150,7 +165,7 @@
             value-format="yyyy-MM-dd"
             type="date"
             placeholder="选择日期"
-            style="width: 100%;"
+            style="width: 100%"
           >
           </el-date-picker>
         </el-form-item>
@@ -159,7 +174,9 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm" :loading="loading">应用</el-button>
+      <el-button type="primary" @click="onConfirm" :loading="loading"
+        >应用</el-button
+      >
     </span>
   </el-dialog>
 </template>
@@ -266,14 +283,14 @@ export default {
       const newMembers =
         this.members.length > 0
           ? memberList.map((item) => {
-              const findItem = this.members.find(
-                (el) => el.triUserId === item.triUserId
-              );
-              return {
-                ...item,
-                ...findItem,
-              };
-            })
+            const findItem = this.members.find(
+              (el) => el.triUserId === item.triUserId
+            );
+            return {
+              ...item,
+              ...findItem,
+            };
+          })
           : memberList;
       this.members = newMembers;
     },
@@ -307,22 +324,22 @@ export default {
           targets =
             _this.form.athleteType === 1
               ? _this.form.athleteIds.map((item) => ({
-                  triUserId: item,
-                  applyDate: _this.form.applyDate,
-                  applyMode: _this.form.applyMode,
-                }))
+                triUserId: item,
+                applyDate: _this.form.applyDate,
+                applyMode: _this.form.applyMode,
+              }))
               : _this.members.map((item) => ({
-                  triUserId: item.triUserId,
-                  applyDate: item.applyDate,
-                  applyMode: item.applyMode,
-                }));
+                triUserId: item.triUserId,
+                applyDate: item.applyDate,
+                applyMode: item.applyMode,
+              }));
         } else {
           targets = [
             {
               triUserId: _this.triUserId,
               applyDate: _this.form.applyDate,
               applyMode: _this.form.applyMode,
-            }
+            },
           ];
         }
 
@@ -334,18 +351,21 @@ export default {
         submitData({
           url: "/api/planClasses/applyPlanClasses",
           requestData: params,
-        }).then((res) => {
-          if (res.success) {
-            _this.$message.success("应用成功");
-            _this.innerVisible = false;
-            _this.$emit("cancel", true);
+        })
+          .then((res) => {
+            if (res.success) {
+              _this.$message.success("应用成功");
+              _this.innerVisible = false;
+              _this.$emit("cancel", true);
+              _this.loading = false;
+            }
+          })
+          .catch(() => {
             _this.loading = false;
-          }
-        }).catch(() => {
-          _this.loading = false;
-        }).finally(() => {
-          _this.loading = false;
-        });
+          })
+          .finally(() => {
+            _this.loading = false;
+          });
       });
     },
     resetForm() {
@@ -392,7 +412,7 @@ export default {
   cursor: pointer;
   /* color: #909399; */
   color: #f56c6c;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 32px;
 }
 .delete-icon:hover {
@@ -404,7 +424,7 @@ export default {
   font-size: 14px;
   font-weight: bold;
   vertical-align: middle;
-  text-align: right;
+  /* text-align: right; */
 }
 .member-row {
   display: flex;
@@ -415,5 +435,13 @@ export default {
 .member-row ::v-deep(.el-col) {
   display: flex;
   align-items: center;
+}
+</style>
+
+<style>
+/* 全局样式，用于 append-to-body 的 dialog */
+.el-dialog__wrapper.add-class-title-modal .el-dialog,
+.add-class-title-modal.el-dialog__wrapper .el-dialog {
+  margin-top: 5vh !important;
 }
 </style>

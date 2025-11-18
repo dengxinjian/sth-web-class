@@ -607,7 +607,8 @@ export default {
           _this.showApplyHistory = true;
         },
         5: () => {
-          _this.handleDeleteGroup();
+          // _this.handleDeleteGroup();
+          _this.handleDeletePlan();
         },
       };
       optMap[index]();

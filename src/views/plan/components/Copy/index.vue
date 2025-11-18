@@ -140,7 +140,7 @@ export default {
           weChat: this.planInfo.weChat,
           description: this.planInfo.description,
           dayDetails: this.planClasses.flat(),
-          sourcePlanId: this.planInfo.planGroupId,
+          sourcePlanId: this.planInfo.id,
         };
         console.log(params, "params");
         submitData({
