@@ -1152,6 +1152,7 @@ export default {
       let newClassSchedule = {};
       const sortVoList = [];
       if (e.item.dataset.type === "classTemplate") {
+        this.handleClassDragToSchedule(e)
         return;
       }
 

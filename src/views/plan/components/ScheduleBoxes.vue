@@ -38,6 +38,25 @@
                   )
                 "
               >
+                <EventCard
+                  v-for="(eventItem, eventIndex) in getDayEvents(
+                    item.weekData,
+                    item.weekIndex * 7 + boxIndex + 1
+                  )"
+                  :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
+                    eventItem.competitionName || eventIndex
+                  }`"
+                  :event-item="eventItem"
+                  :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                  @delete="
+                    handleDeleteEvent(
+                      eventItem,
+                      eventIndex,
+                      item.weekIndex + 1,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
+                />
                 <draggable
                   :key="`draggable-${item.weekIndex}-${boxIndex}`"
                   :list="
@@ -69,25 +88,6 @@
                   @start="handleDragStart"
                   @end="handleDragEnd"
                 >
-                  <EventCard
-                    v-for="(eventItem, eventIndex) in getDayEvents(
-                      item.weekData,
-                      item.weekIndex * 7 + boxIndex + 1
-                    )"
-                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
-                      eventItem.competitionName || eventIndex
-                    }`"
-                    :event-item="eventItem"
-                    :date="String(item.weekIndex * 7 + boxIndex + 1)"
-                    @delete="
-                      handleDeleteEvent(
-                        eventItem,
-                        eventIndex,
-                        item.weekIndex + 1,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )
-                    "
-                  />
                   <ClassCard
                     v-for="(classItem, classIndex) in getDayDetailsArray(
                       item.weekData,
@@ -887,12 +887,12 @@ export default {
       // 查找该天的数据对象
       const dayData = week.find((item) => item && item.day === globalDay);
 
-      if (!dayData || !dayData.events || !Array.isArray(dayData.events)) {
+      if (!dayData || !dayData.competitionDtoList || !Array.isArray(dayData.competitionDtoList)) {
         return [];
       }
-      console.log(dayData.events, "dayData.events");
+      console.log(dayData.competitionDtoList, "dayData.competitionDtoList");
 
-      return dayData.events;
+      return dayData.competitionDtoList;
     },
     handleBoxClick(globalDay, weekIndex) {
       this.$emit("box-click", {
