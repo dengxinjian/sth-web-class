@@ -681,7 +681,13 @@ export default {
      * 删除赛事
      */
     handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
-      console.log(eventItem, eventIndex, weekNumber, globalDay, "eventItem, eventIndex, weekNumber, globalDay");
+      console.log(
+        eventItem,
+        eventIndex,
+        weekNumber,
+        globalDay,
+        "eventItem, eventIndex, weekNumber, globalDay"
+      );
       this.$confirm("确认删除该赛事？", "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
@@ -703,7 +709,13 @@ export default {
      * 编辑赛事
      */
     handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
-      console.log(eventItem, eventIndex, weekNumber, globalDay, "eventItem, eventIndex, weekNumber, globalDay");
+      console.log(
+        eventItem,
+        eventIndex,
+        weekNumber,
+        globalDay,
+        "eventItem, eventIndex, weekNumber, globalDay"
+      );
     },
   },
 };
