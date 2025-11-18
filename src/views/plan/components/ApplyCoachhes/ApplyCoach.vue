@@ -159,7 +159,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm">保存</el-button>
+      <el-button type="primary" @click="onConfirm" :loading="loading">应用</el-button>
     </span>
   </el-dialog>
 </template>
@@ -211,6 +211,7 @@ export default {
       teams: [],
       athletesList: [],
       members: [],
+      loading: false,
     };
   },
   computed: {
@@ -297,6 +298,7 @@ export default {
     },
     onConfirm() {
       const _this = this;
+      this.loading = true;
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
         // 根据登录类型构建 targets 数组
@@ -342,7 +344,12 @@ export default {
             _this.$message.success("应用成功");
             _this.innerVisible = false;
             _this.$emit("cancel", true);
+            _this.loading = false;
           }
+        }).catch(() => {
+          _this.loading = false;
+        }).finally(() => {
+          _this.loading = false;
         });
       });
     },
