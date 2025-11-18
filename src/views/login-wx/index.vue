@@ -227,7 +227,7 @@ export default {
         return;
       }
 
-      this.$message.success("扫码成功");
+      this.$message.success("登录成功");
 
       // 保存用户信息到 Vuex
       this.$store.commit("user/SET_TOKEN", result.jwt);
