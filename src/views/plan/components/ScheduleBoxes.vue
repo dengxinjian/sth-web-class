@@ -78,6 +78,7 @@
                     name: 'plan-classes',
                     put: true,
                   }"
+                  :animation="150"
                   :force-fallback="true"
                   :fallback-on-body="true"
                   :fallback-tolerance="10"
@@ -1049,7 +1050,6 @@ export default {
   background-color: #f9f0ef;
   padding: 10px 0;
   border-bottom: 1px solid #fff;
-  margin-bottom: 10px;
   text-align: center;
 }
 
