@@ -205,6 +205,7 @@
     <AddEvent
       :visible.sync="showAddEvent"
       :event-data="currentEventData"
+      :is-edit-mode="isEditMode"
       @confirm="handleEventConfirm"
       @cancel="handleEventCancel"
     />
@@ -360,6 +361,7 @@ export default {
       // 添加/编辑赛事
       showAddEvent: false,
       currentEventData: {},
+      isEditMode: false,
     };
   },
   watch: {
@@ -392,6 +394,7 @@ export default {
     handleAddEvent(eventData = {}) {
       this.currentEventData = eventData; // 如果有数据则是编辑模式，否则是添加模式
       this.showAddEvent = true;
+      this.isEditMode = false;
     },
     /**
      * 赛事确认
@@ -399,7 +402,7 @@ export default {
     handleEventConfirm(data) {
       console.log("赛事数据:", data);
       data.competitionTime = this.addScheduleDate;
-      if (!this.currentEventData.id) {
+      if (!this.isEditMode) {
         competitionApi.createCompetition(data).then((res) => {
           if (res.success) {
             this.$message.success("赛事保存成功");
@@ -440,6 +443,7 @@ export default {
       console.log(eventItem, "eventItem");
       this.currentEventData = eventItem;
       this.showAddEvent = true;
+      this.isEditMode = true;
     },
     /**
      * 赛事取消

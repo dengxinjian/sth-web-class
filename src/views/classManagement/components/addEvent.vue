@@ -121,6 +121,10 @@ export default {
       type: Object,
       default: null,
     },
+    isEditMode: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -183,11 +187,6 @@ export default {
       distancesByType: {},
       showCustomDistance: false,
     };
-  },
-  computed: {
-    isEditMode() {
-      return !!this.eventData && !!this.eventData.id;
-    },
   },
   watch: {
     visible(val) {
@@ -284,7 +283,8 @@ export default {
       if (distanceValue === "OTHER") {
         this.showCustomDistance = true;
         this.formData.customDistance =
-          data.customDistance || this.extractDistanceNumber(data.competitionDistance);
+          data.customDistance ||
+          this.extractDistanceNumber(data.competitionDistance);
       } else {
         this.showCustomDistance = false;
         this.formData.customDistance = "";

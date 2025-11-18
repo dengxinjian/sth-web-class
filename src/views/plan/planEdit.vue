@@ -56,6 +56,7 @@
       v-model="showAddClassModal"
       :sportType="selectedSportType"
       type="add"
+      :data="CreatePlanCourseDialogData"
       originalType="my"
       @save="onSaveAddClass"
       @cancel="showAddClassModal = false"
@@ -78,6 +79,7 @@
     <AddEvent
       :visible="showAddEvent"
       :event-data="currentEventData"
+      :is-edit-mode="isEditMode"
       @confirm="handleEventConfirm"
       @cancel="handleEventCancel"
     />
@@ -190,6 +192,11 @@ export default {
       currentEventData: {},
       showCreatePlanCourseDialog: false,
       CreatePlanCourseDialogData: {},
+      // 赛事编辑相关数据
+      editEventIndex: null,
+      editEventWeekNumber: null,
+      editEventGlobalDay: null,
+      isEditMode: false,
     };
   },
   mounted() {
@@ -217,9 +224,10 @@ export default {
         this.$set(this.planData.dayDetails, weekIndex, []);
       }
       // 查找该天是否已存在数据
-      let dayData = this.planData.dayDetails[weekIndex].find(
+      let dayIndex = this.planData.dayDetails[weekIndex].findIndex(
         (item) => item.day === globalDay
       );
+      let dayData = this.planData.dayDetails[weekIndex][dayIndex];
       if (!dayData) {
         // 如果该天不存在，创建新的数据对象
         dayData = {
@@ -228,27 +236,41 @@ export default {
           competitionDtoList: [],
         };
         this.planData.dayDetails[weekIndex].push(dayData);
+        dayIndex = this.planData.dayDetails[weekIndex].length - 1;
       }
       // 确保 competitionDtoList 数组存在
       if (!dayData.competitionDtoList) {
         this.$set(dayData, "competitionDtoList", []);
       }
-      // 添加课程到 details 数组
-      dayData.competitionDtoList.push(data);
+      if (this.editEventIndex !== null) {
+        this.$set(dayData.competitionDtoList, this.editEventIndex, data);
+      } else {
+        dayData.competitionDtoList.push(data);
+      }
+      // 保证对 dayDetails 的引用是响应式的
+      this.$set(this.planData.dayDetails[weekIndex], dayIndex, {
+        ...dayData,
+        competitionDtoList: [...dayData.competitionDtoList],
+      });
       console.log(this.planData, "this.planData");
       // 触发响应式更新
       this.$forceUpdate();
 
+      this.editEventIndex = null;
       this.showAddEvent = false;
     },
     /**
      * 赛事取消
      */
     handleEventCancel() {
-      this.currentEventData = null;
+      this.currentEventData = {};
+      this.editEventIndex = null;
+      this.editEventWeekNumber = null;
+      this.editEventGlobalDay = null;
       this.showAddEvent = false;
     },
     handleAddEvent() {
+      this.currentEventData = {};
       this.showAddEvent = true;
     },
     planSlideChange() {
@@ -457,13 +479,14 @@ export default {
     },
     handleCreatePlanCourse(data) {
       console.log(data, "data");
-      this.CreatePlanCourseDialogData = data;
+      this.CreatePlanCourseDialogData = { ...data };
       this.showAddClassModal = true;
     },
     /**
      * 保存添加计划表课程
      */
     onSaveAddClass(saveData, flag) {
+      console.log(saveData, flag, "saveData, flag");
       if (!this.selectedDay || !this.selectedDay.globalDay) {
         console.error("selectedDay 信息不完整");
         this.showAddClassModal = false;
@@ -504,9 +527,28 @@ export default {
       // 触发响应式更新
       this.$forceUpdate();
 
-      this.showAddClassModal = false;
-      this.selectedDay = null;
-      this.selectedSportType = null;
+      if (flag) {
+        this.showAddClassModal = false;
+        this.selectedDay = null;
+        this.selectedSportType = null;
+      }
+      if (this.CreatePlanCourseDialogData.mode === "SAVE") {
+        this.savePlanCourse(saveData);
+      }
+    },
+
+    // 如果是永久保存 需要走接口
+    async savePlanCourse(data) {
+      console.log(data, "data");
+      data.classesJson = JSON.stringify(data.classesJson);
+      classApi.createClass(data).then((res) => {
+        if (res.success) {
+          this.$message.success("课程保存成功");
+          this.getClassList();
+        } else {
+          this.$message.error(res.message);
+        }
+      });
     },
     /**
      * 删除计划表课程
@@ -560,14 +602,25 @@ export default {
         // 删除指定索引的课程
         dayData.details.splice(classIndex, 1);
 
-        // 如果删除后该天的 details 数组为空，可以选择删除该天的数据对象
-        if (dayData.details.length === 0) {
-          const dayIndex = this.planData.dayDetails[weekIndex].findIndex(
-            (item) => item.day === globalDay
-          );
+        const dayIndex = this.planData.dayDetails[weekIndex].findIndex(
+          (item) => item.day === globalDay
+        );
+
+        const hasEvents =
+          Array.isArray(dayData.competitionDtoList) &&
+          dayData.competitionDtoList.length > 0;
+
+        if (dayData.details.length === 0 && !hasEvents) {
+          // 当该天没有课程和赛事时才删除整天
           if (dayIndex !== -1) {
             this.planData.dayDetails[weekIndex].splice(dayIndex, 1);
           }
+        } else if (dayIndex !== -1) {
+          // 否则更新该天的数据以保持响应式
+          this.$set(this.planData.dayDetails[weekIndex], dayIndex, {
+            ...dayData,
+            details: [...dayData.details],
+          });
         }
 
         // 触发响应式更新
@@ -733,6 +786,13 @@ export default {
         globalDay,
         "eventItem, eventIndex, weekNumber, globalDay"
       );
+      this.editEventIndex = eventIndex;
+      this.editEventWeekNumber = weekNumber;
+      this.editEventGlobalDay = globalDay;
+      this.selectedDay = { globalDay, weekNumber };
+      this.isEditMode = true;
+      this.currentEventData = eventItem;
+      this.showAddEvent = true;
     },
   },
 };

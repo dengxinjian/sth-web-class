@@ -16,7 +16,7 @@
       label-width="90px"
       size="small"
     >
-      <el-form-item label="课程名称" prop="title" v-if="!isTemporary">
+      <el-form-item label="课程名称" prop="title">
         <el-input
           v-model="form.title"
           maxlength="50"
@@ -94,9 +94,7 @@ export default {
           { required: true, message: "请输入课程名称", trigger: "blur" },
           { min: 1, max: 50, message: "长度在1到50个字符", trigger: "blur" },
         ],
-        groupId: [
-          { required: true, message: "请选择分组", trigger: "change" },
-        ],
+        groupId: [{ required: true, message: "请选择分组", trigger: "change" }],
       },
     };
   },
@@ -148,7 +146,6 @@ export default {
     },
     handleModeChange() {
       if (this.isTemporary) {
-        this.form.title = "";
         this.form.groupId = undefined;
         if (this.$refs.formRef) {
           this.$refs.formRef.clearValidate();
@@ -161,7 +158,7 @@ export default {
     },
     handleConfirm() {
       if (this.isTemporary) {
-        this.$emit("save", { ...this.form, title: "", groupId: undefined });
+        this.$emit("save", { ...this.form });
         this.innerVisible = false;
         return;
       }
@@ -197,4 +194,3 @@ export default {
   justify-content: center;
 }
 </style>
-

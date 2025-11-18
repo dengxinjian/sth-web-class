@@ -48,6 +48,15 @@
                   }`"
                   :event-item="eventItem"
                   :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                  @edit="
+                    $emit(
+                      'edit-event',
+                      eventItem,
+                      eventIndex,
+                      item.weekIndex + 1,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
                   @delete="
                     handleDeleteEvent(
                       eventItem,
@@ -887,7 +896,11 @@ export default {
       // 查找该天的数据对象
       const dayData = week.find((item) => item && item.day === globalDay);
 
-      if (!dayData || !dayData.competitionDtoList || !Array.isArray(dayData.competitionDtoList)) {
+      if (
+        !dayData ||
+        !dayData.competitionDtoList ||
+        !Array.isArray(dayData.competitionDtoList)
+      ) {
         return [];
       }
       console.log(dayData.competitionDtoList, "dayData.competitionDtoList");
