@@ -27,7 +27,7 @@
               display: inline-block;
               cursor: pointer;
               font-size: 20px;
-              margin-right: 40px;
+              margin-right: 20px;
             "
             class="el-icon-more"
             slot="reference"
@@ -323,6 +323,7 @@ export default {
 
     .planned-schedule-header-title-left {
       flex: 0.85;
+      height: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -347,7 +348,7 @@ export default {
 
     .planned-schedule-header-title-right {
       flex: 0.15;
-      min-width: 200px;
+      min-width: 240px;
       display: flex;
       flex-direction: column;
       align-items: center;

@@ -6,6 +6,7 @@
     :before-close="onCancel"
     class="add-class-title-modal"
     :close-on-click-modal="false"
+    @close="onCancel"
   >
     <span slot="title">新增计划</span>
 
@@ -96,13 +97,14 @@ export default {
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
+    currentGroupId: { type: [String, Number], default: undefined },
   },
   data() {
     return {
       innerVisible: this.visible || this.value || false,
       form: {
         planTitle: undefined,
-        planGroupId: undefined,
+        planGroupId: this.currentGroupId,
         teamId: undefined,
         email: undefined,
         weChat: undefined,
@@ -162,6 +164,12 @@ export default {
       if (val) {
         // reset form when opening
         this.resetForm();
+        // 如果存在 currentGroupId，设置到表单中
+        if (this.currentGroupId) {
+          this.$nextTick(() => {
+            this.form.planGroupId = this.currentGroupId;
+          });
+        }
         this.getGroupList();
         this.getTeamList();
       } else {
@@ -174,6 +182,15 @@ export default {
         );
       }
     },
+    currentGroupId(val) {
+      // 如果对话框已打开且有值，则更新表单
+      if (this.innerVisible && val) {
+        this.form.planGroupId = val;
+      }
+    },
+  },
+  beforeDestroy() {
+    this.resetForm();
   },
   methods: {
     validateEmail() {
@@ -195,6 +212,8 @@ export default {
       });
     },
     onCancel() {
+      // 重置表单数据
+      this.resetForm();
       this.innerVisible = false;
       this.$emit("cancel");
     },

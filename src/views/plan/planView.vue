@@ -47,7 +47,7 @@
     />
 
     <!-- 添加计划 -->
-    <AddPlan v-model="addPlanVisible" />
+    <AddPlan v-model="addPlanVisible" :current-group-id="currentPlanGroupId" />
     <!-- 添加分组 -->
     <AddGroup
       v-model="addGroupVisible"
@@ -572,7 +572,8 @@ export default {
     /**
      * 添加计划
      */
-    handleAddPlan() {
+    handleAddPlan(payload) {
+      this.currentPlanGroupId = payload;
       this.addPlanVisible = true;
     },
     /**
