@@ -61,6 +61,8 @@
         @paste-class="handlePasteClass"
         @view-health-data="handleViewHealthData"
         @add-schedule="handleAddSchedule"
+        @event-detail="handleEventDetail"
+        @edit-event="handleEditEvent"
       />
 
       <!-- 右侧统计面板 -->
@@ -203,6 +205,7 @@
     <AddEvent
       :visible.sync="showAddEvent"
       :event-data="currentEventData"
+      :is-edit-mode="isEditMode"
       @confirm="handleEventConfirm"
       @cancel="handleEventCancel"
     />
@@ -357,7 +360,8 @@ export default {
 
       // 添加/编辑赛事
       showAddEvent: false,
-      currentEventData: null,
+      currentEventData: {},
+      isEditMode: false,
     };
   },
   watch: {
@@ -387,9 +391,10 @@ export default {
     /**
      * 添加赛事
      */
-    handleAddEvent(eventData = null) {
+    handleAddEvent(eventData = {}) {
       this.currentEventData = eventData; // 如果有数据则是编辑模式，否则是添加模式
       this.showAddEvent = true;
+      this.isEditMode = false;
     },
     /**
      * 赛事确认
@@ -397,7 +402,7 @@ export default {
     handleEventConfirm(data) {
       console.log("赛事数据:", data);
       data.competitionTime = this.addScheduleDate;
-      if (!this.currentEventData.id) {
+      if (!this.isEditMode) {
         competitionApi.createCompetition(data).then((res) => {
           if (res.success) {
             this.$message.success("赛事保存成功");
@@ -407,15 +412,44 @@ export default {
             this.$message.error(res.message);
           }
         });
+      } else {
+        competitionApi.updateCompetition(data).then((res) => {
+          if (res.success) {
+            this.$message.success("赛事保存成功");
+            this.showAddEvent = false;
+          }
+        });
       }
+      this.getScheduleData();
       // 这里可以添加保存成功后的处理逻辑，比如刷新列表等
       // 如果需要刷新日程数据，可以调用 this.getScheduleData();
+    },
+    handleEventDetail(eventItem) {
+      console.log(eventItem, "eventItem");
+      this.$confirm("确认删除该赛事？", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        competitionApi.deleteCompetition(eventItem.id).then((res) => {
+          if (res.success) {
+            this.$message.success("赛事删除成功");
+            this.getScheduleData();
+          }
+        });
+      });
+    },
+    handleEditEvent(eventItem) {
+      console.log(eventItem, "eventItem");
+      this.currentEventData = eventItem;
+      this.showAddEvent = true;
+      this.isEditMode = true;
     },
     /**
      * 赛事取消
      */
     handleEventCancel() {
-      this.currentEventData = null;
+      this.currentEventData = {};
       this.showAddEvent = false;
     },
     handleAddSchedule(date) {
@@ -643,6 +677,7 @@ export default {
           let activityList = [];
           let classSchedule = [];
           let healthInfos = [];
+          let competitionList = [];
 
           res.result.forEach((part) => {
             if (item.commonDate === part.dataDate) {
@@ -711,6 +746,7 @@ export default {
               // 处理健康数据
               console.log(part.healthInfos, "part.healthInfos");
               healthInfos = part.healthInfos || [];
+              competitionList = part.competitionList || [];
             }
           });
 
@@ -719,6 +755,7 @@ export default {
             activityList,
             classSchedule,
             healthInfos,
+            competitionList,
             timesp: new Date().getTime(),
           };
         });
@@ -1152,7 +1189,7 @@ export default {
       let newClassSchedule = {};
       const sortVoList = [];
       if (e.item.dataset.type === "classTemplate") {
-        this.handleClassDragToSchedule(e)
+        this.handleClassDragToSchedule(e);
         return;
       }
 

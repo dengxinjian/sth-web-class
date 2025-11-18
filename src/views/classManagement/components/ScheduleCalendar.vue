@@ -107,6 +107,15 @@
                 @click="$emit('view-health-data', $event)"
               />
 
+              <!-- 赛事 -->
+              <EventCard
+                v-for="eventItem in item.competitionList"
+                :key="`event-${item.commonDate}-${eventItem.id}`"
+                :event-item="eventItem"
+                :date="item.commonDate"
+                @delete="$emit('event-detail', eventItem)"
+                @edit="$emit('edit-event', eventItem)"
+              />
               <!-- 课表卡片 -->
               <ScheduleClassCard
                 v-for="classItem in item.classSchedule"
@@ -121,8 +130,8 @@
               />
               <!-- 运动记录卡片 -->
               <ActivityCard
-                v-for="activityItem in item.activityList"
-                :key="`activity-${item.commonDate}-${activityItem.activityId}-${activityItem.classScheduleId}`"
+                v-for="(activityItem, index) in item.activityList"
+                :key="`activity-${item.commonDate}-${index}`"
                 :activity="activityItem"
                 :date="item.commonDate"
                 @click="$emit('activity-detail', activityItem)"
@@ -177,6 +186,7 @@ import HealthDataCard from "./HealthDataCard.vue";
 import { WEEK_LIST } from "../constants";
 import { isToday, convertToLunar } from "../utils/helpers";
 import draggable from "vuedraggable";
+import EventCard from "./eventCard.vue";
 
 export default {
   name: "ScheduleCalendar",
@@ -186,6 +196,7 @@ export default {
     ActivityCard,
     HealthDataCard,
     draggable,
+    EventCard,
   },
   props: {
     currentWeek: {

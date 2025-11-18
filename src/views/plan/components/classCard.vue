@@ -126,6 +126,7 @@
             <CycleStageDetails
               :class-data="classItem.classesJson"
               :max-stages="3"
+              type="class"
             />
           </template>
 
@@ -134,6 +135,7 @@
             <RunStageDetails
               :class-data="classItem.classesJson"
               :max-stages="3"
+              type="class"
             />
           </template>
 

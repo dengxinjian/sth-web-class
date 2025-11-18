@@ -48,6 +48,15 @@
                   }`"
                   :event-item="eventItem"
                   :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                  @edit="
+                    $emit(
+                      'edit-event',
+                      eventItem,
+                      eventIndex,
+                      item.weekIndex + 1,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
                   @delete="
                     handleDeleteEvent(
                       eventItem,
@@ -69,6 +78,7 @@
                     name: 'plan-classes',
                     put: true,
                   }"
+                  :animation="150"
                   :force-fallback="true"
                   :fallback-on-body="true"
                   :fallback-tolerance="10"
@@ -887,7 +897,11 @@ export default {
       // 查找该天的数据对象
       const dayData = week.find((item) => item && item.day === globalDay);
 
-      if (!dayData || !dayData.competitionDtoList || !Array.isArray(dayData.competitionDtoList)) {
+      if (
+        !dayData ||
+        !dayData.competitionDtoList ||
+        !Array.isArray(dayData.competitionDtoList)
+      ) {
         return [];
       }
       console.log(dayData.competitionDtoList, "dayData.competitionDtoList");
@@ -1036,7 +1050,6 @@ export default {
   background-color: #f9f0ef;
   padding: 10px 0;
   border-bottom: 1px solid #fff;
-  margin-bottom: 10px;
   text-align: center;
 }
 

@@ -6,7 +6,7 @@
       class="stage-item"
     >
       <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
-      <div v-for="(part, idx) in stage.sections" :key="idx">
+      <div v-for="(part, idx) in stage.sections" :key="idx + index">
         <div>{{ part.title }}</div>
         <!-- 模式1: 阈值配速 范围 -->
         <div v-if="classData.mode === 1 && part.range === 'range'">
@@ -150,7 +150,7 @@
   <div v-else>
     <div v-for="(stage, index) in classData.stages" :key="index">
       <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
-      <div v-for="(part, idx) in stage.sections" :key="idx">
+      <div v-for="(part, idx) in stage.sections" :key="idx + index">
         <div>{{ part.title }}</div>
         <div v-if="classData.mode === 1 && part.range === 'range'">
           {{

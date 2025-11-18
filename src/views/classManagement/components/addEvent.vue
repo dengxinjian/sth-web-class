@@ -121,6 +121,10 @@ export default {
       type: Object,
       default: null,
     },
+    isEditMode: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -184,11 +188,6 @@ export default {
       showCustomDistance: false,
     };
   },
-  computed: {
-    isEditMode() {
-      return !!this.eventData && !!this.eventData.id;
-    },
-  },
   watch: {
     visible(val) {
       this.innerVisible = val;
@@ -244,67 +243,51 @@ export default {
       });
     },
     fillFormData(data) {
-      // 回填表单数据
-      this.formData.priority = data.priority || "PRIMARY";
-      this.formData.eventName = data.eventName || "";
+      if (!data) return;
 
-      // 处理比赛类型：如果接口返回的是 displayValue，需要转换为 value
-      let competitionTypeValue = "";
-      if (data.competitionType) {
-        // 先尝试通过 displayValue 查找
-        const foundByDisplayValue = this.competitionTypeOptions.find(
-          (item) => item.displayValue === data.competitionType
-        );
-        if (foundByDisplayValue) {
-          competitionTypeValue = foundByDisplayValue.value;
-        } else {
-          // 如果没有找到，可能是 value 格式，直接使用
-          competitionTypeValue = data.competitionType;
-        }
-      }
-      this.formData.competitionType = competitionTypeValue;
+      // 回填优先级
+      this.formData.priority = this.normalizePriority(data.priority);
 
-      // 处理地点数据（如果是字符串格式，需要转换为数组）
-      if (data.location) {
-        if (typeof data.location === "string") {
-          // 字符串格式，需要根据城市数据找到对应的 value 数组
-          this.formData.location = this.parseLocationString(data.location);
-        } else if (Array.isArray(data.location)) {
-          this.formData.location = data.location;
-        }
+      // 赛事名称
+      this.formData.eventName = data.eventName || data.competitionName || "";
+
+      // 处理地点数据（兼容字符串与数组）
+      const locationValue = data.location || data.competitionLocation;
+      if (typeof locationValue === "string") {
+        this.formData.location = this.parseLocationString(locationValue);
+      } else if (Array.isArray(locationValue)) {
+        this.formData.location = locationValue;
       } else {
         this.formData.location = [];
       }
 
-      // 设置比赛类型后，更新距离选项（不重置距离）
-      if (this.formData.competitionType) {
-        // 更新距离选项
-        if (this.distancesByType[this.formData.competitionType]) {
-          this.distanceOptions = this.distancesByType[
-            this.formData.competitionType
-          ].map((item) => ({
-            label: item.label,
-            value: item.value,
-            displayValue: item.displayValue,
-          }));
-        }
+      // 处理比赛类型：兼容 displayValue / value / 数字
+      this.formData.competitionType = this.normalizeCompetitionType(
+        data.competitionType
+      );
 
-        // 设置距离
-        this.$nextTick(() => {
-          if (data.distance) {
-            this.formData.distance = data.distance;
-            // 如果是自定义距离，设置自定义距离值
-            if (data.distance === "OTHER") {
-              this.showCustomDistance = true;
-              if (data.customDistance) {
-                this.formData.customDistance = data.customDistance;
-              }
-            } else {
-              this.showCustomDistance = false;
-              this.formData.customDistance = "";
-            }
-          }
-        });
+      // 根据比赛类型同步距离下拉
+      if (this.formData.competitionType) {
+        this.updateDistanceOptions(this.formData.competitionType, false);
+      }
+
+      // 处理距离：兼容 displayValue（例如 5km）和 value
+      const distanceValue =
+        this.normalizeDistanceValue(
+          data.distance || data.competitionDistance,
+          this.formData.competitionType
+        ) || "";
+
+      this.formData.distance = distanceValue;
+
+      if (distanceValue === "OTHER") {
+        this.showCustomDistance = true;
+        this.formData.customDistance =
+          data.customDistance ||
+          this.extractDistanceNumber(data.competitionDistance);
+      } else {
+        this.showCustomDistance = false;
+        this.formData.customDistance = "";
       }
     },
     parseLocationString(locationStr) {
@@ -356,15 +339,7 @@ export default {
       this.showCustomDistance = false;
 
       // 根据比赛类型更新距离选项
-      if (value && this.distancesByType[value]) {
-        this.distanceOptions = this.distancesByType[value].map((item) => ({
-          label: item.label,
-          value: item.value,
-          displayValue: item.displayValue,
-        }));
-      } else {
-        this.distanceOptions = [];
-      }
+      this.updateDistanceOptions(value);
     },
     handleDistanceChange(value) {
       // 如果选择的是"其他距离"，显示自定义输入框
@@ -386,6 +361,75 @@ export default {
           this.$refs.eventForm.clearValidate("customDistance");
         });
       }
+    },
+    updateDistanceOptions(value, resetSelection = true) {
+      if (value && this.distancesByType[value]) {
+        this.distanceOptions = this.distancesByType[value].map((item) => ({
+          label: item.label,
+          value: item.value,
+          displayValue: item.displayValue,
+        }));
+      } else {
+        this.distanceOptions = [];
+      }
+      if (resetSelection) {
+        this.formData.distance = "";
+      }
+    },
+    normalizePriority(priority) {
+      if (typeof priority === "number") {
+        if (priority === 1) return "PRIMARY";
+        if (priority === 2) return "SECONDARY";
+        return "FOCUS";
+      }
+      const allowed = ["PRIMARY", "SECONDARY", "FOCUS"];
+      return allowed.includes(priority) ? priority : "PRIMARY";
+    },
+    normalizeCompetitionType(value) {
+      if (!value && value !== 0) return "";
+      const valueStr = String(value);
+
+      // 先通过 value 匹配
+      const foundByValue = this.competitionTypeOptions.find(
+        (item) => String(item.value) === valueStr
+      );
+      if (foundByValue) return foundByValue.value;
+
+      // 再通过 displayValue 匹配
+      const foundByDisplayValue = this.competitionTypeOptions.find(
+        (item) => item.displayValue === value
+      );
+      if (foundByDisplayValue) return foundByDisplayValue.value;
+
+      return value;
+    },
+    normalizeDistanceValue(distance, typeValue) {
+      if (!distance) return "";
+      const valueStr = String(distance);
+
+      // 先尝试通过 value 匹配
+      const foundByValue = this.distanceOptions.find(
+        (item) => String(item.value) === valueStr
+      );
+      if (foundByValue) return foundByValue.value;
+
+      // 通过 displayValue 匹配（如 5km）
+      const foundByDisplay = this.distanceOptions.find(
+        (item) => item.displayValue === valueStr
+      );
+      if (foundByDisplay) return foundByDisplay.value;
+
+      // 如果没有匹配到，但存在具体数值，则使用自定义
+      if (valueStr && typeValue) {
+        return "OTHER";
+      }
+
+      return "";
+    },
+    extractDistanceNumber(distanceStr) {
+      if (!distanceStr) return "";
+      const match = distanceStr.match(/[\d.]+/);
+      return match ? match[0] : "";
     },
     handleCustomDistanceInput() {
       // 自定义距离输入时的处理
