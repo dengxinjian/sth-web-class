@@ -239,4 +239,11 @@ export const competitionApi = {
       requestData: data,
     });
   },
+  // 删除赛事
+  deleteCompetition(id) {
+    return submitData({
+      url: `/api/competition/${id}`,
+      method: "delete",
+    });
+  },
 };

@@ -81,6 +81,10 @@
       @confirm="handleEventConfirm"
       @cancel="handleEventCancel"
     />
+    <CreatePlanCourseDialog
+      v-model="showCreatePlanCourseDialog"
+      @save="handleCreatePlanCourse"
+    />
   </div>
 </template>
 
@@ -96,6 +100,7 @@ import AddClassModal from "../classManagement/components/AddClass/index.vue";
 import EditClassModal from "../classManagement/components/EditClass.vue";
 import { planApi } from "./services/planManagement";
 import AddEvent from "../classManagement/components/addEvent.vue";
+import CreatePlanCourseDialog from "./components/CreatePlanCourseDialog.vue";
 export default {
   name: "PlanView",
   components: {
@@ -107,6 +112,7 @@ export default {
     AddClassModal,
     EditClassModal,
     AddEvent,
+    CreatePlanCourseDialog,
   },
   data() {
     return {
@@ -182,6 +188,8 @@ export default {
       },
       showAddEvent: false,
       currentEventData: {},
+      showCreatePlanCourseDialog: false,
+      CreatePlanCourseDialogData: {},
     };
   },
   mounted() {
@@ -443,6 +451,13 @@ export default {
         run: "RUN",
       };
       this.selectedSportType = Map[sportType.key];
+      this.CreatePlanCourseDialogData = {};
+      this.showCreatePlanCourseDialog = true;
+      // this.showAddClassModal = true;
+    },
+    handleCreatePlanCourse(data) {
+      console.log(data, "data");
+      this.CreatePlanCourseDialogData = data;
       this.showAddClassModal = true;
     },
     /**
