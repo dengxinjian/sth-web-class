@@ -1,238 +1,229 @@
 <template>
   <div class="plan-table-scroll-container">
-    <DynamicScroller
+    <div
       class="schedule-boxes-wrapper plan-table-container"
-      :items="planListWithId"
-      :min-item-size="400"
-      key-field="id"
-      :style="{ height: containerHeight }"
-      :emitUpdate="true"
+      :style="{ height: containerHeight, overflowY: 'auto' }"
     >
-      <template #default="{ item, index, active }">
-        <DynamicScrollerItem :item="item" :active="active" :data-index="index">
-          <div style="display: flex">
-            <div class="schedule-boxes-wrapper-content">
-              <div class="week-header">第 {{ item.weekIndex + 1 }}周</div>
-              <div class="schedule-boxes-container">
-                <div
-                  v-for="(box, boxIndex) in boxes"
-                  :key="boxIndex"
-                  class="schedule-box-item"
-                  :class="{ 'last-item': boxIndex === boxes.length - 1 }"
+      <div
+        v-for="(item, index) in planListWithId"
+        :key="item.id || `week-${index}`"
+        :data-index="index"
+        style="display: flex"
+      >
+        <div class="schedule-boxes-wrapper-content">
+          <div class="week-header">第 {{ item.weekIndex + 1 }}周</div>
+          <div class="schedule-boxes-container">
+            <div
+              v-for="(box, boxIndex) in boxes"
+              :key="boxIndex"
+              class="schedule-box-item"
+              :class="{ 'last-item': boxIndex === boxes.length - 1 }"
+            >
+              <div class="box-header">
+                <div class="box-day-text">
+                  Day {{ item.weekIndex * 7 + boxIndex + 1 }}
+                </div>
+              </div>
+              <div
+                class="box-content-classes js-plan-drag-container"
+                :data-week-index="item.weekIndex"
+                :data-day-index="boxIndex"
+                :data-global-day="item.weekIndex * 7 + boxIndex + 1"
+                @contextmenu.stop.prevent="
+                  showContextMenu(
+                    $event,
+                    item.weekIndex * 7 + boxIndex + 1,
+                    item.weekIndex,
+                    boxIndex
+                  )
+                "
+              >
+                <draggable
+                  :key="`draggable-${item.weekIndex}-${boxIndex}`"
+                  :list="
+                    getDayDetailsArray(
+                      item.weekData,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
+                  :group="{
+                    name: 'plan-classes',
+                    put: true,
+                  }"
+                  :force-fallback="true"
+                  :fallback-on-body="true"
+                  :fallback-tolerance="10"
+                  :scroll="true"
+                  :scroll-sensitivity="80"
+                  :scroll-speed="20"
+                  :empty-insert-threshold="50"
+                  :swap-threshold="0.65"
+                  :invert-swap="false"
+                  :filter="'.js-plan-drag-no-drag .box-content'"
+                  :ghost-class="'is-plan-drag-ghost'"
+                  :chosen-class="'is-plan-drag-chosen'"
+                  :drag-class="'is-plan-drag-drag'"
+                  tag="div"
+                  :emptyInsertThreshold="10"
+                  class="draggable-classes-container"
+                  @start="handleDragStart"
+                  @end="handleDragEnd"
                 >
-                  <div class="box-header">
-                    <div class="box-day-text">
-                      Day {{ item.weekIndex * 7 + boxIndex + 1 }}
-                    </div>
-                  </div>
+                  <EventCard
+                    v-for="(eventItem, eventIndex) in getDayEvents(
+                      item.weekData,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )"
+                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
+                      eventItem.competitionName || eventIndex
+                    }`"
+                    :event-item="eventItem"
+                    :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                    @delete="
+                      handleDeleteEvent(
+                        eventItem,
+                        eventIndex,
+                        item.weekIndex + 1,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )
+                    "
+                  />
+                  <ClassCard
+                    v-for="(classItem, classIndex) in getDayDetailsArray(
+                      item.weekData,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )"
+                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${classIndex}-${
+                      classItem.createTime ||
+                      classItem.classesTitle ||
+                      classItem.id ||
+                      classIndex
+                    }`"
+                    :class-item="classItem"
+                    :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                    :is-dragging="isDragging"
+                    @delete="
+                      handleDeleteClass(
+                        classItem,
+                        classIndex,
+                        item.weekIndex + 1,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )
+                    "
+                    @edit="
+                      handleEditClass(
+                        classItem,
+                        classIndex,
+                        item.weekIndex + 1,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )
+                    "
+                    @copy="handleCopyClass"
+                  />
                   <div
-                    class="box-content-classes"
-                    @contextmenu.stop.prevent="
-                      showContextMenu(
-                        $event,
+                    class="box-content"
+                    :class="{ 'is-dragging': isDragging }"
+                    @click="
+                      handleBoxClick(
                         item.weekIndex * 7 + boxIndex + 1,
-                        item.weekIndex,
-                        boxIndex
+                        item.weekIndex
                       )
                     "
                   >
-                    <EventCard
-                      v-for="(eventItem, eventIndex) in getDayEvents(
-                        item.weekData,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )"
-                      :key="`${
-                        item.weekIndex * 7 + boxIndex + 1
-                      }-${eventIndex}-${
-                        eventItem.competitionName || eventIndex
-                      }`"
-                      :event-item="eventItem"
-                      :date="String(item.weekIndex * 7 + boxIndex + 1)"
-                      @delete="
-                        handleDeleteEvent(
-                          eventItem,
-                          eventIndex,
-                          item.weekIndex + 1,
-                          item.weekIndex * 7 + boxIndex + 1
-                        )
-                      "
-                    />
-                    <draggable
-                      class="js-plan-drag-container"
-                      :list="
-                        getDayClassesArray(
-                          item.weekIndex,
-                          item.weekIndex * 7 + boxIndex + 1
-                        )
-                      "
-                      :group="{ name: 'planDrag', pull: true, put: true }"
-                      :animation="180"
-                      :handle="'.class-drap-handle'"
-                      :force-fallback="true"
-                      :fallback-on-body="true"
-                      :fallback-tolerance="5"
-                      :scroll="true"
-                      :scroll-sensitivity="60"
-                      :scroll-speed="20"
-                      :empty-insert-threshold="50"
-                      :swap-threshold="0.65"
-                      :invert-swap="false"
-                      :filter="'.js-plan-drag-no-drag'"
-                      ghost-class="is-plan-drag-ghost"
-                      chosen-class="is-plan-drag-chosen"
-                      drag-class="is-plan-drag-dragging"
-                      :data-week-index="item.weekIndex"
-                      :data-week-number="item.weekIndex + 1"
-                      :data-day="item.weekIndex * 7 + boxIndex + 1"
-                      @choose="
-                        handleDragChoose($event, item.weekIndex, boxIndex)
-                      "
-                      @add="handleDragAdd($event, item.weekIndex, boxIndex)"
-                      @unchoose="handleDragUnchoose"
-                      @move="handleDragMove"
-                    >
-                      <ClassCard
-                        v-for="(classItem, classIndex) in getDayClasses(
-                          item.weekData,
-                          item.weekIndex * 7 + boxIndex + 1
-                        )"
-                        :key="`${
-                          item.weekIndex * 7 + boxIndex + 1
-                        }-${classIndex}-${
-                          classItem.createTime ||
-                          classItem.classesTitle ||
-                          classIndex
-                        }`"
-                        :class-item="classItem"
-                        :date="String(item.weekIndex * 7 + boxIndex + 1)"
-                        @delete="
-                          handleDeleteClass(
-                            classItem,
-                            classIndex,
-                            item.weekIndex + 1,
-                            item.weekIndex * 7 + boxIndex + 1
-                          )
-                        "
-                        @edit="
-                          handleEditClass(
-                            classItem,
-                            classIndex,
-                            item.weekIndex + 1,
-                            item.weekIndex * 7 + boxIndex + 1
-                          )
-                        "
-                        @copy="handleCopyClass"
-                      />
-                    </draggable>
-                    <div
-                      class="box-content"
-                      @click="
-                        handleBoxClick(
-                          item.weekIndex * 7 + boxIndex + 1,
-                          item.weekIndex
-                        )
-                      "
-                    >
-                      <div class="box-plus-circle">
-                        <div class="box-plus">+</div>
-                      </div>
+                    <div class="box-plus-circle">
+                      <div class="box-plus">+</div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <div class="schedule-boxes-wrapper-content-right">
-              <div class="activity-item">
-                <div class="activity">
-                  <span class="label">STH:</span>
-                  <span class="value">{{
-                    getweekSth(item.weekIndex) || "--"
-                  }}</span>
-                </div>
-                <div class="activity">
-                  <span class="label">时长/距离:</span>
-                  <span class="value"
-                    >{{
-                      secondsToHHMMSS(getweekDuration(item.weekIndex)) ===
-                      "00:00:00"
-                        ? "--:--:--"
-                        : secondsToHHMMSS(getweekDuration(item.weekIndex))
-                    }}
-                    / {{ getweekDistance(item.weekIndex) || "--" }}km</span
-                  >
-                </div>
-                <div class="activity">
-                  <span class="label">游泳时长/距离:</span>
-                  <span class="value"
-                    >{{
-                      secondsToHHMMSS(
-                        getweekSwimmingDuration(item.weekIndex)
-                      ) === "00:00:00"
-                        ? "--:--:--"
-                        : secondsToHHMMSS(
-                            getweekSwimmingDuration(item.weekIndex)
-                          )
-                    }}
-                    /
-                    {{
-                      getweekSwimmingDistance(item.weekIndex) > 1000
-                        ? getweekSwimmingDistance(item.weekIndex) / 1000 || "--"
-                        : getweekSwimmingDistance(item.weekIndex) || "--"
-                    }}{{
-                      getweekSwimmingDistance(item.weekIndex) > 1000
-                        ? "km"
-                        : "m"
-                    }}</span
-                  >
-                </div>
-                <div class="activity">
-                  <span class="label">骑行时长/距离:</span>
-                  <span class="value"
-                    >{{
-                      secondsToHHMMSS(getweekCycleDuration(item.weekIndex)) ===
-                      "00:00:00"
-                        ? "--:--:--"
-                        : secondsToHHMMSS(getweekCycleDuration(item.weekIndex))
-                    }}
-                    / {{ getweekCycleDistance(item.weekIndex) || "--" }}km</span
-                  >
-                </div>
-                <div class="activity">
-                  <span class="label">跑步时长/距离:</span>
-                  <span class="value"
-                    >{{
-                      secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ||
-                      "00:00:00"
-                        ? "--:--:--"
-                        : secondsToHHMMSS(getweekRunDuration(item.weekIndex))
-                    }}
-                    / {{ getweekRunDistance(item.weekIndex) || "--" }}km</span
-                  >
-                </div>
-                <div class="activity">
-                  <span class="label">力量时长:</span>
-                  <span class="value">{{
-                    secondsToHHMMSS(getweekPowerDuration(item.weekIndex)) ===
-                    "00:00:00"
-                      ? "--:--:--"
-                      : secondsToHHMMSS(getweekPowerDuration(item.weekIndex))
-                  }}</span>
-                </div>
-                <div class="activity">
-                  <span class="label">其他时长:</span>
-                  <span class="value">{{
-                    secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ||
-                    "00:00:00"
-                      ? "--:--:--"
-                      : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
-                  }}</span>
-                </div>
+                </draggable>
               </div>
             </div>
           </div>
-        </DynamicScrollerItem>
-      </template>
-    </DynamicScroller>
+        </div>
+        <div class="schedule-boxes-wrapper-content-right">
+          <div class="activity-item">
+            <div class="activity">
+              <span class="label">STH:</span>
+              <span class="value">{{
+                getweekSth(item.weekIndex) || "--"
+              }}</span>
+            </div>
+            <div class="activity">
+              <span class="label">时长/距离:</span>
+              <span class="value"
+                >{{
+                  secondsToHHMMSS(getweekDuration(item.weekIndex)) ===
+                  "00:00:00"
+                    ? "--:--:--"
+                    : secondsToHHMMSS(getweekDuration(item.weekIndex))
+                }}
+                / {{ getweekDistance(item.weekIndex) || "--" }}km</span
+              >
+            </div>
+            <div class="activity">
+              <span class="label">游泳时长/距离:</span>
+              <span class="value"
+                >{{
+                  secondsToHHMMSS(getweekSwimmingDuration(item.weekIndex)) ===
+                  "00:00:00"
+                    ? "--:--:--"
+                    : secondsToHHMMSS(getweekSwimmingDuration(item.weekIndex))
+                }}
+                /
+                {{
+                  getweekSwimmingDistance(item.weekIndex) > 1000
+                    ? getweekSwimmingDistance(item.weekIndex) / 1000 || "--"
+                    : getweekSwimmingDistance(item.weekIndex) || "--"
+                }}{{
+                  getweekSwimmingDistance(item.weekIndex) > 1000 ? "km" : "m"
+                }}</span
+              >
+            </div>
+            <div class="activity">
+              <span class="label">骑行时长/距离:</span>
+              <span class="value"
+                >{{
+                  secondsToHHMMSS(getweekCycleDuration(item.weekIndex)) ===
+                  "00:00:00"
+                    ? "--:--:--"
+                    : secondsToHHMMSS(getweekCycleDuration(item.weekIndex))
+                }}
+                / {{ getweekCycleDistance(item.weekIndex) || "--" }}km</span
+              >
+            </div>
+            <div class="activity">
+              <span class="label">跑步时长/距离:</span>
+              <span class="value"
+                >{{
+                  secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ||
+                  "00:00:00"
+                    ? "--:--:--"
+                    : secondsToHHMMSS(getweekRunDuration(item.weekIndex))
+                }}
+                / {{ getweekRunDistance(item.weekIndex) || "--" }}km</span
+              >
+            </div>
+            <div class="activity">
+              <span class="label">力量时长:</span>
+              <span class="value">{{
+                secondsToHHMMSS(getweekPowerDuration(item.weekIndex)) ===
+                "00:00:00"
+                  ? "--:--:--"
+                  : secondsToHHMMSS(getweekPowerDuration(item.weekIndex))
+              }}</span>
+            </div>
+            <div class="activity">
+              <span class="label">其他时长:</span>
+              <span class="value">{{
+                secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ||
+                "00:00:00"
+                  ? "--:--:--"
+                  : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <transition name="context-menu-fade">
       <div
         v-if="contextMenuVisible && hasCopiedClass"
@@ -256,16 +247,12 @@
 <script>
 import ClassCard from "./classCard.vue";
 import EventCard from "../../classManagement/components/eventCard.vue";
-import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
-import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 import draggable from "vuedraggable";
 import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils/index";
 export default {
   name: "ScheduleBoxes",
   components: {
     ClassCard,
-    DynamicScroller,
-    DynamicScrollerItem,
     draggable,
     EventCard,
   },
@@ -297,6 +284,11 @@ export default {
       containerHeight: "600px",
       lastUpdateStart: null,
       dragSourceInfo: null, // 保存拖拽源信息
+      draggingClass: null, // 当前拖拽的课程
+      dragSourceWeekIndex: null, // 拖拽源周索引
+      dragSourceGlobalDay: null, // 拖拽源全局天数
+      dragSourceClassIndex: null, // 拖拽源课程索引
+      isDragging: false, // 是否正在拖动
     };
   },
   computed: {
@@ -311,11 +303,51 @@ export default {
      * RecycleScroller 需要每个 item 有唯一的 key 字段
      */
     planListWithId() {
-      return this.planList.map((week, index) => ({
-        id: `week-${index}`,
-        weekIndex: index,
-        weekData: week,
-      }));
+      // 处理 planList，确保每个周都有正确的数据结构
+      const data = this.planList.map((week, index) => {
+        // 如果周是空数组或未定义，初始化为空数组
+        const weekData = Array.isArray(week) ? week : [];
+
+        return {
+          id: `week-${index}`,
+          weekIndex: index,
+          weekData: weekData,
+        };
+      });
+
+      // 处理 classesJson，确保它是对象格式
+      data.forEach((item) => {
+        // weekData 是天的数组，可能为空数组 []
+        if (item.weekData && Array.isArray(item.weekData)) {
+          item.weekData.forEach((day) => {
+            // day 可能没有 details 属性（新增的天）
+            if (day && day.details && Array.isArray(day.details)) {
+              day.details.forEach((classItem) => {
+                if (classItem && classItem.classesJson) {
+                  // 如果 classesJson 是字符串，解析为对象
+                  if (typeof classItem.classesJson === "string") {
+                    try {
+                      classItem.classesJson = JSON.parse(classItem.classesJson);
+                    } catch (error) {
+                      console.error(
+                        "planListWithId: JSON parse error",
+                        error,
+                        classItem.classesJson
+                      );
+                      // 解析失败时设置为空对象
+                      classItem.classesJson = {};
+                    }
+                  }
+                  // 如果已经是对象，保持不变
+                }
+              });
+            }
+            // 如果 day 没有 details，保持原样（会在 getDayDetailsArray 中处理）
+          });
+        }
+        // 如果 weekData 是空数组，保持原样（会显示空的 7 天容器）
+      });
+      return data;
     },
   },
   mounted() {
@@ -752,180 +784,40 @@ export default {
         );
       }, 0);
     },
-    handleDragChoose(evt, weekIndex, boxIndex) {
-      // 拖拽开始时的处理
-      // 保存拖拽源信息，用于后续处理
-      console.log(evt, "evt");
-      if (evt && evt.item) {
-        const itemEl = evt.item;
-        const fromEl = evt.from;
-        this.dragSourceInfo = {
-          weekIndex: fromEl ? parseNumber(fromEl.dataset.weekIndex) : null,
-          day: fromEl ? parseNumber(fromEl.dataset.day) : null,
-          index: typeof evt.oldIndex === "number" ? evt.oldIndex : null,
-          isClone: evt.pullMode === "clone",
-          sourceItem: itemEl, // 保存源 DOM 元素引用
-          sourceContainer: fromEl, // 保存源容器引用
+    /**
+     * 获取指定天的课程数组引用（用于 vuedraggable）
+     * @param {Array} weekData - 周数据数组
+     * @param {Number} globalDay - 全局天数
+     * @returns {Array} 课程数组引用
+     */
+    getDayDetailsArray(weekData, globalDay) {
+      if (!weekData || !Array.isArray(weekData)) {
+        return [];
+      }
+
+      // 查找该天的数据对象
+      let dayData = weekData.find((item) => item && item.day === globalDay);
+
+      if (!dayData) {
+        // 如果不存在，创建一个新的，使用 Vue.set 确保响应式
+        dayData = {
+          day: globalDay,
+          details: [],
         };
+        // 使用 $set 确保响应式
+        const index = weekData.length;
+        this.$set(weekData, index, dayData);
       }
+
+      // 确保 details 是数组且是响应式的
+      if (!Array.isArray(dayData.details)) {
+        this.$set(dayData, "details", []);
+      }
+
+      // 返回数组引用，确保 vuedraggable 可以正确追踪
+      // 这个引用是稳定的，因为 dayData 对象是响应式的
+      return dayData.details;
     },
-    handleDragUnchoose() {
-      // 拖拽取消时的处理
-      this.dragSourceInfo = null;
-    },
-    handleDragAdd(evt, weekIndex, boxIndex) {
-      // 计算目标天的全局天数
-      const targetGlobalDay = weekIndex * 7 + boxIndex + 1;
-
-      // 如果没有拖拽源信息，说明可能是从外部拖入（如从课程库），直接触发事件
-      if (!this.dragSourceInfo) {
-        this.$emit("plan-item-move", {
-          evt,
-          targetWeekIndex: weekIndex,
-          targetDay: targetGlobalDay,
-          targetIndex: evt.newIndex,
-        });
-        return;
-      }
-
-      const sourceInfo = this.dragSourceInfo;
-      const sourceWeekIndex = sourceInfo.weekIndex;
-      const sourceDay = sourceInfo.day;
-      const sourceIndex = sourceInfo.index;
-      const isClone = sourceInfo.isClone;
-
-      // 检查是否是跨周拖拽
-      const isCrossWeek =
-        sourceWeekIndex !== null && sourceWeekIndex !== weekIndex;
-      // 检查是否是跨天拖拽（即使是同一周，不同天之间也是跨数组操作）
-      const isCrossDay = sourceDay !== null && sourceDay !== targetGlobalDay;
-
-      // 如果是跨数组拖拽（跨周或跨天）且不是克隆模式，需要从源位置删除
-      // 注意：vuedraggable 已经将数据添加到目标数组，但不会自动从源数组删除（因为是不同的数组引用）
-      if (
-        (isCrossWeek || isCrossDay) &&
-        !isClone &&
-        sourceWeekIndex !== null &&
-        sourceDay !== null &&
-        sourceIndex !== null
-      ) {
-        // 先移除源位置的 DOM 元素（如果还存在）
-        const sourceItem = sourceInfo.sourceItem;
-        const sourceContainer = sourceInfo.sourceContainer;
-
-        if (sourceItem && sourceContainer) {
-          // 检查源元素是否还在源容器中（可能已经被 vuedraggable 移动了）
-          if (sourceContainer.contains(sourceItem) && sourceItem.parentNode) {
-            try {
-              sourceItem.parentNode.removeChild(sourceItem);
-            } catch (error) {
-              console.warn("移除源 DOM 元素失败:", error);
-            }
-          }
-        }
-
-        // 使用 nextTick 确保 vuedraggable 完成 DOM 更新后再删除源数据
-        this.$nextTick(() => {
-          // 获取源周的数据
-          const sourceWeek = this.planList[sourceWeekIndex];
-          if (sourceWeek && Array.isArray(sourceWeek)) {
-            // 查找源天的数据对象
-            const sourceDayData = sourceWeek.find(
-              (item) => item && item.day === sourceDay
-            );
-
-            if (sourceDayData && Array.isArray(sourceDayData.details)) {
-              // 从源位置删除课程
-              // 注意：由于 vuedraggable 可能已经修改了数组，我们需要确保删除正确的索引
-              // 如果源索引仍然有效，则删除
-              if (
-                sourceIndex >= 0 &&
-                sourceIndex < sourceDayData.details.length
-              ) {
-                // Vue 2 会自动检测数组的 splice 操作，触发响应式更新
-                sourceDayData.details.splice(sourceIndex, 1);
-
-                // 如果删除后该天的 details 数组为空，可以选择删除该天的数据对象
-                // 但是需要检查是否有 events 数据，如果有则保留 dayData 对象
-                if (sourceDayData.details.length === 0) {
-                  // 检查是否有 events 数据
-                  const hasEvents =
-                    sourceDayData.events &&
-                    Array.isArray(sourceDayData.events) &&
-                    sourceDayData.events.length > 0;
-
-                  // 只有当没有 events 数据时才删除整个 dayData 对象
-                  if (!hasEvents) {
-                    const dayIndex = sourceWeek.findIndex(
-                      (item) => item && item.day === sourceDay
-                    );
-                    if (dayIndex !== -1) {
-                      sourceWeek.splice(dayIndex, 1);
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          // 再次尝试移除源位置的 DOM 元素（确保清理）
-          if (sourceContainer) {
-            // 查找源容器中对应索引的 ClassCard 元素
-            const sourceCards = sourceContainer.querySelectorAll(
-              ".plan-class-card-wrapper"
-            );
-            if (sourceCards.length > sourceIndex && sourceCards[sourceIndex]) {
-              try {
-                const cardToRemove = sourceCards[sourceIndex];
-                if (cardToRemove.parentNode) {
-                  cardToRemove.parentNode.removeChild(cardToRemove);
-                }
-              } catch (error) {
-                console.warn("移除源 DOM 元素失败:", error);
-              }
-            }
-          }
-
-          // 强制更新视图，确保删除操作被正确反映
-          this.$forceUpdate();
-        });
-      }
-
-      // 获取被拖拽的课程项（vuedraggable 已经添加到目标数组）
-      const targetWeek = this.planList[weekIndex];
-      let movedClassItem = null;
-      if (targetWeek && Array.isArray(targetWeek)) {
-        const targetDayData = targetWeek.find(
-          (item) => item && item.day === targetGlobalDay
-        );
-        if (
-          targetDayData &&
-          Array.isArray(targetDayData.details) &&
-          evt.newIndex !== undefined
-        ) {
-          movedClassItem = targetDayData.details[evt.newIndex];
-        }
-      }
-
-      // 触发事件，通知父组件
-      this.$emit("plan-item-move", {
-        evt,
-        sourceWeekIndex,
-        sourceDay,
-        sourceIndex,
-        targetWeekIndex: weekIndex,
-        targetDay: targetGlobalDay,
-        targetIndex: evt.newIndex,
-        isClone,
-        isCrossWeek,
-        isCrossDay,
-        movedClassItem,
-      });
-
-      // 清除拖拽源信息
-      this.dragSourceInfo = null;
-    },
-
     /**
      * 计算容器高度
      * 根据视口高度减去头部高度来计算
@@ -941,52 +833,7 @@ export default {
       // 最小高度为400px
       this.containerHeight = `${Math.max(400, availableHeight)}px`;
     },
-    /**
-     * 获取指定天的课程数组引用（用于 vuedraggable）
-     * @param {Number} weekIndex - 周索引
-     * @param {Number} globalDay - 全局天数
-     * @returns {Array} 课程数组引用
-     */
-    getDayClassesArray(weekIndex, globalDay) {
-      const week = this.planList[weekIndex];
-      if (!Array.isArray(week)) {
-        return [];
-      }
 
-      // 查找该天的数据对象
-      let dayData = week.find((item) => item && item.day === globalDay);
-
-      if (!dayData) {
-        // 如果不存在，创建一个新的
-        dayData = {
-          day: globalDay,
-          details: [],
-        };
-        week.push(dayData);
-      }
-
-      if (!Array.isArray(dayData.details)) {
-        this.$set(dayData, "details", []);
-      }
-
-      // 处理每个课程，解析 classesJson 字符串为对象
-      dayData.details.forEach((classItem) => {
-        if (typeof classItem.classesJson === "string") {
-          try {
-            classItem.classesJson = JSON.parse(classItem.classesJson);
-          } catch (error) {
-            console.error(
-              "解析 classesJson 失败:",
-              error,
-              classItem.classesJson
-            );
-            classItem.classesJson = {};
-          }
-        }
-      });
-
-      return dayData.details;
-    },
     /**
      * 获取指定天的课程列表
      * @param {Array} week - 周数据数组
@@ -1103,37 +950,39 @@ export default {
         duration: 2000,
       });
     },
-    handleDragMove(evt) {
-      // 处理拖拽移动事件，确保空容器也能接收拖拽
-      // 返回 true 允许移动，返回 false 阻止移动
-      try {
-        // 检查目标容器是否存在且有效
-        if (evt && evt.to) {
-          // 确保目标容器有有效的 Sortable 实例
-          const sortableInstance = evt.to.sortableInstance;
-          if (sortableInstance && sortableInstance.options) {
-            return true;
-          }
-          // 即使没有实例，也允许移动（vuedraggable 会自动处理）
-          return true;
-        }
-        return false;
-      } catch (error) {
-        // 如果出现错误，允许移动以避免阻塞拖拽功能
-        console.warn("拖拽移动事件处理出错:", error);
-        return true;
-      }
+
+    /**
+     * 拖拽变化事件（包括克隆元素的添加）
+     */
+    handleDragChange(evt) {
+      // 当克隆元素被添加到目标容器时，可以在这里处理
+      // 由于不再使用虚拟滚动，不需要特殊处理
+    },
+    /**
+     * 拖拽移除（从源容器移除时）
+     */
+    handleDragRemove(evt) {
+      // 由于使用了 pull: 'clone'，源数组不会被自动删除
+      // 删除操作已经在 handleDragAdd 中手动处理了
+      // 这里只需要清理克隆对象（如果有的话）
+      // 实际上，由于我们已经在 handleDragAdd 中手动删除了源对象
+      // 这个事件可能不会触发，或者触发时源对象已经被删除了
+      // 所以这里可以什么都不做
+    },
+    /**
+     * 拖拽开始事件
+     */
+    handleDragStart(evt) {
+      this.isDragging = true;
+    },
+    /**
+     * 拖拽结束事件
+     */
+    handleDragEnd(evt) {
+      this.isDragging = false;
     },
   },
 };
-
-function parseNumber(value) {
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? null : parsed;
-}
 </script>
 
 <style scoped lang="scss">
@@ -1238,8 +1087,9 @@ function parseNumber(value) {
     width: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    min-height: 50px;
     background-color: #fff;
+    position: relative;
   }
 
   .box-content {
@@ -1255,7 +1105,7 @@ function parseNumber(value) {
     opacity: 0;
     margin-bottom: 60px;
 
-    &:hover {
+    &:hover:not(.is-dragging) {
       opacity: 1;
       .box-plus-circle {
         border-color: #bc362e;
@@ -1268,6 +1118,10 @@ function parseNumber(value) {
 
     &:active {
       opacity: 0.8;
+    }
+
+    &.is-dragging {
+      pointer-events: none;
     }
 
     .box-plus-circle {
@@ -1289,8 +1143,23 @@ function parseNumber(value) {
   transform: scale(0.98);
 }
 
+::v-deep .is-plan-drag-chosen {
+  opacity: 0.8;
+}
+
+::v-deep .is-plan-drag-drag {
+  opacity: 0.8;
+  transform: rotate(2deg);
+}
+
+::v-deep .is-plan-dragging {
+  opacity: 0.6;
+  cursor: grabbing !important;
+}
+
 ::v-deep .js-plan-drag-container {
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 50px;
 }
 
 ::v-deep .js-plan-drag-container.is-plan-drop-target {
@@ -1300,6 +1169,21 @@ function parseNumber(value) {
 ::v-deep .js-plan-drag-container.is-plan-drop-active {
   background-color: rgba(64, 158, 255, 0.16);
   box-shadow: inset 0 0 0 2px rgba(64, 158, 255, 0.25);
+}
+
+::v-deep .draggable-classes-container {
+  min-height: 50px;
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+::v-deep .class-drap-handle {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 .context-menu {
   position: fixed;
