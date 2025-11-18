@@ -66,6 +66,8 @@
                   tag="div"
                   :emptyInsertThreshold="10"
                   class="draggable-classes-container"
+                  @start="handleDragStart"
+                  @end="handleDragEnd"
                 >
                   <EventCard
                     v-for="(eventItem, eventIndex) in getDayEvents(
@@ -99,6 +101,7 @@
                     }`"
                     :class-item="classItem"
                     :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                    :is-dragging="isDragging"
                     @delete="
                       handleDeleteClass(
                         classItem,
@@ -119,6 +122,7 @@
                   />
                   <div
                     class="box-content"
+                    :class="{ 'is-dragging': isDragging }"
                     @click="
                       handleBoxClick(
                         item.weekIndex * 7 + boxIndex + 1,
@@ -284,6 +288,7 @@ export default {
       dragSourceWeekIndex: null, // 拖拽源周索引
       dragSourceGlobalDay: null, // 拖拽源全局天数
       dragSourceClassIndex: null, // 拖拽源课程索引
+      isDragging: false, // 是否正在拖动
     };
   },
   computed: {
@@ -964,6 +969,18 @@ export default {
       // 这个事件可能不会触发，或者触发时源对象已经被删除了
       // 所以这里可以什么都不做
     },
+    /**
+     * 拖拽开始事件
+     */
+    handleDragStart(evt) {
+      this.isDragging = true;
+    },
+    /**
+     * 拖拽结束事件
+     */
+    handleDragEnd(evt) {
+      this.isDragging = false;
+    },
   },
 };
 </script>
@@ -1088,7 +1105,7 @@ export default {
     opacity: 0;
     margin-bottom: 60px;
 
-    &:hover {
+    &:hover:not(.is-dragging) {
       opacity: 1;
       .box-plus-circle {
         border-color: #bc362e;
@@ -1101,6 +1118,10 @@ export default {
 
     &:active {
       opacity: 0.8;
+    }
+
+    &.is-dragging {
+      pointer-events: none;
     }
 
     .box-plus-circle {
