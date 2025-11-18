@@ -106,41 +106,19 @@
                 :date="item.commonDate"
                 @click="$emit('view-health-data', $event)"
               />
-              <draggable
-                class="js-class-drag-container"
-                :list="item.classSchedule"
-                :group="{ name: 'classDrag', pull: true, put: true }"
-                :animation="180"
-                :handle="'.class-drap-handle'"
-                :force-fallback="true"
-                :fallback-on-body="true"
-                :fallback-tolerance="5"
-                :scroll="true"
-                :scroll-sensitivity="60"
-                :scroll-speed="20"
-                :empty-insert-threshold="50"
-                :swap-threshold="0.65"
-                :invert-swap="false"
-                ghost-class="is-class-drag-ghost"
-                chosen-class="is-class-drag-chosen"
-                drag-class="is-class-drag-dragging"
-                :data-day="item.commonDate"
-                @move="handleDragMove"
-              >
-                <!-- 课表卡片 -->
-                <ScheduleClassCard
-                  v-for="classItem in item.classSchedule"
-                  :key="`class-${item.commonDate}-${classItem.id}`"
-                  :class-item="classItem"
-                  :date="item.commonDate"
-                  @click="$emit('class-detail', classItem, classItem.sportType)"
-                  @delete="$emit('delete-schedule', $event)"
-                  @device-click="handleDeviceClick"
-                  @edit="$emit('edit-schedule', $event)"
-                  @copy="handleCopyClass"
-                />
-              </draggable>
 
+              <!-- 课表卡片 -->
+              <ScheduleClassCard
+                v-for="classItem in item.classSchedule"
+                :key="`class-${item.commonDate}-${classItem.id}`"
+                :class-item="classItem"
+                :date="item.commonDate"
+                @click="$emit('class-detail', classItem, classItem.sportType)"
+                @delete="$emit('delete-schedule', $event)"
+                @device-click="handleDeviceClick"
+                @edit="$emit('edit-schedule', $event)"
+                @copy="handleCopyClass"
+              />
               <!-- 运动记录卡片 -->
               <ActivityCard
                 v-for="activityItem in item.activityList"

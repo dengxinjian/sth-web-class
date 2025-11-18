@@ -217,16 +217,16 @@ export default {
         dayData = {
           day: globalDay,
           details: [],
-          events: [],
+          competitionDtoList: [],
         };
         this.planData.dayDetails[weekIndex].push(dayData);
       }
-      // 确保 events 数组存在
-      if (!dayData.events) {
-        this.$set(dayData, "events", []);
+      // 确保 competitionDtoList 数组存在
+      if (!dayData.competitionDtoList) {
+        this.$set(dayData, "competitionDtoList", []);
       }
       // 添加课程到 details 数组
-      dayData.events.push(data);
+      dayData.competitionDtoList.push(data);
       console.log(this.planData, "this.planData");
       // 触发响应式更新
       this.$forceUpdate();
@@ -252,11 +252,12 @@ export default {
       const planList = [];
       dayDetails.forEach((item) => {
         item.forEach((week) => {
-          if (week.details.length > 0) {
+          if (week.details.length > 0 || week.competitionDtoList) {
             planList.push(week);
           }
         });
       });
+      console.log(planList, "planList");
       planList.forEach((item) => {
         item.details.forEach((day) => {
           day.classesJson = JSON.stringify(day.classesJson);
@@ -472,7 +473,7 @@ export default {
         dayData = {
           day: globalDay,
           details: [],
-          events: [],
+          competitionDtoList: [],
         };
         this.planData.dayDetails[weekIndex].push(dayData);
       }
@@ -700,7 +701,7 @@ export default {
           (item) => item.day === globalDay
         );
         if (dayData) {
-          dayData.events.splice(eventIndex, 1);
+          dayData.competitionDtoList.splice(eventIndex, 1);
         }
         this.$forceUpdate();
         this.$message.success("删除成功");
