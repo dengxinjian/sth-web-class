@@ -354,10 +354,14 @@ export default {
         });
       });
     },
-    handleClick() {
+    handleClick(event) {
       this.hideContextMenu();
       if (this.type === "view") {
-        this.$emit("view-class", this.classItem);
+        const clickPosition = {
+          clientX: event.clientX,
+          clientY: event.clientY,
+        };
+        this.$emit("view-class", this.classItem, clickPosition);
       }
     },
     hideContextMenu() {

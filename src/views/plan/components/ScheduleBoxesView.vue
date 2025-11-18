@@ -99,14 +99,15 @@
                         @copy="handleCopyClass"
                         type="view"
                         @view-class="
-                          handleCardClick(
-                            $event,
+                          (classItemData, clickPosition) => handleCardClick(
+                            classItemData,
                             classItem,
                             classIndex,
                             item.weekIndex,
                             item.weekIndex + 1,
                             item.weekIndex * 7 + boxIndex + 1,
-                            boxIndex
+                            boxIndex,
+                            clickPosition
                           )
                         "
                       />
@@ -1061,7 +1062,7 @@ export default {
      * @param {Number} globalDay - 全局天数（1-28）
      * @param {Number} boxIndex - 盒子索引（0-6）
      */
-    handleCardClick(eventClassItem, classItem, classIndex, weekIndex, weekNumber, globalDay, boxIndex) {
+    handleCardClick(eventClassItem, classItem, classIndex, weekIndex, weekNumber, globalDay, boxIndex, clickPosition) {
       // 使用从事件中传递过来的classItem，确保数据是最新的
       const finalClassItem = eventClassItem || classItem;
       const cardInfo = {
@@ -1071,6 +1072,7 @@ export default {
         weekNumber, // 周数（从1开始）
         globalDay, // 全局天数（1-28）
         boxIndex, // 盒子索引（0-6）
+        clickPosition, // 点击位置
       };
       console.log("点击的ClassCard信息:", cardInfo);
       // 触发事件，传递完整的card信息
@@ -1137,6 +1139,7 @@ function parseNumber(value) {
 .week-header {
   width: 100%;
   background-color: #f9f0ef;
+  // background-color: #fff !important;
   padding: 10px 0;
   border-bottom: 1px solid #fff;
   margin-bottom: 10px;
@@ -1157,6 +1160,7 @@ function parseNumber(value) {
   border-left: 1px solid #e5e5e5;
   border-right: 1px solid #e5e5e5;
   background-color: #f8f8f8;
+  // background-color: #fff !important;
   min-height: 200px;
   margin-bottom: 10px;
   display: flex;
@@ -1170,7 +1174,8 @@ function parseNumber(value) {
     flex-direction: column;
     align-items: center;
     border-bottom: 1px solid #e5e5e5;
-    background-color: #f5f5f5;
+    // background-color: #f5f5f5;
+    background-color: #fff !important;
 
     .box-day-text {
       font-size: 14px;
@@ -1178,6 +1183,7 @@ function parseNumber(value) {
       font-weight: 600;
       margin-bottom: 8px;
       text-align: center;
+      background-color: #fff !important;
     }
 
     .box-divider {
@@ -1192,6 +1198,7 @@ function parseNumber(value) {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    background-color: #fff !important;
   }
 
   .box-content {

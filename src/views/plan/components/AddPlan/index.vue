@@ -61,7 +61,11 @@
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
-        <el-input placeholder="请输入邮箱" v-model="form.email" />
+        <el-input
+          placeholder="请输入邮箱"
+          v-model="form.email"
+          @blur="validateEmail"
+        />
       </el-form-item>
 
       <el-form-item label="微信号" prop="weChat">
@@ -113,6 +117,24 @@ export default {
           { required: true, message: "请选择分组", trigger: "change" },
         ],
         teamId: [{ required: true, message: "请选择团队", trigger: "change" }],
+        email: [
+          {
+            validator: (rule, value, callback) => {
+              if (!value) {
+                // 邮箱为可选，如果为空则不校验
+                callback();
+                return;
+              }
+              const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+              if (!emailRegex.test(value)) {
+                callback(new Error("请输入正确的邮箱地址"));
+              } else {
+                callback();
+              }
+            },
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       groups: [],
       teams: [],
@@ -154,6 +176,10 @@ export default {
     },
   },
   methods: {
+    validateEmail() {
+      // 手动触发表单校验
+      this.$refs.formRef && this.$refs.formRef.validateField("email");
+    },
     getGroupList() {
       getData({
         url: "/api/planClassesGroup/option",

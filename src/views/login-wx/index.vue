@@ -45,30 +45,36 @@
           />
           <span v-else>ELITE</span>
         </div>
-        <div
+        <!-- <div
           id="wx-login-container"
           :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
-        >
-          <!-- 扫码成功状态 -->
-          <div v-if="hasCode" class="login-success">
+        > -->
+        <!-- 扫码成功状态 -->
+        <!-- <div v-if="hasCode" class="login-success">
             <div class="success-icon">✓</div>
             <div class="success-text">扫码成功</div>
             <div class="success-subtitle">正在跳转...</div>
-          </div>
-          <!-- 加载状态 -->
-          <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
+          </div> -->
+        <!-- 加载状态 -->
+        <!-- <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
             <div class="loading-spinner"></div>
             <div class="loading-text">正在加载二维码...</div>
-          </div>
-          <!-- 错误状态 -->
-          <div v-else-if="wxLoginStatus === 'error'" class="login-error">
+          </div> -->
+        <!-- 错误状态 -->
+        <!-- <div v-else-if="wxLoginStatus === 'error'" class="login-error">
             <div class="error-icon">✗</div>
             <div class="error-text">加载失败</div>
             <div class="error-subtitle">请刷新重试</div>
           </div>
+        </div> -->
+        <div
+          id="wx-login-container"
+          :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
+        >
+          <img class="qrcode-img" :src="qrcodeUrl" alt="扫码二维码" />
         </div>
         <div v-if="!isAgreement" class="wx-login-cover"></div>
-        <div style="margin-bottom: 10px">
+        <div style="margin-bottom: 20px">
           <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
             <el-radio label="1">运动员</el-radio>
             <el-radio label="2">教练</el-radio>
@@ -113,6 +119,7 @@
 </template>
 
 <script>
+import { setToken } from "@/utils/auth";
 import { getData, submitData } from "@/api/common";
 export default {
   name: "LoginWx",
@@ -131,18 +138,137 @@ export default {
       wxLoginStatus: "loading", // 微信登录状态：loading, success, error
       isAgreement: false, // 是否同意用户协议
       loginType: "1", // 登录类型：1-运动员，2-教练
+      qrcodeUrl: "",
+      sceneId: "",
+      pollTimer: null, // 轮询定时器
+      POLL_INTERVAL: 2000, // 轮询间隔：2秒
     };
   },
   mounted() {
-    this.checkUrlParams();
-    this.initSlider();
+    this.getScanQrCode();
+    // this.checkUrlParams();
+    // this.initSlider();
     this.loginType = localStorage.getItem("loginType") || "1";
     localStorage.setItem("loginType", this.loginType);
   },
   beforeDestroy() {
     clearInterval(this.carouselTimer);
+    this.clearPollTimer();
   },
   methods: {
+    /**
+     * 启动扫码结果轮询定时器
+     */
+    startPolling() {
+      this.clearPollTimer();
+      if (!this.sceneId) {
+        console.warn("sceneId 为空，无法启动轮询");
+        return;
+      }
+      // 使用递归的 setTimeout 实现轮询，避免定时器类型不匹配问题
+      const poll = () => {
+        this.pollTimer = setTimeout(async () => {
+          await this.checkLoginResult();
+          // 如果轮询还在进行（未登录成功），继续下一次轮询
+          if (this.pollTimer) {
+            poll();
+          }
+        }, this.POLL_INTERVAL);
+      };
+      poll();
+    },
+    /**
+     * 清除扫码结果轮询定时器
+     */
+    clearPollTimer() {
+      if (this.pollTimer) {
+        clearTimeout(this.pollTimer);
+        this.pollTimer = null;
+      }
+    },
+    /**
+     * 检查扫码登录结果
+     */
+    async checkLoginResult() {
+      if (!this.sceneId) {
+        console.warn("sceneId 为空，无法获取登录结果");
+        this.clearPollTimer();
+        return;
+      }
+
+      try {
+        const res = await getData({
+          url: `/api/wechat/wechatScanLogin/${this.sceneId}`,
+        });
+
+        console.log("获取扫码登录结果成功:", res);
+
+        if (res.code === "100000" && res.result?.jwt) {
+          // 扫码成功，停止轮询并处理登录
+          this.clearPollTimer();
+          this.handleLoginSuccess(res.result);
+        } else if (res.result?.message) {
+          // 显示状态信息（但不停止轮询，允许继续尝试）
+          console.warn("扫码登录状态:", res.result.message);
+        }
+      } catch (error) {
+        console.error("获取扫码登录结果失败:", error);
+        // 网络错误时不停止轮询，继续尝试
+      }
+    },
+    /**
+     * 处理登录成功
+     * @param {Object} result - 登录结果数据
+     */
+    handleLoginSuccess(result) {
+      if (!result?.jwt) {
+        console.warn("登录结果数据不完整，继续轮询");
+        this.startPolling();
+        return;
+      }
+
+      this.$message.success("登录成功");
+
+      // 保存用户信息到 Vuex
+      this.$store.commit("user/SET_TOKEN", result.jwt);
+      this.$store.commit("user/SET_NAME", result.nicknameTag);
+
+      // 保存用户信息到 localStorage
+      localStorage.setItem("triUserId", result.triUserId);
+      localStorage.setItem("name", result.nicknameTag);
+
+      // 设置 token
+      setToken(result.jwt);
+
+      // 跳转到主页
+      this.$router.push("/timeTable/athletic");
+    },
+    /**
+     * 获取扫码二维码
+     */
+    getScanQrCode() {
+      getData({
+        url: "/api/wechat/wechatScanLoginQrCode",
+      })
+        .then((res) => {
+          if (res.result?.sceneId && res.result?.ticket) {
+            this.sceneId = res.result.sceneId;
+            this.qrcodeUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${res.result.ticket}`;
+
+            // token 不存在时启动轮询
+            if (!this.$store.getters.token) {
+              this.startPolling();
+            }
+          } else {
+            console.error("获取二维码失败：返回数据不完整", res);
+            this.$message.error("获取二维码失败，请刷新重试");
+          }
+        })
+        .catch((error) => {
+          console.error("获取扫码二维码失败:", error);
+          this.$message.error("获取二维码失败，请检查网络连接后刷新重试");
+        });
+    },
     // 检查URL参数
     checkUrlParams() {
       // 添加更详细的调试信息
@@ -198,7 +324,7 @@ export default {
         );
 
         // 可以在这里处理登录成功后的逻辑
-        this.handleLoginSuccess(finalCode, finalState);
+        this.handleUrlLoginSuccess(finalCode, finalState);
       } else {
         console.log("未检测到code参数，开始初始化微信登录");
         this.initWxLogin();
@@ -215,8 +341,8 @@ export default {
         : decodeURIComponent(results[1].replace(/\+/g, " "));
     },
 
-    // 处理登录成功
-    handleLoginSuccess(code, state) {
+    // 处理URL参数登录成功
+    handleUrlLoginSuccess(code, state) {
       console.log("处理登录成功，code:", code, "state:", state);
 
       // 调用微信登录回调接口，同时传递code和state参数
@@ -631,12 +757,18 @@ footer {
   left: 0;
   z-index: 1000;
   width: 340px;
-  height: 400px;
+  height: 300px;
 }
 .wx-login-container.noAgreement {
   filter: blur(5px);
 }
-
+.qrcode-img {
+  width: 200px;
+  height: 200px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 100px;
+}
 .wx-login-container iframe {
   width: 200px;
   height: 200px;
