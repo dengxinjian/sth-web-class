@@ -21,6 +21,7 @@
       <PlannedScheduleView
         :planList="planList"
         :planTitle="planTitle"
+        :showMore="showMore"
         @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass"
       />
@@ -145,6 +146,7 @@ export default {
       currentPlanGroupId: "",
       planTitle: "",
       planList: [[], [], [], []],
+      showMore: false,
 
       // 计划列表数据
       planSearchInput: "",
@@ -248,6 +250,7 @@ export default {
 
       // return formattedData;
       this.planList = formattedData;
+      this.showMore = true;
     },
     /**
      * 补充完整周数的数据

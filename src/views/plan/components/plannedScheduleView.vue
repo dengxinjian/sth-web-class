@@ -6,7 +6,9 @@
         <div class="planned-schedule-header-title-left-title">
           {{ planTitle || "计划日程" }}
         </div>
+        <div v-if="!showMore"></div>
         <el-popover
+          v-if="showMore"
           placement="bottom"
           width="110"
           trigger="hover"
@@ -27,12 +29,10 @@
               display: inline-block;
               cursor: pointer;
               font-size: 20px;
-              margin-right: 20px;
             "
             class="el-icon-more"
             slot="reference"
             @click.stop
-            v-show="hasPlanListData"
           ></i>
         </el-popover>
       </div>
@@ -94,19 +94,15 @@ export default {
       type: Array,
       default: () => [],
     },
+    showMore: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       optionsArray: ["概要", "编辑", "复制", "应用", "历史", "删除"],
     };
-  },
-  computed: {
-    hasPlanListData() {
-      if (!this.planList || this.planList.length === 0) {
-        return false;
-      }
-      return this.planList.flat().length > 0;
-    },
   },
   methods: {
     secondsToHHMMSS,
@@ -341,6 +337,8 @@ export default {
       justify-content: space-between;
       align-items: center;
       position: relative;
+      padding: 0 20px;
+      box-sizing: border-box;
 
       .planned-schedule-header-title-left-title {
         font-size: 18px;
