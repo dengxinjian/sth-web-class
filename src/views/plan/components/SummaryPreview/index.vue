@@ -103,6 +103,7 @@
         /> -->
         <el-input
           type="textarea"
+          :readonly="activeClassType === 'official'"
           v-model="form.description"
           placeholder="请输入描述"
         />
@@ -209,7 +210,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm">确定</el-button>
+      <el-button type="primary" v-if="activeClassType !== 'official'" @click="onConfirm">确定</el-button>
     </span>
   </el-dialog>
 </template>
