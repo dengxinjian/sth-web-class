@@ -67,9 +67,9 @@
 
       <el-form-item label="计划源">
         <el-input
-          :readonly="true"
+          :readonly="activeClassType === 'official'"
           placeholder="请输入计划源"
-          :value="planInfo.teamName + ' - ' + planInfo.possessNickname"
+          :value="planSource()"
         />
       </el-form-item>
 
@@ -80,8 +80,8 @@
       <el-form-item label="邮箱" prop="email">
         <!-- <el-input v-model="form.email" placeholder="请输入邮箱" /> -->
         <el-input
-          :readonly="true"
-          :value="planInfo.email"
+          :readonly="activeClassType === 'official'"
+          v-model="form.email"
           placeholder="请输入邮箱"
         />
       </el-form-item>
@@ -89,8 +89,8 @@
       <el-form-item label="微信号" prop="weChat">
         <!-- <el-input v-model="form.weChat" placeholder="请输入微信号" /> -->
         <el-input
-          :readonly="true"
-          :value="planInfo.weChat"
+          :readonly="activeClassType === 'official'"
+          v-model="form.weChat"
           placeholder="请输入微信号"
         />
       </el-form-item>
@@ -103,9 +103,8 @@
         /> -->
         <el-input
           type="textarea"
-          :readonly="true"
+          v-model="form.description"
           placeholder="请输入描述"
-          :value="planInfo.description"
         />
       </el-form-item>
 
@@ -210,7 +209,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onCancel">确定</el-button>
+      <el-button type="primary" @click="onConfirm">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -283,7 +282,7 @@ export default {
           this.$nextTick(() => {
             this.form = {
               planTitle: this.planInfo.planTitle || undefined,
-              planGroupId: this.planInfo.planGroupId || undefined,
+              planGroupId: this.planInfo.planGroupId,
               teamId: this.planInfo.teamId || undefined,
               email: this.planInfo.email || undefined,
               weChat: this.planInfo.weChat || undefined,
@@ -320,6 +319,7 @@ export default {
             email: val.email || undefined,
             weChat: val.weChat || undefined,
             description: val.description || undefined,
+            id: val.id,
           };
           // 清除表单验证状态
           if (this.$refs.formRef) {
@@ -331,6 +331,18 @@ export default {
   },
   methods: {
     secondsToHHMMSS,
+    planSource() {
+      const currentTeamId = this.form.teamId || this.planInfo.teamId;
+      const teamName =
+        this.teamOptions.find((item) => item.id === currentTeamId)?.teamName ||
+        this.planInfo.teamName ||
+        "";
+      const owner = this.planInfo.possessNickname || "";
+      if (!teamName && !owner) return "";
+      if (!owner) return teamName;
+      if (!teamName) return owner;
+      return `${teamName} - ${owner}`;
+    },
     getGroupList() {
       getData({
         url: "/api/planClassesGroup/option",

@@ -208,8 +208,8 @@ export default {
       this.showSummaryPreview = false;
       if (payload) {
         await this.getPlanList();
-        // await this.getPlanDetail(this.currentPlanId);
-        // await this.getPlanDayDetail(this.currentPlanId);
+        await this.getPlanDetail(this.currentPlanId);
+        await this.getPlanDayDetail(this.currentPlanId);
       }
     },
     async handlePlanDayDetail(id, groupId) {
