@@ -206,7 +206,6 @@
                 <CycleStageDetails
                   :class-data="classItem.classesJson"
                   :max-stages="99"
-                  type="class"
                 />
               </template>
               <!-- 跑步详情 -->
@@ -219,7 +218,6 @@
                 <RunStageDetails
                   :class-data="classItem.classesJson"
                   :max-stages="99"
-                  type="class"
                 />
               </template>
 
@@ -257,10 +255,10 @@
 </template>
 <script>
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import CycleStageDetails from "./CycleStageDetails.vue";
-import RunStageDetails from "./RunStageDetails.vue";
-import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from "./utils/constants";
-import { truncateByLines, isExpired } from "./utils/helpers";
+import CycleStageDetails from "../../../classManagement/components/CycleStageDetails.vue";
+import RunStageDetails from "../../../classManagement/components/RunStageDetails.vue";
+import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from "../../../classManagement/constants";
+import { truncateByLines, isExpired } from "../../../classManagement/utils/helpers";
 // import EditClass from "./EditClass.vue";
 export default {
   name: "ViewPlanCard",

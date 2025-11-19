@@ -218,9 +218,9 @@
 </template>
 <script>
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import CycleStageDetails from "./CycleStageDetails.vue";
-import RunStageDetails from "./RunStageDetails.vue";
-import { SPORT_TYPE_ICONS } from "./utils/constants";
+import CycleStageDetails from "../../../classManagement/components/CycleStageDetails.vue";
+import RunStageDetails from "../../../classManagement/components/RunStageDetails.vue";
+import { SPORT_TYPE_ICONS } from "../../../classManagement/constants";
 
 export default {
   name: "ViewPlanDetail",
