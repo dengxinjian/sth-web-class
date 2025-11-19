@@ -238,128 +238,11 @@ export default {
     async getPlanDayDetail(id) {
       const resDayDetail = await planApi.getPlanDayDetail(id);
       console.log("日常详情-resDayDetail", resDayDetail);
-
-      // 返回格式
-      //   [
-      //     {
-      //         "day": 1,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "CYCLE",
-      //                 "classesJson": "{\"id\":718,\"sportType\":\"CYCLE\",\"title\":\"123333\",\"groupId\":26,\"duration\":\"01:00:00\",\"distance\":\"\",\"sth\":10800,\"mode\":1,\"summary\":\"1112233355556666777\",\"tags\":[],\"stages\":[{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]},{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200},{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1},{\"duration\":2400,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"},{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 2,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "CYCLE",
-      //                 "classesJson": "{\"id\":\"\",\"sportType\":\"CYCLE\",\"title\":\"123\",\"groupId\":26,\"duration\":\"00:20:00\",\"distance\":\"\",\"sth\":3600,\"mode\":1,\"summary\":\"\",\"tags\":[],\"stages\":[{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 3,
-      //         "details": [],
-      //         "competitionDtoList": [
-      //             {
-      //                 "id": 5,
-      //                 "priority": 1,
-      //                 "competitionName": "测试赛事",
-      //                 "competitionType": 1,
-      //                 "competitionLocation": "北京市/市辖区/东城区",
-      //                 "competitionDistance": "10km",
-      //                 "competitionTime": null,
-      //                 "officialCompetitionId": null,
-      //                 "competitionTypeEnum": "RUNNING",
-      //                 "competitionDistanceEnum": "RUNNING_10K",
-      //                 "priorityEnum": "PRIMARY"
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "day": 4,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "RUN",
-      //                 "classesJson": "{\"id\":\"\",\"sportType\":\"RUN\",\"title\":\"222\",\"groupId\":25,\"duration\":\"--:--:--\",\"distance\":\"10.00\",\"sth\":\"\",\"mode\":1,\"summary\":\"\",\"tags\":[],\"stages\":[{\"times\":1,\"sections\":[{\"title\":\"跑步\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"distance\",\"range\":\"range\",\"target\":\"00:20:00\",\"targetDistance\":10,\"targetUnit\":\"km\",\"hasCadence\":false,\"thresholdSpeed\":80,\"thresholdSpeedRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetSpeed\":\"05:00\",\"targetSpeedRange\":[\"03:30\",\"05:00\"],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[160,200],\"lap\":false,\"targetSeconds\":600}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":600,\"stageTimeline\":[{\"duration\":600,\"intensity\":82.5,\"title\":\"跑步\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 8,
-      //         "details": [],
-      //         "competitionDtoList": [
-      //             {
-      //                 "id": 6,
-      //                 "priority": 1,
-      //                 "competitionName": "测试赛事2",
-      //                 "competitionType": 2,
-      //                 "competitionLocation": "天津市/县/宁河县",
-      //                 "competitionDistance": "25.75km",
-      //                 "competitionTime": null,
-      //                 "officialCompetitionId": null,
-      //                 "competitionTypeEnum": "TRIATHLON",
-      //                 "competitionDistanceEnum": "SPRINT",
-      //                 "priorityEnum": "PRIMARY"
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "day": 15,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "SWIM",
-      //                 "classesJson": "{\"id\":\"\",\"title\":\"123\",\"groupId\":25,\"sportType\":\"SWIM\",\"distance\":1000,\"distanceUnit\":\"m\",\"duration\":\"\",\"sth\":0,\"summary\":\"\",\"tags\":[]}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 18,
-      //         "details": [],
-      //         "competitionDtoList": [
-      //             {
-      //                 "id": 7,
-      //                 "priority": 1,
-      //                 "competitionName": "测试赛事3",
-      //                 "competitionType": 1,
-      //                 "competitionLocation": "重庆市/县/大足县",
-      //                 "competitionDistance": "21.1km",
-      //                 "competitionTime": null,
-      //                 "officialCompetitionId": null,
-      //                 "competitionTypeEnum": "RUNNING",
-      //                 "competitionDistanceEnum": "RUNNING_HALF_MARATHON",
-      //                 "priorityEnum": "PRIMARY"
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "day": 22,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "CYCLE",
-      //                 "classesJson": "{\"id\":98,\"title\":\"骑车测试\",\"groupId\":0,\"duration\":\"03:20:00\",\"distance\":\"\",\"sth\":36000,\"mode\":1,\"summary\":\"\",\"tags\":[],\"stages\":[{\"times\":\"4\",\"sections\":[{\"title\":\"热身\",\"stageMode\":\"warmup\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200},{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]},{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]},{\"times\":1,\"sections\":[{\"title\":\"冷身\",\"stageMode\":\"cooling\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":9600,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"热身\"},{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":\"4\"},{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1},{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"冷身\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     }
-      // ]
-
       // 处理并重组数据
       const completeData = this.completePlanDayData(resDayDetail.result);
-      console.log("completeData", completeData);
+      // console.log("completeData", completeData);
       const formattedData = this.formatPlanDayDetail(completeData);
-      console.log("重组后的数据-formattedData", formattedData);
+      // console.log("重组后的数据-formattedData", formattedData);
 
       // return formattedData;
       this.planList = formattedData;
@@ -632,20 +515,25 @@ export default {
     /**
      * 删除计划
      */
-    handleDeletePlan(groupId) {
-      this.$confirm("确认删除该计划？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        // 调用删除分组API
-        // groupApi.deleteGroup(groupId).then((res) => {
-        //   if (res.success) {
-        //     this.$message.success("删除成功");
-        //     this.getPlanList();
-        //   }
-        // });
-      });
+    handleDeletePlan() {
+      const _this = this;
+      if (_this.currentPlanDetail.id) {
+        this.$confirm("确认删除该计划？", "提示", {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          // 调用删除分组API
+          planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
+            if (res.success) {
+              this.$message.success("删除成功");
+              this.getPlanList();
+              this.planTitle = '';
+              this.planList = [[], [], [], []];
+            }
+          });
+        });
+      }
     },
   },
 };
