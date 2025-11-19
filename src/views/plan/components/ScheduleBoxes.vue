@@ -653,6 +653,12 @@ export default {
             if (!classesJson.distance || classItem.sportType !== "CYCLE") {
               return classAcc;
             }
+            if (
+              typeof classesJson.distance === "string" &&
+              classesJson.distance.includes("km")
+            ) {
+              return classAcc + Number(classesJson.distance.replace("km", ""));
+            }
             return classAcc + Number(classesJson.distance);
           }, 0)
         );
@@ -730,6 +736,19 @@ export default {
             }
             if (!classesJson.distance || classItem.sportType !== "RUN") {
               return classAcc;
+            }
+            if (
+              !classesJson.distance ||
+              classesJson.distance === "--km" ||
+              classesJson.distance === "--"
+            ) {
+              return classAcc;
+            }
+            if (
+              typeof classesJson.distance === "string" &&
+              classesJson.distance.includes("km")
+            ) {
+              return classAcc + Number(classesJson.distance.replace("km", ""));
             }
             return classAcc + Number(classesJson.distance);
           }, 0)

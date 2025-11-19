@@ -146,14 +146,11 @@
             </div>
             <div style="display: flex" v-if="activity.classesJson.distance">
               <div class="keyword" style="color: #999">
-                {{
-                  !activity.classesJson.distance
-                    ? "--km"
-                    : activity.classesJson.distance
-                }}
+                {{ formatDistance(activity.classesJson.distance, activity.sportType) }}
                 <span v-if="activity.sportType === 3">
                   {{ activity.classesJson.distanceUnit }}
                 </span>
+                <span v-else>km</span>
               </div>
             </div>
             <div

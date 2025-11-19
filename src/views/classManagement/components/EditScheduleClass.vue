@@ -708,6 +708,7 @@ export default {
                   ? "m"
                   : "km",
             };
+
             this.defaultData = {
               duration: this.classData.duration || "00:00:00",
               activityDuration:
@@ -723,6 +724,16 @@ export default {
                   ? "m"
                   : "km",
             };
+            if (
+              this.classData.sportType === "SWIM" ||
+              this.classData.sportType === 3
+            ) {
+              this.actualData.distance = this.classData.preciseDistance;
+              this.defaultData.distance = this.classData.preciseDistance;
+            } else {
+              this.actualData.distance = this.classData.distance;
+            }
+            console.log(this.actualData, "this.actualData");
           }
         } else {
           this.getClassScheduleInfo(this.classItem.id);

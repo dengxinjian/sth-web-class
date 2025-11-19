@@ -4,7 +4,7 @@
       <div class="planned-schedule-header-title-left">
         <div></div>
         <div class="planned-schedule-header-title-left-title">
-          {{ planTitle || "Planned Schedule" }}
+          {{ planTitle || "计划日程" }}
         </div>
         <el-popover
           placement="bottom"
