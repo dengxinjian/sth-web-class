@@ -60,6 +60,7 @@
     <!-- 概要 -->
     <SummaryPreview
       v-model="showSummaryPreview"
+      :active-class-type="activeClassType"
       :planInfo="currentPlanDetail"
       :planClasses="planList"
       @cancel="handleSummaryPreviewCancel"

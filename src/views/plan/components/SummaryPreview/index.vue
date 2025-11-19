@@ -17,23 +17,24 @@
       size="small"
     >
       <el-form-item label="计划名称" prop="planTitle">
-        <!-- <el-input
+        <el-input
           v-model="form.planTitle"
           maxlength="20"
           show-word-limit
           placeholder="请输入计划名称"
           clearable
-        /> -->
-        <span>{{ planInfo.planTitle }}</span>
+          :readonly="activeClassType === 'official'"
+        />
       </el-form-item>
 
       <el-form-item label="分组选择" prop="planGroupId">
-        <!-- <el-select
+        <el-select
           v-model="form.planGroupId"
           placeholder="请选择分组"
           filterable
           clearable
           style="width: 100%"
+          v-if="activeClassType !== 'official'"
         >
           <el-option
             v-for="g in groupOptions"
@@ -41,17 +42,18 @@
             :label="g.planClassesGroup"
             :value="g.id"
           />
-        </el-select> -->
-        <span>{{ planInfo.planGroupName }}</span>
+        </el-select>
+        <el-input v-else :readonly="true" :value="planInfo.planGroupName" />
       </el-form-item>
 
       <el-form-item label="团队" prop="teamId">
-        <!-- <el-select
+        <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
           filterable
           clearable
           style="width: 100%"
+          v-if="activeClassType !== 'official'"
         >
           <el-option
             v-for="g in teamOptions"
@@ -59,26 +61,29 @@
             :label="g.teamName"
             :value="g.id"
           />
-        </el-select> -->
-        <span>{{ planInfo.teamName }}</span>
+        </el-select>
+        <el-input v-else :readonly="true" :value="planInfo.teamName" />
       </el-form-item>
 
       <el-form-item label="计划源">
-        <span>{{ planInfo.teamName }} - {{ planInfo.possessNickname }}</span>
+        <el-input
+          :readonly="true"
+          :value="planInfo.teamName + ' - ' + planInfo.possessNickname"
+        />
       </el-form-item>
 
       <el-form-item label="拥有者">
-        <span>{{ planInfo.possessNickname }}</span>
+        <el-input :readonly="true" :value="planInfo.possessNickname" />
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
         <!-- <el-input v-model="form.email" placeholder="请输入邮箱" /> -->
-         <span>{{ planInfo.email }}</span>
+        <el-input :readonly="true" :value="planInfo.email" />
       </el-form-item>
 
       <el-form-item label="微信号" prop="weChat">
         <!-- <el-input v-model="form.weChat" placeholder="请输入微信号" /> -->
-        <span>{{ planInfo.weChat }}</span>
+        <el-input :readonly="true" :value="planInfo.weChat" />
       </el-form-item>
 
       <el-form-item label="描述" prop="description">
@@ -87,7 +92,11 @@
           v-model="form.description"
           placeholder="请输入描述"
         /> -->
-        <span>{{ planInfo.description }}</span>
+        <el-input
+          type="textarea"
+          :readonly="true"
+          :value="planInfo.description"
+        />
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
@@ -113,8 +122,7 @@
                     : secondsToHHMMSS(getweekSwimmingDuration())
                 }}/周</el-col
               >
-              <el-col :span="8">{{ getweekSwimmingDistance() }}
-              </el-col>
+              <el-col :span="8">{{ getweekSwimmingDistance() }} </el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -183,10 +191,7 @@
                 }}
                 /周</el-col
               >
-              <el-col :span="8"
-                >{{ getweekDistance()
-                }}</el-col
-              >
+              <el-col :span="8">{{ getweekDistance() }}</el-col>
             </el-row>
           </el-col>
         </el-row>
@@ -212,6 +217,7 @@ export default {
     defaultGroupId: { type: [String, Number], default: undefined },
     planInfo: { type: Object, default: () => ({}) },
     planClasses: { type: Array, default: () => [] },
+    activeClassType: { type: String, default: "official" },
   },
   data() {
     return {
@@ -682,7 +688,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      const distanceTotal = week.reduce((acc, item,index) => {
+      const distanceTotal = week.reduce((acc, item, index) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
