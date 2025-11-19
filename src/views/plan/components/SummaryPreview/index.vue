@@ -17,17 +17,18 @@
       size="small"
     >
       <el-form-item label="计划名称" prop="planTitle">
-        <el-input
+        <!-- <el-input
           v-model="form.planTitle"
           maxlength="20"
           show-word-limit
           placeholder="请输入计划名称"
           clearable
-        />
+        /> -->
+        <span>{{ planInfo.planTitle }}</span>
       </el-form-item>
 
       <el-form-item label="分组选择" prop="planGroupId">
-        <el-select
+        <!-- <el-select
           v-model="form.planGroupId"
           placeholder="请选择分组"
           filterable
@@ -40,11 +41,12 @@
             :label="g.planClassesGroup"
             :value="g.id"
           />
-        </el-select>
+        </el-select> -->
+        <span>{{ planInfo.planGroupName }}</span>
       </el-form-item>
 
       <el-form-item label="团队" prop="teamId">
-        <el-select
+        <!-- <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
           filterable
@@ -57,7 +59,8 @@
             :label="g.teamName"
             :value="g.id"
           />
-        </el-select>
+        </el-select> -->
+        <span>{{ planInfo.teamName }}</span>
       </el-form-item>
 
       <el-form-item label="计划源">
@@ -69,19 +72,22 @@
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
-        <el-input v-model="form.email" placeholder="请输入邮箱" />
+        <!-- <el-input v-model="form.email" placeholder="请输入邮箱" /> -->
+         <span>{{ planInfo.email }}</span>
       </el-form-item>
 
       <el-form-item label="微信号" prop="weChat">
-        <el-input v-model="form.weChat" placeholder="请输入微信号" />
+        <!-- <el-input v-model="form.weChat" placeholder="请输入微信号" /> -->
+        <span>{{ planInfo.weChat }}</span>
       </el-form-item>
 
       <el-form-item label="描述" prop="description">
-        <el-input
+        <!-- <el-input
           type="textarea"
           v-model="form.description"
           placeholder="请输入描述"
-        />
+        /> -->
+        <span>{{ planInfo.description }}</span>
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
@@ -189,7 +195,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm">确定</el-button>
+      <el-button type="primary" @click="onCancel">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -220,13 +226,13 @@ export default {
       },
       rules: {
         planTitle: [
-          { required: true, message: "请输入计划标题", trigger: "blur" },
+          { required: false, message: "请输入计划标题", trigger: "blur" },
           { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
         ],
         planGroupId: [
-          { required: true, message: "请选择分组", trigger: "change" },
+          { required: false, message: "请选择分组", trigger: "change" },
         ],
-        teamId: [{ required: true, message: "请选择团队", trigger: "change" }],
+        teamId: [{ required: false, message: "请选择团队", trigger: "change" }],
       },
       groups: [],
       teams: [],

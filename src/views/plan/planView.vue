@@ -22,6 +22,7 @@
         :planList="planList"
         :planTitle="planTitle"
         :showMore="showMore"
+        :activeClassType="activeClassType"
         @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass"
       />
@@ -319,6 +320,12 @@ export default {
     },
     handleClassTypeChange(type) {
       this.activeClassType = type;
+      this.showMore = false;
+      this.planList = [[], [], [], []];
+      this.currentPlanId = "";
+      this.currentPlanGroupId = "";
+      this.planTitle = "";
+      this.currentPlanDetail = {};
       this.getPlanList();
     },
     handlePlanSearch(keyword) {
