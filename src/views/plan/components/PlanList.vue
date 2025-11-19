@@ -51,8 +51,8 @@
 
     <!-- 课程列表 -->
     <div class="schedule-class-container">
-      <el-collapse accordion @change="$emit('collapse-change')">
-        <el-collapse-item v-for="item in classList" :key="item.groupId">
+      <el-collapse v-model="activeCollapse" accordion @change="$emit('collapse-change')">
+        <el-collapse-item v-for="item in classList" :key="item.groupId" :name="item.groupId">
           <template slot="title">
             <div class="schedule-class-title">
               <div class="group-name">
@@ -110,7 +110,7 @@
           </template>
 
           <div class="js-class-drag-container" :key="item.timespan">
-            <div class="plan-item" :class="{ active: selectedPlanId === classItem.id }" v-for="classItem in item.classesList" :key="classItem.id" @click="$emit('choose-plan', classItem.id)">
+            <div class="plan-item" :class="{ active: selectedPlanId === classItem.id }" v-for="classItem in item.classesList" :key="classItem.id" @click="$emit('choose-plan', classItem.id,item.groupId)">
               <span>{{ classItem.planTitle }}</span>
             </div>
           </div>
@@ -139,12 +139,50 @@ export default {
     selectedPlanId: {
       type: [String, Number],
       default: null
+    },
+    currentPlanGroupId: {
+      type: [String, Number],
+      default: null
     }
   },
   data() {
     return {
-      searchInput: ''
+      searchInput: '',
+      activeCollapse: null
     }
+  },
+  watch: {
+    currentPlanGroupId: {
+      handler(newVal) {
+        // 如果有值，尝试展开
+        if (newVal) {
+          // 延迟执行，确保 classList 已更新
+          this.$nextTick(() => {
+            this.tryExpandGroup()
+          })
+        }
+      },
+      immediate: true
+    },
+    classList: {
+      handler(newList) {
+        // 当列表更新时，如果 currentPlanGroupId 有值且对应的分组存在，则展开
+        if (this.currentPlanGroupId && Array.isArray(newList) && newList.length > 0) {
+          this.$nextTick(() => {
+            this.tryExpandGroup()
+          })
+        }
+      },
+      immediate: true,
+      deep: true
+    }
+  },
+  mounted() {
+    // 组件挂载后，延迟检查以确保数据已加载
+    // 使用 setTimeout 确保在异步数据加载完成后也能展开
+    setTimeout(() => {
+      this.tryExpandGroup()
+    }, 100)
   },
   methods: {
     handleClassTypeChange(type) {
@@ -153,6 +191,33 @@ export default {
     },
     handleSearch() {
       this.$emit('search', this.searchInput)
+    },
+    /**
+     * 检查指定的 groupId 是否存在于 classList 中
+     * @param {String|Number} groupId - 分组ID
+     * @returns {Boolean} 是否存在
+     */
+    isGroupExists(groupId) {
+      // 检查 groupId 是否有效（不为空字符串、null、undefined）
+      if (!groupId || groupId === '' || !Array.isArray(this.classList) || this.classList.length === 0) {
+        return false
+      }
+      // 转换为字符串进行比较，支持数字和字符串类型
+      const targetId = String(groupId)
+      return this.classList.some(item => {
+        if (!item || !item.groupId) return false
+        return String(item.groupId) === targetId
+      })
+    },
+    /**
+     * 尝试展开指定的分组
+     */
+    tryExpandGroup() {
+      if (this.currentPlanGroupId && this.isGroupExists(this.currentPlanGroupId)) {
+        this.$nextTick(() => {
+          this.activeCollapse = this.currentPlanGroupId
+        })
+      }
     }
   }
 }
