@@ -647,7 +647,7 @@ export default {
         "classItem, classIndex, weekNumber, globalDay"
       );
       this.showEditPlanClassModal = true;
-      this.editPlanClassData = classItem;
+      this.editPlanClassData = JSON.parse(JSON.stringify(classItem));
       this.editPlanClassIndex = classIndex;
       this.editPlanClassWeekNumber = weekNumber;
       this.editPlanClassGlobalDay = globalDay;

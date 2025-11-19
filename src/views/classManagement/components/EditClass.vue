@@ -133,7 +133,14 @@
                       :disabled="true"
                     ></el-input>
                   </td>
-                  <td>km</td>
+                  <td>
+                    {{
+                      classData.sportType === "SWIM" ||
+                      classData.sportType === 3
+                        ? classData.classesJson?.distanceUnit
+                        : "km"
+                    }}
+                  </td>
                 </tr>
                 <tr v-if="!isRestType(classData.sportType)">
                   <td>STH</td>
@@ -411,8 +418,8 @@ export default {
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
       }
-      if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+      if (distance && Number(distance) > 0) {
+        result = distance;
       }
       if (!result || result === "0") {
         result = "--";

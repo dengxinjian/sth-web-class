@@ -1,6 +1,6 @@
 <template>
   <div
-    class="plan-class-card-wrapper js-plan-drag-no-drag"
+    class="plan-class-card-wrapper js-plan-drag-no-drag js-event-drag-no-drag"
     style="position: relative"
     data-type="planClass"
   >

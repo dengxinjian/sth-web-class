@@ -892,7 +892,6 @@ export default {
       if (!dayData || !dayData.competitionDtoList || !Array.isArray(dayData.competitionDtoList)) {
         return [];
       }
-      console.log(dayData.competitionDtoList, "dayData.competitionDtoList");
 
       return dayData.competitionDtoList;
     },

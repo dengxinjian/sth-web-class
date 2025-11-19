@@ -92,6 +92,7 @@
                   :ghost-class="'is-plan-drag-ghost'"
                   :chosen-class="'is-plan-drag-chosen'"
                   :drag-class="'is-plan-drag-drag'"
+                  :easing="'cubic-bezier(0.175, 0.885, 0.32, 1.275)'"
                   tag="div"
                   :emptyInsertThreshold="10"
                   class="draggable-classes-container"
@@ -489,6 +490,19 @@ export default {
               classesJson.distanceUnit === "m"
             ) {
               return classAcc + Number(classesJson.distance) / 1000;
+            }
+            if (
+              !classesJson.distance ||
+              classesJson.distance === "--km" ||
+              classesJson.distance === "--"
+            ) {
+              return classAcc;
+            }
+            if (
+              typeof classesJson.distance === "string" &&
+              classesJson.distance.includes("km")
+            ) {
+              return classAcc + Number(classesJson.distance.replace("km", ""));
             }
             return classAcc + Number(classesJson.distance);
           }, 0)
@@ -923,7 +937,6 @@ export default {
       ) {
         return [];
       }
-      console.log(dayData.competitionDtoList, "dayData.competitionDtoList");
 
       return dayData.competitionDtoList;
     },

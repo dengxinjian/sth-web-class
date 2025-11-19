@@ -142,7 +142,7 @@
 
               <!-- 添加课表 -->
               <div
-                class="box-content"
+                class="box-content js-schedule-drag-no-drag"
                 @click="handleAddSchedule(item.commonDate)"
               >
                 <div class="box-plus-circle">

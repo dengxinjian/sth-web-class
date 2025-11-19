@@ -82,8 +82,8 @@ export default {
                 );
               },
               easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-              // 过滤掉健康数据卡片，使其不可拖拽
-              filter: ".js-health-data-no-drag",
+              // 过滤掉健康数据卡片 赛事卡片，使其不可拖拽
+              filter: ".js-health-data-no-drag,.js-event-drag-no-drag,.js-schedule-drag-no-drag",
               onStart: (e) => {
                 console.log("onStart", e);
               },

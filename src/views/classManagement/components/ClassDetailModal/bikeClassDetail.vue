@@ -24,9 +24,11 @@
               ? "--:--:--"
               : classInfo.duration
           }}</span>
-          <span>{{
-            formatDistance(classInfo.distance, classInfo.sportType)
-          }}km</span>
+          <span
+            >{{
+              formatDistance(classInfo.distance, classInfo.sportType)
+            }}km</span
+          >
           <span>
             {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -811,13 +813,12 @@ export default {
   },
   methods: {
     formatDistance(distance, sportType) {
-
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
       }
-      if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+      if (distance && Number(distance) > 0) {
+        result = distance;
       }
       if (!result || result === "0") {
         result = "--";
