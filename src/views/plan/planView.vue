@@ -219,8 +219,10 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
-      console.log("日常详情-res", res);
+      // console.log("日常详情-res", res);
       this.currentPlanDetail = res.result;
+      this.currentPlanId = res.result.id;
+      this.currentPlanGroupId = res.result.planGroupId;
     },
     /**
      * 处理计划日常详情数据，重组为按天分组的格式，并按每7天一组组成二维数组
@@ -237,7 +239,7 @@ export default {
     },
     async getPlanDayDetail(id) {
       const resDayDetail = await planApi.getPlanDayDetail(id);
-      console.log("日常详情-resDayDetail", resDayDetail);
+      // console.log("日常详情-resDayDetail", resDayDetail);
       // 处理并重组数据
       const completeData = this.completePlanDayData(resDayDetail.result);
       // console.log("completeData", completeData);
@@ -248,14 +250,16 @@ export default {
       this.planList = formattedData;
     },
     /**
-     * 补充完整28天的数据
-     * 如果返回数据中最后一条数据的day不是28，则补充完整28天
+     * 补充完整周数的数据
+     * 根据最后一条数据的day值除以7向上取整作为周数
+     * 如果周数小于4，则补充数据至4周（28天）
+     * 如果周数大于等于4，则补充数据至当前周数（周数 * 7天）
      * @param {Array} data - getPlanDayDetail接口返回的原始数据
-     * @returns {Array} 补充完整后的数据，确保包含1-28天的数据
+     * @returns {Array} 补充完整后的数据
      */
     completePlanDayData(data) {
       if (!Array.isArray(data) || data.length === 0) {
-        // 如果数据为空，返回28天的空数据
+        // 如果数据为空，返回28天的空数据（4周）
         const result = [];
         for (let day = 1; day <= 28; day++) {
           result.push({
@@ -276,23 +280,22 @@ export default {
       // 找到最大的day值（最后一条数据的day）
       const maxDay = Math.max(...data.map((item) => item.day));
 
-      // 如果最大day不是28，需要补充缺失的天数
-      if (maxDay < 28) {
-        // 从最大day+1开始，补充到28，把数据push到数组中
-        for (let day = maxDay + 1; day <= 28; day++) {
-          const newDayData = {
-            day: day,
-            details: [],
-            competitionDtoList: [],
-          };
-          data.push(newDayData);
-          dayMap.set(day, newDayData);
-        }
+      // 计算周数：最后一条day的数值除以7向上取整
+      const weekCount = Math.ceil(maxDay / 7);
+
+      // 确定目标天数
+      let targetDays;
+      if (weekCount < 4) {
+        // 如果周数小于4，补充至4周（28天）
+        targetDays = 28;
+      } else {
+        // 如果周数大于等于4，补充至当前周数（周数 * 7天）
+        targetDays = weekCount * 7;
       }
 
-      // 确保1-28天的数据都存在，如果中间有缺失的天数也要补充
+      // 确保1到目标天数的数据都存在，如果中间有缺失的天数也要补充
       const completeData = [];
-      for (let day = 1; day <= 28; day++) {
+      for (let day = 1; day <= targetDays; day++) {
         if (dayMap.has(day)) {
           completeData.push(dayMap.get(day));
         } else {
@@ -369,23 +372,14 @@ export default {
       this.showViewClassCard = true;
       this.classModalData = this.findClassById(classId);
     },
-    handleViewPlanClass(cardInfo) {
-      console.log("handleViewPlanClass-cardInfo", cardInfo);
-      // cardInfo 包含完整的卡片信息：
-      // {
-      //   classItem: 课程项数据,
-      //   classIndex: 课程在当前天的索引,
-      //   weekIndex: 周索引（从0开始）,
-      //   weekNumber: 周数（从1开始）,
-      //   globalDay: 全局天数（1-28）,
-      //   boxIndex: 盒子索引（0-6）,
-      //   clickPosition: 点击位置 { clientX, clientY }
-      // }
+    handleViewPlanClass(classItem, clickPosition) {
+      console.log("handleViewPlanClass-classItem", classItem);
+      console.log("handleViewPlanClass-clickPosition", clickPosition);
       this.showViewPlanDetail = true;
       // 使用 classItem 作为课程数据
-      this.classModalData = cardInfo?.classItem || cardInfo;
+      this.classModalData = classItem || {};
       // 保存点击位置
-      this.clickPosition = cardInfo?.clickPosition || null;
+      this.clickPosition = clickPosition || null;
     },
     /**
      * 通过ID查找课程

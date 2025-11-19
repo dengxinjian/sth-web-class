@@ -120,6 +120,7 @@
                       )
                     "
                     @copy="handleCopyClass"
+                    @view-class="handleViewClass"
                     type="view"
                   />
                   <!-- <div
@@ -908,6 +909,9 @@ export default {
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
       this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
     },
+    handleViewClass(classItem, clickPosition) {
+      this.$emit("view-class", classItem, clickPosition);
+    },
     handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
       this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay);
     },
@@ -1098,7 +1102,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    // cursor: pointer;
     padding: 20px;
     border: 2px solid #e5e5e5;
     background-color: #fff;
@@ -1119,10 +1123,6 @@ export default {
 
     &:active {
       opacity: 0.8;
-    }
-
-    &.is-dragging {
-      pointer-events: none;
     }
 
     .box-plus-circle {
@@ -1155,7 +1155,7 @@ export default {
 
 ::v-deep .is-plan-dragging {
   opacity: 0.6;
-  cursor: grabbing !important;
+  // cursor: grabbing !important;
 }
 
 ::v-deep .js-plan-drag-container {
@@ -1179,13 +1179,6 @@ export default {
   position: relative;
 }
 
-::v-deep .class-drap-handle {
-  cursor: grab;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
 .context-menu {
   position: fixed;
   background: white;
@@ -1200,7 +1193,7 @@ export default {
     padding: 8px 16px;
     font-size: 14px;
     color: #606266;
-    cursor: pointer;
+    // cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;

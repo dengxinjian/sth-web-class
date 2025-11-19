@@ -160,7 +160,11 @@ export default {
                     return classTotal;
                   }
                 }
-                if (!classesJson.distance) {
+                if (
+                  !classesJson.distance ||
+                  classesJson.distance === "--km" ||
+                  classesJson.distance === "--"
+                ) {
                   return classTotal;
                 }
                 if (
@@ -168,6 +172,14 @@ export default {
                   classesJson.distanceUnit === "m"
                 ) {
                   return classTotal + Number(classesJson.distance) / 1000;
+                }
+                if (
+                  typeof classesJson.distance === "string" &&
+                  classesJson.distance.includes("km")
+                ) {
+                  return (
+                    classTotal + Number(classesJson.distance.replace("km", ""))
+                  );
                 }
                 return classTotal + Number(classesJson.distance);
               }, 0)
@@ -224,9 +236,10 @@ export default {
     handleAddWeek() {
       this.$emit("add-week");
     },
-    handleViewClass(classItem) {
+    handleViewClass(classItem, clickPosition) {
       console.log("handleViewClass-classItem", classItem);
-      this.$emit("view-class", classItem);
+      console.log("handleViewClass-clickPosition", clickPosition);
+      this.$emit("view-class", classItem, clickPosition);
     },
   },
 };
