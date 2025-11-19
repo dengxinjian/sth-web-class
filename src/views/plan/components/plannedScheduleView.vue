@@ -15,13 +15,14 @@
           popper-class="add-class-btn-popover-planned-schedule"
         >
           <div class="add-class-btn-popover-more-list">
-            <div
-              class="add-class-btn-popover-more-list-item"
-              v-for="(item, index) in optionsArray"
-              :key="index"
-              @click="$emit('options-click', item, index)"
-            >
-              {{ item }}
+            <div v-for="(el, idx) in optionsArray" :key="idx">
+              <div
+                class="add-class-btn-popover-more-list-item"
+                :key="idx"
+                @click="$emit('options-click', el, idx)"
+              >
+                {{ el }}
+              </div>
             </div>
           </div>
           <i
@@ -98,11 +99,20 @@ export default {
       type: Boolean,
       default: false,
     },
+    activeClassType: {
+      type: String,
+      default: "official",
+    },
   },
   data() {
-    return {
-      optionsArray: ["概要", "编辑", "复制", "应用", "历史", "删除"],
-    };
+    return {};
+  },
+  computed: {
+    optionsArray() {
+      return this.activeClassType === "official"
+        ? ["概要", "复制"]
+        : ["概要", "编辑", "复制", "应用", "历史", "删除"];
+    },
   },
   methods: {
     secondsToHHMMSS,
@@ -276,9 +286,40 @@ export default {
       background: rgba(64, 158, 255, 0.18);
     }
   }
-  & .add-class-btn-popover-more-list-item:last-child {
-    border-bottom: none !important;
-    color: #bc362e; // 删除按钮颜色 标准红色
+  // & .add-class-btn-popover-more-list-item:last-child {
+  //   border-bottom: none !important;
+  //   color: #bc362e; // 删除按钮颜色 标准红色
+  // }
+}
+
+.add-class-btn-popover-more-list-official {
+  width: 140px;
+  background-color: #fff;
+  padding: 0 0 0 8px;
+  box-sizing: border-box;
+  & .add-class-btn-popover-more-list-item {
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    background-color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 1px solid #eeeeee;
+
+    &:hover {
+      cursor: pointer;
+      // background: rgba(64, 158, 255, 0.5);
+      // color: #409eff;
+      color: #bc362e;
+      background: rgba(204, 35, 35, 0.05);
+      border-bottom: 1px solid #bc362e;
+    }
+
+    &:active {
+      background: rgba(64, 158, 255, 0.18);
+    }
   }
 }
 .planned-schedule-container {
