@@ -107,20 +107,7 @@
                     : secondsToHHMMSS(getweekSwimmingDuration())
                 }}/周</el-col
               >
-              <el-col :span="8"
-                >{{
-                  getweekSwimmingDistance() > 0
-                    ? getweekSwimmingDistance() > 1000
-                      ? getweekSwimmingDistance() / 1000
-                      : getweekSwimmingDistance()
-                    : ""
-                }}{{
-                  getweekSwimmingDistance() > 0
-                    ? getweekSwimmingDistance() > 1000
-                      ? " km/周"
-                      : " m/周"
-                    : "NA"
-                }}
+              <el-col :span="8">{{ getweekSwimmingDistance() }}
               </el-col>
             </el-row>
           </el-col>
@@ -150,10 +137,7 @@
                     : secondsToHHMMSS(getweekRunDuration())
                 }}/周</el-col
               >
-              <el-col :span="8"
-                >{{ getweekRunDistance() > 0 ? getweekRunDistance() : ""
-                }}{{ getweekRunDistance() > 0 ? " km/周" : "NA" }}</el-col
-              >
+              <el-col :span="8">{{ getweekRunDistance() }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -194,13 +178,7 @@
                 /周</el-col
               >
               <el-col :span="8"
-                >{{ getweekDistance() > 0 ? getweekDistance() : ""
-                }}{{
-                  getweekSwimmingDistance() > 0
-                    ? getweekSwimmingDistance() > 1000
-                      ? " km/周"
-                      : " m/周"
-                    : "NA"
+                >{{ getweekDistance()
                 }}</el-col
               >
             </el-row>
@@ -466,13 +444,49 @@ export default {
       }, 0);
       return durationTotal / 4 || 0;
     },
+    getTotalDistance() {
+      return this.planList.reduce((total, week) => {
+        return (
+          total +
+          week.reduce((weekTotal, item) => {
+            return (
+              weekTotal +
+              item.details.reduce((classTotal, classItem) => {
+                if (!classItem) {
+                  return classTotal;
+                }
+                let classesJson = classItem.classesJson;
+                if (typeof classesJson === "string") {
+                  try {
+                    classesJson = JSON.parse(classesJson);
+                  } catch (error) {
+                    console.error("解析 classesJson 失败:", error);
+                    return classTotal;
+                  }
+                }
+                if (!classesJson.distance) {
+                  return classTotal;
+                }
+                if (
+                  classesJson.sportType === "SWIM" &&
+                  classesJson.distanceUnit === "m"
+                ) {
+                  return classTotal + Number(classesJson.distance) / 1000;
+                }
+                return classTotal + Number(classesJson.distance);
+              }, 0)
+            );
+          }, 0)
+        );
+      }, 0);
+    },
     // 计算周运动距离总和
     getweekDistance() {
       const week = this.planClasses.flat();
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      const distanceTotal = week.reduce((acc, item) => {
+      const distanceTotal = week.reduce((acc, item, index) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -498,11 +512,24 @@ export default {
             if (!classesJson.distance) {
               return classAcc;
             }
-            return classAcc + Number(classesJson.distance);
+            if (classesJson.distance === "--" || classesJson.distance === "-") {
+              return classAcc;
+            }
+            if (
+              classesJson.sportType === "SWIM" &&
+              classesJson.distanceUnit === "m"
+            ) {
+              return classAcc + Number(classesJson.distance) / 1000;
+            }
+            // console.log("classesJson.distance-总距离", classesJson.distance, index);
+            const total1 = classAcc + Number(classesJson.distance);
+            return total1;
           }, 0)
         );
       }, 0);
-      return distanceTotal / 4 || 0;
+      const weekDistance = distanceTotal / 4 || 0;
+      if (weekDistance === 0) return "NA";
+      return weekDistance + " km/周";
     },
     // 计算周运动游泳时长总和
     getweekSwimmingDuration() {
@@ -553,7 +580,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      const distanceTotal = week.reduce((acc, item) => {
+      const distanceTotal = week.reduce((acc, item, index) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -579,11 +606,26 @@ export default {
             if (!classesJson.distance || classItem.sportType !== "SWIM") {
               return classAcc;
             }
-            return classAcc + Number(classesJson.distance);
+            if (classesJson.distance === "--" || classesJson.distance === "-") {
+              return classAcc;
+            }
+            if (
+              classesJson.sportType === "SWIM" &&
+              classesJson.distanceUnit === "km"
+            ) {
+              return classAcc + Number(classesJson.distance) * 1000;
+            }
+            // console.log("classesJson.distance-游泳", classesJson.distance, index);
+            const total1 = classAcc + Number(classesJson.distance);
+            // console.log("total1-游泳", total1);
+            return total1;
           }, 0)
         );
       }, 0);
-      return distanceTotal / 4 || 0;
+      // console.log("distanceTotal-游泳总和", distanceTotal);
+      const weekDistance = distanceTotal / 4 || 0;
+      if (weekDistance === 0) return "NA";
+      return weekDistance / 1000 + " km/周";
     },
     // 计算周骑行时长总和
     getweekCycleDuration() {
@@ -634,7 +676,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      const distanceTotal = week.reduce((acc, item) => {
+      const distanceTotal = week.reduce((acc, item,index) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -659,11 +701,26 @@ export default {
             if (!classesJson.distance || classItem.sportType !== "CYCLE") {
               return classAcc;
             }
-            return classAcc + Number(classesJson.distance);
+            if (classesJson.distance === "--" || classesJson.distance === "-") {
+              return classAcc;
+            }
+            if (
+              typeof classesJson.distance === "string" &&
+              classesJson.distance.includes("km")
+            ) {
+              return classAcc + Number(classesJson.distance.replace("km", ""));
+            }
+            // console.log("classesJson.distance-骑行", classesJson.distance, index);
+            const total1 = classAcc + Number(classesJson.distance);
+            // console.log("total1-骑行", total1);
+            return total1;
           }, 0)
         );
       }, 0);
-      return distanceTotal / 4 || 0;
+      // console.log("distanceTotal-骑行总和", distanceTotal);
+      const weekDistance = distanceTotal / 4 || 0;
+      if (weekDistance === 0) return "NA";
+      return weekDistance + " km/周";
     },
     // 计算周跑步时长总和
     getweekRunDuration() {
@@ -693,7 +750,6 @@ export default {
                 return classAcc;
               }
             }
-
             if (
               !classesJson.duration ||
               classesJson.duration === "00:00:00" ||
@@ -714,7 +770,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      const distanceTotal = week.reduce((acc, item) => {
+      const distanceTotal = week.reduce((acc, item, index) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -736,14 +792,38 @@ export default {
                 return classAcc;
               }
             }
+            // console.log("classesJson.distance-跑步", classesJson);
+            // console.log("classesJson.distance-跑步", classesJson.distance, index);
             if (!classesJson.distance || classItem.sportType !== "RUN") {
               return classAcc;
             }
-            return classAcc + Number(classesJson.distance);
+            if (
+              !classesJson.distance ||
+              classesJson.distance === "--km" ||
+              classesJson.distance === "--"
+            ) {
+              return classAcc;
+            }
+
+            // if (
+            //   typeof classesJson.distance === "string" &&
+            //   classesJson.distance.includes("km")
+            // ) {
+            //   return classAcc + Number(classesJson.distance.replace("km", "")) * 1000;
+            // }
+            // console.log("classesJson.distance-跑步", classesJson.distance, index);
+            const total1 = classAcc + Number(classesJson.distance);
+            // console.log("total1-跑步", total1);
+            return total1;
+            // return classAcc + Number(classesJson.distance);
           }, 0)
         );
       }, 0);
-      return distanceTotal / 4 || 0;
+      // console.log("distanceTotal-跑步总和", distanceTotal);
+      const weekDistance = distanceTotal / 4 || 0;
+      // console.log("weekDistance-跑步", weekDistance);
+      if (weekDistance === 0) return "NA";
+      return weekDistance + " km/周";
     },
     // 计算周力量时长总和
     getweekPowerDuration() {

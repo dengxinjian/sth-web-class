@@ -67,6 +67,13 @@ export const planApi = {
       url: `/api/planClasses/getPlanClassesDayDetail?planClassesId=${id}`,
     });
   },
+
+  // 删除计划
+  deletePlan(id) {
+    return submitData({
+      url: `/api/planClasses/delete?id=${id}`,
+    });
+  },
 };
 
 /**

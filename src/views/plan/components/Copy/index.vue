@@ -133,13 +133,32 @@ export default {
         console.log(this.planClasses, "this.planClasses");
         console.log(this.form, "this.form");
         console.log(this.planInfo, "this.planInfo");
+        console.log("this.planClasses.flat()", this.planClasses.flat());
+        const details = this.planClasses.flat().map((item) => {
+          if (item.competitionDtoList.length > 0 || item.details.length > 0) {
+            return {
+              day: item.day,
+              details: item.details.map(el => {
+                return {
+                  classesId: el.classesId,
+                  classesJson: JSON.stringify(el.classesJson),
+                  sportType: el.sportType,
+                }
+              }),
+              competitionDtoList: item.competitionDtoList,
+            };
+          } else {
+            return null;
+          }
+        }).filter(item => item !== null);
+        console.log(details, "details");
         const params = {
           ...this.form,
           teamId: this.planInfo.teamId,
           email: this.planInfo.email,
           weChat: this.planInfo.weChat,
           description: this.planInfo.description,
-          dayDetails: this.planClasses.flat(),
+          dayDetails: details,
           sourcePlanId: this.planInfo.id,
         };
         console.log(params, "params");

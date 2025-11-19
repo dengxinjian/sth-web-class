@@ -21,6 +21,7 @@
       <PlannedScheduleView
         :planList="planList"
         :planTitle="planTitle"
+        :showMore="showMore"
         @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass"
       />
@@ -145,6 +146,7 @@ export default {
       currentPlanGroupId: "",
       planTitle: "",
       planList: [[], [], [], []],
+      showMore: false,
 
       // 计划列表数据
       planSearchInput: "",
@@ -219,8 +221,10 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
-      console.log("日常详情-res", res);
+      // console.log("日常详情-res", res);
       this.currentPlanDetail = res.result;
+      this.currentPlanId = res.result.id;
+      this.currentPlanGroupId = res.result.planGroupId;
     },
     /**
      * 处理计划日常详情数据，重组为按天分组的格式，并按每7天一组组成二维数组
@@ -237,142 +241,28 @@ export default {
     },
     async getPlanDayDetail(id) {
       const resDayDetail = await planApi.getPlanDayDetail(id);
-      console.log("日常详情-resDayDetail", resDayDetail);
-
-      // 返回格式
-      //   [
-      //     {
-      //         "day": 1,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "CYCLE",
-      //                 "classesJson": "{\"id\":718,\"sportType\":\"CYCLE\",\"title\":\"123333\",\"groupId\":26,\"duration\":\"01:00:00\",\"distance\":\"\",\"sth\":10800,\"mode\":1,\"summary\":\"1112233355556666777\",\"tags\":[],\"stages\":[{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]},{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200},{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1},{\"duration\":2400,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"},{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 2,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "CYCLE",
-      //                 "classesJson": "{\"id\":\"\",\"sportType\":\"CYCLE\",\"title\":\"123\",\"groupId\":26,\"duration\":\"00:20:00\",\"distance\":\"\",\"sth\":3600,\"mode\":1,\"summary\":\"\",\"tags\":[],\"stages\":[{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 3,
-      //         "details": [],
-      //         "competitionDtoList": [
-      //             {
-      //                 "id": 5,
-      //                 "priority": 1,
-      //                 "competitionName": "测试赛事",
-      //                 "competitionType": 1,
-      //                 "competitionLocation": "北京市/市辖区/东城区",
-      //                 "competitionDistance": "10km",
-      //                 "competitionTime": null,
-      //                 "officialCompetitionId": null,
-      //                 "competitionTypeEnum": "RUNNING",
-      //                 "competitionDistanceEnum": "RUNNING_10K",
-      //                 "priorityEnum": "PRIMARY"
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "day": 4,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "RUN",
-      //                 "classesJson": "{\"id\":\"\",\"sportType\":\"RUN\",\"title\":\"222\",\"groupId\":25,\"duration\":\"--:--:--\",\"distance\":\"10.00\",\"sth\":\"\",\"mode\":1,\"summary\":\"\",\"tags\":[],\"stages\":[{\"times\":1,\"sections\":[{\"title\":\"跑步\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"distance\",\"range\":\"range\",\"target\":\"00:20:00\",\"targetDistance\":10,\"targetUnit\":\"km\",\"hasCadence\":false,\"thresholdSpeed\":80,\"thresholdSpeedRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetSpeed\":\"05:00\",\"targetSpeedRange\":[\"03:30\",\"05:00\"],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[160,200],\"lap\":false,\"targetSeconds\":600}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":600,\"stageTimeline\":[{\"duration\":600,\"intensity\":82.5,\"title\":\"跑步\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 8,
-      //         "details": [],
-      //         "competitionDtoList": [
-      //             {
-      //                 "id": 6,
-      //                 "priority": 1,
-      //                 "competitionName": "测试赛事2",
-      //                 "competitionType": 2,
-      //                 "competitionLocation": "天津市/县/宁河县",
-      //                 "competitionDistance": "25.75km",
-      //                 "competitionTime": null,
-      //                 "officialCompetitionId": null,
-      //                 "competitionTypeEnum": "TRIATHLON",
-      //                 "competitionDistanceEnum": "SPRINT",
-      //                 "priorityEnum": "PRIMARY"
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "day": 15,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "SWIM",
-      //                 "classesJson": "{\"id\":\"\",\"title\":\"123\",\"groupId\":25,\"sportType\":\"SWIM\",\"distance\":1000,\"distanceUnit\":\"m\",\"duration\":\"\",\"sth\":0,\"summary\":\"\",\"tags\":[]}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     },
-      //     {
-      //         "day": 18,
-      //         "details": [],
-      //         "competitionDtoList": [
-      //             {
-      //                 "id": 7,
-      //                 "priority": 1,
-      //                 "competitionName": "测试赛事3",
-      //                 "competitionType": 1,
-      //                 "competitionLocation": "重庆市/县/大足县",
-      //                 "competitionDistance": "21.1km",
-      //                 "competitionTime": null,
-      //                 "officialCompetitionId": null,
-      //                 "competitionTypeEnum": "RUNNING",
-      //                 "competitionDistanceEnum": "RUNNING_HALF_MARATHON",
-      //                 "priorityEnum": "PRIMARY"
-      //             }
-      //         ]
-      //     },
-      //     {
-      //         "day": 22,
-      //         "details": [
-      //             {
-      //                 "classesId": null,
-      //                 "sportType": "CYCLE",
-      //                 "classesJson": "{\"id\":98,\"title\":\"骑车测试\",\"groupId\":0,\"duration\":\"03:20:00\",\"distance\":\"\",\"sth\":36000,\"mode\":1,\"summary\":\"\",\"tags\":[],\"stages\":[{\"times\":\"4\",\"sections\":[{\"title\":\"热身\",\"stageMode\":\"warmup\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200},{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]},{\"times\":1,\"sections\":[{\"title\":\"骑行\",\"stageMode\":\"bike\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]},{\"times\":1,\"sections\":[{\"title\":\"冷身\",\"stageMode\":\"cooling\",\"summary\":\"\",\"tags\":[],\"capacity\":\"time\",\"range\":\"range\",\"target\":\"00:20:00\",\"hasCadence\":false,\"thresholdFtp\":80,\"thresholdFtpRange\":[80,85],\"thresholdHeartRate\":80,\"thresholdHeartRateRange\":[80,85],\"targetFtp\":230,\"targetFtpRange\":[140,160],\"targetHeartRate\":150,\"targetHeartRateRange\":[110,150],\"cadence\":[80,90],\"lap\":false,\"targetSeconds\":1200}]}],\"durationSeconds\":\"\",\"distanceMeters\":\"\",\"timeline\":[{\"duration\":9600,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"热身\"},{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":\"4\"},{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"骑行\"}],\"times\":1},{\"duration\":1200,\"stageTimeline\":[{\"duration\":1200,\"intensity\":82.5,\"title\":\"冷身\"}],\"times\":1}],\"maxIntensity\":82.5}"
-      //             }
-      //         ],
-      //         "competitionDtoList": []
-      //     }
-      // ]
-
+      // console.log("日常详情-resDayDetail", resDayDetail);
       // 处理并重组数据
       const completeData = this.completePlanDayData(resDayDetail.result);
-      console.log("completeData", completeData);
+      // console.log("completeData", completeData);
       const formattedData = this.formatPlanDayDetail(completeData);
-      console.log("重组后的数据-formattedData", formattedData);
+      // console.log("重组后的数据-formattedData", formattedData);
 
       // return formattedData;
       this.planList = formattedData;
+      this.showMore = true;
     },
     /**
-     * 补充完整28天的数据
-     * 如果返回数据中最后一条数据的day不是28，则补充完整28天
+     * 补充完整周数的数据
+     * 根据最后一条数据的day值除以7向上取整作为周数
+     * 如果周数小于4，则补充数据至4周（28天）
+     * 如果周数大于等于4，则补充数据至当前周数（周数 * 7天）
      * @param {Array} data - getPlanDayDetail接口返回的原始数据
-     * @returns {Array} 补充完整后的数据，确保包含1-28天的数据
+     * @returns {Array} 补充完整后的数据
      */
     completePlanDayData(data) {
       if (!Array.isArray(data) || data.length === 0) {
-        // 如果数据为空，返回28天的空数据
+        // 如果数据为空，返回28天的空数据（4周）
         const result = [];
         for (let day = 1; day <= 28; day++) {
           result.push({
@@ -393,23 +283,22 @@ export default {
       // 找到最大的day值（最后一条数据的day）
       const maxDay = Math.max(...data.map((item) => item.day));
 
-      // 如果最大day不是28，需要补充缺失的天数
-      if (maxDay < 28) {
-        // 从最大day+1开始，补充到28，把数据push到数组中
-        for (let day = maxDay + 1; day <= 28; day++) {
-          const newDayData = {
-            day: day,
-            details: [],
-            competitionDtoList: [],
-          };
-          data.push(newDayData);
-          dayMap.set(day, newDayData);
-        }
+      // 计算周数：最后一条day的数值除以7向上取整
+      const weekCount = Math.ceil(maxDay / 7);
+
+      // 确定目标天数
+      let targetDays;
+      if (weekCount < 4) {
+        // 如果周数小于4，补充至4周（28天）
+        targetDays = 28;
+      } else {
+        // 如果周数大于等于4，补充至当前周数（周数 * 7天）
+        targetDays = weekCount * 7;
       }
 
-      // 确保1-28天的数据都存在，如果中间有缺失的天数也要补充
+      // 确保1到目标天数的数据都存在，如果中间有缺失的天数也要补充
       const completeData = [];
-      for (let day = 1; day <= 28; day++) {
+      for (let day = 1; day <= targetDays; day++) {
         if (dayMap.has(day)) {
           completeData.push(dayMap.get(day));
         } else {
@@ -486,23 +375,14 @@ export default {
       this.showViewClassCard = true;
       this.classModalData = this.findClassById(classId);
     },
-    handleViewPlanClass(cardInfo) {
-      console.log("handleViewPlanClass-cardInfo", cardInfo);
-      // cardInfo 包含完整的卡片信息：
-      // {
-      //   classItem: 课程项数据,
-      //   classIndex: 课程在当前天的索引,
-      //   weekIndex: 周索引（从0开始）,
-      //   weekNumber: 周数（从1开始）,
-      //   globalDay: 全局天数（1-28）,
-      //   boxIndex: 盒子索引（0-6）,
-      //   clickPosition: 点击位置 { clientX, clientY }
-      // }
+    handleViewPlanClass(classItem, clickPosition) {
+      console.log("handleViewPlanClass-classItem", classItem);
+      console.log("handleViewPlanClass-clickPosition", clickPosition);
       this.showViewPlanDetail = true;
       // 使用 classItem 作为课程数据
-      this.classModalData = cardInfo?.classItem || cardInfo;
+      this.classModalData = classItem || {};
       // 保存点击位置
-      this.clickPosition = cardInfo?.clickPosition || null;
+      this.clickPosition = clickPosition || null;
     },
     /**
      * 通过ID查找课程
@@ -632,20 +512,25 @@ export default {
     /**
      * 删除计划
      */
-    handleDeletePlan(groupId) {
-      this.$confirm("确认删除该计划？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        // 调用删除分组API
-        // groupApi.deleteGroup(groupId).then((res) => {
-        //   if (res.success) {
-        //     this.$message.success("删除成功");
-        //     this.getPlanList();
-        //   }
-        // });
-      });
+    handleDeletePlan() {
+      const _this = this;
+      if (_this.currentPlanDetail.id) {
+        this.$confirm("确认删除该计划？", "提示", {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          // 调用删除分组API
+          planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
+            if (res.success) {
+              this.$message.success("删除成功");
+              this.getPlanList();
+              this.planTitle = '';
+              this.planList = [[], [], [], []];
+            }
+          });
+        });
+      }
     },
   },
 };
