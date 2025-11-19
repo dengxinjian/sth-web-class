@@ -68,6 +68,7 @@
       <el-form-item label="计划源">
         <el-input
           :readonly="true"
+          placeholder="请输入计划源"
           :value="planInfo.teamName + ' - ' + planInfo.possessNickname"
         />
       </el-form-item>
@@ -78,12 +79,20 @@
 
       <el-form-item label="邮箱" prop="email">
         <!-- <el-input v-model="form.email" placeholder="请输入邮箱" /> -->
-        <el-input :readonly="true" :value="planInfo.email" />
+        <el-input
+          :readonly="true"
+          :value="planInfo.email"
+          placeholder="请输入邮箱"
+        />
       </el-form-item>
 
       <el-form-item label="微信号" prop="weChat">
         <!-- <el-input v-model="form.weChat" placeholder="请输入微信号" /> -->
-        <el-input :readonly="true" :value="planInfo.weChat" />
+        <el-input
+          :readonly="true"
+          :value="planInfo.weChat"
+          placeholder="请输入微信号"
+        />
       </el-form-item>
 
       <el-form-item label="描述" prop="description">
@@ -95,6 +104,7 @@
         <el-input
           type="textarea"
           :readonly="true"
+          placeholder="请输入描述"
           :value="planInfo.description"
         />
       </el-form-item>
