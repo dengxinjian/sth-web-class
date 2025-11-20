@@ -17,14 +17,8 @@
       size="small"
     >
       <el-form-item label="计划名称" prop="planTitle">
-        <el-input
-          v-model="form.planTitle"
-          maxlength="20"
-          show-word-limit
-          placeholder="请输入计划名称"
-          clearable
-          :readonly="activeClassType === 'official'"
-        />
+        <span v-if="activeClassType === 'official'">{{ form.planTitle }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.planTitle" maxlength="20" show-word-limit placeholder="请输入计划名称" clearable />
       </el-form-item>
 
       <el-form-item label="分组选择" prop="planGroupId">
@@ -43,10 +37,11 @@
             :value="g.id"
           />
         </el-select>
-        <el-input v-else :readonly="true" :value="planInfo.planGroupName" />
+        <!-- <el-input v-else :readonly="true" :value="planInfo.planGroupName" /> -->
+        <span v-else>{{ planInfo.planGroupName }}</span>
       </el-form-item>
 
-      <el-form-item label="团队" prop="teamId">
+      <el-form-item label="团队" prop="teamId" v-if="loginType === '2'">
         <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
@@ -62,24 +57,24 @@
             :value="g.id"
           />
         </el-select>
-        <el-input v-else :readonly="true" :value="planInfo.teamName" />
+        <!-- <el-input v-else :readonly="true" :value="planInfo.teamName" /> -->
+        <span v-else>{{ planInfo.teamName }}</span>
       </el-form-item>
 
       <el-form-item label="计划源">
-        <el-input
-          :readonly="activeClassType === 'official'"
-          placeholder="请输入计划源"
-          :value="planSource()"
-        />
+        <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" placeholder="请输入计划源" :value="planSource()" />
       </el-form-item>
 
       <el-form-item label="拥有者">
-        <el-input :readonly="true" :value="planInfo.possessNickname" />
+        <span v-if="activeClassType === 'official'">{{ planInfo.possessNickname }}</span>
+        <el-input v-else :readonly="true" :value="planInfo.possessNickname" />
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
-        <!-- <el-input v-model="form.email" placeholder="请输入邮箱" /> -->
+         <span v-if="activeClassType === 'official'">{{ form.email }}</span>
         <el-input
+          v-else
           :readonly="activeClassType === 'official'"
           v-model="form.email"
           placeholder="请输入邮箱"
@@ -87,26 +82,13 @@
       </el-form-item>
 
       <el-form-item label="微信号" prop="weChat">
-        <!-- <el-input v-model="form.weChat" placeholder="请输入微信号" /> -->
-        <el-input
-          :readonly="activeClassType === 'official'"
-          v-model="form.weChat"
-          placeholder="请输入微信号"
-        />
+        <span v-if="activeClassType === 'official'">{{ form.weChat }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.weChat" placeholder="请输入微信号" />
       </el-form-item>
 
       <el-form-item label="描述" prop="description">
-        <!-- <el-input
-          type="textarea"
-          v-model="form.description"
-          placeholder="请输入描述"
-        /> -->
-        <el-input
-          type="textarea"
-          :readonly="activeClassType === 'official'"
-          v-model="form.description"
-          placeholder="请输入描述"
-        />
+        <span v-if="activeClassType === 'official'">{{ form.description }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.description" placeholder="请输入描述" />
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
@@ -214,7 +196,8 @@
     </el-form>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel">取消</el-button>
+      <el-button @click="onCancel" v-if="activeClassType === 'official'">关闭</el-button>
+      <el-button @click="onCancel" v-if="activeClassType !== 'official'">取消</el-button>
       <el-button type="primary" v-if="activeClassType !== 'official'" @click="onConfirm">确定</el-button>
     </span>
   </el-dialog>
@@ -258,6 +241,7 @@ export default {
       groups: [],
       teams: [],
       emptyPlanClasses: [[], [], [], []],
+      loginType: localStorage.getItem("loginType") || "",
     };
   },
   computed: {
