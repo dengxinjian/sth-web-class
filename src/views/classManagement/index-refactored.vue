@@ -403,15 +403,17 @@ export default {
       console.log("赛事数据:", data);
       data.competitionTime = this.addScheduleDate;
       if (!this.isEditMode) {
-        competitionApi.createCompetition(data).then((res) => {
-          if (res.success) {
+        competitionApi
+          .createCompetition(data, this.selectedAthletic)
+          .then(() => {
             this.$message.success("赛事保存成功");
             this.showAddEvent = false;
             // this.getScheduleData();
-          } else {
-            this.$message.error(res.message);
-          }
-        });
+          })
+          .catch((err) => {
+            const message = err?.message || err || "赛事保存失败";
+            this.$message.error(message);
+          });
       } else {
         competitionApi.updateCompetition(data).then((res) => {
           if (res.success) {

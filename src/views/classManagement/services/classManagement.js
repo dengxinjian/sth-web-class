@@ -3,6 +3,7 @@
  */
 
 import { getData, submitData } from "@/api/common.js";
+import request from "@/utils/request";
 
 /**
  * 团队相关API
@@ -222,12 +223,21 @@ export const competitionApi = {
       url: "/api/competition/dropdown-options",
     });
   },
-
+  // 426bc17606074ed298580208f3ece3b1
   // 创建赛事
-  createCompetition(data) {
-    return submitData({
+  createCompetition(data, triUserId) {
+    return request({
       url: "/api/competition",
-      requestData: data,
+      method: "post",
+      data,
+      headers: {
+        requestUserInfoId: triUserId,
+      },
+    }).then((res) => {
+      if (res.success) {
+        return res.result;
+      }
+      return Promise.reject(res.message || "创建赛事失败");
     });
   },
 

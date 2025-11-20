@@ -122,6 +122,7 @@
             :scroll-speed="10"
             ghost-class="is-plan-drag-ghost"
             :key="item.timespan"
+            filter=".official-class"
           >
             <ClassCard
               v-for="classItem in item.classesList"

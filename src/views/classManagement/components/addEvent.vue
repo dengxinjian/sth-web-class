@@ -142,7 +142,16 @@ export default {
           { required: true, message: "请选择优先级", trigger: "change" },
         ],
         eventName: [
-          { required: true, message: "请输入赛事名称", trigger: "blur" },
+          {
+            validator: (rule, value, callback) => {
+              if (!value || !value.trim()) {
+                callback(new Error("请输入赛事名称"));
+              } else {
+                callback();
+              }
+            },
+            trigger: ["blur", "change"],
+          },
         ],
         location: [
           { required: true, message: "请选择赛事地点", trigger: "change" },
@@ -283,8 +292,8 @@ export default {
       if (distanceValue === "OTHER") {
         this.showCustomDistance = true;
         this.formData.customDistance =
-          data.customDistance ||
-          this.extractDistanceNumber(data.competitionDistance);
+          data.competitionDistanceValue ||
+          this.extractDistanceNumber(data.competitionDistanceValue);
       } else {
         this.showCustomDistance = false;
         this.formData.customDistance = "";
@@ -432,7 +441,14 @@ export default {
       return match ? match[0] : "";
     },
     handleCustomDistanceInput() {
-      // 自定义距离输入时的处理
+      // 自定义距离输入时的处理 需要校验是小数时 只能输入2位小数
+      if (this.formData.customDistance) {
+        const num = parseFloat(this.formData.customDistance);
+        if (isNaN(num) || num <= 0 || num.toString().split('.')[1]?.length > 2) {
+          this.$message.error("请输入有效的距离值，小数点后最多2位");
+          this.formData.customDistance = "";
+        }
+      }
     },
     handleClose() {
       this.innerVisible = false;
@@ -480,6 +496,7 @@ export default {
               competitionLocation: locationStr,
               competitionName: this.formData.eventName,
               competitionType: competitionTypeDisplayValue,
+              competitionDistanceValue: this.formData.customDistance,
               priority: priority,
             };
             // 如果是编辑模式，添加 id
