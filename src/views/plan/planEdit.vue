@@ -524,9 +524,7 @@ export default {
 
       // 添加课程到 details 数组
       dayData.details.push(saveData);
-
-      // 触发响应式更新
-      this.$forceUpdate();
+      console.log(this.planData.dayDetails, "this.planData.dayDetails");
 
       if (flag) {
         this.showAddClassModal = false;
@@ -534,8 +532,10 @@ export default {
         this.selectedSportType = null;
       }
       if (this.CreatePlanCourseDialogData.mode === "SAVE") {
-        this.savePlanCourse(saveData);
+        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
       }
+      // 触发响应式更新
+      this.$forceUpdate();
     },
 
     // 如果是永久保存 需要走接口
