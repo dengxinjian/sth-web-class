@@ -107,10 +107,18 @@
         ]"
       > -->
         <el-row :gutter="24" class="member-row" v-if="form.athleteType === 2">
-          <el-col :span="4" align="right"><span class="member-name">成员</span></el-col>
-          <el-col :span="8" align="left"><span class="member-name">方式</span></el-col>
-          <el-col :span="11" align="left"><span class="member-name">时间</span></el-col>
-          <el-col :span="1" align="left"><span class="member-name"></span></el-col>
+          <el-col :span="4" align="right"
+            ><span class="member-name">成员</span></el-col
+          >
+          <el-col :span="8" align="left"
+            ><span class="member-name">方式</span></el-col
+          >
+          <el-col :span="11" align="left"
+            ><span class="member-name">时间</span></el-col
+          >
+          <el-col :span="1" align="left"
+            ><span class="member-name"></span
+          ></el-col>
         </el-row>
         <template v-if="form.athleteType === 2 && members.length > 0">
           <el-row
@@ -134,7 +142,7 @@
                 value-format="yyyy-MM-dd"
                 type="date"
                 placeholder="选择日期"
-                style="width: 100%;"
+                style="width: 100%"
                 :picker-options="pickerOptions"
               >
               </el-date-picker>
@@ -186,6 +194,7 @@
 
 <script>
 import { getData, submitData } from "@/api/common.js";
+import moment from "moment";
 export default {
   name: "ApplyCoach",
   props: {
@@ -194,6 +203,7 @@ export default {
     defaultTitle: { type: String, default: "" },
     defaultGroupId: { type: [String, Number], default: undefined },
     planInfo: { type: Object, default: () => {} },
+    planClasses: { type: Array, default: () => [] },
   },
   data() {
     return {
@@ -292,14 +302,14 @@ export default {
       const newMembers =
         this.members.length > 0
           ? memberList.map((item) => {
-            const findItem = this.members.find(
-              (el) => el.triUserId === item.triUserId
-            );
-            return {
-              ...item,
-              ...findItem,
-            };
-          })
+              const findItem = this.members.find(
+                (el) => el.triUserId === item.triUserId
+              );
+              return {
+                ...item,
+                ...findItem,
+              };
+            })
           : memberList;
       this.members = newMembers;
     },
@@ -322,6 +332,34 @@ export default {
       this.innerVisible = false;
       this.$emit("cancel");
     },
+    diffEndDate(dates, classes) {
+      // 边界检查
+      if (!dates || dates.length === 0 || !classes || classes.length === 0) {
+        return false;
+      }
+
+      // 找出最小日期
+      const minDate = dates.reduce(
+        (min, date) => (moment(date).isBefore(moment(min)) ? date : min),
+        dates[0]
+      );
+
+      // 找出最大day值
+      const maxDay = classes.reduce(
+        (max, item) => Math.max(max, item.day || 0),
+        classes[0]?.day || 0
+      );
+
+      // 计算结束日期：今天 + maxDay 天
+      const endDate = moment().add(maxDay, "days");
+
+      // 判断最小日期是否在结束日期之前
+      return {
+        isBefore: moment(minDate).isBefore(endDate),
+        minDate: minDate,
+        endDate: endDate,
+      };
+    },
     onConfirm() {
       const _this = this;
       this.loading = true;
@@ -333,15 +371,15 @@ export default {
           targets =
             _this.form.athleteType === 1
               ? _this.form.athleteIds.map((item) => ({
-                triUserId: item,
-                applyDate: _this.form.applyDate,
-                applyMode: _this.form.applyMode,
-              }))
+                  triUserId: item,
+                  applyDate: _this.form.applyDate,
+                  applyMode: _this.form.applyMode,
+                }))
               : _this.members.map((item) => ({
-                triUserId: item.triUserId,
-                applyDate: item.applyDate,
-                applyMode: item.applyMode,
-              }));
+                  triUserId: item.triUserId,
+                  applyDate: item.applyDate,
+                  applyMode: item.applyMode,
+                }));
         } else {
           targets = [
             {
@@ -351,31 +389,86 @@ export default {
             },
           ];
         }
-
-        const params = {
-          planClassesId: _this.planInfo.id,
-          teamId: _this.planInfo.teamId,
-          targets,
-        };
-        submitData({
-          url: "/api/planClasses/applyPlanClasses",
-          requestData: params,
-        })
-          .then((res) => {
-            if (res.success) {
-              _this.$message.success("应用成功");
-              _this.innerVisible = false;
-              _this.$emit("cancel", true);
-              _this.loading = false;
-            }
-          })
-          .catch(() => {
-            _this.loading = false;
-          })
-          .finally(() => {
-            _this.loading = false;
-          });
+        const findEndDate = targets.filter((item) => item.applyMode === 2);
+        // console.log(findEndDate, "findEndDate");
+        const planList = _this.planClasses
+          .flat()
+          .filter((item) => item.details.length > 0);
+        // console.log(findEndDate, "findEndDate");
+        // console.log("planList", planList);
+        // console.log(targets, "targets");
+        // console.log(_this.diffEndDate(findEndDate, planList), "diffEndDate");
+        const diffEndDate = _this.diffEndDate(findEndDate, planList);
+        // console.log(diffEndDate, "diffEndDate");
+        if (!diffEndDate.isBefore) {
+          _this.applyPlanClasses(targets);
+          return;
+        } else {
+          if (_this.loginType === "1") {
+            this.$confirm(
+              "当前应用日期小于计划日期，只会部分应用，是否继续应用？",
+              "提示",
+              {
+                confirmButtonText: "继续应用",
+                cancelButtonText: "取消",
+                type: "warning",
+              }
+            )
+              .then(() => {
+                _this.applyPlanClasses(targets);
+              })
+              .catch(() => {
+                _this.loading = false;
+              });
+          } else {
+            const findPerson = _this.athletesOptions.find(
+              (item) => item.triUserId === diffEndDate.minDate.triUserId
+            );
+            console.log(findPerson, "findPerson");
+            this.$confirm(
+              `${findPerson.userNickname}的应用日期小于计划日期，只会部分应用，是否继续应用？`,
+              "提示",
+              {
+                confirmButtonText: "继续应用",
+                cancelButtonText: "取消",
+                type: "warning",
+              }
+            )
+              .then(() => {
+                _this.applyPlanClasses(targets);
+              })
+              .catch(() => {
+                _this.loading = false;
+              });
+          }
+        }
       });
+    },
+    applyPlanClasses(targets) {
+      const _this = this;
+      const params = {
+        planClassesId: _this.planInfo.id,
+        teamId: _this.planInfo.teamId,
+        targets,
+      };
+      submitData({
+        url: "/api/planClasses/applyPlanClasses",
+        requestData: params,
+      })
+        .then((res) => {
+          if (res.success) {
+            _this.$message.success("应用成功");
+            _this.innerVisible = false;
+            _this.$emit("cancel", true);
+            _this.loading = false;
+          }
+        })
+        .catch(() => {
+          _this.loading = false;
+        })
+        .finally(() => {
+          _this.loading = false;
+        });
     },
     resetForm() {
       this.form = {

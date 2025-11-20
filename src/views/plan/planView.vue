@@ -76,10 +76,11 @@
       :planClasses="planList"
       @save="onSaveCopy"
     />
-    <!-- 应用教练 -->
+    <!-- 应用计划 -->
     <ApplyCoach
       v-model="showApplyCoach"
       :planInfo="currentPlanDetail"
+      :planClasses="planList"
       @cancel="handleApplyCoachCancel"
     />
     <!-- 应用历史 -->
