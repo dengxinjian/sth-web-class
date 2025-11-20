@@ -128,12 +128,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekSwimmingDuration())
                 }}{{ secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">{{ getweekSwimmingDistance() || "--:--:--" }} </el-col>
+              <el-col :span="8">{{ getweekSwimmingDistance() || "NA" }} </el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -142,13 +142,13 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekCycleDuration())
                 }}{{ secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
               <el-col :span="8"
-                >{{ getweekCycleDistance() || "--:--:--" }}
+                >{{ getweekCycleDistance() || "NA" }}
               </el-col>
             </el-row>
           </el-col>
@@ -158,12 +158,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekRunDuration())
                 }}{{ secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">{{ getweekRunDistance() || "--:--:--" }}</el-col>
+              <el-col :span="8">{{ getweekRunDistance() || "NA" }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -172,12 +172,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekPowerDuration())
                 }}{{ secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">--:--:--</el-col>
+              <el-col :span="8">NA</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -186,12 +186,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekOtherDuration()) || "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekOtherDuration())
                 }}{{ secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">--:--:--</el-col>
+              <el-col :span="8">NA</el-col>
             </el-row>
           </el-col>
           <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
@@ -200,13 +200,13 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekDuration())
                 }}
                 {{ secondsToHHMMSS(getweekDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">{{ getweekDistance() || "--:--:--" }}</el-col>
+              <el-col :span="8">{{ getweekDistance() || "NA" }}</el-col>
             </el-row>
           </el-col>
         </el-row>
@@ -568,7 +568,7 @@ export default {
         );
       }, 0);
       const weekDistance = distanceTotal / 4 || 0;
-      if (weekDistance === 0) return "--:--:--";
+      if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
@@ -666,7 +666,7 @@ export default {
       }, 0);
       // console.log("distanceTotal-游泳总和", distanceTotal);
       const weekDistance = distanceTotal / 4 || 0;
-      if (weekDistance === 0) return "--:--:--";
+      if (weekDistance === 0) return "NA";
       const distanceKm = weekDistance / 1000;
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = distanceKm % 1 === 0 ? distanceKm : distanceKm.toFixed(2);
@@ -763,7 +763,7 @@ export default {
       }, 0);
       // console.log("distanceTotal-骑行总和", distanceTotal);
       const weekDistance = distanceTotal / 4 || 0;
-      if (weekDistance === 0) return "--:--:--";
+      if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
@@ -868,7 +868,7 @@ export default {
       // console.log("distanceTotal-跑步总和", distanceTotal);
       const weekDistance = distanceTotal / 4 || 0;
       // console.log("weekDistance-跑步", weekDistance);
-      if (weekDistance === 0) return "--:--:--";
+      if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
