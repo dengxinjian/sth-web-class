@@ -175,6 +175,13 @@ export default {
       },
       immediate: true,
       deep: true
+    },
+    // 监听 activeClassType 变化
+    activeClassType: {
+      handler(newVal) {
+        this.handleClassTypeChange(newVal)
+      },
+      immediate: true
     }
   },
   mounted() {

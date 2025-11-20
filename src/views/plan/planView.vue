@@ -49,6 +49,9 @@
       v-model="addPlanVisible"
       :current-group-id="currentPlanGroupId"
       :activeClassType="activeClassType"
+      :copyOfficialPlanInfo="copyOfficialPlanInfo"
+      :planList="planList"
+      @addPlanSuccess="handleAddPlanSuccess"
     />
     <!-- 添加分组 -->
     <AddGroup
@@ -150,6 +153,7 @@ export default {
       planSearchInput: "",
       currentPlanDetail: {},
       currentPlanDayDetail: [],
+      copyOfficialPlanInfo: null,
     };
   },
   watch: {
@@ -164,8 +168,9 @@ export default {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
       console.log("this.$route.query", this.$route.query);
-      const { id, planGroupId, type } = this.$route.query;
+      const { id, planGroupId, type, activeClassType } = this.$route.query;
       if (id && planGroupId) {
+        this.activeClassType = activeClassType || "my";
         this.currentPlanId = id;
         this.currentPlanGroupId = planGroupId;
         this.getPlanDetail(id);
@@ -188,6 +193,19 @@ export default {
     this.getPlanList();
   },
   methods: {
+    handleAddPlanSuccess(payload) {
+      this.getPlanDetail(payload.id);
+      this.getPlanDayDetail(payload.id);
+      this.$nextTick(() => {
+        this.activeClassType = 'my';
+        this.currentPlanId = payload.id;
+        this.currentPlanGroupId = payload.planGroupId;
+        this.planTitle = payload.planTitle;
+        this.currentPlanDetail = payload;
+        this.copyOfficialPlanInfo = null;
+        this.addPlanVisible = false;
+      });
+    },
     onSaveCopy(payload) {
       this.showCopy = false;
       this.getPlanList();
@@ -479,7 +497,16 @@ export default {
           _this.showSummaryPreview = true;
         },
         1: () => {
-          _this.handleEditPlan();
+          if (_this.activeClassType === "official") {
+            console.log(
+              "currentPlanDetail-copyOfficialPlanInfo",
+              _this.currentPlanDetail
+            );
+            _this.copyOfficialPlanInfo = _this.currentPlanDetail;
+            _this.handleAddPlan(_this.currentPlanDetail.planGroupId);
+          } else {
+            _this.handleEditPlan();
+          }
         },
         2: () => {
           _this.showCopy = true;

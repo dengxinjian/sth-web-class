@@ -103,14 +103,15 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm">下一步</el-button>
+      <el-button type="primary" @click="onConfirm" v-if="!copyOfficialPlanInfo">下一步</el-button>
+      <el-button type="primary" @click="addPlan" v-else>确定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
 import { getData, submitData } from "@/api/common.js";
-
+import { planApi } from "../../services/planManagement";
 export default {
   name: "AddPlan",
   props: {
@@ -118,6 +119,8 @@ export default {
     value: { type: Boolean, default: undefined },
     currentGroupId: { type: [String, Number], default: undefined },
     activeClassType: { type: String, default: "my" },
+    copyOfficialPlanInfo: { type: Object, default: null },
+    planList: { type: Array, default: () => [] },
   },
   data() {
     return {
@@ -215,11 +218,36 @@ export default {
         this.form.planGroupId = val;
       }
     },
+    copyOfficialPlanInfo(val) {
+      console.log("copyOfficialPlanInfo-val", val);
+      if (val) {
+        this.$nextTick(() => {
+          this.form = {
+            ...this.form,
+            ...val,
+            planTitle: val.planTitle,
+            planGroupId: this.currentGroupId,
+            teamId: val.teamId,
+            planSource: `${val.teamName} - ${val.possessNickname}`,
+            email: val.email,
+            weChat: val.weChat,
+            description: val.description,
+          };
+        });
+        // 清除表单验证状态
+        if (this.$refs.formRef) {
+          this.$refs.formRef.clearValidate();
+        }
+      }
+    },
   },
   beforeDestroy() {
     this.resetForm();
   },
   methods: {
+    onCopyPlan() {
+      this.$emit("copyPlan", this.form);
+    },
     getTeamDetail() {
       getData({
         url: "/api/team/my-team",
@@ -317,20 +345,51 @@ export default {
       const nameValue =
         localStorage.getItem("name")?.split("#")[0] || undefined;
       this.form = {
-        planTitle: undefined,
-        planGroupId: undefined,
-        teamId: undefined,
-        planSource: nameValue,
+        planTitle: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.planTitle : undefined,
+        planGroupId: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.planGroupId : undefined,
+        teamId: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.teamId : undefined,
+        planSource: this.copyOfficialPlanInfo ? `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}` : nameValue,
         possessNickname: nameValue,
-        email: undefined,
-        weChat: undefined,
-        description: undefined,
+        email: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.email : undefined,
+        weChat: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.weChat : undefined,
+        description: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.description : undefined,
       };
       this.$nextTick(() => {
         if (this.$refs.formRef) {
           this.$refs.formRef.clearValidate();
         }
       });
+    },
+    // 添加计划
+    async addPlan() {
+      console.log("addPlan-this.planList", this.planList);
+      console.log("addPlan-this.form", this.form);
+      const planData = this.planList.flat().map(item => {
+        return {
+          ...item,
+          details: item.details.map(el => {
+            return {
+              ...el,
+              classesJson: JSON.stringify(el.classesJson),
+            }
+          }),
+        };
+      }).filter(el => el.details.length > 0 || el.competitionDtoList.length > 0);
+      console.log("addPlan-planData", planData);
+      const res = await planApi.addPlan({
+        planTitle: this.form.planTitle,
+        planGroupId: this.form.planGroupId,
+        teamId: this.form.teamId,
+        email: this.form.email,
+        weChat: this.form.weChat,
+        description: this.form.description,
+        dayDetails: planData,
+      });
+      if (res.success) {
+        this.$message.success("添加成功");
+        this.onCancel();
+        this.$emit("addPlanSuccess", res.result);
+      }
     },
   },
 };
