@@ -27,19 +27,14 @@
         @view-class="handleViewPlanClass"
       />
     </div>
-    <ViewPlanCard
-      :visible="showViewClassCard"
-      :class-item="classModalData"
-      :active-class-type="activeClassType"
-      @close="showViewClassCard = false"
-      type="view"
-    />
+    <!-- 查看计划详情 -->
     <ViewPlanDetail
       :visible="showViewPlanDetail"
       :class-item="classModalData"
       :click-position="clickPosition"
       @close="showViewPlanDetail = false"
     />
+    <!-- 复制课程 -->
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
       :class-id="copyClassFromOfficialClassId"
@@ -88,7 +83,6 @@
 <script>
 import { parseClassesJson } from "../classManagement/utils/helpers";
 import PlanList from "./components/PlanList.vue";
-import ViewPlanCard from "./components/ViewPlanCard/index.vue";
 import ViewPlanDetail from "./components/ViewPlanDetail/index.vue";
 import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOfficial/index.vue";
 import PlannedScheduleView from "./components/plannedScheduleView.vue";
@@ -106,11 +100,9 @@ export default {
   name: "PlanView",
   components: {
     PlanList,
-    ViewPlanCard,
     ViewPlanDetail,
     CopyClassFromOfficial,
     PlannedScheduleView,
-    // PlannedSchedule,
     AddPlan,
     AddGroup,
     SummaryPreview,
@@ -533,7 +525,7 @@ export default {
             if (res.success) {
               this.$message.success("删除成功");
               this.getPlanList();
-              this.planTitle = '';
+              this.planTitle = "";
               this.planList = [[], [], [], []];
             }
           });

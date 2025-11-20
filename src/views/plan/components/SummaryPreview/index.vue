@@ -66,15 +66,17 @@
       </el-form-item>
 
       <el-form-item label="计划源">
-        <el-input
+        <!-- <el-input
           :readonly="activeClassType === 'official'"
           placeholder="请输入计划源"
           :value="planSource()"
-        />
+        /> -->
+        {{ planSource() }}
       </el-form-item>
 
       <el-form-item label="拥有者">
-        <el-input :readonly="true" :value="planInfo.possessNickname" />
+        <!-- <el-input :readonly="true" :value="planInfo.possessNickname" /> -->
+         {{ planInfo.possessNickname }}
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
