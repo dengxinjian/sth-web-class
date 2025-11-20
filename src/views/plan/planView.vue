@@ -45,7 +45,11 @@
     />
 
     <!-- 添加计划 -->
-    <AddPlan v-model="addPlanVisible" :current-group-id="currentPlanGroupId" />
+    <AddPlan
+      v-model="addPlanVisible"
+      :current-group-id="currentPlanGroupId"
+      :activeClassType="activeClassType"
+    />
     <!-- 添加分组 -->
     <AddGroup
       v-model="addGroupVisible"
@@ -215,7 +219,7 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
-      // console.log("日常详情-res", res);
+      console.log("日常详情-res", res);
       this.currentPlanDetail = res.result;
       this.currentPlanId = res.result.id;
       this.currentPlanGroupId = res.result.planGroupId;

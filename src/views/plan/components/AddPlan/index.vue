@@ -44,7 +44,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="团队" prop="teamId">
+      <el-form-item label="团队" prop="teamId" v-if="loginType === '2'">
         <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
@@ -61,6 +61,22 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="计划源" prop="planSource">
+        <el-input
+          :readonly="activeClassType === 'official'"
+          placeholder="请选择团队"
+          v-model="form.planSource"
+        />
+      </el-form-item>
+
+      <el-form-item label="拥有者">
+        <el-input
+          :readonly="true"
+          placeholder="请选择团队"
+          v-model="form.possessNickname"
+        />
+      </el-form-item>
+
       <el-form-item label="邮箱" prop="email">
         <el-input
           placeholder="请输入邮箱"
@@ -75,9 +91,12 @@
 
       <el-form-item label="描述" prop="description">
         <el-input
+          :rows="6"
           type="textarea"
           placeholder="请输入描述"
           v-model="form.description"
+          :maxlength="500"
+          show-word-limit
         />
       </el-form-item>
     </el-form>
@@ -98,6 +117,7 @@ export default {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
     currentGroupId: { type: [String, Number], default: undefined },
+    activeClassType: { type: String, default: "my" },
   },
   data() {
     return {
@@ -106,6 +126,9 @@ export default {
         planTitle: undefined,
         planGroupId: this.currentGroupId,
         teamId: undefined,
+        planSource: localStorage.getItem("name")?.split("#")[0] || undefined,
+        possessNickname:
+          localStorage.getItem("name")?.split("#")[0] || undefined,
         email: undefined,
         weChat: undefined,
         description: undefined,
@@ -127,7 +150,8 @@ export default {
                 callback();
                 return;
               }
-              const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+              const emailRegex =
+                /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
               if (!emailRegex.test(value)) {
                 callback(new Error("请输入正确的邮箱地址"));
               } else {
@@ -141,6 +165,8 @@ export default {
       groups: [],
       teams: [],
       emptyPlanClasses: [[], [], [], []],
+      teamInfo: {},
+      loginType: localStorage.getItem("loginType") || "",
     };
   },
   computed: {
@@ -172,6 +198,7 @@ export default {
         }
         this.getGroupList();
         this.getTeamList();
+        // this.getTeamDetail();
       } else {
         // clear validation when closing
         this.$nextTick(
@@ -193,15 +220,66 @@ export default {
     this.resetForm();
   },
   methods: {
+    getTeamDetail() {
+      getData({
+        url: "/api/team/my-team",
+      }).then((res) => {
+        console.log("团队详情-res", res);
+        this.teamInfo = res.result;
+        if (this.teamInfo.teamName && this.teamInfo.teamOwnerNickname) {
+          // 重置表单数据显示
+          this.$nextTick(() => {
+            this.form = {
+              ...this.form,
+              planSource: `${this.teamInfo.teamName} - ${this.teamInfo.teamOwnerNickname}`,
+              planSourceId: this.teamInfo.teamOwnerId,
+              possessNickname: this.teamInfo.teamOwnerNickname,
+              // teamId: this.teamInfo.id,
+            };
+          });
+          // 清除表单验证状态
+          if (this.$refs.formRef) {
+            this.$refs.formRef.clearValidate();
+          }
+        }
+      });
+    },
     validateEmail() {
       // 手动触发表单校验
       this.$refs.formRef && this.$refs.formRef.validateField("email");
+    },
+    handleTeamChange(val) {
+      const findTeam = this.teams.find((item) => item.id === val);
+      if (findTeam) {
+        if (findTeam.teamName && findTeam.teamOwnerNickname) {
+          this.$nextTick(() => {
+            this.form = {
+              ...this.form,
+              planSource: `${findTeam.teamName} - ${findTeam.teamOwnerNickname}`,
+              planSourceId: findTeam.teamOwnerId,
+              possessNickname: findTeam.teamOwnerNickname,
+            };
+          });
+        }
+      }
     },
     getGroupList() {
       getData({
         url: "/api/planClassesGroup/option",
       }).then((res) => {
         this.groups = res.result;
+        if (!this.currentGroupId) {
+          this.$nextTick(() => {
+            this.form = {
+              ...this.form,
+              planGroupId: this.groups[0].id,
+            };
+          });
+          // 清除表单验证状态
+          if (this.$refs.formRef) {
+            this.$refs.formRef.clearValidate();
+          }
+        }
       });
     },
     getTeamList() {
@@ -236,10 +314,14 @@ export default {
       });
     },
     resetForm() {
+      const nameValue =
+        localStorage.getItem("name")?.split("#")[0] || undefined;
       this.form = {
         planTitle: undefined,
         planGroupId: undefined,
         teamId: undefined,
+        planSource: nameValue,
+        possessNickname: nameValue,
         email: undefined,
         weChat: undefined,
         description: undefined,

@@ -147,7 +147,7 @@ export default {
       }, 0);
     },
     getTotalDistance() {
-      return this.planList.reduce((total, week) => {
+      const total = this.planList.reduce((total, week) => {
         return (
           total +
           week.reduce((weekTotal, item) => {
@@ -193,6 +193,8 @@ export default {
           }, 0)
         );
       }, 0);
+      // 如果是整数，不保留小数；如果有小数，保留两位小数
+      return total % 1 === 0 ? total : Number(total.toFixed(2));
     },
     getTotalDuration() {
       console.log(this.planList, "this.planList");
