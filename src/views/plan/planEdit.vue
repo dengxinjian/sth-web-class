@@ -351,6 +351,7 @@ export default {
     },
     handleClassSearch(keyword) {
       this.classSearchInput = keyword;
+      this.getClassList();
     },
     /**
      * 获取课程列表
