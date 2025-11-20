@@ -482,7 +482,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     getTotalDistance() {
       return this.planList.reduce((total, week) => {
@@ -567,7 +567,7 @@ export default {
           }, 0)
         );
       }, 0);
-      const weekDistance = distanceTotal / 4 || 0;
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
       if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
@@ -614,7 +614,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周游泳距离总和
     getweekSwimmingDistance() {
@@ -665,7 +665,7 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-游泳总和", distanceTotal);
-      const weekDistance = distanceTotal / 4 || 0;
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
       if (weekDistance === 0) return "NA";
       const distanceKm = weekDistance / 1000;
       // 如果是整数，不保留小数；如果有小数，保留两位小数
@@ -712,7 +712,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周骑行距离总和
     getweekCycleDistance() {
@@ -762,7 +762,7 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-骑行总和", distanceTotal);
-      const weekDistance = distanceTotal / 4 || 0;
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
       if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
@@ -808,7 +808,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周跑步距离总和
     getweekRunDistance() {
@@ -866,7 +866,7 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-跑步总和", distanceTotal);
-      const weekDistance = distanceTotal / 4 || 0;
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
       // console.log("weekDistance-跑步", weekDistance);
       if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
@@ -901,7 +901,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周其他时长总和
     getweekOtherDuration() {
@@ -931,7 +931,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
   },
 };
