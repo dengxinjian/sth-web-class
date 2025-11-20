@@ -87,6 +87,7 @@
             type="date"
             placeholder="选择日期"
             style="width: 100%"
+            :picker-options="pickerOptions"
           >
           </el-date-picker>
         </el-form-item>
@@ -134,6 +135,7 @@
                 type="date"
                 placeholder="选择日期"
                 style="width: 100%;"
+                :picker-options="pickerOptions"
               >
               </el-date-picker>
             </el-col>
@@ -166,6 +168,7 @@
             type="date"
             placeholder="选择日期"
             style="width: 100%"
+            :picker-options="pickerOptions"
           >
           </el-date-picker>
         </el-form-item>
@@ -229,6 +232,12 @@ export default {
       athletesList: [],
       members: [],
       loading: false,
+      pickerOptions: {
+        disabledDate(time) {
+          // 禁用今天以前的日期（不包括今天）
+          return time.getTime() < new Date().setHours(0, 0, 0, 0);
+        },
+      },
     };
   },
   computed: {
