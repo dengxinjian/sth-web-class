@@ -167,10 +167,8 @@ export default {
   mounted() {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
-      console.log("this.$route.query", this.$route.query);
-      const { id, planGroupId, type, activeClassType } = this.$route.query;
+      const { id, planGroupId, type } = this.$route.query;
       if (id && planGroupId) {
-        this.activeClassType = activeClassType || "my";
         this.currentPlanId = id;
         this.currentPlanGroupId = planGroupId;
         this.getPlanDetail(id);
@@ -237,7 +235,7 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
-      console.log("日常详情-res", res);
+      // console.log("日常详情-res", res);
       this.currentPlanDetail = res.result;
       this.currentPlanId = res.result.id;
       this.currentPlanGroupId = res.result.planGroupId;
@@ -398,8 +396,6 @@ export default {
       this.classModalData = this.findClassById(classId);
     },
     handleViewPlanClass(classItem, clickPosition) {
-      console.log("handleViewPlanClass-classItem", classItem);
-      console.log("handleViewPlanClass-clickPosition", clickPosition);
       this.showViewPlanDetail = true;
       // 使用 classItem 作为课程数据
       this.classModalData = classItem || {};
@@ -462,7 +458,6 @@ export default {
      *编辑分组
      */
     handleEditGroup(payload) {
-      console.log(payload, "payload");
       this.currentGroup = {
         id: payload.groupId,
         groupName: payload.groupName,
@@ -498,10 +493,6 @@ export default {
         },
         1: () => {
           if (_this.activeClassType === "official") {
-            console.log(
-              "currentPlanDetail-copyOfficialPlanInfo",
-              _this.currentPlanDetail
-            );
             _this.copyOfficialPlanInfo = _this.currentPlanDetail;
             _this.handleAddPlan(_this.currentPlanDetail.planGroupId);
           } else {
@@ -529,7 +520,6 @@ export default {
         ...this.currentPlanDetail,
         dayDetails: this.planList,
       };
-      console.log("params-编辑", params);
       // 将 params 保存到 planStore 中的 planData
       this.$store.dispatch("plan/savePlanData", params);
       // 跳转到 planEdit 页面

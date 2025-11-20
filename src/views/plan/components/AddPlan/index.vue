@@ -219,7 +219,6 @@ export default {
       }
     },
     copyOfficialPlanInfo(val) {
-      console.log("copyOfficialPlanInfo-val", val);
       if (val) {
         this.$nextTick(() => {
           this.form = {
@@ -252,7 +251,6 @@ export default {
       getData({
         url: "/api/team/my-team",
       }).then((res) => {
-        console.log("团队详情-res", res);
         this.teamInfo = res.result;
         if (this.teamInfo.teamName && this.teamInfo.teamOwnerNickname) {
           // 重置表单数据显示
@@ -362,8 +360,6 @@ export default {
     },
     // 添加计划
     async addPlan() {
-      console.log("addPlan-this.planList", this.planList);
-      console.log("addPlan-this.form", this.form);
       const planData = this.planList.flat().map(item => {
         return {
           ...item,
@@ -375,7 +371,6 @@ export default {
           }),
         };
       }).filter(el => el.details.length > 0 || el.competitionDtoList.length > 0);
-      console.log("addPlan-planData", planData);
       const res = await planApi.addPlan({
         planTitle: this.form.planTitle,
         planGroupId: this.form.planGroupId,
