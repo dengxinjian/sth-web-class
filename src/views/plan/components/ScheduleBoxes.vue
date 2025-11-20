@@ -205,7 +205,7 @@
               <span class="label">跑步时长/距离:</span>
               <span class="value"
                 >{{
-                  secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ||
+                  secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ===
                   "00:00:00"
                     ? "--:--:--"
                     : secondsToHHMMSS(getweekRunDuration(item.weekIndex))
@@ -688,7 +688,6 @@ export default {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
-
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
@@ -870,7 +869,7 @@ export default {
       const viewportHeight =
         window.innerHeight || document.documentElement.clientHeight;
       // 减去头部高度（Planned Schedule 头部大约80px）
-      const headerHeight = 80;
+      const headerHeight = 120;
       // 计算可用高度
       const availableHeight = viewportHeight - headerHeight;
       // 最小高度为400px
@@ -1036,6 +1035,7 @@ export default {
   background-color: transparent;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 20px;
 
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {

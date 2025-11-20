@@ -40,7 +40,7 @@
         </div>
       </el-popover>
 
-      <el-input size="mini" v-model="searchInput" @input="handleSearch">
+      <el-input size="mini" v-model="searchInput" @keyup.enter.native="handleSearch">
         <el-button
           slot="append"
           icon="el-icon-search"

@@ -2,7 +2,7 @@
   <div class="plan-table-scroll-container">
     <div
       class="schedule-boxes-wrapper plan-table-container"
-      :style="{ height: containerHeight, overflowY: 'auto' }"
+      :style="{ height: '100%', overflowY: 'auto' }"
     >
       <div
         v-for="(item, index) in planListWithId"
@@ -89,41 +89,41 @@
                   @start="handleDragStart"
                   @end="handleDragEnd"
                 > -->
-                  <ClassCard
-                    v-for="(classItem, classIndex) in getDayDetailsArray(
-                      item.weekData,
+                <ClassCard
+                  v-for="(classItem, classIndex) in getDayDetailsArray(
+                    item.weekData,
+                    item.weekIndex * 7 + boxIndex + 1
+                  )"
+                  :key="`${item.weekIndex * 7 + boxIndex + 1}-${classIndex}-${
+                    classItem.createTime ||
+                    classItem.classesTitle ||
+                    classItem.id ||
+                    classIndex
+                  }`"
+                  :class-item="classItem"
+                  :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                  :is-dragging="isDragging"
+                  @delete="
+                    handleDeleteClass(
+                      classItem,
+                      classIndex,
+                      item.weekIndex + 1,
                       item.weekIndex * 7 + boxIndex + 1
-                    )"
-                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${classIndex}-${
-                      classItem.createTime ||
-                      classItem.classesTitle ||
-                      classItem.id ||
-                      classIndex
-                    }`"
-                    :class-item="classItem"
-                    :date="String(item.weekIndex * 7 + boxIndex + 1)"
-                    :is-dragging="isDragging"
-                    @delete="
-                      handleDeleteClass(
-                        classItem,
-                        classIndex,
-                        item.weekIndex + 1,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )
-                    "
-                    @edit="
-                      handleEditClass(
-                        classItem,
-                        classIndex,
-                        item.weekIndex + 1,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )
-                    "
-                    @copy="handleCopyClass"
-                    @view-class="handleViewClass"
-                    type="view"
-                  />
-                  <!-- <div
+                    )
+                  "
+                  @edit="
+                    handleEditClass(
+                      classItem,
+                      classIndex,
+                      item.weekIndex + 1,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
+                  @copy="handleCopyClass"
+                  @view-class="handleViewClass"
+                  type="view"
+                />
+                <!-- <div
                     class="box-content"
                     :class="{ 'is-dragging': isDragging }"
                     @click="
@@ -197,7 +197,7 @@
               <span class="label">跑步时长/距离:</span>
               <span class="value"
                 >{{
-                  secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ||
+                  secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ===
                   "00:00:00"
                     ? "--:--:--"
                     : secondsToHHMMSS(getweekRunDuration(item.weekIndex))
@@ -830,7 +830,7 @@ export default {
       const viewportHeight =
         window.innerHeight || document.documentElement.clientHeight;
       // 减去头部高度（Planned Schedule 头部大约80px）
-      const headerHeight = 80;
+      const headerHeight = 140;
       // 计算可用高度
       const availableHeight = viewportHeight - headerHeight;
       // 最小高度为400px
@@ -890,7 +890,11 @@ export default {
       // 查找该天的数据对象
       const dayData = week.find((item) => item && item.day === globalDay);
 
-      if (!dayData || !dayData.competitionDtoList || !Array.isArray(dayData.competitionDtoList)) {
+      if (
+        !dayData ||
+        !dayData.competitionDtoList ||
+        !Array.isArray(dayData.competitionDtoList)
+      ) {
         return [];
       }
 
