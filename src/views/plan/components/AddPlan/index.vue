@@ -44,7 +44,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="团队" prop="teamId">
+      <el-form-item label="团队" prop="teamId" v-if="activeClassType !== 'my'">
         <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
@@ -59,6 +59,17 @@
             :value="g.id"
           />
         </el-select>
+      </el-form-item>
+
+      <el-form-item label="计划源" prop="planSource">
+        <el-input
+          :readonly="activeClassType === 'official'"
+          placeholder="请输入计划源"
+        />
+      </el-form-item>
+
+      <el-form-item label="拥有者">
+        <el-input :readonly="true" v-model="form.possessNickname" />
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
@@ -98,6 +109,7 @@ export default {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
     currentGroupId: { type: [String, Number], default: undefined },
+    activeClassType: { type: String, default: "my" },
   },
   data() {
     return {
@@ -106,6 +118,9 @@ export default {
         planTitle: undefined,
         planGroupId: this.currentGroupId,
         teamId: undefined,
+        planSource: undefined,
+        planSourceId: undefined,
+        possessNickname: undefined,
         email: undefined,
         weChat: undefined,
         description: undefined,
@@ -141,6 +156,7 @@ export default {
       groups: [],
       teams: [],
       emptyPlanClasses: [[], [], [], []],
+      teamInfo: {},
     };
   },
   computed: {
@@ -172,6 +188,7 @@ export default {
         }
         this.getGroupList();
         this.getTeamList();
+        this.getTeamDetail();
       } else {
         // clear validation when closing
         this.$nextTick(
@@ -193,6 +210,14 @@ export default {
     this.resetForm();
   },
   methods: {
+    getTeamDetail() {
+      getData({
+        url: "/api/team/my-team",
+      }).then((res) => {
+        console.log("团队详情-res", res);
+        this.teamInfo = res.result;
+      });
+    },
     validateEmail() {
       // 手动触发表单校验
       this.$refs.formRef && this.$refs.formRef.validateField("email");
