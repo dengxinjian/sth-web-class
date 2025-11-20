@@ -441,14 +441,38 @@ export default {
       return match ? match[0] : "";
     },
     handleCustomDistanceInput() {
-      // 自定义距离输入时的处理 需要校验是小数时 只能输入2位小数
-      if (this.formData.customDistance) {
-        const num = parseFloat(this.formData.customDistance);
-        if (isNaN(num) || num <= 0 || num.toString().split('.')[1]?.length > 2) {
-          this.$message.error("请输入有效的距离值，小数点后最多2位");
-          this.formData.customDistance = "";
-        }
+      const rawValue = this.formData.customDistance;
+      const strValue =
+        rawValue === undefined || rawValue === null ? "" : String(rawValue);
+
+      if (!strValue) {
+        this.formData.customDistance = "";
+        return;
       }
+
+      const match = strValue.match(/^(\d+(?:\.\d{0,2})?)/);
+      const sanitized = match ? match[1] : "";
+
+      if (!sanitized) {
+        this.formData.customDistance = "";
+        this.$message.error("请输入有效的距离值，小数点后最多2位");
+        return;
+      }
+
+      // 如果用户刚输入到 "."，先允许继续输入
+      if (sanitized.endsWith(".")) {
+        this.formData.customDistance = sanitized;
+        return;
+      }
+
+      const num = parseFloat(sanitized);
+      if (isNaN(num) || num <= 0) {
+        this.formData.customDistance = "";
+        this.$message.error("请输入有效的距离值，小数点后最多2位");
+        return;
+      }
+
+      this.formData.customDistance = sanitized;
     },
     handleClose() {
       this.innerVisible = false;

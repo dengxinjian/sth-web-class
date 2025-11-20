@@ -372,6 +372,17 @@ export default {
   },
   methods: {
     secondsToHHMMSS,
+    roundDistance(value, decimals = 2) {
+      if (value === null || typeof value === "undefined") {
+        return value;
+      }
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) {
+        return value;
+      }
+      const factor = Math.pow(10, decimals);
+      return Math.round((numericValue + Number.EPSILON) * factor) / factor;
+    },
     //  计算周运动sth总值
     getweekSth(weekIndex) {
       const week = this.planList[weekIndex];
@@ -459,7 +470,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -508,6 +519,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周运动游泳时长总和
     getweekSwimmingDuration(weekIndex) {
@@ -557,7 +569,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -593,6 +605,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周骑行时长总和
     getweekCycleDuration(weekIndex) {
@@ -642,7 +655,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -677,6 +690,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周跑步时长总和
     getweekRunDuration(weekIndex) {
@@ -725,7 +739,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -767,6 +781,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周力量时长总和
     getweekPowerDuration(weekIndex) {
