@@ -147,7 +147,7 @@ export default {
   mounted() {
     this.getScanQrCode();
     // this.checkUrlParams();
-    // this.initSlider();
+    this.initSlider();
     this.loginType = localStorage.getItem("loginType") || "1";
     localStorage.setItem("loginType", this.loginType);
   },
