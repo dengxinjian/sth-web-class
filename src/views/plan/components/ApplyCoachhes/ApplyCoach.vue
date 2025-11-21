@@ -13,7 +13,7 @@
       ref="formRef"
       :model="form"
       :rules="rules"
-      label-width="145px"
+      :label-width="loginType === '2' ? '145px' : '90px'"
       size="small"
     >
       <template v-if="loginType === '2'">
