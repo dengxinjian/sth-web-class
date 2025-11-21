@@ -418,7 +418,8 @@
                   <el-input-number
                     v-if="part.capacity === 'distance'"
                     :controls="false"
-                    :step="part.unit === 'km' ? 1 : 0.1"
+                    :step="part.targetUnit === 'km' ? 0.01 : 1"
+                    :precision="part.targetUnit === 'km' ? 2 : 0"
                     :step-strictly="true"
                     v-model="part.targetDistance"
                     size="small"
@@ -983,16 +984,16 @@ export default {
                 Number(this.classInfo.duration) +
                 section.targetSeconds * Number(stage.times || 1);
             } else {
-              if (section.targetUnit === "m") {
-                this.classInfo.distance = (
-                  Number(this.classInfo.distance) +
-                  (section.targetDistance / 1000) * Number(stage.times || 1)
-                ).toFixed(4);
-              } else {
-                this.classInfo.distance =
-                  Number(this.classInfo.distance) +
-                  section.targetDistance * Number(stage.times || 1);
-              }
+              const times = Number(stage.times || 1);
+              const targetDistance = Number(section.targetDistance) || 0;
+              const distanceIncrement =
+                section.targetUnit === "m"
+                  ? (targetDistance / 1000) * times
+                  : targetDistance * times;
+              this.classInfo.distance = this.preciseAdd(
+                this.classInfo.distance,
+                distanceIncrement
+              );
               console.log(this.classInfo.distance, "this.classInfo.distance");
             }
           } else {
@@ -1003,32 +1004,39 @@ export default {
               if (section.range === "target") {
                 const timer = mmssToSeconds(section.targetSpeed);
                 const timer1 = hhmmssToSeconds(section.target);
-                this.classInfo.distance =
-                  Number(this.classInfo.distance) +
+                const distanceIncrement =
                   Number((timer1 / timer).toFixed(2)) *
-                    Number(stage.times || 1);
+                  Number(stage.times || 1);
+                this.classInfo.distance = this.preciseAdd(
+                  this.classInfo.distance,
+                  distanceIncrement
+                );
                 console.log(this.classInfo.distance, "this.classInfo.distance");
               } else {
                 const timer = hhmmssToSeconds(section.target);
                 const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
                 const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
                 const timer3 = (timer1 + timer2) / 2;
-                this.classInfo.distance =
-                  Number(this.classInfo.distance) +
+                const distanceIncrement =
                   Number((timer / timer3).toFixed(2)) *
-                    Number(stage.times || 1);
+                  Number(stage.times || 1);
+                this.classInfo.distance = this.preciseAdd(
+                  this.classInfo.distance,
+                  distanceIncrement
+                );
                 console.log(this.classInfo.distance, "this.classInfo.distance");
               }
             } else {
-              if (section.targetUnit === "m") {
-                this.classInfo.distance =
-                  Number(this.classInfo.distance) +
-                  (section.targetDistance / 1000) * Number(stage.times || 1);
-              } else {
-                this.classInfo.distance =
-                  Number(this.classInfo.distance) +
-                  section.targetDistance * Number(stage.times || 1);
-              }
+              const times = Number(stage.times || 1);
+              const targetDistance = Number(section.targetDistance) || 0;
+              const distanceIncrement =
+                section.targetUnit === "m"
+                  ? (targetDistance / 1000) * times
+                  : targetDistance * times;
+              this.classInfo.distance = this.preciseAdd(
+                this.classInfo.distance,
+                distanceIncrement
+              );
               console.log(section, "section");
 
               if (section.range === "target") {
@@ -1071,6 +1079,10 @@ export default {
           : "";
         console.log(this.classInfo.distance, "this.classInfo.duration");
       }
+      const normalizedDistance = Number(
+        (Number(this.classInfo.distance) || 0).toFixed(3)
+      );
+      this.classInfo.distance = normalizedDistance || "";
     },
     handleClose() {
       this.onCancel();
@@ -1261,6 +1273,17 @@ export default {
         parseInt(time.split(":")[2]);
       return Math.round((seconds / speed) * 1000);
     },
+    preciseAdd(...values) {
+      const precision = 1000;
+      const total = values.reduce((sum, value) => {
+        const num = Number(value);
+        if (Number.isNaN(num)) {
+          return sum;
+        }
+        return sum + Math.round(num * precision);
+      }, 0);
+      return total / precision;
+    },
     handleTargetChange(index, sectionIndex) {
       const {
         target,
@@ -1292,6 +1315,10 @@ export default {
           this.classInfo.mode,
           speed
         );
+      console.log(
+        this.classInfo.stages[index].sections[sectionIndex].targetSeconds,
+        "this.classInfo.stages[index].sections[sectionIndex].targetSeconds"
+      );
       this.calculateTimeline();
     },
     calculateIndent(section, mode) {
