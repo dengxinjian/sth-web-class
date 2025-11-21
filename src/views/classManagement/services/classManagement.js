@@ -53,6 +53,12 @@ export const classApi = {
       requestData: data,
     });
   },
+  // 获取当前人 课程配置数
+  getCurrentUserClassConfigCount() {
+    return getData({
+      url: "/api/classes/getUserClassesCount",
+    });
+  },
 };
 
 /**
@@ -137,6 +143,14 @@ export const scheduleApi = {
   retrySync({ classScheduleId, deviceType }) {
     return submitData({
       url: `/api/classSchedule/retryClassScheduleSync?classScheduleId=${classScheduleId}&deviceType=${deviceType}`,
+    });
+  },
+
+  // 录入运动
+  createActivity(data) {
+    return submitData({
+      url: "/api/manualDeviceActivity/create",
+      requestData: data,
     });
   },
 };
@@ -242,11 +256,24 @@ export const competitionApi = {
   },
 
   // 更新赛事
-  updateCompetition(data) {
-    return submitData({
+  updateCompetition(data, triUserId) {
+    // return submitData({
+    //   url: "/api/competition",
+    //   method: "put",
+    //   requestData: data,
+    // });
+    return request({
       url: "/api/competition",
+      headers: {
+        requestUserInfoId: triUserId,
+      },
       method: "put",
-      requestData: data,
+      data,
+    }).then((res) => {
+      if (res.success) {
+        return res.result;
+      }
+      return Promise.reject(res.message || "创建赛事失败");
     });
   },
   // 删除赛事

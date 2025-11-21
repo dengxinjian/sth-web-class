@@ -27,7 +27,7 @@
         </div>
         <div class="planned-schedule-header-title-right-total">
           <span class="label">总STH:</span>
-          <span class="value">{{ getTotalSth() || "--" }}</span>
+          <span class="value">{{ getTotalSth() > 100000 ? getTotalSth() / 10000 + "万" : getTotalSth() || "--" }}</span>
         </div>
       </div>
     </div>
@@ -197,8 +197,22 @@ export default {
         );
       }, 0);
     },
-    handleDeleteClass(classItem, classIndex, weekNumber, globalDay) {
-      this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
+    handleDeleteClass(
+      classItem,
+      classIndex,
+      weekNumber,
+      globalDay,
+      isCut = false
+    ) {
+      console.log(classItem, classIndex, weekNumber, globalDay, isCut, "classItem, classIndex, weekNumber, globalDay, isCut");
+      this.$emit(
+        "delete-class",
+        classItem,
+        classIndex,
+        weekNumber,
+        globalDay,
+        isCut
+      );
     },
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
       this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
