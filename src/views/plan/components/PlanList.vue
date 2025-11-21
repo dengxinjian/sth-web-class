@@ -192,8 +192,15 @@ export default {
         }
       },
       immediate: true,
-      deep: true,
+      deep: true
     },
+    // 监听 activeClassType 变化
+    activeClassType: {
+      handler(newVal) {
+        this.handleClassTypeChange(newVal)
+      },
+      immediate: true
+    }
   },
   mounted() {
     // 组件挂载后，延迟检查以确保数据已加载

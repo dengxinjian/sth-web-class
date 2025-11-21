@@ -49,6 +49,9 @@
       v-model="addPlanVisible"
       :current-group-id="currentPlanGroupId"
       :activeClassType="activeClassType"
+      :copyOfficialPlanInfo="copyOfficialPlanInfo"
+      :planList="planList"
+      @addPlanSuccess="handleAddPlanSuccess"
     />
     <!-- 添加分组 -->
     <AddGroup
@@ -73,10 +76,11 @@
       :planClasses="planList"
       @save="onSaveCopy"
     />
-    <!-- 应用教练 -->
+    <!-- 应用计划 -->
     <ApplyCoach
       v-model="showApplyCoach"
       :planInfo="currentPlanDetail"
+      :planClasses="planList"
       @cancel="handleApplyCoachCancel"
     />
     <!-- 应用历史 -->
@@ -150,6 +154,7 @@ export default {
       planSearchInput: "",
       currentPlanDetail: {},
       currentPlanDayDetail: [],
+      copyOfficialPlanInfo: null,
     };
   },
   watch: {
@@ -163,7 +168,6 @@ export default {
   mounted() {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
-      console.log("this.$route.query", this.$route.query);
       const { id, planGroupId, type } = this.$route.query;
       if (id && planGroupId) {
         this.currentPlanId = id;
@@ -188,6 +192,19 @@ export default {
     this.getPlanList();
   },
   methods: {
+    handleAddPlanSuccess(payload) {
+      this.getPlanDetail(payload.id);
+      this.getPlanDayDetail(payload.id);
+      this.$nextTick(() => {
+        this.activeClassType = 'my';
+        this.currentPlanId = payload.id;
+        this.currentPlanGroupId = payload.planGroupId;
+        this.planTitle = payload.planTitle;
+        this.currentPlanDetail = payload;
+        this.copyOfficialPlanInfo = null;
+        this.addPlanVisible = false;
+      });
+    },
     onSaveCopy(payload) {
       this.showCopy = false;
       this.getPlanList();
@@ -219,7 +236,7 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
-      console.log("日常详情-res", res);
+      // console.log("日常详情-res", res);
       this.currentPlanDetail = res.result;
       this.currentPlanId = res.result.id;
       this.currentPlanGroupId = res.result.planGroupId;
@@ -380,8 +397,6 @@ export default {
       this.classModalData = this.findClassById(classId);
     },
     handleViewPlanClass(classItem, clickPosition) {
-      console.log("handleViewPlanClass-classItem", classItem);
-      console.log("handleViewPlanClass-clickPosition", clickPosition);
       this.showViewPlanDetail = true;
       // 使用 classItem 作为课程数据
       this.classModalData = classItem || {};
@@ -444,7 +459,6 @@ export default {
      *编辑分组
      */
     handleEditGroup(payload) {
-      console.log(payload, "payload");
       this.currentGroup = {
         id: payload.groupId,
         groupName: payload.groupName,
@@ -479,7 +493,12 @@ export default {
           _this.showSummaryPreview = true;
         },
         1: () => {
-          _this.handleEditPlan();
+          if (_this.activeClassType === "official") {
+            _this.copyOfficialPlanInfo = _this.currentPlanDetail;
+            _this.handleAddPlan(_this.currentPlanDetail.planGroupId);
+          } else {
+            _this.handleEditPlan();
+          }
         },
         2: () => {
           _this.showCopy = true;
@@ -502,7 +521,6 @@ export default {
         ...this.currentPlanDetail,
         dayDetails: this.planList,
       };
-      console.log("params-编辑", params);
       // 将 params 保存到 planStore 中的 planData
       this.$store.dispatch("plan/savePlanData", params);
       // 跳转到 planEdit 页面

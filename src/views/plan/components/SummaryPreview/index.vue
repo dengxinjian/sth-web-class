@@ -17,14 +17,8 @@
       size="small"
     >
       <el-form-item label="计划名称" prop="planTitle">
-        <el-input
-          v-model="form.planTitle"
-          maxlength="20"
-          show-word-limit
-          placeholder="请输入计划名称"
-          clearable
-          :readonly="activeClassType === 'official'"
-        />
+        <span v-if="activeClassType === 'official'">{{ form.planTitle }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.planTitle" maxlength="20" show-word-limit placeholder="请输入计划名称" clearable />
       </el-form-item>
 
       <el-form-item label="分组选择" prop="planGroupId">
@@ -43,10 +37,11 @@
             :value="g.id"
           />
         </el-select>
-        <el-input v-else :readonly="true" :value="planInfo.planGroupName" />
+        <!-- <el-input v-else :readonly="true" :value="planInfo.planGroupName" /> -->
+        <span v-else>{{ planInfo.planGroupName }}</span>
       </el-form-item>
 
-      <el-form-item label="团队" prop="teamId">
+      <el-form-item label="团队" prop="teamId" v-if="loginType === '2'">
         <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
@@ -62,24 +57,24 @@
             :value="g.id"
           />
         </el-select>
-        <el-input v-else :readonly="true" :value="planInfo.teamName" />
+        <!-- <el-input v-else :readonly="true" :value="planInfo.teamName" /> -->
+        <span v-else>{{ planInfo.teamName }}</span>
       </el-form-item>
 
       <el-form-item label="计划源">
-        <el-input
-          :readonly="activeClassType === 'official'"
-          placeholder="请输入计划源"
-          :value="planSource()"
-        />
+        <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" placeholder="请输入计划源" :value="planSource()" />
       </el-form-item>
 
       <el-form-item label="拥有者">
-        <el-input :readonly="true" :value="planInfo.possessNickname" />
+        <span v-if="activeClassType === 'official'">{{ planInfo.possessNickname }}</span>
+        <el-input v-else :readonly="true" :value="planInfo.possessNickname" />
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
-        <!-- <el-input v-model="form.email" placeholder="请输入邮箱" /> -->
+         <span v-if="activeClassType === 'official'">{{ form.email }}</span>
         <el-input
+          v-else
           :readonly="activeClassType === 'official'"
           v-model="form.email"
           placeholder="请输入邮箱"
@@ -87,26 +82,13 @@
       </el-form-item>
 
       <el-form-item label="微信号" prop="weChat">
-        <!-- <el-input v-model="form.weChat" placeholder="请输入微信号" /> -->
-        <el-input
-          :readonly="activeClassType === 'official'"
-          v-model="form.weChat"
-          placeholder="请输入微信号"
-        />
+        <span v-if="activeClassType === 'official'">{{ form.weChat }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.weChat" placeholder="请输入微信号" />
       </el-form-item>
 
       <el-form-item label="描述" prop="description">
-        <!-- <el-input
-          type="textarea"
-          v-model="form.description"
-          placeholder="请输入描述"
-        /> -->
-        <el-input
-          type="textarea"
-          :readonly="activeClassType === 'official'"
-          v-model="form.description"
-          placeholder="请输入描述"
-        />
+        <span v-if="activeClassType === 'official'">{{ form.description }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.description" placeholder="请输入描述" />
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
@@ -128,12 +110,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekSwimmingDuration())
                 }}{{ secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">{{ getweekSwimmingDistance() || "--:--:--" }} </el-col>
+              <el-col :span="8">{{ getweekSwimmingDistance() || "NA" }} </el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -142,13 +124,13 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekCycleDuration())
                 }}{{ secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
               <el-col :span="8"
-                >{{ getweekCycleDistance() || "--:--:--" }}
+                >{{ getweekCycleDistance() || "NA" }}
               </el-col>
             </el-row>
           </el-col>
@@ -158,12 +140,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekRunDuration())
                 }}{{ secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">{{ getweekRunDistance() || "--:--:--" }}</el-col>
+              <el-col :span="8">{{ getweekRunDistance() || "NA" }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -172,12 +154,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekPowerDuration())
                 }}{{ secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">--:--:--</el-col>
+              <el-col :span="8">NA</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -186,12 +168,12 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekOtherDuration()) || "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekOtherDuration())
                 }}{{ secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">--:--:--</el-col>
+              <el-col :span="8">NA</el-col>
             </el-row>
           </el-col>
           <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
@@ -200,13 +182,13 @@
               <el-col :span="8"
                 >{{
                   secondsToHHMMSS(getweekDuration()) === "00:00:00"
-                    ? "--:--:--"
+                    ? "NA"
                     : secondsToHHMMSS(getweekDuration())
                 }}
                 {{ secondsToHHMMSS(getweekDuration()) === "00:00:00"
                 ? "" : "/周" }}</el-col
               >
-              <el-col :span="8">{{ getweekDistance() || "--:--:--" }}</el-col>
+              <el-col :span="8">{{ getweekDistance() || "NA" }}</el-col>
             </el-row>
           </el-col>
         </el-row>
@@ -214,7 +196,8 @@
     </el-form>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel">取消</el-button>
+      <el-button @click="onCancel" v-if="activeClassType === 'official'">关闭</el-button>
+      <el-button @click="onCancel" v-if="activeClassType !== 'official'">取消</el-button>
       <el-button type="primary" v-if="activeClassType !== 'official'" @click="onConfirm">确定</el-button>
     </span>
   </el-dialog>
@@ -258,6 +241,7 @@ export default {
       groups: [],
       teams: [],
       emptyPlanClasses: [[], [], [], []],
+      loginType: localStorage.getItem("loginType") || "",
     };
   },
   computed: {
@@ -482,7 +466,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     getTotalDistance() {
       return this.planList.reduce((total, week) => {
@@ -567,8 +551,8 @@ export default {
           }, 0)
         );
       }, 0);
-      const weekDistance = distanceTotal / 4 || 0;
-      if (weekDistance === 0) return "--:--:--";
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
@@ -614,7 +598,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周游泳距离总和
     getweekSwimmingDistance() {
@@ -665,8 +649,8 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-游泳总和", distanceTotal);
-      const weekDistance = distanceTotal / 4 || 0;
-      if (weekDistance === 0) return "--:--:--";
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      if (weekDistance === 0) return "NA";
       const distanceKm = weekDistance / 1000;
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = distanceKm % 1 === 0 ? distanceKm : distanceKm.toFixed(2);
@@ -712,7 +696,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周骑行距离总和
     getweekCycleDistance() {
@@ -762,8 +746,8 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-骑行总和", distanceTotal);
-      const weekDistance = distanceTotal / 4 || 0;
-      if (weekDistance === 0) return "--:--:--";
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
@@ -808,7 +792,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周跑步距离总和
     getweekRunDistance() {
@@ -866,9 +850,9 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-跑步总和", distanceTotal);
-      const weekDistance = distanceTotal / 4 || 0;
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
       // console.log("weekDistance-跑步", weekDistance);
-      if (weekDistance === 0) return "--:--:--";
+      if (weekDistance === 0) return "NA";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
@@ -901,7 +885,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
     // 计算周其他时长总和
     getweekOtherDuration() {
@@ -931,7 +915,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / 4 || 0;
+      return durationTotal / this.planClasses.length || 0;
     },
   },
 };

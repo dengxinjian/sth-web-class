@@ -106,7 +106,7 @@ export default {
   computed: {
     optionsArray() {
       return this.activeClassType === "official"
-        ? ["概要", "复制"]
+        ? ["概要", "添加"]
         : ["概要", "编辑", "复制", "应用", "历史", "删除"];
     },
   },
