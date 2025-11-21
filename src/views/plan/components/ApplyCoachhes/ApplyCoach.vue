@@ -244,8 +244,10 @@ export default {
       loading: false,
       pickerOptions: {
         disabledDate(time) {
-          // 禁用今天以前的日期（不包括今天）
-          return time.getTime() < new Date().setHours(0, 0, 0, 0);
+          // 禁用今天以前的日期（包括今天）
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return time.getTime() <= today.getTime();
         },
       },
     };
