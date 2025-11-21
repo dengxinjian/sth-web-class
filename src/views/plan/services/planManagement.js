@@ -74,6 +74,13 @@ export const planApi = {
       url: `/api/planClasses/delete?id=${id}`,
     });
   },
+
+  // 计划限制数量
+  getPlanLimitCount() {
+    return getData({
+      url: "/api/planClasses/getUserPlanClassesCount",
+    });
+  },
 };
 
 /**
