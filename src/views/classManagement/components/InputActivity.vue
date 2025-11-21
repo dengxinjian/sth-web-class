@@ -59,8 +59,25 @@
             placeholder="请输入距离"
             type="number"
             :min="0"
-          />
-          <el-select
+          >
+            <template slot="append">
+              <el-select
+                placeholder="请选择距离单位"
+                style="width: 80px"
+                v-model="formData.distanceUnit"
+                class="unit-select"
+                :disabled="distanceUnitOptions.length === 1"
+              >
+                <el-option
+                  v-for="unit in distanceUnitOptions"
+                  :key="unit.value"
+                  :label="unit.label"
+                  :value="unit.value"
+                />
+              </el-select>
+            </template>
+          </el-input>
+          <!-- <el-select
             v-model="formData.distanceUnit"
             class="unit-select"
             :disabled="distanceUnitOptions.length === 1"
@@ -71,7 +88,7 @@
               :label="unit.label"
               :value="unit.value"
             />
-          </el-select>
+          </el-select> -->
         </div>
       </el-form-item>
 
@@ -268,7 +285,10 @@ export default {
           activityDuration: this.parseDurationToSeconds(
             this.formData.activityDuration
           ),
-          distance: this.formData.distance || 0,
+          distance:
+            this.formData.distanceUnit === "km"
+              ? this.formData.distance * 1000
+              : this.formData.distance,
           distanceUnit: this.formData.distanceUnit,
           sthValue: this.formData.sthValue || 0,
           calories: this.formData.calories || 0,
