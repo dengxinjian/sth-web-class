@@ -163,7 +163,7 @@
                 <div
                   class="context-menu-item"
                   @click="
-                    handleAddSchedule(item.commonDate);
+                    handleAddSchedule(contextMenuDate);
                     hideContextMenu();
                   "
                 >
@@ -173,7 +173,7 @@
                 <div
                   class="context-menu-item"
                   @click="
-                    handleInputActivity(item.commonDate);
+                    handleInputActivity(contextMenuDate);
                     hideContextMenu();
                   "
                 >
