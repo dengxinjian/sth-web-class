@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="680px"
+    :width="getDialogWidth()"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -11,7 +11,7 @@
 
     <custom-table
       :data="tableData"
-      :columns="columns"
+      :columns="getColumns()"
       :total="total"
       :getList="getApplyHistory"
       :pagination="pagination"
@@ -90,6 +90,29 @@ export default {
     },
   },
   methods: {
+    getDialogWidth() {
+      const loginType = localStorage.getItem("loginType");
+      if (loginType === "2") {
+        return "680px";
+      } else {
+        return "520px";
+      }
+    },
+    getColumns() {
+      const loginType = localStorage.getItem("loginType");
+      if (loginType === "2") {
+        return [
+          { prop: "teamName", label: "团队名称", width: 180 },
+          { prop: "applyNickname", label: "昵称", width: 180 },
+          { prop: "applyTimeRange", label: "应用时间", width: 260 },
+        ];
+      } else {
+        return [
+          { prop: "applyNickname", label: "昵称", width: 180 },
+          { prop: "applyTimeRange", label: "应用时间", width: 260 },
+        ];
+      }
+    },
     getApplyHistory() {
       getData({
         url: "/api/applyPlanClassesHistory/listByPlanId",

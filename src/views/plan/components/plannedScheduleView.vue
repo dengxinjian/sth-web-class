@@ -197,7 +197,6 @@ export default {
       return total % 1 === 0 ? total : Number(total.toFixed(2));
     },
     getTotalDuration() {
-      console.log(this.planList, "this.planList");
       return this.planList.reduce((total, week) => {
         return (
           total +
@@ -205,7 +204,7 @@ export default {
             return (
               weekTotal +
               item.details.reduce((classTotal, classItem) => {
-                console.log(classItem, "classItem");
+                // console.log(classItem, "classItem");
                 if (!classItem) {
                   return classTotal;
                 }
@@ -245,8 +244,8 @@ export default {
       this.$emit("add-week");
     },
     handleViewClass(classItem, clickPosition) {
-      console.log("handleViewClass-classItem", classItem);
-      console.log("handleViewClass-clickPosition", clickPosition);
+      // console.log("handleViewClass-classItem", classItem);
+      // console.log("handleViewClass-clickPosition", clickPosition);
       this.$emit("view-class", classItem, clickPosition);
     },
   },

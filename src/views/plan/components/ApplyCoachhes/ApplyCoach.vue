@@ -13,7 +13,7 @@
       ref="formRef"
       :model="form"
       :rules="rules"
-      label-width="90px"
+      label-width="145px"
       size="small"
     >
       <template v-if="loginType === '2'">
@@ -23,8 +23,8 @@
             placeholder="请选择团队"
             filterable
             clearable
-            style="width: 100%"
-            @change="getMembersList(form.teamId)"
+            style="width: 90%"
+            @change="getTeamGroupList(form.teamId)"
           >
             <el-option
               v-for="g in teamOptions"
@@ -36,7 +36,7 @@
         </el-form-item>
 
         <el-form-item label="人员选择" prop="athleteIds">
-          <el-select
+          <!-- <el-select
             v-model="form.athleteIds"
             placeholder="请选择人员"
             filterable
@@ -51,7 +51,15 @@
               :label="g.userNickname"
               :value="g.triUserId"
             />
-          </el-select>
+          </el-select> -->
+          <el-cascader
+            v-model="form.athleteIds"
+            :options="teamGroupList"
+            :props="memberProps"
+            clearable
+            style="width: 90%"
+            @change="handleCascaderChange"
+          ></el-cascader>
         </el-form-item>
 
         <el-form-item label="类型" prop="athleteType">
@@ -69,7 +77,7 @@
           <el-select
             v-model="form.applyMode"
             placeholder="请选择"
-            style="width: 100%"
+            style="width: 90%"
           >
             <el-option label="以开始日期" :value="1"></el-option>
             <el-option label="以结束日期" :value="2"></el-option>
@@ -86,7 +94,7 @@
             value-format="yyyy-MM-dd"
             type="date"
             placeholder="选择日期"
-            style="width: 100%"
+            style="width: 90%"
             :picker-options="pickerOptions"
           >
           </el-date-picker>
@@ -107,13 +115,13 @@
         ]"
       > -->
         <el-row :gutter="24" class="member-row" v-if="form.athleteType === 2">
-          <el-col :span="4" align="right"
+          <el-col :span="6" align="right"
             ><span class="member-name">成员</span></el-col
           >
-          <el-col :span="8" align="left"
+          <el-col :span="7" align="left"
             ><span class="member-name">方式</span></el-col
           >
-          <el-col :span="11" align="left"
+          <el-col :span="9" align="left"
             ><span class="member-name">时间</span></el-col
           >
           <el-col :span="1" align="left"
@@ -127,16 +135,16 @@
             v-for="(item, index) in members"
             :key="index"
           >
-            <el-col :span="4" align="right">
+            <el-col :span="6" align="right">
               <span class="member-name">{{ item.userNickname }}</span>
             </el-col>
-            <el-col :span="8" align="left">
+            <el-col :span="7" align="left">
               <el-select v-model="item.applyMode" placeholder="请选择">
                 <el-option label="以开始日期" :value="1"></el-option>
                 <el-option label="以结束日期" :value="2"></el-option>
               </el-select>
             </el-col>
-            <el-col :span="11" align="left">
+            <el-col :span="9" align="left">
               <el-date-picker
                 v-model="item.applyDate"
                 value-format="yyyy-MM-dd"
@@ -162,7 +170,7 @@
           <el-select
             v-model="form.applyMode"
             placeholder="请选择"
-            style="width: 100%"
+            style="width: 90%"
           >
             <el-option label="以开始日期" :value="1"></el-option>
             <el-option label="以结束日期" :value="2"></el-option>
@@ -175,7 +183,7 @@
             value-format="yyyy-MM-dd"
             type="date"
             placeholder="选择日期"
-            style="width: 100%"
+            style="width: 90%"
             :picker-options="pickerOptions"
           >
           </el-date-picker>
@@ -239,9 +247,11 @@ export default {
         ],
       },
       teams: [],
+      teamGroupList: [],
       athletesList: [],
       members: [],
       loading: false,
+      memberProps: { multiple: true },
       pickerOptions: {
         disabledDate(time) {
           // 禁用今天以前的日期（包括今天）
@@ -250,6 +260,7 @@ export default {
           return time.getTime() <= today.getTime();
         },
       },
+      originAthletesAll: [], // 所有运动员列表，用于提交时筛选
     };
   },
   computed: {
@@ -292,6 +303,34 @@ export default {
     },
   },
   methods: {
+    handleCascaderChange(value) {
+      const choosedAthletes = value
+        .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))
+        .filter((val) => val !== undefined && val !== null);
+      const memberList = choosedAthletes.map((item) => {
+        const findItem = this.originAthletesAll.find(
+          (el) => el.triUserId === item
+        );
+        return {
+          ...findItem,
+          applyMode: undefined,
+          applyDate: undefined,
+        };
+      });
+      const newMembers =
+        this.members.length > 0
+          ? memberList.map((item) => {
+              const findItem = this.members.find(
+                (el) => el.triUserId === item.triUserId
+              );
+              return {
+                ...item,
+                ...findItem,
+              };
+            })
+          : memberList;
+      this.members = newMembers;
+    },
     handleAthleteChange(value) {
       const memberList = value.map((item) => {
         const findItem = this.athletesList.find((el) => el.triUserId === item);
@@ -322,6 +361,33 @@ export default {
         this.teams = res.result;
       });
     },
+    getTeamGroupList(teamId) {
+      this.form.athleteIds = [];
+      this.members = [];
+      getData({
+        url: `/api/team/group/list/${teamId}`,
+        teamId: teamId,
+      }).then((res) => {
+        const treeData = res.result.map((item) => {
+          const members = item.members
+            ? item.members.filter((el) => el.userType === 3)
+            : [];
+          return {
+            id: item.id,
+            value: item.id,
+            label: item.groupName,
+            children: members.map((member) => ({
+              ...member,
+              label: member.userNickname,
+              value: member.triUserId,
+            })),
+          };
+        });
+        this.teamGroupList = treeData;
+        // 所有运动员列表，用于提交时筛选
+        this.originAthletesAll = treeData.map((item) => item.children).flat();
+      });
+    },
     getMembersList(teamId) {
       getData({
         url: `/api/team/info/${teamId}`,
@@ -334,17 +400,12 @@ export default {
       this.innerVisible = false;
       this.$emit("cancel");
     },
-    diffEndDate(dates, classes) {
+    // 判断是否在结束日期之后
+    diffAffterDate(dates, classes) {
       // 边界检查
       if (!dates || dates.length === 0 || !classes || classes.length === 0) {
         return false;
       }
-
-      // 找出最小日期
-      const minDate = dates.reduce(
-        (min, date) => (moment(date).isBefore(moment(min)) ? date : min),
-        dates[0]
-      );
 
       // 找出最大day值
       const maxDay = classes.reduce(
@@ -355,24 +416,63 @@ export default {
       // 计算结束日期：今天 + maxDay 天
       const endDate = moment().add(maxDay, "days");
 
-      // 判断最小日期是否在结束日期之前
+      // 遍历dates中的每一项，判断是否在结束日期之后
+      const dateResults = dates.map((date) => {
+        const isAfter = moment(date.applyDate).isAfter(endDate);
+        return {
+          date: date,
+          isAfter: isAfter,
+        };
+      });
+
+      // 判断是否所有日期都在结束日期之后
+      const isAfter = dateResults.every((item) => item.isAfter === false);
+
+      // 获取所有在结束日期之后的日期
+      const isAfterArr = dateResults
+        .filter((item) => item.isAfter === false)
+        .map((item) => item.date);
+      // 返回结果
       return {
-        isBefore: moment(minDate).isBefore(endDate),
-        minDate: minDate,
+        isAfter: isAfter, // true: 存在应用日期超出计划日期，false: 所有应用日期都在计划日期之内
+        isAfterArr: isAfterArr,
         endDate: endDate,
+        maxDay: maxDay,
       };
+    },
+    // 告警提示
+    alarmConfirm(message, targets) {
+      const _this = this;
+      this.$confirm(message, "提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          _this.applyPlanClasses(targets);
+        })
+        .catch(() => {
+          _this.loading = false;
+        });
     },
     onConfirm() {
       const _this = this;
-      this.loading = true;
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
+        _this.loading = true;
+        const originAthletes = _this.teamGroupList
+          .map((item) => item.children)
+          .flat();
+        const choosedAthletes = _this.form.athleteIds
+          .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))
+          .filter((val) => val !== undefined && val !== null);
+
         // 根据登录类型构建 targets 数组
         let targets = [];
         if (_this.loginType === "2") {
           targets =
             _this.form.athleteType === 1
-              ? _this.form.athleteIds.map((item) => ({
+              ? choosedAthletes.map((item) => ({
                   triUserId: item,
                   applyDate: _this.form.applyDate,
                   applyMode: _this.form.applyMode,
@@ -392,56 +492,44 @@ export default {
           ];
         }
         const findEndDate = targets.filter((item) => item.applyMode === 2);
-        // console.log(findEndDate, "findEndDate");
+
         const planList = _this.planClasses
           .flat()
           .filter((item) => item.details.length > 0);
-        // console.log(findEndDate, "findEndDate");
-        // console.log("planList", planList);
-        // console.log(targets, "targets");
-        // console.log(_this.diffEndDate(findEndDate, planList), "diffEndDate");
-        const diffEndDate = _this.diffEndDate(findEndDate, planList);
-        // console.log(diffEndDate, "diffEndDate");
-        if (!diffEndDate.isBefore) {
+        const diffAffterDate = _this.diffAffterDate(findEndDate, planList);
+        if (!diffAffterDate.isAfter) {
           _this.applyPlanClasses(targets);
           return;
         } else {
           if (_this.loginType === "1") {
-            this.$confirm(
-              "当前应用日期小于计划日期，只会部分应用，是否继续应用？",
-              "提示",
-              {
-                confirmButtonText: "继续应用",
-                cancelButtonText: "取消",
-                type: "warning",
-              }
-            )
-              .then(() => {
-                _this.applyPlanClasses(targets);
-              })
-              .catch(() => {
-                _this.loading = false;
-              });
+            const message =
+              "当前应用周期小于计划周期，只会应用部分，确认是否应用？";
+            _this.alarmConfirm(message, targets);
           } else {
-            const findPerson = _this.athletesOptions.find(
-              (item) => item.triUserId === diffEndDate.minDate.triUserId
-            );
-            console.log(findPerson, "findPerson");
-            this.$confirm(
-              `${findPerson.userNickname}的应用日期小于计划日期，只会部分应用，是否继续应用？`,
-              "提示",
-              {
-                confirmButtonText: "继续应用",
-                cancelButtonText: "取消",
-                type: "warning",
-              }
-            )
-              .then(() => {
-                _this.applyPlanClasses(targets);
-              })
-              .catch(() => {
-                _this.loading = false;
-              });
+            // 查找所有在结束日期之前的日期对应的人员信息
+            const findPersons = diffAffterDate.isAfterArr
+              .map((item) =>
+                _this.originAthletesAll.find(
+                  (el) => el.triUserId === item.triUserId
+                )
+              )
+              .filter((person) => person !== undefined);
+
+            // 生成提示信息
+            let message = "";
+            if (findPersons.length === 1) {
+              message = `${findPersons[0].userNickname} 的应用周期小于计划周期，只会应用部分，确认是否应用？`;
+            } else if (findPersons.length > 1) {
+              const names = findPersons
+                .map((person) => person.userNickname)
+                .join("、");
+              message = `${names} 的应用周期小于计划周期，只会应用部分，确认是否应用？`;
+            } else {
+              message =
+                "当前应用周期小于计划周期，只会应用部分，确认是否应用？";
+            }
+
+            _this.alarmConfirm(message, targets);
           }
         }
       });
@@ -450,7 +538,7 @@ export default {
       const _this = this;
       const params = {
         planClassesId: _this.planInfo.id,
-        teamId: _this.planInfo.teamId,
+        teamId: _this.form.teamId,
         targets,
       };
       submitData({
@@ -487,7 +575,7 @@ export default {
     },
     removeMember(item, index) {
       this.form.athleteIds = this.form.athleteIds.filter(
-        (el) => el !== item.triUserId
+        (el) => !el.includes(item.triUserId)
       );
       this.members.splice(index, 1);
     },

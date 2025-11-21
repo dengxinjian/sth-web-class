@@ -155,6 +155,8 @@ export default {
       currentPlanDetail: {},
       currentPlanDayDetail: [],
       copyOfficialPlanInfo: null,
+      limitValue: 0, // 计划限制数量
+      currentCount: 0, // 当前计划数量
     };
   },
   watch: {
@@ -190,8 +192,14 @@ export default {
       }
     }
     this.getPlanList();
+    this.getPlanLimitCount();
   },
   methods: {
+    async getPlanLimitCount() {
+      const res = await planApi.getPlanLimitCount();
+      this.limitValue = res.result.limitValue;
+      this.currentCount = res.result.currentCount;
+    },
     handleAddPlanSuccess(payload) {
       this.getPlanDetail(payload.id);
       this.getPlanDayDetail(payload.id);
@@ -236,7 +244,6 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
-      // console.log("日常详情-res", res);
       this.currentPlanDetail = res.result;
       this.currentPlanId = res.result.id;
       this.currentPlanGroupId = res.result.planGroupId;
@@ -256,12 +263,9 @@ export default {
     },
     async getPlanDayDetail(id) {
       const resDayDetail = await planApi.getPlanDayDetail(id);
-      // console.log("日常详情-resDayDetail", resDayDetail);
       // 处理并重组数据
       const completeData = this.completePlanDayData(resDayDetail.result);
-      // console.log("completeData", completeData);
       const formattedData = this.formatPlanDayDetail(completeData);
-      // console.log("重组后的数据-formattedData", formattedData);
 
       // return formattedData;
       this.planList = formattedData;
@@ -436,7 +440,11 @@ export default {
     /**
      * 添加计划
      */
-    handleAddPlan(payload) {
+    async handleAddPlan(payload) {
+      if (this.currentCount >= this.limitValue) {
+        this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+        return;
+      }
       this.currentPlanGroupId = payload;
       this.addPlanVisible = true;
     },
