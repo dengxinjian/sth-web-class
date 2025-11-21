@@ -3,6 +3,7 @@
  */
 
 import { getData, submitData } from "@/api/common.js";
+import request from "@/utils/request";
 
 /**
  * 团队相关API
@@ -50,6 +51,12 @@ export const classApi = {
     return submitData({
       url: "/api/classes/update",
       requestData: data,
+    });
+  },
+  // 获取当前人 课程配置数
+  getCurrentUserClassConfigCount() {
+    return getData({
+      url: "/api/classes/getUserClassesCount",
     });
   },
 };
@@ -138,6 +145,14 @@ export const scheduleApi = {
       url: `/api/classSchedule/retryClassScheduleSync?classScheduleId=${classScheduleId}&deviceType=${deviceType}`,
     });
   },
+
+  // 录入运动
+  createActivity(data) {
+    return submitData({
+      url: "/api/manualDeviceActivity/create",
+      requestData: data,
+    });
+  },
 };
 
 /**
@@ -222,21 +237,43 @@ export const competitionApi = {
       url: "/api/competition/dropdown-options",
     });
   },
-
+  // 426bc17606074ed298580208f3ece3b1
   // 创建赛事
-  createCompetition(data) {
-    return submitData({
+  createCompetition(data, triUserId) {
+    return request({
       url: "/api/competition",
-      requestData: data,
+      method: "post",
+      data,
+      headers: {
+        requestUserInfoId: triUserId,
+      },
+    }).then((res) => {
+      if (res.success) {
+        return res.result;
+      }
+      return Promise.reject(res.message || "创建赛事失败");
     });
   },
 
   // 更新赛事
-  updateCompetition(data) {
-    return submitData({
+  updateCompetition(data, triUserId) {
+    // return submitData({
+    //   url: "/api/competition",
+    //   method: "put",
+    //   requestData: data,
+    // });
+    return request({
       url: "/api/competition",
+      headers: {
+        requestUserInfoId: triUserId,
+      },
       method: "put",
-      requestData: data,
+      data,
+    }).then((res) => {
+      if (res.success) {
+        return res.result;
+      }
+      return Promise.reject(res.message || "创建赛事失败");
     });
   },
   // 删除赛事

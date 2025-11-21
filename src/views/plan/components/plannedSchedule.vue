@@ -27,7 +27,7 @@
         </div>
         <div class="planned-schedule-header-title-right-total">
           <span class="label">总STH:</span>
-          <span class="value">{{ getTotalSth() || "--" }}</span>
+          <span class="value">{{ getTotalSth() > 100000 ? getTotalSth() / 10000 + "万" : getTotalSth() || "--" }}</span>
         </div>
       </div>
     </div>
@@ -103,8 +103,19 @@ export default {
         );
       }, 0);
     },
+    roundDistance(value, decimals = 2) {
+      if (value === null || typeof value === "undefined") {
+        return value;
+      }
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) {
+        return value;
+      }
+      const factor = Math.pow(10, decimals);
+      return Math.round((numericValue + Number.EPSILON) * factor) / factor;
+    },
     getTotalDistance() {
-      return this.planList.reduce((total, week) => {
+      const totalDistance = this.planList.reduce((total, week) => {
         return (
           total +
           week.reduce((weekTotal, item) => {
@@ -150,6 +161,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     getTotalDuration() {
       return this.planList.reduce((total, week) => {
@@ -185,8 +197,22 @@ export default {
         );
       }, 0);
     },
-    handleDeleteClass(classItem, classIndex, weekNumber, globalDay) {
-      this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
+    handleDeleteClass(
+      classItem,
+      classIndex,
+      weekNumber,
+      globalDay,
+      isCut = false
+    ) {
+      console.log(classItem, classIndex, weekNumber, globalDay, isCut, "classItem, classIndex, weekNumber, globalDay, isCut");
+      this.$emit(
+        "delete-class",
+        classItem,
+        classIndex,
+        weekNumber,
+        globalDay,
+        isCut
+      );
     },
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
       this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);

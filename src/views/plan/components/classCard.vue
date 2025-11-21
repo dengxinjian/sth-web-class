@@ -183,6 +183,16 @@
           <i class="el-icon-edit"></i>
           编辑
         </div>
+        <div
+          class="context-menu-item"
+          @click="
+            handleCut();
+            hideContextMenu();
+          "
+        >
+          <i class="el-icon-scissors"></i>
+          剪切
+        </div>
         <div class="context-menu-item" @click="handleCopy">
           <i class="el-icon-crop"></i>
           复制
@@ -377,6 +387,11 @@ export default {
     handleCopy() {
       this.hideContextMenu();
       this.$emit("copy", this.classItem);
+    },
+    handleCut() {
+      this.hideContextMenu();
+      console.log("handleCut-classItem-1", this.classItem);
+      this.$emit("cut", this.classItem);
     },
     handleViewClass() {
       console.log("handleViewClass-classItem-1", this.classItem);

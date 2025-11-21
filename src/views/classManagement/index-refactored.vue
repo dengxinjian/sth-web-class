@@ -63,6 +63,7 @@
         @add-schedule="handleAddSchedule"
         @event-detail="handleEventDetail"
         @edit-event="handleEditEvent"
+        @input-activity="handleInputActivity"
       />
 
       <!-- 右侧统计面板 -->
@@ -209,6 +210,11 @@
       @confirm="handleEventConfirm"
       @cancel="handleEventCancel"
     />
+    <InputActivity
+      :visible.sync="showInputActivity"
+      :activityDate="inputActivityDate"
+      @submit="handleInputActivitySave"
+    />
   </div>
 </template>
 
@@ -234,6 +240,7 @@ import ViewClassCard from "./components/ViewClassCard";
 import EditScheduleClass from "./components/EditScheduleClass";
 import HealthView from "./components/HealthView.vue";
 import AddEvent from "./components/addEvent.vue";
+import InputActivity from "./components/InputActivity.vue";
 
 // 服务和工具导入
 import {
@@ -280,6 +287,7 @@ export default {
     EditScheduleClass,
     HealthView,
     AddEvent,
+    InputActivity,
   },
   mixins: [dragMixin],
   data() {
@@ -304,6 +312,7 @@ export default {
       // 课程数据
       classList: [],
       classSearchInput: "",
+      currentUserClassConfig: {},
 
       // 日程数据
       currentWeek: [],
@@ -362,6 +371,10 @@ export default {
       showAddEvent: false,
       currentEventData: {},
       isEditMode: false,
+
+      // 录入运动
+      showInputActivity: false,
+      inputActivityDate: "",
     };
   },
   watch: {
@@ -376,6 +389,7 @@ export default {
   mounted() {
     // 根据路由初始化菜单状态
     this.initMenuFromRoute();
+    this.getCurrentUserClassConfigCount();
 
     if (localStorage.getItem("loginType") !== "1") {
       this.getTeamAndAthleticData();
@@ -388,6 +402,17 @@ export default {
     }
   },
   methods: {
+    handleInputActivitySave(data) {
+      console.log(data, "data");
+      data.triUserId = this.selectedAthletic;
+      scheduleApi.createActivity(data).then((res) => {
+        if (res.success) {
+          this.$message.success("运动录入成功");
+          this.showInputActivity = false;
+          this.getScheduleData();
+        }
+      });
+    },
     /**
      * 添加赛事
      */
@@ -396,6 +421,11 @@ export default {
       this.showAddEvent = true;
       this.isEditMode = false;
     },
+    handleInputActivity(date) {
+      console.log(date, "date");
+      this.inputActivityDate = date;
+      this.showInputActivity = true;
+    },
     /**
      * 赛事确认
      */
@@ -403,22 +433,26 @@ export default {
       console.log("赛事数据:", data);
       data.competitionTime = this.addScheduleDate;
       if (!this.isEditMode) {
-        competitionApi.createCompetition(data).then((res) => {
-          if (res.success) {
+        competitionApi
+          .createCompetition(data, this.selectedAthletic)
+          .then(() => {
             this.$message.success("赛事保存成功");
             this.showAddEvent = false;
             // this.getScheduleData();
-          } else {
-            this.$message.error(res.message);
-          }
-        });
+          })
+          .catch((err) => {
+            const message = err?.message || err || "赛事保存失败";
+            this.$message.error(message);
+          });
       } else {
-        competitionApi.updateCompetition(data).then((res) => {
-          if (res.success) {
-            this.$message.success("赛事保存成功");
-            this.showAddEvent = false;
-          }
-        });
+        competitionApi
+          .updateCompetition(data, this.selectedAthletic)
+          .then((res) => {
+            if (res.success) {
+              this.$message.success("赛事保存成功");
+              this.showAddEvent = false;
+            }
+          });
       }
       this.getScheduleData();
       // 这里可以添加保存成功后的处理逻辑，比如刷新列表等
@@ -916,12 +950,26 @@ export default {
     handleRefresh() {
       this.getScheduleData();
     },
+    async getCurrentUserClassConfigCount() {
+      const res = await classApi.getCurrentUserClassConfigCount();
+      if (res.success) {
+        this.currentUserClassConfig = res.result;
+      }
+    },
 
     /**
      * 新增课程
      */
     handleAddClass(groupId) {
+      if (
+        this.currentUserClassConfig.currentCount >=
+        this.currentUserClassConfig.limitValue
+      ) {
+        this.$message.error("超出课程数量上限");
+        return;
+      }
       this.addGroupId = groupId;
+
       this.showAddClassTitle = true;
     },
 
@@ -1139,6 +1187,13 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
+      if (
+        this.currentUserClassConfig.currentCount >=
+        this.currentUserClassConfig.limitValue
+      ) {
+        this.$message.error("超出课程数量上限");
+        return;
+      }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;

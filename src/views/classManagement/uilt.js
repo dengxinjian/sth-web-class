@@ -1,11 +1,13 @@
 import { mmssToSeconds } from "@/utils/index";
 import { Message } from "element-ui";
-export const debounce = (cb, wait) => {
-  let timer;
+export const debounce = (func, wait) => {
+  let timeout;
   return function (...args) {
     const context = this;
-    clearTimeout(timer);
-    timer = setTimeout(() => cb.apply(context, args), wait);
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func.apply(context, args);
+    }, wait);
   };
 };
 

@@ -1,7 +1,8 @@
 <template>
   <div
-    class="schedule-class "
-   :data-id="classData.id"
+    class="schedule-class"
+    :class="activeClassType === 'my' ? 'my-class' : 'official-class'"
+    :data-id="classData.id"
     data-type="classTemplate"
     @click="$emit('view', classData.id, classData.sportType)"
   >

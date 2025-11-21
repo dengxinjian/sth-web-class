@@ -150,31 +150,50 @@
                 </div>
               </div>
             </div>
+            <transition name="context-menu-fade">
+              <div
+                v-if="contextMenuVisible"
+                class="context-menu"
+                :style="{
+                  left: contextMenuX + 'px',
+                  top: contextMenuY + 'px',
+                }"
+                @click.stop
+              >
+                <div
+                  class="context-menu-item"
+                  @click="
+                    handleAddSchedule(contextMenuDate);
+                    hideContextMenu();
+                  "
+                >
+                  <i class="el-icon-plus"></i>
+                  <span>添加</span>
+                </div>
+                <div
+                  class="context-menu-item"
+                  @click="
+                    handleInputActivity(contextMenuDate);
+                    hideContextMenu();
+                  "
+                >
+                  <i class="el-icon-plus"></i>
+                  <span>录入运动</span>
+                </div>
+                <div
+                  v-if="hasCopiedClass"
+                  class="context-menu-item"
+                  @click="handlePaste"
+                >
+                  <i class="el-icon-document-copy"></i>
+                  <span>粘贴</span>
+                </div>
+              </div>
+            </transition>
           </div>
         </div>
       </div>
     </div>
-    <transition name="context-menu-fade">
-      <div
-        v-if="contextMenuVisible && hasCopiedClass"
-        class="context-menu"
-        :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
-        @click.stop
-      >
-        <!-- <div class="context-menu-item" @click="hideContextMenu()">
-          <i class="el-icon-close"></i>
-          <span>取消</span>
-        </div> -->
-        <div
-          v-if="hasCopiedClass"
-          class="context-menu-item"
-          @click="handlePaste"
-        >
-          <i class="el-icon-document-copy"></i>
-          <span>粘贴</span>
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -298,6 +317,9 @@ export default {
         console.warn("拖拽移动事件处理出错:", error);
         return true;
       }
+    },
+    handleInputActivity(date) {
+      this.$emit("input-activity", date);
     },
   },
 };
@@ -503,7 +525,6 @@ export default {
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   z-index: 99999;
   padding: 4px 0;
   min-width: 120px;

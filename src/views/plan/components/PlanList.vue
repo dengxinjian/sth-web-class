@@ -40,7 +40,7 @@
         </div>
       </el-popover>
 
-      <el-input size="mini" v-model="searchInput" @keyup.enter.native="handleSearch">
+      <el-input size="mini" v-model="searchInput" @input="handleSearch">
         <el-button
           slot="append"
           icon="el-icon-search"
@@ -51,8 +51,16 @@
 
     <!-- 课程列表 -->
     <div class="schedule-class-container">
-      <el-collapse v-model="activeCollapse" accordion @change="$emit('collapse-change')">
-        <el-collapse-item v-for="item in classList" :key="item.groupId" :name="item.groupId">
+      <el-collapse
+        v-model="activeCollapse"
+        accordion
+        @change="$emit('collapse-change')"
+      >
+        <el-collapse-item
+          v-for="item in classList"
+          :key="item.groupId"
+          :name="item.groupId"
+        >
           <template slot="title">
             <div class="schedule-class-title">
               <div class="group-name">
@@ -68,7 +76,10 @@
               >
                 <div class="group-operations">
                   <span>
-                    <el-button type="text" @click="$emit('add-plan', item.groupId)">
+                    <el-button
+                      type="text"
+                      @click="$emit('add-plan', item.groupId)"
+                    >
                       新增计划
                     </el-button>
                   </span>
@@ -100,17 +111,19 @@
                     </el-button>
                   </span>
                 </div>
-                <i
-                  class="el-icon-more"
-                  slot="reference"
-                  @click.stop
-                ></i>
+                <i class="el-icon-more" slot="reference" @click.stop></i>
               </el-popover>
             </div>
           </template>
 
           <div class="js-class-drag-container" :key="item.timespan">
-            <div class="plan-item" :class="{ active: selectedPlanId === classItem.id }" v-for="classItem in item.classesList" :key="classItem.id" @click="$emit('choose-plan', classItem.id,item.groupId)">
+            <div
+              class="plan-item"
+              :class="{ active: selectedPlanId === classItem.id }"
+              v-for="classItem in item.classesList"
+              :key="classItem.id"
+              @click="$emit('choose-plan', classItem.id, item.groupId)"
+            >
               <span>{{ classItem.planTitle }}</span>
             </div>
           </div>
@@ -121,35 +134,36 @@
 </template>
 
 <script>
+import { debounce } from "../../classManagement/uilt";
 export default {
-  name: 'PlanList',
+  name: "PlanList",
   props: {
     classList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     activeClassType: {
       type: String,
-      default: 'my'
+      default: "my",
     },
     showAddClassBtn: {
       type: Boolean,
-      default: true
+      default: true,
     },
     selectedPlanId: {
       type: [String, Number],
-      default: null
+      default: null,
     },
     currentPlanGroupId: {
       type: [String, Number],
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      searchInput: '',
-      activeCollapse: null
-    }
+      searchInput: "",
+      activeCollapse: null,
+    };
   },
   watch: {
     currentPlanGroupId: {
@@ -158,19 +172,23 @@ export default {
         if (newVal) {
           // 延迟执行，确保 classList 已更新
           this.$nextTick(() => {
-            this.tryExpandGroup()
-          })
+            this.tryExpandGroup();
+          });
         }
       },
-      immediate: true
+      immediate: true,
     },
     classList: {
       handler(newList) {
         // 当列表更新时，如果 currentPlanGroupId 有值且对应的分组存在，则展开
-        if (this.currentPlanGroupId && Array.isArray(newList) && newList.length > 0) {
+        if (
+          this.currentPlanGroupId &&
+          Array.isArray(newList) &&
+          newList.length > 0
+        ) {
           this.$nextTick(() => {
-            this.tryExpandGroup()
-          })
+            this.tryExpandGroup();
+          });
         }
       },
       immediate: true,
@@ -188,16 +206,23 @@ export default {
     // 组件挂载后，延迟检查以确保数据已加载
     // 使用 setTimeout 确保在异步数据加载完成后也能展开
     setTimeout(() => {
-      this.tryExpandGroup()
-    }, 100)
+      this.tryExpandGroup();
+    }, 100);
+  },
+  created() {
+    this.emitSearch = debounce(() => {
+      this.$emit("search", this.searchInput);
+    }, 500);
   },
   methods: {
     handleClassTypeChange(type) {
-      this.$emit('update:activeClassType', type)
-      this.$emit('class-type-change', type)
+      this.$emit("update:activeClassType", type);
+      this.$emit("class-type-change", type);
     },
     handleSearch() {
-      this.$emit('search', this.searchInput)
+      if (this.emitSearch) {
+        this.emitSearch();
+      }
     },
     /**
      * 检查指定的 groupId 是否存在于 classList 中
@@ -206,28 +231,36 @@ export default {
      */
     isGroupExists(groupId) {
       // 检查 groupId 是否有效（不为空字符串、null、undefined）
-      if (!groupId || groupId === '' || !Array.isArray(this.classList) || this.classList.length === 0) {
-        return false
+      if (
+        !groupId ||
+        groupId === "" ||
+        !Array.isArray(this.classList) ||
+        this.classList.length === 0
+      ) {
+        return false;
       }
       // 转换为字符串进行比较，支持数字和字符串类型
-      const targetId = String(groupId)
-      return this.classList.some(item => {
-        if (!item || !item.groupId) return false
-        return String(item.groupId) === targetId
-      })
+      const targetId = String(groupId);
+      return this.classList.some((item) => {
+        if (!item || !item.groupId) return false;
+        return String(item.groupId) === targetId;
+      });
     },
     /**
      * 尝试展开指定的分组
      */
     tryExpandGroup() {
-      if (this.currentPlanGroupId && this.isGroupExists(this.currentPlanGroupId)) {
+      if (
+        this.currentPlanGroupId &&
+        this.isGroupExists(this.currentPlanGroupId)
+      ) {
         this.$nextTick(() => {
-          this.activeCollapse = this.currentPlanGroupId
-        })
+          this.activeCollapse = this.currentPlanGroupId;
+        });
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -256,7 +289,7 @@ export default {
     }
 
     li.active::after {
-      content: '';
+      content: "";
       position: absolute;
       bottom: 0;
       left: 50%;
@@ -359,4 +392,3 @@ export default {
   background-color: rgba(204, 35, 35, 0.15);
 }
 </style>
-

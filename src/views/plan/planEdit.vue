@@ -119,6 +119,7 @@ export default {
   data() {
     return {
       classList: [],
+      currentUserClassConfig: {},
       activeClassType: "my",
       showViewClassCard: false,
       classModalData: {},
@@ -134,50 +135,7 @@ export default {
       showSportTypeModal: false,
       showAddClassModal: false,
       showEditPlanClassModal: false,
-      planList: [
-        [
-          {
-            day: 1,
-            details: [
-              {
-                classesJson:
-                  '{"id":282,"title":"STH_轻松骑@2h30min","groupId":10,"duration":"02:30:00","distance":"","sth":18000,"mode":1,"summary":"- 150分钟1-2区骑行","tags":[],"stages":[{"times":1,"sections":[{"title":"恢复","stageMode":"recover","summary":"","tags":[],"capacity":"time","range":"range","target":"02:30:00","hasCadence":false,"thresholdFtp":80,"thresholdFtpRange":[50,65],"thresholdHeartRate":80,"thresholdHeartRateRange":[80,85],"targetFtp":230,"targetFtpRange":[140,160],"targetHeartRate":150,"targetHeartRateRange":[110,150],"cadence":[80,90],"lap":false,"targetSeconds":9000}]}],"durationSeconds":"","distanceMeters":"","timeline":[{"duration":9000,"stageTimeline":[{"duration":9000,"intensity":57.5,"title":"恢复"}],"times":1}],"maxIntensity":57.5}',
-                classesTitle: "STH_轻松骑@2h30min",
-                label: "[]",
-                sportType: "CYCLE",
-              },
-            ],
-          },
-          {
-            day: 4,
-            details: [
-              {
-                classesJson:
-                  '{"id":"","sportType":"RUN","title":"STH_马拉松赛-H(补给分段)","groupId":6,"duration":"--:--:--","distance":21.3,"sth":"","mode":1,"summary":"马拉松比赛/比赛手表可选项","tags":[],"stages":[{"times":1,"sections":[{"title":"出发","stageMode":"bike","summary":"","tags":[],"capacity":"distance","range":"range","target":"00:20:00","targetDistance":7,"targetUnit":"km","hasCadence":false,"thresholdSpeed":80,"thresholdSpeedRange":[94,97],"thresholdHeartRate":80,"thresholdHeartRateRange":[80,85],"targetSpeed":"05:00","targetSpeedRange":["03:30","05:00"],"targetHeartRate":150,"targetHeartRateRange":[110,150],"cadence":[160,200],"lap":false,"targetSeconds":600}]},{"times":1,"sections":[{"title":"第一支胶","stageMode":"bike","summary":"","tags":[],"capacity":"distance","range":"range","target":"00:20:00","targetDistance":6,"targetUnit":"km","hasCadence":false,"thresholdSpeed":80,"thresholdSpeedRange":[94,97],"thresholdHeartRate":80,"thresholdHeartRateRange":[80,85],"targetSpeed":"05:00","targetSpeedRange":["03:30","05:00"],"targetHeartRate":150,"targetHeartRateRange":[110,150],"cadence":[160,200],"lap":false,"targetSeconds":600}]},{"times":1,"sections":[{"title":"第二支胶&盐丸","stageMode":"bike","summary":"","tags":[],"capacity":"distance","range":"range","target":"00:20:00","targetDistance":5,"targetUnit":"km","hasCadence":false,"thresholdSpeed":80,"thresholdSpeedRange":[94,97],"thresholdHeartRate":80,"thresholdHeartRateRange":[80,85],"targetSpeed":"05:00","targetSpeedRange":["03:30","05:00"],"targetHeartRate":150,"targetHeartRateRange":[110,150],"cadence":[160,200],"lap":false,"targetSeconds":600}]},{"times":1,"sections":[{"title":"第三支胶&尽力加速","stageMode":"bike","summary":"","tags":[],"capacity":"distance","range":"range","target":"00:20:00","targetDistance":3.3,"targetUnit":"km","hasCadence":false,"thresholdSpeed":80,"thresholdSpeedRange":[95,98],"thresholdHeartRate":80,"thresholdHeartRateRange":[80,85],"targetSpeed":"05:00","targetSpeedRange":["03:30","05:00"],"targetHeartRate":150,"targetHeartRateRange":[110,150],"cadence":[160,200],"lap":false,"targetSeconds":600}]}],"durationSeconds":"","distanceMeters":"","timeline":[{"duration":600,"stageTimeline":[{"duration":600,"intensity":95.5,"title":"出发"}],"times":1},{"duration":600,"stageTimeline":[{"duration":600,"intensity":95.5,"title":"第一支胶"}],"times":1},{"duration":600,"stageTimeline":[{"duration":600,"intensity":95.5,"title":"第二支胶&盐丸"}],"times":1},{"duration":600,"stageTimeline":[{"duration":600,"intensity":96.5,"title":"第三支胶&尽力加速"}],"times":1}],"maxIntensity":96.5}',
-                classesTitle: "STH_马拉松赛-H(补给分段)",
-                label: null,
-                sportType: "RUN",
-              },
-            ],
-          },
-        ],
-        [
-          {
-            day: 8,
-            details: [
-              {
-                classesJson:
-                  '{"id":282,"title":"STH_轻松骑@2h30min","groupId":10,"duration":"02:30:00","distance":"","sth":18000,"mode":1,"summary":"- 150分钟1-2区骑行","tags":[],"stages":[{"times":1,"sections":[{"title":"恢复","stageMode":"recover","summary":"","tags":[],"capacity":"time","range":"range","target":"02:30:00","hasCadence":false,"thresholdFtp":80,"thresholdFtpRange":[50,65],"thresholdHeartRate":80,"thresholdHeartRateRange":[80,85],"targetFtp":230,"targetFtpRange":[140,160],"targetHeartRate":150,"targetHeartRateRange":[110,150],"cadence":[80,90],"lap":false,"targetSeconds":9000}]}],"durationSeconds":"","distanceMeters":"","timeline":[{"duration":9000,"stageTimeline":[{"duration":9000,"intensity":57.5,"title":"恢复"}],"times":1}],"maxIntensity":57.5}',
-                classesTitle: "STH_轻松骑@2h30min",
-                label: "[]",
-                sportType: "CYCLE",
-              },
-            ],
-          },
-        ],
-        [],
-        [],
-      ],
+      planList: [],
       selectedDay: null,
       selectedSportType: "RUN",
       editPlanClassData: {},
@@ -199,12 +157,24 @@ export default {
       isEditMode: false,
     };
   },
+  watch: {},
   mounted() {
     this.getClassList();
+    this.getCurrentUserClassConfigCount();
     console.log(this.$route.query, "this.$route.query");
     this.planType = this.$route.query.type;
     // 获取 store plan.js planData数据
-    this.planData = this.$store.state.plan.planData;
+    const storePlanData = this.$store.state.plan.planData;
+    if (storePlanData) {
+      this.planData = storePlanData;
+    } else {
+      // 如果 store 中没有数据，初始化 planData
+      this.planData = {
+        dayDetails: [],
+      };
+      // 保存初始数据到 store
+      this.$store.dispatch("plan/savePlanData", this.planData);
+    }
     console.log(this.planData, "this.planData");
     // this.$store.dispatch("plan", this.planType);
     // this.$route.query.planId && this.getPlanData();
@@ -381,6 +351,15 @@ export default {
       }
     },
     /**
+     * 获取当前人 课程配置数
+     */
+    async getCurrentUserClassConfigCount() {
+      const res = await classApi.getCurrentUserClassConfigCount();
+      if (res.success) {
+        this.currentUserClassConfig = res.result;
+      }
+    },
+    /**
      * 移动课程
      */
     handleMoveClass(classId, groupId) {
@@ -434,6 +413,13 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
+      if (
+        this.currentUserClassConfig.currentCount >=
+        this.currentUserClassConfig.limitValue
+      ) {
+        this.$message.error("超出课程数量上限");
+        return;
+      }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;
@@ -524,9 +510,7 @@ export default {
 
       // 添加课程到 details 数组
       dayData.details.push(saveData);
-
-      // 触发响应式更新
-      this.$forceUpdate();
+      console.log(this.planData.dayDetails, "this.planData.dayDetails");
 
       if (flag) {
         this.showAddClassModal = false;
@@ -534,8 +518,10 @@ export default {
         this.selectedSportType = null;
       }
       if (this.CreatePlanCourseDialogData.mode === "SAVE") {
-        this.savePlanCourse(saveData);
+        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
       }
+      // 触发响应式更新
+      this.$forceUpdate();
     },
 
     // 如果是永久保存 需要走接口
@@ -554,12 +540,16 @@ export default {
     /**
      * 删除计划表课程
      */
-    handleDeletePlanClass(classItem, classIndex, weekNumber, globalDay) {
-      this.$confirm("确认删除该课程？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
+    handleDeletePlanClass(classItem, classIndex, weekNumber, globalDay, isCut) {
+      console.log(
+        classItem,
+        classIndex,
+        weekNumber,
+        globalDay,
+        isCut,
+        "classItem, classIndex, weekNumber, globalDay, isCut"
+      );
+      if (isCut) {
         if (
           weekNumber === undefined ||
           globalDay === undefined ||
@@ -634,7 +624,88 @@ export default {
         this.editPlanClassGlobalDay = null;
 
         this.$message.success("删除成功");
-      });
+      } else {
+        this.$confirm("确认删除该课程？", "提示", {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          if (
+            weekNumber === undefined ||
+            globalDay === undefined ||
+            classIndex === undefined
+          ) {
+            console.error("删除参数不完整");
+            return;
+          }
+
+          const weekIndex = weekNumber - 1;
+
+          // 检查周数据是否存在
+          if (!this.planData.dayDetails[weekIndex]) {
+            console.error(`第 ${weekNumber} 周数据不存在`);
+            return;
+          }
+
+          // 查找该天的数据对象
+          const dayData = this.planData.dayDetails[weekIndex].find(
+            (item) => item.day === globalDay
+          );
+          console.log(dayData, "dayData");
+
+          if (!dayData) {
+            console.error(`第 ${globalDay} 天的数据不存在`);
+            return;
+          }
+
+          // 检查 details 数组是否存在
+          if (!dayData.details || !Array.isArray(dayData.details)) {
+            console.error(`第 ${globalDay} 天的课程数组不存在`);
+            return;
+          }
+
+          // 检查索引是否有效
+          if (classIndex < 0 || classIndex >= dayData.details.length) {
+            console.error(`课程索引 ${classIndex} 无效`);
+            return;
+          }
+
+          // 删除指定索引的课程
+          dayData.details.splice(classIndex, 1);
+
+          const dayIndex = this.planData.dayDetails[weekIndex].findIndex(
+            (item) => item.day === globalDay
+          );
+
+          const hasEvents =
+            Array.isArray(dayData.competitionDtoList) &&
+            dayData.competitionDtoList.length > 0;
+
+          if (dayData.details.length === 0 && !hasEvents) {
+            // 当该天没有课程和赛事时才删除整天
+            if (dayIndex !== -1) {
+              this.planData.dayDetails[weekIndex].splice(dayIndex, 1);
+            }
+          } else if (dayIndex !== -1) {
+            // 否则更新该天的数据以保持响应式
+            this.$set(this.planData.dayDetails[weekIndex], dayIndex, {
+              ...dayData,
+              details: [...dayData.details],
+            });
+          }
+
+          // 触发响应式更新
+          this.$forceUpdate();
+
+          // 重置编辑相关数据
+          this.editPlanClassData = {};
+          this.editPlanClassIndex = null;
+          this.editPlanClassWeekNumber = null;
+          this.editPlanClassGlobalDay = null;
+
+          this.$message.success("删除成功");
+        });
+      }
     },
     /**
      * 编辑计划表课程

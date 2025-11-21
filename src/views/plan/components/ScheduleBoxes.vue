@@ -130,6 +130,14 @@
                       )
                     "
                     @copy="handleCopyClass"
+                    @cut="
+                      handleCutClass(
+                        classItem,
+                        classIndex,
+                        item.weekIndex + 1,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )
+                    "
                   />
                   <div
                     class="box-content"
@@ -300,6 +308,9 @@ export default {
       dragSourceGlobalDay: null, // 拖拽源全局天数
       dragSourceClassIndex: null, // 拖拽源课程索引
       isDragging: false, // 是否正在拖动
+      cutClass: {
+        isCut: false,
+      },
     };
   },
   computed: {
@@ -372,6 +383,17 @@ export default {
   },
   methods: {
     secondsToHHMMSS,
+    roundDistance(value, decimals = 2) {
+      if (value === null || typeof value === "undefined") {
+        return value;
+      }
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) {
+        return value;
+      }
+      const factor = Math.pow(10, decimals);
+      return Math.round((numericValue + Number.EPSILON) * factor) / factor;
+    },
     //  计算周运动sth总值
     getweekSth(weekIndex) {
       const week = this.planList[weekIndex];
@@ -459,7 +481,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -508,6 +530,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周运动游泳时长总和
     getweekSwimmingDuration(weekIndex) {
@@ -557,7 +580,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -593,6 +616,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周骑行时长总和
     getweekCycleDuration(weekIndex) {
@@ -642,7 +666,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -677,6 +701,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周跑步时长总和
     getweekRunDuration(weekIndex) {
@@ -725,7 +750,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      return week.reduce((acc, item) => {
+      const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -767,6 +792,7 @@ export default {
           }, 0)
         );
       }, 0);
+      return this.roundDistance(totalDistance);
     },
     // 计算周力量时长总和
     getweekPowerDuration(weekIndex) {
@@ -982,6 +1008,18 @@ export default {
         this.copiedClass
       );
       this.hideContextMenu();
+      if (this.cutClass.isCut) {
+        console.log("handlePaste-cutClass-1", this.cutClass);
+        this.$emit(
+          "delete-class",
+          this.cutClass.classItem,
+          this.cutClass.classIndex,
+          this.cutClass.weekNumber,
+          this.cutClass.globalDay,
+          true
+        );
+        this.cutClass = { isCut: false };
+      }
       // 粘贴完成后清除复制状态
       this.hasCopiedClass = false;
       this.copiedClass = null;
@@ -995,7 +1033,18 @@ export default {
         duration: 2000,
       });
     },
-
+    handleCutClass(classItem, classIndex, weekNumber, globalDay) {
+      console.log("handleCutClass-classItem-1", classItem);
+      this.copiedClass = { ...classItem };
+      this.hasCopiedClass = true;
+      this.$message({
+        message: "课表已剪切，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
+      });
+      this.cutClass = { classIndex, weekNumber, globalDay, isCut: true };
+      // this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
+    },
     /**
      * 拖拽变化事件（包括克隆元素的添加）
      */

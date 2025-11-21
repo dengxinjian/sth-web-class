@@ -21,7 +21,7 @@ const modules = modulesFiles.keys().reduce((modules, modulePath) => {
 const store = new Vuex.Store({
   modules,
   getters,
-  plugins: [createPersistedstate({ paths: ["userInfo"] })],
+  plugins: [createPersistedstate({ paths: ["userInfo", "plan"] })],
 });
 
 export default store;

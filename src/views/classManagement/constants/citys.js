@@ -1063,11 +1063,6 @@ const citys = [
         label: "省直辖县级行政区划",
         value: "429000",
       },
-      {
-        id: "1368",
-        label: "DYS-当阳市",
-        value: "DY",
-      },
     ],
   },
   {

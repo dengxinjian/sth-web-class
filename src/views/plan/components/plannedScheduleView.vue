@@ -26,11 +26,7 @@
             </div>
           </div>
           <i
-            style="
-              display: inline-block;
-              cursor: pointer;
-              font-size: 20px;
-            "
+            style="display: inline-block; cursor: pointer; font-size: 20px"
             class="el-icon-more"
             slot="reference"
             @click.stop
@@ -53,7 +49,7 @@
         </div>
         <div class="planned-schedule-header-title-right-total">
           <span class="label">总STH:</span>
-          <span class="value">{{ getTotalSth() || "--" }}</span>
+          <span class="value">{{ getTotalSth() > 100000 ? getTotalSth() / 10000 + "万" : getTotalSth() || "--" }}</span>
         </div>
       </div>
     </div>
@@ -146,8 +142,19 @@ export default {
         );
       }, 0);
     },
+    roundDistance(value, decimals = 2) {
+      if (value === null || typeof value === "undefined") {
+        return value;
+      }
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) {
+        return value;
+      }
+      const factor = Math.pow(10, decimals);
+      return Math.round((numericValue + Number.EPSILON) * factor) / factor;
+    },
     getTotalDistance() {
-      const total = this.planList.reduce((total, week) => {
+      const totalDistance = this.planList.reduce((total, week) => {
         return (
           total +
           week.reduce((weekTotal, item) => {
@@ -194,7 +201,7 @@ export default {
         );
       }, 0);
       // 如果是整数，不保留小数；如果有小数，保留两位小数
-      return total % 1 === 0 ? total : Number(total.toFixed(2));
+      return this.roundDistance(totalDistance);
     },
     getTotalDuration() {
       return this.planList.reduce((total, week) => {

@@ -40,7 +40,7 @@
         </div>
       </el-popover>
 
-      <el-input size="mini" v-model="searchInput" @keyup.enter.native="handleSearch">
+      <el-input size="mini" v-model="searchInput" @input="handleSearch">
         <el-button
           slot="append"
           icon="el-icon-search"
@@ -68,7 +68,10 @@
               >
                 <div class="group-operations">
                   <span>
-                    <el-button type="text" @click="$emit('add-class', item.groupId)">
+                    <el-button
+                      type="text"
+                      @click="$emit('add-class', item.groupId)"
+                    >
                       新增课程
                     </el-button>
                   </span>
@@ -100,11 +103,7 @@
                     </el-button>
                   </span>
                 </div>
-                <i
-                  class="el-icon-more"
-                  slot="reference"
-                  @click.stop
-                ></i>
+                <i class="el-icon-more" slot="reference" @click.stop></i>
               </el-popover>
             </div>
           </template>
@@ -123,6 +122,7 @@
             :scroll-speed="10"
             ghost-class="is-plan-drag-ghost"
             :key="item.timespan"
+            filter=".official-class"
           >
             <ClassCard
               v-for="classItem in item.classesList"
@@ -133,7 +133,9 @@
               @click="$emit('class-detail', classItem.id, classItem.sportType)"
               @move="$emit('move-class', classItem.id, item.groupId)"
               @delete="$emit('delete-class', classItem.id)"
-              @copy="$emit('copy-class', classItem, item.groupId, classItem.title)"
+              @copy="
+                $emit('copy-class', classItem, item.groupId, classItem.title)
+              "
               @view="$emit('view-class', classItem.id)"
             />
           </draggable>
@@ -144,48 +146,57 @@
 </template>
 
 <script>
-import ClassCard from './ClassCard.vue'
-import draggable from 'vuedraggable'
+import ClassCard from "./ClassCard.vue";
+import draggable from "vuedraggable";
+import { debounce } from "../uilt";
 
 export default {
-  name: 'ClassList',
+  name: "ClassList",
   components: {
     ClassCard,
-    draggable
+    draggable,
   },
   props: {
     classList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     activeClassType: {
       type: String,
-      default: 'my'
+      default: "my",
     },
     showAddClassBtn: {
       type: Boolean,
-      default: true
+      default: true,
     },
     groupName: {
       type: String,
-      default: 'classDrag'
-    }
+      default: "classDrag",
+    },
   },
   data() {
     return {
-      searchInput: ''
-    }
+      searchInput: "",
+      emitSearch: null,
+    };
+  },
+  created() {
+    this.emitSearch = debounce(() => {
+      this.$emit("search", this.searchInput);
+    }, 500);
   },
   methods: {
     handleClassTypeChange(type) {
-      this.$emit('update:activeClassType', type)
-      this.$emit('class-type-change', type)
+      this.$emit("update:activeClassType", type);
+      this.$emit("class-type-change", type);
     },
     handleSearch() {
-      this.$emit('search', this.searchInput)
-    }
-  }
-}
+      if (this.emitSearch) {
+        this.emitSearch();
+      }
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -214,7 +225,7 @@ export default {
     }
 
     li.active::after {
-      content: '';
+      content: "";
       position: absolute;
       bottom: 0;
       left: 50%;
@@ -290,4 +301,3 @@ export default {
   align-items: center;
 }
 </style>
-

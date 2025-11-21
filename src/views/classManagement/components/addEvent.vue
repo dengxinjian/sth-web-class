@@ -91,7 +91,16 @@
               placeholder="请输入距离"
               @input="handleCustomDistanceInput"
             >
-              <template slot="append">km</template>
+              <template slot="append">
+                <el-select
+                  v-model="formData.competitionDistanceUnit"
+                  placeholder="请选择距离单位"
+                  style="width: 80px"
+                >
+                  <el-option label="km" value="km" />
+                  <el-option label="m" value="m" />
+                </el-select>
+              </template>
             </el-input>
           </el-form-item>
         </div>
@@ -136,13 +145,23 @@ export default {
         competitionType: "",
         distance: "",
         customDistance: "",
+        competitionDistanceUnit: "km",
       },
       rules: {
         priority: [
           { required: true, message: "请选择优先级", trigger: "change" },
         ],
         eventName: [
-          { required: true, message: "请输入赛事名称", trigger: "blur" },
+          {
+            validator: (rule, value, callback) => {
+              if (!value || !value.trim()) {
+                callback(new Error("请输入赛事名称"));
+              } else {
+                callback();
+              }
+            },
+            trigger: ["blur", "change"],
+          },
         ],
         location: [
           { required: true, message: "请选择赛事地点", trigger: "change" },
@@ -235,6 +254,7 @@ export default {
         competitionType: "",
         distance: "",
         customDistance: "",
+        competitionDistanceUnit: "km",
       };
       this.showCustomDistance = false;
       this.distanceOptions = [];
@@ -283,12 +303,15 @@ export default {
       if (distanceValue === "OTHER") {
         this.showCustomDistance = true;
         this.formData.customDistance =
-          data.customDistance ||
-          this.extractDistanceNumber(data.competitionDistance);
+          data.competitionDistanceValue /
+            (data.competitionDistanceUnit === "km" ? 1000 : 1) ||
+          this.extractDistanceNumber(data.competitionDistanceValue);
       } else {
         this.showCustomDistance = false;
         this.formData.customDistance = "";
       }
+      this.formData.competitionDistanceUnit =
+        data.competitionDistanceUnit || "km";
     },
     parseLocationString(locationStr) {
       // 将字符串格式的地点（如：湖北/武汉）转换为级联选择器的 value 数组
@@ -337,6 +360,11 @@ export default {
       this.formData.distance = "";
       this.formData.customDistance = "";
       this.showCustomDistance = false;
+      if (value === "SWIM") {
+        this.formData.competitionDistanceUnit = "m";
+      } else {
+        this.formData.competitionDistanceUnit = "km";
+      }
 
       // 根据比赛类型更新距离选项
       this.updateDistanceOptions(value);
@@ -432,7 +460,38 @@ export default {
       return match ? match[0] : "";
     },
     handleCustomDistanceInput() {
-      // 自定义距离输入时的处理
+      const rawValue = this.formData.customDistance;
+      const strValue =
+        rawValue === undefined || rawValue === null ? "" : String(rawValue);
+
+      if (!strValue) {
+        this.formData.customDistance = "";
+        return;
+      }
+
+      const match = strValue.match(/^(\d+(?:\.\d{0,2})?)/);
+      const sanitized = match ? match[1] : "";
+
+      if (!sanitized) {
+        this.formData.customDistance = "";
+        this.$message.error("请输入有效的距离值，小数点后最多2位");
+        return;
+      }
+
+      // 如果用户刚输入到 "."，先允许继续输入
+      if (sanitized.endsWith(".")) {
+        this.formData.customDistance = sanitized;
+        return;
+      }
+
+      const num = parseFloat(sanitized);
+      if (isNaN(num) || num <= 0) {
+        this.formData.customDistance = "";
+        this.$message.error("请输入有效的距离值，小数点后最多2位");
+        return;
+      }
+
+      this.formData.customDistance = sanitized;
     },
     handleClose() {
       this.innerVisible = false;
@@ -465,8 +524,8 @@ export default {
               this.formData.priority === "PRIMARY"
                 ? 1
                 : this.formData.priority === "SECONDARY"
-                  ? 2
-                  : 3;
+                ? 2
+                : 3;
 
             // 获取距离的 displayValue（如果不是 OTHER）
             const competitionDistance = this.distanceOptions.find(
@@ -480,6 +539,11 @@ export default {
               competitionLocation: locationStr,
               competitionName: this.formData.eventName,
               competitionType: competitionTypeDisplayValue,
+              competitionDistanceValue:
+                this.formData.competitionDistanceUnit === "km"
+                  ? this.formData.customDistance * 1000
+                  : this.formData.customDistance,
+              competitionDistanceUnit: this.formData.competitionDistanceUnit,
               priority: priority,
             };
             // 如果是编辑模式，添加 id
