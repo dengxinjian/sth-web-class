@@ -1,5 +1,88 @@
 <template>
-  <div class="wx-login-page"></div>
+  <div class="wx-login-page">
+    <header>
+      <div class="logo-container">
+        <div class="logo">
+          <img
+            :src="require('@/views/login-wx/imgs/logo-move.png')"
+            alt="强者之心"
+          />
+        </div>
+        <div class="brand-description">
+          <span>TRI强者，恒心不止。 Try Tri, Timeless Strength.</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="slider-container">
+      <div class="slider"></div>
+      <div class="content-overlay">
+        <div class="text-content">
+          <h1>强者之心</h1>
+          <p>让科学普及训练</p>
+          <div class="contact-info">
+            <h2>联系我们</h2>
+            <!-- <div class="contact-item">
+                        <span class="contact-label">电话：</span>
+                        <span class="contact-value">000-0000-0000</span>
+                    </div> -->
+            <div class="contact-item">
+              <span class="contact-label">邮箱：</span>
+              <span class="contact-value">service@strongtri.com</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wx-login-block">
+        <div class="elite-title">ELITE</div>
+        <div id="wx-login-container" class="wx-login-container">
+          <!-- 扫码成功状态 -->
+          <div v-if="hasCode && !wxLoginStatus" class="login-success">
+            <div class="success-icon">✓</div>
+            <div class="success-text">扫码成功</div>
+            <div class="success-subtitle">正在跳转...</div>
+          </div>
+          <!-- 小程序码状态 -->
+          <div
+            v-else-if="wxLoginStatus === 'miniprogram'"
+            class="miniprogram-code"
+          >
+            <div class="miniprogram-title">请使用微信扫码</div>
+            <img
+              src="./imgs/miniprogram.png"
+              alt="小程序码"
+              class="miniprogram-img"
+            />
+            <div class="miniprogram-subtitle">扫码进入小程序</div>
+            <el-button @click="handleMiniprogramCode">已完成扫码</el-button>
+          </div>
+          <!-- 加载状态 -->
+          <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">正在加载二维码...</div>
+          </div>
+          <!-- 错误状态 -->
+          <div v-else-if="wxLoginStatus === 'error'" class="login-error">
+            <div class="error-icon">✗</div>
+            <div class="error-text">加载失败</div>
+            <div class="error-subtitle">请刷新重试</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-content">
+        <p>
+          <img
+            :src="require('@/views/login-wx/imgs/logo.png')"
+            alt=""
+            width="30"
+          />© 2025 武汉强大之心体育有限公司 版权所有 鄂ICP备2024075413号-2
+        </p>
+      </div>
+    </footer>
+  </div>
 </template>
 
 <script>
@@ -22,14 +105,11 @@ export default {
       wxLoginStatus: "", // 微信登录状态：loading, success, error, miniprogram
       showMiniprogramCode: false, // 是否显示小程序码
       unionid: "", // 微信unionid
-      loginType: "1", // 登录类型：1-运动员，2-教练
     };
   },
   mounted() {
     this.checkUrlParams();
     this.initSlider();
-    this.loginType = localStorage.getItem("loginType") || "1";
-    localStorage.setItem("loginType", this.loginType);
   },
   beforeDestroy() {
     clearInterval(this.carouselTimer);
@@ -43,24 +123,27 @@ export default {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get("code");
       const state = urlParams.get("state");
+      const unionid = urlParams.get("unionid");
 
       // 也检查hash中的参数（有些情况下参数可能在hash中）
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const codeFromHash = hashParams.get("code");
       const stateFromHash = hashParams.get("state");
+      const unionidFromHash = hashParams.get("unionid");
 
       // 检查URL中是否包含code字符串
       const urlContainsCode = window.location.href.includes("code=");
       const urlContainsState = window.location.href.includes("state=");
-
+      const unionidFromUrl = window.location.href.includes("unionid=");
       // 备用方法：使用正则表达式解析URL参数
       const regexCode = this.getUrlParameter("code");
       const regexState = this.getUrlParameter("state");
+      const regexUnionid = this.getUrlParameter("unionid");
 
       // 优先使用search中的参数，如果没有则使用hash中的参数，最后使用正则表达式
       const finalCode = code || codeFromHash || regexCode;
       const finalState = state || stateFromHash || regexState;
-
+      this.unionid = unionid || unionidFromHash || regexUnionid;
       if (finalCode) {
         this.hasCode = true;
         this.wxLoginStatus = "success";
@@ -85,43 +168,9 @@ export default {
     // 处理登录成功
     handleLoginSuccess(code, state) {
       // 调用微信登录回调接口，同时传递code和state参数
-      getData({
-        url: "/api/wechat/callback",
-        code: code,
-        state: state,
-      })
-        .then((res) => {
-          this.unionid = res.result.unionid;
-          // 判断返回的res.jwt是否有值
-          if (res.result.jwt && res.result.jwt.trim() !== "") {
-            this.$store.commit("user/SET_TOKEN", res.result.jwt);
-            this.$store.commit("user/SET_NAME", res.result.nicknameTag);
-            localStorage.setItem("triUserId", res.result.triUserId);
-            localStorage.setItem("name", res.result.nicknameTag);
-            setToken(res.result.jwt);
-            this.$router.push("/timeTable/athletic");
-          } else {
-            this.$router.replace(
-              "/login-cd?code=" +
-                code +
-                "&state=" +
-                state +
-                "&unionid=" +
-                this.unionid
-            );
-            // 没有jwt值，显示小程序码
-            this.showMiniprogramCode = true;
-            this.wxLoginStatus = "miniprogram";
-          }
-        })
-        .catch((error) => {
-          console.error("登录失败:", error);
-          this.$message.error("登录失败，请重试");
-          this.$router.push("/login");
-          // 登录失败也显示小程序码
-          // this.showMiniprogramCode = true;
-          // this.wxLoginStatus = 'miniprogram';
-        });
+
+      this.showMiniprogramCode = true;
+      this.wxLoginStatus = "miniprogram";
     },
     initSlider() {
       const slider = document.querySelector(".slider");
@@ -232,6 +281,10 @@ export default {
           .then((res) => {
             if (res.result.jwt) {
               this.$store.commit("user/SET_TOKEN", res.result.jwt);
+              this.$store.commit("user/SET_NAME", res.result.nicknameTag);
+              localStorage.setItem("triUserId", res.result.triUserId);
+              localStorage.setItem("name", res.result.nicknameTag);
+              console.log("res.result.jwt", res.result.jwt);
               setToken(res.result.jwt);
               this.$router.push("/timeTable/athletic");
             } else {

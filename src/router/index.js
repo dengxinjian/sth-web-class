@@ -6,7 +6,7 @@ Vue.use(Router);
 // 环境配置
 const config = {
   development: {
-    loginComponent: () => import("@/views/login/index")
+    loginComponent: () => import("@/views/login-wx/index")
   },
   staging: {
     loginComponent: () => import("@/views/login-wx/index"),
@@ -75,6 +75,11 @@ export const constantRoutes = [
   {
     path: "/login-scan",
     component: () => import("@/views/login-wx/scan"),
+    hidden: true,
+  },
+  {
+    path: "/login-cd",
+    component: () => import("@/views/login-wx/logninCd"),
     hidden: true,
   },
   {
