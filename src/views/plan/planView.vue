@@ -338,12 +338,7 @@ export default {
     },
     handleClassTypeChange(type) {
       this.activeClassType = type;
-      this.showMore = false;
-      this.planList = [[], [], [], []];
-      this.currentPlanId = "";
-      this.currentPlanGroupId = "";
-      this.planTitle = "";
-      this.currentPlanDetail = {};
+      this.restPageInfo();
       this.getPlanList();
     },
     handlePlanSearch(keyword) {
@@ -558,13 +553,20 @@ export default {
           planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
             if (res.success) {
               this.$message.success("删除成功");
+              this.restPageInfo();
               this.getPlanList();
-              this.planTitle = "";
-              this.planList = [[], [], [], []];
             }
           });
         });
       }
+    },
+    restPageInfo() {
+      this.showMore = false;
+      this.planList = [[], [], [], []];
+      this.currentPlanId = "";
+      this.currentPlanGroupId = "";
+      this.planTitle = "";
+      this.currentPlanDetail = {};
     },
   },
 };
