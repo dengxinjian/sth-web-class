@@ -45,31 +45,34 @@
           />
           <span v-else>ELITE</span>
         </div>
-        <!-- <div
+        <div
           id="wx-login-container"
           :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
-        > -->
-        <!-- 扫码成功状态 -->
-        <!-- <div v-if="hasCode" class="login-success">
+          v-if="isNewUser"
+        >
+          <!-- 扫码成功状态 -->
+          <div v-if="hasCode" class="login-success">
             <div class="success-icon">✓</div>
             <div class="success-text">扫码成功</div>
             <div class="success-subtitle">正在跳转...</div>
-          </div> -->
-        <!-- 加载状态 -->
-        <!-- <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
+          </div>
+          <!-- 加载状态 -->
+          <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
             <div class="loading-spinner"></div>
             <div class="loading-text">正在加载二维码...</div>
-          </div> -->
-        <!-- 错误状态 -->
-        <!-- <div v-else-if="wxLoginStatus === 'error'" class="login-error">
+          </div>
+          <!-- 错误状态 -->
+          <div v-else-if="wxLoginStatus === 'error'" class="login-error">
             <div class="error-icon">✗</div>
             <div class="error-text">加载失败</div>
             <div class="error-subtitle">请刷新重试</div>
           </div>
-        </div> -->
+        </div>
+        <!-- 扫码关注服务号 -->
         <div
           id="wx-login-container"
           :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
+          v-if="!isNewUser"
         >
           <img class="qrcode-img" :src="qrcodeUrl" alt="扫码二维码" />
         </div>
@@ -142,6 +145,7 @@ export default {
       sceneId: "",
       pollTimer: null, // 轮询定时器
       POLL_INTERVAL: 2000, // 轮询间隔：2秒
+      isNewUser: false, // 是否是新用户
     };
   },
   mounted() {
@@ -203,7 +207,7 @@ export default {
 
         console.log("获取扫码登录结果成功:", res);
 
-        if (res.code === "100000" && res.result?.jwt) {
+        if (res.code === "100000" && res.result && res.result) {
           // 扫码成功，停止轮询并处理登录
           this.clearPollTimer();
           this.handleLoginSuccess(res.result);
@@ -222,7 +226,9 @@ export default {
      */
     handleLoginSuccess(result) {
       if (!result?.jwt) {
-        console.warn("登录结果数据不完整，继续轮询");
+        // console.warn("登录结果数据不完整，继续轮询");
+        this.isNewUser = true;
+        this.checkUrlParams();
         this.startPolling();
         return;
       }
