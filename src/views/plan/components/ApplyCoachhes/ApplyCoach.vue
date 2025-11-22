@@ -629,11 +629,3 @@ export default {
   align-items: center;
 }
 </style>
-
-<style>
-/* 全局样式，用于 append-to-body 的 dialog */
-.el-dialog__wrapper.add-class-title-modal .el-dialog,
-.add-class-title-modal.el-dialog__wrapper .el-dialog {
-  margin-top: 5vh !important;
-}
-</style>

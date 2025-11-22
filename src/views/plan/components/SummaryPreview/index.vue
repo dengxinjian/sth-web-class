@@ -4,7 +4,7 @@
     width="680px"
     append-to-body
     :before-close="onCancel"
-    class="add-class-title-modal"
+    class="add-class-title-modal summary-preview-modal"
     :close-on-click-modal="false"
   >
     <span slot="title">概要</span>
@@ -965,3 +965,12 @@ export default {
   font-size: 12px;
 }
 </style>
+
+<style>
+/* 仅应用于当前弹窗的样式，用于 append-to-body 的 dialog */
+.el-dialog__wrapper.summary-preview-modal .el-dialog,
+.summary-preview-modal.el-dialog__wrapper .el-dialog {
+  margin-top: 5vh !important;
+}
+</style>
+
