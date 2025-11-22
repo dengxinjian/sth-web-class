@@ -204,7 +204,7 @@ export default {
       this.getPlanDetail(payload.id);
       this.getPlanDayDetail(payload.id);
       this.$nextTick(() => {
-        this.activeClassType = 'my';
+        this.activeClassType = "my";
         this.currentPlanId = payload.id;
         this.currentPlanGroupId = payload.planGroupId;
         this.planTitle = payload.planTitle;
@@ -338,12 +338,7 @@ export default {
     },
     handleClassTypeChange(type) {
       this.activeClassType = type;
-      this.showMore = false;
-      this.planList = [[], [], [], []];
-      this.currentPlanId = "";
-      this.currentPlanGroupId = "";
-      this.planTitle = "";
-      this.currentPlanDetail = {};
+      this.restPageInfo();
       this.getPlanList();
     },
     handlePlanSearch(keyword) {
@@ -512,6 +507,10 @@ export default {
           _this.showCopy = true;
         },
         3: () => {
+          if (this.currentCount >= this.limitValue) {
+            this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+            return;
+          }
           _this.showApplyCoach = true;
         },
         4: () => {
@@ -554,13 +553,20 @@ export default {
           planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
             if (res.success) {
               this.$message.success("删除成功");
+              this.restPageInfo();
               this.getPlanList();
-              this.planTitle = "";
-              this.planList = [[], [], [], []];
             }
           });
         });
       }
+    },
+    restPageInfo() {
+      this.showMore = false;
+      this.planList = [[], [], [], []];
+      this.currentPlanId = "";
+      this.currentPlanGroupId = "";
+      this.planTitle = "";
+      this.currentPlanDetail = {};
     },
   },
 };

@@ -63,8 +63,8 @@
 
       <el-form-item label="计划源" prop="planSource">
         <el-input
-          :readonly="activeClassType === 'official'"
-          placeholder="请选择团队"
+          :readonly="true"
+          placeholder="请输入计划源"
           v-model="form.planSource"
         />
       </el-form-item>
@@ -72,7 +72,7 @@
       <el-form-item label="拥有者">
         <el-input
           :readonly="true"
-          placeholder="请选择团队"
+          placeholder="请输入拥有者"
           v-model="form.possessNickname"
         />
       </el-form-item>

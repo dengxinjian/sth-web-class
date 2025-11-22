@@ -4,7 +4,7 @@
     width="680px"
     append-to-body
     :before-close="onCancel"
-    class="add-class-title-modal"
+    class="add-class-title-modal summary-preview-modal"
     :close-on-click-modal="false"
   >
     <span slot="title">概要</span>
@@ -62,13 +62,15 @@
       </el-form-item>
 
       <el-form-item label="计划源">
-        <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
-        <el-input v-else :readonly="activeClassType === 'official'" placeholder="请输入计划源" :value="planSource()" />
+        <!-- <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" placeholder="请输入计划源" :value="planSource()" disabled /> -->
+        <span>{{ planSource() }}</span>
       </el-form-item>
 
       <el-form-item label="拥有者">
-        <span v-if="activeClassType === 'official'">{{ planInfo.possessNickname }}</span>
-        <el-input v-else :readonly="true" :value="planInfo.possessNickname" />
+        <!-- <span v-if="activeClassType === 'official'">{{ planInfo.possessNickname }}</span>
+        <el-input v-else :readonly="true" :value="planInfo.possessNickname" disabled /> -->
+        <span>{{ planInfo.possessNickname }}</span>
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
@@ -78,6 +80,7 @@
           :readonly="activeClassType === 'official'"
           v-model="form.email"
           placeholder="请输入邮箱"
+          @change="validateEmail"
         />
       </el-form-item>
 
@@ -88,7 +91,7 @@
 
       <el-form-item label="描述" prop="description">
         <span v-if="activeClassType === 'official'">{{ form.description }}</span>
-        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.description" placeholder="请输入描述" />
+        <el-input type="textarea" v-else :readonly="activeClassType === 'official'" :rows="6" :maxlength="500" show-word-limit v-model="form.description" placeholder="请输入描述" />
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
@@ -113,7 +116,7 @@
                     ? "NA"
                     : secondsToHHMMSS(getweekSwimmingDuration())
                 }}{{ secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                ? "" : "/周" }}</el-col
+                ? "" : " /周" }}</el-col
               >
               <el-col :span="8">{{ getweekSwimmingDistance() || "NA" }} </el-col>
             </el-row>
@@ -127,7 +130,7 @@
                     ? "NA"
                     : secondsToHHMMSS(getweekCycleDuration())
                 }}{{ secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                ? "" : "/周" }}</el-col
+                ? "" : " /周" }}</el-col
               >
               <el-col :span="8"
                 >{{ getweekCycleDistance() || "NA" }}
@@ -143,7 +146,7 @@
                     ? "NA"
                     : secondsToHHMMSS(getweekRunDuration())
                 }}{{ secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                ? "" : "/周" }}</el-col
+                ? "" : " /周" }}</el-col
               >
               <el-col :span="8">{{ getweekRunDistance() || "NA" }}</el-col>
             </el-row>
@@ -157,7 +160,7 @@
                     ? "NA"
                     : secondsToHHMMSS(getweekPowerDuration())
                 }}{{ secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                ? "" : "/周" }}</el-col
+                ? "" : " /周" }}</el-col
               >
               <el-col :span="8">NA</el-col>
             </el-row>
@@ -171,7 +174,7 @@
                     ? "NA"
                     : secondsToHHMMSS(getweekOtherDuration())
                 }}{{ secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
-                ? "" : "/周" }}</el-col
+                ? "" : " /周" }}</el-col
               >
               <el-col :span="8">NA</el-col>
             </el-row>
@@ -186,7 +189,7 @@
                     : secondsToHHMMSS(getweekDuration())
                 }}
                 {{ secondsToHHMMSS(getweekDuration()) === "00:00:00"
-                ? "" : "/周" }}</el-col
+                ? "" : " /周" }}</el-col
               >
               <el-col :span="8">{{ getweekDistance() || "NA" }}</el-col>
             </el-row>
@@ -237,6 +240,25 @@ export default {
           { required: false, message: "请选择分组", trigger: "change" },
         ],
         teamId: [{ required: false, message: "请选择团队", trigger: "change" }],
+        email: [
+          {
+            validator: (rule, value, callback) => {
+              if (!value) {
+                // 邮箱为可选，如果为空则不校验
+                callback();
+                return;
+              }
+              const emailRegex =
+                /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+              if (!emailRegex.test(value)) {
+                callback(new Error("请输入正确的邮箱地址"));
+              } else {
+                callback();
+              }
+            },
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       groups: [],
       teams: [],
@@ -370,6 +392,10 @@ export default {
           }
         });
       });
+    },
+    validateEmail() {
+      // 手动触发表单校验
+      this.$refs.formRef && this.$refs.formRef.validateField("email");
     },
     resetForm() {
       this.form = {
@@ -939,3 +965,12 @@ export default {
   font-size: 12px;
 }
 </style>
+
+<style>
+/* 仅应用于当前弹窗的样式，用于 append-to-body 的 dialog */
+.el-dialog__wrapper.summary-preview-modal .el-dialog,
+.summary-preview-modal.el-dialog__wrapper .el-dialog {
+  margin-top: 5vh !important;
+}
+</style>
+
