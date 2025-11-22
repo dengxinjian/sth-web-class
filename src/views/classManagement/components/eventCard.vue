@@ -10,6 +10,7 @@
     >
       <div
         class="classScheduleCard"
+        :class="{ 'is-dragging': isDragging }"
         :style="cardStyle"
         data-type="classSchedule"
         @click.stop="handleClick"
@@ -33,14 +34,16 @@
               placement="right"
               trigger="hover"
               :tabindex="9999"
+              :disabled="isDragging"
               v-if="type === 'edit'"
             >
               <div class="btn-list-hover">
-                <el-button type="text" @click.stop="$emit('edit', eventItem)">
+                <el-button type="text" icon="el-icon-edit" @click.stop="$emit('edit', eventItem)">
                   编辑
                 </el-button>
                 <el-button
                   type="text"
+                  icon="el-icon-delete"
                   @click.stop="$emit('delete', eventItem.id)"
                 >
                   删除
@@ -100,6 +103,10 @@ export default {
         return ["view", "edit"].includes(value);
       },
     },
+    isDragging: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -122,6 +129,10 @@ export default {
   },
   methods: {
     showContextMenu(event) {
+      // 如果正在拖拽，不显示右键菜单
+      if (this.isDragging) {
+        return;
+      }
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
       this.$nextTick(() => {
         // 获取组件根元素
@@ -195,6 +206,10 @@ export default {
       });
     },
     handleClick() {
+      // 如果正在拖拽，不处理点击事件
+      if (this.isDragging) {
+        return;
+      }
       this.hideContextMenu();
       if (this.type === "view") {
         this.$emit("view-class", this.eventItem);
@@ -242,8 +257,14 @@ export default {
   padding-top: 10px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
 
-  &:hover {
+  &:hover:not(.is-dragging) {
     transform: scale(1.02);
+  }
+
+  &.is-dragging {
+    pointer-events: none;
+    opacity: 0.6;
+    cursor: grabbing !important;
   }
 
   > .classScheduleCard {

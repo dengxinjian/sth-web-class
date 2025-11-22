@@ -123,7 +123,7 @@ export default {
           duration: "",
           sth: "",
           summary: "",
-          tags: "",
+          tags: [],
         },
         this.data || {}
       ),
