@@ -204,7 +204,7 @@ export default {
       this.getPlanDetail(payload.id);
       this.getPlanDayDetail(payload.id);
       this.$nextTick(() => {
-        this.activeClassType = 'my';
+        this.activeClassType = "my";
         this.currentPlanId = payload.id;
         this.currentPlanGroupId = payload.planGroupId;
         this.planTitle = payload.planTitle;
@@ -512,6 +512,10 @@ export default {
           _this.showCopy = true;
         },
         3: () => {
+          if (this.currentCount >= this.limitValue) {
+            this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+            return;
+          }
           _this.showApplyCoach = true;
         },
         4: () => {
