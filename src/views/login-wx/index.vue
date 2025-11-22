@@ -39,33 +39,47 @@
           <img
             src="./imgs/PREMIUM.svg"
             alt="ELITE"
-            width="100%"
-            height="45%"
+            width="112px"
+            style="margin-top: 12px;"
             v-if="loginType === '2'"
           />
-          <span v-else>ELITE</span>
+          <!-- <span v-else>ELITE</span> -->
+           <img src="./imgs/title.png" alt="ELITE"
+           style="scale: 0.45;"
+            v-else
+          />
         </div>
         <div
           id="wx-login-container"
-          :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
+          :class="wx-login-container"
           v-if="isNewUser"
         >
           <!-- 扫码成功状态 -->
-          <div v-if="hasCode" class="login-success">
+          <!-- <div v-if="hasCode" class="login-success">
             <div class="success-icon">✓</div>
             <div class="success-text">扫码成功</div>
             <div class="success-subtitle">正在跳转...</div>
-          </div>
+          </div> -->
           <!-- 加载状态 -->
-          <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
+          <!-- <div v-else-if="wxLoginStatus === 'loading'" class="login-loading">
             <div class="loading-spinner"></div>
             <div class="loading-text">正在加载二维码...</div>
-          </div>
+          </div> -->
           <!-- 错误状态 -->
-          <div v-else-if="wxLoginStatus === 'error'" class="login-error">
+          <!-- <div v-else-if="wxLoginStatus === 'error'" class="login-error">
             <div class="error-icon">✗</div>
             <div class="error-text">加载失败</div>
             <div class="error-subtitle">请刷新重试</div>
+          </div> -->
+          <div class="miniprogram-code">
+            <div class="miniprogram-title">请使用微信扫码</div>
+            <img
+              src="./imgs/miniprogram-test.png"
+              alt="小程序码"
+              class="miniprogram-img"
+            />
+            <div class="miniprogram-subtitle">扫码进入小程序</div>
+            <el-button @click="handleMiniprogramCode">已完成扫码</el-button>
           </div>
         </div>
         <!-- 扫码关注服务号 -->
@@ -77,13 +91,14 @@
           <img class="qrcode-img" :src="qrcodeUrl" alt="扫码二维码" />
         </div>
         <div v-if="!isAgreement" class="wx-login-cover"></div>
-        <div style="margin-bottom: 20px">
+        <div style="margin-bottom: 20px" v-if="!isNewUser
+        ">
           <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
             <el-radio label="1">运动员</el-radio>
             <el-radio label="2">教练</el-radio>
           </el-radio-group>
         </div>
-        <div style="display: flex; align-items: center; font-size: 14px">
+        <div style="display: flex; align-items: center; font-size: 14px" v-if="!isNewUser">
           <el-checkbox
             v-model="isAgreement"
             label=""
@@ -160,6 +175,32 @@ export default {
     this.clearPollTimer();
   },
   methods: {
+    handleMiniprogramCode() {
+      if (this.unionid) {
+        getData({
+          url: "/api/wechat/getByUnionid",
+          unionid: this.unionid,
+        })
+          .then((res) => {
+            if (res.result.jwt) {
+              this.$message.success("登录成功");
+              this.$store.commit("user/SET_TOKEN", res.result.jwt);
+              this.$store.commit("user/SET_NAME", res.result.nicknameTag);
+              localStorage.setItem("triUserId", res.result.triUserId);
+              localStorage.setItem("name", res.result.nicknameTag);
+              console.log("res.result.jwt", res.result.jwt);
+              setToken(res.result.jwt);
+              this.$router.push("/timeTable/athletic");
+            } else {
+              this.$message.error("请重新扫码");
+            }
+          })
+          .catch((error) => {
+            console.error("获取微信用户信息失败:", error);
+            this.$message.error("获取微信用户信息失败，请刷新重试");
+          });
+      }
+    },
     /**
      * 启动扫码结果轮询定时器
      */
@@ -228,8 +269,9 @@ export default {
       if (!result?.jwt) {
         // console.warn("登录结果数据不完整，继续轮询");
         this.isNewUser = true;
-        this.checkUrlParams();
-        this.startPolling();
+        this.unionid = result.unionid;
+        // this.checkUrlParams();
+        // this.startPolling();
         return;
       }
 
@@ -768,13 +810,7 @@ footer {
 .wx-login-container.noAgreement {
   filter: blur(5px);
 }
-.qrcode-img {
-  width: 200px;
-  height: 200px;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 100px;
-}
+
 .wx-login-container iframe {
   width: 200px;
   height: 200px;
@@ -865,6 +901,58 @@ footer {
 .error-subtitle {
   font-size: 14px;
   opacity: 0.8;
+}
+
+.qrcode-img {
+  width: 200px;
+  height: 200px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 60px;
+}
+
+/* 登录状态样式 */
+.miniprogram-code {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.miniprogram-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.miniprogram-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* 扫码成功样式 */
+.login-success {
+  color: #52c41a;
+}
+
+.miniprogram-subtitle {
+  font-size: 12px;
+  color: #666;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+/* 小程序码样式 */
+.miniprogram-code {
+  color: #1890ff;
 }
 
 /* 动画效果 */
