@@ -62,15 +62,13 @@
       </el-form-item>
 
       <el-form-item label="计划源">
-        <!-- <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
-        <el-input v-else :readonly="activeClassType === 'official'" placeholder="请输入计划源" :value="planSource()" disabled /> -->
-        <span>{{ planSource() }}</span>
+        <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
+        <el-input v-else :readonly="activeClassType === 'official'" placeholder="请输入计划源" :value="planSource()" disabled />
       </el-form-item>
 
       <el-form-item label="拥有者">
-        <!-- <span v-if="activeClassType === 'official'">{{ planInfo.possessNickname }}</span>
-        <el-input v-else :readonly="true" :value="planInfo.possessNickname" disabled /> -->
-        <span>{{ planInfo.possessNickname }}</span>
+        <span v-if="activeClassType === 'official'">{{ planInfo.possessNickname }}</span>
+        <el-input v-else :readonly="true" :value="planInfo.possessNickname" disabled />
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">

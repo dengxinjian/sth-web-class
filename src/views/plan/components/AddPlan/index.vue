@@ -66,6 +66,7 @@
           :readonly="true"
           placeholder="请输入计划源"
           v-model="form.planSource"
+          disabled
         />
       </el-form-item>
 
@@ -74,6 +75,7 @@
           :readonly="true"
           placeholder="请输入拥有者"
           v-model="form.possessNickname"
+          disabled
         />
       </el-form-item>
 
