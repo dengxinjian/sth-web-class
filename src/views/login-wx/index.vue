@@ -289,7 +289,7 @@ export default {
       setToken(result.jwt);
 
       // 跳转到主页
-      this.$router.push("/timeTable/athletic");
+      this.$router.push("/timeTable/class");
     },
     /**
      * 获取扫码二维码
