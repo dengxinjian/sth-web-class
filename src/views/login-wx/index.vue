@@ -190,7 +190,7 @@ export default {
               localStorage.setItem("name", res.result.nicknameTag);
               console.log("res.result.jwt", res.result.jwt);
               setToken(res.result.jwt);
-              this.$router.push("/timeTable/athletic");
+              this.$router.push("/timeTable/class");
             } else {
               this.$message.error("请重新扫码");
             }

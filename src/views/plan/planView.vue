@@ -52,6 +52,7 @@
       :copyOfficialPlanInfo="copyOfficialPlanInfo"
       :planList="planList"
       @addPlanSuccess="handleAddPlanSuccess"
+      @cancel="handleAddPlanCancel"
     />
     <!-- 添加分组 -->
     <AddGroup
@@ -199,6 +200,10 @@ export default {
       const res = await planApi.getPlanLimitCount();
       this.limitValue = res.result.limitValue;
       this.currentCount = res.result.currentCount;
+    },
+    handleAddPlanCancel() {
+      this.addPlanVisible = false;
+      this.copyOfficialPlanInfo = null;
     },
     handleAddPlanSuccess(payload) {
       this.getPlanDetail(payload.id);
