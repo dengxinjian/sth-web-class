@@ -92,6 +92,7 @@
 
     <SportTypeModal
       v-model="showSportTypeModal"
+      :isClass="isClass"
       @select="onSelectSportType"
       @addEvent="handleAddEvent"
     />
@@ -359,6 +360,7 @@ export default {
       copyClassFromOfficialGroupId: "",
       copyClassFromOfficialData: {},
       addGroupId: "",
+      isClass: true,
       // 查看课程
       showViewClassCard: false,
       showEditScheduleClass: false,
@@ -403,11 +405,11 @@ export default {
     }
   },
   methods: {
-    handleCutClass(classesDate,classItem) {
+    handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
       this.handlePasteClass(classesDate, classItem);
-      this.handleDeleteClassSchedule(classItem.id,true);
+      this.handleDeleteClassSchedule(classItem.id, true);
     },
     handleInputActivitySave(data) {
       console.log(data, "data");
@@ -497,6 +499,7 @@ export default {
       this.classModalDataType = "addSchedule";
       this.addScheduleDate = date;
       this.showSportTypeModal = true;
+      this.isClass = false;
       console.log(date, "date");
     },
     async handlePasteClass(date, classItem) {
@@ -735,6 +738,7 @@ export default {
                   oldActivityDuration: i.duration,
                   oldActivityDistance: Math.round(i.distance),
                   preciseDistance: Math.round(i.distance),
+                  oldActivitySthValue: i.sthValue,
                 }))
                 .filter((i) => !i.bindingManualActivityId);
 
@@ -766,6 +770,7 @@ export default {
                         oldActivityDistance: Math.round(
                           item.oldActivityDistance
                         ),
+                        oldActivitySthValue: item.oldActivitySthValue,
                       };
                       console.log(activityList[index], "activityList[index]");
                     }
@@ -977,6 +982,7 @@ export default {
         this.$message.error("超出课程数量上限");
         return;
       }
+      this.isClass = true;
       this.addGroupId = groupId;
 
       this.showAddClassTitle = true;

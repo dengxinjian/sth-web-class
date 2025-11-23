@@ -27,7 +27,11 @@
         </div>
         <div class="planned-schedule-header-title-right-total">
           <span class="label">总STH:</span>
-          <span class="value">{{ getTotalSth() > 100000 ? getTotalSth() / 10000 + "万" : getTotalSth() || "--" }}</span>
+          <span class="value">{{
+            getTotalSth() > 100000
+              ? (getTotalSth() / 10000).toFixed(2) + "万"
+              : getTotalSth() || "--"
+          }}</span>
         </div>
       </div>
     </div>
@@ -41,6 +45,7 @@
           @delete-class="handleDeleteClass"
           @edit-class="handleEditClass"
           @paste-class="handlePasteClass"
+          @paste-event="handlePasteEvent"
           @delete-event="handleDeleteEvent"
           @edit-event="handleEditEvent"
           @plan-item-move="$emit('plan-item-move', $event)"
@@ -204,7 +209,14 @@ export default {
       globalDay,
       isCut = false
     ) {
-      console.log(classItem, classIndex, weekNumber, globalDay, isCut, "classItem, classIndex, weekNumber, globalDay, isCut");
+      console.log(
+        classItem,
+        classIndex,
+        weekNumber,
+        globalDay,
+        isCut,
+        "classItem, classIndex, weekNumber, globalDay, isCut"
+      );
       this.$emit(
         "delete-class",
         classItem,
@@ -220,8 +232,18 @@ export default {
     handlePasteClass(globalDay, weekNumber, classItem) {
       this.$emit("paste-class", globalDay, weekNumber, classItem);
     },
-    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
-      this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay);
+    handlePasteEvent(globalDay, weekNumber, eventItem) {
+      this.$emit("paste-event", globalDay, weekNumber, eventItem);
+    },
+    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay, isCut) {
+      this.$emit(
+        "delete-event",
+        eventItem,
+        eventIndex,
+        weekNumber,
+        globalDay,
+        isCut
+      );
     },
     handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
       this.$emit("edit-event", eventItem, eventIndex, weekNumber, globalDay);

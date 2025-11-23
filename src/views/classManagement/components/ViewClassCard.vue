@@ -18,7 +18,7 @@
           placement="right"
           trigger="hover"
           :tabindex="999"
-          v-if="type === 'edit'"
+          v-if="type === 'edit' && showDeleteBtn"
         >
           <div class="btn-list-hover">
             <span v-if="showMoveBtn">
@@ -64,6 +64,17 @@
           </div>
           <i class="el-icon-more" slot="reference" @click.stop></i>
         </el-popover>
+        <span v-if="!showDeleteBtn">
+          <el-button
+            type="text"
+            @click.stop="
+              $emit('copy', classItem);
+              handleClose();
+            "
+          >
+            {{ copyBtnText }}
+          </el-button>
+        </span>
       </div>
       <div>
         <div class="class-schedule-card-container">

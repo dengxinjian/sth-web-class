@@ -5,7 +5,7 @@ export const statisticKeyToTitle = {
   },
   totalDistanceKm: {
     title: "总距离",
-    unit: "KM",
+    unit: "km",
     color: "rgba(217, 206, 185, 1)",
   },
   totalCalories: {
@@ -26,7 +26,7 @@ export const statisticKeyToTitle = {
   runDistanceKm: {
     title: "跑步距离",
     icon: require("@/assets/addClass/icon-run.png"),
-    unit: "KM",
+    unit: "km",
     color: "rgba(255, 21, 82, 1)",
   },
   cycleTime: {
@@ -37,7 +37,7 @@ export const statisticKeyToTitle = {
   cycleDistanceKm: {
     title: "骑行距离",
     icon: require("@/assets/addClass/icon-bike.png"),
-    unit: "KM",
+    unit: "km",
     color: "rgba(134, 91, 214, 1)",
   },
   swimTime: {
@@ -48,7 +48,7 @@ export const statisticKeyToTitle = {
   swimDistanceKm: {
     title: "游泳距离",
     icon: require("@/assets/addClass/icon-swim.png"),
-    unit: "KM",
+    unit: "km",
     color: "rgba(46, 166, 223, 1)",
   },
   strengthTime: {
@@ -67,7 +67,7 @@ export const statisticKeyToTitle = {
 export const unitConversion = (value, unit) => {
   if (unit === "kcal") {
     return value;
-  } else if (unit === "KM") {
+  } else if (unit === "km") {
     return (value / 1000).toFixed(2);
   } else {
     return value;

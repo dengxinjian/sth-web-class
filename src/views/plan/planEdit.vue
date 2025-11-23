@@ -22,6 +22,7 @@
         @delete-event="handleDeleteEvent"
         @edit-event="handleEditEvent"
         @paste-class="handlePasteClass"
+        @paste-event="handlePasteEvent"
         @add-week="handleAddWeek"
         @plan-item-move="handlePlanItemMove"
         @plan-library-drop="handlePlanLibraryDrop"
@@ -518,6 +519,7 @@ export default {
         this.selectedSportType = null;
       }
       if (this.CreatePlanCourseDialogData.mode === "SAVE") {
+        console.log(saveData, "saveData");
         this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
       }
       // 触发响应式更新
@@ -527,7 +529,7 @@ export default {
     // 如果是永久保存 需要走接口
     async savePlanCourse(data) {
       console.log(data, "data");
-      data.classesJson = JSON.stringify(data.classesJson);
+      // data.classesJson = JSON.stringify(data.classesJson);
       classApi.createClass(data).then((res) => {
         if (res.success) {
           this.$message.success("课程保存成功");
@@ -718,6 +720,7 @@ export default {
         globalDay,
         "classItem, classIndex, weekNumber, globalDay"
       );
+      this.CreatePlanCourseDialogData = {};
       this.showEditPlanClassModal = true;
       this.editPlanClassData = JSON.parse(JSON.stringify(classItem));
       this.editPlanClassIndex = classIndex;
@@ -810,8 +813,15 @@ export default {
      */
     handlePasteClass(globalDay, weekNumber, classItem) {
       console.log(globalDay, classItem, "globalDay, classItem");
+      this.CreatePlanCourseDialogData = {};
       this.selectedDay = { globalDay, weekNumber };
       this.onSaveAddClass(classItem, true);
+    },
+    handlePasteEvent(globalDay, weekNumber, eventItem) {
+      console.log(globalDay, eventItem, "globalDay, eventItem");
+      this.CreatePlanCourseDialogData = {};
+      this.selectedDay = { globalDay, weekNumber };
+      this.handleEventConfirm(eventItem);
     },
     /**
      * 添加周
@@ -822,20 +832,16 @@ export default {
     /**
      * 删除赛事
      */
-    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
+    handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay, isCut) {
       console.log(
         eventItem,
         eventIndex,
         weekNumber,
         globalDay,
-        "eventItem, eventIndex, weekNumber, globalDay"
+        isCut,
+        "eventItem, eventIndex, weekNumber, globalDay, isCut"
       );
-      this.$confirm("确认删除该赛事？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(() => {
-        console.log("删除赛事");
+      if (isCut) {
         const weekIndex = weekNumber - 1;
         const dayData = this.planData.dayDetails[weekIndex].find(
           (item) => item.day === globalDay
@@ -844,8 +850,24 @@ export default {
           dayData.competitionDtoList.splice(eventIndex, 1);
         }
         this.$forceUpdate();
-        this.$message.success("删除成功");
-      });
+      } else {
+        this.$confirm("确认删除该赛事？", "提示", {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          console.log("删除赛事");
+          const weekIndex = weekNumber - 1;
+          const dayData = this.planData.dayDetails[weekIndex].find(
+            (item) => item.day === globalDay
+          );
+          if (dayData) {
+            dayData.competitionDtoList.splice(eventIndex, 1);
+          }
+          this.$forceUpdate();
+          this.$message.success("删除成功");
+        });
+      }
     },
     /**
      * 编辑赛事

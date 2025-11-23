@@ -54,10 +54,10 @@
         />
       </div>
     </div>
-    <div class="add-event-img">
+    <div class="add-event-img" v-if="!isClass">
       <img src="~@/assets/addClass/addEvent.png" alt="" />
     </div>
-    <div class="event-grid">
+    <div class="event-grid" v-if="!isClass">
       <div class="event-card" @click="onSelectEvent('event')">
         <img class="event-icon" src="~@/assets/addClass/eventIcon.png" alt="" />
         <img class="event-name" src="~@/assets/addClass/event.png" alt="" />
@@ -76,6 +76,10 @@ export default {
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
+    isClass: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -273,9 +277,9 @@ export default {
     height: 84px;
   }
   .event-name {
-     width: 45px;
-     height: 20px;
-     margin-top: 40px;
+    width: 45px;
+    height: 20px;
+    margin-top: 40px;
   }
 }
 </style>

@@ -49,7 +49,7 @@
         </div>
         <div class="planned-schedule-header-title-right-total">
           <span class="label">总STH:</span>
-          <span class="value">{{ getTotalSth() > 100000 ? getTotalSth() / 10000 + "万" : getTotalSth() || "--" }}</span>
+          <span class="value">{{ getTotalSth() > 100000 ? (getTotalSth() / 10000).toFixed(2) + "万" : getTotalSth() || "--" }}</span>
         </div>
       </div>
     </div>

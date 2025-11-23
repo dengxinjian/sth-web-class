@@ -86,6 +86,7 @@ export default {
     classData: {
       type: Object,
       required: true,
+      default: () => ({}),
     },
     activeClassType: {
       type: String,

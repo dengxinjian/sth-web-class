@@ -82,6 +82,7 @@
                     :event-item="eventItem"
                     :date="String(item.weekIndex * 7 + boxIndex + 1)"
                     data-type="planEvent"
+                    :is-plan="true"
                     :is-dragging="isDragging"
                     @edit="
                       $emit(
@@ -94,6 +95,15 @@
                     "
                     @delete="
                       handleDeleteEvent(
+                        eventItem,
+                        eventIndex,
+                        item.weekIndex + 1,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )
+                    "
+                    @copy="handleCopyEvent"
+                    @cut="
+                      handleCutEvent(
                         eventItem,
                         eventIndex,
                         item.weekIndex + 1,
@@ -282,13 +292,13 @@
     </div>
     <transition name="context-menu-fade">
       <div
-        v-if="contextMenuVisible && hasCopiedClass"
+        v-if="contextMenuVisible && (hasCopiedClass || hasCopiedEvent)"
         class="context-menu"
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
         @click.stop
       >
         <div
-          v-if="hasCopiedClass"
+          v-if="hasCopiedClass || hasCopiedEvent"
           class="context-menu-item"
           @click="handlePaste(contextMenuWeekIndex)"
         >
@@ -336,6 +346,8 @@ export default {
       contextMenuGlobalDay: null,
       hasCopiedClass: false,
       copiedClass: null,
+      hasCopiedEvent: false,
+      copiedEvent: null,
       contextMenuWeekIndex: null,
       containerHeight: "600px",
       lastUpdateStart: null,
@@ -347,6 +359,17 @@ export default {
       isDragging: false, // 是否正在拖动
       cutClass: {
         isCut: false,
+        classItem: null,
+        classIndex: null,
+        weekNumber: null,
+        globalDay: null,
+      },
+      cutEvent: {
+        isCut: false,
+        eventItem: null,
+        eventIndex: null,
+        weekNumber: null,
+        globalDay: null,
       },
     };
   },
@@ -1071,29 +1094,65 @@ export default {
       // 不要清除 copiedClass 和 hasCopiedClass，这样复制状态会保留
     },
     handlePaste(weekIndex) {
-      const weekNumber = weekIndex + 1;
-      this.$emit(
-        "paste-class",
-        this.contextMenuGlobalDay,
-        weekNumber,
-        this.copiedClass
-      );
-      this.hideContextMenu();
-      if (this.cutClass.isCut) {
-        console.log("handlePaste-cutClass-1", this.cutClass);
+      if (this.copiedClass !== null) {
+        const weekNumber = weekIndex + 1;
         this.$emit(
-          "delete-class",
-          this.cutClass.classItem,
-          this.cutClass.classIndex,
-          this.cutClass.weekNumber,
-          this.cutClass.globalDay,
-          true
+          "paste-class",
+          this.contextMenuGlobalDay,
+          weekNumber,
+          this.copiedClass
         );
-        this.cutClass = { isCut: false };
+        this.hideContextMenu();
+        if (this.cutClass.isCut) {
+          this.$emit(
+            "delete-class",
+            this.cutClass.classItem,
+            this.cutClass.classIndex,
+            this.cutClass.weekNumber,
+            this.cutClass.globalDay,
+            true
+          );
+          this.cutClass = {
+            isCut: false,
+            classItem: null,
+            classIndex: null,
+            weekNumber: null,
+            globalDay: null,
+          };
+        }
+      }
+      if (this.copiedEvent !== null) {
+        const weekNumber = weekIndex + 1;
+        this.$emit(
+          "paste-event",
+          this.contextMenuGlobalDay,
+          weekNumber,
+          this.copiedEvent
+        );
+        this.hideContextMenu();
+        if (this.cutEvent.isCut) {
+          this.$emit(
+            "delete-event",
+            this.cutEvent.eventItem,
+            this.cutEvent.eventIndex,
+            this.cutEvent.weekNumber,
+            this.cutEvent.globalDay,
+            true
+          );
+          this.cutEvent = {
+            isCut: false,
+            eventItem: null,
+            eventIndex: null,
+            weekNumber: null,
+            globalDay: null,
+          };
+        }
       }
       // 粘贴完成后清除复制状态
       this.hasCopiedClass = false;
       this.copiedClass = null;
+      this.hasCopiedEvent = false;
+      this.copiedEvent = null;
     },
     handleCopyClass(classItem) {
       this.copiedClass = { ...classItem };
@@ -1113,8 +1172,49 @@ export default {
         type: "success",
         duration: 2000,
       });
-      this.cutClass = { classIndex, weekNumber, globalDay, isCut: true };
+      this.cutClass = {
+        classItem,
+        classIndex,
+        weekNumber,
+        globalDay,
+        isCut: true,
+      };
       // this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
+    },
+    // 赛事复制
+    handleCopyEvent(eventItem) {
+      if (!eventItem) {
+        console.error("handleCopyEvent: eventItem is null or undefined");
+        return;
+      }
+      // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
+      const { id, ...eventData } = eventItem;
+      this.copiedEvent = { ...eventData };
+      this.hasCopiedEvent = true;
+      this.$message({
+        message: "赛事已复制，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
+      });
+    },
+    // 赛事剪切
+    handleCutEvent(eventItem, eventIndex, weekNumber, globalDay) {
+      // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
+      const { id, ...eventData } = eventItem;
+      this.copiedEvent = { ...eventData };
+      this.hasCopiedEvent = true;
+      this.$message({
+        message: "赛事已剪切，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
+      });
+      this.cutEvent = {
+        eventItem,
+        eventIndex,
+        weekNumber,
+        globalDay,
+        isCut: true,
+      };
     },
     /**
      * 拖拽变化事件（包括克隆元素的添加）
@@ -1159,13 +1259,20 @@ export default {
         return false;
       }
       // 检查拖拽元素是否来自赛事容器，如果是则不允许放入
-      if (from.classList && from.classList.contains('draggable-events-container')) {
+      if (
+        from.classList &&
+        from.classList.contains("draggable-events-container")
+      ) {
         return false;
       }
       // 检查拖拽元素是否是 EventCard，如果是则不允许放入
-      const isEventCard = (dragEl.querySelector && dragEl.querySelector('[data-type="planEvent"]') !== null) ||
-                         (dragEl.closest && dragEl.closest('[data-type="planEvent"]') !== null) ||
-                         (dragEl.getAttribute && dragEl.getAttribute('data-type') === 'planEvent');
+      const isEventCard =
+        (dragEl.querySelector &&
+          dragEl.querySelector('[data-type="planEvent"]') !== null) ||
+        (dragEl.closest &&
+          dragEl.closest('[data-type="planEvent"]') !== null) ||
+        (dragEl.getAttribute &&
+          dragEl.getAttribute("data-type") === "planEvent");
       if (isEventCard) {
         return false;
       }
@@ -1196,12 +1303,17 @@ export default {
         return false;
       }
       // 只允许来自赛事容器的项目放入
-      if (from.classList && from.classList.contains('draggable-events-container')) {
+      if (
+        from.classList &&
+        from.classList.contains("draggable-events-container")
+      ) {
         return true;
       }
       // 检查拖拽元素是否是 EventCard
-      const isEventCard = (dragEl.querySelector && dragEl.querySelector('[data-type="planEvent"]') !== null) ||
-                         (dragEl.closest && dragEl.closest('[data-type="planEvent"]') !== null);
+      const isEventCard =
+        (dragEl.querySelector &&
+          dragEl.querySelector('[data-type="planEvent"]') !== null) ||
+        (dragEl.closest && dragEl.closest('[data-type="planEvent"]') !== null);
       return isEventCard;
     },
   },
@@ -1252,6 +1364,7 @@ export default {
 // }
 .schedule-boxes-wrapper-content {
   flex: 0.85;
+  min-width: 0; // 防止 flex 子元素溢出
   border-right: 1px solid #e5e5e5;
 }
 
@@ -1267,10 +1380,13 @@ export default {
   display: flex;
   align-items: stretch;
   width: 100%;
+  min-width: 0; // 防止 flex 子元素溢出
 }
 
 .schedule-box-item {
-  flex: 1;
+  flex: 1 1 0; // 统一宽度，允许收缩和扩展
+  min-width: 0; // 防止内容溢出
+  max-width: 100%; // 确保不超过容器宽度
   padding: 0;
   position: relative;
   border-left: 1px solid #e5e5e5;
@@ -1308,6 +1424,7 @@ export default {
   .box-content-classes {
     flex: 1;
     width: 100%;
+    min-width: 0; // 防止 flex 子元素溢出
     display: flex;
     flex-direction: column;
     min-height: 50px;
@@ -1398,12 +1515,14 @@ export default {
   min-height: 50px;
   flex: 1;
   width: 100%;
+  min-width: 0; // 防止 flex 子元素溢出
   position: relative;
 }
 
 ::v-deep .draggable-events-container {
   min-height: 10px;
   width: 100%;
+  min-width: 0; // 防止 flex 子元素溢出
   position: relative;
   margin-bottom: 5px;
 }

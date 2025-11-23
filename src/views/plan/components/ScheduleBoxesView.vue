@@ -1052,6 +1052,7 @@ export default {
 // }
 .schedule-boxes-wrapper-content {
   flex: 0.85;
+  min-width: 0; // 防止 flex 子元素溢出
   border-right: 1px solid #e5e5e5;
 }
 
@@ -1067,10 +1068,13 @@ export default {
   display: flex;
   align-items: stretch;
   width: 100%;
+  min-width: 0; // 防止 flex 子元素溢出
 }
 
 .schedule-box-item {
-  flex: 1;
+  flex: 1 1 0; // 统一宽度，允许收缩和扩展
+  min-width: 0; // 防止内容溢出
+  max-width: 100%; // 确保不超过容器宽度
   padding: 0;
   position: relative;
   border-left: 1px solid #e5e5e5;
@@ -1108,6 +1112,7 @@ export default {
   .box-content-classes {
     flex: 1;
     width: 100%;
+    min-width: 0; // 防止 flex 子元素溢出
     display: flex;
     flex-direction: column;
     min-height: 50px;
@@ -1194,6 +1199,7 @@ export default {
   min-height: 50px;
   flex: 1;
   width: 100%;
+  min-width: 0; // 防止 flex 子元素溢出
   position: relative;
 }
 

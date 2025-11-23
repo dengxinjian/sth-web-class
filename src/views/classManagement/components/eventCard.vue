@@ -38,8 +38,28 @@
               v-if="type === 'edit'"
             >
               <div class="btn-list-hover">
-                <el-button type="text" icon="el-icon-edit" @click.stop="$emit('edit', eventItem)">
+                <el-button
+                  type="text"
+                  icon="el-icon-edit"
+                  @click.stop="$emit('edit', eventItem)"
+                >
                   编辑
+                </el-button>
+                <el-button
+                  type="text"
+                  icon="el-icon-scissors"
+                  v-if="isPlan"
+                  @click.stop="handleCut"
+                >
+                  剪切
+                </el-button>
+                <el-button
+                  type="text"
+                  icon="el-icon-crop"
+                  v-if="isPlan"
+                  @click.stop="handleCopy"
+                >
+                  复制
                 </el-button>
                 <el-button
                   type="text"
@@ -52,8 +72,8 @@
               <i class="el-icon-more" slot="reference" @click.stop></i>
             </el-popover>
           </div>
-           <!-- 课程标题 -->
-           <div class="title">{{ eventItem.competitionName }}</div>
+          <!-- 课程标题 -->
+          <div class="title">{{ eventItem.competitionName }}</div>
         </div>
       </div>
     </div>
@@ -75,7 +95,15 @@
           <i class="el-icon-edit"></i>
           编辑
         </div>
-        <div class="context-menu-item" @click="handleDelete">
+        <div class="context-menu-item" v-if="isPlan" @click.stop="handleCut">
+          <i class="el-icon-scissors"></i>
+          剪切
+        </div>
+        <div class="context-menu-item" v-if="isPlan" @click.stop="handleCopy">
+          <i class="el-icon-crop"></i>
+          复制
+        </div>
+        <div class="context-menu-item" @click.stop="handleDelete">
           <i class="el-icon-delete"></i>
           删除
         </div>
@@ -104,6 +132,10 @@ export default {
       },
     },
     isDragging: {
+      type: Boolean,
+      default: false,
+    },
+    isPlan: {
       type: Boolean,
       default: false,
     },
@@ -225,6 +257,10 @@ export default {
     handleCopy() {
       this.hideContextMenu();
       this.$emit("copy", this.eventItem);
+    },
+    handleCut() {
+      this.hideContextMenu();
+      this.$emit("cut", this.eventItem);
     },
     handleViewClass() {
       console.log("handleViewClass-classItem-1", this.eventItem);

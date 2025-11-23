@@ -5,7 +5,7 @@
     :data-id="classItem.id"
     :data-day="date"
     data-type="planClass"
-    @click="$emit('edit', classItem)"
+    @click.stop="$emit('edit', classItem)"
   >
     <div
       class="class-schedule-card-container js-plan-class-card"
@@ -190,7 +190,7 @@
         </div>
         <div
           class="context-menu-item"
-          @click="
+          @click.stop="
             handleCut();
             hideContextMenu();
           "
@@ -198,11 +198,11 @@
           <i class="el-icon-scissors"></i>
           剪切
         </div>
-        <div class="context-menu-item" @click="handleCopy">
+        <div class="context-menu-item" @click.stop="handleCopy">
           <i class="el-icon-crop"></i>
           复制
         </div>
-        <div class="context-menu-item" @click="handleDelete">
+        <div class="context-menu-item" @click.stop="handleDelete">
           <i class="el-icon-delete"></i>
           删除
         </div>
@@ -412,6 +412,8 @@ export default {
 .class-schedule-card-container {
   margin-bottom: 5px;
   cursor: pointer;
+  // max-width: 200px;
+  width: 100%;
   .sport-drap-handle {
     display: none;
   }

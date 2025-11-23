@@ -131,8 +131,8 @@
               />
               <!-- 运动记录卡片 -->
               <ActivityCard
-                v-for="(activityItem, index) in item.activityList"
-                :key="`activity-${item.commonDate}-${index}`"
+                v-for="(activityItem, activityIndex) in item.activityList"
+                :key="`activity-${item.commonDate}-${activityIndex}`"
                 :activity="activityItem"
                 :date="item.commonDate"
                 @click="$emit('activity-detail', activityItem)"
@@ -274,9 +274,53 @@ export default {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
       this.$nextTick(() => {
         this.contextMenuVisible = true;
-        this.contextMenuX = event.clientX;
-        this.contextMenuY = event.clientY;
         this.contextMenuDate = date;
+
+        // 先设置初始位置
+        let x = event.clientX;
+        let y = event.clientY;
+
+        // 等待菜单渲染完成后再计算边界并调整位置
+        this.$nextTick(() => {
+          const menuElement = document.querySelector('.context-menu');
+          if (!menuElement) {
+            this.contextMenuX = x;
+            this.contextMenuY = y;
+            return;
+          }
+
+          const menuRect = menuElement.getBoundingClientRect();
+          const menuWidth = menuRect.width;
+          const menuHeight = menuRect.height;
+
+          // 获取视口尺寸
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+
+          // 限制右边界
+          if (x + menuWidth > viewportWidth) {
+            x = viewportWidth - menuWidth - 10;
+          }
+
+          // 限制左边界
+          if (x < 10) {
+            x = 10;
+          }
+
+          // 限制下边界
+          if (y + menuHeight > viewportHeight) {
+            y = viewportHeight - menuHeight - 10;
+          }
+
+          // 限制上边界
+          if (y < 10) {
+            y = 10;
+          }
+
+          // 更新菜单位置
+          this.contextMenuX = x;
+          this.contextMenuY = y;
+        });
       });
     },
     hideContextMenu() {

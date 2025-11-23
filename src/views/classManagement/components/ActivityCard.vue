@@ -92,6 +92,7 @@
           </div>
           <div style="display: flex; gap: 4px">
             <div class="keyword">
+              {{ restoreVerification("sthValue") ? "" : "*" }}
               {{ activity.sthValue ? activity.sthValue : "--" }}
             </div>
             <div>
@@ -291,8 +292,10 @@ export default {
         distance = this.activity.preciseDistance;
         console.log(distance, this.activity.oldActivityDistance, "distance");
         return distance === this.activity.oldActivityDistance;
-      } else {
+      } else if (field === "duration") {
         return this.activity[field] === this.activity.oldActivityDuration;
+      } else if (field === "sthValue") {
+        return this.activity[field] === this.activity.oldActivitySthValue;
       }
     },
     formatDistance(distance, sportType) {
