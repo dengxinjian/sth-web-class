@@ -36,17 +36,19 @@
               <el-button
                 v-if="activity.classesJson"
                 type="text"
+                icon="el-icon-link"
                 @click="$emit('unbind', activity.classScheduleId)"
               >
                 解除匹配
               </el-button>
 
-              <el-button type="text" @click="$emit('edit', activity)">
+              <el-button type="text" icon="el-icon-edit" @click="$emit('edit', activity)">
                 编辑
               </el-button>
               <el-button
                 v-if="!activity.classesJson"
                 type="text"
+                icon="el-icon-delete"
                 @click="$emit('delete', activity)"
               >
                 删除

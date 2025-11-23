@@ -59,6 +59,7 @@
         @edit-schedule="handleEditClassSchedule"
         @edit-activity="handleEditActivity"
         @paste-class="handlePasteClass"
+        @cut-class="handleCutClass"
         @view-health-data="handleViewHealthData"
         @add-schedule="handleAddSchedule"
         @event-detail="handleEventDetail"
@@ -402,6 +403,12 @@ export default {
     }
   },
   methods: {
+    handleCutClass(classesDate,classItem) {
+      console.log(classesDate, "classesDate");
+      console.log(classItem, "classItem");
+      this.handlePasteClass(classesDate, classItem);
+      this.handleDeleteClassSchedule(classItem.id,true);
+    },
     handleInputActivitySave(data) {
       console.log(data, "data");
       data.triUserId = this.selectedAthletic;
@@ -496,7 +503,6 @@ export default {
       console.log(date, classItem, "date, classItem");
       await this.getAthleticThreshold(this.selectedAthletic, date);
       const newData = JSON.parse(JSON.stringify(classItem));
-      newData.classesJson = JSON.parse(newData.classesJson);
       newData.classesDate = date + " 00:00:00";
       // 根据运动类型计算阈值
       if (newData.sportType === "RUN") {
@@ -779,7 +785,10 @@ export default {
 
               // 处理健康数据
               console.log(part.healthInfos, "part.healthInfos");
-              healthInfos = part.healthInfos || [];
+              healthInfos =
+                part.healthInfos && part.healthInfos.length > 0
+                  ? [part.healthInfos[0]]
+                  : [];
               competitionList = part.competitionList || [];
             }
           });
@@ -1102,18 +1111,22 @@ export default {
     /**
      * 删除课表
      */
-    async handleDeleteClassSchedule(classId) {
-      this.$confirm("确认删除该课表？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
+    async handleDeleteClassSchedule(classId, isCut = false) {
+      if (!isCut) {
+        this.$confirm("确认删除该课表？", "提示", {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(async () => {
+          const res = await scheduleApi.deleteSchedule(classId);
+          if (res.success) {
+            this.$message.success("删除成功");
+            this.getScheduleData();
+          }
+        });
+      } else {
         const res = await scheduleApi.deleteSchedule(classId);
-        if (res.success) {
-          this.$message.success("删除成功");
-          this.getScheduleData();
-        }
-      });
+      }
     },
 
     /**

@@ -127,6 +127,7 @@
                 @device-click="handleDeviceClick"
                 @edit="$emit('edit-schedule', $event)"
                 @copy="handleCopyClass"
+                @cut="handleCutClass"
               />
               <!-- 运动记录卡片 -->
               <ActivityCard
@@ -249,6 +250,7 @@ export default {
       contextMenuDate: null, // 保存右键点击的日期
       hasCopiedClass: false, // 是否已复制过课程
       copiedClass: null, // 保存复制的课程数据
+      hasCutClass: false, // 是否已剪切过课程
     };
   },
   mounted() {
@@ -268,6 +270,7 @@ export default {
       this.$emit("add-schedule", date);
     },
     showContextMenu(event, date) {
+      console.log("showContextMenu-1", event, date);
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
       this.$nextTick(() => {
         this.contextMenuVisible = true;
@@ -282,11 +285,31 @@ export default {
       // 不要清除 copiedClass 和 hasCopiedClass，这样复制状态会保留
     },
     handlePaste() {
+      console.log("handlePaste-cutClass-1", this.contextMenuDate, this.copiedClass);
+
+      if (this.hasCutClass) {
+        this.$emit("cut-class", this.contextMenuDate, this.copiedClass);
+        this.hideContextMenu();
+        this.hasCutClass = false;
+        this.copiedClass = null;
+        return;
+      }
       this.$emit("paste-class", this.contextMenuDate, this.copiedClass);
-      this.hideContextMenu();
+
       // 粘贴完成后清除复制状态
+      this.hideContextMenu();
       this.hasCopiedClass = false;
       this.copiedClass = null;
+    },
+    handleCutClass(classItem) {
+      this.copiedClass = { ...classItem };
+      this.hasCopiedClass = true;
+      this.hasCutClass = true;
+      this.$message({
+        message: "课程已剪切，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
+      });
     },
     handleCopyClass(classItem) {
       this.copiedClass = { ...classItem };
