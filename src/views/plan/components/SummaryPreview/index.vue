@@ -685,7 +685,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      const durationTotal = week.reduce((acc, item) => {
+      const durationTotal = week.reduce((acc, item, index) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -708,6 +708,9 @@ export default {
               }
             }
 
+            if (classesJson.sportType === "REMARK") {
+              return classAcc + hhmmssToSeconds(classesJson.duration);
+            }
             if (
               !classesJson.duration ||
               classesJson.duration === "00:00:00" ||
