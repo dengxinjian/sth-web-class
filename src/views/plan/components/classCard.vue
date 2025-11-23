@@ -5,6 +5,7 @@
     :data-id="classItem.id"
     :data-day="date"
     data-type="planClass"
+    @click="$emit('edit', classItem)"
   >
     <div
       class="class-schedule-card-container js-plan-class-card"
@@ -43,14 +44,18 @@
               v-if="type === 'edit'"
             >
               <div class="btn-list-hover">
-                <el-button type="text" @click.stop="$emit('edit', classItem)">
+                <el-button type="text" icon="el-icon-edit" @click.stop="$emit('edit', classItem)">
                   编辑
                 </el-button>
-                <el-button type="text" @click.stop="$emit('copy', classItem)">
+                <el-button type="text" icon="el-icon-scissors" @click.stop="$emit('cut', classItem)">
+                  剪切
+                </el-button>
+                <el-button type="text" icon="el-icon-crop" @click.stop="$emit('copy', classItem)">
                   复制
                 </el-button>
                 <el-button
                   type="text"
+                  icon="el-icon-delete"
                   @click.stop="$emit('delete', classItem.id)"
                 >
                   删除

@@ -38,45 +38,17 @@
                   )
                 "
               >
-                <EventCard
-                  v-for="(eventItem, eventIndex) in getDayEvents(
-                    item.weekData,
-                    item.weekIndex * 7 + boxIndex + 1
-                  )"
-                  :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
-                    eventItem.competitionName || eventIndex
-                  }`"
-                  :event-item="eventItem"
-                  :date="String(item.weekIndex * 7 + boxIndex + 1)"
-                  @edit="
-                    $emit(
-                      'edit-event',
-                      eventItem,
-                      eventIndex,
-                      item.weekIndex + 1,
-                      item.weekIndex * 7 + boxIndex + 1
-                    )
-                  "
-                  @delete="
-                    handleDeleteEvent(
-                      eventItem,
-                      eventIndex,
-                      item.weekIndex + 1,
-                      item.weekIndex * 7 + boxIndex + 1
-                    )
-                  "
-                />
                 <draggable
-                  :key="`draggable-${item.weekIndex}-${boxIndex}`"
+                  :key="`draggable-events-${item.weekIndex}-${boxIndex}`"
                   :list="
-                    getDayDetailsArray(
+                    getDayEventsArray(
                       item.weekData,
                       item.weekIndex * 7 + boxIndex + 1
                     )
                   "
                   :group="{
-                    name: 'plan-classes',
-                    put: true,
+                    name: 'plan-events',
+                    put: canPutInEventContainer,
                   }"
                   :animation="150"
                   :force-fallback="true"
@@ -88,7 +60,71 @@
                   :empty-insert-threshold="50"
                   :swap-threshold="0.65"
                   :invert-swap="false"
-                  :filter="'.js-plan-drag-no-drag .box-content'"
+                  :ghost-class="'is-plan-drag-ghost'"
+                  :chosen-class="'is-plan-drag-chosen'"
+                  :drag-class="'is-plan-drag-drag'"
+                  :easing="'cubic-bezier(0.175, 0.885, 0.32, 1.275)'"
+                  tag="div"
+                  :emptyInsertThreshold="10"
+                  class="draggable-events-container"
+                  @start="handleDragStart"
+                  @end="handleEventDragEnd"
+                  @clone="handleEventDragEnd"
+                >
+                  <EventCard
+                    v-for="(eventItem, eventIndex) in getDayEventsArray(
+                      item.weekData,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )"
+                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
+                      eventItem.competitionName || eventItem.id || eventIndex
+                    }`"
+                    :event-item="eventItem"
+                    :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                    data-type="planEvent"
+                    :is-dragging="isDragging"
+                    @edit="
+                      $emit(
+                        'edit-event',
+                        eventItem,
+                        eventIndex,
+                        item.weekIndex + 1,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )
+                    "
+                    @delete="
+                      handleDeleteEvent(
+                        eventItem,
+                        eventIndex,
+                        item.weekIndex + 1,
+                        item.weekIndex * 7 + boxIndex + 1
+                      )
+                    "
+                  />
+                </draggable>
+                <draggable
+                  :key="`draggable-${item.weekIndex}-${boxIndex}`"
+                  :list="
+                    getDayDetailsArray(
+                      item.weekData,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
+                  :group="{
+                    name: 'plan-classes',
+                    put: canPutInClassContainer,
+                  }"
+                  :animation="150"
+                  :force-fallback="true"
+                  :fallback-on-body="true"
+                  :fallback-tolerance="10"
+                  :scroll="true"
+                  :scroll-sensitivity="80"
+                  :scroll-speed="20"
+                  :empty-insert-threshold="50"
+                  :swap-threshold="0.65"
+                  :invert-swap="false"
+                  :filter="'.js-plan-drag-no-drag,.box-content'"
                   :ghost-class="'is-plan-drag-ghost'"
                   :chosen-class="'is-plan-drag-chosen'"
                   :drag-class="'is-plan-drag-drag'"
@@ -113,6 +149,7 @@
                     :class-item="classItem"
                     :date="String(item.weekIndex * 7 + boxIndex + 1)"
                     :is-dragging="isDragging"
+                    data-type="planClass"
                     @delete="
                       handleDeleteClass(
                         classItem,
@@ -965,6 +1002,40 @@ export default {
 
       return dayData.competitionDtoList;
     },
+    /**
+     * 获取指定天的赛事数组引用（用于 vuedraggable）
+     * @param {Array} weekData - 周数据数组
+     * @param {Number} globalDay - 全局天数
+     * @returns {Array} 赛事数组引用
+     */
+    getDayEventsArray(weekData, globalDay) {
+      if (!weekData || !Array.isArray(weekData)) {
+        return [];
+      }
+
+      // 查找该天的数据对象
+      let dayData = weekData.find((item) => item && item.day === globalDay);
+
+      if (!dayData) {
+        // 如果不存在，创建一个新的，使用 Vue.set 确保响应式
+        dayData = {
+          day: globalDay,
+          details: [],
+          competitionDtoList: [],
+        };
+        // 使用 $set 确保响应式
+        const index = weekData.length;
+        this.$set(weekData, index, dayData);
+      }
+
+      // 确保 competitionDtoList 是数组且是响应式的
+      if (!Array.isArray(dayData.competitionDtoList)) {
+        this.$set(dayData, "competitionDtoList", []);
+      }
+
+      // 返回数组引用，确保 vuedraggable 可以正确追踪
+      return dayData.competitionDtoList;
+    },
     handleBoxClick(globalDay, weekIndex) {
       this.$emit("box-click", {
         weekNumber: weekIndex + 1,
@@ -1028,7 +1099,7 @@ export default {
       this.copiedClass = { ...classItem };
       this.hasCopiedClass = true;
       this.$message({
-        message: "课表已复制，右键点击目标日期可粘贴",
+        message: "课程已复制，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
       });
@@ -1038,7 +1109,7 @@ export default {
       this.copiedClass = { ...classItem };
       this.hasCopiedClass = true;
       this.$message({
-        message: "课表已剪切，右键点击目标日期可粘贴",
+        message: "课程已剪切，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
       });
@@ -1074,6 +1145,64 @@ export default {
      */
     handleDragEnd(evt) {
       this.isDragging = false;
+    },
+    /**
+     * 判断是否可以放入课程容器
+     * @param {HTMLElement} to - 目标容器
+     * @param {HTMLElement} from - 源容器
+     * @param {HTMLElement} dragEl - 拖拽元素
+     * @returns {Boolean} 是否可以放入
+     */
+    canPutInClassContainer(to, from, dragEl) {
+      // 如果参数不存在，默认不允许放入
+      if (!from || !dragEl) {
+        return false;
+      }
+      // 检查拖拽元素是否来自赛事容器，如果是则不允许放入
+      if (from.classList && from.classList.contains('draggable-events-container')) {
+        return false;
+      }
+      // 检查拖拽元素是否是 EventCard，如果是则不允许放入
+      const isEventCard = (dragEl.querySelector && dragEl.querySelector('[data-type="planEvent"]') !== null) ||
+                         (dragEl.closest && dragEl.closest('[data-type="planEvent"]') !== null) ||
+                         (dragEl.getAttribute && dragEl.getAttribute('data-type') === 'planEvent');
+      if (isEventCard) {
+        return false;
+      }
+      // 其他情况允许放入（是 ClassCard）
+      return true;
+    },
+    /**
+     * 赛事拖拽结束事件
+     */
+    handleEventDragEnd(evt) {
+      console.log("handleEventDragEnd-evt-1", evt);
+      this.isDragging = false;
+    },
+    /**
+     * 赛事拖拽添加事件
+     */
+    handleEventDragAdd(evt) {},
+    /**
+     * 判断是否可以放入赛事容器
+     * @param {HTMLElement} to - 目标容器
+     * @param {HTMLElement} from - 源容器
+     * @param {HTMLElement} dragEl - 拖拽元素
+     * @returns {Boolean} 是否可以放入
+     */
+    canPutInEventContainer(to, from, dragEl) {
+      // 如果参数不存在，默认不允许放入
+      if (!from || !dragEl) {
+        return false;
+      }
+      // 只允许来自赛事容器的项目放入
+      if (from.classList && from.classList.contains('draggable-events-container')) {
+        return true;
+      }
+      // 检查拖拽元素是否是 EventCard
+      const isEventCard = (dragEl.querySelector && dragEl.querySelector('[data-type="planEvent"]') !== null) ||
+                         (dragEl.closest && dragEl.closest('[data-type="planEvent"]') !== null);
+      return isEventCard;
     },
   },
 };
@@ -1270,6 +1399,13 @@ export default {
   flex: 1;
   width: 100%;
   position: relative;
+}
+
+::v-deep .draggable-events-container {
+  min-height: 10px;
+  width: 100%;
+  position: relative;
+  margin-bottom: 5px;
 }
 
 ::v-deep .class-drap-handle {

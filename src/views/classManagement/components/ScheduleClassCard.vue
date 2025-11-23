@@ -50,14 +50,31 @@
               :tabindex="9999"
             >
               <div class="btn-list-hover">
-                <el-button type="text" @click.stop="$emit('edit', classItem)">
+                <el-button
+                  type="text"
+                  icon="el-icon-edit"
+                  @click.stop="$emit('edit', classItem)"
+                >
                   编辑
-                </el-button>
-                <el-button type="text" @click.stop="$emit('copy', classItem)">
-                  复制
                 </el-button>
                 <el-button
                   type="text"
+                  icon="el-icon-scissors"
+                  @click.stop="$emit('cut', classItem)"
+                >
+                  剪切
+                </el-button>
+                <el-button
+                  type="text"
+                  icon="el-icon-crop"
+                  @click.stop="$emit('copy', classItem)"
+                >
+                  复制
+                </el-button>
+
+                <el-button
+                  type="text"
+                  icon="el-icon-delete"
                   @click.stop="$emit('delete', classItem.id)"
                 >
                   删除
@@ -187,6 +204,10 @@
         >
           <i class="el-icon-edit"></i>
           编辑
+        </div>
+        <div class="context-menu-item" @click="handleCut">
+          <i class="el-icon-scissors"></i>
+          剪切
         </div>
         <div class="context-menu-item" @click="handleCopy">
           <i class="el-icon-crop"></i>
@@ -362,6 +383,10 @@ export default {
     handleCopy() {
       this.hideContextMenu();
       this.$emit("copy", this.classItem);
+    },
+    handleCut() {
+      this.hideContextMenu();
+      this.$emit("cut", this.classItem);
     },
   },
 };
