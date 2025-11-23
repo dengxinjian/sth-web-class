@@ -160,7 +160,7 @@
                 }}{{ secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
                 ? "" : " /周" }}</el-col
               >
-              <el-col :span="8">N/A</el-col>
+              <el-col :span="8">{{ getweekPowerAndOtherDistance('STRENGTH') || "N/A" }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -168,13 +168,13 @@
               <el-col :span="8">其他</el-col>
               <el-col :span="8"
                 >{{
-                  secondsToHHMMSS(getweekOtherDuration()) || "00:00:00"
+                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
                     ? "N/A"
                     : secondsToHHMMSS(getweekOtherDuration())
                 }}{{ secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
                 ? "" : " /周" }}</el-col
               >
-              <el-col :span="8">N/A</el-col>
+              <el-col :span="8">{{ getweekPowerAndOtherDistance('OTHER') || "N/A" }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
@@ -575,6 +575,7 @@ export default {
           }, 0)
         );
       }, 0);
+      // console.log("distanceTotal-总距离", distanceTotal);
       const weekDistance = distanceTotal / this.planClasses.length || 0;
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
@@ -849,7 +850,7 @@ export default {
                 return classAcc;
               }
             }
-            // console.log("classesJson.distance-跑步", classesJson);
+
             // console.log("classesJson.distance-跑步", classesJson.distance, index);
             if (!classesJson.distance || classItem.sportType !== "RUN") {
               return classAcc;
@@ -920,7 +921,7 @@ export default {
       if (!week || !Array.isArray(week)) {
         return 0;
       }
-      const durationTotal = week.reduce((acc, item) => {
+      const durationTotal = week.reduce((acc, item,index) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
           return acc;
         }
@@ -943,6 +944,56 @@ export default {
         );
       }, 0);
       return durationTotal / this.planClasses.length || 0;
+    },
+    // 计算周力量或其他距离总和
+    getweekPowerAndOtherDistance(type) {
+      const week = this.planClasses.flat();
+      if (!week || !Array.isArray(week)) {
+        return 0;
+      }
+      const distanceTotal = week.reduce((acc, item, index) => {
+        if (!item || !item.details || !Array.isArray(item.details)) {
+          return acc;
+        }
+
+        return (
+          acc +
+          item.details.reduce((classAcc, classItem) => {
+            if (!classItem) {
+              return classAcc;
+            }
+
+            // 处理 classesJson 可能是字符串的情况
+            let classesJson = classItem.classesJson;
+            if (typeof classesJson === "string") {
+              try {
+                classesJson = JSON.parse(classesJson);
+              } catch (error) {
+                console.error("解析 classesJson 失败:", error);
+                return classAcc;
+              }
+            }
+
+            if (!classesJson.distance || classItem.sportType !== type) {
+              return classAcc;
+            }
+            if (
+              !classesJson.distance ||
+              classesJson.distance === "--km" ||
+              classesJson.distance === "--"
+            ) {
+              return classAcc;
+            }
+            const total1 = classAcc + Number(classesJson.distance);
+            return total1;
+          }, 0)
+        );
+      }, 0);
+      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      if (weekDistance === 0) return "N/A";
+      // 如果是整数，不保留小数；如果有小数，保留两位小数
+      const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
+      return formattedDistance + " km/周";
     },
   },
 };
