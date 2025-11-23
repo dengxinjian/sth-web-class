@@ -189,6 +189,9 @@
           </el-date-picker>
         </el-form-item>
       </template>
+      <!-- <el-form-item label="">
+        <a href="javascript:void(0)" @click="viewApplyHistory" style="color: #409EFF;">应用历史</a>
+      </el-form-item> -->
     </el-form>
 
     <span slot="footer" class="dialog-footer">
@@ -303,6 +306,9 @@ export default {
     },
   },
   methods: {
+    viewApplyHistory() {
+      this.$emit("viewApplyHistory", this.planInfo.id);
+    },
     handleCascaderChange(value) {
       const choosedAthletes = value
         .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))

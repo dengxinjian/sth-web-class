@@ -83,6 +83,7 @@
       :planInfo="currentPlanDetail"
       :planClasses="planList"
       @cancel="handleApplyCoachCancel"
+      @viewApplyHistory="handleViewApplyHistory"
     />
     <!-- 应用历史 -->
     <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
@@ -225,6 +226,10 @@ export default {
     handleApplyCoachCancel(payload) {
       this.showApplyCoach = false;
       // this.getPlanList();
+    },
+    handleViewApplyHistory(planId) {
+      this.showApplyHistory = true;
+      this.currentPlanId = planId;
     },
     /**
      * 处理概要预览取消事件
