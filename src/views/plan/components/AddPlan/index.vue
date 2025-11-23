@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
     @close="onCancel"
   >
-    <span slot="title">新增计划</span>
+    <span slot="title">{{ copyOfficialPlanInfo ? '添加计划' : '新增计划' }}</span>
 
     <el-form
       ref="formRef"
@@ -27,7 +27,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="分组选择" prop="planGroupId">
+      <el-form-item label="分组" prop="planGroupId">
         <el-select
           v-model="form.planGroupId"
           placeholder="请选择分组"
@@ -61,7 +61,7 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="计划源" prop="planSource">
+      <el-form-item label="计划源" prop="planSource" v-if="!copyOfficialPlanInfo">
         <el-input
           :readonly="true"
           placeholder="请输入计划源"
@@ -70,7 +70,25 @@
         />
       </el-form-item>
 
-      <el-form-item label="拥有者">
+      <el-form-item label="拥有者" v-if="!copyOfficialPlanInfo">
+        <el-input
+          :readonly="true"
+          placeholder="请输入拥有者"
+          v-model="form.possessNickname"
+          disabled
+        />
+      </el-form-item>
+
+      <el-form-item label="创建者" prop="planSource" v-if="copyOfficialPlanInfo">
+        <el-input
+          :readonly="true"
+          placeholder="请输入计划源"
+          v-model="form.planSource"
+          disabled
+        />
+      </el-form-item>
+
+      <el-form-item label="所有者" v-if="copyOfficialPlanInfo">
         <el-input
           :readonly="true"
           placeholder="请输入拥有者"
@@ -87,15 +105,26 @@
         />
       </el-form-item>
 
-      <el-form-item label="微信号" prop="weChat">
+      <el-form-item label="微信号" prop="weChat" v-if="!copyOfficialPlanInfo">
         <el-input placeholder="请输入微信号" v-model="form.weChat" />
       </el-form-item>
 
-      <el-form-item label="描述" prop="description">
+      <el-form-item label="描述" prop="description" v-if="!copyOfficialPlanInfo">
         <el-input
           :rows="6"
           type="textarea"
           placeholder="请输入描述"
+          v-model="form.description"
+          :maxlength="500"
+          show-word-limit
+        />
+      </el-form-item>
+
+      <el-form-item label="概要" prop="description" v-if="copyOfficialPlanInfo">
+        <el-input
+          :rows="6"
+          type="textarea"
+          placeholder="请输入概要"
           v-model="form.description"
           :maxlength="500"
           show-word-limit

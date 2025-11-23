@@ -16,12 +16,12 @@
       label-width="90px"
       size="small"
     >
-      <el-form-item label="计划标题" prop="planTitle">
+      <el-form-item label="计划名称" prop="planTitle">
         <el-input
           v-model="form.planTitle"
           maxlength="20"
           show-word-limit
-          placeholder="请输入计划标题"
+          placeholder="请输入计划名称"
           clearable
         />
       </el-form-item>
@@ -73,7 +73,7 @@ export default {
       },
       rules: {
         planTitle: [
-          { required: true, message: "请输入计划标题", trigger: "blur" },
+          { required: true, message: "请输入计划名称", trigger: "blur" },
           { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
         ],
         planGroupId: [
