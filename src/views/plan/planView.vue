@@ -509,13 +509,13 @@ export default {
           }
         },
         2: () => {
-          _this.showCopy = true;
-        },
-        3: () => {
           if (this.currentCount >= this.limitValue) {
             this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
             return;
           }
+          _this.showCopy = true;
+        },
+        3: () => {
           _this.showApplyCoach = true;
         },
         4: () => {
