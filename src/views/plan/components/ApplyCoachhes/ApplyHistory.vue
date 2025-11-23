@@ -10,6 +10,7 @@
     <span slot="title">历史</span>
 
     <custom-table
+      v-if="loginType === '2'"
       :data="tableData"
       :columns="getColumns()"
       :total="total"
@@ -17,17 +18,9 @@
       :pagination="pagination"
       @pagination-change="handlePaginationChange"
     />
-    <!-- <el-table :data="tableData" style="width: 100%">
-      <el-table-column prop="teamName" label="团队名称" width="180" />
-        <el-table-column prop="nickname" label="昵称" width="180" />
-        <el-table-column prop="applyTime" label="应用时间" />
-      </el-table> -->
-    <!-- </custom-table> -->
-
-    <!-- <el-row>
-      <el-col>应用时间</el-col>
-      <el-col v-for="item in tableData" :key="item.teamName">{{ item.applyTime }}</el-col>
-    </el-row> -->
+    <el-table v-else :data="tableData" style="width: 100%">
+      <el-table-column prop="applyTimeRange" label="应用时间" />
+    </el-table>
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">关闭</el-button>
     </span>
@@ -62,6 +55,7 @@ export default {
         page: 1,
         limit: 10,
       },
+      loginType: localStorage.getItem("loginType") || '1',
     };
   },
   watch: {
@@ -95,7 +89,7 @@ export default {
       if (loginType === "2") {
         return "680px";
       } else {
-        return "520px";
+        return "280px";
       }
     },
     getColumns() {
@@ -108,7 +102,7 @@ export default {
         ];
       } else {
         return [
-          { prop: "applyNickname", label: "昵称", width: 180 },
+          // { prop: "applyNickname", label: "昵称", width: 180 },
           { prop: "applyTimeRange", label: "应用时间", width: 260 },
         ];
       }
