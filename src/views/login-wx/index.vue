@@ -79,7 +79,7 @@
               class="miniprogram-img"
             />
             <div class="miniprogram-subtitle">扫码进入小程序</div>
-            <el-button @click="handleMiniprogramCode">已完成扫码</el-button>
+            <el-button @click="handleMiniprogramCode">已完成阈值设置</el-button>
           </div>
         </div>
         <!-- 扫码关注服务号 -->
