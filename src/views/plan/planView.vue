@@ -558,6 +558,7 @@ export default {
           planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
             if (res.success) {
               this.$message.success("删除成功");
+              this.getPlanLimitCount();
               this.restPageInfo();
               this.getPlanList();
             }
