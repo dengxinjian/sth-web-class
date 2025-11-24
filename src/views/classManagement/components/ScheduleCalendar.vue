@@ -115,6 +115,8 @@
                 :date="item.commonDate"
                 @delete="$emit('event-detail', eventItem)"
                 @edit="$emit('edit-event', eventItem)"
+                @copy="handleCopyEvent"
+                @cut="handleCutEvent"
               />
               <!-- 课表卡片 -->
               <ScheduleClassCard
@@ -182,7 +184,7 @@
                   <span>录入运动</span>
                 </div>
                 <div
-                  v-if="hasCopiedClass"
+                  v-if="hasCopiedClass || hasCopiedEvent"
                   class="context-menu-item"
                   @click="handlePaste"
                 >
@@ -251,6 +253,10 @@ export default {
       hasCopiedClass: false, // 是否已复制过课程
       copiedClass: null, // 保存复制的课程数据
       hasCutClass: false, // 是否已剪切过课程
+      hasCopiedEvent: false, // 是否已复制过赛事
+      copiedEvent: null, // 保存复制的赛事数据
+      hasCutEvent: false, // 是否已剪切过赛事
+      cutEvent: null, // 保存剪切的赛事信息（用于删除原位置）
     };
   },
   mounted() {
@@ -329,21 +335,40 @@ export default {
       // 不要清除 copiedClass 和 hasCopiedClass，这样复制状态会保留
     },
     handlePaste() {
-      console.log("handlePaste-cutClass-1", this.contextMenuDate, this.copiedClass);
+      console.log("handlePaste-1", this.contextMenuDate, this.copiedClass, this.copiedEvent);
 
-      if (this.hasCutClass) {
-        this.$emit("cut-class", this.contextMenuDate, this.copiedClass);
+      // 处理课程粘贴
+      if (this.copiedClass !== null) {
+        if (this.hasCutClass) {
+          this.$emit("cut-class", this.contextMenuDate, this.copiedClass);
+          this.hideContextMenu();
+          this.hasCutClass = false;
+          this.copiedClass = null;
+          this.hasCopiedClass = false;
+          return;
+        }
+        this.$emit("paste-class", this.contextMenuDate, this.copiedClass);
         this.hideContextMenu();
-        this.hasCutClass = false;
+        this.hasCopiedClass = false;
         this.copiedClass = null;
-        return;
       }
-      this.$emit("paste-class", this.contextMenuDate, this.copiedClass);
 
-      // 粘贴完成后清除复制状态
-      this.hideContextMenu();
-      this.hasCopiedClass = false;
-      this.copiedClass = null;
+      // 处理赛事粘贴
+      if (this.copiedEvent !== null) {
+        if (this.hasCutEvent) {
+          this.$emit("cut-event", this.contextMenuDate, this.copiedEvent, this.cutEvent);
+          this.hideContextMenu();
+          this.hasCutEvent = false;
+          this.copiedEvent = null;
+          this.hasCopiedEvent = false;
+          this.cutEvent = null;
+          return;
+        }
+        this.$emit("paste-event", this.contextMenuDate, this.copiedEvent);
+        this.hideContextMenu();
+        this.hasCopiedEvent = false;
+        this.copiedEvent = null;
+      }
     },
     handleCutClass(classItem) {
       this.copiedClass = { ...classItem };
@@ -358,8 +383,51 @@ export default {
     handleCopyClass(classItem) {
       this.copiedClass = { ...classItem };
       this.hasCopiedClass = true;
+      // 清除剪切状态，因为复制操作会覆盖剪切操作
+      this.hasCutClass = false;
       this.$message({
         message: "课表已复制，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
+      });
+    },
+    // 赛事复制
+    handleCopyEvent(eventItem) {
+      if (!eventItem) {
+        console.error("handleCopyEvent: eventItem is null or undefined");
+        return;
+      }
+      // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
+      const { id, ...eventData } = eventItem;
+      this.copiedEvent = { ...eventData };
+      this.hasCopiedEvent = true;
+      // 清除剪切状态，因为复制操作会覆盖剪切操作
+      this.hasCutEvent = false;
+      this.cutEvent = null;
+      this.$message({
+        message: "赛事已复制，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
+      });
+    },
+    // 赛事剪切
+    handleCutEvent(eventItem) {
+      if (!eventItem) {
+        console.error("handleCutEvent: eventItem is null or undefined");
+        return;
+      }
+      // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
+      const { id, ...eventData } = eventItem;
+      this.copiedEvent = { ...eventData };
+      this.hasCopiedEvent = true;
+      this.hasCutEvent = true;
+      // 保存剪切信息，用于删除原位置
+      this.cutEvent = {
+        eventItem: { ...eventItem }, // 保存完整的原赛事数据，包括 id
+        date: eventItem.competitionTime || this.contextMenuDate,
+      };
+      this.$message({
+        message: "赛事已剪切，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
       });
@@ -599,7 +667,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;

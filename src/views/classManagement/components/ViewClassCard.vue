@@ -8,6 +8,8 @@
       :show-close="false"
       :modal="false"
       top="20vh"
+      :custom-class="dialogCustomClass"
+      :style="{ '--dialog-margin-left': dialogMarginLeft }"
     >
       <div
         slot="title"
@@ -301,6 +303,10 @@ export default {
         return ["view", "edit"].includes(value);
       },
     },
+    dialogMarginLeft: {
+      type: String,
+      default: "320px",
+    },
   },
   data() {
     return {
@@ -309,6 +315,9 @@ export default {
     };
   },
   computed: {
+    dialogCustomClass() {
+      return "view-class-card-dialog";
+    },
     cardStyle() {
       // 过期且有时长的课程显示为红色
       if (
@@ -392,9 +401,6 @@ export default {
 <style lang="scss" scoped>
 ::v-deep(.el-dialog__body) {
   padding-top: 0 !important;
-}
-::v-deep(.el-dialog) {
-  margin-left: 320px !important;
 }
 
 .classScheduleCard {

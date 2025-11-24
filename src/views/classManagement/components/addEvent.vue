@@ -154,7 +154,10 @@ export default {
         eventName: [
           {
             validator: (rule, value, callback) => {
-              if (!value || !value.trim()) {
+              // 处理 value 可能是数字或其他类型的情况
+              const valueStr = value != null ? String(value) : "";
+              const trimmedValue = valueStr.trim();
+              if (!trimmedValue) {
                 callback(new Error("请输入赛事名称"));
               } else {
                 callback();
@@ -176,10 +179,13 @@ export default {
           {
             validator: (rule, value, callback) => {
               if (this.formData.distance === "OTHER") {
-                if (!value || !value.trim()) {
+                // 处理 value 可能是数字或字符串的情况
+                const valueStr = value != null ? String(value) : "";
+                const trimmedValue = valueStr.trim();
+                if (!trimmedValue) {
                   callback(new Error("请输入自定义距离"));
                 } else {
-                  const num = parseFloat(value);
+                  const num = parseFloat(trimmedValue);
                   if (isNaN(num) || num <= 0) {
                     callback(new Error("请输入有效的距离值"));
                   } else {
@@ -393,7 +399,10 @@ export default {
     updateDistanceOptions(value, resetSelection = true) {
       if (value && this.distancesByType[value]) {
         this.distanceOptions = this.distancesByType[value].map((item) => ({
-          label: item.label,
+          label:
+            value === "TRIATHLON"
+              ? item.label + "(" + item.displayValue + ")"
+              : item.label,
           value: item.value,
           displayValue: item.displayValue,
         }));
@@ -401,7 +410,16 @@ export default {
         this.distanceOptions = [];
       }
       if (resetSelection) {
-        this.formData.distance = "";
+        // 如果只有一个选项，自动选择第一个
+        if (this.distanceOptions.length === 1) {
+          this.formData.distance = this.distanceOptions[0].value;
+          // 如果选择的是"其他距离"，需要显示自定义输入框
+          if (this.formData.distance === "OTHER") {
+            this.showCustomDistance = true;
+          }
+        } else {
+          this.formData.distance = "";
+        }
       }
     },
     normalizePriority(priority) {

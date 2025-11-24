@@ -105,6 +105,10 @@
   margin: 1vh auto !important;
 }
 
+.view-class-card-dialog.el-dialog {
+  margin-left: var(--dialog-margin-left, 320px) !important;
+}
+
 .sth {
   width: 24px;
 }

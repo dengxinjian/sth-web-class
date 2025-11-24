@@ -830,6 +830,21 @@ export default {
         }
       }
     },
+    data(val) {
+      this.getTagList();
+      this.getTagList();
+      if (this.data.id && this.originalType === "my") {
+        this.getClassInfo(this.data.id);
+      } else if (this.originalType === "my") {
+        this.resetForm();
+      } else {
+        console.log(this.data, "this.data");
+        this.classInfo = this.data.classesJson;
+        this.timeline = this.data.classesJson.timeline;
+        this.maxIntensity = this.data.classesJson.maxIntensity;
+        this.classInfo.groupId = this.data.classesGroupId;
+      }
+    },
   },
   created() {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);

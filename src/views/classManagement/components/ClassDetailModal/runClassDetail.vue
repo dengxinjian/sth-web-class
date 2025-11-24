@@ -414,7 +414,8 @@
                   <el-input-number
                     v-if="part.capacity === 'distance'"
                     :controls="false"
-                    :step="part.unit === 'km' ? 1 : 0.1"
+                    :step="part.targetUnit === 'km' ? 0.01 : 1"
+                    :precision="part.targetUnit === 'km' ? 2 : 0"
                     :step-strictly="true"
                     v-model="part.targetDistance"
                     size="small"

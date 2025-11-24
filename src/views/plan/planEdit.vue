@@ -30,6 +30,7 @@
       />
     </div>
     <ViewClassCard
+      class="view-class-card"
       :visible="showViewClassCard"
       :class-item="classModalData"
       :active-class-type="activeClassType"
@@ -39,6 +40,7 @@
       @copy="handleCopyClassFromOfficial"
       @save="handleUpdateClass"
       type="edit"
+      dialog-margin-left="260px"
     />
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
@@ -56,7 +58,7 @@
     <AddClassModal
       v-model="showAddClassModal"
       :sportType="selectedSportType"
-      type="add"
+      :type="classModalDataType"
       :data="CreatePlanCourseDialogData"
       originalType="my"
       @save="onSaveAddClass"
@@ -468,6 +470,7 @@ export default {
     handleCreatePlanCourse(data) {
       console.log(data, "data");
       this.CreatePlanCourseDialogData = { ...data };
+      this.classModalDataType = "add";
       this.showAddClassModal = true;
     },
     /**
@@ -530,14 +533,26 @@ export default {
     async savePlanCourse(data) {
       console.log(data, "data");
       // data.classesJson = JSON.stringify(data.classesJson);
-      classApi.createClass(data).then((res) => {
-        if (res.success) {
-          this.$message.success("课程保存成功");
-          this.getClassList();
-        } else {
-          this.$message.error(res.message);
-        }
-      });
+      if (this.classModalDataType === "add") {
+        classApi.createClass(data).then((res) => {
+          if (res.success) {
+            this.$message.success("课程保存成功");
+            this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
+            this.classModalDataType = "edit";
+            this.getClassList();
+          }
+        });
+      } else {
+        classApi.updateClass(data).then((res) => {
+          if (res.success) {
+            this.$message.success("课程保存成功");
+            this.classModalDataType = "edit";
+            this.getClassList();
+          } else {
+            this.$message.error(res.message);
+          }
+        });
+      }
     },
     /**
      * 删除计划表课程
@@ -917,8 +932,7 @@ function clampIndex(index, length) {
 
 .plan-container {
   display: flex;
-  height: 100%;
-  max-height: calc(100vh - 60px);
+  height: 100vh;
   overflow-y: hidden;
   overflow-x: auto;
 
@@ -943,7 +957,6 @@ function clampIndex(index, length) {
   .type-change {
     flex: 0 0 260px;
     height: 100vh;
-    max-height: calc(100vh - 60px);
     background-color: #f8f8f8;
     overflow-y: auto;
     overflow-x: hidden;

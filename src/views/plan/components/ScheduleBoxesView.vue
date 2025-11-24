@@ -217,7 +217,7 @@
             <div class="activity">
               <span class="label">其他时长:</span>
               <span class="value">{{
-                secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ||
+                secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ===
                 "00:00:00"
                   ? "--:--:--"
                   : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
@@ -792,12 +792,20 @@ export default {
             if (
               !classItem.classesJson.duration ||
               classItem.classesJson.duration === "00:00:00" ||
-              classItem.classesJson.duration === "--:--:--" ||
-              classItem.sportType !== "OTHER"
+              classItem.classesJson.duration === "--:--:--"
             ) {
               return classAcc;
             }
-            return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
+            console.log(classItem.sportType, "classItem.sportType");
+            if (
+              classItem.sportType === "REMARK" ||
+              classItem.sportType === "REST" ||
+              classItem.sportType === "OTHER"
+            ) {
+              console.log(classItem.classesJson.duration, classAcc + hhmmssToSeconds(classItem.classesJson.duration), "classItem.classesJson.duration");
+              return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
+            }
+            return classAcc;
           }, 0)
         );
       }, 0);

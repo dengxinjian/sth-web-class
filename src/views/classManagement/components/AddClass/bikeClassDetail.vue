@@ -773,6 +773,20 @@ export default {
         }
       }
     },
+    data(val) {
+      this.getTagList();
+      if (this.data.id && this.originalType === "my") {
+        this.getClassInfo(this.data.id);
+      } else if (this.originalType === "my") {
+        this.resetForm();
+      } else {
+        this.classInfo = this.data.classesJson;
+        this.timeline = this.data.classesJson.timeline;
+        this.maxIntensity = this.data.classesJson.maxIntensity;
+        this.classInfo.groupId = this.data.groupId;
+        this.handleClassDrag();
+      }
+    },
   },
   created() {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);

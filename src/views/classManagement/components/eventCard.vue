@@ -25,7 +25,7 @@
             <div class="sport-type-icon">
               <img
                 class="image-icon"
-                src="~@/assets/addClass/eventIcon.png"
+                :src="getClassImageIcon(eventItem.priority)"
                 alt=""
               />
             </div>
@@ -48,7 +48,6 @@
                 <el-button
                   type="text"
                   icon="el-icon-scissors"
-                  v-if="isPlan"
                   @click.stop="handleCut"
                 >
                   剪切
@@ -56,7 +55,6 @@
                 <el-button
                   type="text"
                   icon="el-icon-crop"
-                  v-if="isPlan"
                   @click.stop="handleCopy"
                 >
                   复制
@@ -95,11 +93,11 @@
           <i class="el-icon-edit"></i>
           编辑
         </div>
-        <div class="context-menu-item" v-if="isPlan" @click.stop="handleCut">
+        <div class="context-menu-item" @click.stop="handleCut">
           <i class="el-icon-scissors"></i>
           剪切
         </div>
-        <div class="context-menu-item" v-if="isPlan" @click.stop="handleCopy">
+        <div class="context-menu-item" @click.stop="handleCopy">
           <i class="el-icon-crop"></i>
           复制
         </div>
@@ -160,6 +158,15 @@ export default {
     document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
+    getClassImageIcon (priority) {
+      if (priority === "PRIMARY" || priority === 1) {
+        return require("@/assets/addClass/eventOne.png");
+      } else if (priority === "SECONDARY" || priority === 2) {
+        return require("@/assets/addClass/eventTwo.png");
+      } else {
+        return require("@/assets/addClass/eventThree.png");
+      }
+    },
     showContextMenu(event) {
       // 如果正在拖拽，不显示右键菜单
       if (this.isDragging) {
@@ -351,7 +358,8 @@ export default {
     }
 
     .image-icon {
-      width: 20px;
+      width: 18px;
+      height: 22px;
     }
 
     .title {
@@ -402,7 +410,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;

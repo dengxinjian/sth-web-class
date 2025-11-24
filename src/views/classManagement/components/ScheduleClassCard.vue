@@ -515,7 +515,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;

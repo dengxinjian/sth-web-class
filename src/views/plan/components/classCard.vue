@@ -5,13 +5,13 @@
     :data-id="classItem.id"
     :data-day="date"
     data-type="planClass"
-    @click.stop="$emit('edit', classItem)"
   >
     <div
       class="class-schedule-card-container js-plan-class-card"
       :data-id="classItem.id"
       :data-date="date"
       data-type="classSchedule"
+      @click.stop="handleClick"
     >
       <div
         class="classScheduleCard"
@@ -44,13 +44,25 @@
               v-if="type === 'edit'"
             >
               <div class="btn-list-hover">
-                <el-button type="text" icon="el-icon-edit" @click.stop="$emit('edit', classItem)">
+                <el-button
+                  type="text"
+                  icon="el-icon-edit"
+                  @click.stop="$emit('edit', classItem)"
+                >
                   编辑
                 </el-button>
-                <el-button type="text" icon="el-icon-scissors" @click.stop="$emit('cut', classItem)">
+                <el-button
+                  type="text"
+                  icon="el-icon-scissors"
+                  @click.stop="$emit('cut', classItem)"
+                >
                   剪切
                 </el-button>
-                <el-button type="text" icon="el-icon-crop" @click.stop="$emit('copy', classItem)">
+                <el-button
+                  type="text"
+                  icon="el-icon-crop"
+                  @click.stop="$emit('copy', classItem)"
+                >
                   复制
                 </el-button>
                 <el-button
@@ -373,14 +385,8 @@ export default {
       });
     },
     handleClick(event) {
-      this.hideContextMenu();
-      if (this.type === "view") {
-        const clickPosition = {
-          clientX: event.clientX,
-          clientY: event.clientY,
-        };
-        this.$emit("view-class", this.classItem, clickPosition);
-      }
+      console.log("handleClick-event-1", event);
+      this.$emit("edit", this.classItem);
     },
     hideContextMenu() {
       this.contextMenuVisible = false;
@@ -538,7 +544,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;
