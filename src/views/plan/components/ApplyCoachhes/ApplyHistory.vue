@@ -19,6 +19,7 @@
       @pagination-change="handlePaginationChange"
     />
     <el-table v-else :data="tableData" style="width: 100%">
+      <el-table-column prop="applyNickname" label="昵称" />
       <el-table-column prop="applyTimeRange" label="应用时间" />
     </el-table>
     <span slot="footer" class="dialog-footer">
@@ -89,7 +90,7 @@ export default {
       if (loginType === "2") {
         return "680px";
       } else {
-        return "280px";
+        return "500px";
       }
     },
     getColumns() {
@@ -102,7 +103,7 @@ export default {
         ];
       } else {
         return [
-          // { prop: "applyNickname", label: "昵称", width: 180 },
+          { prop: "applyNickname", label: "昵称", width: 180 },
           { prop: "applyTimeRange", label: "应用时间", width: 260 },
         ];
       }
@@ -114,7 +115,12 @@ export default {
         pageNo: this.pagination.page,
         pageSize: this.pagination.limit,
       }).then((res) => {
-        this.tableData = res.result.records;
+        this.tableData = res.result.records.map(el => {
+          return {
+            ...el,
+            teamName: el.teamName || '/',
+          }
+        });
         this.total = res.result.total;
       });
     },
