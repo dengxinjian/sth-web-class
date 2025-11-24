@@ -40,18 +40,15 @@
             src="./imgs/PREMIUM.svg"
             alt="ELITE"
             width="112px"
-            style="margin-top: 12px;"
+            style="margin-top: 12px"
             v-if="loginType === '2'"
           />
           <!-- <span v-else>ELITE</span> -->
-           <img src="./imgs/title.png" alt="ELITE"
-           style="scale: 0.45;"
-            v-else
-          />
+          <img src="./imgs/title.png" alt="ELITE" style="scale: 0.45" v-else />
         </div>
         <div
           id="wx-login-container"
-          :class="wx-login-container"
+          :class="wx - login - container"
           v-if="isNewUser"
         >
           <!-- 扫码成功状态 -->
@@ -89,16 +86,23 @@
           v-if="!isNewUser"
         >
           <img class="qrcode-img" :src="qrcodeUrl" alt="扫码二维码" />
+          <div class="qrcode-subtitle" v-if="isExpire">
+            <div></div>
+            <img src="./imgs/refresh.png" alt="二维码已过期" width="50" height="50" @click.stop="refreshQrCode" />
+            <div>二维码已过期，请重新获取</div>
+          </div>
         </div>
         <div v-if="!isAgreement" class="wx-login-cover"></div>
-        <div style="margin-bottom: 20px" v-if="!isNewUser
-        ">
+        <div style="margin-bottom: 20px" v-if="!isNewUser">
           <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
             <el-radio label="1">运动员</el-radio>
             <el-radio label="2">教练</el-radio>
           </el-radio-group>
         </div>
-        <div style="display: flex; align-items: center; font-size: 14px" v-if="!isNewUser">
+        <div
+          style="display: flex; align-items: center; font-size: 14px"
+          v-if="!isNewUser"
+        >
           <el-checkbox
             v-model="isAgreement"
             label=""
@@ -161,6 +165,9 @@ export default {
       pollTimer: null, // 轮询定时器
       POLL_INTERVAL: 2000, // 轮询间隔：2秒
       isNewUser: false, // 是否是新用户
+      expireTime: 0, // 二维码过期时间
+      // 是否过期
+      isExpire: false,
     };
   },
   mounted() {
@@ -175,6 +182,24 @@ export default {
     this.clearPollTimer();
   },
   methods: {
+    refreshQrCode() {
+      setTimeout(() => {
+        this.isExpire = false;
+        this.getScanQrCode();
+      }, 300);
+    },
+    // 300s的倒计时函数
+    countDown() {
+      if (this.expireTime > 0) {
+        setTimeout(() => {
+          this.expireTime--;
+          this.countDown();
+        }, 1000);
+      } else {
+        this.isExpire = true;
+        this.clearPollTimer();
+      }
+    },
     handleMiniprogramCode() {
       if (this.unionid) {
         getData({
@@ -250,6 +275,7 @@ export default {
 
         if (res.code === "100000" && res.result && res.result) {
           // 扫码成功，停止轮询并处理登录
+          this.isExpire = false;
           this.clearPollTimer();
           this.handleLoginSuccess(res.result);
         } else if (res.result?.message) {
@@ -300,12 +326,15 @@ export default {
       })
         .then((res) => {
           if (res.result?.sceneId && res.result?.ticket) {
+            // 过期时间
+            this.expireTime = res.result.expireSeconds;
             this.sceneId = res.result.sceneId;
             this.qrcodeUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${res.result.ticket}`;
 
             // token 不存在时启动轮询
             if (!this.$store.getters.token) {
               this.startPolling();
+              this.countDown();
             }
           } else {
             console.error("获取二维码失败：返回数据不完整", res);
@@ -807,6 +836,9 @@ footer {
   width: 340px;
   height: 300px;
 }
+.wx-login-container {
+  position: relative;
+}
 .wx-login-container.noAgreement {
   filter: blur(5px);
 }
@@ -953,6 +985,32 @@ footer {
 /* 小程序码样式 */
 .miniprogram-code {
   color: #1890ff;
+}
+
+.qrcode-subtitle{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 14px;
+  & > img {
+    cursor: pointer;
+  }
+  & > div{
+    margin-bottom: 30px;
+    color:#fff;
+  }
 }
 
 /* 动画效果 */
