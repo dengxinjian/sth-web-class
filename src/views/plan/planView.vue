@@ -47,7 +47,7 @@
     <!-- 添加计划 -->
     <AddPlan
       v-model="addPlanVisible"
-      :current-group-id="currentPlanGroupId"
+      :current-group-id="addPlanGroupId"
       :activeClassType="activeClassType"
       :copyOfficialPlanInfo="copyOfficialPlanInfo"
       :planList="planList"
@@ -105,6 +105,7 @@ import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue";
 
 // 服务和工具导入
 import { planApi, groupApi } from "./services/planManagement";
+import { getData } from "@/api/common";
 
 export default {
   name: "PlanView",
@@ -151,6 +152,8 @@ export default {
       planTitle: "",
       planList: [[], [], [], []],
       showMore: false,
+      addPlanGroupId: null,
+      ownerTeams: [],
 
       // 计划列表数据
       planSearchInput: "",
@@ -173,9 +176,9 @@ export default {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
       const { id, planGroupId, type } = this.$route.query;
-      if (id && planGroupId) {
-        this.currentPlanId = id;
-        this.currentPlanGroupId = planGroupId;
+      if (id) {
+        this.currentPlanId = parseInt(id);
+        this.currentPlanGroupId = parseInt(planGroupId);
         this.getPlanDetail(id);
         this.getPlanDayDetail(id);
       }
@@ -195,12 +198,21 @@ export default {
     }
     this.getPlanList();
     this.getPlanLimitCount();
+    this.getTeamList();
   },
   methods: {
+    getTeamList() {
+      getData({
+        url: "/api/team/coach/all-teams",
+      }).then((res) => {
+        this.ownerTeams = res.result;
+      });
+    },
     async getPlanLimitCount() {
       const res = await planApi.getPlanLimitCount();
       this.limitValue = res.result.limitValue;
       this.currentCount = res.result.currentCount;
+      return res.result;
     },
     handleAddPlanCancel() {
       this.addPlanVisible = false;
@@ -446,11 +458,12 @@ export default {
      * 添加计划
      */
     async handleAddPlan(payload) {
-      if (this.currentCount >= this.limitValue) {
+      const result = await this.getPlanLimitCount();
+      if (result.currentCount >= result.limitValue) {
         this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
         return;
       }
-      this.currentPlanGroupId = payload;
+      this.addPlanGroupId = payload;
       this.addPlanVisible = true;
     },
     /**
@@ -499,26 +512,44 @@ export default {
     /**
      * 处理选项的点击事件
      */
-    handleOptionsClick(item, index) {
+    async handleOptionsClick(item, index) {
       const _this = this;
       const optMap = {
         0: () => {
           _this.showSummaryPreview = true;
         },
-        1: () => {
+        1: async () => {
           if (_this.activeClassType === "official") {
-            _this.copyOfficialPlanInfo = _this.currentPlanDetail;
-            _this.handleAddPlan(_this.currentPlanDetail.planGroupId);
+            const result = await _this.getPlanLimitCount();
+            if (result.currentCount >= result.limitValue) {
+              _this.$message.error(
+                "您当前的计划数量已达上限，无法添加更多计划"
+              );
+              return;
+            }
+            _this.$nextTick(() => {
+              _this.copyOfficialPlanInfo = {
+                ..._this.currentPlanDetail,
+                planGroupId: null,
+                teamId: _this.ownerTeams[0]?.id || null,
+                ownerName: localStorage.getItem("name").split("#")[0],
+                ownerId: localStorage.getItem("triUserId"),
+              };
+              _this.handleAddPlan();
+            });
           } else {
             _this.handleEditPlan();
           }
         },
-        2: () => {
-          if (this.currentCount >= this.limitValue) {
-            this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+        2: async () => {
+          const result = await _this.getPlanLimitCount();
+          if (result.currentCount >= result.limitValue) {
+            _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
             return;
           }
-          _this.showCopy = true;
+          _this.$nextTick(() => {
+            _this.showCopy = true;
+          });
         },
         3: () => {
           _this.showApplyCoach = true;
@@ -562,10 +593,21 @@ export default {
           // 调用删除分组API
           planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
             if (res.success) {
-              this.$message.success("删除成功");
-              this.getPlanLimitCount();
-              this.restPageInfo();
-              this.getPlanList();
+              _this.$message.success("删除成功");
+              const currentPlanId = String(_this.currentPlanDetail.id);
+              const queryPlanId = _this.$route.query?.id;
+              if (queryPlanId && String(queryPlanId) === currentPlanId) {
+                _this.getPlanList();
+                _this.restPageInfo();
+                // 删除成功后，刷新页面，并清除当前路由参数，防止页面缓存导致数据不更新
+                _this.$router.replace({
+                  path: "/timeTable/plan",
+                });
+              } else {
+                _this.getPlanLimitCount();
+                _this.restPageInfo();
+                _this.getPlanList();
+              }
             }
           });
         });

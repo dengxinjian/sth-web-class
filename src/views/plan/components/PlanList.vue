@@ -182,7 +182,7 @@ export default {
       handler(newList) {
         // 当列表更新时，如果 currentPlanGroupId 有值且对应的分组存在，则展开
         if (
-          this.currentPlanGroupId &&
+          this.currentPlanGroupId != null &&
           Array.isArray(newList) &&
           newList.length > 0
         ) {
@@ -230,9 +230,9 @@ export default {
      * @returns {Boolean} 是否存在
      */
     isGroupExists(groupId) {
-      // 检查 groupId 是否有效（不为空字符串、null、undefined）
+      // 检查 groupId 是否有效（不为空字符串、null、undefined，但允许0）
       if (
-        !groupId ||
+        groupId == null ||
         groupId === "" ||
         !Array.isArray(this.classList) ||
         this.classList.length === 0
@@ -242,7 +242,7 @@ export default {
       // 转换为字符串进行比较，支持数字和字符串类型
       const targetId = String(groupId);
       return this.classList.some((item) => {
-        if (!item || !item.groupId) return false;
+        if (!item || item.groupId == null) return false;
         return String(item.groupId) === targetId;
       });
     },
@@ -251,7 +251,7 @@ export default {
      */
     tryExpandGroup() {
       if (
-        this.currentPlanGroupId &&
+        this.currentPlanGroupId != null &&
         this.isGroupExists(this.currentPlanGroupId)
       ) {
         this.$nextTick(() => {
