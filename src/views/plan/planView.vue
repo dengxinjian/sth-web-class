@@ -201,6 +201,7 @@ export default {
       const res = await planApi.getPlanLimitCount();
       this.limitValue = res.result.limitValue;
       this.currentCount = res.result.currentCount;
+      return res.result;
     },
     handleAddPlanCancel() {
       this.addPlanVisible = false;
@@ -446,7 +447,8 @@ export default {
      * 添加计划
      */
     async handleAddPlan(payload) {
-      if (this.currentCount >= this.limitValue) {
+      const result = await this.getPlanLimitCount();
+      if (result.currentCount >= result.limitValue) {
         this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
         return;
       }
@@ -499,26 +501,36 @@ export default {
     /**
      * 处理选项的点击事件
      */
-    handleOptionsClick(item, index) {
+    async handleOptionsClick(item, index) {
       const _this = this;
       const optMap = {
         0: () => {
           _this.showSummaryPreview = true;
         },
-        1: () => {
+        1: async () => {
           if (_this.activeClassType === "official") {
-            _this.copyOfficialPlanInfo = _this.currentPlanDetail;
-            _this.handleAddPlan(_this.currentPlanDetail.planGroupId);
+            const result = await _this.getPlanLimitCount();
+            if (result.currentCount >= result.limitValue) {
+              _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+              return;
+            }
+            _this.$nextTick(() => {
+              _this.copyOfficialPlanInfo = _this.currentPlanDetail;
+              _this.handleAddPlan(_this.currentPlanDetail.planGroupId);
+            });
           } else {
             _this.handleEditPlan();
           }
         },
-        2: () => {
-          if (this.currentCount >= this.limitValue) {
-            this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+        2: async () => {
+          const result = await _this.getPlanLimitCount();
+          if (result.currentCount >= result.limitValue) {
+            _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
             return;
           }
-          _this.showCopy = true;
+          _this.$nextTick(() => {
+            _this.showCopy = true;
+          });
         },
         3: () => {
           _this.showApplyCoach = true;
