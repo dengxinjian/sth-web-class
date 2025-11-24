@@ -381,14 +381,8 @@ export default {
       return result;
     },
     handleDelete() {
-      this.$confirm("确认删除该课程？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
-        this.handleClose();
-        this.$emit("delete", this.classItem.id);
-      });
+      this.handleClose();
+      this.$emit("delete", this.classItem.id);
     },
     handleEditSave(saveData, flag) {
       console.log(saveData, flag, "saveData, flag");

@@ -376,11 +376,17 @@ export default {
      * 删除课程
      */
     async handleDeleteClass(classId) {
-      const res = await classApi.deleteClass(classId);
-      if (res.success) {
-        this.$message.success("删除成功");
-        this.getClassList();
-      }
+      this.$confirm("确认删除该课程？", "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        const res = await classApi.deleteClass(classId);
+        if (res.success) {
+          this.$message.success("删除成功");
+          this.getClassList();
+        }
+      });
     },
     async handleUpdateClass(classData) {
       classApi.updateClass(classData).then((res) => {
