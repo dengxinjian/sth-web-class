@@ -402,7 +402,7 @@
                       </div>
                     </div>
                   </td>
-                  <td class="unit-cell">Kcal</td>
+                  <td class="unit-cell">kcal</td>
                 </tr>
               </tbody>
             </table>
