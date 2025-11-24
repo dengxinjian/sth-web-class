@@ -9,8 +9,8 @@
     custom-class="class-dialog"
   >
     <span slot="title"
-      >{{ scheduleType === "add" ? "新建" : "编辑" }}骑行课表 </span
-    >
+      >{{ scheduleType === "add" ? "新建" : "编辑" }}骑行课表
+    </span>
     <div class="basic-info">
       <div class="basic-info-item">
         <div class="basic-info-title">
@@ -1058,7 +1058,23 @@ export default {
         }),
       }).then((res) => {
         if (res.success) {
-          this.$emit("save", flag);
+          this.$emit(
+            "save",
+            {
+              id: this.classInfo.id,
+              classesTitle: this.classInfo.title,
+              classesGroupId: this.classInfo.groupId,
+              labels: this.classInfo.tags,
+              classesDate: this.classesDate + " 00:00:00",
+              sportType: "CYCLE",
+              classesJson: JSON.stringify({
+                ...this.classInfo,
+                timeline: this.timeline,
+                maxIntensity: this.maxIntensity,
+              }),
+            },
+            flag
+          );
           this.$message.success("课表保存成功");
         }
         if (flag) this.onCancel();

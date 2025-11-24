@@ -425,7 +425,11 @@ export default {
   methods: {
     handleSaveClassDetail(data) {
       console.log(data, "data", this.scheduleType);
-      if (this.scheduleType === "add" && data.classesTitle) {
+      if (!data.classesTitle || data.classesTitle === "") {
+        this.$message.error("课表标题不能为空");
+        return;
+      }
+      if (this.scheduleType === "add") {
         scheduleApi
           .createSchedule({
             classesTitle: data.classesTitle,
@@ -440,6 +444,7 @@ export default {
             if (res.success) {
               this.classDetailData = res.result;
               this.scheduleType = "edit";
+              this.getScheduleData();
               this.$message.success("课程保存成功");
             }
           });

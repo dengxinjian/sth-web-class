@@ -221,7 +221,15 @@ export default {
         classesJson: JSON.stringify({ ...this.form }),
       }).then((res) => {
         if (res.success) {
-          this.$emit("save", flag);
+          this.$emit("save",{
+            id: this.form.id,
+            classesTitle: this.form.title,
+            classesGroupId: this.form.groupId,
+            labels: this.form.tags,
+            classesDate: this.classesDate + " 00:00:00",
+            sportType: "OTHER",
+            classesJson: JSON.stringify({...this.form}),
+          }, flag);
           this.$message.success("课表保存成功");
         }
         if (flag) this.onCancel();
