@@ -109,22 +109,11 @@
         <el-input placeholder="请输入微信号" v-model="form.weChat" />
       </el-form-item>
 
-      <el-form-item label="描述" prop="description" v-if="!copyOfficialPlanInfo">
+      <el-form-item label="描述" prop="description">
         <el-input
           :rows="6"
           type="textarea"
           placeholder="请输入描述"
-          v-model="form.description"
-          :maxlength="500"
-          show-word-limit
-        />
-      </el-form-item>
-
-      <el-form-item label="概要" prop="description" v-if="copyOfficialPlanInfo">
-        <el-input
-          :rows="6"
-          type="textarea"
-          placeholder="请输入概要"
           v-model="form.description"
           :maxlength="500"
           show-word-limit
@@ -256,7 +245,7 @@ export default {
             ...this.form,
             ...val,
             planTitle: val.planTitle,
-            planGroupId: this.currentGroupId,
+            // planGroupId: this.currentGroupId,
             teamId: val.teamId,
             planSource: val.teamName ? `${val.teamName} - ${val.possessNickname}` : val.possessNickname,
             email: val.email,
