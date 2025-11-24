@@ -53,6 +53,7 @@
             />
           </el-select> -->
           <el-cascader
+            :key="cascaderKey"
             v-model="form.athleteIds"
             :options="teamGroupList"
             :props="memberProps"
@@ -254,6 +255,7 @@ export default {
       athletesList: [],
       members: [],
       loading: false,
+      cascaderKey: 0, // 用于强制级联选择器重新渲染
       memberProps: {
         multiple: true,
         emitPath: true,
@@ -308,26 +310,33 @@ export default {
         );
       }
     },
-    teamGroupList(newList) {
-      // 当 teamGroupList 更新时，验证 form.athleteIds 的值是否有效
-      if (newList && Array.isArray(newList) && this.form.athleteIds && this.form.athleteIds.length > 0) {
-        // 检查所有选中的值是否仍然存在于新的列表中
-        const isValid = this.form.athleteIds.every((path) => {
-          if (!Array.isArray(path) || path.length === 0) return false;
-          const [groupId, userId] = path;
-          const group = newList.find((item) => item && item.value === groupId);
-          if (!group || !group.children) return false;
-          return group.children.some((child) => child && child.value === userId);
-        });
-        if (!isValid) {
-          // 如果值无效，清空选择
-          this.$nextTick(() => {
-            this.form.athleteIds = [];
-            this.members = [];
-          });
-        }
-      }
-    },
+    // teamGroupList(newList) {
+    //   // 当 teamGroupList 更新时，验证 form.athleteIds 的值是否有效
+    //   if (
+    //     newList &&
+    //     Array.isArray(newList) &&
+    //     this.form.athleteIds &&
+    //     this.form.athleteIds.length > 0
+    //   ) {
+    //     // 检查所有选中的值是否仍然存在于新的列表中
+    //     const isValid = this.form.athleteIds.every((path) => {
+    //       if (!Array.isArray(path) || path.length === 0) return false;
+    //       const [groupId, userId] = path;
+    //       const group = newList.find((item) => item && item.value === groupId);
+    //       if (!group || !group.children) return false;
+    //       return group.children.some(
+    //         (child) => child && child.value === userId
+    //       );
+    //     });
+    //     if (!isValid) {
+    //       // 如果值无效，清空选择
+    //       this.$nextTick(() => {
+    //         this.form.athleteIds = [];
+    //         this.members = [];
+    //       });
+    //     }
+    //   }
+    // },
   },
   methods: {
     viewApplyHistory() {
@@ -423,11 +432,13 @@ export default {
                 value: member.triUserId,
               })),
             };
-          })
-          // .filter((item) => item != null && item.value != null); // 确保节点有效
+          });
+        // .filter((item) => item != null && item.value != null); // 确保节点有效
         this.teamGroupList = treeData;
         // 所有运动员列表，用于提交时筛选
-        this.originAthletesAll = treeData.map((item) => item.children || []).flat();
+        this.originAthletesAll = treeData
+          .map((item) => item.children || [])
+          .flat();
       });
     },
     getMembersList(teamId) {
@@ -440,6 +451,13 @@ export default {
     },
     onCancel() {
       this.innerVisible = false;
+      this.form = {
+        teamId: undefined,
+        athleteIds: [],
+        athleteType: 2,
+      };
+      this.members = [];
+      this.resetForm();
       this.$emit("cancel");
     },
     // 判断是否在结束日期之后
@@ -621,6 +639,9 @@ export default {
         athleteType: 2,
       };
       this.members = [];
+      this.teamGroupList = []; // 清空团队分组列表
+      // 更新 key 强制级联选择器重新渲染
+      this.cascaderKey += 1;
       this.$nextTick(() => {
         if (this.$refs.formRef) {
           this.$refs.formRef.clearValidate();
