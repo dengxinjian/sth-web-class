@@ -8,7 +8,9 @@
     :close-on-click-modal="false"
     custom-class="class-dialog"
   >
-    <span slot="title">编辑骑行课表</span>
+    <span slot="title"
+      >{{ scheduleType === "add" ? "新建" : "编辑" }}骑行课表 </span
+    >
     <div class="basic-info">
       <div class="basic-info-item">
         <div class="basic-info-title">
@@ -721,11 +723,19 @@ export default {
       type: Boolean,
       default: undefined,
     },
+    scheduleType: {
+      type: String,
+      default: "add",
+    },
     data: {
       type: Object,
       default: () => ({}),
     },
     triUserId: {
+      type: String,
+      default: "",
+    },
+    classesDate: {
       type: String,
       default: "",
     },
@@ -804,7 +814,16 @@ export default {
         } else {
           // 如果没有ID，说明是新增，重置表单
           this.resetForm();
+          this.getAthleticThreshold(this.classesDate);
         }
+      }
+    },
+    data(val) {
+      this.getTagList();
+      if (this.data.id) {
+        this.getClassInfo(this.data.id);
+      } else {
+        this.resetForm();
       }
     },
   },
@@ -825,16 +844,13 @@ export default {
       }
       return result;
     },
-    async getAthleticThreshold() {
+    async getAthleticThreshold(classesDate) {
       if (!this.triUserId) {
         console.warn("triUserId is empty, skip getAthleticThreshold");
         return;
       }
       console.log(this.data, "this.data.classesDate");
-      const res = await athleteApi.getUserProfile(
-        this.triUserId,
-        this.data.classesDate
-      );
+      const res = await athleteApi.getUserProfile(this.triUserId, classesDate);
       if (res.result && res.result.thresholdRecordList) {
         res.result.thresholdRecordList.forEach((item) => {
           switch (item.thresholdType) {
@@ -1011,25 +1027,24 @@ export default {
     },
     // 新增课程
     submitNewClass(flag) {
-      submitData({
-        url: "/api/classes/create",
-        classesTitle: this.classInfo.title,
-        classesGroupId: this.classInfo.groupId,
-        labels: this.classInfo.tags,
-        sportType: "CYCLE",
-        classesJson: JSON.stringify({
-          ...this.classInfo,
-          timeline: this.timeline,
-          maxIntensity: this.maxIntensity,
-        }),
-      }).then((res) => {
-        if (res.success) {
-          this.classInfo.id = res.result;
-          this.$emit("save", flag);
-          this.$message.success("课程保存成功");
-        }
-        if (flag) this.onCancel();
-      });
+      this.$emit(
+        "save",
+        {
+          classesTitle: this.classInfo.title,
+          classesGroupId: this.classInfo.groupId,
+          labels: this.classInfo.tags,
+          classesDate: this.classesDate + " 00:00:00",
+          sportType: "CYCLE",
+          classesJson: JSON.stringify({
+            ...this.classInfo,
+            timeline: this.timeline,
+            maxIntensity: this.maxIntensity,
+          }),
+          triUserId: this.triUserId,
+        },
+        flag
+      );
+      if (flag) this.onCancel();
     },
     // 更新课程
     submitUpdateClass(flag) {

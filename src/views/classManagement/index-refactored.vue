@@ -141,10 +141,16 @@
     <ClassDetailModal
       v-model="showClassDetailModal"
       :type="classSportType"
+      :scheduleType="scheduleType"
       :data="classDetailData"
+      :classesDate="addScheduleDate"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
-      @save="handleClassDetailSave"
+      @save="handleSaveClassDetail"
+      @cancel="
+        showClassDetailModal = false;
+        classDetailData = {};
+      "
     />
 
     <CopyClassFromOfficial
@@ -182,9 +188,15 @@
       :is-activity="isActivity"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
-      @close="showEditScheduleClass = false"
+      @close="
+        showEditScheduleClass = false;
+        classDetailData = {};
+      "
       @save="handleClassDetailSave"
-      @delete="handleDeleteClassSchedule"
+      @delete="
+        handleDeleteClassSchedule;
+        classDetailData = {};
+      "
     />
 
     <!-- 健康数据查看弹窗 -->
@@ -346,6 +358,7 @@ export default {
       // 对话框数据
       classModalData: { title: "", groupId: "" },
       classModalDataType: "",
+      scheduleType: "add",
       currentGroup: { id: "", classesGroupName: "" },
       moveGroupId: "",
       moveClassId: "",
@@ -407,6 +420,31 @@ export default {
     }
   },
   methods: {
+    handleSaveClassDetail(data) {
+      console.log(data, "data", this.scheduleType);
+      if (this.scheduleType === "add" && data.classesTitle) {
+        scheduleApi
+          .createSchedule({
+            classesTitle: data.classesTitle,
+            classesGroupId: data.classesGroupId,
+            labels: data.labels,
+            classesDate: this.addScheduleDate + " 00:00:00",
+            sportType: data.sportType,
+            classesJson: data.classesJson,
+            triUserId: this.selectedAthletic,
+          })
+          .then((res) => {
+            if (res.success) {
+              this.classDetailData = res.result;
+              this.scheduleType = "edit";
+              this.$message.success("课程保存成功");
+            }
+          });
+        return;
+      }
+      this.scheduleType = "add";
+      this.getScheduleData();
+    },
     handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
@@ -427,11 +465,7 @@ export default {
       let priority = eventItem.priority;
       if (typeof priority === "string") {
         priority =
-          priority === "PRIMARY"
-            ? 1
-            : priority === "SECONDARY"
-              ? 2
-              : 3;
+          priority === "PRIMARY" ? 1 : priority === "SECONDARY" ? 2 : 3;
       } else if (typeof priority !== "number") {
         priority = 1; // 默认值
       }
@@ -516,8 +550,9 @@ export default {
      */
     handleEventConfirm(data) {
       console.log("赛事数据:", data);
-      data.competitionTime = this.addScheduleDate;
       if (!this.isEditMode) {
+        data.competitionTime = this.addScheduleDate;
+
         competitionApi
           .createCompetition(data, this.selectedAthletic)
           .then(() => {
@@ -626,8 +661,8 @@ export default {
         ...newData,
         triUserId: this.selectedAthletic,
       });
-
       if (res.success) {
+        this.classModalData = res.result;
         this.getScheduleData();
         this.getClassList();
       }
@@ -1625,7 +1660,6 @@ export default {
       if (this.classModalDataType !== "addSchedule") {
         this.classModalDataType = "add";
       }
-      console.log(item, "item");
       var Map = {
         swim: "SWIM",
         strength: "STRENGTH",
@@ -1635,6 +1669,15 @@ export default {
         ride: "CYCLE",
         run: "RUN",
       };
+
+      if (this.classModalDataType === "addSchedule") {
+        this.showClassDetailModal = true;
+        this.classSportType = Map[item.key];
+        console.log(this.addScheduleDate, "this.addScheduleDate");
+        return;
+      }
+      console.log(item, "item");
+
       this.classModalData.sportType = Map[item.key];
       this.showAddClassModal = true;
       this.showSportTypeModal = false;

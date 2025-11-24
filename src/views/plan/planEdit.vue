@@ -486,7 +486,6 @@ export default {
 
       const weekIndex = this.selectedDay.weekNumber - 1;
       const globalDay = this.selectedDay.globalDay;
-
       // 确保周数据存在
       if (!this.planData.dayDetails[weekIndex]) {
         this.$set(this.planData.dayDetails, weekIndex, []);
@@ -512,9 +511,11 @@ export default {
         this.$set(dayData, "details", []);
       }
 
-      // 添加课程到 details 数组
-      dayData.details.push(saveData);
-      console.log(this.planData.dayDetails, "this.planData.dayDetails");
+      if (this.classModalDataType === "add") {
+        dayData.details.push(saveData);
+      } else {
+        this.$set(dayData.details, dayData.details.length - 1, saveData);
+      }
 
       if (flag) {
         this.showAddClassModal = false;
@@ -524,6 +525,8 @@ export default {
       if (this.CreatePlanCourseDialogData.mode === "SAVE") {
         console.log(saveData, "saveData");
         this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
+      } else {
+        this.classModalDataType = "edit";
       }
       // 触发响应式更新
       this.$forceUpdate();
@@ -534,11 +537,11 @@ export default {
       console.log(data, "data");
       // data.classesJson = JSON.stringify(data.classesJson);
       if (this.classModalDataType === "add") {
+        this.classModalDataType = "edit";
         classApi.createClass(data).then((res) => {
           if (res.success) {
             this.$message.success("课程保存成功");
             this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
-            this.classModalDataType = "edit";
             this.getClassList();
           }
         });
@@ -546,7 +549,6 @@ export default {
         classApi.updateClass(data).then((res) => {
           if (res.success) {
             this.$message.success("课程保存成功");
-            this.classModalDataType = "edit";
             this.getClassList();
           } else {
             this.$message.error(res.message);

@@ -263,11 +263,9 @@
                         size="small"
                         placeholder=""
                         :min="0"
+                        :step="actualData.distanceUnit === 'km' ? 0.01 : 1"
                         :controls="false"
                         :disabled="isInputDisabled"
-                        :precision="
-                          actualData.distanceUnit === 'm' ? 0 : undefined
-                        "
                         @input="handleDistanceInput"
                       />
                       <div class="action-buttons">
@@ -703,12 +701,13 @@ export default {
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
               distanceUnit:
-                this.classData.sportType === "SWIM" ||
+                this.classData.distanceUnit ||
+                (this.classData.sportType === "SWIM" ||
                 this.classData.sportType === 3
                   ? "m"
-                  : "km",
+                  : "km"),
             };
-
+            console.log(this.classData, "classData");
             this.defaultData = {
               duration: this.classData.duration || "00:00:00",
               activityDuration:
@@ -719,19 +718,27 @@ export default {
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
               distanceUnit:
-                this.classData.sportType === "SWIM" ||
+                this.classData.distanceUnit ||
+                (this.classData.sportType === "SWIM" ||
                 this.classData.sportType === 3
                   ? "m"
-                  : "km",
+                  : "km"),
             };
-            if (
-              this.classData.sportType === "SWIM" ||
-              this.classData.sportType === 3
-            ) {
+            // if (
+            //   this.classData.sportType === "SWIM" ||
+            //   this.classData.sportType === 3
+            // ) {
+            //   this.actualData.distance = this.classData.preciseDistance;
+            //   this.defaultData.distance = this.classData.preciseDistance;
+            // } else {
+            //   this.actualData.distance = this.classData.distance;
+            // }
+            if (this.classData.distanceUnit === "m") {
               this.actualData.distance = this.classData.preciseDistance;
               this.defaultData.distance = this.classData.preciseDistance;
             } else {
-              this.actualData.distance = this.classData.distance;
+              this.actualData.distance = this.classData.preciseDistance / 1000;
+              this.defaultData.distance = this.classData.preciseDistance / 1000;
             }
             console.log(this.actualData, "this.actualData");
           }
@@ -856,7 +863,7 @@ export default {
             activityDuration: this.translateSecondsToFormat(
               this.sportDetail.netDuration
             ),
-            distance: parseFloat(this.sportDetail.distance.toFixed(0)),
+            distance: parseFloat(this.sportDetail.distance),
             sthValue: this.sportDetail.sthValue,
             calories: this.sportDetail.calories,
             distanceUnit: this.sportDetail.sportType === 3 ? "m" : "km",
@@ -1049,6 +1056,13 @@ export default {
     },
     saveClassSchedule(flag) {
       const isModified = this.isActualDataModified();
+      let distance = null;
+      if (this.actualData.distance) {
+        distance =
+          this.actualData.distanceUnit === "km"
+            ? this.actualData.distance * 1000
+            : this.actualData.distance;
+      }
       submitData({
         url: "/api/classSchedule/updateClassSchedule",
         id: this.isActivity
@@ -1058,10 +1072,7 @@ export default {
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
         duration: hhmmssToSeconds(this.actualData.duration) || null,
-        distance:
-          this.actualData.distanceUnit === "km"
-            ? this.actualData.distance * 1000
-            : this.actualData.distance || null,
+        distance: distance,
         sthValue: this.actualData.sthValue || null,
         calories: this.actualData.calories || null,
         distanceUnit: this.actualData.distanceUnit || null,

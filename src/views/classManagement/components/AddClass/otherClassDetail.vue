@@ -204,7 +204,6 @@ export default {
       }
     },
     data(val) {
-      this.getTagList();
       if (this.data.id && this.originalType === "my") {
         this.getClassInfo(this.data.id);
       } else if (this.originalType === "my") {

@@ -7,7 +7,7 @@
     class="add-swim-class-dialog"
     :close-on-click-modal="false"
   >
-    <span slot="title">编辑其他运动课表</span>
+    <span slot="title">{{ scheduleType === "add" ? "新建" : "编辑" }}其他运动课表</span>
 
     <div class="form-section">
       <el-form :model="form" label-width="60px">
@@ -117,9 +117,17 @@ export default {
       type: Boolean,
       default: undefined,
     },
+    scheduleType: {
+      type: String,
+      default: "add",
+    },
     data: {
       type: Object,
       default: () => ({}),
+    },
+    classesDate: {
+      type: String,
+      default: "",
     },
   },
   data() {
@@ -136,7 +144,7 @@ export default {
           duration: "",
           sth: "",
           summary: "",
-          tags: "",
+          tags: [],
         },
         this.data || {}
       ),
@@ -171,6 +179,13 @@ export default {
         }
       }
     },
+    data(val) {
+      if (this.data.id) {
+        this.getClassInfo(this.data.id);
+      } else {
+        this.resetForm();
+      }
+    },
   },
   methods: {
     // 编辑进入弹框时，查询课程数据
@@ -187,20 +202,16 @@ export default {
     },
     // 新增课程
     submitNewClass(flag) {
-      submitData({
-        url: "/api/classes/create",
+      this.$emit("save", {
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
+        labels: this.form.tags,
+        classesDate: this.classesDate + " 00:00:00",
         sportType: "OTHER",
-        classesJson: JSON.stringify({ ...this.form }),
-      }).then((res) => {
-        if (res.success) {
-          this.form.id = res.result;
-          this.$emit("save", flag);
-          this.$message.success("课程保存成功");
-        }
-        if (flag) this.onCancel();
+        classesJson: JSON.stringify({...this.form}),
+        triUserId: this.triUserId,
       });
+      if (flag) this.onCancel();
     },
     // 更新课程
     submitUpdateClass(flag) {

@@ -1552,13 +1552,6 @@ export default {
   margin-bottom: 5px;
 }
 
-::v-deep .class-drap-handle {
-  cursor: grab;
-
-  &:active {
-    cursor: grabbing;
-  }
-}
 .context-menu {
   position: fixed;
   background: white;

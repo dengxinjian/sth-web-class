@@ -250,9 +250,7 @@ export default {
         return;
       }
       this.hideContextMenu();
-      if (this.type === "view") {
-        this.$emit("view-class", this.eventItem);
-      }
+      this.$emit("edit", this.eventItem);
     },
     hideContextMenu() {
       this.contextMenuVisible = false;

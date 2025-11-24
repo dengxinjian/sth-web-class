@@ -89,6 +89,8 @@
             <el-input
               v-model="formData.customDistance"
               placeholder="请输入距离"
+              :step="formData.competitionDistanceUnit === 'km' ? 0.001 : 1"
+              :precision="formData.competitionDistanceUnit === 'km' ? 3 : 0"
               @input="handleCustomDistanceInput"
             >
               <template slot="append">
@@ -96,6 +98,7 @@
                   v-model="formData.competitionDistanceUnit"
                   placeholder="请选择距离单位"
                   style="width: 80px"
+                  @change="handleDistanceUnitChange"
                 >
                   <el-option label="km" value="km" />
                   <el-option label="m" value="m" />
@@ -211,6 +214,7 @@ export default {
       distanceOptions: [],
       distancesByType: {},
       showCustomDistance: false,
+      lastDistanceUnit: "km",
     };
   },
   watch: {
@@ -264,6 +268,7 @@ export default {
       };
       this.showCustomDistance = false;
       this.distanceOptions = [];
+      this.lastDistanceUnit = "km";
       this.$nextTick(() => {
         this.$refs.eventForm && this.$refs.eventForm.clearValidate();
       });
@@ -308,16 +313,16 @@ export default {
 
       if (distanceValue === "OTHER") {
         this.showCustomDistance = true;
-        this.formData.customDistance =
-          data.competitionDistanceValue /
-            (data.competitionDistanceUnit === "km" ? 1000 : 1) ||
-          this.extractDistanceNumber(data.competitionDistanceValue);
+        this.formData.customDistance = this.extractDistanceNumber(
+          data.competitionDistanceValue
+        );
       } else {
         this.showCustomDistance = false;
         this.formData.customDistance = "";
       }
       this.formData.competitionDistanceUnit =
         data.competitionDistanceUnit || "km";
+      this.lastDistanceUnit = this.formData.competitionDistanceUnit;
     },
     parseLocationString(locationStr) {
       // 将字符串格式的地点（如：湖北/武汉）转换为级联选择器的 value 数组
@@ -371,6 +376,7 @@ export default {
       } else {
         this.formData.competitionDistanceUnit = "km";
       }
+      this.lastDistanceUnit = this.formData.competitionDistanceUnit;
 
       // 根据比赛类型更新距离选项
       this.updateDistanceOptions(value);
@@ -477,9 +483,38 @@ export default {
       const match = distanceStr.match(/[\d.]+/);
       return match ? match[0] : "";
     },
+    handleDistanceUnitChange(newUnit) {
+      const previousUnit = this.lastDistanceUnit || "km";
+      this.lastDistanceUnit = newUnit;
+
+      if (!this.formData.customDistance) {
+        this.formData.customDistance = "";
+        return;
+      }
+
+      const numericValue = parseFloat(this.formData.customDistance);
+      if (!Number.isFinite(numericValue) || numericValue <= 0) {
+        this.formData.customDistance = "";
+        return;
+      }
+
+      if (newUnit === "m") {
+        const meters =
+          previousUnit === "km" ? numericValue * 1000 : numericValue;
+        this.formData.customDistance = String(Math.trunc(meters));
+      } else {
+        const kilometers =
+          previousUnit === "m" ? numericValue / 1000 : numericValue;
+        const normalizedKm = Math.round(kilometers * 100) / 100;
+        this.formData.customDistance =
+          normalizedKm > 0 ? normalizedKm.toString() : "";
+      }
+
+      this.handleCustomDistanceInput();
+    },
     handleCustomDistanceInput() {
       const rawValue = this.formData.customDistance;
-      const strValue =
+      let strValue =
         rawValue === undefined || rawValue === null ? "" : String(rawValue);
 
       if (!strValue) {
@@ -487,29 +522,53 @@ export default {
         return;
       }
 
-      const match = strValue.match(/^(\d+(?:\.\d{0,2})?)/);
+      const isKilometer = this.formData.competitionDistanceUnit === "km";
+
+      // 允许以 "." 开头的输入，自动补全为 "0."
+      if (isKilometer && strValue.startsWith(".")) {
+        strValue = `0${strValue}`;
+      }
+
+      const match = strValue.match(
+        isKilometer ? /^(\d+(?:\.\d{0,3})?)/ : /^(\d+)/
+      );
       const sanitized = match ? match[1] : "";
 
       if (!sanitized) {
         this.formData.customDistance = "";
-        this.$message.error("请输入有效的距离值，小数点后最多2位");
+        this.$message.error(
+          isKilometer
+            ? "请输入有效的距离值，小数点后最多3位"
+            : "请输入有效的整数距离值"
+        );
         return;
       }
 
       // 如果用户刚输入到 "."，先允许继续输入
-      if (sanitized.endsWith(".")) {
+      if (isKilometer && sanitized.endsWith(".")) {
         this.formData.customDistance = sanitized;
         return;
       }
 
       const num = parseFloat(sanitized);
       if (isNaN(num) || num <= 0) {
+        // 允许用户暂时输入 0，方便继续补充小数或其他数字
+        if (!isNaN(num) && num === 0) {
+          this.formData.customDistance = sanitized;
+          return;
+        }
         this.formData.customDistance = "";
-        this.$message.error("请输入有效的距离值，小数点后最多2位");
+        this.$message.error(
+          isKilometer
+            ? "请输入有效的距离值，小数点后最多3位"
+            : "请输入有效的整数距离值"
+        );
         return;
       }
 
-      this.formData.customDistance = sanitized;
+      this.formData.customDistance = isKilometer
+        ? sanitized
+        : String(Math.trunc(num));
     },
     handleClose() {
       this.innerVisible = false;

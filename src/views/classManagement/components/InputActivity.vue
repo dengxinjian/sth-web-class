@@ -16,14 +16,6 @@
       label-position="left"
       class="input-activity-form"
     >
-      <el-form-item label="运动日期：">
-        <el-input
-          v-model="formData.activityDate"
-          disabled
-          class="is-readonly"
-        />
-      </el-form-item>
-
       <el-form-item label="运动类型：" prop="activityType">
         <el-select
           v-model="formData.activityType"
@@ -39,6 +31,21 @@
             :value="item.value"
           />
         </el-select>
+      </el-form-item>
+      <el-form-item label="运动时间：">
+        <!-- <el-input
+          v-model="formData.activityDate"
+          disabled
+          class="is-readonly"
+        /> -->
+        <el-date-picker
+          v-model="formData.activityDate"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          format="yyyy-MM-dd HH:mm:ss"
+          type="datetime"
+          placeholder="选择日期时间"
+        >
+        </el-date-picker>
       </el-form-item>
 
       <el-form-item label="总时长：" prop="duration">
@@ -91,20 +98,26 @@
           </el-select> -->
         </div>
       </el-form-item>
+      <el-form-item label="消耗：" prop="calories">
+        <el-input
+          v-model.number="formData.calories"
+          placeholder="请输入消耗（千卡）"
+          type="number"
+          :min="0"
+          :step="1"
+          :step-strictly="true"
+          :controls="false"
+        >
+          <template slot="append">
+            <span>kcal</span>
+          </template>
+        </el-input>
+      </el-form-item>
 
       <el-form-item label="STH：" prop="sthValue">
         <el-input
           v-model.number="formData.sthValue"
           placeholder="请输入 STH"
-          type="number"
-          :min="0"
-        />
-      </el-form-item>
-
-      <el-form-item label="消耗：" prop="calories">
-        <el-input
-          v-model.number="formData.calories"
-          placeholder="请输入消耗（千卡）"
           type="number"
           :min="0"
         />
@@ -280,7 +293,7 @@ export default {
       this.$refs.activityForm.validate((valid) => {
         if (!valid) return;
         const payload = {
-          activityDate: this.formData.activityDate + " 00:00:00",
+          activityDate: this.formData.activityDate,
           duration: this.parseDurationToSeconds(this.formData.duration),
           activityDuration: this.parseDurationToSeconds(
             this.formData.activityDuration

@@ -6,7 +6,9 @@
       :visible="visible"
       :value="value"
       :data="data"
+      :scheduleType="scheduleType"
       :triUserId="triUserId"
+      :classesDate="classesDate"
       v-on="$listeners"
     />
   </div>
@@ -59,7 +61,15 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    scheduleType: {
+      type: String,
+      default: "add",
+    },
     triUserId: {
+      type: String,
+      default: "",
+    },
+    classesDate: {
       type: String,
       default: "",
     },
