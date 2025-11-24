@@ -176,9 +176,9 @@ export default {
     // 判断路由是否有值
     if (Object.keys(this.$route.query).length > 0) {
       const { id, planGroupId, type } = this.$route.query;
-      if (id && planGroupId) {
-        this.currentPlanId = id;
-        this.currentPlanGroupId = planGroupId;
+      if (id) {
+        this.currentPlanId = parseInt(id);
+        this.currentPlanGroupId = parseInt(planGroupId);
         this.getPlanDetail(id);
         this.getPlanDayDetail(id);
       }
@@ -522,7 +522,9 @@ export default {
           if (_this.activeClassType === "official") {
             const result = await _this.getPlanLimitCount();
             if (result.currentCount >= result.limitValue) {
-              _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+              _this.$message.error(
+                "您当前的计划数量已达上限，无法添加更多计划"
+              );
               return;
             }
             _this.$nextTick(() => {
@@ -530,8 +532,8 @@ export default {
                 ..._this.currentPlanDetail,
                 planGroupId: null,
                 teamId: _this.ownerTeams[0]?.id || null,
-                ownerName: localStorage.getItem('name').split('#')[0],
-                ownerId: localStorage.getItem('triUserId')
+                ownerName: localStorage.getItem("name").split("#")[0],
+                ownerId: localStorage.getItem("triUserId"),
               };
               _this.handleAddPlan();
             });
@@ -591,10 +593,20 @@ export default {
           // 调用删除分组API
           planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
             if (res.success) {
-              this.$message.success("删除成功");
-              this.getPlanLimitCount();
-              this.restPageInfo();
-              this.getPlanList();
+              _this.$message.success("删除成功");
+              const currentPlanId = String(_this.currentPlanDetail.id);
+              const queryPlanId = _this.$route.query?.id;
+              if (queryPlanId && String(queryPlanId) === currentPlanId) {
+                _this.restPageInfo();
+                // 删除成功后，刷新页面，并清除当前路由参数，防止页面缓存导致数据不更新
+                _this.$router.replace({
+                  path: "/timeTable/plan",
+                });
+              } else {
+                _this.getPlanLimitCount();
+                _this.restPageInfo();
+                _this.getPlanList();
+              }
             }
           });
         });
