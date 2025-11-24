@@ -547,7 +547,7 @@ export default {
         if (!classItem) {
           return 0;
         }
-
+        console.log('classItem-时长',classItem.classesJson,index)
         const classesJson = parseClassesJson(classItem.classesJson);
         if (!classesJson || !isValidDuration(classesJson.duration)) {
           return 0;
@@ -1055,7 +1055,8 @@ export default {
 
       // 计算单个课程项的时长
       const calculateClassDuration = (classItem) => {
-        if (!classItem || classItem.sportType !== "OTHER") {
+        const allowedSportTypes = ["OTHER", "REMARK", "REST"];
+        if (!classItem || !allowedSportTypes.includes(classItem.sportType)) {
           return 0;
         }
 
