@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
   >
     <div class="add-class-img">
-      <img src="~@/assets/addClass/addClass.png" alt="" />
+      <img :src="currentIcon" alt="" />
     </div>
     <div class="type-grid">
       <div
@@ -80,6 +80,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isSchedule: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -94,6 +98,13 @@ export default {
         { key: "run", name: "跑步" },
       ],
     };
+  },
+  computed: {
+    currentIcon() {
+      return this.isSchedule
+        ? require("@/assets/addClass/type-title.png")
+        : require("@/assets/addClass/addClass.png");
+    },
   },
   watch: {
     visible(val) {
@@ -115,10 +126,12 @@ export default {
     onSelect(item) {
       this.$emit("select", { key: item.key, name: item.name });
       this.innerVisible = false;
+      this.$emit("cancel");
     },
     onSelectEvent() {
       this.$emit("addEvent");
       this.innerVisible = false;
+      this.$emit("cancel");
     },
   },
 };

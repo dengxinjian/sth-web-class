@@ -95,8 +95,10 @@
     <SportTypeModal
       v-model="showSportTypeModal"
       :isClass="isClass"
+      :isSchedule="isSchedule"
       @select="onSelectSportType"
       @addEvent="handleAddEvent"
+      @cancel="handleCancelSportType"
     />
 
     <SportDetailModal
@@ -376,6 +378,7 @@ export default {
       copyClassFromOfficialData: {},
       addGroupId: "",
       isClass: true,
+      isSchedule: false,
       // 查看课程
       showViewClassCard: false,
       showEditScheduleClass: false,
@@ -612,6 +615,7 @@ export default {
       this.showSportTypeModal = true;
       this.classModalData = { title: "" };
       this.isClass = false;
+      this.isSchedule = true;
       console.log(date, "date");
     },
     async handlePasteClass(date, classItem) {
@@ -1681,6 +1685,11 @@ export default {
       this.classModalData.sportType = Map[item.key];
       this.showAddClassModal = true;
       this.showSportTypeModal = false;
+    },
+
+    handleCancelSportType() {
+      this.showSportTypeModal = false;
+      this.isSchedule = false;
     },
 
     /**
