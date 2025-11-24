@@ -542,7 +542,7 @@ export default {
       this.$store.dispatch("plan/savePlanData", params);
       // 跳转到 planEdit 页面
       this.$router.push({
-        path: "/timeTable/plan/add",
+        path: "/plan/add",
         query: {
           type: "edit",
         },

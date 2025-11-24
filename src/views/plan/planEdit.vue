@@ -30,6 +30,7 @@
       />
     </div>
     <ViewClassCard
+      class="view-class-card"
       :visible="showViewClassCard"
       :class-item="classModalData"
       :active-class-type="activeClassType"
@@ -39,6 +40,7 @@
       @copy="handleCopyClassFromOfficial"
       @save="handleUpdateClass"
       type="edit"
+      dialog-margin-left="260px"
     />
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
@@ -917,8 +919,7 @@ function clampIndex(index, length) {
 
 .plan-container {
   display: flex;
-  height: 100%;
-  max-height: calc(100vh - 60px);
+  height: 100vh;
   overflow-y: hidden;
   overflow-x: auto;
 
@@ -943,7 +944,6 @@ function clampIndex(index, length) {
   .type-change {
     flex: 0 0 260px;
     height: 100vh;
-    max-height: calc(100vh - 60px);
     background-color: #f8f8f8;
     overflow-y: auto;
     overflow-x: hidden;

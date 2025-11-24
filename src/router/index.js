@@ -6,7 +6,7 @@ Vue.use(Router);
 // 环境配置
 const config = {
   development: {
-    loginComponent: () => import("@/views/login/index")
+    loginComponent: () => import("@/views/login/index"),
   },
   staging: {
     loginComponent: () => import("@/views/login-wx/index"),
@@ -177,18 +177,17 @@ export const asyncRoutes = [
         meta: { title: "计划管理" },
       },
       {
-        path: "plan/add",
-        component: () => import("@/views/plan/planEdit.vue"),
-        meta: { title: "计划管理" },
-      },
-      {
         path: "/class-management-test",
         component: () => import("@/views/classManagement/index-refactored.vue"),
         meta: { title: "课程管理（测试）", icon: "education" },
       },
     ],
   },
-
+  {
+    path: "/plan/add",
+    component: () => import("@/views/plan/planEdit.vue"),
+    meta: { title: "计划管理" },
+  },
   // {
   //   path: "/systemManage",
   //   component: Layout,

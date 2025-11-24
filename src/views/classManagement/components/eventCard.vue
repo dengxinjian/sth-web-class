@@ -48,7 +48,6 @@
                 <el-button
                   type="text"
                   icon="el-icon-scissors"
-                  v-if="isPlan"
                   @click.stop="handleCut"
                 >
                   剪切
@@ -56,7 +55,6 @@
                 <el-button
                   type="text"
                   icon="el-icon-crop"
-                  v-if="isPlan"
                   @click.stop="handleCopy"
                 >
                   复制
@@ -95,11 +93,11 @@
           <i class="el-icon-edit"></i>
           编辑
         </div>
-        <div class="context-menu-item" v-if="isPlan" @click.stop="handleCut">
+        <div class="context-menu-item" @click.stop="handleCut">
           <i class="el-icon-scissors"></i>
           剪切
         </div>
-        <div class="context-menu-item" v-if="isPlan" @click.stop="handleCopy">
+        <div class="context-menu-item" @click.stop="handleCopy">
           <i class="el-icon-crop"></i>
           复制
         </div>
@@ -402,7 +400,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;

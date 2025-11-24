@@ -60,6 +60,8 @@
         @edit-activity="handleEditActivity"
         @paste-class="handlePasteClass"
         @cut-class="handleCutClass"
+        @paste-event="handlePasteEvent"
+        @cut-event="handleCutEvent"
         @view-health-data="handleViewHealthData"
         @add-schedule="handleAddSchedule"
         @event-detail="handleEventDetail"
@@ -411,6 +413,80 @@ export default {
       this.handlePasteClass(classesDate, classItem);
       this.handleDeleteClassSchedule(classItem.id, true);
     },
+    /**
+     * 粘贴赛事
+     */
+    async handlePasteEvent(date, eventItem) {
+      console.log(date, eventItem, "handlePasteEvent date, eventItem");
+      if (!eventItem) {
+        this.$message.error("赛事数据无效");
+        return;
+      }
+      // 参照 addEvent.vue 的参数构建方式
+      // 处理 priority：转换为数字格式
+      let priority = eventItem.priority;
+      if (typeof priority === "string") {
+        priority =
+          priority === "PRIMARY"
+            ? 1
+            : priority === "SECONDARY"
+              ? 2
+              : 3;
+      } else if (typeof priority !== "number") {
+        priority = 1; // 默认值
+      }
+
+      // 处理 competitionDistanceValue：确保是正确的数值
+      let competitionDistanceValue = eventItem.competitionDistanceValue;
+      if (typeof competitionDistanceValue === "string") {
+        competitionDistanceValue = parseFloat(competitionDistanceValue) || 0;
+      }
+      // 如果单位是 km，需要转换为米（但这里应该保持原值，因为 API 可能已经处理）
+      // 根据 addEvent.vue，如果单位是 km，customDistance * 1000，但这里 eventItem 应该已经是正确的值
+
+      // 构建提交数据（按照 addEvent.vue 的格式）
+      const submitData = {
+        competitionDistance: eventItem.competitionDistance, // displayValue
+        competitionLocation: eventItem.competitionLocation, // 字符串格式（如：湖北/武汉）
+        competitionName: eventItem.competitionName,
+        competitionType: eventItem.competitionType, // displayValue
+        competitionDistanceValue: competitionDistanceValue,
+        competitionDistanceUnit: eventItem.competitionDistanceUnit || "km",
+        priority: priority,
+        competitionTime: date, // 使用 competitionTime 设置新日期
+      };
+
+      try {
+        await competitionApi.createCompetition(
+          submitData,
+          this.selectedAthletic
+        );
+        this.$message.success("赛事粘贴成功");
+        this.getScheduleData();
+      } catch (err) {
+        const message = err?.message || err || "赛事粘贴失败";
+        this.$message.error(message);
+      }
+    },
+    /**
+     * 剪切赛事（粘贴后删除原位置）
+     */
+    async handleCutEvent(date, eventItem, cutEventInfo) {
+      console.log(date, eventItem, cutEventInfo, "handleCutEvent");
+      // 先粘贴
+      await this.handlePasteEvent(date, eventItem);
+      // 然后删除原位置的赛事
+      if (cutEventInfo && cutEventInfo.eventItem && cutEventInfo.eventItem.id) {
+        try {
+          await competitionApi.deleteCompetition(cutEventInfo.eventItem.id);
+          this.$message.success("赛事剪切成功");
+          this.getScheduleData();
+        } catch (err) {
+          const message = err?.message || err || "删除原赛事失败";
+          this.$message.error(message);
+        }
+      }
+    },
     handleInputActivitySave(data) {
       console.log(data, "data");
       data.triUserId = this.selectedAthletic;
@@ -506,6 +582,7 @@ export default {
       console.log(date, classItem, "date, classItem");
       await this.getAthleticThreshold(this.selectedAthletic, date);
       const newData = JSON.parse(JSON.stringify(classItem));
+      newData.classesJson = parseClassesJson(newData.classesJson);
       newData.classesDate = date + " 00:00:00";
       // 根据运动类型计算阈值
       if (newData.sportType === "RUN") {
@@ -1566,6 +1643,7 @@ export default {
      * 保存各类型课程
      */
     onSaveAddClass(saveData, flag) {
+      console.log(saveData, "saveData");
       if (this.classModalDataType === "add") {
         classApi.createClass(saveData).then((res) => {
           if (res.success) {

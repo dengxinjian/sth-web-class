@@ -38,7 +38,7 @@
                   )
                 "
               >
-                <draggable
+                <!-- <draggable
                   :key="`draggable-events-${item.weekIndex}-${boxIndex}`"
                   :list="
                     getDayEventsArray(
@@ -70,7 +70,7 @@
                   @start="handleDragStart"
                   @end="handleEventDragEnd"
                   @clone="handleEventDragEnd"
-                >
+                > -->
                   <EventCard
                     v-for="(eventItem, eventIndex) in getDayEventsArray(
                       item.weekData,
@@ -111,7 +111,7 @@
                       )
                     "
                   />
-                </draggable>
+                <!-- </draggable> -->
                 <draggable
                   :key="`draggable-${item.weekIndex}-${boxIndex}`"
                   :list="
@@ -955,7 +955,7 @@ export default {
       const viewportHeight =
         window.innerHeight || document.documentElement.clientHeight;
       // 减去头部高度（Planned Schedule 头部大约80px）
-      const headerHeight = 120;
+      const headerHeight = 60;
       // 计算可用高度
       const availableHeight = viewportHeight - headerHeight;
       // 最小高度为400px
@@ -1069,6 +1069,7 @@ export default {
       this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
     },
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
+      console.log("handleEditClass-classItem-1", classItem);
       this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
     },
     handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
@@ -1157,6 +1158,14 @@ export default {
     handleCopyClass(classItem) {
       this.copiedClass = { ...classItem };
       this.hasCopiedClass = true;
+      // 清除剪切状态，因为复制操作会覆盖剪切操作
+      this.cutClass = {
+        isCut: false,
+        classItem: null,
+        classIndex: null,
+        weekNumber: null,
+        globalDay: null,
+      };
       this.$message({
         message: "课程已复制，右键点击目标日期可粘贴",
         type: "success",
@@ -1191,6 +1200,14 @@ export default {
       const { id, ...eventData } = eventItem;
       this.copiedEvent = { ...eventData };
       this.hasCopiedEvent = true;
+      // 清除剪切状态，因为复制操作会覆盖剪切操作
+      this.cutEvent = {
+        isCut: false,
+        eventItem: null,
+        eventIndex: null,
+        weekNumber: null,
+        globalDay: null,
+      };
       this.$message({
         message: "赛事已复制，右键点击目标日期可粘贴",
         type: "success",
@@ -1547,7 +1564,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;
