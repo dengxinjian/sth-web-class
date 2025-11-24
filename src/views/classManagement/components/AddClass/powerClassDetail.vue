@@ -239,6 +239,16 @@ export default {
         }
       }
     },
+    data(val) {
+      this.getTagList();
+      if (this.data.id && this.originalType === "my") {
+        this.getClassInfo(this.data.id);
+      } else if (this.originalType === "my") {
+        this.resetForm();
+      } else {
+        this.form = this.data.classesJson;
+      }
+    },
   },
   methods: {
     // 获取标签列表
@@ -282,6 +292,7 @@ export default {
     },
     // 更新课程
     submitUpdateClass(flag) {
+      console.log(this.form, "this.form");
       const saveData = {
         id: this.form.id,
         classesTitle: this.form.title,

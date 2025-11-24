@@ -240,6 +240,16 @@ export default {
         }
       }
     },
+    data(val) {
+      this.getTagList();
+      if (this.data.id && this.originalType === "my") {
+        this.getClassInfo(this.data.id);
+      } else if (this.originalType === "my") {
+        this.resetForm();
+      } else {
+        this.form = this.data.classesJson;
+      }
+    },
   },
   methods: {
     // 获取标签列表

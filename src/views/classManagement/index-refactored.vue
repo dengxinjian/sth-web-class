@@ -1648,6 +1648,8 @@ export default {
         classApi.createClass(saveData).then((res) => {
           if (res.success) {
             this.$message.success("课程保存成功");
+            this.classModalData = res.result;
+            this.classModalDataType = "edit";
             if (flag) this.showAddClassModal = false;
             this.getClassList();
           } else {

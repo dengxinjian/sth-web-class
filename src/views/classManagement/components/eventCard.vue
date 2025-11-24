@@ -25,7 +25,7 @@
             <div class="sport-type-icon">
               <img
                 class="image-icon"
-                src="~@/assets/addClass/eventIcon.png"
+                :src="getClassImageIcon(eventItem.priority)"
                 alt=""
               />
             </div>
@@ -158,6 +158,15 @@ export default {
     document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
+    getClassImageIcon (priority) {
+      if (priority === "PRIMARY") {
+        return require("@/assets/addClass/eventOne.png");
+      } else if (priority === "SECONDARY") {
+        return require("@/assets/addClass/eventTwo.png");
+      } else {
+        return require("@/assets/addClass/eventThree.png");
+      }
+    },
     showContextMenu(event) {
       // 如果正在拖拽，不显示右键菜单
       if (this.isDragging) {
@@ -349,7 +358,8 @@ export default {
     }
 
     .image-icon {
-      width: 20px;
+      width: 18px;
+      height: 22px;
     }
 
     .title {

@@ -71,46 +71,46 @@
                   @end="handleEventDragEnd"
                   @clone="handleEventDragEnd"
                 > -->
-                  <EventCard
-                    v-for="(eventItem, eventIndex) in getDayEventsArray(
-                      item.weekData,
+                <EventCard
+                  v-for="(eventItem, eventIndex) in getDayEventsArray(
+                    item.weekData,
+                    item.weekIndex * 7 + boxIndex + 1
+                  )"
+                  :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
+                    eventItem.competitionName || eventItem.id || eventIndex
+                  }`"
+                  :event-item="eventItem"
+                  :date="String(item.weekIndex * 7 + boxIndex + 1)"
+                  data-type="planEvent"
+                  :is-plan="true"
+                  :is-dragging="isDragging"
+                  @edit="
+                    $emit(
+                      'edit-event',
+                      eventItem,
+                      eventIndex,
+                      item.weekIndex + 1,
                       item.weekIndex * 7 + boxIndex + 1
-                    )"
-                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
-                      eventItem.competitionName || eventItem.id || eventIndex
-                    }`"
-                    :event-item="eventItem"
-                    :date="String(item.weekIndex * 7 + boxIndex + 1)"
-                    data-type="planEvent"
-                    :is-plan="true"
-                    :is-dragging="isDragging"
-                    @edit="
-                      $emit(
-                        'edit-event',
-                        eventItem,
-                        eventIndex,
-                        item.weekIndex + 1,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )
-                    "
-                    @delete="
-                      handleDeleteEvent(
-                        eventItem,
-                        eventIndex,
-                        item.weekIndex + 1,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )
-                    "
-                    @copy="handleCopyEvent"
-                    @cut="
-                      handleCutEvent(
-                        eventItem,
-                        eventIndex,
-                        item.weekIndex + 1,
-                        item.weekIndex * 7 + boxIndex + 1
-                      )
-                    "
-                  />
+                    )
+                  "
+                  @delete="
+                    handleDeleteEvent(
+                      eventItem,
+                      eventIndex,
+                      item.weekIndex + 1,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
+                  @copy="handleCopyEvent"
+                  @cut="
+                    handleCutEvent(
+                      eventItem,
+                      eventIndex,
+                      item.weekIndex + 1,
+                      item.weekIndex * 7 + boxIndex + 1
+                    )
+                  "
+                />
                 <!-- </draggable> -->
                 <draggable
                   :key="`draggable-${item.weekIndex}-${boxIndex}`"
@@ -279,12 +279,12 @@
             </div>
             <div class="activity">
               <span class="label">其他时长:</span>
-              <span class="value">{{
-                secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ||
-                "00:00:00"
-                  ? "--:--:--"
-                  : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
-              }}</span>
+                <span class="value">{{
+                  secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ===
+                  "00:00:00"
+                    ? "--:--:--"
+                    : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
+                }}</span>
             </div>
           </div>
         </div>
@@ -902,12 +902,20 @@ export default {
             if (
               !classItem.classesJson.duration ||
               classItem.classesJson.duration === "00:00:00" ||
-              classItem.classesJson.duration === "--:--:--" ||
-              classItem.sportType !== "OTHER"
+              classItem.classesJson.duration === "--:--:--"
             ) {
               return classAcc;
             }
-            return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
+            console.log(classItem.sportType, "classItem.sportType");
+            if (
+              classItem.sportType === "REMARK" ||
+              classItem.sportType === "REST" ||
+              classItem.sportType === "OTHER"
+            ) {
+              console.log(classItem.classesJson.duration, classAcc + hhmmssToSeconds(classItem.classesJson.duration), "classItem.classesJson.duration");
+              return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
+            }
+            return classAcc;
           }, 0)
         );
       }, 0);

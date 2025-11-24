@@ -542,8 +542,8 @@ export default {
               this.formData.priority === "PRIMARY"
                 ? 1
                 : this.formData.priority === "SECONDARY"
-                  ? 2
-                  : 3;
+                ? 2
+                : 3;
 
             // 获取距离的 displayValue（如果不是 OTHER）
             const competitionDistance = this.distanceOptions.find(
