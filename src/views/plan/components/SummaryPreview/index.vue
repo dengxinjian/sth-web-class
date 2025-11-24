@@ -18,7 +18,15 @@
     >
       <el-form-item label="计划名称" prop="planTitle">
         <span v-if="activeClassType === 'official'">{{ form.planTitle }}</span>
-        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.planTitle" maxlength="20" show-word-limit placeholder="请输入计划名称" clearable />
+        <el-input
+          v-else
+          :readonly="activeClassType === 'official'"
+          v-model="form.planTitle"
+          maxlength="20"
+          show-word-limit
+          placeholder="请输入计划名称"
+          clearable
+        />
       </el-form-item>
 
       <el-form-item label="分组选择" prop="planGroupId">
@@ -63,16 +71,29 @@
 
       <el-form-item label="计划源">
         <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
-        <el-input v-else :readonly="activeClassType === 'official'" placeholder="请输入计划源" :value="planSource()" disabled />
+        <el-input
+          v-else
+          :readonly="activeClassType === 'official'"
+          placeholder="请输入计划源"
+          :value="planSource()"
+          disabled
+        />
       </el-form-item>
 
       <el-form-item label="拥有者">
-        <span v-if="activeClassType === 'official'">{{ planInfo.possessNickname }}</span>
-        <el-input v-else :readonly="true" :value="planInfo.possessNickname" disabled />
+        <span v-if="activeClassType === 'official'">{{
+          planInfo.possessNickname
+        }}</span>
+        <el-input
+          v-else
+          :readonly="true"
+          :value="planInfo.possessNickname"
+          disabled
+        />
       </el-form-item>
 
       <el-form-item label="邮箱" prop="email">
-         <span v-if="activeClassType === 'official'">{{ form.email }}</span>
+        <span v-if="activeClassType === 'official'">{{ form.email }}</span>
         <el-input
           v-else
           :readonly="activeClassType === 'official'"
@@ -84,12 +105,28 @@
 
       <el-form-item label="微信号" prop="weChat">
         <span v-if="activeClassType === 'official'">{{ form.weChat }}</span>
-        <el-input v-else :readonly="activeClassType === 'official'" v-model="form.weChat" placeholder="请输入微信号" />
+        <el-input
+          v-else
+          :readonly="activeClassType === 'official'"
+          v-model="form.weChat"
+          placeholder="请输入微信号"
+        />
       </el-form-item>
 
       <el-form-item label="描述" prop="description">
-        <span v-if="activeClassType === 'official'">{{ form.description }}</span>
-        <el-input type="textarea" v-else :readonly="activeClassType === 'official'" :rows="6" :maxlength="500" show-word-limit v-model="form.description" placeholder="请输入描述" />
+        <span v-if="activeClassType === 'official'">{{
+          form.description
+        }}</span>
+        <el-input
+          type="textarea"
+          v-else
+          :readonly="activeClassType === 'official'"
+          :rows="6"
+          :maxlength="500"
+          show-word-limit
+          v-model="form.description"
+          placeholder="请输入描述"
+        />
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
@@ -113,10 +150,15 @@
                   secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
                     ? "N/A"
                     : secondsToHHMMSS(getweekSwimmingDuration())
-                }}{{ secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                ? "" : " /周" }}</el-col
+                }}{{
+                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
               >
-              <el-col :span="8">{{ getweekSwimmingDistance() || "N/A" }} </el-col>
+              <el-col :span="8"
+                >{{ getweekSwimmingDistance() || "N/A" }}
+              </el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -127,12 +169,13 @@
                   secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
                     ? "N/A"
                     : secondsToHHMMSS(getweekCycleDuration())
-                }}{{ secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                ? "" : " /周" }}</el-col
+                }}{{
+                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
               >
-              <el-col :span="8"
-                >{{ getweekCycleDistance() || "N/A" }}
-              </el-col>
+              <el-col :span="8">{{ getweekCycleDistance() || "N/A" }} </el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -143,8 +186,11 @@
                   secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
                     ? "N/A"
                     : secondsToHHMMSS(getweekRunDuration())
-                }}{{ secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                ? "" : " /周" }}</el-col
+                }}{{
+                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
               >
               <el-col :span="8">{{ getweekRunDistance() || "N/A" }}</el-col>
             </el-row>
@@ -157,10 +203,15 @@
                   secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
                     ? "N/A"
                     : secondsToHHMMSS(getweekPowerDuration())
-                }}{{ secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                ? "" : " /周" }}</el-col
+                }}{{
+                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
               >
-              <el-col :span="8">{{ getweekPowerAndOtherDistance('STRENGTH') || "N/A" }}</el-col>
+              <el-col :span="8">{{
+                getweekPowerAndOtherDistance("STRENGTH") || "N/A"
+              }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -171,10 +222,15 @@
                   secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
                     ? "N/A"
                     : secondsToHHMMSS(getweekOtherDuration())
-                }}{{ secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
-                ? "" : " /周" }}</el-col
+                }}{{
+                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
               >
-              <el-col :span="8">{{ getweekPowerAndOtherDistance('OTHER') || "N/A" }}</el-col>
+              <el-col :span="8">{{
+                getweekPowerAndOtherDistance("OTHER") || "N/A"
+              }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
@@ -186,8 +242,11 @@
                     ? "N/A"
                     : secondsToHHMMSS(getweekDuration())
                 }}
-                {{ secondsToHHMMSS(getweekDuration()) === "00:00:00"
-                ? "" : " /周" }}</el-col
+                {{
+                  secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
               >
               <el-col :span="8">{{ getweekDistance() || "N/A" }}</el-col>
             </el-row>
@@ -197,9 +256,18 @@
     </el-form>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel" v-if="activeClassType === 'official'">关闭</el-button>
-      <el-button @click="onCancel" v-if="activeClassType !== 'official'">取消</el-button>
-      <el-button type="primary" v-if="activeClassType !== 'official'" @click="onConfirm">确定</el-button>
+      <el-button @click="onCancel" v-if="activeClassType === 'official'"
+        >关闭</el-button
+      >
+      <el-button @click="onCancel" v-if="activeClassType !== 'official'"
+        >取消</el-button
+      >
+      <el-button
+        type="primary"
+        v-if="activeClassType !== 'official'"
+        @click="onConfirm"
+        >确定</el-button
+      >
     </span>
   </el-dialog>
 </template>
@@ -452,43 +520,54 @@ export default {
     // 计算周运动时长总和
     getweekDuration() {
       const week = this.planClasses.flat();
-      if (!week || !Array.isArray(week)) {
+      if (!week || !Array.isArray(week) || week.length === 0) {
         return 0;
       }
 
-      const durationTotal = week.reduce((acc, item) => {
-        if (!item || !item.details || !Array.isArray(item.details)) {
+      // 解析 classesJson（可能是字符串）
+      const parseClassesJson = (classesJson) => {
+        if (typeof classesJson === "string") {
+          try {
+            return JSON.parse(classesJson);
+          } catch (error) {
+            console.error("解析 classesJson 失败:", error);
+            return null;
+          }
+        }
+        return classesJson;
+      };
+
+      // 验证时长是否有效
+      const isValidDuration = (duration) => {
+        return duration && duration !== "00:00:00" && duration !== "--:--:--";
+      };
+
+      // 计算单个课程项的时长
+      const calculateClassDuration = (classItem,index) => {
+        if (!classItem) {
+          return 0;
+        }
+
+        const classesJson = parseClassesJson(classItem.classesJson);
+        if (!classesJson || !isValidDuration(classesJson.duration)) {
+          return 0;
+        }
+
+        return hhmmssToSeconds(classesJson.duration);
+      };
+
+      // 计算总时长
+      const durationTotal = week.reduce((acc, item,index) => {
+        if (!item?.details || !Array.isArray(item.details)) {
           return acc;
         }
 
-        return (
-          acc +
-          item.details.reduce((classAcc, classItem) => {
-            if (!classItem) {
-              return classAcc;
-            }
-
-            // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
-            if (typeof classesJson === "string") {
-              try {
-                classesJson = JSON.parse(classesJson);
-              } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
-              }
-            }
-
-            if (
-              !classesJson.duration ||
-              classesJson.duration === "00:00:00" ||
-              classesJson.duration === "--:--:--"
-            ) {
-              return classAcc;
-            }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
-          }, 0)
+        const itemDuration = item.details.reduce(
+          (classAcc, classItem) => classAcc + calculateClassDuration(classItem,index),
+          0
         );
+
+        return acc + itemDuration;
       }, 0);
       return durationTotal / this.planClasses.length || 0;
     },
@@ -579,49 +658,61 @@ export default {
       const weekDistance = distanceTotal / this.planClasses.length || 0;
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
-      const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
+      const formattedDistance =
+        weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
     },
     // 计算周运动游泳时长总和
     getweekSwimmingDuration() {
       const week = this.planClasses.flat();
-      if (!week || !Array.isArray(week)) {
+      if (!week || !Array.isArray(week) || week.length === 0) {
         return 0;
       }
+
+      // 解析 classesJson（可能是字符串）
+      const parseClassesJson = (classesJson) => {
+        if (typeof classesJson === "string") {
+          try {
+            return JSON.parse(classesJson);
+          } catch (error) {
+            console.error("解析 classesJson 失败:", error);
+            return null;
+          }
+        }
+        return classesJson;
+      };
+
+      // 验证时长是否有效
+      const isValidDuration = (duration) => {
+        return duration && duration !== "00:00:00" && duration !== "--:--:--";
+      };
+
+      // 计算单个课程项的时长
+      const calculateClassDuration = (classItem) => {
+        if (!classItem || classItem.sportType !== "SWIM") {
+          return 0;
+        }
+
+        const classesJson = parseClassesJson(classItem.classesJson);
+        if (!classesJson || !isValidDuration(classesJson.duration)) {
+          return 0;
+        }
+
+        return hhmmssToSeconds(classesJson.duration);
+      };
+
+      // 计算总时长
       const durationTotal = week.reduce((acc, item) => {
-        if (!item || !item.details || !Array.isArray(item.details)) {
+        if (!item?.details || !Array.isArray(item.details)) {
           return acc;
         }
 
-        return (
-          acc +
-          item.details.reduce((classAcc, classItem) => {
-            if (!classItem) {
-              return classAcc;
-            }
-
-            // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
-            if (typeof classesJson === "string") {
-              try {
-                classesJson = JSON.parse(classesJson);
-              } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
-              }
-            }
-
-            if (
-              !classesJson.duration ||
-              classesJson.duration === "00:00:00" ||
-              classesJson.duration === "--:--:--" ||
-              classItem.sportType !== "SWIM"
-            ) {
-              return classAcc;
-            }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
-          }, 0)
+        const itemDuration = item.details.reduce(
+          (classAcc, classItem) => classAcc + calculateClassDuration(classItem),
+          0
         );
+
+        return acc + itemDuration;
       }, 0);
       return durationTotal / this.planClasses.length || 0;
     },
@@ -678,51 +769,59 @@ export default {
       if (weekDistance === 0) return "N/A";
       const distanceKm = weekDistance / 1000;
       // 如果是整数，不保留小数；如果有小数，保留两位小数
-      const formattedDistance = distanceKm % 1 === 0 ? distanceKm : distanceKm.toFixed(2);
+      const formattedDistance =
+        distanceKm % 1 === 0 ? distanceKm : distanceKm.toFixed(2);
       return formattedDistance + " km/周";
     },
     getweekCycleDuration() {
       const week = this.planClasses.flat();
-      if (!week || !Array.isArray(week)) {
+      if (!week || !Array.isArray(week) || week.length === 0) {
         return 0;
       }
-      const durationTotal = week.reduce((acc, item, index) => {
-        if (!item || !item.details || !Array.isArray(item.details)) {
+
+      // 解析 classesJson（可能是字符串）
+      const parseClassesJson = (classesJson) => {
+        if (typeof classesJson === "string") {
+          try {
+            return JSON.parse(classesJson);
+          } catch (error) {
+            console.error("解析 classesJson 失败:", error);
+            return null;
+          }
+        }
+        return classesJson;
+      };
+
+      // 验证时长是否有效
+      const isValidDuration = (duration) => {
+        return duration && duration !== "00:00:00" && duration !== "--:--:--";
+      };
+      // 计算单个课程项的时长
+      const calculateClassDuration = (classItem) => {
+        if (!classItem || classItem.sportType !== "CYCLE") {
+          return 0;
+        }
+
+        const classesJson = parseClassesJson(classItem.classesJson);
+        if (!classesJson || !isValidDuration(classesJson.duration)) {
+          return 0;
+        }
+
+        return hhmmssToSeconds(classesJson.duration);
+      };
+
+      // 计算总时长
+      const durationTotal = week.reduce((acc, item) => {
+        if (!item?.details || !Array.isArray(item.details)) {
           return acc;
         }
 
-        return (
-          acc +
-          item.details.reduce((classAcc, classItem) => {
-            if (!classItem) {
-              return classAcc;
-            }
-
-            // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
-            if (typeof classesJson === "string") {
-              try {
-                classesJson = JSON.parse(classesJson);
-              } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
-              }
-            }
-
-            if (classesJson.sportType === "REMARK") {
-              return classAcc + hhmmssToSeconds(classesJson.duration);
-            }
-            if (
-              !classesJson.duration ||
-              classesJson.duration === "00:00:00" ||
-              classesJson.duration === "--:--:--" ||
-              classItem.sportType !== "CYCLE"
-            ) {
-              return classAcc;
-            }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
-          }, 0)
+        const itemDuration = item.details.reduce(
+          (classAcc, classItem) => classAcc + calculateClassDuration(classItem),
+          0
         );
+
+        return acc + itemDuration;
       }, 0);
       return durationTotal / this.planClasses.length || 0;
     },
@@ -777,48 +876,61 @@ export default {
       const weekDistance = distanceTotal / this.planClasses.length || 0;
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
-      const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
+      const formattedDistance =
+        weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
     },
     // 计算周跑步时长总和
     getweekRunDuration() {
       const week = this.planClasses.flat();
-      if (!week || !Array.isArray(week)) {
+      if (!week || !Array.isArray(week) || week.length === 0) {
         return 0;
       }
+
+      // 解析 classesJson（可能是字符串）
+      const parseClassesJson = (classesJson) => {
+        if (typeof classesJson === "string") {
+          try {
+            return JSON.parse(classesJson);
+          } catch (error) {
+            console.error("解析 classesJson 失败:", error);
+            return null;
+          }
+        }
+        return classesJson;
+      };
+
+      // 验证时长是否有效
+      const isValidDuration = (duration) => {
+        return duration && duration !== "00:00:00" && duration !== "--:--:--";
+      };
+
+      // 计算单个课程项的时长
+      const calculateClassDuration = (classItem) => {
+        if (!classItem || classItem.sportType !== "RUN") {
+          return 0;
+        }
+
+        const classesJson = parseClassesJson(classItem.classesJson);
+        if (!classesJson || !isValidDuration(classesJson.duration)) {
+          return 0;
+        }
+
+        return hhmmssToSeconds(classesJson.duration);
+      };
+
+      // 计算总时长
       const durationTotal = week.reduce((acc, item) => {
-        if (!item || !item.details || !Array.isArray(item.details)) {
+        if (!item?.details || !Array.isArray(item.details)) {
           return acc;
         }
 
-        return (
-          acc +
-          item.details.reduce((classAcc, classItem) => {
-            if (!classItem) {
-              return classAcc;
-            }
-
-            // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
-            if (typeof classesJson === "string") {
-              try {
-                classesJson = JSON.parse(classesJson);
-              } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
-              }
-            }
-            if (
-              !classesJson.duration ||
-              classesJson.duration === "00:00:00" ||
-              classesJson.duration === "--:--:--" ||
-              classItem.sportType !== "RUN"
-            ) {
-              return classAcc;
-            }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
-          }, 0)
+        const itemDuration = item.details.reduce(
+          (classAcc, classItem) => classAcc + calculateClassDuration(classItem),
+          0
         );
+
+        return acc + itemDuration;
       }, 0);
       return durationTotal / this.planClasses.length || 0;
     },
@@ -882,7 +994,8 @@ export default {
       // console.log("weekDistance-跑步", weekDistance);
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
-      const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
+      const formattedDistance =
+        weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
     },
     // 计算周力量时长总和
@@ -918,30 +1031,54 @@ export default {
     // 计算周其他时长总和
     getweekOtherDuration() {
       const week = this.planClasses.flat();
-      if (!week || !Array.isArray(week)) {
+      if (!week || !Array.isArray(week) || week.length === 0) {
         return 0;
       }
-      const durationTotal = week.reduce((acc, item,index) => {
-        if (!item || !item.details || !Array.isArray(item.details)) {
+
+      // 解析 classesJson（可能是字符串）
+      const parseClassesJson = (classesJson) => {
+        if (typeof classesJson === "string") {
+          try {
+            return JSON.parse(classesJson);
+          } catch (error) {
+            console.error("解析 classesJson 失败:", error);
+            return null;
+          }
+        }
+        return classesJson;
+      };
+
+      // 验证时长是否有效
+      const isValidDuration = (duration) => {
+        return duration && duration !== "00:00:00" && duration !== "--:--:--";
+      };
+
+      // 计算单个课程项的时长
+      const calculateClassDuration = (classItem) => {
+        if (!classItem || classItem.sportType !== "OTHER") {
+          return 0;
+        }
+
+        const classesJson = parseClassesJson(classItem.classesJson);
+        if (!classesJson || !isValidDuration(classesJson.duration)) {
+          return 0;
+        }
+
+        return hhmmssToSeconds(classesJson.duration);
+      };
+
+      // 计算总时长
+      const durationTotal = week.reduce((acc, item) => {
+        if (!item?.details || !Array.isArray(item.details)) {
           return acc;
         }
-        return (
-          acc +
-          item.details.reduce((classAcc, classItem) => {
-            if (!classItem) {
-              return classAcc;
-            }
-            if (
-              !classItem.classesJson.duration ||
-              classItem.classesJson.duration === "00:00:00" ||
-              classItem.classesJson.duration === "--:--:--" ||
-              classItem.sportType !== "OTHER"
-            ) {
-              return classAcc;
-            }
-            return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
-          }, 0)
+
+        const itemDuration = item.details.reduce(
+          (classAcc, classItem) => classAcc + calculateClassDuration(classItem),
+          0
         );
+
+        return acc + itemDuration;
       }, 0);
       return durationTotal / this.planClasses.length || 0;
     },
@@ -992,7 +1129,8 @@ export default {
       const weekDistance = distanceTotal / this.planClasses.length || 0;
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
-      const formattedDistance = weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
+      const formattedDistance =
+        weekDistance % 1 === 0 ? weekDistance : weekDistance.toFixed(2);
       return formattedDistance + " km/周";
     },
   },
@@ -1025,4 +1163,3 @@ export default {
   margin-top: 5vh !important;
 }
 </style>
-
