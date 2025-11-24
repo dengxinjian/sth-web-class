@@ -406,7 +406,7 @@ export default {
         teamId: teamId,
       }).then((res) => {
         const treeData = (res.result || [])
-          .filter((item) => item != null) // 过滤掉 null 或 undefined
+          // .filter((item) => item != null) // 过滤掉 null 或 undefined
           .map((item) => {
             const members = item.members
               ? item.members
@@ -424,7 +424,7 @@ export default {
               })),
             };
           })
-          .filter((item) => item != null && item.value != null); // 确保节点有效
+          // .filter((item) => item != null && item.value != null); // 确保节点有效
         this.teamGroupList = treeData;
         // 所有运动员列表，用于提交时筛选
         this.originAthletesAll = treeData.map((item) => item.children || []).flat();
