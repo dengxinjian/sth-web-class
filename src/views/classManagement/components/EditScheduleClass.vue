@@ -555,6 +555,7 @@
       :triUserId="triUserId"
       @save="$emit('save', $event)"
       @cancel="handleClassDetailClose"
+      v-if="!isActivity"
     />
   </div>
 </template>
@@ -800,6 +801,7 @@ export default {
     },
     // 编辑进入弹框时，查询课表数据
     getClassScheduleInfo(id) {
+      if (!this.classItem.classesJson) return;
       getData({
         url: "/api/classSchedule/getClassScheduleById",
         id,

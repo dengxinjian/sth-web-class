@@ -28,8 +28,9 @@
           <div class="row-item">
             <span class="label">距离</span>
             <el-input-number
-              :step="0.1"
+              :step="distanceStep"
               :min="0"
+              :precision="distancePrecision"
               :step-strictly="true"
               :controls="false"
               v-model="form.distance"
@@ -186,6 +187,12 @@ export default {
     summaryLength() {
       return (this.form.summary || "").length;
     },
+    distancePrecision() {
+      return this.form.distanceUnit === "km" ? 2 : 0;
+    },
+    distanceStep() {
+      return this.form.distanceUnit === "km" ? 0.01 : 1;
+    },
   },
   watch: {
     visible(val) {
@@ -217,6 +224,9 @@ export default {
         this.resetForm();
       }
     },
+    "form.distanceUnit"(val) {
+      this.form.distance = this.normalizeDistanceValue(this.form.distance, val);
+    },
   },
   methods: {
     // 获取标签列表
@@ -240,6 +250,10 @@ export default {
         if (res.success) {
           this.form = JSON.parse(res.result.classesJson);
           this.form.id = res.result.id;
+          this.form.distance = this.normalizeDistanceValue(
+            this.form.distance,
+            this.form.distanceUnit
+          );
           console.log(this.form, "this.form");
         }
       });
@@ -336,6 +350,14 @@ export default {
         summary: "",
         tips: "",
       };
+    },
+    normalizeDistanceValue(value, unit) {
+      const numeric = Number(value);
+      if (Number.isNaN(numeric)) return "";
+      if (unit === "km") {
+        return Number(numeric.toFixed(2));
+      }
+      return Math.trunc(numeric);
     },
   },
 };

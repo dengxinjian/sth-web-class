@@ -1057,6 +1057,7 @@ export default {
     },
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
+      if (!this.data.classesJson) return;
       getData({
         url: "/api/classSchedule/getClassScheduleById",
         id,

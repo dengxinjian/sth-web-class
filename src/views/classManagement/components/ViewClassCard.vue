@@ -373,7 +373,7 @@ export default {
         result = distance.replace("km", "");
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+        result = sportType !== "SWIM" ? Number(distance).toFixed(2) : distance;
       }
       if (!result || result === "0") {
         result = "--";

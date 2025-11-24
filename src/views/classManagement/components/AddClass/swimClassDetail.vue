@@ -30,8 +30,9 @@
           <div class="row-item">
             <span class="label">距离</span>
             <el-input-number
-              :step="0.1"
+              :step="distanceStep"
               :min="0"
+              :precision="distancePrecision"
               :step-strictly="true"
               :controls="false"
               v-model="form.distance"
@@ -216,6 +217,12 @@ export default {
     },
     summaryLength() {
       return (this.form.summary || "").length;
+    },
+    distancePrecision() {
+      return this.form.distanceUnit === "km" ? 2 : 0;
+    },
+    distanceStep() {
+      return this.form.distanceUnit === "km" ? 0.01 : 1;
     },
   },
   watch: {

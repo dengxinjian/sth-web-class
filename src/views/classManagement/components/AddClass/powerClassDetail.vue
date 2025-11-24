@@ -32,6 +32,7 @@
             <el-input-number
               :step="0.1"
               :min="0"
+              :precision="2"
               :step-strictly="true"
               :controls="false"
               v-model="form.distance"

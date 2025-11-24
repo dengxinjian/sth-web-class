@@ -28,6 +28,7 @@
             <el-input-number
               :step="0.1"
               :min="0"
+              :precision="2"
               :step-strictly="true"
               :controls="false"
               v-model="form.distance"
@@ -190,6 +191,7 @@ export default {
   methods: {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
+      if (!this.data.classesJson) return;
       getData({
         url: "/api/classSchedule/getClassScheduleById",
         id,
