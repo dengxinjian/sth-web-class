@@ -547,7 +547,6 @@ export default {
         if (!classItem) {
           return 0;
         }
-        console.log('classItem-时长',classItem.classesJson,index)
         const classesJson = parseClassesJson(classItem.classesJson);
         if (!classesJson || !isValidDuration(classesJson.duration)) {
           return 0;
