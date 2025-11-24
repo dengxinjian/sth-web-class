@@ -102,9 +102,9 @@
         <el-input
           v-model.number="formData.calories"
           placeholder="请输入消耗（千卡）"
-          type="number"
           :min="0"
           :step="1"
+          :precision="0"
           :step-strictly="true"
           :controls="false"
         >
@@ -117,8 +117,8 @@
       <el-form-item label="STH：" prop="sthValue">
         <el-input
           v-model.number="formData.sthValue"
+          :precision="0"
           placeholder="请输入 STH"
-          type="number"
           :min="0"
         />
       </el-form-item>
@@ -209,7 +209,7 @@ export default {
     activityDate: {
       immediate: true,
       handler(value) {
-        this.$set(this.formData, "activityDate", value || "");
+        this.$set(this.formData, "activityDate", this.formatActivityDate(value));
       },
     },
   },
@@ -222,9 +222,15 @@ export default {
         this.formData.distanceUnit = "km";
       }
     },
+    formatActivityDate(dateValue) {
+      if (!dateValue) return "";
+      const trimmed = String(dateValue).trim();
+      if (!trimmed) return "";
+      return `${trimmed}${trimmed.includes(" ") ? "" : " 00:00:00"}`;
+    },
     getInitialFormData() {
       return {
-        activityDate: this.activityDate || "",
+        activityDate: this.formatActivityDate(this.activityDate),
         activityType: "",
         duration: "",
         activityDuration: "",
@@ -237,7 +243,7 @@ export default {
     initializeForm() {
       this.formData = {
         ...this.getInitialFormData(),
-        activityDate: this.activityDate || "",
+        activityDate: this.formatActivityDate(this.activityDate),
       };
       this.$nextTick(() => {
         this.$refs.activityForm && this.$refs.activityForm.clearValidate();
@@ -308,6 +314,7 @@ export default {
           activityType: this.formData.activityType,
           sportType: this.formData.activityType,
         };
+        console.log(payload, "payload");
         this.$emit("submit", payload);
       });
     },
