@@ -254,7 +254,11 @@ export default {
       athletesList: [],
       members: [],
       loading: false,
-      memberProps: { multiple: true },
+      memberProps: {
+        multiple: true,
+        emitPath: true,
+        checkStrictly: false,
+      },
       pickerOptions: {
         disabledDate(time) {
           // 禁用今天以前的日期（包括今天）
@@ -304,25 +308,52 @@ export default {
         );
       }
     },
+    teamGroupList(newList) {
+      // 当 teamGroupList 更新时，验证 form.athleteIds 的值是否有效
+      if (newList && Array.isArray(newList) && this.form.athleteIds && this.form.athleteIds.length > 0) {
+        // 检查所有选中的值是否仍然存在于新的列表中
+        const isValid = this.form.athleteIds.every((path) => {
+          if (!Array.isArray(path) || path.length === 0) return false;
+          const [groupId, userId] = path;
+          const group = newList.find((item) => item && item.value === groupId);
+          if (!group || !group.children) return false;
+          return group.children.some((child) => child && child.value === userId);
+        });
+        if (!isValid) {
+          // 如果值无效，清空选择
+          this.$nextTick(() => {
+            this.form.athleteIds = [];
+            this.members = [];
+          });
+        }
+      }
+    },
   },
   methods: {
     viewApplyHistory() {
       this.$emit("viewApplyHistory", this.planInfo.id);
     },
     handleCascaderChange(value) {
+      if (!value || !Array.isArray(value)) {
+        this.members = [];
+        return;
+      }
       const choosedAthletes = value
         .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))
         .filter((val) => val !== undefined && val !== null);
-      const memberList = choosedAthletes.map((item) => {
-        const findItem = this.originAthletesAll.find(
-          (el) => el.triUserId === item
-        );
-        return {
-          ...findItem,
-          applyMode: undefined,
-          applyDate: undefined,
-        };
-      });
+      const memberList = choosedAthletes
+        .map((item) => {
+          const findItem = this.originAthletesAll.find(
+            (el) => el && el.triUserId === item
+          );
+          if (!findItem) return null;
+          return {
+            ...findItem,
+            applyMode: undefined,
+            applyDate: undefined,
+          };
+        })
+        .filter((item) => item != null); // 过滤掉 null
       const newMembers =
         this.members.length > 0
           ? memberList.map((item) => {
@@ -374,24 +405,29 @@ export default {
         url: `/api/team/group/list/${teamId}`,
         teamId: teamId,
       }).then((res) => {
-        const treeData = res.result.map((item) => {
-          const members = item.members
-            ? item.members.filter((el) => el.userType === 3)
-            : [];
-          return {
-            id: item.id,
-            value: item.id,
-            label: item.groupName,
-            children: members.map((member) => ({
-              ...member,
-              label: member.userNickname,
-              value: member.triUserId,
-            })),
-          };
-        });
+        const treeData = (res.result || [])
+          // .filter((item) => item != null) // 过滤掉 null 或 undefined
+          .map((item) => {
+            const members = item.members
+              ? item.members
+                  .filter((el) => el != null && el.userType === 3)
+                  .filter((member) => member.userNickname && member.triUserId) // 确保必要字段存在
+              : [];
+            return {
+              id: item.id,
+              value: item.id,
+              label: item.groupName || "",
+              children: members.map((member) => ({
+                ...member,
+                label: member.userNickname || "",
+                value: member.triUserId,
+              })),
+            };
+          })
+          // .filter((item) => item != null && item.value != null); // 确保节点有效
         this.teamGroupList = treeData;
         // 所有运动员列表，用于提交时筛选
-        this.originAthletesAll = treeData.map((item) => item.children).flat();
+        this.originAthletesAll = treeData.map((item) => item.children || []).flat();
       });
     },
     getMembersList(teamId) {
@@ -485,7 +521,9 @@ export default {
                   applyDate: item.applyDate,
                   applyMode: item.applyMode,
                 }));
-          const findEmptyDateOrApplyMode = targets.filter((item) => !item.applyDate || !item.applyMode);
+          const findEmptyDateOrApplyMode = targets.filter(
+            (item) => !item.applyDate || !item.applyMode
+          );
           if (findEmptyDateOrApplyMode.length > 0) {
             _this.$message.error("日期和方式不能为空，请选择日期和方式");
             _this.loading = false;
@@ -557,6 +595,13 @@ export default {
         .then((res) => {
           if (res.success) {
             _this.$message.success("应用成功");
+            this.form = {
+              teamId: undefined,
+              athleteIds: [],
+              athleteType: 2,
+            };
+            this.members = [];
+            _this.resetForm();
             _this.innerVisible = false;
             _this.$emit("cancel", true);
             _this.loading = false;
