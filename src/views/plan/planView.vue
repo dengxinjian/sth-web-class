@@ -597,6 +597,7 @@ export default {
               const currentPlanId = String(_this.currentPlanDetail.id);
               const queryPlanId = _this.$route.query?.id;
               if (queryPlanId && String(queryPlanId) === currentPlanId) {
+                _this.getPlanList();
                 _this.restPageInfo();
                 // 删除成功后，刷新页面，并清除当前路由参数，防止页面缓存导致数据不更新
                 _this.$router.replace({
