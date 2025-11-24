@@ -159,9 +159,9 @@ export default {
   },
   methods: {
     getClassImageIcon (priority) {
-      if (priority === "PRIMARY") {
+      if (priority === "PRIMARY" || priority === 1) {
         return require("@/assets/addClass/eventOne.png");
-      } else if (priority === "SECONDARY") {
+      } else if (priority === "SECONDARY" || priority === 2) {
         return require("@/assets/addClass/eventTwo.png");
       } else {
         return require("@/assets/addClass/eventThree.png");

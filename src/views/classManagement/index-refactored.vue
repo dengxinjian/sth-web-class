@@ -575,6 +575,7 @@ export default {
       this.classModalDataType = "addSchedule";
       this.addScheduleDate = date;
       this.showSportTypeModal = true;
+      this.classModalData = { title: "" };
       this.isClass = false;
       console.log(date, "date");
     },
@@ -1059,9 +1060,9 @@ export default {
         this.$message.error("超出课程数量上限");
         return;
       }
+      this.classModalDataType = "add";
       this.isClass = true;
       this.addGroupId = groupId;
-
       this.showAddClassTitle = true;
     },
 
