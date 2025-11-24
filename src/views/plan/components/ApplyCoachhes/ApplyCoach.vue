@@ -466,9 +466,6 @@ export default {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
         _this.loading = true;
-        const originAthletes = _this.teamGroupList
-          .map((item) => item.children)
-          .flat();
         const choosedAthletes = _this.form.athleteIds
           .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))
           .filter((val) => val !== undefined && val !== null);
@@ -488,6 +485,12 @@ export default {
                   applyDate: item.applyDate,
                   applyMode: item.applyMode,
                 }));
+          const findEmptyDateOrApplyMode = targets.filter((item) => !item.applyDate || !item.applyMode);
+          if (findEmptyDateOrApplyMode.length > 0) {
+            _this.$message.error("日期和方式不能为空，请选择日期和方式");
+            _this.loading = false;
+            return;
+          }
         } else {
           targets = [
             {
