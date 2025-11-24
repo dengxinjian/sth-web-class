@@ -79,7 +79,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="创建者" prop="planSource" v-if="copyOfficialPlanInfo">
+      <el-form-item label="创建者" v-if="copyOfficialPlanInfo">
         <el-input
           :readonly="true"
           placeholder="请输入计划源"
@@ -92,7 +92,7 @@
         <el-input
           :readonly="true"
           placeholder="请输入拥有者"
-          v-model="form.possessNickname"
+          v-model="form.ownerName"
           disabled
         />
       </el-form-item>
@@ -152,6 +152,7 @@ export default {
         planSource: localStorage.getItem("name")?.split("#")[0] || undefined,
         possessNickname:
           localStorage.getItem("name")?.split("#")[0] || undefined,
+        ownerName: localStorage.getItem("name")?.split("#")[0] || undefined,
         email: undefined,
         weChat: undefined,
         description: undefined,
@@ -248,6 +249,7 @@ export default {
             // planGroupId: this.currentGroupId,
             teamId: val.teamId,
             planSource: val.teamName ? `${val.teamName} - ${val.possessNickname}` : val.possessNickname,
+            ownerName: val.ownerName,
             email: val.email,
             weChat: val.weChat,
             description: val.description,
@@ -295,6 +297,7 @@ export default {
       this.$refs.formRef && this.$refs.formRef.validateField("email");
     },
     handleTeamChange(val) {
+      if (this.copyOfficialPlanInfo) return;
       const findTeam = this.teams.find((item) => item.id === val);
       if (findTeam) {
         if (findTeam.teamName && findTeam.teamOwnerNickname) {
@@ -371,6 +374,7 @@ export default {
         email: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.email : undefined,
         weChat: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.weChat : undefined,
         description: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.description : undefined,
+        ownerName: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.ownerName : undefined,
       };
       this.$nextTick(() => {
         if (this.$refs.formRef) {
@@ -391,13 +395,14 @@ export default {
           }),
         };
       }).filter(el => el.details.length > 0 || el.competitionDtoList.length > 0);
-      const res = await planApi.addPlan({
+      const res = await planApi.createSelfPlanByOffice({
         planTitle: this.form.planTitle,
         planGroupId: this.form.planGroupId,
         teamId: this.form.teamId,
         email: this.form.email,
         weChat: this.form.weChat,
         description: this.form.description,
+        officialPlanId: this.copyOfficialPlanInfo.id,
         dayDetails: planData,
       });
       if (res.success) {

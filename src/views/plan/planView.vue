@@ -47,7 +47,7 @@
     <!-- 添加计划 -->
     <AddPlan
       v-model="addPlanVisible"
-      :current-group-id="currentPlanGroupId"
+      :current-group-id="addPlanGroupId"
       :activeClassType="activeClassType"
       :copyOfficialPlanInfo="copyOfficialPlanInfo"
       :planList="planList"
@@ -105,6 +105,7 @@ import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue";
 
 // 服务和工具导入
 import { planApi, groupApi } from "./services/planManagement";
+import { getData } from "@/api/common";
 
 export default {
   name: "PlanView",
@@ -151,6 +152,8 @@ export default {
       planTitle: "",
       planList: [[], [], [], []],
       showMore: false,
+      addPlanGroupId: null,
+      ownerTeams: [],
 
       // 计划列表数据
       planSearchInput: "",
@@ -195,8 +198,16 @@ export default {
     }
     this.getPlanList();
     this.getPlanLimitCount();
+    this.getTeamList();
   },
   methods: {
+    getTeamList() {
+      getData({
+        url: "/api/team/coach/all-teams",
+      }).then((res) => {
+        this.ownerTeams = res.result;
+      });
+    },
     async getPlanLimitCount() {
       const res = await planApi.getPlanLimitCount();
       this.limitValue = res.result.limitValue;
@@ -452,7 +463,7 @@ export default {
         this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
         return;
       }
-      this.currentPlanGroupId = payload;
+      this.addPlanGroupId = payload;
       this.addPlanVisible = true;
     },
     /**
@@ -515,8 +526,14 @@ export default {
               return;
             }
             _this.$nextTick(() => {
-              _this.copyOfficialPlanInfo = _this.currentPlanDetail;
-              _this.handleAddPlan(_this.currentPlanDetail.planGroupId);
+              _this.copyOfficialPlanInfo = {
+                ..._this.currentPlanDetail,
+                planGroupId: null,
+                teamId: _this.ownerTeams[0]?.id || null,
+                ownerName: localStorage.getItem('name').split('#')[0],
+                ownerId: localStorage.getItem('triUserId')
+              };
+              _this.handleAddPlan();
             });
           } else {
             _this.handleEditPlan();
