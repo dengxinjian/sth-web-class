@@ -119,7 +119,7 @@
     </div>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onDelete" :disabled="!form.id">删除</el-button>
+      <!-- <el-button @click="onDelete" :disabled="!form.id">删除</el-button> -->
       <el-button @click="onCancel">取消</el-button>
       <el-button type="warning" @click="onSave(false)">保存</el-button>
       <el-button type="danger" @click="onSave(true)">保存并关闭</el-button>
@@ -295,14 +295,14 @@ export default {
     },
     // 删除课程
     submitDeleteClass() {
-      this.$confirm("确认删除该课程？", "提示", {
+      this.$confirm("确认删除该课表？", "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       })
         .then(() => {
           submitData({
-            url: "/api/classes/deleteClasses?id=" + this.form.id,
+            url: "/api/classSchedule/deleteClassSchedule?id=" + this.form.id,
           }).then((res) => {
             if (res.success) {
               this.resetForm();

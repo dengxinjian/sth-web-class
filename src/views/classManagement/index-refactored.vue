@@ -150,8 +150,11 @@
       :triUserId="selectedAthletic"
       @save="handleSaveClassDetail"
       @cancel="
+        scheduleType = 'add';
         showClassDetailModal = false;
         classDetailData = {};
+        getScheduleData();
+
       "
     />
 
@@ -450,7 +453,6 @@ export default {
           });
         return;
       }
-      this.scheduleType = "add";
       this.getScheduleData();
     },
     handleCutClass(classesDate, classItem) {
@@ -1240,6 +1242,7 @@ export default {
      * 删除课表
      */
     async handleDeleteClassSchedule(classId, isCut = false) {
+      console.log(classId, "classId");
       if (!isCut) {
         this.$confirm("确认删除该课表？", "提示", {
           confirmButtonText: "删除",

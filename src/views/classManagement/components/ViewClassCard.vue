@@ -265,7 +265,7 @@
       :class-item="classItem"
       @close="showEditClass = false"
       @save="handleEditSave"
-      @delete="$emit('delete', classItem)"
+      @delete="$emit('delete', classItem.id)"
     />
   </div>
 </template>

@@ -379,6 +379,7 @@ export default {
     },
     deleteClass(id) {
       this.handleClose();
+      console.log(id, "id");
       this.$emit("delete", id);
     },
     handleEditClassDetail() {
