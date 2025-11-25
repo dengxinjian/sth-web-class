@@ -62,7 +62,10 @@
       :data="CreatePlanCourseDialogData"
       originalType="my"
       @save="handleSaveAddClass"
-      @cancel="showAddClassModal = false"
+      @cancel="
+        showAddClassModal = false;
+        isClassError = false;
+      "
     />
     <EditClassModal
       :visible="showEditPlanClassModal"
@@ -167,6 +170,7 @@ export default {
       editEventWeekNumber: null,
       editEventGlobalDay: null,
       isEditMode: false,
+      isClassError: false,
     };
   },
   watch: {},
@@ -386,7 +390,12 @@ export default {
       this.moveGroupId = groupId;
       this.moveType = "class";
       this.showMoveGroup = true;
-      console.log(this.moveClassId, this.moveGroupId, this.moveType, "this.moveClassId, this.moveGroupId, this.moveType");
+      console.log(
+        this.moveClassId,
+        this.moveGroupId,
+        this.moveType,
+        "this.moveClassId, this.moveGroupId, this.moveType"
+      );
     },
 
     /**
@@ -562,7 +571,10 @@ export default {
         this.showAddClassModal = false;
         return;
       }
-
+      if (saveData.classesTitle.length < 1) {
+        this.$message.error("课程标题不能为空");
+        return;
+      }
       const weekIndex = this.selectedDay.weekNumber - 1;
       const globalDay = this.selectedDay.globalDay;
       // 确保周数据存在
@@ -618,13 +630,26 @@ export default {
       // data.classesJson = JSON.stringify(data.classesJson);
       if (this.classModalDataType === "add") {
         this.classModalDataType = "edit";
-        classApi.createClass(data).then((res) => {
-          if (res.success) {
-            this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
-            this.getClassList();
-          }
-        });
+        classApi
+          .createClass(data)
+          .then((res) => {
+            console.log(res, "res");
+            if (res.success) {
+              this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
+              this.isClassError = false;
+              this.getClassList();
+            } else {
+              this.isClassError = true;
+            }
+          })
+          .catch((err) => {
+            console.log(err, "err");
+            this.isClassError = true;
+          });
       } else {
+        if (this.isClassError) {
+          return;
+        }
         classApi.updateClass(data).then((res) => {
           if (res.success) {
             this.getClassList();
