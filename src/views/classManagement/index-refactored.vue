@@ -2,80 +2,94 @@
   <div class="container">
     <div class="athletic-container" v-loading="loading">
       <!-- 左侧菜单 -->
-      <!-- <LeftMenu v-model="activeName" @change="handleTypeChange" /> -->
+      <LeftMenu v-model="activeName" @change="handleTypeChange" />
 
-      <!-- 中间内容区 -->
-      <div class="type-change">
-        <!-- 运动员管理 -->
-        <div v-if="activeName === 'athletic'">
-          <AthleticManagement
-            :teamId="selectedTeam"
-            :teamName="getTeamName(selectedTeam)"
-            @athletic-click="handleAthleticChange"
-          />
+      <div
+        class="content-container"
+        style="display: flex; width: 100%"
+        v-if="activeName === 'athletic' || activeName === 'class'"
+      >
+        <!-- 中间内容区 -->
+        <div class="type-change">
+          <!-- 运动员管理 -->
+          <div v-show="activeName === 'athletic'">
+            <AthleticManagement
+              :teamId="selectedTeam"
+              :teamName="getTeamName(selectedTeam)"
+              :activeName="activeName"
+              @athletic-click="handleAthleticChange"
+            />
+          </div>
+
+          <!-- 课程管理 -->
+          <div v-show="activeName === 'class'" class="class-container-wrapper">
+            <ClassList
+              :class-list="classList"
+              :active-class-type.sync="activeClassType"
+              @class-type-change="handleClassTypeChange"
+              @search="handleClassSearch"
+              @add-class="handleAddClass"
+              @add-group="handleAddGroup"
+              @edit-group="handleEditGroup"
+              @delete-group="handleDeleteGroup"
+              @move-group="handleMoveGroup"
+              @class-detail="handleClassDetail"
+              @move-class="handleMoveClass"
+              @delete-class="handleDeleteClass"
+              @copy-class="handleCopyClassFromOfficial"
+              @collapse-change="classSlideChange"
+              @view-class="handleViewClass"
+            />
+          </div>
         </div>
 
-        <!-- 课程管理 -->
-        <div v-else class="class-container-wrapper">
-          <ClassList
-            :class-list="classList"
-            :active-class-type.sync="activeClassType"
-            @class-type-change="handleClassTypeChange"
-            @search="handleClassSearch"
-            @add-class="handleAddClass"
-            @add-group="handleAddGroup"
-            @edit-group="handleEditGroup"
-            @delete-group="handleDeleteGroup"
-            @move-group="handleMoveGroup"
-            @class-detail="handleClassDetail"
-            @move-class="handleMoveClass"
-            @delete-class="handleDeleteClass"
-            @copy-class="handleCopyClassFromOfficial"
-            @collapse-change="classSlideChange"
-            @view-class="handleViewClass"
-          />
-        </div>
+        <!-- 日程表 -->
+        <ScheduleCalendar
+          :current-week="currentWeek"
+          :team-list="teamList"
+          :athletic-list="athleticList"
+          :selected-team="selectedTeam"
+          :selected-athletic="selectedAthletic"
+          @week-change="onWeekChange"
+          @team-change="handleTeamChange"
+          @athletic-change="handleAthleticChange"
+          @show-info="showAthleticInfoDialog = true"
+          @show-statistic="showMonthStatisticDialog = true"
+          @refresh="handleRefresh"
+          @class-detail="handleClassScheduleDetail"
+          @activity-detail="handleSportDetail"
+          @delete-schedule="handleDeleteClassSchedule"
+          @unbind="handleUnbind"
+          @delete-activity="handleDeleteActivity"
+          @device-click="handleDeviceClick"
+          @edit-schedule="handleEditClassSchedule"
+          @edit-activity="handleEditActivity"
+          @paste-class="handlePasteClass"
+          @cut-class="handleCutClass"
+          @paste-event="handlePasteEvent"
+          @cut-event="handleCutEvent"
+          @view-health-data="handleViewHealthData"
+          @add-schedule="handleAddSchedule"
+          @event-detail="handleEventDetail"
+          @edit-event="handleEditEvent"
+          @input-activity="handleInputActivity"
+        />
+
+        <!-- 右侧统计面板 -->
+        <StatisticsPanel
+          :sth-data="sthData"
+          :statistic-data="statisticData"
+          :device-list="deviceList"
+          @device-change="handleDeviceChange"
+        />
       </div>
-
-      <!-- 日程表 -->
-      <ScheduleCalendar
-        :current-week="currentWeek"
-        :team-list="teamList"
-        :athletic-list="athleticList"
-        :selected-team="selectedTeam"
-        :selected-athletic="selectedAthletic"
-        @week-change="onWeekChange"
-        @team-change="handleTeamChange"
-        @athletic-change="handleAthleticChange"
-        @show-info="showAthleticInfoDialog = true"
-        @show-statistic="showMonthStatisticDialog = true"
-        @refresh="handleRefresh"
-        @class-detail="handleClassScheduleDetail"
-        @activity-detail="handleSportDetail"
-        @delete-schedule="handleDeleteClassSchedule"
-        @unbind="handleUnbind"
-        @delete-activity="handleDeleteActivity"
-        @device-click="handleDeviceClick"
-        @edit-schedule="handleEditClassSchedule"
-        @edit-activity="handleEditActivity"
-        @paste-class="handlePasteClass"
-        @cut-class="handleCutClass"
-        @paste-event="handlePasteEvent"
-        @cut-event="handleCutEvent"
-        @view-health-data="handleViewHealthData"
-        @add-schedule="handleAddSchedule"
-        @event-detail="handleEventDetail"
-        @edit-event="handleEditEvent"
-        @input-activity="handleInputActivity"
-      />
-
-      <!-- 右侧统计面板 -->
-      <StatisticsPanel
-        :sth-data="sthData"
-        :statistic-data="statisticData"
-        :device-list="deviceList"
-        @device-change="handleDeviceChange"
-      />
+      <div
+        class="content-container"
+        style="display: flex; width: 100%"
+        v-if="activeName === 'plan'"
+      >
+        <PlanView />
+      </div>
     </div>
 
     <!-- 对话框组件 -->
@@ -154,7 +168,6 @@
         showClassDetailModal = false;
         classDetailData = {};
         getScheduleData();
-
       "
     />
 
@@ -262,6 +275,7 @@ import EditScheduleClass from "./components/EditScheduleClass";
 import HealthView from "./components/HealthView.vue";
 import AddEvent from "./components/addEvent.vue";
 import InputActivity from "./components/InputActivity.vue";
+import PlanView from "../plan/planView.vue";
 
 // 服务和工具导入
 import {
@@ -309,6 +323,7 @@ export default {
     HealthView,
     AddEvent,
     InputActivity,
+    PlanView,
   },
   mixins: [dragMixin],
   data() {
@@ -405,16 +420,16 @@ export default {
     // 监听路由变化，同步菜单状态
     $route: {
       handler(to) {
-        this.initMenuFromRoute();
+        // this.initMenuFromRoute();
       },
       immediate: false,
     },
   },
   mounted() {
     // 根据路由初始化菜单状态
-    this.initMenuFromRoute();
-    this.getCurrentUserClassConfigCount();
-
+    this.activeName = localStorage.getItem("activeName") || "class";
+    console.log(this.activeName, "this.activeName");
+    // this.initMenuFromRoute();
     if (localStorage.getItem("loginType") !== "1") {
       this.getTeamAndAthleticData();
     } else {
@@ -703,19 +718,20 @@ export default {
     /**
      * 根据路由初始化菜单状态
      */
-    initMenuFromRoute() {
-      const path = this.$route.path;
-      if (path.includes("athletic")) {
-        this.activeName = "athletic";
-      } else if (path.includes("class") || path.includes("timeTable")) {
-        this.activeName = "class";
-      }
-    },
+    // initMenuFromRoute() {
+    //   const path = this.$route.path;
+    //   if (path.includes("athletic")) {
+    //     this.activeName = "athletic";
+    //   } else if (path.includes("class") || path.includes("timeTable")) {
+    //     this.activeName = "class";
+    //   }
+    // },
     /**
      * 类型切换（运动员/课程）
      */
     handleTypeChange(type) {
       this.activeName = type;
+      this.getClassList();
     },
 
     /**
@@ -1921,6 +1937,7 @@ export default {
 }
 
 .athletic-container {
+  width: 100%;
   display: flex;
   height: 100%;
   max-height: calc(100vh - 60px);

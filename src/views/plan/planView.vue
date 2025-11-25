@@ -628,6 +628,7 @@ export default {
 <style scoped lang="scss">
 .container {
   background-color: #f5f5f5;
+  width: 100%;
 }
 
 .plan-container {

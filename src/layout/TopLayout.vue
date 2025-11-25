@@ -19,9 +19,9 @@
     <!-- 主内容区域 -->
     <div class="main-container">
       <!-- 左侧菜单（el-menu导航菜单） -->
-      <div v-if="showLeftMenu" class="left-menu-container">
+      <!-- <div v-if="showLeftMenu" class="left-menu-container">
         <left-menu v-model="activeMenuType" @change="handleMenuChange" />
-      </div>
+      </div> -->
 
       <!-- 主内容区 -->
       <div class="content-wrapper">
@@ -90,7 +90,7 @@ export default {
     // 监听路由变化，同步菜单状态
     $route: {
       handler(to) {
-        this.syncMenuFromRoute(to);
+        // this.syncMenuFromRoute(to);
       },
       immediate: true,
     },
