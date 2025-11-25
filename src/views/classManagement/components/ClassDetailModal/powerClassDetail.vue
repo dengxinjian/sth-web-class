@@ -24,6 +24,29 @@
               <TimeInput v-model="form.duration" size="small" />
             </div>
             <div class="row-item">
+            <span class="label">距离</span>
+            <el-input-number
+              :step="0.1"
+              :min="0"
+              :precision="2"
+              :step-strictly="true"
+              :controls="false"
+              v-model="form.distance"
+              placeholder=""
+              class="pill-input short"
+            />
+          </div>
+          <div class="row-item">
+            <el-select
+              v-model="form.distanceUnit"
+              :disabled="originalType === 'official'"
+              class="pill-select short"
+            >
+              <el-option label="m" value="m" />
+              <el-option label="km" value="km" />
+            </el-select>
+          </div>
+            <div class="row-item">
               <span class="label">STH</span>
               <el-input-number :step="1" :min="0" :step-strictly="true" :controls="false" v-model="form.sth" placeholder="" class="pill-input short" />
             </div>

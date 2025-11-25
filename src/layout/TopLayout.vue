@@ -26,7 +26,7 @@
       <!-- 主内容区 -->
       <div class="content-wrapper">
         <app-main />
-        <right-panel v-if="showSettings">
+          <right-panel v-if="showSettings">
           <settings />
         </right-panel>
       </div>

@@ -132,7 +132,8 @@
                     }}
                     <span
                       v-if="
-                        classItem.classesJson && classItem.sportType === 'SWIM'
+                        classItem.classesJson.distanceUnit &&
+                        classItem.classesJson.distanceUnit !== 'km'
                       "
                     >
                       {{ classItem.classesJson.distanceUnit }}

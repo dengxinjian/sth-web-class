@@ -59,7 +59,12 @@
                   classData.classesJson?.sportType
                 )
               }}
-              <span v-if="classData.sportType === 'SWIM'">
+              <span
+                v-if="
+                  classData.classesJson.distanceUnit &&
+                  classData.classesJson.distanceUnit !== 'km'
+                "
+              >
                 {{ classData.classesJson?.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -704,7 +709,9 @@ export default {
               distanceUnit:
                 this.classData.distanceUnit ||
                 (this.classData.sportType === "SWIM" ||
-                this.classData.sportType === 3
+                this.classData.sportType === 3 ||
+                this.classData.sportType === 4 ||
+                this.classData.sportType === "STRENGTH"
                   ? "m"
                   : "km"),
             };
@@ -721,7 +728,9 @@ export default {
               distanceUnit:
                 this.classData.distanceUnit ||
                 (this.classData.sportType === "SWIM" ||
-                this.classData.sportType === 3
+                this.classData.sportType === 3 ||
+                this.classData.sportType === 4 ||
+                this.classData.sportType === "STRENGTH"
                   ? "m"
                   : "km"),
             };
@@ -818,7 +827,7 @@ export default {
             distance: this.classData.distance || 0,
             sthValue: this.classData.sthValue || 0,
             calories: this.classData.calories || 0,
-            distanceUnit: this.classData.sportType === "SWIM" ? "m" : "km",
+            distanceUnit: this.classData.sportType === "SWIM" || this.classData.sportType === "STRENGTH" ? "m" : "km",
           };
         }
       });
