@@ -132,7 +132,7 @@ export default {
 // el-menu 样式定制
 :deep(.type-change-menu) {
   border-right: none;
-  width: 100%;
+  width: 80px;
   min-height: 100%;
 
   .el-menu-item {
