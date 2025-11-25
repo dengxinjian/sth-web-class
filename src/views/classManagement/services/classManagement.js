@@ -247,12 +247,7 @@ export const competitionApi = {
       headers: {
         requestUserInfoId: triUserId,
       },
-    }).then((res) => {
-      if (res.success) {
-        return res.result;
-      }
-      return Promise.reject(res.message || "创建赛事失败");
-    });
+    })
   },
 
   // 更新赛事
@@ -269,12 +264,7 @@ export const competitionApi = {
       },
       method: "put",
       data,
-    }).then((res) => {
-      if (res.success) {
-        return res.result;
-      }
-      return Promise.reject(res.message || "创建赛事失败");
-    });
+    })
   },
   // 删除赛事
   deleteCompetition(id) {

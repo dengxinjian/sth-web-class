@@ -568,23 +568,25 @@ export default {
           .then(() => {
             this.$message.success("赛事保存成功");
             this.showAddEvent = false;
-            // this.getScheduleData();
+            this.getScheduleData();
           })
           .catch((err) => {
             const message = err?.message || err || "赛事保存失败";
             this.$message.error(message);
           });
       } else {
+        console.log(data, "data");
+        console.log(this.selectedAthletic, "this.selectedAthletic");
         competitionApi
           .updateCompetition(data, this.selectedAthletic)
           .then((res) => {
             if (res.success) {
               this.$message.success("赛事保存成功");
               this.showAddEvent = false;
+              this.getScheduleData();
             }
           });
       }
-      this.getScheduleData();
       // 这里可以添加保存成功后的处理逻辑，比如刷新列表等
       // 如果需要刷新日程数据，可以调用 this.getScheduleData();
     },
