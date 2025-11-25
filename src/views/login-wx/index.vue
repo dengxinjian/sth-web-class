@@ -71,7 +71,7 @@
           <div class="miniprogram-code">
             <div class="miniprogram-title">请使用微信扫码</div>
             <img
-              src="./imgs/miniprogram-test.png"
+              src="./imgs/miniprogram.png"
               alt="小程序码"
               class="miniprogram-img"
             />
