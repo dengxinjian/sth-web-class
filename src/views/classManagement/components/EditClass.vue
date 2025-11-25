@@ -344,7 +344,7 @@ export default {
           };
         });
       } else {
-        this.getClassInfo(this.classItem.id);
+        // this.getClassInfo(this.classItem.id);
         // 确保 classesJson 被正确解析
         const classData = { ...this.classItem };
         if (classData.classesJson) {
@@ -357,20 +357,20 @@ export default {
     },
   },
   methods: {
-    getClassInfo(id) {
-      getData({
-        url: "/api/classes/getClassesById",
-        id,
-      }).then((res) => {
-        if (res.success) {
-          const classData = JSON.parse(res.result.classesJson);
-          this.classData = {
-            ...res.result,
-            classesJson: classData,
-          };
-        }
-      });
-    },
+    // getClassInfo(id) {
+    //   getData({
+    //     url: "/api/classes/getClassesById",
+    //     id,
+    //   }).then((res) => {
+    //     if (res.success) {
+    //       const classData = JSON.parse(res.result.classesJson);
+    //       this.classData = {
+    //         ...res.result,
+    //         classesJson: classData,
+    //       };
+    //     }
+    //   });
+    // },
     isRestType(sportType) {
       return ["REST", "REMARK"].includes(sportType);
     },
@@ -389,7 +389,7 @@ export default {
     handleAddClassModalClose() {
       // 子对话框关闭时的回调
       this.showAddClassModal = false;
-      this.getClassInfo(this.classItem.id);
+      // this.getClassInfo(this.classItem.id);
       this.handleClose();
     },
     handleClose() {

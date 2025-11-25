@@ -96,7 +96,8 @@
               {{
                 formatDistance(
                   classItem.classesJson.distance,
-                  classItem.sportType
+                  classItem.sportType,
+                  classItem.classesJson.distanceUnit
                 )
               }}
               <span v-if="classItem.classesJson.distanceUnit && classItem.classesJson.distanceUnit !== 'km'">
@@ -297,7 +298,7 @@ export default {
     formatDuration(duration) {
       return duration === "00:00:00" ? "--:--:--" : duration;
     },
-    formatDistance(distance, sportType) {
+    formatDistance(distance, sportType, distanceUnit) {
       console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
@@ -308,6 +309,9 @@ export default {
       }
       if (!result || result === "0") {
         result = "--";
+      }
+      if (distanceUnit && distanceUnit !== "km" && sportType !== "SWIM" && result !== "--") {
+        result = (Number(result) / 1000).toFixed(2);
       }
       return result;
     },
