@@ -769,7 +769,7 @@ export default {
         summary: "", // 概要
         tags: [], // 标签
         capacity: "time", // 容量
-        range: "target", // 范围
+        range: "range", // 范围
         target: "00:20:00", // 目标
         hasCadence: false,
         thresholdFtp: 80,
@@ -780,7 +780,7 @@ export default {
         targetFtpRange: [140, 160],
         targetHeartRate: 150,
         targetHeartRateRange: [110, 150],
-        cadence: [60, 80],
+        cadence: [80, 90],
         lap: false,
         targetSeconds: 20 * 60, // 计算出来的秒数
       },
@@ -829,6 +829,11 @@ export default {
   },
   created() {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);
+  },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
   },
   methods: {
     formatDistance(distance, sportType) {
@@ -1179,47 +1184,55 @@ export default {
       }
       this.calculateTimeline();
     },
+    // 创建深拷贝的section模板
+    createSectionTemplate(title, stageMode) {
+      return {
+        ...this.sectionTemplate,
+        title,
+        stageMode,
+        tags: [...this.sectionTemplate.tags], // 深拷贝数组
+        thresholdFtpRange: [...this.sectionTemplate.thresholdFtpRange], // 深拷贝数组
+        thresholdHeartRateRange: [
+          ...this.sectionTemplate.thresholdHeartRateRange,
+        ], // 深拷贝数组
+        targetFtpRange: [...this.sectionTemplate.targetFtpRange], // 深拷贝数组
+        targetHeartRateRange: [...this.sectionTemplate.targetHeartRateRange], // 深拷贝数组
+        cadence: [...this.sectionTemplate.cadence], // 深拷贝数组
+      };
+    },
     // 添加段落
     handleAddStage(type) {
       switch (type) {
         case "warmup":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "热身", stageMode: "warmup" },
-            ],
+            sections: [this.createSectionTemplate("热身", "warmup")],
           });
           break;
         case "recover":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "恢复", stageMode: "recover" },
-            ],
+            sections: [this.createSectionTemplate("恢复", "recover")],
           });
           break;
         case "cooling":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "冷身", stageMode: "cooling" },
-            ],
+            sections: [this.createSectionTemplate("冷身", "cooling")],
           });
           break;
         case "stage1":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "骑行", stageMode: "bike" },
-            ],
+            sections: [this.createSectionTemplate("骑行", "bike")],
           });
           break;
         case "stage2":
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              { ...this.sectionTemplate, title: "骑行", stageMode: "bike" },
-              { ...this.sectionTemplate, title: "骑行", stageMode: "bike" },
+              this.createSectionTemplate("骑行", "bike"),
+              this.createSectionTemplate("骑行", "bike"),
             ],
           });
           break;
@@ -1227,9 +1240,9 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              { ...this.sectionTemplate, title: "骑行", stageMode: "bike" },
-              { ...this.sectionTemplate, title: "骑行", stageMode: "bike" },
-              { ...this.sectionTemplate, title: "骑行", stageMode: "bike" },
+              this.createSectionTemplate("骑行", "bike"),
+              this.createSectionTemplate("骑行", "bike"),
+              this.createSectionTemplate("骑行", "bike"),
             ],
           });
           break;

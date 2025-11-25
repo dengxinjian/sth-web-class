@@ -46,6 +46,7 @@
               v-model="form.distanceUnit"
               :disabled="originalType === 'official'"
               class="pill-select short"
+              @change="handleDistanceUnitChange"
             >
               <el-option label="m" value="m" />
               <el-option label="km" value="km" />
@@ -241,9 +242,10 @@ export default {
         if (this.data.id && this.originalType === "my") {
           // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
           if (this.data.classesJson) {
-            const classesJson = typeof this.data.classesJson === 'string'
-              ? JSON.parse(this.data.classesJson)
-              : this.data.classesJson;
+            const classesJson =
+              typeof this.data.classesJson === "string"
+                ? JSON.parse(this.data.classesJson)
+                : this.data.classesJson;
             this.form = classesJson;
             this.form.id = this.data.id;
             this.form.groupId = this.data.classesGroupId || this.data.groupId;
@@ -263,9 +265,10 @@ export default {
       if (this.data.id && this.originalType === "my") {
         // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
         if (this.data.classesJson) {
-          const classesJson = typeof this.data.classesJson === 'string'
-            ? JSON.parse(this.data.classesJson)
-            : this.data.classesJson;
+          const classesJson =
+            typeof this.data.classesJson === "string"
+              ? JSON.parse(this.data.classesJson)
+              : this.data.classesJson;
           this.form = classesJson;
           this.form.id = this.data.id;
           this.form.groupId = this.data.classesGroupId || this.data.groupId;
@@ -280,7 +283,20 @@ export default {
       }
     },
   },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
+  },
   methods: {
+    handleDistanceUnitChange(value) {
+      const distanceValue = Number(this.form.distance) || 0;
+      if (value === "km") {
+        this.form.distance = Number((distanceValue / 1000).toFixed(2));
+      } else {
+        this.form.distance = Math.round(distanceValue * 1000);
+      }
+    },
     // 获取标签列表
     getTagList() {
       getData({

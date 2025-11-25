@@ -555,6 +555,7 @@
     <ClassDetailModal
       :visible="showClassDetailModal"
       :type="normalizedSportType"
+      scheduleType="edit"
       :data="classData"
       :athleticThreshold="athleticThreshold"
       :triUserId="triUserId"
@@ -827,7 +828,11 @@ export default {
             distance: this.classData.distance || 0,
             sthValue: this.classData.sthValue || 0,
             calories: this.classData.calories || 0,
-            distanceUnit: this.classData.sportType === "SWIM" || this.classData.sportType === "STRENGTH" ? "m" : "km",
+            distanceUnit:
+              this.classData.sportType === "SWIM" ||
+              this.classData.sportType === "STRENGTH"
+                ? "m"
+                : "km",
           };
         }
       });

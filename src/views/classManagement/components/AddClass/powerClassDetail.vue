@@ -30,9 +30,9 @@
           <div class="row-item">
             <span class="label">距离</span>
             <el-input-number
-              :step="0.1"
+              :step="distanceStep"
               :min="0"
-              :precision="2"
+              :precision="distancePrecision"
               :step-strictly="true"
               :controls="false"
               v-model="form.distance"
@@ -46,6 +46,7 @@
               v-model="form.distanceUnit"
               :disabled="originalType === 'official'"
               class="pill-select short"
+              @change="handleDistanceUnitChange"
             >
               <el-option label="m" value="m" />
               <el-option label="km" value="km" />
@@ -217,6 +218,12 @@ export default {
     summaryLength() {
       return (this.form.summary || "").length;
     },
+    distancePrecision() {
+      return this.form.distanceUnit === "km" ? 2 : 0;
+    },
+    distanceStep() {
+      return this.form.distanceUnit === "km" ? 0.01 : 1;
+    },
   },
   watch: {
     visible(val) {
@@ -273,7 +280,20 @@ export default {
       }
     },
   },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
+  },
   methods: {
+    handleDistanceUnitChange(value) {
+      const distanceValue = Number(this.form.distance) || 0;
+      if (value === "km") {
+        this.form.distance = Number((distanceValue / 1000).toFixed(2));
+      } else {
+        this.form.distance = Math.round(distanceValue * 1000);
+      }
+    },
     // 获取标签列表
     getTagList() {
       getData({

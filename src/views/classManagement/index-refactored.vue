@@ -448,7 +448,7 @@ export default {
               this.classDetailData = res.result;
               this.scheduleType = "edit";
               this.getScheduleData();
-              this.$message.success("课程保存成功");
+              this.$message.success("课表保存成功");
             }
           });
         return;

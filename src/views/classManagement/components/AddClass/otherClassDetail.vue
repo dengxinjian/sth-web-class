@@ -235,6 +235,11 @@ export default {
       }
     },
   },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
+  },
   methods: {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {

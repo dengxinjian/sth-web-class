@@ -874,6 +874,11 @@ export default {
   created() {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);
   },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
+  },
   methods: {
     formatDistance(distance, sportType) {
       let result = "";
