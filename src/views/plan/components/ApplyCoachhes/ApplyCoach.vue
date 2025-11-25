@@ -263,10 +263,10 @@ export default {
       },
       pickerOptions: {
         disabledDate(time) {
-          // 禁用今天以前的日期（包括今天）
+          // 禁用今天以前的日期（不包括今天）
           const today = new Date();
           today.setHours(0, 0, 0, 0);
-          return time.getTime() <= today.getTime();
+          return time.getTime() < today.getTime();
         },
       },
       originAthletesAll: [], // 所有运动员列表，用于提交时筛选
