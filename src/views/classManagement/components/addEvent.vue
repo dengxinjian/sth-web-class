@@ -316,6 +316,9 @@ export default {
         this.formData.customDistance = this.extractDistanceNumber(
           data.competitionDistanceValue
         );
+        // if (this.formData.competitionDistanceUnit === "km") {
+        //   this.formData.customDistance = this.formData.customDistance / 1000;
+        // }
       } else {
         this.showCustomDistance = false;
         this.formData.customDistance = "";
@@ -616,10 +619,7 @@ export default {
               competitionLocation: locationStr,
               competitionName: this.formData.eventName,
               competitionType: competitionTypeDisplayValue,
-              competitionDistanceValue:
-                this.formData.competitionDistanceUnit === "km"
-                  ? this.formData.customDistance * 1000
-                  : this.formData.customDistance,
+              competitionDistanceValue: this.formData.customDistance,
               competitionDistanceUnit: this.formData.competitionDistanceUnit,
               priority: priority,
             };
