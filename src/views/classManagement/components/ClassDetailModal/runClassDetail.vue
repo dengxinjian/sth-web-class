@@ -895,7 +895,7 @@ export default {
         this.getTagList();
         if (this.data.id) {
           // 如果有ID，先获取数据，获取完成后再重置表单（保留获取到的数据）
-          this.getClassInfo(this.data.id);
+          this.getClassInfo(this.data.classScheduleId || this.data.id);
         } else {
           // 如果没有ID，说明是新增，重置表单
           this.resetForm();
@@ -906,7 +906,7 @@ export default {
     data(val) {
       this.getTagList();
       if (this.data.id) {
-        this.getClassInfo(this.data.id);
+        this.getClassInfo(this.data.classScheduleId || this.data.id);
       } else {
         this.resetForm();
       }
@@ -1063,6 +1063,7 @@ export default {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       if (!this.data.classesJson) return;
+      console.log(this.data, "this.data");
       getData({
         url: "/api/classSchedule/getClassScheduleById",
         id,
@@ -1151,19 +1152,23 @@ export default {
         }),
       }).then((res) => {
         if (res.success) {
-          this.$emit("save",{
-            id: this.classInfo.id,
-            classesTitle: this.classInfo.title,
-            classesGroupId: this.classInfo.groupId,
-            labels: this.classInfo.tags,
-            classesDate: this.classesDate + " 00:00:00",
-            sportType: "RUN",
-            classesJson: JSON.stringify({
-              ...this.classInfo,
-              timeline: this.timeline,
-              maxIntensity: this.maxIntensity,
-            }),
-          }, flag);
+          this.$emit(
+            "save",
+            {
+              id: this.classInfo.id,
+              classesTitle: this.classInfo.title,
+              classesGroupId: this.classInfo.groupId,
+              labels: this.classInfo.tags,
+              classesDate: this.classesDate + " 00:00:00",
+              sportType: "RUN",
+              classesJson: JSON.stringify({
+                ...this.classInfo,
+                timeline: this.timeline,
+                maxIntensity: this.maxIntensity,
+              }),
+            },
+            flag
+          );
           this.$message.success("课表保存成功");
         }
         if (flag) this.onCancel();

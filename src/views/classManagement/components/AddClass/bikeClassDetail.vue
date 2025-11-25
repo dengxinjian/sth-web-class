@@ -757,10 +757,40 @@ export default {
     innerVisible(val) {
       this.$emit("update:visible", val);
       this.$emit("input", val);
-        this.getTagList();
       // 当弹框打开时清空表单
+      if (val) {
+        if (this.data.id && this.originalType === "my") {
+          // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
+          if (this.data.classesJson) {
+            const classesJson =
+              typeof this.data.classesJson === "string"
+                ? JSON.parse(this.data.classesJson)
+                : this.data.classesJson;
+            this.classInfo = classesJson;
+            this.timeline = classesJson.timeline;
+            this.maxIntensity = classesJson.maxIntensity;
+            this.classInfo.id = this.data.id;
+            this.classInfo.groupId =
+              this.data.classesGroupId || this.data.groupId;
+            this.handleClassDrag();
+          } else {
+            // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
+            this.getClassInfo(this.data.id);
+          }
+        } else if (this.originalType === "my") {
+          this.handleClassDrag();
+          this.resetForm();
+        } else {
+          this.classInfo = this.data.classesJson;
+          this.timeline = this.data.classesJson.timeline;
+          this.maxIntensity = this.data.classesJson.maxIntensity;
+          this.classInfo.groupId = this.data.groupId;
+          this.handleClassDrag();
+        }
+      }
     },
     data(val) {
+      console.log(this.data, "this.data");
       this.getTagList();
       if (this.data.id && this.originalType === "my") {
         // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
@@ -778,7 +808,7 @@ export default {
           this.handleClassDrag();
         } else {
           // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
-        this.getClassInfo(this.data.id);
+          this.getClassInfo(this.data.id);
         }
       } else if (this.originalType === "my") {
         this.handleClassDrag();
