@@ -134,7 +134,7 @@
               <!-- 运动记录卡片 -->
               <ActivityCard
                 v-for="(activityItem, activityIndex) in item.activityList"
-                :key="`activity-${item.commonDate}-${activityIndex}`"
+                :key="`activity-${item.commonDate}-${activityItem.activityId || activityItem.manualActivityId || activityIndex}-${activityItem.classScheduleId || 'unmatched'}-${!!activityItem.classesJson}-${item.timesp || Date.now()}`"
                 :activity="activityItem"
                 :date="item.commonDate"
                 @click="$emit('activity-detail', activityItem)"

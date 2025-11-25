@@ -830,7 +830,7 @@ export default {
             this.classInfo.groupId = this.data.classesGroupId || this.data.groupId;
           } else {
             // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
-            this.getClassInfo(this.data.id);
+          this.getClassInfo(this.data.id);
           }
         } else if (this.originalType === "my") {
           this.resetForm();
@@ -858,7 +858,7 @@ export default {
           this.classInfo.groupId = this.data.classesGroupId || this.data.groupId;
         } else {
           // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
-          this.getClassInfo(this.data.id);
+        this.getClassInfo(this.data.id);
         }
       } else if (this.originalType === "my") {
         this.resetForm();

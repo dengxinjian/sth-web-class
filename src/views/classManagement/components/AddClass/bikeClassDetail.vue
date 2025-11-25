@@ -757,7 +757,7 @@ export default {
     innerVisible(val) {
       this.$emit("update:visible", val);
       this.$emit("input", val);
-      this.getTagList();
+        this.getTagList();
       // 当弹框打开时清空表单
     },
     data(val) {
@@ -778,7 +778,7 @@ export default {
           this.handleClassDrag();
         } else {
           // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
-          this.getClassInfo(this.data.id);
+        this.getClassInfo(this.data.id);
         }
       } else if (this.originalType === "my") {
         this.handleClassDrag();

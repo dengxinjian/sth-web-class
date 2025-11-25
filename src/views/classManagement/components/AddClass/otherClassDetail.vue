@@ -164,7 +164,7 @@ export default {
           groupId: this.data.groupId || "",
           sportType: "OTHER",
           distance: "",
-          distanceUnit: "m",
+          distanceUnit: "km",
           duration: "",
           sth: "",
           summary: "",

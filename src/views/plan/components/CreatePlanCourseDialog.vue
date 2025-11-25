@@ -107,7 +107,9 @@ export default {
     },
     activeRules() {
       if (this.isTemporary) {
-        return {};
+        return {
+          title: this.rules.title,
+        };
       }
       return this.rules;
     },
@@ -157,7 +159,7 @@ export default {
       this.$emit("cancel");
     },
     handleConfirm() {
-      if (this.isTemporary) {
+      if (!this.$refs.formRef) {
         this.$emit("save", { ...this.form });
         this.innerVisible = false;
         return;

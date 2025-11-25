@@ -935,8 +935,11 @@ export default {
         });
         console.log(this.currentWeek, "this.currentWeek");
 
-        // 初始化拖拽
-        this.initAllDrag();
+        // 强制 Vue 检测数组变化
+        this.$nextTick(() => {
+          // 初始化拖拽
+          this.initAllDrag();
+        });
       }
 
       this.loading = false;

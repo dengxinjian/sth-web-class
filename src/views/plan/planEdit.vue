@@ -61,7 +61,7 @@
       :type="classModalDataType"
       :data="CreatePlanCourseDialogData"
       originalType="my"
-      @save="onSaveAddClass"
+      @save="handleSaveAddClass"
       @cancel="showAddClassModal = false"
     />
     <EditClassModal
@@ -90,6 +90,13 @@
       v-model="showCreatePlanCourseDialog"
       @save="handleCreatePlanCourse"
     />
+    <MoveGroup
+      v-model="showMoveGroup"
+      :id="moveGroupId"
+      :class-id="moveClassId"
+      :type="moveType"
+      @save="onSaveMoveGroup"
+    />
   </div>
 </template>
 
@@ -106,6 +113,7 @@ import EditClassModal from "../classManagement/components/EditClass.vue";
 import { planApi } from "./services/planManagement";
 import AddEvent from "../classManagement/components/addEvent.vue";
 import CreatePlanCourseDialog from "./components/CreatePlanCourseDialog.vue";
+import MoveGroup from "../classManagement/components/MoveGroup/index.vue";
 export default {
   name: "PlanView",
   components: {
@@ -118,6 +126,7 @@ export default {
     EditClassModal,
     AddEvent,
     CreatePlanCourseDialog,
+    MoveGroup,
   },
   data() {
     return {
@@ -130,7 +139,7 @@ export default {
       moveGroupId: "",
       moveType: "",
       showMoveGroup: false,
-      classModalDataType: "",
+      classModalDataType: "add",
       copyClassFromOfficialClassId: "",
       copyClassFromOfficialGroupId: "",
       copyClassFromOfficialData: {},
@@ -184,6 +193,13 @@ export default {
   },
 
   methods: {
+    /**
+     * 保存移动分组
+     */
+    onSaveMoveGroup() {
+      this.showMoveGroup = false;
+      this.getClassList();
+    },
     /**
      * 赛事确认
      */
@@ -370,6 +386,7 @@ export default {
       this.moveGroupId = groupId;
       this.moveType = "class";
       this.showMoveGroup = true;
+      console.log(this.moveClassId, this.moveGroupId, this.moveType, "this.moveClassId, this.moveGroupId, this.moveType");
     },
 
     /**
@@ -517,9 +534,67 @@ export default {
         this.$set(dayData, "details", []);
       }
 
+      // if (this.classModalDataType === "add") {
+      //   dayData.details.push(saveData);
+      // } else {
+      //   this.$set(dayData.details, dayData.details.length - 1, saveData);
+      // }
+      dayData.details.push(saveData);
+
+      if (flag) {
+        this.showAddClassModal = false;
+        this.selectedDay = null;
+        this.selectedSportType = null;
+      }
+      if (this.CreatePlanCourseDialogData.mode === "SAVE") {
+        console.log(saveData, "saveData");
+        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
+      } else {
+        this.classModalDataType = "edit";
+      }
+      // 触发响应式更新
+      this.$forceUpdate();
+    },
+    handleSaveAddClass(saveData, flag) {
+      console.log(saveData, flag, "saveData, flag");
+      if (!this.selectedDay || !this.selectedDay.globalDay) {
+        console.error("selectedDay 信息不完整");
+        this.showAddClassModal = false;
+        return;
+      }
+
+      const weekIndex = this.selectedDay.weekNumber - 1;
+      const globalDay = this.selectedDay.globalDay;
+      // 确保周数据存在
+      if (!this.planData.dayDetails[weekIndex]) {
+        this.$set(this.planData.dayDetails, weekIndex, []);
+      }
+
+      // 查找该天是否已存在数据
+      let dayData = this.planData.dayDetails[weekIndex].find(
+        (item) => item.day === globalDay
+      );
+
+      if (!dayData) {
+        // 如果该天不存在，创建新的数据对象
+        dayData = {
+          day: globalDay,
+          details: [],
+          competitionDtoList: [],
+        };
+        this.planData.dayDetails[weekIndex].push(dayData);
+      }
+
+      // 确保 details 数组存在
+      if (!dayData.details) {
+        this.$set(dayData, "details", []);
+      }
+
       if (this.classModalDataType === "add") {
+        this.$message.success("课程保存成功");
         dayData.details.push(saveData);
       } else {
+        this.$message.success("课程保存成功");
         this.$set(dayData.details, dayData.details.length - 1, saveData);
       }
 
@@ -537,7 +612,6 @@ export default {
       // 触发响应式更新
       this.$forceUpdate();
     },
-
     // 如果是永久保存 需要走接口
     async savePlanCourse(data) {
       console.log(data, "data");
@@ -546,7 +620,6 @@ export default {
         this.classModalDataType = "edit";
         classApi.createClass(data).then((res) => {
           if (res.success) {
-            this.$message.success("课程保存成功");
             this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
             this.getClassList();
           }
@@ -554,7 +627,6 @@ export default {
       } else {
         classApi.updateClass(data).then((res) => {
           if (res.success) {
-            this.$message.success("课程保存成功");
             this.getClassList();
           } else {
             this.$message.error(res.message);

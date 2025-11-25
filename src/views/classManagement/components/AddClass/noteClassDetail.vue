@@ -119,7 +119,7 @@ export default {
           groupId: this.data.groupId || "",
           sportType: "REMARK",
           distance: "",
-          distanceUnit: "m",
+          distanceUnit: "km",
           duration: "",
           sth: "",
           summary: "",

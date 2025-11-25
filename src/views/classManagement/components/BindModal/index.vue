@@ -30,8 +30,9 @@
               />
             </div>
             <div class="card-content">
-              <div class="card-title">
-                {{ exerciseData[0].name }}
+              <div class="card-title" v-if="exerciseData[0].name">{{ exerciseData[0].name }}</div>
+              <div class="card-title" v-else>
+                {{ getSportTypeName(exerciseData[0].sportType) }}_手动录入
               </div>
               <div class="card-duration">
                 {{
@@ -144,7 +145,7 @@
 
 <script>
 import { SPORT_TYPE_ICONS } from "../../constants";
-import { getClassImageIcon, getClassIconArrowColor } from "../../utils/helpers";
+import { getClassImageIcon, getClassIconArrowColor, getSportTypeName } from "../../utils/helpers";
 
 export default {
   name: "BindModal",
@@ -191,8 +192,10 @@ export default {
     },
   },
   methods: {
+    getSportTypeName(sportType) {
+      return getSportTypeName(sportType);
+    },
     formatDistance(distance, sportType) {
-
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
