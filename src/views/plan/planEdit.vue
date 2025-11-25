@@ -720,7 +720,7 @@ export default {
         this.editPlanClassWeekNumber = null;
         this.editPlanClassGlobalDay = null;
 
-        this.$message.success("删除成功");
+        this.$message.success("操作成功");
       } else {
         this.$confirm("确认删除该课程？", "提示", {
           confirmButtonText: "删除",
