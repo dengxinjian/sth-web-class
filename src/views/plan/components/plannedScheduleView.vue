@@ -25,12 +25,13 @@
               </div>
             </div>
           </div>
-          <i
+          <!-- <i
             style="display: inline-block; cursor: pointer; font-size: 20px"
             class="el-icon-more"
             slot="reference"
             @click.stop
-          ></i>
+          ></i> -->
+          <el-button type="text" slot="reference">操作</el-button>
         </el-popover>
       </div>
       <div class="planned-schedule-header-title-right">
@@ -264,6 +265,7 @@ export default {
   width: 110px !important;
   padding: 8px 0;
   background-color: #fff;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 .add-class-btn-popover-more-list {
   width: 140px;
