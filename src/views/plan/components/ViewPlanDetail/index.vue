@@ -232,7 +232,8 @@ export default {
   props: {
     classItem: {
       type: Object,
-      required: true,
+      required: false,
+      default: () => ({}),
     },
     visible: {
       type: Boolean,
@@ -245,7 +246,7 @@ export default {
   },
   data() {
     return {
-      innerVisible: false,
+      innerVisible: this.visible || false,
       popupStyle: {},
     };
   },
@@ -255,20 +256,32 @@ export default {
     },
   },
   watch: {
-    visible(val) {
-      this.innerVisible = val;
-      if (val) {
-        this.$nextTick(() => {
-          this.setPopupPosition();
-        });
-      }
+    visible: {
+      immediate: true,
+      handler(val) {
+        this.innerVisible = val;
+        if (val && this.clickPosition) {
+          // 使用双重 nextTick 确保 DOM 已完全渲染
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.setPopupPosition();
+            });
+          });
+        }
+      },
     },
-    clickPosition() {
-      if (this.innerVisible) {
-        this.$nextTick(() => {
-          this.setPopupPosition();
-        });
-      }
+    clickPosition: {
+      immediate: false,
+      handler(newVal) {
+        if (this.innerVisible && newVal) {
+          // 使用双重 nextTick 确保 DOM 已完全渲染
+          this.$nextTick(() => {
+            this.$nextTick(() => {
+              this.setPopupPosition();
+            });
+          });
+        }
+      },
     },
   },
   methods: {
@@ -299,56 +312,54 @@ export default {
         return;
       }
 
-      // 使用双重 nextTick 确保 DOM 已完全渲染
-      this.$nextTick(() => {
-        this.$nextTick(() => {
-          const popupEl = this.$refs.popupContainer;
-          if (!popupEl) {
-            return;
-          }
+      const popupEl = this.$refs.popupContainer;
+      if (!popupEl) {
+        return;
+      }
 
-          // 获取弹窗尺寸
-          const popupRect = popupEl.getBoundingClientRect();
-          const popupWidth = popupRect.width || 400; // 默认宽度
-          const popupHeight = popupRect.height || 300; // 默认高度
+      // 获取弹窗尺寸
+      const popupRect = popupEl.getBoundingClientRect();
+      const popupWidth = popupRect.width || 400; // 默认宽度
+      const popupHeight = popupRect.height || 300; // 默认高度
 
-          // 计算位置：点击位置右侧10px
-          let left = this.clickPosition.clientX + 10;
-          let top = this.clickPosition.clientY;
+      // 计算位置：点击位置右侧10px
+      // 兼容 clientX/clientY 和 x/y 两种格式
+      const clickX = this.clickPosition.clientX || this.clickPosition.x || 0;
+      const clickY = this.clickPosition.clientY || this.clickPosition.y || 0;
+      let left = clickX + 10;
+      let top = clickY;
 
-          // 边界检查：确保弹窗不超出视口
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
+      // 边界检查：确保弹窗不超出视口
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
-          // 如果右侧超出，调整到左侧
-          if (left + popupWidth > viewportWidth) {
-            left = this.clickPosition.clientX - popupWidth - 10;
-          }
+      // 如果右侧超出，调整到左侧
+      if (left + popupWidth > viewportWidth) {
+        left = clickX - popupWidth - 10;
+      }
 
-          // 如果左侧超出，调整到右侧
-          if (left < 0) {
-            left = 10;
-          }
+      // 如果左侧超出，调整到右侧
+      if (left < 0) {
+        left = 10;
+      }
 
-          // 如果底部超出，向上调整
-          if (top + popupHeight > viewportHeight) {
-            top = viewportHeight - popupHeight - 10;
-          }
+      // 如果底部超出，向上调整
+      if (top + popupHeight > viewportHeight) {
+        top = viewportHeight - popupHeight - 10;
+      }
 
-          // 如果顶部超出，向下调整
-          if (top < 0) {
-            top = 10;
-          }
+      // 如果顶部超出，向下调整
+      if (top < 0) {
+        top = 10;
+      }
 
-          // 应用位置
-          this.popupStyle = {
-            position: "fixed",
-            left: `${left}px`,
-            top: `${top}px`,
-            zIndex: 2001,
-          };
-        });
-      });
+      // 应用位置
+      this.popupStyle = {
+        position: "fixed",
+        left: `${left}px`,
+        top: `${top}px`,
+        zIndex: 2001,
+      };
     },
   },
 };

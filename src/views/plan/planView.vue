@@ -418,11 +418,18 @@ export default {
       this.classModalData = this.findClassById(classId);
     },
     handleViewPlanClass(classItem, clickPosition) {
-      this.showViewPlanDetail = true;
+      if (!classItem) {
+        console.warn("handleViewPlanClass: classItem is required");
+        return;
+      }
       // 使用 classItem 作为课程数据
-      this.classModalData = classItem || {};
+      this.classModalData = classItem;
       // 保存点击位置
       this.clickPosition = clickPosition || null;
+      // 最后设置 visible，确保数据已准备好
+      this.$nextTick(() => {
+        this.showViewPlanDetail = true;
+      });
     },
     /**
      * 通过ID查找课程
