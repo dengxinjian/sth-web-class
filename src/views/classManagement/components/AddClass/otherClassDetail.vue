@@ -30,8 +30,9 @@
           <div class="row-item">
             <span class="label">距离</span>
             <el-input-number
-              :step="0.1"
+              :step="distanceStep"
               :min="0"
+              :precision="distancePrecision"
               :step-strictly="true"
               :controls="false"
               v-model="form.distance"
@@ -45,6 +46,7 @@
               v-model="form.distanceUnit"
               :disabled="originalType === 'official'"
               class="pill-select short"
+              @change="handleDistanceUnitChange"
             >
               <el-option label="m" value="m" />
               <el-option label="km" value="km" />
@@ -181,6 +183,12 @@ export default {
     summaryLength() {
       return (this.form.summary || "").length;
     },
+    distancePrecision() {
+      return this.form.distanceUnit === "km" ? 2 : 0;
+    },
+    distanceStep() {
+      return this.form.distanceUnit === "km" ? 0.01 : 1;
+    },
   },
   watch: {
     visible(val) {
@@ -197,9 +205,10 @@ export default {
         if (this.data.id && this.originalType === "my") {
           // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
           if (this.data.classesJson) {
-            const classesJson = typeof this.data.classesJson === 'string'
-              ? JSON.parse(this.data.classesJson)
-              : this.data.classesJson;
+            const classesJson =
+              typeof this.data.classesJson === "string"
+                ? JSON.parse(this.data.classesJson)
+                : this.data.classesJson;
             this.form = classesJson;
             this.form.id = this.data.id;
             this.form.groupId = this.data.classesGroupId || this.data.groupId;
@@ -218,9 +227,10 @@ export default {
       if (this.data.id && this.originalType === "my") {
         // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
         if (this.data.classesJson) {
-          const classesJson = typeof this.data.classesJson === 'string'
-            ? JSON.parse(this.data.classesJson)
-            : this.data.classesJson;
+          const classesJson =
+            typeof this.data.classesJson === "string"
+              ? JSON.parse(this.data.classesJson)
+              : this.data.classesJson;
           this.form = classesJson;
           this.form.id = this.data.id;
           this.form.groupId = this.data.classesGroupId || this.data.groupId;
@@ -241,6 +251,14 @@ export default {
     }
   },
   methods: {
+    handleDistanceUnitChange(value) {
+      const distanceValue = Number(this.form.distance) || 0;
+      if (value === "km") {
+        this.form.distance = Number((distanceValue / 1000).toFixed(2));
+      } else {
+        this.form.distance = Math.round(distanceValue * 1000);
+      }
+    },
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({

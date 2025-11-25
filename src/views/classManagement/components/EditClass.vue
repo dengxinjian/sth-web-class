@@ -39,7 +39,7 @@
                   classData.sportType
                 )
               }}
-              <span v-if="classData.sportType === 'SWIM'">
+               <span v-if="classData.classesJson.distanceUnit && classData.classesJson.distanceUnit !== 'km'">
                 {{ classData.classesJson.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -135,7 +135,7 @@
                   </td>
                   <td>
                     {{
-                      classData.sportType === 'SWIM'
+                      classData.classesJson.distanceUnit && classData.classesJson.distanceUnit !== 'km'
                         ? classData.classesJson.distanceUnit
                         : "km"
                     }}

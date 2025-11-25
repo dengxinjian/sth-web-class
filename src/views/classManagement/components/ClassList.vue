@@ -40,7 +40,12 @@
         </div>
       </el-popover>
 
-      <el-input size="mini" v-model="searchInput" clearable @input="handleSearch">
+      <el-input
+        size="mini"
+        v-model="searchInput"
+        clearable
+        @input="handleSearch"
+      >
         <el-button
           slot="append"
           icon="el-icon-search"
@@ -189,6 +194,8 @@ export default {
     handleClassTypeChange(type) {
       this.$emit("update:activeClassType", type);
       this.$emit("class-type-change", type);
+      this.searchInput = "";
+      this.emitSearch();
     },
     handleSearch() {
       if (this.emitSearch) {
