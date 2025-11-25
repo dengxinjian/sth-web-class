@@ -197,6 +197,8 @@ export default {
     // 监听 activeClassType 变化
     activeClassType: {
       handler(newVal) {
+        // 清空搜索输入
+        this.searchInput = "";
         this.handleClassTypeChange(newVal)
       },
       immediate: true
@@ -216,6 +218,8 @@ export default {
   },
   methods: {
     handleClassTypeChange(type) {
+      // 清空搜索输入
+      this.searchInput = "";
       this.$emit("update:activeClassType", type);
       this.$emit("class-type-change", type);
     },

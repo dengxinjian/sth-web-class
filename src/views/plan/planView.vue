@@ -359,6 +359,7 @@ export default {
       return completeData;
     },
     handleClassTypeChange(type) {
+      this.planSearchInput = "";
       this.activeClassType = type;
       this.restPageInfo();
       this.getPlanList();
