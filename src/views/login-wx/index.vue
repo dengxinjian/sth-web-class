@@ -71,7 +71,7 @@
           <div class="miniprogram-code">
             <div class="miniprogram-title">请使用微信扫码</div>
             <img
-              src="./imgs/miniprogram-test.png"
+              src="./imgs/miniprogram.png"
               alt="小程序码"
               class="miniprogram-img"
             />
@@ -217,7 +217,7 @@ export default {
               setToken(res.result.jwt);
               this.$router.push("/timeTable/class");
             } else {
-              this.$message.error("请扫码进入小程序完成运动阈值设置");
+              this.$message.error("请完成引导页设置");
             }
           })
           .catch((error) => {

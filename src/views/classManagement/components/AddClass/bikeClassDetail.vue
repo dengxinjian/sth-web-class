@@ -759,6 +759,7 @@ export default {
       this.$emit("input", val);
       // 当弹框打开时清空表单
       if (val) {
+        this.getTagList();
         if (this.data.id && this.originalType === "my") {
           // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
           if (this.data.classesJson) {
