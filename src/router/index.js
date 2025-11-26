@@ -8,8 +8,11 @@ const config = {
   development: {
     loginComponent: () => import("@/views/login/index"),
   },
+  // staging: {
+  //   loginComponent: () => import("@/views/login-wx/index"),
+  // },
   staging: {
-    loginComponent: () => import("@/views/login-wx/index"),
+    loginComponent: () => import("@/views/login/index"),
   },
   production: {
     loginComponent: () => import("@/views/login-wx/index"),
@@ -70,11 +73,6 @@ export const constantRoutes = [
   {
     path: "/login",
     component: currentConfig.loginComponent,
-    hidden: true,
-  },
-  {
-    path: "/login-test",
-    component: () => import("@/views/login/index"),
     hidden: true,
   },
   {
