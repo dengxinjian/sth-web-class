@@ -27,6 +27,7 @@
         @plan-item-move="handlePlanItemMove"
         @plan-library-drop="handlePlanLibraryDrop"
         @save="handleSave"
+        @save-and-exit="handleSaveAndExit"
       />
     </div>
     <ViewClassCard
@@ -179,17 +180,18 @@ export default {
     };
   },
   watch: {
+    // 暂不去除，后续根据功能是否需要再启用
     // 监听路由中type值，如果值为edit，则开启30s自动保存数据功能
-    '$route.query.type': {
-      handler(newVal) {
-        if (newVal === 'edit') {
-          this.startAutoSave();
-        } else if (newVal === 'add') {
-          this.stopAutoSave();
-        }
-      },
-      immediate: true,
-    },
+    // '$route.query.type': {
+    //   handler(newVal) {
+    //     if (newVal === 'edit') {
+    //       this.startAutoSave();
+    //     } else if (newVal === 'add') {
+    //       this.stopAutoSave();
+    //     }
+    //   },
+    //   immediate: true,
+    // },
   },
   mounted() {
     this.getClassList();
@@ -217,7 +219,7 @@ export default {
     this.initialPlanData = JSON.parse(JSON.stringify(this.planData));
 
     // 监听浏览器刷新/关闭事件
-    window.addEventListener('beforeunload', this.handleBeforeUnload);
+    window.addEventListener("beforeunload", this.handleBeforeUnload);
   },
   // 路由离开守卫 - 监听路由跳转
   beforeRouteLeave(to, from, next) {
@@ -237,7 +239,7 @@ export default {
             }
           })
           .catch((error) => {
-            console.error('离开页面处理失败:', error);
+            console.error("离开页面处理失败:", error);
             next(false);
           });
       }, 0);
@@ -249,7 +251,7 @@ export default {
   beforeDestroy() {
     this.stopAutoSave();
     // 移除事件监听
-    window.removeEventListener('beforeunload', this.handleBeforeUnload);
+    window.removeEventListener("beforeunload", this.handleBeforeUnload);
   },
   methods: {
     // 检测数据是否有变更
@@ -274,18 +276,18 @@ export default {
         // 标准方式
         event.preventDefault();
         // Chrome 需要设置 returnValue
-        event.returnValue = '您有未保存的数据，确定要离开吗？';
+        event.returnValue = "您有未保存的数据，确定要离开吗？";
         return event.returnValue;
       }
     },
     // 处理离开页面时的保存提示
     handleLeaveWithSave() {
       return new Promise((resolve) => {
-        this.$confirm('您有未保存的数据，是否保存后再离开？', '提示', {
-          confirmButtonText: '保存并离开',
-          cancelButtonText: '不保存离开',
+        this.$confirm("您有未保存的数据，是否保存后再离开？", "提示", {
+          confirmButtonText: "保存并离开",
+          cancelButtonText: "不保存离开",
           distinguishCancelAndClose: true,
-          type: 'warning',
+          type: "warning",
           closeOnClickModal: false,
           closeOnPressEscape: false,
           lockScroll: true,
@@ -294,19 +296,19 @@ export default {
             // 用户点击"保存并离开"
             try {
               this.isSaving = true;
-              await this.handleSave();
+              await this.handleSaveAndExit();
               this.isSaving = false;
               this.markDataSaved();
               resolve(true);
             } catch (error) {
-              console.error('保存失败:', error);
+              console.error("保存失败:", error);
               this.isSaving = false;
-              this.$message.error('保存失败，请重试');
+              this.$message.error("保存失败，请重试");
               resolve(false);
             }
           })
           .catch((action) => {
-            if (action === 'cancel') {
+            if (action === "cancel") {
               // 用户点击"不保存离开"
               this.hasUnsavedChanges = false;
               resolve(true);
@@ -444,7 +446,13 @@ export default {
     planSlideChange() {
       // 拖拽功能已由 vuedraggable 处理，无需手动初始化
     },
-    async handleSave() {
+    // 保存并关闭
+    async handleSaveAndExit() {
+      await this.handleSave(true);
+      this.$router.replace("/timeTable/plan");
+    },
+    // 保存
+    async handleSave(isExit = false) {
       console.log(this.planData, "this.planData");
       this.isSaving = true; // 标记正在保存
       const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
@@ -464,16 +472,20 @@ export default {
       });
       try {
         if (this.planType === "add") {
-          await this.addPlan(planList);
+          if (this.planData.id) {
+            await this.updatePlan(planList, isExit, "add");
+          } else {
+            await this.addPlan(planList, isExit);
+          }
         } else {
-          await this.updatePlan(planList);
+          await this.updatePlan(planList, isExit);
         }
       } finally {
         this.isSaving = false;
       }
       console.log(planList, "planList");
     },
-    async updatePlan(planList) {
+    async updatePlan(planList, isExit = false, type = "update") {
       const res = await planApi.updatePlan({
         planTitle: this.planData.planTitle,
         planGroupId: this.planData.planGroupId,
@@ -487,19 +499,26 @@ export default {
       if (res.success) {
         // 标记数据已保存
         this.markDataSaved();
-        this.$message.success("更新成功");
-        this.$router.replace({
-          path: "/timeTable/plan",
-          query: {
-            id: this.planData.id,
-            planGroupId: this.planData.planGroupId,
-            type: "edit",
-          },
-        });
+        if (type === "add") {
+          this.$message.success("添加成功");
+        } else {
+          this.$message.success(isExit ? "更新成功" : "保存成功");
+        }
+
+        if (isExit) {
+          this.$router.replace({
+            path: "/timeTable/plan",
+            query: {
+              id: this.planData.id,
+              planGroupId: this.planData.planGroupId,
+              type: "edit",
+            },
+          });
+        }
       }
     },
     // 添加计划
-    async addPlan(planList) {
+    async addPlan(planList, isExit = false) {
       const res = await planApi.addPlan({
         planTitle: this.planData.planTitle,
         planGroupId: this.planData.planGroupId,
@@ -512,14 +531,20 @@ export default {
       if (res.success) {
         // 标记数据已保存
         this.markDataSaved();
-        this.$message.success("添加成功");
-        this.$router.replace({
-          path: "/timeTable/plan",
-          query: {
-            id: res.result.id,
-            planGroupId: this.planData.planGroupId,
-          },
-        });
+        this.$message.success(isExit ? "添加成功" : "保存成功");
+        this.planData = {
+          ...this.planData,
+          ...res.result,
+        };
+        if (isExit) {
+          this.$router.replace({
+            path: "/timeTable/plan",
+            query: {
+              id: res.result.id,
+              planGroupId: this.planData.planGroupId,
+            },
+          });
+        }
       }
     },
     handleClassTypeChange(type) {
