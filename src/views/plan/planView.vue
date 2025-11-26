@@ -180,6 +180,7 @@ export default {
     },
     isPlan: {
       handler(newVal) {
+        console.log(newVal, "newVal");
         if (newVal) {
           if (Object.keys(this.$route.query).length > 0) {
             const { id, planGroupId, type } = this.$route.query;
@@ -623,6 +624,9 @@ export default {
               const queryPlanId = _this.$route.query?.id;
               _this.$emit("choose-plan", false);
               if (queryPlanId && String(queryPlanId) === currentPlanId) {
+                _this.$router.replace({
+                  path: "/timeTable/class",
+                });
                 _this.getPlanList();
                 _this.restPageInfo();
               } else {
