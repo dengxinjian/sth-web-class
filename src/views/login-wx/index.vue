@@ -329,7 +329,7 @@ export default {
         .then((res) => {
           if (res.result?.sceneId && res.result?.ticket) {
             // 过期时间
-            this.expireTime = (res.result.expireSeconds - 20) || 0;
+            this.expireTime = (res.result.expireSeconds - 25) || 0;
             this.sceneId = res.result.sceneId;
             this.qrcodeUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${res.result.ticket}`;
 
