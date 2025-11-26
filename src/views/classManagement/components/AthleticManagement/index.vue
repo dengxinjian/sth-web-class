@@ -447,14 +447,6 @@ export default {
     },
   },
   watch: {
-    activeName: {
-      handler(newVal) {
-        if (newVal) {
-          this.getAthleticData();
-        }
-      },
-      immediate: false,
-    },
     teamId: {
       handler(newVal) {
         if (newVal) {
@@ -463,6 +455,9 @@ export default {
       },
       immediate: false,
     },
+  },
+  mounted() {
+    this.getAthleticData();
   },
   methods: {
     // 判断是否为当前用户
