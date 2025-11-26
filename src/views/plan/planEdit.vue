@@ -158,9 +158,22 @@ export default {
       editEventWeekNumber: null,
       editEventGlobalDay: null,
       isEditMode: false,
+      autoSaveTimer: null,
     };
   },
-  watch: {},
+  watch: {
+    // 监听路由中type值，如果值为edit，则开启30s自动保存数据功能
+    '$route.query.type': {
+      handler(newVal) {
+        if (newVal === 'edit') {
+          this.startAutoSave();
+        } else if (newVal === 'add') {
+          this.stopAutoSave();
+        }
+      },
+      immediate: true,
+    },
+  },
   mounted() {
     this.getClassList();
     this.getCurrentUserClassConfigCount();
@@ -182,8 +195,62 @@ export default {
     // this.$store.dispatch("plan", this.planType);
     // this.$route.query.planId && this.getPlanData();
   },
-
+  // 离开页面时,清除定时器，停止自动保存
+  beforeDestroy() {
+    this.stopAutoSave();
+  },
   methods: {
+    startAutoSave() {
+      // 如果已有定时器在运行，先清除旧的定时器，避免重复启动
+      if (this.autoSaveTimer) {
+        this.stopAutoSave();
+      }
+      this.autoSaveTimer = setInterval(() => {
+        try {
+          this.handleAutoSave();
+          console.log("自动保存数据");
+        } catch (error) {
+          console.error("自动保存失败:", error);
+          // 即使保存失败，定时器仍然继续运行
+        }
+      }, 30000);
+    },
+    stopAutoSave() {
+      if (this.autoSaveTimer) {
+        clearInterval(this.autoSaveTimer);
+        this.autoSaveTimer = null;
+      }
+    },
+    async handleAutoSave() {
+      const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
+      const planList = [];
+      dayDetails.forEach((item) => {
+        item.forEach((week) => {
+          if (week.details.length > 0 || week.competitionDtoList) {
+            planList.push(week);
+          }
+        });
+      });
+      planList.forEach((item) => {
+        item.details.forEach((day) => {
+          day.classesJson = JSON.stringify(day.classesJson);
+        });
+      });
+
+      const res = await planApi.updatePlan({
+        planTitle: this.planData.planTitle,
+        planGroupId: this.planData.planGroupId,
+        teamId: this.planData.teamId,
+        email: this.planData.email,
+        weChat: this.planData.weChat,
+        description: this.planData.description,
+        dayDetails: planList,
+        planClassesId: this.planData.id,
+      });
+      if (res.success) {
+        // this.$message.success("更新成功");
+      }
+    },
     /**
      * 赛事确认
      */
