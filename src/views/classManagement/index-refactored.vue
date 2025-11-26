@@ -88,7 +88,47 @@
         style="display: flex; width: 100%"
         v-if="activeName === 'plan'"
       >
-        <PlanView />
+        <PlanView :isPlan="isPlan" @choose-plan="handleChoosePlan" />
+        <!-- 日程表 -->
+        <ScheduleCalendar
+          v-if="!isPlan"
+          :current-week="currentWeek"
+          :team-list="teamList"
+          :athletic-list="athleticList"
+          :selected-team="selectedTeam"
+          :selected-athletic="selectedAthletic"
+          @week-change="onWeekChange"
+          @team-change="handleTeamChange"
+          @athletic-change="handleAthleticChange"
+          @show-info="showAthleticInfoDialog = true"
+          @show-statistic="showMonthStatisticDialog = true"
+          @refresh="handleRefresh"
+          @class-detail="handleClassScheduleDetail"
+          @activity-detail="handleSportDetail"
+          @delete-schedule="handleDeleteClassSchedule"
+          @unbind="handleUnbind"
+          @delete-activity="handleDeleteActivity"
+          @device-click="handleDeviceClick"
+          @edit-schedule="handleEditClassSchedule"
+          @edit-activity="handleEditActivity"
+          @paste-class="handlePasteClass"
+          @cut-class="handleCutClass"
+          @paste-event="handlePasteEvent"
+          @cut-event="handleCutEvent"
+          @view-health-data="handleViewHealthData"
+          @add-schedule="handleAddSchedule"
+          @event-detail="handleEventDetail"
+          @edit-event="handleEditEvent"
+          @input-activity="handleInputActivity"
+        />
+        <!-- 右侧统计面板 -->
+        <StatisticsPanel
+          v-if="!isPlan"
+          :sth-data="sthData"
+          :statistic-data="statisticData"
+          :device-list="deviceList"
+          @device-change="handleDeviceChange"
+        />
       </div>
     </div>
 
@@ -348,7 +388,6 @@ export default {
       // 课程数据
       classList: [],
       classSearchInput: "",
-      currentUserClassConfig: {},
 
       // 日程数据
       currentWeek: [],
@@ -414,13 +453,17 @@ export default {
       // 录入运动
       showInputActivity: false,
       inputActivityDate: "",
+
+      isPlan: false,
     };
   },
   watch: {
     // 监听路由变化，同步菜单状态
     $route: {
-      handler(to) {
+      handler(to, from) {
         // this.initMenuFromRoute();
+        console.log(to, "to");
+        console.log(from, "from");
       },
       immediate: false,
     },
@@ -439,8 +482,16 @@ export default {
       this.getAuthorizedDeviceList();
       this.getClassList();
     }
+    console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
+    if (this.$store.state.fromPath === "/plan/add") {
+      this.isPlan = true;
+    }
   },
   methods: {
+    handleChoosePlan(isPlan) {
+      console.log("handleChoosePlan");
+      this.isPlan = isPlan;
+    },
     handleSaveClassDetail(data) {
       console.log(data, "data", this.scheduleType);
       if (!data.classesTitle || data.classesTitle === "") {
@@ -732,6 +783,7 @@ export default {
     handleTypeChange(type) {
       this.activeName = type;
       this.getClassList();
+      this.isPlan = false;
     },
 
     /**
@@ -1106,24 +1158,11 @@ export default {
     handleRefresh() {
       this.getScheduleData();
     },
-    async getCurrentUserClassConfigCount() {
-      const res = await classApi.getCurrentUserClassConfigCount();
-      if (res.success) {
-        this.currentUserClassConfig = res.result;
-      }
-    },
 
     /**
      * 新增课程
      */
     handleAddClass(groupId) {
-      if (
-        this.currentUserClassConfig.currentCount >=
-        this.currentUserClassConfig.limitValue
-      ) {
-        this.$message.error("超出课程数量上限");
-        return;
-      }
       this.classModalDataType = "add";
       this.isClass = true;
       this.addGroupId = groupId;
@@ -1349,13 +1388,6 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
-      if (
-        this.currentUserClassConfig.currentCount >=
-        this.currentUserClassConfig.limitValue
-      ) {
-        this.$message.error("超出课程数量上限");
-        return;
-      }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;

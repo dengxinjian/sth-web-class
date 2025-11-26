@@ -122,7 +122,6 @@ export default {
   data() {
     return {
       classList: [],
-      currentUserClassConfig: {},
       activeClassType: "my",
       showViewClassCard: false,
       classModalData: {},
@@ -163,7 +162,6 @@ export default {
   watch: {},
   mounted() {
     this.getClassList();
-    this.getCurrentUserClassConfigCount();
     console.log(this.$route.query, "this.$route.query");
     this.planType = this.$route.query.type;
     // 获取 store plan.js planData数据
@@ -287,7 +285,7 @@ export default {
       if (res.success) {
         this.$message.success("更新成功");
         this.$router.replace({
-          path: "/timeTable/plan",
+          path: "/timeTable/class",
           query: {
             id: this.planData.id,
             planGroupId: this.planData.planGroupId,
@@ -310,7 +308,7 @@ export default {
       if (res.success) {
         this.$message.success("添加成功");
         this.$router.replace({
-          path: "/timeTable/plan",
+          path: "/timeTable/class",
           query: {
             id: res.result.id,
             planGroupId: this.planData.planGroupId,
@@ -351,15 +349,6 @@ export default {
         // });
       } else {
         this.classList = [];
-      }
-    },
-    /**
-     * 获取当前人 课程配置数
-     */
-    async getCurrentUserClassConfigCount() {
-      const res = await classApi.getCurrentUserClassConfigCount();
-      if (res.success) {
-        this.currentUserClassConfig = res.result;
       }
     },
     /**
@@ -422,13 +411,6 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
-      if (
-        this.currentUserClassConfig.currentCount >=
-        this.currentUserClassConfig.limitValue
-      ) {
-        this.$message.error("超出课程数量上限");
-        return;
-      }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;

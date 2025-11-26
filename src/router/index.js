@@ -9,7 +9,7 @@ const config = {
     loginComponent: () => import("@/views/login/index"),
   },
   staging: {
-    loginComponent: () => import("@/views/login-wx/index"),
+    loginComponent: () => import("@/views/login/index"),
   },
   production: {
     loginComponent: () => import("@/views/login-wx/index"),
@@ -162,19 +162,9 @@ export const asyncRoutes = [
     meta: { title: "课表查看", icon: "el-icon-setting" },
     children: [
       {
-        path: "athletic",
-        component: () => import("@/views/classManagement/index-refactored.vue"),
-        meta: { title: "课表管理" },
-      },
-      {
         path: "class",
         component: () => import("@/views/classManagement/index-refactored.vue"),
         meta: { title: "课程管理" },
-      },
-      {
-        path: "plan",
-        component: () => import("@/views/plan/planView.vue"),
-        meta: { title: "计划管理" },
       },
       {
         path: "/class-management-test",

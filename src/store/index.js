@@ -19,6 +19,19 @@ const modules = modulesFiles.keys().reduce((modules, modulePath) => {
 }, {});
 
 const store = new Vuex.Store({
+  state: {
+    fromPath: "",
+  },
+  mutations: {
+    SET_FROM_PATH: (state, fromPath) => {
+      state.fromPath = fromPath;
+    },
+  },
+  actions: {
+    setFromPath({ commit }, fromPath) {
+      commit("SET_FROM_PATH", fromPath);
+    },
+  },
   modules,
   getters,
   plugins: [createPersistedstate({ paths: ["userInfo", "plan"] })],
