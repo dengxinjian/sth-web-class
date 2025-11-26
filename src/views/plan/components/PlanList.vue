@@ -55,6 +55,7 @@
         v-model="activeCollapse"
         accordion
         @change="$emit('collapse-change')"
+        v-loading="loading"
       >
         <el-collapse-item
           v-for="item in classList"
@@ -163,6 +164,7 @@ export default {
     return {
       searchInput: "",
       activeCollapse: null,
+      loading: false,
     };
   },
   watch: {
@@ -180,6 +182,8 @@ export default {
     },
     classList: {
       handler(newList) {
+        // 当列表更新时隐藏 loading
+        this.loading = false;
         // 当列表更新时，如果 currentPlanGroupId 有值且对应的分组存在，则展开
         if (
           this.currentPlanGroupId != null &&
@@ -192,17 +196,22 @@ export default {
         }
       },
       immediate: true,
-      deep: true
+      deep: true,
     },
     // 监听 activeClassType 变化
     activeClassType: {
-      handler(newVal) {
+      handler(newVal, oldVal) {
         // 清空搜索输入
         this.searchInput = "";
-        this.handleClassTypeChange(newVal)
+        // 当 activeClassType 改变时显示 loading 并折叠所有项
+        if (oldVal !== undefined && newVal !== oldVal) {
+          this.loading = true;
+          this.activeCollapse = null;
+        }
+        this.handleClassTypeChange(newVal);
       },
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   mounted() {
     // 组件挂载后，延迟检查以确保数据已加载
