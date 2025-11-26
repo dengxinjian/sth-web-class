@@ -197,7 +197,8 @@ export default {
       }
     }
     this.getPlanList();
-    this.getPlanLimitCount();
+    // 计划数量限制接口，不删除，后续根据需求再定
+    // this.getPlanLimitCount();
     this.getTeamList();
   },
   methods: {
@@ -466,11 +467,11 @@ export default {
      * 添加计划
      */
     async handleAddPlan(payload) {
-      const result = await this.getPlanLimitCount();
-      if (result.currentCount >= result.limitValue) {
-        this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
-        return;
-      }
+      // const result = await this.getPlanLimitCount();
+      // if (result.currentCount >= result.limitValue) {
+      //   this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+      //   return;
+      // }
       this.addPlanGroupId = payload;
       this.addPlanVisible = true;
     },
@@ -528,13 +529,13 @@ export default {
         },
         1: async () => {
           if (_this.activeClassType === "official") {
-            const result = await _this.getPlanLimitCount();
-            if (result.currentCount >= result.limitValue) {
-              _this.$message.error(
-                "您当前的计划数量已达上限，无法添加更多计划"
-              );
-              return;
-            }
+            // const result = await _this.getPlanLimitCount();
+            // if (result.currentCount >= result.limitValue) {
+            //   _this.$message.error(
+            //     "您当前的计划数量已达上限，无法添加更多计划"
+            //   );
+            //   return;
+            // }
             _this.$nextTick(() => {
               _this.copyOfficialPlanInfo = {
                 ..._this.currentPlanDetail,
@@ -550,11 +551,11 @@ export default {
           }
         },
         2: async () => {
-          const result = await _this.getPlanLimitCount();
-          if (result.currentCount >= result.limitValue) {
-            _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
-            return;
-          }
+          // const result = await _this.getPlanLimitCount();
+          // if (result.currentCount >= result.limitValue) {
+          //   _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+          //   return;
+          // }
           _this.$nextTick(() => {
             _this.showCopy = true;
           });
