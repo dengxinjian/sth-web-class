@@ -75,7 +75,7 @@ export default {
   login: {
     title: "强者之心",
     logIn: "登录",
-    username: "TriUserId",
+    username: "账号",
     password: "密码",
     any: "随便填",
     thirdparty: "第三方登录",
