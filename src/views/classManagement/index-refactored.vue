@@ -333,7 +333,8 @@ export default {
       // 课程数据
       classList: [],
       classSearchInput: "",
-      currentUserClassConfig: {},
+      // 课程数量限制 -- 后续根据待用功能添加
+      // currentUserClassConfig: {},
 
       // 日程数据
       currentWeek: [],
@@ -413,7 +414,7 @@ export default {
   mounted() {
     // 根据路由初始化菜单状态
     this.initMenuFromRoute();
-    this.getCurrentUserClassConfigCount();
+    // this.getCurrentUserClassConfigCount();
 
     if (localStorage.getItem("loginType") !== "1") {
       this.getTeamAndAthleticData();
@@ -1104,13 +1105,14 @@ export default {
      * 新增课程
      */
     handleAddClass(groupId) {
-      if (
-        this.currentUserClassConfig.currentCount >=
-        this.currentUserClassConfig.limitValue
-      ) {
-        this.$message.error("超出课程数量上限");
-        return;
-      }
+      // 课程数量限制 -- 后续根据待用功能添加
+      // if (
+      //   this.currentUserClassConfig.currentCount >=
+      //   this.currentUserClassConfig.limitValue
+      // ) {
+      //   this.$message.error("超出课程数量上限");
+      //   return;
+      // }
       this.classModalDataType = "add";
       this.isClass = true;
       this.addGroupId = groupId;
@@ -1336,13 +1338,14 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
-      if (
-        this.currentUserClassConfig.currentCount >=
-        this.currentUserClassConfig.limitValue
-      ) {
-        this.$message.error("超出课程数量上限");
-        return;
-      }
+      // 课程数量限制 -- 后续根据待用功能添加
+      // if (
+      //   this.currentUserClassConfig.currentCount >=
+      //   this.currentUserClassConfig.limitValue
+      // ) {
+      //   this.$message.error("超出课程数量上限");
+      //   return;
+      // }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;

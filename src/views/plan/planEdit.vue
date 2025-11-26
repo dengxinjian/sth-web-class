@@ -193,7 +193,8 @@ export default {
   },
   mounted() {
     this.getClassList();
-    this.getCurrentUserClassConfigCount();
+    // 课程数量限制 -- 后续根据待用功能添加
+    // this.getCurrentUserClassConfigCount();
     console.log(this.$route.query, "this.$route.query");
     this.planType = this.$route.query.type;
     // 获取 store plan.js planData数据
@@ -631,13 +632,14 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
-      if (
-        this.currentUserClassConfig.currentCount >=
-        this.currentUserClassConfig.limitValue
-      ) {
-        this.$message.error("超出课程数量上限");
-        return;
-      }
+      // 课程数量限制 -- 后续根据待用功能添加
+      // if (
+      //   this.currentUserClassConfig.currentCount >=
+      //   this.currentUserClassConfig.limitValue
+      // ) {
+      //   this.$message.error("超出课程数量上限");
+      //   return;
+      // }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;
