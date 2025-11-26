@@ -159,6 +159,10 @@ export default {
       editEventGlobalDay: null,
       isEditMode: false,
       autoSaveTimer: null,
+      // 数据变更追踪
+      hasUnsavedChanges: false,
+      initialPlanData: null,
+      isSaving: false, // 标记是否正在保存，避免重复提示
     };
   },
   watch: {
@@ -194,12 +198,111 @@ export default {
     console.log(this.planData, "this.planData");
     // this.$store.dispatch("plan", this.planType);
     // this.$route.query.planId && this.getPlanData();
+
+    // 保存初始数据快照，用于检测变更
+    this.initialPlanData = JSON.parse(JSON.stringify(this.planData));
+
+    // 监听浏览器刷新/关闭事件
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
+  },
+  // 路由离开守卫 - 监听路由跳转
+  beforeRouteLeave(to, from, next) {
+    // 先检查数据是否有变更
+    this.checkDataChanged();
+
+    if (this.hasUnsavedChanges && !this.isSaving) {
+      // 阻止路由跳转，等待用户选择
+      // 使用 setTimeout 确保弹窗能正常显示
+      setTimeout(() => {
+        this.handleLeaveWithSave()
+          .then((shouldLeave) => {
+            if (shouldLeave) {
+              next();
+            } else {
+              next(false);
+            }
+          })
+          .catch((error) => {
+            console.error('离开页面处理失败:', error);
+            next(false);
+          });
+      }, 0);
+    } else {
+      next();
+    }
   },
   // 离开页面时,清除定时器，停止自动保存
   beforeDestroy() {
     this.stopAutoSave();
+    // 移除事件监听
+    window.removeEventListener('beforeunload', this.handleBeforeUnload);
   },
   methods: {
+    // 检测数据是否有变更
+    checkDataChanged() {
+      const currentData = JSON.stringify(this.planData);
+      const initialData = JSON.stringify(this.initialPlanData);
+      this.hasUnsavedChanges = currentData !== initialData;
+      return this.hasUnsavedChanges;
+    },
+    // 标记数据已修改
+    markDataChanged() {
+      this.hasUnsavedChanges = true;
+    },
+    // 标记数据已保存
+    markDataSaved() {
+      this.hasUnsavedChanges = false;
+      this.initialPlanData = JSON.parse(JSON.stringify(this.planData));
+    },
+    // 处理浏览器刷新/关闭事件
+    handleBeforeUnload(event) {
+      if (this.hasUnsavedChanges && !this.isSaving) {
+        // 标准方式
+        event.preventDefault();
+        // Chrome 需要设置 returnValue
+        event.returnValue = '您有未保存的数据，确定要离开吗？';
+        return event.returnValue;
+      }
+    },
+    // 处理离开页面时的保存提示
+    handleLeaveWithSave() {
+      return new Promise((resolve) => {
+        this.$confirm('您有未保存的数据，是否保存后再离开？', '提示', {
+          confirmButtonText: '保存并离开',
+          cancelButtonText: '不保存离开',
+          distinguishCancelAndClose: true,
+          type: 'warning',
+          closeOnClickModal: false,
+          closeOnPressEscape: false,
+          lockScroll: true,
+        })
+          .then(async () => {
+            // 用户点击"保存并离开"
+            try {
+              this.isSaving = true;
+              await this.handleSave();
+              this.isSaving = false;
+              this.markDataSaved();
+              resolve(true);
+            } catch (error) {
+              console.error('保存失败:', error);
+              this.isSaving = false;
+              this.$message.error('保存失败，请重试');
+              resolve(false);
+            }
+          })
+          .catch((action) => {
+            if (action === 'cancel') {
+              // 用户点击"不保存离开"
+              this.hasUnsavedChanges = false;
+              resolve(true);
+            } else {
+              // 用户关闭对话框（点击 X 或按 ESC），取消离开
+              resolve(false);
+            }
+          });
+      });
+    },
     startAutoSave() {
       // 如果已有定时器在运行，先清除旧的定时器，避免重复启动
       if (this.autoSaveTimer) {
@@ -248,6 +351,8 @@ export default {
         planClassesId: this.planData.id,
       });
       if (res.success) {
+        // 自动保存成功后，标记数据已保存
+        this.markDataSaved();
         // this.$message.success("更新成功");
       }
     },
@@ -295,6 +400,8 @@ export default {
       console.log(this.planData, "this.planData");
       // 触发响应式更新
       this.$forceUpdate();
+      // 标记数据已修改
+      this.markDataChanged();
 
       this.editEventIndex = null;
       this.showAddEvent = false;
@@ -316,8 +423,9 @@ export default {
     planSlideChange() {
       // 拖拽功能已由 vuedraggable 处理，无需手动初始化
     },
-    handleSave() {
+    async handleSave() {
       console.log(this.planData, "this.planData");
+      this.isSaving = true; // 标记正在保存
       const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
       const planList = [];
       dayDetails.forEach((item) => {
@@ -333,10 +441,14 @@ export default {
           day.classesJson = JSON.stringify(day.classesJson);
         });
       });
-      if (this.planType === "add") {
-        this.addPlan(planList);
-      } else {
-        this.updatePlan(planList);
+      try {
+        if (this.planType === "add") {
+          await this.addPlan(planList);
+        } else {
+          await this.updatePlan(planList);
+        }
+      } finally {
+        this.isSaving = false;
       }
       console.log(planList, "planList");
     },
@@ -352,6 +464,8 @@ export default {
         planClassesId: this.planData.id,
       });
       if (res.success) {
+        // 标记数据已保存
+        this.markDataSaved();
         this.$message.success("更新成功");
         this.$router.replace({
           path: "/timeTable/plan",
@@ -375,6 +489,8 @@ export default {
         dayDetails: planList,
       });
       if (res.success) {
+        // 标记数据已保存
+        this.markDataSaved();
         this.$message.success("添加成功");
         this.$router.replace({
           path: "/timeTable/plan",
@@ -603,6 +719,8 @@ export default {
       }
       // 触发响应式更新
       this.$forceUpdate();
+      // 标记数据已修改
+      this.markDataChanged();
     },
 
     // 如果是永久保存 需要走接口
@@ -708,6 +826,8 @@ export default {
 
         // 触发响应式更新
         this.$forceUpdate();
+        // 标记数据已修改
+        this.markDataChanged();
 
         // 重置编辑相关数据
         this.editPlanClassData = {};
@@ -788,6 +908,8 @@ export default {
 
           // 触发响应式更新
           this.$forceUpdate();
+          // 标记数据已修改
+          this.markDataChanged();
 
           // 重置编辑相关数据
           this.editPlanClassData = {};
@@ -885,6 +1007,8 @@ export default {
 
       // 触发响应式更新
       this.$forceUpdate();
+      // 标记数据已修改
+      this.markDataChanged();
 
       // 如果 flag 为 true，关闭编辑对话框
       if (flag) {
@@ -918,6 +1042,8 @@ export default {
      */
     handleAddWeek() {
       this.planData.dayDetails.push([]);
+      // 标记数据已修改
+      this.markDataChanged();
     },
     /**
      * 删除赛事
@@ -940,6 +1066,8 @@ export default {
           dayData.competitionDtoList.splice(eventIndex, 1);
         }
         this.$forceUpdate();
+        // 标记数据已修改
+        this.markDataChanged();
       } else {
         this.$confirm("确认删除该赛事？", "提示", {
           confirmButtonText: "删除",
@@ -955,6 +1083,8 @@ export default {
             dayData.competitionDtoList.splice(eventIndex, 1);
           }
           this.$forceUpdate();
+          // 标记数据已修改
+          this.markDataChanged();
           this.$message.success("删除成功");
         });
       }
