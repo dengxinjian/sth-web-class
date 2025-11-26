@@ -39,7 +39,7 @@
             />
           </div>
           <div class="row-item">
-            <el-select v-model="form.distanceUnit" class="pill-select short">
+            <el-select v-model="form.distanceUnit" class="pill-select short" @change="handleDistanceUnitChange">
               <el-option label="m" value="m" />
               <el-option label="km" value="km" />
             </el-select>
@@ -228,7 +228,20 @@ export default {
       this.form.distance = this.normalizeDistanceValue(this.form.distance, val);
     },
   },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
+  },
   methods: {
+    handleDistanceUnitChange(value) {
+      const distanceValue = Number(this.form.distance) || 0;
+      if (value === "km") {
+        this.form.distance = Number((distanceValue / 1000).toFixed(2));
+      } else {
+        this.form.distance = Math.round(distanceValue * 1000);
+      }
+    },
     // 获取标签列表
     getTagList() {
       getData({

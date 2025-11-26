@@ -71,12 +71,12 @@
           <div class="miniprogram-code">
             <div class="miniprogram-title">请使用微信扫码</div>
             <img
-              src="./imgs/miniprogram-test.png"
+              src="./imgs/miniprogram.png"
               alt="小程序码"
               class="miniprogram-img"
             />
             <div class="miniprogram-subtitle">扫码进入小程序</div>
-            <el-button @click="handleMiniprogramCode">已完成阈值设置</el-button>
+            <el-button @click="handleMiniprogramCode">我已完成</el-button>
           </div>
         </div>
         <!-- 扫码关注服务号 -->
@@ -196,6 +196,8 @@ export default {
           this.countDown();
         }, 1000);
       } else {
+        console.log("二维码过期");
+        console.log(this.expireTime, "this.expireTime");
         this.isExpire = true;
         this.clearPollTimer();
       }
@@ -217,7 +219,7 @@ export default {
               setToken(res.result.jwt);
               this.$router.push("/timeTable/class");
             } else {
-              this.$message.error("请扫码进入小程序完成运动阈值设置");
+              this.$message.error("请完成引导页设置");
             }
           })
           .catch((error) => {
@@ -327,7 +329,7 @@ export default {
         .then((res) => {
           if (res.result?.sceneId && res.result?.ticket) {
             // 过期时间
-            this.expireTime = res.result.expireSeconds;
+            this.expireTime = (res.result.expireSeconds - 25) || 0;
             this.sceneId = res.result.sceneId;
             this.qrcodeUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${res.result.ticket}`;
 
@@ -337,7 +339,6 @@ export default {
               this.countDown();
             }
           } else {
-            console.error("获取二维码失败：返回数据不完整", res);
             this.$message.error("获取二维码失败，请刷新重试");
           }
         })

@@ -854,7 +854,7 @@ export default {
         summary: "", // 概要
         tags: [], // 标签
         capacity: "time", // 容量
-        range: "target", // 范围
+        range: "range", // 范围
         target: "00:20:00", // 目标时间
         targetDistance: 10,
         targetUnit: "km",
@@ -895,7 +895,7 @@ export default {
         this.getTagList();
         if (this.data.id) {
           // 如果有ID，先获取数据，获取完成后再重置表单（保留获取到的数据）
-          this.getClassInfo(this.data.id);
+          this.getClassInfo(this.data.classScheduleId || this.data.id);
         } else {
           // 如果没有ID，说明是新增，重置表单
           this.resetForm();
@@ -906,7 +906,7 @@ export default {
     data(val) {
       this.getTagList();
       if (this.data.id) {
-        this.getClassInfo(this.data.id);
+        this.getClassInfo(this.data.classScheduleId || this.data.id);
       } else {
         this.resetForm();
       }
@@ -914,6 +914,11 @@ export default {
   },
   created() {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);
+  },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
   },
   methods: {
     formatDistance(distance, sportType) {
@@ -1058,6 +1063,7 @@ export default {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       if (!this.data.classesJson) return;
+      console.log(this.data, "this.data");
       getData({
         url: "/api/classSchedule/getClassScheduleById",
         id,
@@ -1146,19 +1152,23 @@ export default {
         }),
       }).then((res) => {
         if (res.success) {
-          this.$emit("save",{
-            id: this.classInfo.id,
-            classesTitle: this.classInfo.title,
-            classesGroupId: this.classInfo.groupId,
-            labels: this.classInfo.tags,
-            classesDate: this.classesDate + " 00:00:00",
-            sportType: "RUN",
-            classesJson: JSON.stringify({
-              ...this.classInfo,
-              timeline: this.timeline,
-              maxIntensity: this.maxIntensity,
-            }),
-          }, flag);
+          this.$emit(
+            "save",
+            {
+              id: this.classInfo.id,
+              classesTitle: this.classInfo.title,
+              classesGroupId: this.classInfo.groupId,
+              labels: this.classInfo.tags,
+              classesDate: this.classesDate + " 00:00:00",
+              sportType: "RUN",
+              classesJson: JSON.stringify({
+                ...this.classInfo,
+                timeline: this.timeline,
+                maxIntensity: this.maxIntensity,
+              }),
+            },
+            flag
+          );
           this.$message.success("课表保存成功");
         }
         if (flag) this.onCancel();
@@ -1267,47 +1277,55 @@ export default {
       this.classInfo.stages.splice(index, 1);
       this.calculateTimeline();
     },
+    // 创建深拷贝的section模板
+    createSectionTemplate(title, stageMode) {
+      return {
+        ...this.sectionTemplate,
+        title,
+        stageMode,
+        tags: [...this.sectionTemplate.tags], // 深拷贝数组
+        thresholdSpeedRange: [...this.sectionTemplate.thresholdSpeedRange], // 深拷贝数组
+        thresholdHeartRateRange: [
+          ...this.sectionTemplate.thresholdHeartRateRange,
+        ], // 深拷贝数组
+        targetSpeedRange: [...this.sectionTemplate.targetSpeedRange], // 深拷贝数组
+        targetHeartRateRange: [...this.sectionTemplate.targetHeartRateRange], // 深拷贝数组
+        cadence: [...this.sectionTemplate.cadence], // 深拷贝数组
+      };
+    },
     // 添加段落
     handleAddStage(type) {
       switch (type) {
         case "warmup":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "热身", stageMode: "warmup" },
-            ],
+            sections: [this.createSectionTemplate("热身", "warmup")],
           });
           break;
         case "recover":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "恢复", stageMode: "recover" },
-            ],
+            sections: [this.createSectionTemplate("恢复", "recover")],
           });
           break;
         case "cooling":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "冷身", stageMode: "cooling" },
-            ],
+            sections: [this.createSectionTemplate("冷身", "cooling")],
           });
           break;
         case "stage1":
           this.classInfo.stages.push({
             times: 1,
-            sections: [
-              { ...this.sectionTemplate, title: "跑步", stageMode: "bike" },
-            ],
+            sections: [this.createSectionTemplate("跑步", "bike")],
           });
           break;
         case "stage2":
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              { ...this.sectionTemplate, title: "跑步", stageMode: "bike" },
-              { ...this.sectionTemplate, title: "跑步", stageMode: "bike" },
+              this.createSectionTemplate("跑步", "bike"),
+              this.createSectionTemplate("跑步", "bike"),
             ],
           });
           break;
@@ -1315,9 +1333,9 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [
-              { ...this.sectionTemplate, title: "跑步", stageMode: "bike" },
-              { ...this.sectionTemplate, title: "跑步", stageMode: "bike" },
-              { ...this.sectionTemplate, title: "跑步", stageMode: "bike" },
+              this.createSectionTemplate("跑步", "bike"),
+              this.createSectionTemplate("跑步", "bike"),
+              this.createSectionTemplate("跑步", "bike"),
             ],
           });
           break;

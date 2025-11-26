@@ -29,7 +29,7 @@
         />
       </el-form-item>
 
-      <el-tooltip
+      <!-- <el-tooltip
         v-model="capsTooltip"
         content="Caps lock is On"
         placement="right"
@@ -58,8 +58,8 @@
               :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
             />
           </span>
-        </el-form-item> -->
-      </el-tooltip>
+        </el-form-item>
+      </el-tooltip> -->
       <div style="display: flex; align-items: center; font-size: 14px; margin-bottom: 10px;">
         <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
           <el-radio label="1">运动员</el-radio>

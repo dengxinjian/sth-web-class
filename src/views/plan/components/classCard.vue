@@ -96,10 +96,11 @@
               {{
                 formatDistance(
                   classItem.classesJson.distance,
-                  classItem.sportType
+                  classItem.sportType,
+                  classItem.classesJson.distanceUnit
                 )
               }}
-              <span v-if="classItem.classesJson.distanceUnit && classItem.classesJson.distanceUnit !== 'km' ">
+              <span v-if="classItem.classesJson.distanceUnit && classItem.classesJson.distanceUnit !== 'km'">
                 {{ classItem.classesJson.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -297,7 +298,7 @@ export default {
     formatDuration(duration) {
       return duration === "00:00:00" ? "--:--:--" : duration;
     },
-    formatDistance(distance, sportType) {
+    formatDistance(distance, sportType, distanceUnit) {
       console.log(distance, sportType, "distance, sportType");
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
@@ -308,6 +309,9 @@ export default {
       }
       if (!result || result === "0") {
         result = "--";
+      }
+      if (distanceUnit && distanceUnit !== "km" && sportType !== "SWIM" && result !== "--") {
+        result = (Number(result) / 1000).toFixed(2);
       }
       return result;
     },
@@ -386,7 +390,16 @@ export default {
     },
     handleClick(event) {
       console.log("handleClick-event-1", event);
-      this.$emit("edit", this.classItem);
+      if (this.type === "view") {
+        // 获取点击位置
+        const clickPosition = {
+          x: event.clientX || event.pageX,
+          y: event.clientY || event.pageY,
+        };
+        this.$emit("view-class", this.classItem, clickPosition);
+      } else {
+        this.$emit("edit", this.classItem);
+      }
     },
     hideContextMenu() {
       this.contextMenuVisible = false;
@@ -404,10 +417,14 @@ export default {
       console.log("handleCut-classItem-1", this.classItem);
       this.$emit("cut", this.classItem);
     },
-    handleViewClass() {
-      console.log("handleViewClass-classItem-1", this.classItem);
+    handleViewClass(event) {
       if (this.type === "view") {
-        this.$emit("view-class", this.classItem);
+        // 获取点击位置
+        const clickPosition = event ? {
+          x: event.clientX || event.pageX,
+          y: event.clientY || event.pageY,
+        } : null;
+        this.$emit("view-class", this.classItem, clickPosition);
       }
     },
   },

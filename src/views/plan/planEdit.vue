@@ -27,6 +27,7 @@
         @plan-item-move="handlePlanItemMove"
         @plan-library-drop="handlePlanLibraryDrop"
         @save="handleSave"
+        @save-and-exit="handleSaveAndExit"
       />
     </div>
     <ViewClassCard
@@ -61,8 +62,11 @@
       :type="classModalDataType"
       :data="CreatePlanCourseDialogData"
       originalType="my"
-      @save="onSaveAddClass"
-      @cancel="showAddClassModal = false"
+      @save="handleSaveAddClass"
+      @cancel="
+        showAddClassModal = false;
+        isClassError = false;
+      "
     />
     <EditClassModal
       :visible="showEditPlanClassModal"
@@ -90,6 +94,13 @@
       v-model="showCreatePlanCourseDialog"
       @save="handleCreatePlanCourse"
     />
+    <MoveGroup
+      v-model="showMoveGroup"
+      :id="moveGroupId"
+      :class-id="moveClassId"
+      :type="moveType"
+      @save="onSaveMoveGroup"
+    />
   </div>
 </template>
 
@@ -106,6 +117,7 @@ import EditClassModal from "../classManagement/components/EditClass.vue";
 import { planApi } from "./services/planManagement";
 import AddEvent from "../classManagement/components/addEvent.vue";
 import CreatePlanCourseDialog from "./components/CreatePlanCourseDialog.vue";
+import MoveGroup from "../classManagement/components/MoveGroup/index.vue";
 export default {
   name: "PlanView",
   components: {
@@ -118,6 +130,7 @@ export default {
     EditClassModal,
     AddEvent,
     CreatePlanCourseDialog,
+    MoveGroup,
   },
   data() {
     return {
@@ -129,7 +142,7 @@ export default {
       moveGroupId: "",
       moveType: "",
       showMoveGroup: false,
-      classModalDataType: "",
+      classModalDataType: "add",
       copyClassFromOfficialClassId: "",
       copyClassFromOfficialGroupId: "",
       copyClassFromOfficialData: {},
@@ -157,11 +170,32 @@ export default {
       editEventWeekNumber: null,
       editEventGlobalDay: null,
       isEditMode: false,
+      autoSaveTimer: null,
+      // 数据变更追踪
+      hasUnsavedChanges: false,
+      initialPlanData: null,
+      isSaving: false, // 标记是否正在保存，避免重复提示
+      isClassError: false,
     };
   },
-  watch: {},
+  watch: {
+    // 暂不去除，后续根据功能是否需要再启用
+    // 监听路由中type值，如果值为edit，则开启30s自动保存数据功能
+    // '$route.query.type': {
+    //   handler(newVal) {
+    //     if (newVal === 'edit') {
+    //       this.startAutoSave();
+    //     } else if (newVal === 'add') {
+    //       this.stopAutoSave();
+    //     }
+    //   },
+    //   immediate: true,
+    // },
+  },
   mounted() {
     this.getClassList();
+    // 课程数量限制 -- 后续根据待用功能添加
+    // this.getCurrentUserClassConfigCount();
     console.log(this.$route.query, "this.$route.query");
     this.planType = this.$route.query.type;
     // 获取 store plan.js planData数据
@@ -179,9 +213,171 @@ export default {
     console.log(this.planData, "this.planData");
     // this.$store.dispatch("plan", this.planType);
     // this.$route.query.planId && this.getPlanData();
-  },
 
+    // 保存初始数据快照，用于检测变更
+    this.initialPlanData = JSON.parse(JSON.stringify(this.planData));
+
+    // 监听浏览器刷新/关闭事件
+    window.addEventListener("beforeunload", this.handleBeforeUnload);
+  },
+  // 路由离开守卫 - 监听路由跳转
+  beforeRouteLeave(to, from, next) {
+    // 先检查数据是否有变更
+    this.checkDataChanged();
+
+    if (this.hasUnsavedChanges && !this.isSaving) {
+      // 阻止路由跳转，等待用户选择
+      // 使用 setTimeout 确保弹窗能正常显示
+      setTimeout(() => {
+        this.handleLeaveWithSave()
+          .then((shouldLeave) => {
+            if (shouldLeave) {
+              next();
+            } else {
+              next(false);
+            }
+          })
+          .catch((error) => {
+            console.error("离开页面处理失败:", error);
+            next(false);
+          });
+      }, 0);
+    } else {
+      next();
+    }
+  },
+  // 离开页面时,清除定时器，停止自动保存
+  beforeDestroy() {
+    this.stopAutoSave();
+    // 移除事件监听
+    window.removeEventListener("beforeunload", this.handleBeforeUnload);
+  },
   methods: {
+    // 检测数据是否有变更
+    checkDataChanged() {
+      const currentData = JSON.stringify(this.planData);
+      const initialData = JSON.stringify(this.initialPlanData);
+      this.hasUnsavedChanges = currentData !== initialData;
+      return this.hasUnsavedChanges;
+    },
+    // 标记数据已修改
+    markDataChanged() {
+      this.hasUnsavedChanges = true;
+    },
+    // 标记数据已保存
+    markDataSaved() {
+      this.hasUnsavedChanges = false;
+      this.initialPlanData = JSON.parse(JSON.stringify(this.planData));
+    },
+    // 处理浏览器刷新/关闭事件
+    handleBeforeUnload(event) {
+      if (this.hasUnsavedChanges && !this.isSaving) {
+        // 标准方式
+        event.preventDefault();
+        // Chrome 需要设置 returnValue
+        event.returnValue = "您有未保存的数据，确定要离开吗？";
+        return event.returnValue;
+      }
+    },
+    // 处理离开页面时的保存提示
+    handleLeaveWithSave() {
+      return new Promise((resolve) => {
+        this.$confirm("您有未保存的数据，是否保存后再离开？", "提示", {
+          confirmButtonText: "保存并离开",
+          cancelButtonText: "不保存离开",
+          distinguishCancelAndClose: true,
+          type: "warning",
+          closeOnClickModal: false,
+          closeOnPressEscape: false,
+          lockScroll: true,
+        })
+          .then(async () => {
+            // 用户点击"保存并离开"
+            try {
+              this.isSaving = true;
+              await this.handleSaveAndExit();
+              this.isSaving = false;
+              this.markDataSaved();
+              resolve(true);
+            } catch (error) {
+              console.error("保存失败:", error);
+              this.isSaving = false;
+              this.$message.error("保存失败，请重试");
+              resolve(false);
+            }
+          })
+          .catch((action) => {
+            if (action === "cancel") {
+              // 用户点击"不保存离开"
+              this.hasUnsavedChanges = false;
+              resolve(true);
+            } else {
+              // 用户关闭对话框（点击 X 或按 ESC），取消离开
+              resolve(false);
+            }
+          });
+      });
+    },
+    startAutoSave() {
+      // 如果已有定时器在运行，先清除旧的定时器，避免重复启动
+      if (this.autoSaveTimer) {
+        this.stopAutoSave();
+      }
+      this.autoSaveTimer = setInterval(() => {
+        try {
+          this.handleAutoSave();
+          console.log("自动保存数据");
+        } catch (error) {
+          console.error("自动保存失败:", error);
+          // 即使保存失败，定时器仍然继续运行
+        }
+      }, 30000);
+    },
+    stopAutoSave() {
+      if (this.autoSaveTimer) {
+        clearInterval(this.autoSaveTimer);
+        this.autoSaveTimer = null;
+      }
+    },
+    async handleAutoSave() {
+      const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
+      const planList = [];
+      dayDetails.forEach((item) => {
+        item.forEach((week) => {
+          if (week.details.length > 0 || week.competitionDtoList) {
+            planList.push(week);
+          }
+        });
+      });
+      planList.forEach((item) => {
+        item.details.forEach((day) => {
+          day.classesJson = JSON.stringify(day.classesJson);
+        });
+      });
+
+      const res = await planApi.updatePlan({
+        planTitle: this.planData.planTitle,
+        planGroupId: this.planData.planGroupId,
+        teamId: this.planData.teamId,
+        email: this.planData.email,
+        weChat: this.planData.weChat,
+        description: this.planData.description,
+        dayDetails: planList,
+        planClassesId: this.planData.id,
+      });
+      if (res.success) {
+        // 自动保存成功后，标记数据已保存
+        this.markDataSaved();
+        // this.$message.success("更新成功");
+      }
+    },
+    /**
+     * 保存移动分组
+     */
+    onSaveMoveGroup() {
+      this.showMoveGroup = false;
+      this.getClassList();
+    },
     /**
      * 赛事确认
      */
@@ -226,6 +422,8 @@ export default {
       console.log(this.planData, "this.planData");
       // 触发响应式更新
       this.$forceUpdate();
+      // 标记数据已修改
+      this.markDataChanged();
 
       this.editEventIndex = null;
       this.showAddEvent = false;
@@ -247,8 +445,15 @@ export default {
     planSlideChange() {
       // 拖拽功能已由 vuedraggable 处理，无需手动初始化
     },
-    handleSave() {
+    // 保存并关闭
+    async handleSaveAndExit() {
+      await this.handleSave(true);
+      this.$router.replace("/timeTable/plan");
+    },
+    // 保存
+    async handleSave(isExit = false) {
       console.log(this.planData, "this.planData");
+      this.isSaving = true; // 标记正在保存
       const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
       const planList = [];
       dayDetails.forEach((item) => {
@@ -264,14 +469,22 @@ export default {
           day.classesJson = JSON.stringify(day.classesJson);
         });
       });
-      if (this.planType === "add") {
-        this.addPlan(planList);
-      } else {
-        this.updatePlan(planList);
+      try {
+        if (this.planType === "add") {
+          if (this.planData.id) {
+            await this.updatePlan(planList, isExit, "add");
+          } else {
+            await this.addPlan(planList, isExit);
+          }
+        } else {
+          await this.updatePlan(planList, isExit);
+        }
+      } finally {
+        this.isSaving = false;
       }
       console.log(planList, "planList");
     },
-    async updatePlan(planList) {
+    async updatePlan(planList, isExit = false, type = "update") {
       const res = await planApi.updatePlan({
         planTitle: this.planData.planTitle,
         planGroupId: this.planData.planGroupId,
@@ -283,19 +496,28 @@ export default {
         planClassesId: this.planData.id,
       });
       if (res.success) {
-        this.$message.success("更新成功");
-        this.$router.replace({
-          path: "/timeTable/class",
-          query: {
-            id: this.planData.id,
-            planGroupId: this.planData.planGroupId,
-            type: "edit",
-          },
-        });
+        // 标记数据已保存
+        this.markDataSaved();
+        if (type === "add") {
+          this.$message.success("添加成功");
+        } else {
+          this.$message.success(isExit ? "更新成功" : "保存成功");
+        }
+
+        if (isExit) {
+          this.$router.replace({
+            path: "/timeTable/plan",
+            query: {
+              id: this.planData.id,
+              planGroupId: this.planData.planGroupId,
+              type: "edit",
+            },
+          });
+        }
       }
     },
     // 添加计划
-    async addPlan(planList) {
+    async addPlan(planList, isExit = false) {
       const res = await planApi.addPlan({
         planTitle: this.planData.planTitle,
         planGroupId: this.planData.planGroupId,
@@ -306,14 +528,22 @@ export default {
         dayDetails: planList,
       });
       if (res.success) {
-        this.$message.success("添加成功");
-        this.$router.replace({
-          path: "/timeTable/class",
-          query: {
-            id: res.result.id,
-            planGroupId: this.planData.planGroupId,
-          },
-        });
+        // 标记数据已保存
+        this.markDataSaved();
+        this.$message.success(isExit ? "添加成功" : "保存成功");
+        this.planData = {
+          ...this.planData,
+          ...res.result,
+        };
+        if (isExit) {
+          this.$router.replace({
+            path: "/timeTable/plan",
+            query: {
+              id: res.result.id,
+              planGroupId: this.planData.planGroupId,
+            },
+          });
+        }
       }
     },
     handleClassTypeChange(type) {
@@ -359,6 +589,12 @@ export default {
       this.moveGroupId = groupId;
       this.moveType = "class";
       this.showMoveGroup = true;
+      console.log(
+        this.moveClassId,
+        this.moveGroupId,
+        this.moveType,
+        "this.moveClassId, this.moveGroupId, this.moveType"
+      );
     },
 
     /**
@@ -411,6 +647,14 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
+      // 课程数量限制 -- 后续根据待用功能添加
+      // if (
+      //   this.currentUserClassConfig.currentCount >=
+      //   this.currentUserClassConfig.limitValue
+      // ) {
+      //   this.$message.error("超出课程数量上限");
+      //   return;
+      // }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;
@@ -499,9 +743,70 @@ export default {
         this.$set(dayData, "details", []);
       }
 
+      // if (this.classModalDataType === "add") {
+      //   dayData.details.push(saveData);
+      // } else {
+      //   this.$set(dayData.details, dayData.details.length - 1, saveData);
+      // }
+      dayData.details.push(saveData);
+
+      if (flag) {
+        this.showAddClassModal = false;
+        this.selectedDay = null;
+        this.selectedSportType = null;
+      }
+      if (this.CreatePlanCourseDialogData.mode === "SAVE") {
+        console.log(saveData, "saveData");
+        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
+      } else {
+        this.classModalDataType = "edit";
+      }
+      // 触发响应式更新
+      this.$forceUpdate();
+    },
+    handleSaveAddClass(saveData, flag) {
+      console.log(saveData, flag, "saveData, flag");
+      if (!this.selectedDay || !this.selectedDay.globalDay) {
+        console.error("selectedDay 信息不完整");
+        this.showAddClassModal = false;
+        return;
+      }
+      if (saveData.classesTitle.length < 1) {
+        this.$message.error("课程标题不能为空");
+        return;
+      }
+      const weekIndex = this.selectedDay.weekNumber - 1;
+      const globalDay = this.selectedDay.globalDay;
+      // 确保周数据存在
+      if (!this.planData.dayDetails[weekIndex]) {
+        this.$set(this.planData.dayDetails, weekIndex, []);
+      }
+
+      // 查找该天是否已存在数据
+      let dayData = this.planData.dayDetails[weekIndex].find(
+        (item) => item.day === globalDay
+      );
+
+      if (!dayData) {
+        // 如果该天不存在，创建新的数据对象
+        dayData = {
+          day: globalDay,
+          details: [],
+          competitionDtoList: [],
+        };
+        this.planData.dayDetails[weekIndex].push(dayData);
+      }
+
+      // 确保 details 数组存在
+      if (!dayData.details) {
+        this.$set(dayData, "details", []);
+      }
+
       if (this.classModalDataType === "add") {
+        this.$message.success("课程保存成功");
         dayData.details.push(saveData);
       } else {
+        this.$message.success("课程保存成功");
         this.$set(dayData.details, dayData.details.length - 1, saveData);
       }
 
@@ -518,25 +823,37 @@ export default {
       }
       // 触发响应式更新
       this.$forceUpdate();
+      // 标记数据已修改
+      this.markDataChanged();
     },
-
     // 如果是永久保存 需要走接口
     async savePlanCourse(data) {
       console.log(data, "data");
       // data.classesJson = JSON.stringify(data.classesJson);
       if (this.classModalDataType === "add") {
         this.classModalDataType = "edit";
-        classApi.createClass(data).then((res) => {
-          if (res.success) {
-            this.$message.success("课程保存成功");
-            this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
-            this.getClassList();
-          }
-        });
+        classApi
+          .createClass(data)
+          .then((res) => {
+            console.log(res, "res");
+            if (res.success) {
+              this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
+              this.isClassError = false;
+              this.getClassList();
+            } else {
+              this.isClassError = true;
+            }
+          })
+          .catch((err) => {
+            console.log(err, "err");
+            this.isClassError = true;
+          });
       } else {
+        if (this.isClassError) {
+          return;
+        }
         classApi.updateClass(data).then((res) => {
           if (res.success) {
-            this.$message.success("课程保存成功");
             this.getClassList();
           } else {
             this.$message.error(res.message);
@@ -623,6 +940,8 @@ export default {
 
         // 触发响应式更新
         this.$forceUpdate();
+        // 标记数据已修改
+        this.markDataChanged();
 
         // 重置编辑相关数据
         this.editPlanClassData = {};
@@ -630,7 +949,7 @@ export default {
         this.editPlanClassWeekNumber = null;
         this.editPlanClassGlobalDay = null;
 
-        this.$message.success("删除成功");
+        this.$message.success("操作成功");
       } else {
         this.$confirm("确认删除该课程？", "提示", {
           confirmButtonText: "删除",
@@ -703,6 +1022,8 @@ export default {
 
           // 触发响应式更新
           this.$forceUpdate();
+          // 标记数据已修改
+          this.markDataChanged();
 
           // 重置编辑相关数据
           this.editPlanClassData = {};
@@ -800,6 +1121,8 @@ export default {
 
       // 触发响应式更新
       this.$forceUpdate();
+      // 标记数据已修改
+      this.markDataChanged();
 
       // 如果 flag 为 true，关闭编辑对话框
       if (flag) {
@@ -833,6 +1156,8 @@ export default {
      */
     handleAddWeek() {
       this.planData.dayDetails.push([]);
+      // 标记数据已修改
+      this.markDataChanged();
     },
     /**
      * 删除赛事
@@ -855,6 +1180,8 @@ export default {
           dayData.competitionDtoList.splice(eventIndex, 1);
         }
         this.$forceUpdate();
+        // 标记数据已修改
+        this.markDataChanged();
       } else {
         this.$confirm("确认删除该赛事？", "提示", {
           confirmButtonText: "删除",
@@ -870,6 +1197,8 @@ export default {
             dayData.competitionDtoList.splice(eventIndex, 1);
           }
           this.$forceUpdate();
+          // 标记数据已修改
+          this.markDataChanged();
           this.$message.success("删除成功");
         });
       }

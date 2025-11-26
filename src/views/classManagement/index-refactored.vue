@@ -388,6 +388,8 @@ export default {
       // 课程数据
       classList: [],
       classSearchInput: "",
+      // 课程数量限制 -- 后续根据待用功能添加
+      // currentUserClassConfig: {},
 
       // 日程数据
       currentWeek: [],
@@ -514,7 +516,7 @@ export default {
               this.classDetailData = res.result;
               this.scheduleType = "edit";
               this.getScheduleData();
-              this.$message.success("课程保存成功");
+              this.$message.success("课表保存成功");
             }
           });
         return;
@@ -1003,8 +1005,11 @@ export default {
         });
         console.log(this.currentWeek, "this.currentWeek");
 
-        // 初始化拖拽
-        this.initAllDrag();
+        // 强制 Vue 检测数组变化
+        this.$nextTick(() => {
+          // 初始化拖拽
+          this.initAllDrag();
+        });
       }
 
       this.loading = false;
@@ -1163,6 +1168,14 @@ export default {
      * 新增课程
      */
     handleAddClass(groupId) {
+      // 课程数量限制 -- 后续根据待用功能添加
+      // if (
+      //   this.currentUserClassConfig.currentCount >=
+      //   this.currentUserClassConfig.limitValue
+      // ) {
+      //   this.$message.error("超出课程数量上限");
+      //   return;
+      // }
       this.classModalDataType = "add";
       this.isClass = true;
       this.addGroupId = groupId;
@@ -1388,6 +1401,14 @@ export default {
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
+      // 课程数量限制 -- 后续根据待用功能添加
+      // if (
+      //   this.currentUserClassConfig.currentCount >=
+      //   this.currentUserClassConfig.limitValue
+      // ) {
+      //   this.$message.error("超出课程数量上限");
+      //   return;
+      // }
       this.copyClassFromOfficialClassId = classData.id;
       this.copyClassFromOfficialGroupId = groupId;
       this.copyClassFromOfficialData = classData;

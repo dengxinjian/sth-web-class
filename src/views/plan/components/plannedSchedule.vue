@@ -2,13 +2,16 @@
   <div class="planned-schedule-container">
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
+        <div>
+          <el-button type="info" style="margin-left: 20px;" @click="handleCancel">取消</el-button>
+        </div>
         <div class="planned-schedule-header-title-left-title">
           {{ planTitle }}
         </div>
         <div class="planned-schedule-header-title-left-button">
-          <el-button type="primary" @click="handleSave">保存</el-button>
           <el-button type="primary" @click="handleAddWeek">添加周</el-button>
-          <el-button type="info" @click="handleCancel">取消</el-button>
+          <el-button type="primary" @click="handleSave">保存</el-button>
+          <el-button type="primary" @click="handleSaveAndExit">保存并关闭</el-button>
         </div>
       </div>
       <div class="planned-schedule-header-title-right">
@@ -256,6 +259,9 @@ export default {
     },
     handleSave() {
       this.$emit("save");
+    },
+    handleSaveAndExit() {
+      this.$emit("save-and-exit");
     },
   },
 };

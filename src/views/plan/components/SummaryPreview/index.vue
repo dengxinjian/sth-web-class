@@ -130,7 +130,7 @@
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
-        <span>{{ planClasses.length }}周</span>
+        <span>{{ weekNumber }}周</span>
       </el-form-item>
 
       <el-form-item label="统计">
@@ -330,6 +330,8 @@ export default {
       teams: [],
       emptyPlanClasses: [[], [], [], []],
       loginType: localStorage.getItem("loginType") || "",
+      planList: [],
+      weekNumber: 0,
     };
   },
   computed: {
@@ -404,6 +406,51 @@ export default {
             this.$refs.formRef.clearValidate();
           }
         });
+      }
+    },
+    planClasses(newVal) {
+      // console.log(newVal, "newVal");
+      // 过滤出至少包含一个有效计划项的周
+      // if (!newVal || !Array.isArray(newVal) || newVal.length === 0) {
+      //   this.planList = [];
+      //   return;
+      // }
+
+      // // 检查周是否包含有效的计划项（有 details 且不为空 并且 competitionDtoList也不为空）
+      // const hasValidDetails = (week) => {
+      //   if (!Array.isArray(week) || week.length === 0) {
+      //     return false;
+      //   }
+      //   return week.some((item) => {
+      //     if (!item) {
+      //       return false;
+      //     }
+      //     // 检查 details 是否存在且不为空
+      //     const hasValidDetails = item.details && Array.isArray(item.details) && item.details.length > 0;
+      //     // 检查 competitionDtoList 是否存在且不为空
+      //     const hasValidCompetition = item.competitionDtoList && Array.isArray(item.competitionDtoList) && item.competitionDtoList.length > 0;
+      //     // 两个条件都要满足
+      //     return hasValidDetails || hasValidCompetition;
+      //   });
+      // };
+
+      // this.planList = newVal.filter(hasValidDetails);
+      if (newVal && Array.isArray(newVal) && newVal.length > 0) {
+        const newDayDetailList = newVal
+          .flat()
+          .filter(
+            (item) =>
+              (item.details &&
+                Array.isArray(item.details) &&
+                item.details.length > 0) ||
+              (item.competitionDtoList &&
+                Array.isArray(item.competitionDtoList) &&
+                item.competitionDtoList.length > 0)
+          );
+        this.weekNumber = Math.ceil(
+          newDayDetailList[newDayDetailList.length - 1]?.day / 7
+        );
+        // console.log(this.weekNumber, "this.weekNumber");
       }
     },
   },
@@ -543,7 +590,7 @@ export default {
       };
 
       // 计算单个课程项的时长
-      const calculateClassDuration = (classItem,index) => {
+      const calculateClassDuration = (classItem, index) => {
         if (!classItem) {
           return 0;
         }
@@ -556,19 +603,20 @@ export default {
       };
 
       // 计算总时长
-      const durationTotal = week.reduce((acc, item,index) => {
+      const durationTotal = week.reduce((acc, item, index) => {
         if (!item?.details || !Array.isArray(item.details)) {
           return acc;
         }
 
         const itemDuration = item.details.reduce(
-          (classAcc, classItem) => classAcc + calculateClassDuration(classItem,index),
+          (classAcc, classItem) =>
+            classAcc + calculateClassDuration(classItem, index),
           0
         );
 
         return acc + itemDuration;
       }, 0);
-      return durationTotal / this.planClasses.length || 0;
+      return durationTotal / this.weekNumber || 0;
     },
     getTotalDistance() {
       return this.planList.reduce((total, week) => {
@@ -654,7 +702,7 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-总距离", distanceTotal);
-      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      const weekDistance = distanceTotal / this.weekNumber || 0;
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance =
@@ -713,7 +761,7 @@ export default {
 
         return acc + itemDuration;
       }, 0);
-      return durationTotal / this.planClasses.length || 0;
+      return durationTotal / this.weekNumber || 0;
     },
     // 计算周游泳距离总和
     getweekSwimmingDistance() {
@@ -764,7 +812,7 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-游泳总和", distanceTotal);
-      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      const weekDistance = distanceTotal / this.weekNumber || 0;
       if (weekDistance === 0) return "N/A";
       const distanceKm = weekDistance / 1000;
       // 如果是整数，不保留小数；如果有小数，保留两位小数
@@ -822,7 +870,7 @@ export default {
 
         return acc + itemDuration;
       }, 0);
-      return durationTotal / this.planClasses.length || 0;
+      return durationTotal / this.weekNumber || 0;
     },
     // 计算周骑行距离总和
     getweekCycleDistance() {
@@ -872,7 +920,7 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-骑行总和", distanceTotal);
-      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      const weekDistance = distanceTotal / this.weekNumber || 0;
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance =
@@ -931,7 +979,7 @@ export default {
 
         return acc + itemDuration;
       }, 0);
-      return durationTotal / this.planClasses.length || 0;
+      return durationTotal / this.weekNumber || 0;
     },
     // 计算周跑步距离总和
     getweekRunDistance() {
@@ -989,7 +1037,7 @@ export default {
         );
       }, 0);
       // console.log("distanceTotal-跑步总和", distanceTotal);
-      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      const weekDistance = distanceTotal / this.weekNumber || 0;
       // console.log("weekDistance-跑步", weekDistance);
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
@@ -1025,7 +1073,7 @@ export default {
           }, 0)
         );
       }, 0);
-      return durationTotal / this.planClasses.length || 0;
+      return durationTotal / this.weekNumber || 0;
     },
     // 计算周其他时长总和
     getweekOtherDuration() {
@@ -1080,7 +1128,7 @@ export default {
 
         return acc + itemDuration;
       }, 0);
-      return durationTotal / this.planClasses.length || 0;
+      return durationTotal / this.weekNumber || 0;
     },
     // 计算周力量或其他距离总和
     getweekPowerAndOtherDistance(type) {
@@ -1126,7 +1174,7 @@ export default {
           }, 0)
         );
       }, 0);
-      const weekDistance = distanceTotal / this.planClasses.length || 0;
+      const weekDistance = distanceTotal / this.weekNumber || 0;
       if (weekDistance === 0) return "N/A";
       // 如果是整数，不保留小数；如果有小数，保留两位小数
       const formattedDistance =

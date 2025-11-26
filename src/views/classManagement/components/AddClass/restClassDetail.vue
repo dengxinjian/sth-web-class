@@ -128,7 +128,7 @@ export default {
           groupId: this.data.groupId || "",
           sportType: "REST",
           distance: "",
-          distanceUnit: "m",
+          distanceUnit: "km",
           duration: "",
           sth: "",
           summary: "",
@@ -198,6 +198,11 @@ export default {
         this.form = this.data.classesJson;
       }
     },
+  },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
   },
   methods: {
     // 编辑进入弹框时，查询课程数据

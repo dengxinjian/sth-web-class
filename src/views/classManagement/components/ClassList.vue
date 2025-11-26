@@ -40,7 +40,12 @@
         </div>
       </el-popover>
 
-      <el-input size="mini" v-model="searchInput" @input="handleSearch">
+      <el-input
+        size="mini"
+        v-model="searchInput"
+        clearable
+        @input="handleSearch"
+      >
         <el-button
           slot="append"
           icon="el-icon-search"
@@ -51,8 +56,13 @@
 
     <!-- 课程列表 -->
     <div class="schedule-class-container">
-      <el-collapse accordion @change="$emit('collapse-change')">
-        <el-collapse-item v-for="item in classList" :key="item.groupId">
+      <el-collapse
+        accordion
+        v-model="activeCollapseItem"
+        @change="$emit('collapse-change')"
+        v-loading="loading"
+      >
+        <el-collapse-item v-for="item in classList" :key="item.groupId" :name="item.groupId">
           <template slot="title">
             <div class="schedule-class-title">
               <div class="group-name">
@@ -178,7 +188,28 @@ export default {
     return {
       searchInput: "",
       emitSearch: null,
+      loading: false,
+      activeCollapseItem: "",
     };
+  },
+  watch: {
+    activeClassType: {
+      handler(newVal, oldVal) {
+        // 当 activeClassType 改变时显示 loading 并折叠所有项
+        if (oldVal !== undefined && newVal !== oldVal) {
+          this.loading = true;
+          this.activeCollapseItem = "";
+        }
+      },
+      immediate: false,
+    },
+    classList: {
+      handler() {
+        // 当 classList 更新时隐藏 loading
+        this.loading = false;
+      },
+      deep: true,
+    },
   },
   created() {
     this.emitSearch = debounce(() => {
@@ -189,6 +220,8 @@ export default {
     handleClassTypeChange(type) {
       this.$emit("update:activeClassType", type);
       this.$emit("class-type-change", type);
+      this.searchInput = "";
+      this.emitSearch();
     },
     handleSearch() {
       if (this.emitSearch) {

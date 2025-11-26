@@ -820,14 +820,16 @@ export default {
         if (this.data.id && this.originalType === "my") {
           // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
           if (this.data.classesJson) {
-            const classesJson = typeof this.data.classesJson === 'string'
-              ? JSON.parse(this.data.classesJson)
-              : this.data.classesJson;
+            const classesJson =
+              typeof this.data.classesJson === "string"
+                ? JSON.parse(this.data.classesJson)
+                : this.data.classesJson;
             this.classInfo = classesJson;
             this.timeline = classesJson.timeline;
             this.maxIntensity = classesJson.maxIntensity;
             this.classInfo.id = this.data.id;
-            this.classInfo.groupId = this.data.classesGroupId || this.data.groupId;
+            this.classInfo.groupId =
+              this.data.classesGroupId || this.data.groupId;
           } else {
             // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
             this.getClassInfo(this.data.id);
@@ -848,14 +850,16 @@ export default {
       if (this.data.id && this.originalType === "my") {
         // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
         if (this.data.classesJson) {
-          const classesJson = typeof this.data.classesJson === 'string'
-            ? JSON.parse(this.data.classesJson)
-            : this.data.classesJson;
+          const classesJson =
+            typeof this.data.classesJson === "string"
+              ? JSON.parse(this.data.classesJson)
+              : this.data.classesJson;
           this.classInfo = classesJson;
           this.timeline = classesJson.timeline;
           this.maxIntensity = classesJson.maxIntensity;
           this.classInfo.id = this.data.id;
-          this.classInfo.groupId = this.data.classesGroupId || this.data.groupId;
+          this.classInfo.groupId =
+            this.data.classesGroupId || this.data.groupId;
         } else {
           // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
           this.getClassInfo(this.data.id);
@@ -873,6 +877,11 @@ export default {
   },
   created() {
     this.handleTimesChange = debounce(this.handleTimesChange, 500);
+  },
+  mounted() {
+    if (this.innerVisible) {
+      this.getTagList();
+    }
   },
   methods: {
     formatDistance(distance, sportType) {

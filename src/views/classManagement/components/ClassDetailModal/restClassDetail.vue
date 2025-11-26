@@ -123,7 +123,7 @@ export default {
       if (val) {
         if (this.data.id) {
           // 如果有ID，先获取数据
-          this.getClassInfo(this.data.id)
+          this.getClassInfo(this.data.classScheduleId || this.data.id);
         } else {
           // 如果没有ID，说明是新增，重置表单
           this.resetForm()
@@ -132,7 +132,7 @@ export default {
     },
     data(val) {
       if (this.data.id) {
-        this.getClassInfo(this.data.id);
+        this.getClassInfo(this.data.classScheduleId || this.data.id);
       } else {
         this.resetForm();
       }

@@ -39,7 +39,7 @@
                   classData.sportType
                 )
               }}
-              <span v-if="classData.classesJson.distanceUnit && classData.classesJson.distanceUnit !== 'km' ">
+               <span v-if="classData.classesJson.distanceUnit && classData.classesJson.distanceUnit !== 'km'">
                 {{ classData.classesJson.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -419,7 +419,7 @@ export default {
         result = distance.replace("km", "");
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = sportType !== "SWIM" ? Number(distance).toFixed(2) : distance;
+        result = distance;
       }
       if (!result || result === "0") {
         result = "--";

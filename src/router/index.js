@@ -8,6 +8,9 @@ const config = {
   development: {
     loginComponent: () => import("@/views/login/index"),
   },
+  // staging: {
+  //   loginComponent: () => import("@/views/login-wx/index"),
+  // },
   staging: {
     loginComponent: () => import("@/views/login/index"),
   },
