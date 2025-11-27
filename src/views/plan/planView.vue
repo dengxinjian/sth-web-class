@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" :style="{ width: isPlan ? '100%' : '' }">
     <div class="plan-container">
       <div class="type-change">
         <PlanList
@@ -19,6 +19,7 @@
         />
       </div>
       <PlannedScheduleView
+        v-if="isPlan"
         :planList="planList"
         :planTitle="planTitle"
         :showMore="showMore"
@@ -121,6 +122,12 @@ export default {
     ApplyCoach,
     ApplyHistory,
   },
+  props: {
+    isPlan: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       classList: [],
@@ -171,34 +178,43 @@ export default {
       },
       deep: true,
     },
+    isPlan: {
+      handler(newVal) {
+        console.log(newVal, "newVal");
+        if (newVal) {
+          if (Object.keys(this.$route.query).length > 0) {
+            const { id, planGroupId, type } = this.$route.query;
+            if (id) {
+              this.currentPlanId = parseInt(id);
+              this.currentPlanGroupId = parseInt(planGroupId);
+              this.getPlanDetail(id);
+              this.getPlanDayDetail(id);
+            }
+
+            // if (type === "edit") {
+            //   this.getPlanDetail(this.currentPlanDetail.id);
+            //   this.getPlanDayDetail(this.currentPlanDetail.id);
+            // }
+
+            if (type === "cancel" && this.$store.state.plan.planData?.id) {
+              this.currentPlanId = this.$store.state.plan.planData?.id;
+              if (this.currentPlanId) {
+                this.getPlanDetail(this.currentPlanId);
+                this.getPlanDayDetail(this.currentPlanId);
+              }
+            }
+            // this.$emit("choose-plan");
+          }
+          this.getPlanList();
+          // this.getPlanLimitCount();
+          this.getTeamList();
+        }
+      },
+      immediate: true,
+    },
   },
   mounted() {
     // 判断路由是否有值
-    if (Object.keys(this.$route.query).length > 0) {
-      const { id, planGroupId, type } = this.$route.query;
-      if (id) {
-        this.currentPlanId = parseInt(id);
-        this.currentPlanGroupId = parseInt(planGroupId);
-        this.getPlanDetail(id);
-        this.getPlanDayDetail(id);
-      }
-
-      // if (type === "edit") {
-      //   this.getPlanDetail(this.currentPlanDetail.id);
-      //   this.getPlanDayDetail(this.currentPlanDetail.id);
-      // }
-
-      if (type === "cancel" && this.$store.state.plan.planData?.id) {
-        this.currentPlanId = this.$store.state.plan.planData?.id;
-        if (this.currentPlanId) {
-          this.getPlanDetail(this.currentPlanId);
-          this.getPlanDayDetail(this.currentPlanId);
-        }
-      }
-    }
-    this.getPlanList();
-    this.getPlanLimitCount();
-    this.getTeamList();
   },
   methods: {
     getTeamList() {
@@ -258,6 +274,7 @@ export default {
     async handlePlanDayDetail(id, groupId) {
       this.currentPlanId = id;
       this.currentPlanGroupId = groupId;
+      this.$emit("choose-plan", true);
       await this.getPlanDetail(id);
       await this.getPlanDayDetail(id);
     },
@@ -466,11 +483,11 @@ export default {
      * 添加计划
      */
     async handleAddPlan(payload) {
-      const result = await this.getPlanLimitCount();
-      if (result.currentCount >= result.limitValue) {
-        this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
-        return;
-      }
+      // const result = await this.getPlanLimitCount();
+      // if (result.currentCount >= result.limitValue) {
+      //   this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+      //   return;
+      // }
       this.addPlanGroupId = payload;
       this.addPlanVisible = true;
     },
@@ -528,13 +545,13 @@ export default {
         },
         1: async () => {
           if (_this.activeClassType === "official") {
-            const result = await _this.getPlanLimitCount();
-            if (result.currentCount >= result.limitValue) {
-              _this.$message.error(
-                "您当前的计划数量已达上限，无法添加更多计划"
-              );
-              return;
-            }
+            // const result = await _this.getPlanLimitCount();
+            // if (result.currentCount >= result.limitValue) {
+            //   _this.$message.error(
+            //     "您当前的计划数量已达上限，无法添加更多计划"
+            //   );
+            //   return;
+            // }
             _this.$nextTick(() => {
               _this.copyOfficialPlanInfo = {
                 ..._this.currentPlanDetail,
@@ -543,6 +560,7 @@ export default {
                 ownerName: localStorage.getItem("name").split("#")[0],
                 ownerId: localStorage.getItem("triUserId"),
               };
+              _this.$emit("choose-plan", true);
               _this.handleAddPlan();
             });
           } else {
@@ -550,11 +568,11 @@ export default {
           }
         },
         2: async () => {
-          const result = await _this.getPlanLimitCount();
-          if (result.currentCount >= result.limitValue) {
-            _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
-            return;
-          }
+          // const result = await _this.getPlanLimitCount();
+          // if (result.currentCount >= result.limitValue) {
+          //   _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
+          //   return;
+          // }
           _this.$nextTick(() => {
             _this.showCopy = true;
           });
@@ -604,15 +622,15 @@ export default {
               _this.$message.success("删除成功");
               const currentPlanId = String(_this.currentPlanDetail.id);
               const queryPlanId = _this.$route.query?.id;
+              _this.$emit("choose-plan", false);
               if (queryPlanId && String(queryPlanId) === currentPlanId) {
+                _this.$router.replace({
+                  path: "/timeTable/class",
+                });
                 _this.getPlanList();
                 _this.restPageInfo();
-                // 删除成功后，刷新页面，并清除当前路由参数，防止页面缓存导致数据不更新
-                _this.$router.replace({
-                  path: "/timeTable/plan",
-                });
               } else {
-                _this.getPlanLimitCount();
+                // _this.getPlanLimitCount();
                 _this.restPageInfo();
                 _this.getPlanList();
               }

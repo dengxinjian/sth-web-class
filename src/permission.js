@@ -21,7 +21,7 @@ router.beforeEach(async (to, from, next) => {
   const hasToken = getToken();
 
   console.log('路由守卫触发:', { to: to.path, from: from.path, hasToken });
-
+  store.commit("SET_FROM_PATH", from.path);
   if (hasToken) {
     if (to.path === "/login") {
       // if is logged in, redirect to the home page

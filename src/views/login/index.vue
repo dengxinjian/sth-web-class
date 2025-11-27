@@ -20,7 +20,7 @@
         <el-input
           ref="username"
           v-model="loginForm.userName"
-          :placeholder="$t('login.username')"
+          placeholder="请输入用户id"
           name="username"
           type="text"
           tabindex="1"
@@ -35,7 +35,7 @@
         placement="right"
         manual
       >
-        <el-form-item prop="password">
+        <!-- <el-form-item prop="password">
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>

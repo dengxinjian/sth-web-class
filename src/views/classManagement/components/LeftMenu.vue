@@ -100,14 +100,14 @@ export default {
       },
       immediate: true,
     },
-    "$route.path": {
-      handler(newVal) {
-        console.log(newVal, "newVal");
-        this.activeName = newVal.split("/")[2];
-        localStorage.setItem("activeName", this.activeName);
-      },
-      immediate: true,
-    },
+    // "$route.path": {
+    //   handler(newVal) {
+    //     console.log(newVal, "newVal");
+    //     this.activeName = newVal.split("/")[2];
+    //     localStorage.setItem("activeName", this.activeName);
+    //   },
+    //   immediate: true,
+    // },
   },
   methods: {
     handleMenuSelect(index) {
@@ -124,7 +124,7 @@ export default {
 
 <style lang="scss" scoped>
 .left-menu {
-  width: 100%;
+  width: 80px;
   height: 100%;
   background-color: #fff;
 }
@@ -132,7 +132,7 @@ export default {
 // el-menu 样式定制
 :deep(.type-change-menu) {
   border-right: none;
-  width: 100%;
+  width: 80px;
   min-height: 100%;
 
   .el-menu-item {

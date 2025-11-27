@@ -135,7 +135,6 @@ export default {
   data() {
     return {
       classList: [],
-      currentUserClassConfig: {},
       activeClassType: "my",
       showViewClassCard: false,
       classModalData: {},
@@ -449,7 +448,14 @@ export default {
     // 保存并关闭
     async handleSaveAndExit() {
       await this.handleSave(true);
-      this.$router.replace("/timeTable/plan");
+      this.$router.replace({
+        path: "/timeTable/class",
+        query: {
+          id: this.planData.id,
+          planGroupId: this.planData.planGroupId,
+          type: "edit",
+        },
+      });
     },
     // 保存
     async handleSave(isExit = false) {
@@ -507,7 +513,7 @@ export default {
 
         if (isExit) {
           this.$router.replace({
-            path: "/timeTable/plan",
+            path: "/timeTable/class",
             query: {
               id: this.planData.id,
               planGroupId: this.planData.planGroupId,
@@ -538,7 +544,7 @@ export default {
         };
         if (isExit) {
           this.$router.replace({
-            path: "/timeTable/plan",
+            path: "/timeTable/class",
             query: {
               id: res.result.id,
               planGroupId: this.planData.planGroupId,
@@ -580,15 +586,6 @@ export default {
         // });
       } else {
         this.classList = [];
-      }
-    },
-    /**
-     * 获取当前人 课程配置数
-     */
-    async getCurrentUserClassConfigCount() {
-      const res = await classApi.getCurrentUserClassConfigCount();
-      if (res.success) {
-        this.currentUserClassConfig = res.result;
       }
     },
     /**

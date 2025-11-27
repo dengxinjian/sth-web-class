@@ -1,6 +1,6 @@
 <template>
   <div class="athletic-management">
-    <div style="padding: 10px;">
+    <div style="padding: 10px">
       <div class="athletic-title">{{ teamName }}</div>
       <div class="athletic-operation">
         <el-input size="mini" v-model="searchInput" @input="handleSearch">
@@ -375,6 +375,10 @@ export default {
       type: String,
       default: "",
     },
+    activeName: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -444,13 +448,16 @@ export default {
   },
   watch: {
     teamId: {
-      handler(newVal, oldVal) {
-        if (newVal && newVal !== oldVal) {
+      handler(newVal) {
+        if (newVal) {
           this.getAthleticData();
         }
       },
-      immediate: true,
+      immediate: false,
     },
+  },
+  mounted() {
+    this.getAthleticData();
   },
   methods: {
     // 判断是否为当前用户
