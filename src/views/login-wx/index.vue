@@ -166,6 +166,8 @@ export default {
       POLL_INTERVAL: 2000, // 轮询间隔：2秒
       isNewUser: false, // 是否是新用户
       expireTime: 0, // 二维码过期时间
+      expireTimestamp: 0, // 二维码过期时间戳
+      expireTimer: null, // 二维码过期定时器
       // 是否过期
       isExpire: false,
     };
@@ -180,6 +182,7 @@ export default {
   beforeDestroy() {
     clearInterval(this.carouselTimer);
     this.clearPollTimer();
+    this.clearExpireTimer();
   },
   methods: {
     refreshQrCode() {
@@ -188,18 +191,28 @@ export default {
         this.getScanQrCode();
       }, 300);
     },
+    clearExpireTimer() {
+      if (this.expireTimer) {
+        clearTimeout(this.expireTimer);
+        this.expireTimer = null;
+      }
+    },
     // 300s的倒计时函数
     countDown() {
-      if (this.expireTime > 0) {
-        setTimeout(() => {
+      if (this.expireTimestamp === 0) return;
+      const now = new Date() - this.expireTimestamp;
+      this.clearExpireTimer();
+      if (Date.now() - this.expireTimestamp < 290000) {
+        this.expireTimer = setTimeout(() => {
           this.expireTime--;
           this.countDown();
         }, 1000);
       } else {
         console.log("二维码过期");
-        console.log(this.expireTime, "this.expireTime");
         this.isExpire = true;
+        this.expireTimestamp = 0;
         this.clearPollTimer();
+        this.clearExpireTimer();
       }
     },
     handleMiniprogramCode() {
@@ -215,7 +228,7 @@ export default {
               this.$store.commit("user/SET_NAME", res.result.nicknameTag);
               localStorage.setItem("triUserId", res.result.triUserId);
               localStorage.setItem("name", res.result.nicknameTag);
-              console.log("res.result.jwt", res.result.jwt);
+              // console.log("res.result.jwt", res.result.jwt);
               setToken(res.result.jwt);
               this.$router.push("/timeTable/class");
             } else {
@@ -273,12 +286,12 @@ export default {
           url: `/api/wechat/wechatScanLogin/${this.sceneId}`,
         });
 
-        console.log("获取扫码登录结果成功:", res);
-
         if (res.code === "100000" && res.result && res.result) {
           // 扫码成功，停止轮询并处理登录
           this.isExpire = false;
+          this.expireTimestamp = 0;
           this.clearPollTimer();
+          this.clearExpireTimer();
           this.handleLoginSuccess(res.result);
         } else if (res.result?.message) {
           // 显示状态信息（但不停止轮询，允许继续尝试）
@@ -329,6 +342,8 @@ export default {
         .then((res) => {
           if (res.result?.sceneId && res.result?.ticket) {
             // 过期时间
+            this.expireTimestamp = res.timestamp;
+            // console.log("this.expireTimestamp", this.expireTimestamp);
             this.expireTime = (res.result.expireSeconds - 25) || 0;
             this.sceneId = res.result.sceneId;
             this.qrcodeUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${res.result.ticket}`;
@@ -350,9 +365,9 @@ export default {
     // 检查URL参数
     checkUrlParams() {
       // 添加更详细的调试信息
-      console.log("当前完整URL:", window.location.href);
-      console.log("window.location.search:", window.location.search);
-      console.log("window.location.hash:", window.location.hash);
+      // console.log("当前完整URL:", window.location.href);
+      // console.log("window.location.search:", window.location.search);
+      // console.log("window.location.hash:", window.location.hash);
 
       // 尝试多种方式获取code和state参数
       const urlParams = new URLSearchParams(window.location.search);
@@ -389,22 +404,22 @@ export default {
       const finalCode = code || codeFromHash || regexCode;
       const finalState = state || stateFromHash || regexState;
 
-      console.log("最终获取到的参数:", { code: finalCode, state: finalState });
+      // console.log("最终获取到的参数:", { code: finalCode, state: finalState });
 
       if (finalCode) {
         this.hasCode = true;
         this.wxLoginStatus = "success";
-        console.log(
-          "检测到code参数，显示扫码成功状态，code值:",
-          finalCode,
-          "state值:",
-          finalState
-        );
+        // console.log(
+        //   "检测到code参数，显示扫码成功状态，code值:",
+        //   finalCode,
+        //   "state值:",
+        //   finalState
+        // );
 
         // 可以在这里处理登录成功后的逻辑
         this.handleUrlLoginSuccess(finalCode, finalState);
       } else {
-        console.log("未检测到code参数，开始初始化微信登录");
+        // console.log("未检测到code参数，开始初始化微信登录");
         this.initWxLogin();
       }
     },
@@ -421,7 +436,7 @@ export default {
 
     // 处理URL参数登录成功
     handleUrlLoginSuccess(code, state) {
-      console.log("处理登录成功，code:", code, "state:", state);
+      // console.log("处理登录成功，code:", code, "state:", state);
 
       // 调用微信登录回调接口，同时传递code和state参数
       getData({
@@ -432,12 +447,12 @@ export default {
         },
       })
         .then((res) => {
-          console.log("微信登录回调成功，res:", res);
+          // console.log("微信登录回调成功，res:", res);
 
           // 根据后端返回结果处理后续逻辑
           if (res.success) {
             // 登录成功，可以跳转到主页或保存用户信息
-            console.log("登录成功，准备跳转");
+            // console.log("登录成功，准备跳转");
             // this.$router.push('/dashboard'); // 根据实际路由调整
           } else {
             // 登录失败，显示错误信息
@@ -455,7 +470,7 @@ export default {
 
       // 示例：3秒后跳转到主页
       setTimeout(() => {
-        console.log("准备跳转到主页");
+        // console.log("准备跳转到主页");
         // this.$router.push('/dashboard'); // 根据实际路由调整
       }, 3000);
     },
@@ -471,15 +486,15 @@ export default {
         let currentImageIndex = 0;
         let loadedImages = 0;
 
-        console.log("背景图片数组:", this.backgroundImages);
-        console.log("轮播容器:", slider);
+        // console.log("背景图片数组:", this.backgroundImages);
+        // console.log("轮播容器:", slider);
 
         // 清空容器
         slider.innerHTML = "";
 
         // 初始化轮播图片
         this.backgroundImages.forEach((image, index) => {
-          console.log(`添加图片 ${index}:`, image);
+          // console.log(`添加图片 ${index}:`, image);
           const img = document.createElement("img");
           img.src = image;
           img.className = index === 0 ? "active" : "";
@@ -493,10 +508,10 @@ export default {
           img.style.transition = "opacity 1s ease-in-out";
 
           img.onload = () => {
-            console.log(`图片 ${index} 加载成功`);
+            // console.log(`图片 ${index} 加载成功`);
             loadedImages++;
             if (loadedImages === this.backgroundImages.length) {
-              console.log("所有图片加载完成，开始轮播");
+              // console.log("所有图片加载完成，开始轮播");
             }
           };
 
