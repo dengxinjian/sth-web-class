@@ -130,7 +130,7 @@
                         classItem.sportType
                       )
                     }}
-                   <span v-if="classItem.classesJson.distanceUnit && classItem.classesJson.distanceUnit !== 'km'">
+                   <span v-if="classItem.classesJson?.distanceUnit && classItem.classesJson.distanceUnit !== 'km'">
                       {{ classItem.classesJson.distanceUnit }}
                     </span>
                     <span v-else>km</span>
@@ -187,7 +187,7 @@
                     >
                       <ExerciseProcessChart
                         :exerciseList="stage.stageTimeline"
-                        :maxIntensity="classItem.classesJson.maxIntensity"
+                        :maxIntensity="classItem.classesJson?.maxIntensity"
                         :height="16"
                       />
                     </div>
