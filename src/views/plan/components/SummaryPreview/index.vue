@@ -409,32 +409,6 @@ export default {
       }
     },
     planClasses(newVal) {
-      // console.log(newVal, "newVal");
-      // 过滤出至少包含一个有效计划项的周
-      // if (!newVal || !Array.isArray(newVal) || newVal.length === 0) {
-      //   this.planList = [];
-      //   return;
-      // }
-
-      // // 检查周是否包含有效的计划项（有 details 且不为空 并且 competitionDtoList也不为空）
-      // const hasValidDetails = (week) => {
-      //   if (!Array.isArray(week) || week.length === 0) {
-      //     return false;
-      //   }
-      //   return week.some((item) => {
-      //     if (!item) {
-      //       return false;
-      //     }
-      //     // 检查 details 是否存在且不为空
-      //     const hasValidDetails = item.details && Array.isArray(item.details) && item.details.length > 0;
-      //     // 检查 competitionDtoList 是否存在且不为空
-      //     const hasValidCompetition = item.competitionDtoList && Array.isArray(item.competitionDtoList) && item.competitionDtoList.length > 0;
-      //     // 两个条件都要满足
-      //     return hasValidDetails || hasValidCompetition;
-      //   });
-      // };
-
-      // this.planList = newVal.filter(hasValidDetails);
       if (newVal && Array.isArray(newVal) && newVal.length > 0) {
         const newDayDetailList = newVal
           .flat()
@@ -447,10 +421,13 @@ export default {
                 Array.isArray(item.competitionDtoList) &&
                 item.competitionDtoList.length > 0)
           );
-        this.weekNumber = Math.ceil(
-          newDayDetailList[newDayDetailList.length - 1]?.day / 7
-        );
-        // console.log(this.weekNumber, "this.weekNumber");
+        const lastItem = newDayDetailList[newDayDetailList.length - 1];
+        const day = lastItem?.day;
+        if (day != null && typeof day === 'number' && !isNaN(day) && isFinite(day)) {
+          this.weekNumber = Math.ceil(day / 7);
+        } else {
+          this.weekNumber = 0;
+        }
       }
     },
   },
