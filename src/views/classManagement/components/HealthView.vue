@@ -2,7 +2,7 @@
   <div class="health-view-container">
     <div class="health-header">
       <h3 class="health-title">健康数据</h3>
-      <div class="date-info"> {{ date }}</div>
+      <div class="date-info">{{ date }}</div>
       <el-select
         v-model="selectedDeviceId"
         placeholder="请选择设备"
@@ -99,9 +99,9 @@
 
 <script>
 import * as echarts from "echarts";
-import { scheduleApi } from "../services/classManagement";
-import { DEVICE_TYPE_DICT } from '../constants'
-import { secondsToHHMM } from '@/utils'
+import { scheduleApi, athleteApi } from "../services/classManagement";
+import { DEVICE_TYPE_DICT } from "../constants";
+import { secondsToHHMM } from "@/utils";
 
 export default {
   name: "HealthView",
@@ -114,10 +114,10 @@ export default {
       type: String,
       required: true,
     },
-    deviceList: {
-      type: Array,
-      default: () => [],
-    },
+    // deviceList: {
+    //   type: Array,
+    //   default: () => [],
+    // },
     deviceType: {
       type: Number,
       default: null,
@@ -134,11 +134,19 @@ export default {
       hrvChart: null,
       rhrChart: null,
       sleepChart: null,
+      deviceList: [],
     };
+  },
+  watch: {
+    triUserId: {
+      handler(newVal) {
+        this.getDeviceList();
+      },
+      immediate: true,
+    },
   },
   mounted() {
     this.initCharts();
-    this.selectInitialDevice();
   },
   beforeDestroy() {
     if (this.hrvChart) {
@@ -152,6 +160,16 @@ export default {
     }
   },
   methods: {
+    // 获取设备列表
+    async getDeviceList() {
+      const res = await athleteApi.getDeviceList(this.triUserId);
+      if (res.success && res.result) {
+        this.deviceList = res.result;
+        this.selectInitialDevice();
+      } else {
+        console.error("获取设备列表失败:", res);
+      }
+    },
     /**
      * 初始化图表
      */
@@ -257,10 +275,12 @@ export default {
         const date = new Date(item.date);
         return `${date.getMonth() + 1}/${date.getDate()}`;
       });
-      const sleepTimeBarChatData = (data.sleepTimeBarChatData || []).map((item) => {
-        const date = new Date(item.date);
-        return `${date.getMonth() + 1}/${date.getDate()}`;
-      });
+      const sleepTimeBarChatData = (data.sleepTimeBarChatData || []).map(
+        (item) => {
+          const date = new Date(item.date);
+          return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+      );
       // tooltip显示完整年/月/日
       const hrvBarChatDataAll = (data.hrvBarChatData || []).map((item) => {
         const date = new Date(item.date);
@@ -270,10 +290,14 @@ export default {
         const date = new Date(item.date);
         return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
       });
-      const sleepTimeBarChatDataAll = (data.sleepTimeBarChatData || []).map((item) => {
-        const date = new Date(item.date);
-        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
-      });
+      const sleepTimeBarChatDataAll = (data.sleepTimeBarChatData || []).map(
+        (item) => {
+          const date = new Date(item.date);
+          return `${date.getFullYear()}/${
+            date.getMonth() + 1
+          }/${date.getDate()}`;
+        }
+      );
       // HRV 图表
       const hrvData = (data.hrvBarChatData || []).map((item) => item.value);
       const hrvAvg = (data.hrvBarChatData || []).map((item) => item.aveValue);

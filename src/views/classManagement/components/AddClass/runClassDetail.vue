@@ -1146,11 +1146,27 @@ export default {
         this.$message.error(validation.message);
         return;
       }
-      if (this.classInfo.id) {
-        this.submitUpdateClass(closeAfter);
-      } else {
-        this.submitNewClass(closeAfter);
-      }
+      submitData({
+        url: "/api/classes/calculateTimeDistanceSth",
+        classesTitle: this.classInfo.title,
+        classesGroupId: this.classInfo.groupId,
+        labels: this.classInfo.tags,
+        sportType: "RUN",
+        classesJson: JSON.stringify({
+          ...this.classInfo,
+          timeline: this.timeline,
+          maxIntensity: this.maxIntensity,
+        }),
+      }).then((res) => {
+        if (res.success) {
+          this.classInfo.sth = res.result?.sth || "";
+          if (this.classInfo.id) {
+            this.submitUpdateClass(closeAfter);
+          } else {
+            this.submitNewClass(closeAfter);
+          }
+        }
+      });
     },
     onDelete() {
       this.$emit("delete");

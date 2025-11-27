@@ -197,6 +197,13 @@ export const athleteApi = {
       url: `/api/classSchedule/updateAuthorizedDevice?deviceId=${deviceId}&syncFlag=${syncFlag}`,
     });
   },
+  // 获取所有设备列表
+  getDeviceList(triUserId) {
+    return getData({
+      url: "/api/classSchedule/authorizedAllDevice",
+      triUserId,
+    });
+  },
 };
 
 /**
