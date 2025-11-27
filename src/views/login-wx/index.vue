@@ -71,7 +71,7 @@
           <div class="miniprogram-code">
             <div class="miniprogram-title">请使用微信扫码</div>
             <img
-              src="./imgs/miniprogram.png"
+              :src="miniprogramUrl"
               alt="小程序码"
               class="miniprogram-img"
             />
@@ -170,6 +170,7 @@ export default {
       expireTimer: null, // 二维码过期定时器
       // 是否过期
       isExpire: false,
+      miniprogramUrl: process.env.NODE_ENV === "production" ? "./imgs/miniprogram.png" : "./imgs/miniprogram-test.png",
     };
   },
   mounted() {
