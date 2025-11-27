@@ -170,7 +170,7 @@ export default {
       expireTimer: null, // 二维码过期定时器
       // 是否过期
       isExpire: false,
-      miniprogramUrl: process.env.NODE_ENV === "production" ? "./imgs/miniprogram.png" : "./imgs/miniprogram-test.png",
+      miniprogramUrl: process.env.NODE_ENV === "production" ? require("@/views/login-wx/imgs/miniprogram.png") : require("@/views/login-wx/imgs/miniprogram-test.png"),
     };
   },
   mounted() {
