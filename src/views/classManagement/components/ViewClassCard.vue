@@ -260,7 +260,7 @@
       :class-item="classItem"
       @close="showEditClass = false"
       @save="handleEditSave"
-      @delete="$emit('delete', classItem.id)"
+      @delete="$emit('delete', classItem)"
     />
   </div>
 </template>
@@ -378,7 +378,7 @@ export default {
     },
     handleDelete() {
       this.handleClose();
-      this.$emit("delete", this.classItem.id);
+      this.$emit("delete", this.classItem);
     },
     handleEditSave(saveData, flag) {
       console.log(saveData, flag, "saveData, flag");

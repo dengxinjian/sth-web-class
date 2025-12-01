@@ -142,7 +142,7 @@
               :group-id="item.groupId"
               @click="$emit('class-detail', classItem.id, classItem.sportType)"
               @move="$emit('move-class', classItem.id, item.groupId)"
-              @delete="$emit('delete-class', classItem.id)"
+              @delete="$emit('delete-class', classItem)"
               @copy="
                 $emit('copy-class', classItem, item.groupId, classItem.title)
               "
