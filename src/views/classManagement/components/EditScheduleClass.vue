@@ -537,7 +537,7 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="deleteClass(classData.id)" v-if="!isActivity"
+        <el-button @click="deleteClass(classData)" v-if="!isActivity"
           >删除</el-button
         >
         <el-button @click="handleClose">取消</el-button>
@@ -833,13 +833,13 @@ export default {
     isTrainingAdvice(sportType) {
       return ["REMARK", "OTHER", "REST"].includes(sportType);
     },
-    deleteClass(id) {
-      this.$confirm("确认删除该课表？", "提示", {
+    deleteClass(classData) {
+      this.$confirm(`确认删除课表【${classData?.classesJson?.title}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await scheduleApi.deleteSchedule(id);
+        const res = await scheduleApi.deleteSchedule(classData?.id);
         if (res.success) {
           this.$message.success("删除成功");
           this.handleClose();

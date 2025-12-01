@@ -333,6 +333,7 @@ import {
   isSportTypeMatch,
   generateSortData,
   getCompletionStatus,
+  getSportTypeName,
 } from "./utils/helpers";
 import { getLunarDate, secondsToHHMMSS } from "@/utils/index";
 import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
@@ -527,7 +528,7 @@ export default {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
       this.handlePasteClass(classesDate, classItem);
-      this.handleDeleteClassSchedule(classItem.id, true);
+      this.handleDeleteClassSchedule(classItem, true);
     },
     /**
      * 粘贴赛事
@@ -1204,14 +1205,14 @@ export default {
     /**
      * 删除分组
      */
-    handleDeleteGroup(groupId) {
-      this.$confirm("确认删除该分组？", "提示", {
+    handleDeleteGroup(item) {
+      this.$confirm(`确认删除分组【${item.groupName}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
         // 调用删除分组API
-        groupApi.deleteGroup(groupId).then((res) => {
+        groupApi.deleteGroup(item.groupId).then((res) => {
           if (res.success) {
             this.$message.success("删除成功");
             this.getClassList();
@@ -1311,22 +1312,21 @@ export default {
     /**
      * 删除课表
      */
-    async handleDeleteClassSchedule(classId, isCut = false) {
-      console.log(classId, "classId");
+    async handleDeleteClassSchedule(classItem, isCut = false) {
       if (!isCut) {
-        this.$confirm("确认删除该课表？", "提示", {
+        this.$confirm(`确认删除课表【${classItem?.classesJson?.title}】？`, "提示", {
           confirmButtonText: "删除",
           cancelButtonText: "取消",
           type: "warning",
         }).then(async () => {
-          const res = await scheduleApi.deleteSchedule(classId);
+          const res = await scheduleApi.deleteSchedule(classItem?.classId);
           if (res.success) {
             this.$message.success("删除成功");
             this.getScheduleData();
           }
         });
       } else {
-        const res = await scheduleApi.deleteSchedule(classId);
+        const res = await scheduleApi.deleteSchedule(classItem?.classId);
       }
     },
 
@@ -1375,11 +1375,15 @@ export default {
       });
     },
 
+    getSportTypeName(sportType) {
+      return getSportTypeName(sportType);
+    },
+
     /**
      * 删除运动
      */
     handleDeleteActivity(activity) {
-      this.$confirm("确认删除该运动？", "提示", {
+      this.$confirm(`确认删除运动【${this.getSportTypeName(activity.sportType)}_手动录入】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",

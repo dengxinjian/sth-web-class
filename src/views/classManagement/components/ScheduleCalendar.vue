@@ -125,7 +125,7 @@
                 :class-item="classItem"
                 :date="item.commonDate"
                 @click="$emit('class-detail', classItem, classItem.sportType)"
-                @delete="$emit('delete-schedule', $event)"
+                @delete="$emit('delete-schedule', classItem)"
                 @device-click="handleDeviceClick"
                 @edit="$emit('edit-schedule', $event)"
                 @copy="handleCopyClass"

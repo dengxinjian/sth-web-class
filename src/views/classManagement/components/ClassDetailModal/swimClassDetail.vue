@@ -308,7 +308,7 @@ export default {
     },
     // 删除课程
     submitDeleteClass() {
-      this.$confirm("确认删除该课表？", "提示", {
+      this.$confirm(`确认删除课表【${this.form.title}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",

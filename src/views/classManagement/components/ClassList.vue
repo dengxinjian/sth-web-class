@@ -107,7 +107,7 @@
                     <el-button
                       type="text"
                       :disabled="!item.groupId"
-                      @click="$emit('delete-group', item.groupId)"
+                      @click="$emit('delete-group', item)"
                     >
                       删除分组
                     </el-button>
