@@ -519,14 +519,14 @@ export default {
     /**
      * 删除分组
      */
-    handleDeleteGroup(groupId) {
-      this.$confirm("确认删除该分组？", "提示", {
+    handleDeleteGroup(item) {
+      this.$confirm(`确认删除分组【${item?.groupName}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
         // 调用删除分组API
-        groupApi.deleteGroup(groupId).then((res) => {
+        groupApi.deleteGroup(item.groupId).then((res) => {
           if (res.success) {
             this.$message.success("删除成功");
             this.getPlanList();
@@ -611,7 +611,7 @@ export default {
     handleDeletePlan() {
       const _this = this;
       if (_this.currentPlanDetail.id) {
-        this.$confirm("确认删除该计划？", "提示", {
+        this.$confirm(`确认删除计划【${_this.currentPlanDetail?.planTitle}】？`, "提示", {
           confirmButtonText: "删除",
           cancelButtonText: "取消",
           type: "warning",
