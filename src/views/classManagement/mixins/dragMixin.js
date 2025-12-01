@@ -97,16 +97,22 @@ export default {
                 console.log("onUnchoose - 取消选择", e);
               },
               onMove: (evt, originalEvent) => {
-                console.log("onMove event triggered", {
-                  related: evt.related,
-                  dragged: evt.dragged,
-                  relatedRect: evt.relatedRect,
-                  draggedRect: evt.draggedRect,
-                  willInsertAfter: evt.willInsertAfter,
-                  originalEvent: originalEvent,
-                });
-                // onMove 需要返回值：返回 -1 取消移动，返回 1 允许移动
-                // 返回 true 或 1 表示允许移动
+                const isActivityDrag =
+                  evt.dragged &&
+                  evt.dragged.classList &&
+                  evt.dragged.classList.contains("sport-drap-handle");
+                const eventDropEl =
+                  (originalEvent &&
+                    originalEvent.target &&
+                    originalEvent.target.closest &&
+                    originalEvent.target.closest(".js-event-drop-container")) ||
+                  (evt.related &&
+                    evt.related.closest &&
+                    evt.related.closest(".js-event-drop-container"));
+                // 拖拽运动到赛事时，阻止课表容器接管排序，让赛事自身处理
+                if (isActivityDrag && eventDropEl) {
+                  return false;
+                }
                 return true;
               },
               onChange: (evt) => {
@@ -184,6 +190,7 @@ export default {
               // 清理拖拽产生的克隆运动卡片DOM
               // 当运动卡片被拖拽时（pull: "clone"），会产生克隆元素
               // 拖拽结束后，需要清理残留的克隆元素
+              console.log(e, "e");
               if (e.pullMode === "clone") {
                 _this.$nextTick(() => {
                   // 检查克隆元素是否还在 DOM 中
@@ -276,6 +283,55 @@ export default {
     },
 
     /**
+     * 初始化赛事卡片拖拽（运动拖到赛事匹配）
+     */
+    initEventDrag() {
+      this.$nextTick(() => {
+        const _this = this;
+        document.querySelectorAll(".js-event-drop-container").forEach((el) => {
+          new Sortable(el, {
+            group: {
+              name: "classDrag",
+              pull: false,
+              put: function (to, from, dragEl) {
+                if (!to || !from || !dragEl) return false;
+                const targetDate = to.el?.dataset?.date;
+                const sourceDate = from.el?.dataset?.date;
+                if (!targetDate || !sourceDate) {
+                  return false;
+                }
+                if (targetDate !== sourceDate) {
+                  return false;
+                }
+                const hasActivityId =
+                  dragEl.dataset?.activityid || dragEl.dataset?.manualactivityid;
+                return !!hasActivityId;
+              },
+            },
+            sort: false,
+            animation: 150,
+            onAdd(e) {
+              if (e.item && e.item.parentNode) {
+                e.item.parentNode.removeChild(e.item);
+              }
+              if (typeof _this.handleMatchEvent !== "function") {
+                console.warn("handleMatchEvent is not implemented");
+                return;
+              }
+              _this.handleMatchEvent({
+                eventId: e.to.dataset.id,
+                eventDate: e.to.dataset.date,
+                activityId: e.item.dataset.activityid,
+                manualActivityId: e.item.dataset.manualactivityid,
+                activityDate: e.item.dataset.date,
+              });
+            },
+          });
+        });
+      });
+    },
+
+    /**
      * 初始化所有拖拽功能
      */
     initAllDrag() {
@@ -283,6 +339,7 @@ export default {
       this.initScheduleDrag();
       this.initActivityDrag();
       this.initClassScheduleCardDrag();
+      this.initEventDrag();
     },
   },
 };

@@ -1,8 +1,10 @@
 <template>
   <div
-    class="plan-class-card-wrapper js-plan-drag-no-drag js-event-drag-no-drag"
+    class="plan-class-card-wrapper js-plan-drag-no-drag js-event-drag-no-drag js-event-drop-container"
     style="position: relative"
     data-type="planClass"
+    :data-id="eventItem.id"
+    :data-date="date"
   >
     <div
       class="class-schedule-card-container js-plan-class-card"
