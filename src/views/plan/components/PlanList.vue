@@ -125,7 +125,16 @@
               :key="classItem.id"
               @click="$emit('choose-plan', classItem.id, item.groupId)"
             >
-              <span>{{ classItem.planTitle }}</span>
+              <el-popover
+                placement="right"
+                width="400px"
+                trigger="hover"
+                :disabled="!classItem.planTitle"
+                popper-class="hover-plan-detail-popover"
+              >
+                <span slot="reference" @click.stop>{{ classItem.planTitle }}</span>
+                <HoverPlanDetail :planInfo="classItem"></HoverPlanDetail>
+              </el-popover>
             </div>
           </div>
         </el-collapse-item>
@@ -136,8 +145,12 @@
 
 <script>
 import { debounce } from "../../classManagement/uilt";
+import HoverPlanDetail from "./HoverPlanDetail/index.vue";
 export default {
   name: "PlanList",
+  components: {
+    HoverPlanDetail,
+  },
   props: {
     classList: {
       type: Array,
