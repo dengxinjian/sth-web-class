@@ -56,7 +56,7 @@
               type="text"
               size="mini"
               @click="handleAddGroup"
-              >新建分组</el-button
+              >新增分组</el-button
             >
             <el-button
               v-if="
@@ -134,7 +134,7 @@
               type="text"
               size="mini"
               @click="handleAddGroup"
-              >新建分组</el-button
+              >新增分组</el-button
             >
             <el-button
               v-if="
@@ -388,7 +388,7 @@ export default {
       // 分组管理相关
       showGroupDialog: false,
       showMoveDialog: false,
-      groupDialogTitle: "新建分组",
+      groupDialogTitle: "新增分组",
       currentGroup: {},
       targetGroupId: "",
       groupForm: {
@@ -711,7 +711,7 @@ export default {
 
     // 新建分组
     handleAddGroup() {
-      this.groupDialogTitle = "新建分组";
+      this.groupDialogTitle = "新增分组";
       this.resetGroupForm();
       this.showGroupDialog = true;
     },
