@@ -1384,9 +1384,30 @@ export default {
 
       let newClassSchedule = {};
       const sortVoList = [];
+
+      // 课程模板拖拽的单独处理
       if (e.item.dataset.type === "classTemplate") {
         this.handleClassDragToSchedule(e);
         return;
+      }
+
+      // 计算在“仅课程卡片”中的实际索引，忽略健康数据、赛事、运动记录等非课程元素
+      let targetClassIndex = 0;
+      try {
+        const children = Array.from(e.to.children || []);
+        const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
+        children.forEach((child, idx) => {
+          if (
+            idx < newIndex &&
+            child.dataset &&
+            child.dataset.type === "classSchedule"
+          ) {
+            targetClassIndex += 1;
+          }
+        });
+      } catch (err) {
+        console.warn("计算课程拖拽索引失败，使用原始 newIndex", err);
+        targetClassIndex = e.newIndex || 0;
       }
 
       // 移除拖拽产生的DOM元素，避免显示重复的课表
@@ -1411,7 +1432,8 @@ export default {
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(date)) {
           currentData = JSON.parse(JSON.stringify(item.classSchedule));
-          currentData.splice(e.newIndex, 0, newClassSchedule);
+          // 使用只包含课程的索引插入，避免健康数据和赛事影响排序
+          currentData.splice(targetClassIndex, 0, newClassSchedule);
         }
       });
 
