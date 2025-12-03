@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
   >
     <span slot="title"
-      >{{ scheduleType === "add" ? "新建" : "编辑" }}游泳课表</span
+      >{{ scheduleType === "add" ? "新增" : "编辑" }}游泳课表</span
     >
 
     <div class="form-section">

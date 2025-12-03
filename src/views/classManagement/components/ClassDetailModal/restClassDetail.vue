@@ -7,7 +7,7 @@
       class="add-swim-class-dialog"
        :close-on-click-modal="false"
     >
-      <span slot="title">{{ scheduleType === "add" ? "新建" : "编辑" }}休息课表</span>
+      <span slot="title">{{ scheduleType === "add" ? "新增" : "编辑" }}休息课表</span>
 
       <div class="form-section">
         <el-form :model="form" label-width="60px">
