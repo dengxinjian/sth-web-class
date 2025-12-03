@@ -173,7 +173,9 @@
                   <i class="el-icon-plus"></i>
                   <span>添加</span>
                 </div>
+                <!-- 录入运动 只有在当前日期小于等于今天时才显示-->
                 <div
+                  v-if="contextMenuDate <= new Date().toISOString().split('T')[0]"
                   class="context-menu-item"
                   @click="
                     handleInputActivity(contextMenuDate);
