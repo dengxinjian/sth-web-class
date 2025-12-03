@@ -10,7 +10,7 @@
         </div>
         <div class="planned-schedule-header-title-left-button">
           <el-button type="primary" @click="handleAddWeek">添加周</el-button>
-          <el-button type="primary" @click="handleSave">保存</el-button>
+          <el-button type="primary" @click="handleSave" style="background-color: #f5a623; border-color:#f5a623;">保存</el-button>
           <el-button type="primary" @click="handleSaveAndExit">保存并关闭</el-button>
         </div>
       </div>

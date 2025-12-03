@@ -240,7 +240,7 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="deleteClass(classData.id)">删除</el-button>
         <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleEditSave(false)"
+        <el-button type="primary" @click="handleEditSave(false)" style="background-color: #f5a623; border-color:#f5a623;"
           >保存</el-button
         >
         <el-button type="danger" @click="handleEditSave(true)"
