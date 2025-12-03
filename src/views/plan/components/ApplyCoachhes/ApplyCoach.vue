@@ -612,7 +612,7 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            _this.$message.success("应用成功");
+            _this.$message.success("事件创建成功，计划持续同步中，稍后请在应用历史查看");
             this.form = {
               teamId: undefined,
               athleteIds: [],
