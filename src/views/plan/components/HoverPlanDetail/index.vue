@@ -1,9 +1,152 @@
 <template>
   <div class="hover-plan-detail">
-    <h2>概要</h2>
+    <!-- <h2>概要</h2> -->
+    <div class="detail-row-box">
+      <div class="detail-row-title">计划名称</div>
+      <div class="detail-row-content">{{ planDetail.planTitle }}</div>
+    </div>
+    <div class="detail-row-box" v-if="planDetail?.teamName">
+      <div class="detail-row-title">团队</div>
+      <div class="detail-row-content">{{ planDetail.teamName }}</div>
+    </div>
+    <div class="detail-row-box">
+      <div class="detail-row-title">计划源</div>
+      <div class="detail-row-content">{{ planDetail.teamName ? `${planDetail.teamName} - ${planDetail.planSourceNickname}` : planDetail.planSourceNickname }}</div>
+    </div>
+    <div class="detail-row-box" v-for="item in renderColumns" :key="item.prop">
+      <div class="detail-row-title">{{ item.label }}</div>
+      <div class="detail-row-content">{{ planDetail[item.prop] }}</div>
+    </div>
+    <div class="detail-row-box">
+      <div class="detail-row-title">计划周期</div>
+      <div class="detail-row-content">{{ weekNumber }}周</div>
+    </div>
+    <div class="detail-row-box">
+      <div class="detail-row-title">统计</div>
+      <div class="detail-row-content">
+        <el-row>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5" style="text-align: left;">类型</el-col>
+              <el-col :span="9">时长</el-col>
+              <el-col :span="9">距离</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5" style="text-align: left;">游泳</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekSwimmingDuration())
+                }}{{
+                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9"
+                >{{ getweekSwimmingDistance() || "N/A" }}
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">骑行</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekCycleDuration())
+                }}{{
+                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{ getweekCycleDistance() || "N/A" }} </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">跑步</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekRunDuration())
+                }}{{
+                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{ getweekRunDistance() || "N/A" }}</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">力量</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekPowerDuration())
+                }}{{
+                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{
+                getweekPowerAndOtherDistance("STRENGTH") || "N/A"
+              }}</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">其他</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekOtherDuration())
+                }}{{
+                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{
+                getweekPowerAndOtherDistance("OTHER") || "N/A"
+              }}</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
+            <el-row>
+              <el-col :span="5">总计</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekDuration())
+                }}
+                {{
+                  secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{ getweekDistance() || "N/A" }}</el-col>
+            </el-row>
+          </el-col>
+        </el-row>
+      </div>
+    </div>
 
-    <el-form ref="formRef" label-width="70px" size="small">
-      <el-form-item label="计划名称" prop="planTitle">
+    <!-- <el-form ref="formRef" label-width="70px" size="small"> -->
+      <!-- <el-form-item label="计划名称" prop="planTitle">
         <span>{{ planDetail.planTitle }}</span>
       </el-form-item>
 
@@ -28,10 +171,10 @@
       </el-form-item>
 
       <el-form-item label="计划周期" prop="groupId">
-        <span>{{ weekNumber }}周</span>
-      </el-form-item>
+        <span>{{ weekNumber }}周</span> -->
+      <!-- </el-form-item> -->
 
-      <el-form-item label="统计">
+      <!-- <el-form-item label="统计">
         <el-row>
           <el-col :span="24">
             <el-row>
@@ -151,7 +294,7 @@
           </el-col>
         </el-row>
       </el-form-item>
-    </el-form>
+    </el-form> -->
   </div>
 </template>
 <script>
@@ -169,6 +312,14 @@ export default {
   },
   data() {
     return {
+      renderColumns: [
+        // { label: "计划名称", prop: "planTitle" },
+        // { label: "团队", prop: "teamName" },
+        // { label: "计划源", prop: "planSourceNickname" },
+        { label: "邮箱", prop: "email" },
+        { label: "微信号", prop: "weChat" },
+        { label: "描述", prop: "description" },
+      ],
       groups: [],
       teams: [],
       emptyPlanClasses: [[], [], [], []],
@@ -203,6 +354,7 @@ export default {
   watch: {
     planInfo: {
       handler(newVal) {
+        console.log("newVal-planInfo",newVal);
         if (
           newVal &&
           typeof newVal === "object" &&
@@ -1067,6 +1219,7 @@ export default {
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  border-radius: 16px;
 
   .el-form {
     max-width: 100%;
@@ -1078,12 +1231,20 @@ export default {
 
     .el-form-item__content {
       overflow: hidden;
+      display: flex;
+      /* align-items: flex-start; */
 
       span {
-        display: block;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 6;
+        line-clamp: 6;
         overflow: hidden;
+        text-overflow: ellipsis;
         word-break: break-word;
         max-width: 100%;
+        font-size: 12px !important;
+        color: #999 !important;
       }
     }
 
@@ -1102,10 +1263,36 @@ export default {
     margin: 0 !important;
 
     .el-col {
-      padding: 0 4px;
+      padding: 0 !important;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+  }
+
+  .detail-row-box {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    .detail-row-title {
+      width: 50px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .detail-row-content {
+      flex: 1;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 6;
+      line-clamp: 6;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-all;
+      font-size: 12px;
+      color: #999;
+      margin-left: 12px;
     }
   }
 }
@@ -1130,5 +1317,32 @@ export default {
 .detail-value {
   color: #303133;
   word-break: break-word;
+}
+</style>
+
+<style>
+.hover-plan-detail .el-form-item {
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.hover-plan-detail .el-form-item__label {
+  font-size: 14px !important;
+  line-height: 24px !important;
+  padding-top: 0 !important;
+}
+
+.hover-plan-detail .el-form-item__content {
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.hover-plan-detail .el-form-item__content span {
+  font-size: 12px !important;
+  color: #999 !important;
+}
+
+.hover-plan-detail .el-col {
+  padding: 0 !important;
 }
 </style>

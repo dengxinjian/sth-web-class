@@ -127,7 +127,7 @@
             >
               <el-popover
                 placement="right"
-                width="400px"
+                width="320px"
                 trigger="hover"
                 :disabled="!classItem.planTitle"
                 popper-class="hover-plan-detail-popover"
