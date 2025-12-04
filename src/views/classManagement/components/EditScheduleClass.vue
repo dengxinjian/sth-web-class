@@ -839,7 +839,10 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await scheduleApi.deleteSchedule(classData?.id);
+        const res = await scheduleApi.deleteSchedule({
+          id: classData?.id,
+          triUserId: this.triUserId,
+        });
         if (res.success) {
           this.$message.success("删除成功");
           this.handleClose();

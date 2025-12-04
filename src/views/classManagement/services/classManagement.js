@@ -94,9 +94,16 @@ export const scheduleApi = {
   },
 
   // 删除课表
-  deleteSchedule(id) {
-    return submitData({
-      url: `/api/classSchedule/deleteClassSchedule?id=${id}`,
+  deleteSchedule(params) {
+    // return submitData({
+    //   url: `/api/classSchedule/deleteClassSchedule?id=${id}`,
+    // });
+    return request({
+      url: `/api/classSchedule/deleteClassSchedule?id=${params.id}`,
+      method: "post",
+      headers: {
+        requestUserInfoId: params.triUserId,
+      },
     });
   },
 

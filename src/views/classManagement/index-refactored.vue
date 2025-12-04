@@ -1321,14 +1321,20 @@ export default {
           cancelButtonText: "取消",
           type: "warning",
         }).then(async () => {
-          const res = await scheduleApi.deleteSchedule(classItem?.classId);
+          const res = await scheduleApi.deleteSchedule({
+            id: classItem?.classId,
+            triUserId: this.selectedAthletic,
+          });
           if (res.success) {
             this.$message.success("删除成功");
             this.getScheduleData();
           }
         });
       } else {
-        const res = await scheduleApi.deleteSchedule(classItem?.classId);
+        const res = await scheduleApi.deleteSchedule({
+          id: classItem?.classId,
+          triUserId: this.selectedAthletic,
+        });
       }
     },
 
