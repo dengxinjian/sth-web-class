@@ -1108,10 +1108,10 @@ export default {
       }
       console.log(device, "device");
 
-      if (device.syncStatus === 1) {
-        this.$message.info("该设备已同步成功");
-        return;
-      }
+      // if (device.syncStatus === 1) {
+      //   this.$message.info("该设备已同步成功");
+      //   return;
+      // }
 
       this.$confirm("确定同步课表至设备吗？", "提示", {
         confirmButtonText: "确定",
@@ -1123,10 +1123,12 @@ export default {
           deviceType: device.deviceType,
         });
         if (res.success) {
-          this.$message.success(res.result);
+          // this.$message.success(res.result);
+          this.$message.success('同步成功');
           this.getScheduleData();
         } else {
-          this.$message.error(res.message);
+          // this.$message.error(res.message);
+          this.$message.error('同步失败');
         }
       });
     },

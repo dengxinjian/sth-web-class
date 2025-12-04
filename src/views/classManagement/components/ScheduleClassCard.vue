@@ -457,6 +457,9 @@ export default {
         .sport-type-color2 {
           background-color: #c72a29;
         }
+        .sport-type-color3 {
+          background-color: #f5a623;
+        }
         .sport-type-color0 {
           background-color: #aaaaaa;
         }
