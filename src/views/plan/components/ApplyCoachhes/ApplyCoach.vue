@@ -60,6 +60,7 @@
             clearable
             style="width: 90%"
             @change="handleCascaderChange"
+            collapse-tags
           ></el-cascader>
         </el-form-item>
 
@@ -129,41 +130,46 @@
             ><span class="member-name"></span
           ></el-col>
         </el-row>
-        <template v-if="form.athleteType === 2 && members.length > 0">
-          <el-row
-            :gutter="24"
-            class="member-row"
-            v-for="(item, index) in members"
-            :key="index"
-          >
-            <el-col :span="6" align="right">
-              <span class="member-name">{{ item.userNickname }}</span>
-            </el-col>
-            <el-col :span="7" align="left">
-              <el-select v-model="item.applyMode" placeholder="请选择">
-                <el-option label="以开始日期" :value="1"></el-option>
-                <el-option label="以结束日期" :value="2"></el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="9" align="left">
-              <el-date-picker
-                v-model="item.applyDate"
-                value-format="yyyy-MM-dd"
-                type="date"
-                placeholder="选择日期"
-                style="width: 100%"
-                :picker-options="pickerOptions"
-              >
-              </el-date-picker>
-            </el-col>
-            <el-col :span="1" align="left">
-              <i
-                class="el-icon-circle-close delete-icon"
-                @click="removeMember(item, index)"
-              ></i>
-            </el-col>
-          </el-row>
-        </template>
+        <div class="member-row-wrapper" v-if="form.athleteType === 2 && members.length > 0">
+            <el-row
+              :gutter="24"
+              class="member-row"
+              v-for="(item, index) in members"
+              :key="index"
+            >
+              <el-col :span="6" align="right">
+                <span class="member-name">{{ item.userNickname }}</span>
+              </el-col>
+              <el-col :span="7" align="left">
+                <el-select
+                  v-model="item.applyMode"
+                  placeholder="请选择"
+                  size="small"
+                >
+                  <el-option label="以开始日期" :value="1"></el-option>
+                  <el-option label="以结束日期" :value="2"></el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="9" align="left">
+                <el-date-picker
+                  v-model="item.applyDate"
+                  value-format="yyyy-MM-dd"
+                  type="date"
+                  placeholder="选择日期"
+                  style="width: 100%"
+                  :picker-options="pickerOptions"
+                  size="small"
+                >
+                </el-date-picker>
+              </el-col>
+              <el-col :span="1" align="left">
+                <i
+                  class="el-icon-circle-close delete-icon"
+                  @click="removeMember(item, index)"
+                ></i>
+              </el-col>
+            </el-row>
+        </div>
       </template>
       <!-- </el-form-item> -->
       <template v-else>
@@ -223,7 +229,7 @@ export default {
       form: {
         teamId: undefined,
         athleteIds: [],
-        athleteType: 2,
+        athleteType: 1,
         applyMode: undefined,
         applyDate: undefined,
       },
@@ -454,7 +460,7 @@ export default {
       this.form = {
         teamId: undefined,
         athleteIds: [],
-        athleteType: 2,
+        athleteType: 1,
       };
       this.members = [];
       this.resetForm();
@@ -616,7 +622,7 @@ export default {
             this.form = {
               teamId: undefined,
               athleteIds: [],
-              athleteType: 2,
+              athleteType: 1,
             };
             this.members = [];
             _this.resetForm();
@@ -636,7 +642,7 @@ export default {
       this.form = {
         teamId: undefined,
         athleteIds: [],
-        athleteType: 2,
+        athleteType: 1,
       };
       this.members = [];
       this.teamGroupList = []; // 清空团队分组列表
@@ -698,6 +704,11 @@ export default {
   align-items: center;
   width: 100%;
   margin-bottom: 10px;
+}
+.member-row-wrapper {
+  width: 100%;
+  max-height: 360px;
+  overflow-y: auto;
 }
 .member-row ::v-deep(.el-col) {
   display: flex;
