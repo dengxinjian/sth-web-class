@@ -61,6 +61,7 @@
             style="width: 90%"
             collapse-tags
             @change="handleCascaderChange"
+            collapse-tags
           ></el-cascader>
         </el-form-item>
 
@@ -130,8 +131,7 @@
             ><span class="member-name"></span
           ></el-col>
         </el-row>
-        <div class="member-list-wrapper">
-          <template v-if="form.athleteType === 2 && members.length > 0">
+        <div class="member-row-wrapper" v-if="form.athleteType === 2 && members.length > 0">
             <el-row
               :gutter="24"
               class="member-row"
@@ -142,7 +142,11 @@
                 <span class="member-name">{{ item.userNickname }}</span>
               </el-col>
               <el-col :span="7" align="left">
-                <el-select v-model="item.applyMode" placeholder="请选择" size="small">
+                <el-select
+                  v-model="item.applyMode"
+                  placeholder="请选择"
+                  size="small"
+                >
                   <el-option label="以开始日期" :value="1"></el-option>
                   <el-option label="以结束日期" :value="2"></el-option>
                 </el-select>
@@ -166,7 +170,6 @@
                 ></i>
               </el-col>
             </el-row>
-          </template>
         </div>
       </template>
       <!-- </el-form-item> -->
@@ -706,6 +709,11 @@ export default {
   align-items: center;
   width: 100%;
   margin-bottom: 10px;
+}
+.member-row-wrapper {
+  width: 100%;
+  max-height: 360px;
+  overflow-y: auto;
 }
 .member-list-wrapper {
   max-height: 400px;

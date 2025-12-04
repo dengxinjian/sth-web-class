@@ -308,7 +308,7 @@ export class CalculateBike {
     if (!this.athleticThreshold || !this.athleticThreshold.cycle) {
       return 0;
     }
-    return Math.round(this.athleticThreshold.cycle * (thresholdFtp / 100));
+    return Math.round((this.athleticThreshold.cycle * thresholdFtp) / 100);
   }
   calculateThresholdFtpRangeNum(thresholdFtpRange) {
     if (!thresholdFtpRange[0] || !thresholdFtpRange[1]) {
