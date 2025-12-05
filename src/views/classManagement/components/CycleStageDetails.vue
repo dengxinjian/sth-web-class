@@ -80,6 +80,9 @@
               part.targetHeartRateRangeNumZone[1]
             }}
           </span>
+          <span v-if="part.hasCadence">
+            踏频{{ part.cadence[0] }}~{{ part.cadence[1] }}
+          </span>
         </div>
         <!-- 模式3: 目标功率 目标 -->
         <div v-if="classData.mode === 3 && part.range === 'target'">
