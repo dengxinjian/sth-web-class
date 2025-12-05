@@ -1322,7 +1322,7 @@ export default {
           type: "warning",
         }).then(async () => {
           const res = await scheduleApi.deleteSchedule({
-            id: classItem?.classId || classItem?.id,
+            id: classItem?.id,
             triUserId: this.selectedAthletic,
           });
           if (res.success) {
@@ -1332,7 +1332,7 @@ export default {
         });
       } else {
         const res = await scheduleApi.deleteSchedule({
-          id: classItem?.classId,
+          id: classItem?.id,
           triUserId: this.selectedAthletic,
         });
       }
