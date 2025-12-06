@@ -10,8 +10,8 @@
     <span slot="title">{{ scheduleType === "add" ? "新增" : "编辑" }}其他运动课表</span>
 
     <div class="form-section">
-      <el-form :model="form" label-width="60px">
-        <el-form-item label="标题：">
+      <el-form ref="titleRef" :model="form" :rules="rules" label-width="70px">
+        <el-form-item label="标题：" prop="title">
           <el-input
             v-model="form.title"
             placeholder="标题"
@@ -149,6 +149,9 @@ export default {
         },
         this.data || {}
       ),
+      rules: {
+        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+      },
     };
   },
   computed: {
@@ -264,7 +267,8 @@ export default {
     onCancel() {
       this.$emit("cancel");
     },
-    onSave(closeAfter) {
+    async onSave(closeAfter) {
+      await this.$refs.titleRef.validate();
       const payload = { ...this.form };
       if (this.form.id) {
         this.submitUpdateClass(closeAfter);

@@ -12,15 +12,9 @@
     }}</span>
 
     <div class="form-section">
-      <el-form :model="form" label-width="60px">
-        <el-form-item label="标题：">
-          <el-input
-            v-model="form.title"
-            placeholder="标题"
-            :maxlength="50"
-            :disabled="originalType === 'official'"
-            class="pill-input"
-          />
+      <el-form ref="titleRef" :rules="rules" :model="form" label-width="70px">
+        <el-form-item label="标题：" prop="title">
+          <el-input type="text" placeholder="标题" v-model="form.title" :disabled="originalType === 'official'" :maxlength="50" />
         </el-form-item>
 
         <div class="row">
@@ -210,6 +204,9 @@ export default {
         },
         this.data || {}
       ),
+      rules: {
+        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+      },
     };
   },
   computed: {
@@ -378,7 +375,8 @@ export default {
       this.innerVisible = false;
       this.$emit("cancel");
     },
-    onSave(closeAfter) {
+    async onSave(closeAfter) {
+      await this.$refs.titleRef.validate();
       const payload = { ...this.form };
       if (this.form.id) {
         this.submitUpdateClass(closeAfter);
