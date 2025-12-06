@@ -513,8 +513,9 @@ export default {
           })
           .then((res) => {
             if (res.success) {
-              this.classDetailData = res.result;
-              this.scheduleType = "edit";
+              // this.classDetailData = res.result;
+              // this.scheduleType = "edit";
+              this.scheduleType = 'add';
               this.getScheduleData();
               this.$message.success("课表保存成功");
             }
