@@ -203,12 +203,7 @@
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
       @save="handleSaveClassDetail"
-      @cancel="
-        scheduleType = 'add';
-        showClassDetailModal = false;
-        classDetailData = {};
-        getScheduleData();
-      "
+      @cancel="handleResetClassDetail"
     />
 
     <CopyClassFromOfficial
@@ -494,13 +489,27 @@ export default {
       console.log("handleChoosePlan");
       this.isPlan = isPlan;
     },
+    handleResetClassDetail() {
+      this.scheduleType = 'add';
+      this.showClassDetailModal = false;
+      // 等待弹窗完全关闭后再重置数据，确保子组件能正确响应
+      this.$nextTick(() => {
+        // 彻底清空对象的所有属性
+        const keys = Object.keys(this.classDetailData);
+        keys.forEach(key => {
+          this.$delete(this.classDetailData, key);
+        });
+        // 确保设置为全新的空对象
+        this.$set(this, 'classDetailData', {});
+        this.getScheduleData();
+      });
+    },
     handleSaveClassDetail(data) {
-      console.log(data, "data", this.scheduleType);
       if (!data.classesTitle || data.classesTitle === "") {
         this.$message.error("课表标题不能为空");
         return;
       }
-      if (this.scheduleType === "add") {
+      if (this.scheduleType === "add" && !data.id) {
         scheduleApi
           .createSchedule({
             classesTitle: data.classesTitle,
@@ -512,10 +521,10 @@ export default {
             triUserId: this.selectedAthletic,
           })
           .then((res) => {
+            console.log("******创建课表", res);
             if (res.success) {
-              // this.classDetailData = res.result;
-              // this.scheduleType = "edit";
-              this.scheduleType = 'add';
+              this.classDetailData = res.result;
+              this.scheduleType = "edit";
               this.getScheduleData();
               this.$message.success("课表保存成功");
             }
@@ -1755,8 +1764,13 @@ export default {
       };
 
       if (this.classModalDataType === "addSchedule") {
-        this.showClassDetailModal = true;
+        // 新增模式，确保数据为空
+        this.scheduleType = 'add';
+        this.classDetailData = {};
         this.classSportType = Map[item.key];
+        this.$nextTick(() => {
+          this.showClassDetailModal = true;
+        });
         console.log(this.addScheduleDate, "this.addScheduleDate");
         return;
       }
