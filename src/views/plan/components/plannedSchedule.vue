@@ -3,15 +3,24 @@
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
         <div>
-          <el-button type="info" style="margin-left: 20px;" @click="handleCancel">取消</el-button>
+          <el-button type="info" style="margin-left: 20px" @click="handleCancel"
+            >取消</el-button
+          >
         </div>
         <div class="planned-schedule-header-title-left-title">
           {{ planTitle }}
         </div>
         <div class="planned-schedule-header-title-left-button">
-          <el-button type="primary" @click="handleAddWeek">添加周</el-button>
-          <el-button type="primary" @click="handleSave" style="background-color: #f5a623; border-color:#f5a623;">保存</el-button>
-          <el-button type="primary" @click="handleSaveAndExit">保存并关闭</el-button>
+          <!-- <el-button type="primary" @click="handleAddWeek">添加周</el-button> -->
+          <el-button
+            type="primary"
+            @click="handleSave"
+            style="background-color: #f5a623; border-color: #f5a623"
+            >保存</el-button
+          >
+          <el-button type="primary" @click="handleSaveAndExit"
+            >保存并关闭</el-button
+          >
         </div>
       </div>
       <div class="planned-schedule-header-title-right">
@@ -55,6 +64,13 @@
           @plan-item-reorder="$emit('plan-item-reorder', $event)"
           @plan-library-drop="$emit('plan-library-drop', $event)"
         />
+      </div>
+    </div>
+    <div class="box-content" @click="handleAddWeek">
+      <div class="box-plus-circle">
+        <el-tooltip effect="dark" content="添加周" placement="top">
+          <div class="box-plus">+</div>
+        </el-tooltip>
       </div>
     </div>
   </div>
@@ -363,6 +379,40 @@ export default {
       background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
       border-left: 1px solid rgba(228, 231, 237, 0.8);
       box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
+    }
+  }
+}
+
+.box-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 8px;
+  border: 2px solid #e5e5e5;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  margin-right: 200px;
+
+  &:hover {
+    border-color: #bc362e;
+      .box-plus-circle {
+        border-color: #bc362e;
+
+        .box-plus {
+          color: #bc362e;
+        }
+      }
+    }
+  .box-plus-circle {
+    .box-plus {
+      font-size: 22px;
+      color: #303133;
+      font-weight: 300;
+      user-select: none;
+      line-height: 1;
+      transition: all 0.2s ease;
     }
   }
 }
