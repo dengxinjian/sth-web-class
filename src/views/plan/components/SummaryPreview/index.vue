@@ -49,7 +49,7 @@
         <span v-else>{{ planInfo.planGroupName }}</span>
       </el-form-item>
 
-      <el-form-item label="团队" prop="teamId" v-if="loginType === '2'">
+      <el-form-item label="团队" prop="teamId" v-if="loginType === '2' && form.teamId">
         <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
@@ -65,7 +65,6 @@
             :value="g.id"
           />
         </el-select>
-        <!-- <el-input v-else :readonly="true" :value="planInfo.teamName" /> -->
         <span v-else>{{ planInfo.teamName }}</span>
       </el-form-item>
 
@@ -299,11 +298,11 @@ export default {
       },
       rules: {
         planTitle: [
-          { required: false, message: "请输入计划标题", trigger: "blur" },
+          { required: true, message: "请输入计划标题", trigger: "blur" },
           { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
         ],
         planGroupId: [
-          { required: false, message: "请选择分组", trigger: "change" },
+          { required: true, message: "请选择分组", trigger: "change" },
         ],
         teamId: [{ required: false, message: "请选择团队", trigger: "change" }],
         email: [
