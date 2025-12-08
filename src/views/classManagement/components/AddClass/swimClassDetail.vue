@@ -108,7 +108,7 @@
           </div>
         </div>
 
-        <el-form-item label="标签：">
+        <el-form-item label="标签" class="label-top">
           <el-select
             v-model="form.tags"
             placeholder="选择或输入标签内容"
@@ -493,5 +493,15 @@ export default {
 .dialog-footer .el-button--danger {
   background: #d83b36;
   border-color: #d83b36;
+}
+.label-top ::v-deep(.el-form-item__label) {
+  display: block;
+  float: none;
+  text-align: left;
+  padding: 0 0 8px 0;
+  line-height: 1.5;
+}
+.label-top ::v-deep(.el-form-item__content) {
+  margin-left: 0 !important;
 }
 </style>
