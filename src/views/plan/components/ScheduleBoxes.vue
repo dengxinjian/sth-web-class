@@ -279,14 +279,22 @@
             </div>
             <div class="activity">
               <span class="label">其他时长:</span>
-                <span class="value">{{
-                  secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ===
-                  "00:00:00"
-                    ? "--:--:--"
-                    : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
-                }}</span>
+              <span class="value">{{
+                secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ===
+                "00:00:00"
+                  ? "--:--:--"
+                  : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
+              }}</span>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="box-content" @click="$emit('add-week')">
+        <div class="box-plus-circle">
+          <!-- <el-tooltip effect="dark" content="添加周" placement="top"> -->
+            <div class="box-plus">+</div>
+          <!-- </el-tooltip> -->
+          <div>添加周</div>
         </div>
       </div>
     </div>
@@ -912,7 +920,11 @@ export default {
               classItem.sportType === "REST" ||
               classItem.sportType === "OTHER"
             ) {
-              console.log(classItem.classesJson.duration, classAcc + hhmmssToSeconds(classItem.classesJson.duration), "classItem.classesJson.duration");
+              console.log(
+                classItem.classesJson.duration,
+                classAcc + hhmmssToSeconds(classItem.classesJson.duration),
+                "classItem.classesJson.duration"
+              );
               return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
             }
             return classAcc;
@@ -1654,6 +1666,43 @@ export default {
     .label {
       font-weight: 500;
       color: #303133;
+    }
+  }
+}
+.box-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 20px;
+  border: 2px solid #e5e5e5;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+
+  &:hover {
+    border-color: #bc362e;
+      .box-plus-circle {
+        border-color: #bc362e;
+        color: #bc362e;
+        .box-plus {
+          color: #bc362e;
+        }
+      }
+    }
+  .box-plus-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    .box-plus {
+      font-size: 22px;
+      color: #303133;
+      font-weight: 300;
+      user-select: none;
+      line-height: 1;
+      transition: all 0.2s ease;
     }
   }
 }
