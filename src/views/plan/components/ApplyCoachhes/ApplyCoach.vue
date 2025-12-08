@@ -231,8 +231,8 @@ export default {
         teamId: undefined,
         athleteIds: [],
         athleteType: 1,
-        applyMode: undefined,
-        applyDate: undefined,
+        applyMode: 1,
+        applyDate: moment().format("YYYY-MM-DD"),
       },
       rules: {
         title: [
@@ -365,8 +365,9 @@ export default {
           if (!findItem) return null;
           return {
             ...findItem,
-            applyMode: undefined,
-            applyDate: undefined,
+            applyMode: 1,
+            // 今天的年月日
+            applyDate: moment().format("YYYY-MM-DD"),
           };
         })
         .filter((item) => item != null); // 过滤掉 null
@@ -650,6 +651,8 @@ export default {
         teamId: undefined,
         athleteIds: [],
         athleteType: 1,
+        applyMode: 1,
+        applyDate: moment().format("YYYY-MM-DD"),
       };
       this.members = [];
       this.teamGroupList = []; // 清空团队分组列表
