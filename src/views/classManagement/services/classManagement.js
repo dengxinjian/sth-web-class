@@ -287,4 +287,12 @@ export const competitionApi = {
       method: "delete",
     });
   },
+
+  // 赛事绑定运动
+  bindActivity(data) {
+    return submitData({
+      url: "/api/competition/bindActivity",
+      requestData: data,
+    });
+  },
 };

@@ -1635,6 +1635,56 @@ export default {
     },
 
     /**
+     * 运动和赛事匹配
+     */
+    handleMatchEvent({
+      eventId,
+      eventDate,
+      activityId,
+      manualActivityId,
+      activityDate,
+    }) {
+      if (!eventId) {
+        this.$message.error("赛事信息无效");
+        return;
+      }
+      if (eventDate && activityDate && eventDate !== activityDate) {
+        this.$message.warning("只能匹配同一天的赛事");
+        this.getScheduleData();
+        return;
+      }
+      const bindingActivityId = manualActivityId || activityId;
+      if (!bindingActivityId) {
+        this.$message.error("运动数据无效");
+        this.getScheduleData();
+        return;
+      }
+      const type = manualActivityId ? 2 : 1;
+      competitionApi
+        .bindActivity({
+          competitionId: eventId,
+          bindingActivityId,
+          type,
+          competitionDate: eventDate,
+          triUserId: this.selectedAthletic,
+        })
+        .then((res) => {
+          if (res.success) {
+            this.$message.success("赛事匹配成功");
+          } else {
+            this.$message.error(res.message || "赛事匹配失败");
+          }
+        })
+        .catch((error) => {
+          console.error("赛事匹配失败:", error);
+          this.$message.error("赛事匹配失败");
+        })
+        .finally(() => {
+          this.getScheduleData();
+        });
+    },
+
+    /**
      * 绑定课程和运动
      */
     handleBind(classItem, activityItem, type) {
