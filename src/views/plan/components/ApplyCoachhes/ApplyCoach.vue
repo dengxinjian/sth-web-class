@@ -418,6 +418,8 @@ export default {
       this.form.athleteIds = [];
       this.members = [];
       this.teamGroupList = []
+      if (!teamId) return
+      this.teamGroupList = []
       if (!teamId) return;
       getData({
         url: `/api/team/group/list/${teamId}`,
