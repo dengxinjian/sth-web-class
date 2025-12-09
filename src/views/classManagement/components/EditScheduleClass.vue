@@ -27,15 +27,23 @@
               :maxlength="50"
             />
           </div> -->
-          <el-form v-if="classData.classesJson?.title || classData.activityName" ref="titleRef" :model="form" :rules="rules" label-width="70px">
+          <el-form
+            v-if="classData.classesJson?.title || classData.activityName"
+            ref="titleRef"
+            :model="form"
+            :rules="rules"
+            label-width="70px"
+          >
             <el-form-item label="标题：" prop="title">
               <el-input
                 type="text"
                 placeholder="标题"
                 v-model="form.title"
-                :disabled="!classData.classesJson?.title && !!classData.activityName"
+                :disabled="
+                  !classData.classesJson?.title && !!classData.activityName
+                "
                 :maxlength="50"
-                style="width: 100%;"
+                style="width: 100%"
               />
             </el-form-item>
           </el-form>
@@ -484,7 +492,13 @@
                   <td>{{ sportDetail.minSpeed || "-" }}</td>
                   <td>{{ sportDetail.avgSpeed || "-" }}</td>
                   <td>{{ sportDetail.maxSpeed || "-" }}</td>
-                  <td>km</td>
+                  <td>
+                    {{
+                      sportDetail.sportType === 1 || sportDetail.sportType === 2
+                        ? "km"
+                        : "m"
+                    }}
+                  </td>
                 </tr>
                 <tr>
                   <td>
@@ -765,7 +779,10 @@ export default {
           this.classData = this.classItem;
           console.log(this.classData, "classData");
           // 同步标题到 form
-          this.form.title = this.classData.classesJson?.title || this.classData.activityName || "";
+          this.form.title =
+            this.classData.classesJson?.title ||
+            this.classData.activityName ||
+            "";
           if (this.classData.activityId) {
             this.getSportDetail();
           } else {
