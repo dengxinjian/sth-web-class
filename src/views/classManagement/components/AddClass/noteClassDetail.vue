@@ -7,7 +7,7 @@
     class="add-swim-class-dialog"
     :close-on-click-modal="false"
   >
-    <span slot="title">{{ type === "add" ? "新建备忘录" : "编辑备忘录" }}</span>
+    <span slot="title">{{ type === "add" ? "新增备忘录" : "编辑备忘录" }}</span>
 
     <div class="form-section">
       <el-form ref="titleRef" :rules="rules" :model="form" label-width="70px">

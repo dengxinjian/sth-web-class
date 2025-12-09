@@ -11,7 +11,7 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <div v-if="classData.classesJson?.title || classData.activityName">
+          <!-- <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input
               type="text"
@@ -26,7 +26,19 @@
               disabled
               :maxlength="50"
             />
-          </div>
+          </div> -->
+          <el-form v-if="classData.classesJson?.title || classData.activityName" ref="titleRef" :model="form" :rules="rules" label-width="70px">
+            <el-form-item label="标题：" prop="title">
+              <el-input
+                type="text"
+                placeholder="标题"
+                v-model="form.title"
+                :disabled="!classData.classesJson?.title && !!classData.activityName"
+                :maxlength="50"
+                style="width: 100%;"
+              />
+            </el-form-item>
+          </el-form>
           <span v-else
             >{{ getSportTypeName(classData.sportType) }}手动运动数据</span
           >
@@ -683,6 +695,18 @@ export default {
       showClassDetailModal: false,
       type: "edit",
       sportDetail: {},
+      form: {
+        title: "",
+      },
+      rules: {
+        title: [
+          {
+            required: true,
+            message: "请输入标题",
+            trigger: ["change", "blur"],
+          },
+        ],
+      },
     };
   },
   computed: {
@@ -734,11 +758,14 @@ export default {
             calories: 0,
             distanceUnit: "km",
           };
+          this.form.title = "";
         });
       } else {
         if (this.isActivity) {
           this.classData = this.classItem;
           console.log(this.classData, "classData");
+          // 同步标题到 form
+          this.form.title = this.classData.classesJson?.title || this.classData.activityName || "";
           if (this.classData.activityId) {
             this.getSportDetail();
           } else {
@@ -862,6 +889,8 @@ export default {
             ...res.result,
             classesJson: classData,
           };
+          // 同步标题到 form
+          this.form.title = this.classData.classesJson?.title || "";
           this.actualData = {
             duration: this.classData.duration || "00:00:00",
             activityDuration: "00:00:00",
@@ -1202,8 +1231,22 @@ export default {
         }
       });
     },
-    handleSave(flag) {
+    async handleSave(flag) {
       console.log(this.classData, "classData");
+      // 如果有标题表单且可编辑（有 classesJson.title），先验证并同步标题
+      if (this.$refs.titleRef && this.classData.classesJson?.title) {
+        try {
+          await this.$refs.titleRef.validate();
+          // 同步 form.title 到 classData.classesJson.title
+          if (!this.classData.classesJson) {
+            this.$set(this.classData, "classesJson", {});
+          }
+          this.$set(this.classData.classesJson, "title", this.form.title);
+        } catch (error) {
+          // 验证失败，不继续保存
+          return;
+        }
+      }
       // if (!this.isActivity || !this.classData.activityId) {
       //   this.saveClassSchedule(flag);
       // } else {
@@ -1316,6 +1359,12 @@ export default {
       > span {
         flex: 1;
         white-space: nowrap;
+      }
+    }
+    ::v-deep .el-form-item {
+      margin-left: 0;
+      .el-form-item__content {
+        margin-left: 0 !important;
       }
     }
   }
