@@ -59,7 +59,12 @@
                   classData.classesJson?.sportType
                 )
               }}
-              <span v-if="classData.classesJson?.distanceUnit && classData.classesJson.distanceUnit !== 'km'">
+              <span
+                v-if="
+                  classData.classesJson?.distanceUnit &&
+                  classData.classesJson.distanceUnit !== 'km'
+                "
+              >
                 {{ classData.classesJson?.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -449,18 +454,62 @@
                   <td>单位</td>
                 </tr>
                 <tr>
+                  <td>心率</td>
+                  <td>{{ sportDetail.minHeartRate || "-" }}</td>
+                  <td>{{ sportDetail.avgHeartRate || "-" }}</td>
+                  <td>{{ sportDetail.maxHeartRate || "-" }}</td>
+                  <td>bpm</td>
+                </tr>
+                <tr v-if="sportDetail.sportType === 1">
                   <td>功率</td>
-                  <td>{{ sportDetail.minPower }}</td>
-                  <td>{{ sportDetail.avgPower }}</td>
-                  <td>{{ sportDetail.maxPower }}</td>
+                  <td>{{ sportDetail.minPower || "-" }}</td>
+                  <td>{{ sportDetail.avgPower || "-" }}</td>
+                  <td>{{ sportDetail.maxPower || "-" }}</td>
                   <td>w</td>
                 </tr>
                 <tr>
-                  <td>心率</td>
-                  <td>{{ sportDetail.minHeartRate }}</td>
-                  <td>{{ sportDetail.avgHeartRate }}</td>
-                  <td>{{ sportDetail.maxHeartRate }}</td>
-                  <td>bpm</td>
+                  <td>{{ sportDetail.sportType === 1 ? "速度" : "配速" }}</td>
+                  <td>{{ sportDetail.minSpeed || "-" }}</td>
+                  <td>{{ sportDetail.avgSpeed || "-" }}</td>
+                  <td>{{ sportDetail.maxSpeed || "-" }}</td>
+                  <td>km</td>
+                </tr>
+                <tr>
+                  <td>
+                    {{
+                      sportDetail.sportType === 1
+                        ? "踏频"
+                        : sportDetail.sportType === 2
+                        ? "步频"
+                        : "划频"
+                    }}
+                  </td>
+                  <td>{{ sportDetail.minCadence || "-" }}</td>
+                  <td>{{ sportDetail.avgCadence || "-" }}</td>
+                  <td>{{ sportDetail.maxCadence || "-" }}</td>
+                  <td>
+                    {{
+                      sportDetail.sportType === 1
+                        ? "rpm"
+                        : sportDetail.sportType === 2
+                        ? "spm"
+                        : "min"
+                    }}
+                  </td>
+                </tr>
+                <tr v-if="sportDetail.sportType === 2">
+                  <td>步幅</td>
+                  <td>{{ sportDetail.minStrideLength || "-" }}</td>
+                  <td>{{ sportDetail.avgStrideLength || "-" }}</td>
+                  <td>{{ sportDetail.maxStrideLength || "-" }}</td>
+                  <td>m</td>
+                </tr>
+                <tr>
+                  <td>温度</td>
+                  <td>{{ sportDetail.minTemperature || "-" }}</td>
+                  <td>{{ sportDetail.avgTemperature || "-" }}</td>
+                  <td>{{ sportDetail.maxTemperature || "-" }}</td>
+                  <td>-</td>
                 </tr>
               </table>
             </div>
@@ -820,7 +869,8 @@ export default {
             sthValue: this.classData.sthValue || 0,
             calories: this.classData.calories || 0,
             distanceUnit:
-              this.classData.classesJson?.distanceUnit && this.classData.classesJson.distanceUnit !== 'km'
+              this.classData.classesJson?.distanceUnit &&
+              this.classData.classesJson.distanceUnit !== "km"
                 ? "m"
                 : "km",
           };
@@ -834,11 +884,15 @@ export default {
       return ["REMARK", "OTHER", "REST"].includes(sportType);
     },
     deleteClass(classData) {
-      this.$confirm(`确认删除课表【${classData?.classesJson?.title}】？`, "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
+      this.$confirm(
+        `确认删除课表【${classData?.classesJson?.title}】？`,
+        "提示",
+        {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).then(async () => {
         const res = await scheduleApi.deleteSchedule({
           id: classData?.id,
           triUserId: this.triUserId,

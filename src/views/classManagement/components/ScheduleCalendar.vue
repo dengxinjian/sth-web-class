@@ -134,7 +134,13 @@
               <!-- 运动记录卡片 -->
               <ActivityCard
                 v-for="(activityItem, activityIndex) in item.activityList"
-                :key="`activity-${item.commonDate}-${activityItem.activityId || activityItem.manualActivityId || activityIndex}-${activityItem.classScheduleId || 'unmatched'}-${!!activityItem.classesJson}-${item.timesp || Date.now()}`"
+                :key="`activity-${item.commonDate}-${
+                  activityItem.activityId ||
+                  activityItem.manualActivityId ||
+                  activityIndex
+                }-${
+                  activityItem.classScheduleId || 'unmatched'
+                }-${!!activityItem.classesJson}-${item.timesp || Date.now()}`"
                 :activity="activityItem"
                 :date="item.commonDate"
                 @click="$emit('activity-detail', activityItem)"
@@ -175,7 +181,9 @@
                 </div>
                 <!-- 录入运动 只有在当前日期小于等于今天时才显示-->
                 <div
-                  v-if="contextMenuDate <= new Date().toISOString().split('T')[0]"
+                  v-if="
+                    contextMenuDate <= new Date().toISOString().split('T')[0]
+                  "
                   class="context-menu-item"
                   @click="
                     handleInputActivity(contextMenuDate);
@@ -290,7 +298,7 @@ export default {
 
         // 等待菜单渲染完成后再计算边界并调整位置
         this.$nextTick(() => {
-          const menuElement = document.querySelector('.context-menu');
+          const menuElement = document.querySelector(".context-menu");
           if (!menuElement) {
             this.contextMenuX = x;
             this.contextMenuY = y;
@@ -337,7 +345,12 @@ export default {
       // 不要清除 copiedClass 和 hasCopiedClass，这样复制状态会保留
     },
     handlePaste() {
-      console.log("handlePaste-1", this.contextMenuDate, this.copiedClass, this.copiedEvent);
+      console.log(
+        "handlePaste-1",
+        this.contextMenuDate,
+        this.copiedClass,
+        this.copiedEvent
+      );
 
       // 处理课程粘贴
       if (this.copiedClass !== null) {
@@ -358,7 +371,12 @@ export default {
       // 处理赛事粘贴
       if (this.copiedEvent !== null) {
         if (this.hasCutEvent) {
-          this.$emit("cut-event", this.contextMenuDate, this.copiedEvent, this.cutEvent);
+          this.$emit(
+            "cut-event",
+            this.contextMenuDate,
+            this.copiedEvent,
+            this.cutEvent
+          );
           this.hideContextMenu();
           this.hasCutEvent = false;
           this.copiedEvent = null;
@@ -594,6 +612,20 @@ export default {
       padding-bottom: 20px;
       transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
       will-change: transform; /* 提示浏览器优化渲染 */
+      /* 显示添加入口：整个单元格悬停时展示 */
+      &:hover {
+        .box-content {
+          opacity: 1;
+          .box-plus-circle {
+            border-color: #bc362e;
+
+            .box-plus {
+              color: #bc362e;
+            }
+          }
+        }
+      }
+
       .box-content {
         width: 100%;
         display: flex;
@@ -606,17 +638,6 @@ export default {
         background-color: #fff;
         transition: all 0.3s ease;
         opacity: 0;
-
-        &:hover {
-          opacity: 1;
-          .box-plus-circle {
-            border-color: #bc362e;
-
-            .box-plus {
-              color: #bc362e;
-            }
-          }
-        }
 
         &:active {
           opacity: 0.8;
