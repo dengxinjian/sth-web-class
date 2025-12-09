@@ -597,9 +597,17 @@ export default {
             if (findPersons.length === 1) {
               message = `${findPersons[0].userNickname} 的应用周期小于计划周期，只会应用部分，确认是否应用？`;
             } else if (findPersons.length > 1) {
-              const names = findPersons
-                .map((person) => person.userNickname)
-                .join("、");
+              let names = "";
+              if (findPersons.length > 10) {
+                names = findPersons
+                  .slice(0, 10)
+                  .map((person) => person.userNickname)
+                  .join("、") + `...等${findPersons.length}位运动员`;
+              } else {
+                names = findPersons
+                  .map((person) => person.userNickname)
+                  .join("、");
+              }
               message = `${names} 的应用周期小于计划周期，只会应用部分，确认是否应用？`;
             } else {
               message =
