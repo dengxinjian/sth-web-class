@@ -289,13 +289,14 @@
           </div>
         </div>
       </div>
-      <div class="box-content" @click="$emit('add-week')">
+      <div class="box-content-week" @click="$emit('add-week')">
         <div class="box-plus-circle">
           <!-- <el-tooltip effect="dark" content="添加周" placement="top"> -->
             <div class="box-plus">+</div>
           <!-- </el-tooltip> -->
           <div>添加周</div>
         </div>
+        <div class="schedule-boxes-wrapper-content-right"></div>
       </div>
     </div>
     <transition name="context-menu-fade">
@@ -1669,16 +1670,11 @@ export default {
     }
   }
 }
-.box-content {
-  width: 100%;
+.box-content-week {
   display: flex;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
-  padding: 20px;
-  border: 2px solid #e5e5e5;
   background-color: #fff;
-  transition: all 0.3s ease;
   margin-bottom: 20px;
 
   &:hover {
@@ -1695,7 +1691,11 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    transition: all 0.3s ease;
+    border: 2px solid #e5e5e5;
+    padding: 20px;
+    box-sizing: border-box;
+    flex: 0.847;
     .box-plus {
       font-size: 22px;
       color: #303133;
