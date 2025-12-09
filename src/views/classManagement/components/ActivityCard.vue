@@ -2,11 +2,11 @@
   <div style="position: relative">
     <div
       class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
-      :style="{ backgroundColor: bgColor }"
       :data-activityId="activity.activityId"
       :data-manualActivityId="activity.manualActivityId"
       :data-date="date"
     >
+      <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
       <div
         :class="[
           'card-body',
@@ -16,10 +16,9 @@
         :data-activityId="activity.activityId"
         :data-manualActivityId="activity.manualActivityId"
         :data-date="date"
-        style="background-color: #fff"
         @contextmenu.prevent.stop="showContextMenu"
       >
-        <div class="body-title" style="background-color: #fff">
+        <div class="body-title">
           <div class="sport-type-icon">
             <img
               class="image-icon"
@@ -42,7 +41,11 @@
                 解除匹配
               </el-button>
 
-              <el-button type="text" icon="el-icon-edit" @click="$emit('edit', activity)">
+              <el-button
+                type="text"
+                icon="el-icon-edit"
+                @click="$emit('edit', activity)"
+              >
                 编辑
               </el-button>
               <el-button
@@ -149,7 +152,12 @@
             </div>
             <div style="display: flex" v-if="activity.classesJson.distance">
               <div class="keyword" style="color: #999">
-                {{ formatDistance(activity.classesJson.distance, activity.sportType) }}
+                {{
+                  formatDistance(
+                    activity.classesJson.distance,
+                    activity.sportType
+                  )
+                }}
                 <span v-if="activity.sportType === 3">
                   {{ activity.classesJson.distanceUnit }}
                 </span>
@@ -427,8 +435,7 @@ export default {
   margin-bottom: 5px;
   overflow: hidden;
   border-radius: 6px;
-  background-color: #ffffff;
-  padding-top: 10px;
+  // background-color: #ffffff;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
 
   &:hover {
@@ -440,6 +447,7 @@ export default {
     padding-left: 2px;
     padding-right: 2px;
     padding-bottom: 5px;
+    // background-color: #fff;
 
     .body-title {
       display: flex;

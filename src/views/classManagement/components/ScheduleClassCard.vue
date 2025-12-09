@@ -8,7 +8,6 @@
     >
       <div
         class="classScheduleCard"
-        :style="cardStyle"
         :data-id="classItem.id"
         :data-date="date"
         data-type="classSchedule"
@@ -18,10 +17,8 @@
         "
         @contextmenu.stop.prevent="showContextMenu"
       >
-        <div
-          class="card-body class-drap-handle"
-          style="background-color: white"
-        >
+        <div :style="cardStyle"></div>
+        <div class="card-body class-drap-handle">
           <!-- 标题栏 -->
           <div class="body-title">
             <div class="sport-type-icon">
@@ -106,7 +103,12 @@
                   classItem.sportType
                 )
               }}
-              <span v-if="classItem.classesJson.distanceUnit && classItem.classesJson.distanceUnit !== 'km'">
+              <span
+                v-if="
+                  classItem.classesJson.distanceUnit &&
+                  classItem.classesJson.distanceUnit !== 'km'
+                "
+              >
                 {{ classItem.classesJson.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -261,9 +263,9 @@ export default {
         this.classItem.classesJson.duration &&
         this.classItem.classesJson.duration !== "00:00:00"
       ) {
-        return { backgroundColor: "rgba(204, 35, 35, 1)" };
+        return { backgroundColor: "rgba(204, 35, 35, 1)", height: "10px" };
       }
-      return { backgroundColor: "#fff" };
+      return { backgroundColor: "#fff", height: "10px" };
     },
   },
   mounted() {
@@ -405,11 +407,9 @@ export default {
   margin-right: 2px;
   position: relative;
   border: 1px solid #e5e5e5;
-  transition: all 0.3s ease;
+  // transition: all 0.3s ease;
   overflow: hidden;
   border-radius: 6px;
-  background-color: #ffffff;
-  padding-top: 10px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
 
   &:hover {
@@ -431,7 +431,6 @@ export default {
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      background-color: white;
       padding: 5px 3px;
 
       .sport-type-icon {

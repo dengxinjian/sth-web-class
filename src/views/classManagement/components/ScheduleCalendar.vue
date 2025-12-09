@@ -637,9 +637,78 @@ export default {
     }
   }
 }
-::v-deep .is-class-drag-ghost {
-  opacity: 0.5;
-  transform: scale(0.98);
+::v-deep .is-drag-chosen {
+  background-color: #fff !important;
+}
+/* 拖拽克隆元素样式 - 红色矩形带渐变效果 */
+::v-deep .is-drag-ghost {
+  position: relative;
+  background: #cc2323 !important;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 220, 220, 0.3) 3%,
+    #cc2323 8%,
+    #cc2323 92%,
+    rgba(255, 200, 200, 0.4) 97%,
+    rgba(255, 255, 255, 0.2) 100%
+  ) !important;
+  border-radius: 6px !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: 0 2px 8px rgba(204, 35, 35, 0.3) !important;
+  opacity: 0.95 !important;
+  transform: scale(0.96) !important;
+  overflow: hidden !important;
+  min-height: 10px !important;
+  height: 10px !important;
+
+  /* 确保内容不可见，只显示红色矩形 */
+  * {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* 顶部光泽渐变效果 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 25%;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 240, 240, 0.2) 30%,
+      rgba(255, 200, 200, 0.1) 60%,
+      transparent 100%
+    );
+    pointer-events: none;
+    border-radius: 6px 6px 0 0;
+    z-index: 1;
+  }
+
+  /* 底部阴影渐变效果 */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20%;
+    background: linear-gradient(
+      to top,
+      rgba(180, 0, 0, 0.3) 0%,
+      rgba(200, 50, 50, 0.15) 50%,
+      transparent 100%
+    );
+    pointer-events: none;
+    border-radius: 0 0 6px 6px;
+    z-index: 1;
+  }
 }
 
 ::v-deep .js-class-drag-container {
@@ -696,4 +765,5 @@ export default {
 .context-menu-fade-leave-to {
   opacity: 0;
 }
+
 </style>

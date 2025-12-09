@@ -11,6 +11,70 @@ export default {
   },
   methods: {
     /**
+     * 选中时设置浅红色背景
+     */
+    setDragBg(e) {
+      const cardElement =
+        e.item.closest(
+          ".classScheduleCard, .sportScheduleCard, .class-schedule-card-container"
+        ) || e.item;
+      if (cardElement) {
+        cardElement.dataset.originalBg =
+          cardElement.style.backgroundColor || "";
+        cardElement.style.backgroundColor = "#f7d7d7";
+      }
+      console.log(cardElement, "cardElement");
+      console.log(
+        cardElement.style.backgroundColor,
+        "cardElement.style.backgroundColor"
+      );
+
+      const cardBody =
+        (e.item.classList &&
+          (e.item.classList.contains("card-body") ||
+            e.item.classList.contains("sport-drap-handle") ||
+            e.item.classList.contains("class-drap-handle"))) ||
+        !cardElement
+          ? e.item
+          : cardElement.querySelector(".card-body");
+
+      if (cardElement) {
+        cardElement.dataset.originalBg = cardElement.style.backgroundColor || "";
+        cardElement.style.backgroundColor = "#f7d7d7";
+      }
+      if (cardBody && cardBody !== cardElement) {
+        cardBody.dataset.originalBg = cardBody.style.backgroundColor || "";
+        cardBody.style.backgroundColor = "#f7d7d7";
+      }
+      // console.log(cardBody, "cardBody");
+    },
+
+    /**
+     * 恢复原始背景
+     */
+    restoreDragBg(e) {
+      const cardElement =
+        e.item.closest(".classScheduleCard, .sportScheduleCard, .class-schedule-card-container") ||
+        e.item;
+      const cardBody =
+        (e.item.classList &&
+          (e.item.classList.contains("card-body") ||
+            e.item.classList.contains("sport-drap-handle") ||
+            e.item.classList.contains("class-drap-handle"))) ||
+        !cardElement
+          ? e.item
+          : cardElement.querySelector(".card-body");
+      if (cardElement && cardElement.dataset.originalBg !== undefined) {
+        cardElement.style.backgroundColor = cardElement.dataset.originalBg;
+        delete cardElement.dataset.originalBg;
+      }
+      if (cardBody && cardBody !== cardElement && cardBody.dataset.originalBg !== undefined) {
+        cardBody.style.backgroundColor = cardBody.dataset.originalBg;
+        delete cardBody.dataset.originalBg;
+      }
+    },
+
+    /**
      * 初始化课程列表拖拽（从课程库拖到日历）
      */
     initClassDrag() {
@@ -21,12 +85,17 @@ export default {
             animation: 150,
             dataIdAttr: "data-id",
             scroll: true,
-            swapThreshold: 0.6,
-            scrollSpeed: 10,
-            easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-            onStart: (e) => {},
+            scrollSpeed: 20,
+            scrollSensitivity: 30, // 增加敏感度
+            bubbleScroll: true,
+            ghostClass: "is-drag-ghost",
+            chosenClass: "is-drag-chosen",
+            onStart: (e) => {
+              this.setDragBg(e);
+            },
             onEnd: (e) => {
               console.log(e, "e");
+              this.restoreDragBg(e);
               // 只有拖到日历容器(.js-schedule-drag-container)时才处理
               // 避免拖到运动卡片(.js-sport-container-put)时也触发
               if (
@@ -60,41 +129,28 @@ export default {
               dataIdAttr: "data-id",
               scroll: true,
               scrollContainer: scrollContainerEl, // 指定滚动容器为课表外层容器
-              swapThreshold: 0.6,
               scrollSpeed: 20,
-              scrollSensitivity: 200, // 增加敏感度
+              scrollSensitivity: 30, // 增加敏感度
               bubbleScroll: true,
-              forceFallback: false,
-              scrollFn: function (
-                offsetX,
-                offsetY,
-                originalEvent,
-                touchEvt,
-                hoverTargetEl
-              ) {
-                console.log(
-                  offsetX,
-                  offsetY,
-                  originalEvent,
-                  touchEvt,
-                  hoverTargetEl,
-                  "offsetX, offsetY, originalEvent, touchEvt, hoverTargetEl"
-                );
-              },
-              easing: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+              ghostClass: "is-drag-ghost",
+              chosenClass: "is-drag-chosen",
               // 过滤掉健康数据卡片 赛事卡片，使其不可拖拽
-              filter: ".js-health-data-no-drag,.js-event-drag-no-drag,.js-schedule-drag-no-drag",
+              filter:
+                ".js-health-data-no-drag,.js-event-drag-no-drag,.js-schedule-drag-no-drag",
               onStart: (e) => {
                 console.log("onStart", e);
+                _this.setDragBg(e);
               },
               onEnd: (e) => {
                 console.log("onEnd", e);
+                _this.restoreDragBg(e);
               },
               onChoose: (e) => {
                 console.log("onChoose - 开始选择元素", e);
               },
               onUnchoose: (e) => {
                 console.log("onUnchoose - 取消选择", e);
+                _this.restoreDragBg(e);
               },
               onMove: (evt, originalEvent) => {
                 const isActivityDrag =
@@ -167,7 +223,11 @@ export default {
             scrollSpeed: 20,
             scrollSensitivity: 30, // 增加敏感度
             bubbleScroll: true,
-            onStart: (e) => {},
+            ghostClass: "is-drag-ghost",
+            chosenClass: "is-drag-chosen",
+            onStart: (e) => {
+              _this.setDragBg(e);
+            },
             onMove: (evt) => {},
             onAdd(e) {
               console.log(e, "e");
@@ -187,6 +247,7 @@ export default {
               });
             },
             onEnd: (e) => {
+              _this.restoreDragBg(e);
               // 清理拖拽产生的克隆运动卡片DOM
               // 当运动卡片被拖拽时（pull: "clone"），会产生克隆元素
               // 拖拽结束后，需要清理残留的克隆元素
@@ -236,12 +297,16 @@ export default {
               },
             },
             animation: 150,
-            dataIdAttr: "data-activityId",
+            dataIdAttr: "data-id",
             scroll: true,
             scrollSpeed: 20,
-            scrollSensitivity: 30,
+            scrollSensitivity: 30, // 增加敏感度
             bubbleScroll: true,
-            onStart: (e) => {},
+            ghostClass: "is-drag-ghost",
+            chosenClass: "is-drag-chosen",
+            onStart: (e) => {
+              _this.setDragBg(e);
+            },
             onAdd(e) {
               console.log(e, "e");
               // 移除拖拽产生的DOM元素，避免显示重复的运动卡片
@@ -256,6 +321,7 @@ export default {
               });
             },
             onEnd: (e) => {
+              _this.restoreDragBg(e);
               // 清理拖拽产生的克隆元素
               // 当从课表卡片拖出运动卡片时（pull: "clone"），会产生克隆元素
               if (e.pullMode === "clone") {
@@ -292,7 +358,7 @@ export default {
           new Sortable(el, {
             group: {
               name: "classDrag",
-              pull: false,
+              pull: "clone",
               put: function (to, from, dragEl) {
                 if (!to || !from || !dragEl) return false;
                 const targetDate = to.el?.dataset?.date;
@@ -304,12 +370,22 @@ export default {
                   return false;
                 }
                 const hasActivityId =
-                  dragEl.dataset?.activityid || dragEl.dataset?.manualactivityid;
+                  dragEl.dataset?.activityid ||
+                  dragEl.dataset?.manualactivityid;
                 return !!hasActivityId;
               },
             },
+            filter: ".js-event-drag-no-drag",
+            ghostClass: "is-drag-ghost",
+            chosenClass: "is-drag-chosen",
             sort: false,
             animation: 150,
+            onStart: (e) => {
+              _this.setDragBg(e);
+            },
+            onEnd: (e) => {
+              _this.restoreDragBg(e);
+            },
             onAdd(e) {
               if (e.item && e.item.parentNode) {
                 e.item.parentNode.removeChild(e.item);
