@@ -630,7 +630,7 @@ export default {
       this.isEditMode = false;
     },
     handleInputActivity(date) {
-      if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可录入运动，请加入团队后操作！");
+      if (!this.selectedAthletic) return this.$message.error("当前是教练模式，选择运动员后方可为其添加课表/录入运动/添加赛事！");
       console.log(date, "date");
       this.inputActivityDate = date;
       this.showInputActivity = true;
@@ -699,7 +699,7 @@ export default {
       this.showAddEvent = false;
     },
     handleAddSchedule(date) {
-      if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可添加课程，请加入团队后操作！");
+      if (!this.selectedAthletic) return this.$message.error("当前是教练模式，选择运动员后方可为其添加课表/录入运动/添加赛事！");
       this.classModalDataType = "addSchedule";
       this.addScheduleDate = date;
       this.showSportTypeModal = true;
