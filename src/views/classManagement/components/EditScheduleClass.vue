@@ -450,10 +450,16 @@
               </div>
               <div class="sync-params">
                 <span
-                  >平均速度：{{
-                    (sportDetail.avgSpeed * 3.6).toFixed(1)
+                  >平均{{ sportDetail.sportType === 1 ? "速度" : "配速" }}：{{
+                    sportDetail.avgSpeed
                   }}
-                  km/h</span
+                  {{
+                    sportDetail.sportType === 1
+                      ? "km/h"
+                      : sportDetail.sportType === 2
+                      ? "km"
+                      : "m"
+                  }}</span
                 >
                 <span>卡路里：{{ sportDetail.calories }} kcal</span>
               </div>
