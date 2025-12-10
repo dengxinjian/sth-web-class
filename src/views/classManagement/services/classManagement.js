@@ -291,7 +291,7 @@ export const competitionApi = {
   // 赛事绑定运动
   bindActivity(data) {
     return submitData({
-      url: "/api/competition/bindActivity",
+      url: "/api/activity/activityBindCompetition",
       requestData: data,
     });
   },

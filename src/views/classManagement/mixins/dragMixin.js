@@ -39,7 +39,8 @@ export default {
           : cardElement.querySelector(".card-body");
 
       if (cardElement) {
-        cardElement.dataset.originalBg = cardElement.style.backgroundColor || "";
+        cardElement.dataset.originalBg =
+          cardElement.style.backgroundColor || "";
         cardElement.style.backgroundColor = "#f7d7d7";
       }
       if (cardBody && cardBody !== cardElement) {
@@ -54,8 +55,9 @@ export default {
      */
     restoreDragBg(e) {
       const cardElement =
-        e.item.closest(".classScheduleCard, .sportScheduleCard, .class-schedule-card-container") ||
-        e.item;
+        e.item.closest(
+          ".classScheduleCard, .sportScheduleCard, .class-schedule-card-container"
+        ) || e.item;
       const cardBody =
         (e.item.classList &&
           (e.item.classList.contains("card-body") ||
@@ -68,7 +70,11 @@ export default {
         cardElement.style.backgroundColor = cardElement.dataset.originalBg;
         delete cardElement.dataset.originalBg;
       }
-      if (cardBody && cardBody !== cardElement && cardBody.dataset.originalBg !== undefined) {
+      if (
+        cardBody &&
+        cardBody !== cardElement &&
+        cardBody.dataset.originalBg !== undefined
+      ) {
         cardBody.style.backgroundColor = cardBody.dataset.originalBg;
         delete cardBody.dataset.originalBg;
       }
@@ -171,13 +177,7 @@ export default {
                 }
                 return true;
               },
-              onChange: (evt) => {
-                console.log("onChange - 元素位置发生变化", {
-                  item: evt.item,
-                  oldIndex: evt.oldIndex,
-                  newIndex: evt.newIndex,
-                });
-              },
+              onChange: (evt) => {},
               onUpdate: (e) => {
                 // 同一容器内排序时触发
                 console.log("onUpdate - 同一容器内排序", e);

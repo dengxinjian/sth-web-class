@@ -491,17 +491,17 @@ export default {
       this.isPlan = isPlan;
     },
     handleResetClassDetail() {
-      this.scheduleType = 'add';
+      this.scheduleType = "add";
       this.showClassDetailModal = false;
       // 等待弹窗完全关闭后再重置数据，确保子组件能正确响应
       this.$nextTick(() => {
         // 彻底清空对象的所有属性
         const keys = Object.keys(this.classDetailData);
-        keys.forEach(key => {
+        keys.forEach((key) => {
           this.$delete(this.classDetailData, key);
         });
         // 确保设置为全新的空对象
-        this.$set(this, 'classDetailData', {});
+        this.$set(this, "classDetailData", {});
         this.getScheduleData();
       });
     },
@@ -1134,11 +1134,11 @@ export default {
         });
         if (res.success) {
           // this.$message.success(res.result);
-          this.$message.success('同步成功');
+          this.$message.success("同步成功");
           this.getScheduleData();
         } else {
           // this.$message.error(res.message);
-          this.$message.error('同步失败');
+          this.$message.error("同步失败");
         }
       });
     },
@@ -1326,11 +1326,15 @@ export default {
      */
     async handleDeleteClassSchedule(classItem, isCut = false) {
       if (!isCut) {
-        this.$confirm(`确认删除课表【${classItem?.classesJson?.title}】？`, "提示", {
-          confirmButtonText: "删除",
-          cancelButtonText: "取消",
-          type: "warning",
-        }).then(async () => {
+        this.$confirm(
+          `确认删除课表【${classItem?.classesJson?.title}】？`,
+          "提示",
+          {
+            confirmButtonText: "删除",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+        ).then(async () => {
           const res = await scheduleApi.deleteSchedule({
             id: classItem?.id,
             triUserId: this.selectedAthletic,
@@ -1401,11 +1405,17 @@ export default {
      * 删除运动
      */
     handleDeleteActivity(activity) {
-      this.$confirm(`确认删除运动【${this.getSportTypeName(activity.sportType)}_手动录入】？`, "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
+      this.$confirm(
+        `确认删除运动【${this.getSportTypeName(
+          activity.sportType
+        )}_手动录入】？`,
+        "提示",
+        {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).then(async () => {
         const type = activity.activityId ? 1 : 2;
         const activityId = activity.activityId
           ? activity.activityId
@@ -1644,8 +1654,30 @@ export default {
       manualActivityId,
       activityDate,
     }) {
+      console.log(
+        eventId,
+        eventDate,
+        activityId,
+        manualActivityId,
+        activityDate,
+        "eventId, eventDate, activityId, manualActivityId, activityDate"
+      );
       if (!eventId) {
         this.$message.error("赛事信息无效");
+        return;
+      }
+      if (!this.currentWeek || !Array.isArray(this.currentWeek)) {
+        this.$message.error("周数据未初始化");
+        this.getScheduleData();
+        return;
+      }
+      const eventData = this.currentWeek.find(
+        (item) => item.commonDate === eventDate
+      );
+      console.log(eventData, "eventData");
+      if (!eventData) {
+        this.$message.error("未找到对应的日期数据");
+        this.getScheduleData();
         return;
       }
       if (eventDate && activityDate && eventDate !== activityDate) {
@@ -1659,29 +1691,207 @@ export default {
         this.getScheduleData();
         return;
       }
-      const type = manualActivityId ? 2 : 1;
+
+      // 找到对应的赛事数据
+      // 检查 competitionList 是否存在
+      if (
+        !eventData.competitionList ||
+        !Array.isArray(eventData.competitionList)
+      ) {
+        this.$message.error("赛事列表数据无效");
+        this.getScheduleData();
+        return;
+      }
+
+      console.log("eventId:", eventId, "type:", typeof eventId);
+      console.log("competitionList:", eventData.competitionList);
+      console.log(
+        "competitionList ids:",
+        eventData.competitionList.map((item) => ({
+          id: item.id,
+          type: typeof item.id,
+        }))
+      );
+
+      // 使用类型转换，支持字符串和数字类型匹配
+      const competition = eventData.competitionList.find(
+        (item) => String(item.id) === String(eventId)
+      );
+      console.log(competition, "competition");
+      if (!competition) {
+        this.$message.error(
+          `未找到对应的赛事数据，eventId: ${eventId}，可用ID: ${eventData.competitionList
+            .map((item) => item.id)
+            .join(", ")}`
+        );
+        this.getScheduleData();
+        return;
+      }
+
+      // 找到对应的运动数据
+      const activity = eventData?.activityList?.find(
+        (item) =>
+          (activityId && item.activityId === activityId) ||
+          (manualActivityId && item.manualActivityId === manualActivityId)
+      );
+      console.log(activity, "activity");
+      if (!activity) {
+        this.$message.error("未找到对应的运动数据");
+        this.getScheduleData();
+        return;
+      }
+
+      // 获取比赛类型（可能是 displayValue 数字、value 字符串或 label 中文）
+      const rawCompetitionType = competition.competitionType;
+
+      // 比赛类型映射表（参照 addEvent.vue 和 API 返回的数据结构）
+      // displayValue: 数字, value: 英文值, label: 中文
+      const COMPETITION_TYPE_MAP = {
+        // 通过 displayValue（数字）映射
+        2: { value: "TRIATHLON", label: "铁三" },
+        1: { value: "RUNNING", label: "路跑" },
+        4: { value: "CYCLE", label: "骑行" },
+        5: { value: "SWIM", label: "游泳" },
+        3: { value: "OTHER", label: "其他" },
+        // 通过 value（英文）映射
+        TRIATHLON: { value: "TRIATHLON", label: "铁三" },
+        RUNNING: { value: "RUNNING", label: "路跑" },
+        CYCLE: { value: "CYCLE", label: "骑行" },
+        SWIM: { value: "SWIM", label: "游泳" },
+        OTHER: { value: "OTHER", label: "其他" },
+        // 通过 label（中文）映射
+        铁三: { value: "TRIATHLON", label: "铁三" },
+        路跑: { value: "RUNNING", label: "路跑" },
+        骑行: { value: "CYCLE", label: "骑行" },
+        游泳: { value: "SWIM", label: "游泳" },
+        其他: { value: "OTHER", label: "其他" },
+      };
+
+      // 规范化比赛类型，统一转换为 value
+      const normalizeCompetitionType = (type) => {
+        if (type === null || type === undefined) return null;
+        // 先尝试直接匹配
+        if (COMPETITION_TYPE_MAP[type]) {
+          return COMPETITION_TYPE_MAP[type].value;
+        }
+        // 尝试转换为字符串匹配
+        const typeStr = String(type);
+        if (COMPETITION_TYPE_MAP[typeStr]) {
+          return COMPETITION_TYPE_MAP[typeStr].value;
+        }
+        // 尝试转换为数字匹配（处理 displayValue）
+        const typeNum = Number(type);
+        if (!isNaN(typeNum) && COMPETITION_TYPE_MAP[typeNum]) {
+          return COMPETITION_TYPE_MAP[typeNum].value;
+        }
+        return null;
+      };
+
+      const normalizedCompetitionType =
+        normalizeCompetitionType(rawCompetitionType);
+      if (!normalizedCompetitionType) {
+        this.$message.warning(`未知的比赛类型: ${rawCompetitionType}`);
+        this.getScheduleData();
+        return;
+      }
+
+      // 获取运动类型（可能是数字 1,2,3 或字符串 CYCLE, RUN, SWIM）
+      let activitySportType = activity.sportType;
+
+      // 将数字类型转换为字符串类型
+      const ACTIVITY_TYPE_DICT = {
+        1: "CYCLE",
+        2: "RUN",
+        3: "SWIM",
+        4: "STRENGTH",
+        5: "OTHER",
+      };
+      if (typeof activitySportType === "number") {
+        activitySportType =
+          ACTIVITY_TYPE_DICT[activitySportType] || activitySportType;
+      }
+
+      // 比赛类型到运动类型的映射（根据 value 匹配）
+      const competitionTypeToSportTypes = {
+        TRIATHLON: ["CYCLE", "SWIM", "RUN"], // 铁三可以匹配骑行、游泳、跑步
+        RUNNING: ["RUN"], // 路跑只能匹配跑步
+        CYCLE: ["CYCLE"], // 骑行只能匹配骑行
+        SWIM: ["SWIM"], // 游泳只能匹配游泳
+        OTHER: ["CYCLE", "SWIM", "RUN", "STRENGTH", "OTHER"], // 其他类型可以匹配所有运动类型
+      };
+
+      // 检查比赛类型和运动类型是否匹配
+      const allowedSportTypes =
+        competitionTypeToSportTypes[normalizedCompetitionType];
+      if (!allowedSportTypes || allowedSportTypes.length === 0) {
+        const competitionInfo = Object.values(COMPETITION_TYPE_MAP).find(
+          (item) => item.value === normalizedCompetitionType
+        );
+        const competitionTypeName =
+          competitionInfo?.label || normalizedCompetitionType;
+        this.$message.warning(
+          `比赛类型为${competitionTypeName}时，暂不支持匹配运动数据`
+        );
+        this.getScheduleData();
+        return;
+      }
+
+      // 如果比赛类型为"其他"，则允许匹配所有运动类型，直接跳过检查
+      if (normalizedCompetitionType === "OTHER") {
+        // 允许匹配，继续后续处理
+      } else if (!allowedSportTypes.includes(activitySportType)) {
+        const competitionInfo = Object.values(COMPETITION_TYPE_MAP).find(
+          (item) => item.value === normalizedCompetitionType
+        );
+        const competitionTypeName =
+          competitionInfo?.label || normalizedCompetitionType;
+
+        // 运动类型中文名称映射
+        const sportTypeNameMap = {
+          CYCLE: "骑行",
+          RUN: "跑步",
+          SWIM: "游泳",
+          STRENGTH: "力量",
+          OTHER: "其他",
+        };
+
+        // 根据比赛类型生成允许的运动类型提示信息
+        let allowedTypesText = "";
+        if (normalizedCompetitionType === "TRIATHLON") {
+          allowedTypesText = "骑行、游泳、跑步";
+        } else {
+          // 获取允许的运动类型的中文名称
+          const allowedNames = allowedSportTypes
+            .map((type) => sportTypeNameMap[type] || type)
+            .join("、");
+          allowedTypesText = allowedNames;
+        }
+
+        this.$message.warning(
+          `比赛类型为${competitionTypeName}时，只能匹配${allowedTypesText}的运动数据`
+        );
+        this.getScheduleData();
+        return;
+      }
+
+      // 匹配成功，继续后续处理
       competitionApi
         .bindActivity({
-          competitionId: eventId,
-          bindingActivityId,
-          type,
-          competitionDate: eventDate,
-          triUserId: this.selectedAthletic,
+          activityIds: [activity.activityId],
+          competitionId: competition.id,
+          day: eventDate,
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("赛事匹配成功");
-          } else {
-            this.$message.error(res.message || "赛事匹配失败");
+            this.$message.success("匹配成功");
           }
+          this.getScheduleData();
         })
-        .catch((error) => {
-          console.error("赛事匹配失败:", error);
-          this.$message.error("赛事匹配失败");
-        })
-        .finally(() => {
+        .catch((err) => {
+          console.error("匹配失败:", err);
           this.getScheduleData();
         });
+      // const type = manualActivityId ? 2 : 1;
     },
 
     /**
@@ -1849,7 +2059,7 @@ export default {
 
       if (this.classModalDataType === "addSchedule") {
         // 新增模式，确保数据为空
-        this.scheduleType = 'add';
+        this.scheduleType = "add";
         this.classDetailData = {};
         this.classSportType = Map[item.key];
         this.$nextTick(() => {
@@ -2153,7 +2363,6 @@ export default {
   border-right: 1px solid #e5e5e5;
   background-color: #fff;
 }
-
 </style>
 
 <style lang="scss">
