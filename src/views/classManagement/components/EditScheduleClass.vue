@@ -48,7 +48,7 @@
             </el-form-item>
           </el-form>
           <span v-else
-            >{{ getSportTypeName(classData.sportType) }}手动运动数据</span
+            >{{ getSportTypeName(classData.sportType) }}_手动录入数据</span
           >
         </div>
       </div>

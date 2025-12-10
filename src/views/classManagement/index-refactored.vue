@@ -630,6 +630,7 @@ export default {
       this.isEditMode = false;
     },
     handleInputActivity(date) {
+      if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可录入运动，请加入团队后操作！");
       console.log(date, "date");
       this.inputActivityDate = date;
       this.showInputActivity = true;
@@ -698,6 +699,7 @@ export default {
       this.showAddEvent = false;
     },
     handleAddSchedule(date) {
+      if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可添加课程，请加入团队后操作！");
       this.classModalDataType = "addSchedule";
       this.addScheduleDate = date;
       this.showSportTypeModal = true;
@@ -1189,6 +1191,7 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
+      if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可给团队人员添加课程，请加入团队后操作！");
       this.classModalDataType = "add";
       this.isClass = true;
       this.addGroupId = groupId;
