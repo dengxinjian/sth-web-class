@@ -487,7 +487,7 @@
                   <td>{{ sportDetail.maxPower || "-" }}</td>
                   <td>w</td>
                 </tr>
-                <tr>
+                <tr v-if="sportDetail.sportType !== 4">
                   <td>{{ sportDetail.sportType === 1 ? "速度" : "配速" }}</td>
                   <td>{{ sportDetail.minSpeed || "-" }}</td>
                   <td>{{ sportDetail.avgSpeed || "-" }}</td>
@@ -502,7 +502,7 @@
                     }}
                   </td>
                 </tr>
-                <tr>
+                <tr v-if="sportDetail.sportType !== 4">
                   <td>
                     {{
                       sportDetail.sportType === 1
