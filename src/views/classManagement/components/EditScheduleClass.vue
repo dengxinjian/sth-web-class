@@ -495,7 +495,7 @@
                   <td>
                     {{
                       sportDetail.sportType === 1 || sportDetail.sportType === 2
-                        ? "km"
+                        ? "km/h"
                         : "m"
                     }}
                   </td>
@@ -962,11 +962,161 @@ export default {
 
       return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
     },
+    // 将速度按运动类型格式化显示
+    formatSpeedBySport(sportType, min, avg, max) {
+      const toPace = (secondsPerUnit, unitLabel) => {
+        if (!secondsPerUnit || secondsPerUnit <= 0) return "-";
+        const minutes = Math.floor(secondsPerUnit / 60);
+        const seconds = Math.round(secondsPerUnit % 60);
+        return `${minutes}:${String(seconds).padStart(2, "0")}`;
+      };
+
+      const toKmPerHour = (val) => {
+        if (val === undefined || val === null) return "-";
+        return `${(val * 3.6).toFixed(1)}`;
+      };
+
+      const convertValue = (val) => {
+        const isSwim = sportType === "SWIM" || sportType === 3;
+        const isRun = sportType === "RUN" || sportType === 2;
+        const isCycle = sportType === "CYCLE" || sportType === 1;
+        console.log(val, "val");
+
+        if (!val || val === undefined || val === null || Number.isNaN(val)) {
+          return "-";
+        }
+        // val 预期为 m/s
+        if (isSwim) {
+          const secPer100m = 100 / val;
+          return toPace(secPer100m);
+        }
+        if (isRun) {
+          const secPerKm = 1000 / val;
+          return toPace(secPerKm,);
+        }
+        if (isCycle) {
+          return toKmPerHour(val);
+        }
+        // 其他默认 km/h
+        return toKmPerHour(val);
+      };
+
+      return {
+        minSpeed: convertValue(min),
+        avgSpeed: convertValue(avg),
+        maxSpeed: convertValue(max),
+      };
+    },
+    // 将步频按运动类型格式化显示
+    formatCadenceBySport(sportType, min, avg, max) {
+      const formatVal = (val) =>
+        val === undefined || val === null || Number.isNaN(val)
+          ? "-"
+          : `${val} `;
+      return {
+        minCadence: formatVal(min),
+        avgCadence: formatVal(avg),
+        maxCadence: formatVal(max),
+      };
+    },
+    // 步幅格式化（单位米）
+    formatStride(min, avg, max) {
+      const formatVal = (val) =>
+        val === undefined || val === null || Number.isNaN(val)
+          ? "-"
+          : `${Number(val)} `;
+      return {
+        minStrideLength: formatVal(min),
+        avgStrideLength: formatVal(avg),
+        maxStrideLength: formatVal(max),
+      };
+    },
+    formatOutlineData(result = {}) {
+      const {
+        sportType = this.data.sportType,
+        duration = 0,
+        netDuration = 0,
+        distance = 0,
+        minSpeed,
+        avgSpeed,
+        maxSpeed,
+        calories = 0,
+        sthValue = 0,
+        totalAscent,
+        totalDescent,
+        minCadence,
+        avgCadence,
+        maxCadence,
+        minStrideLength,
+        avgStrideLength,
+        maxStrideLength,
+        minTemperature,
+        avgTemperature,
+        maxTemperature,
+        deviceType,
+        productName = "",
+        np,
+        if: intensityFactor,
+      } = result;
+      const formattedSpeeds = this.formatSpeedBySport(
+        sportType,
+        minSpeed,
+        avgSpeed,
+        maxSpeed
+      );
+      const formattedCadence = this.formatCadenceBySport(
+        sportType,
+        minCadence,
+        avgCadence,
+        maxCadence
+      );
+      const formattedStride =
+        sportType === 2
+          ? this.formatStride(minStrideLength, avgStrideLength, maxStrideLength)
+          : {
+            minStrideLength: "-",
+            avgStrideLength: "-",
+            maxStrideLength: "-",
+          };
+
+      const deviceTypeFormat = [
+        { en: "COROS", cn: "高驰" },
+        { en: "GARMIN", cn: "佳明中国" },
+        { en: "GARMIN", cn: "佳明国际" },
+        { en: "HUAMI", cn: "华米" },
+      ];
+      const deviceName =
+        deviceType && deviceTypeFormat[deviceType - 1]
+          ? deviceTypeFormat[deviceType - 1].en
+          : "";
+
+      return {
+        ...result,
+        sportType,
+        minSpeed: formattedSpeeds.minSpeed,
+        avgSpeed: formattedSpeeds.avgSpeed,
+        maxSpeed: formattedSpeeds.maxSpeed,
+        minCadence: formattedCadence.minCadence,
+        avgCadence: formattedCadence.avgCadence,
+        maxCadence: formattedCadence.maxCadence,
+        minStrideLength: formattedStride.minStrideLength,
+        avgStrideLength: formattedStride.avgStrideLength,
+        maxStrideLength: formattedStride.maxStrideLength,
+        minTemperature: minTemperature || "-",
+        avgTemperature: avgTemperature || "-",
+        maxTemperature: maxTemperature || "-",
+        totalAscent: totalAscent || "-",
+        totalDescent: totalDescent || "-",
+        np: np || "-",
+        if: intensityFactor || "-",
+        productName: `${deviceName || ""} ${productName || ""}`.trim(),
+      };
+    },
     // 查询运动详情
     getSportDetail() {
       scheduleApi.getActivityDetail(this.classData.activityId).then((res) => {
         if (res.success) {
-          this.sportDetail = res.result;
+          this.sportDetail = this.formatOutlineData(res.result);
           const actualData = {
             duration: this.translateSecondsToFormat(this.sportDetail.duration),
             activityDuration: this.translateSecondsToFormat(
