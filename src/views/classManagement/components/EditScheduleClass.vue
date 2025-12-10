@@ -494,8 +494,10 @@
                   <td>{{ sportDetail.maxSpeed || "-" }}</td>
                   <td>
                     {{
-                      sportDetail.sportType === 1 || sportDetail.sportType === 2
+                      sportDetail.sportType === 1
                         ? "km/h"
+                        : sportDetail.sportType === 2
+                        ? "km"
                         : "m"
                     }}
                   </td>
@@ -992,7 +994,7 @@ export default {
         }
         if (isRun) {
           const secPerKm = 1000 / val;
-          return toPace(secPerKm,);
+          return toPace(secPerKm);
         }
         if (isCycle) {
           return toKmPerHour(val);
@@ -1074,10 +1076,10 @@ export default {
         sportType === 2
           ? this.formatStride(minStrideLength, avgStrideLength, maxStrideLength)
           : {
-            minStrideLength: "-",
-            avgStrideLength: "-",
-            maxStrideLength: "-",
-          };
+              minStrideLength: "-",
+              avgStrideLength: "-",
+              maxStrideLength: "-",
+            };
 
       const deviceTypeFormat = [
         { en: "COROS", cn: "高驰" },
