@@ -1877,7 +1877,8 @@ export default {
       // 匹配成功，继续后续处理
       competitionApi
         .bindActivity({
-          activityIds: [activity.activityId],
+          activityId: activity.activityId,
+          manualActivityId: activity.manualActivityId,
           competitionId: competition.id,
           day: eventDate,
         })
