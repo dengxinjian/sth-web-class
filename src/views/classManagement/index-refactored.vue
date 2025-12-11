@@ -279,6 +279,11 @@
       @confirm="handleEventConfirm"
       @cancel="handleEventCancel"
     />
+    <EventInfo
+      :visible.sync="showEventInfo"
+      :event-data="currentEventData"
+      @close="showEventInfo = false"
+    />
     <InputActivity
       :visible.sync="showInputActivity"
       :activityDate="inputActivityDate"
@@ -311,6 +316,7 @@ import HealthView from "./components/HealthView.vue";
 import AddEvent from "./components/addEvent.vue";
 import InputActivity from "./components/InputActivity.vue";
 import PlanView from "../plan/planView.vue";
+import EventInfo from "./components/EventInfo.vue";
 
 // 服务和工具导入
 import {
@@ -360,6 +366,7 @@ export default {
     AddEvent,
     InputActivity,
     PlanView,
+    EventInfo,
   },
   mixins: [dragMixin],
   data() {
@@ -447,6 +454,7 @@ export default {
       showAddEvent: false,
       currentEventData: {},
       isEditMode: false,
+      showEventInfo: false,
 
       // 录入运动
       showInputActivity: false,
@@ -686,9 +694,38 @@ export default {
     },
     handleEditEvent(eventItem) {
       console.log(eventItem, "eventItem");
-      this.currentEventData = eventItem;
-      this.showAddEvent = true;
-      this.isEditMode = true;
+
+      // 获取今天的日期（只比较日期部分，不考虑时间）
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // 解析 eventItem.competitionDate（可能是 "YYYY-MM-DD" 格式或 Date 对象）
+      let eventDate;
+      if (typeof eventItem.competitionDate === "string") {
+        console.log(eventItem.competitionDate, "eventItem.competitionDate");
+        eventDate = new Date(eventItem.competitionDate);
+      } else if (eventItem.competitionDate instanceof Date) {
+        eventDate = new Date(eventItem.competitionDate);
+      } else {
+        this.$message.error("赛事日期格式无效");
+        return;
+      }
+
+      eventDate.setHours(0, 0, 0, 0);
+
+      // 计算天数差
+      const diffTime = eventDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // 校验日期必须大于今天
+      if (diffDays > 0) {
+        this.currentEventData = eventItem;
+        this.showAddEvent = true;
+        this.isEditMode = true;
+      } else {
+        this.currentEventData = eventItem;
+        this.showEventInfo = true;
+      }
     },
     /**
      * 赛事取消
@@ -1813,7 +1850,7 @@ export default {
 
       // 比赛类型到运动类型的映射（根据 value 匹配）
       const competitionTypeToSportTypes = {
-        TRIATHLON: ["CYCLE", "SWIM", "RUN"], // 铁三可以匹配骑行、游泳、跑步
+        TRIATHLON: ["CYCLE", "SWIM", "RUN", "OTHER"], // 铁三可以匹配骑行、游泳、跑步
         RUNNING: ["RUN"], // 路跑只能匹配跑步
         CYCLE: ["CYCLE"], // 骑行只能匹配骑行
         SWIM: ["SWIM"], // 游泳只能匹配游泳

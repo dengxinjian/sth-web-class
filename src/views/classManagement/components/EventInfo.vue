@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="90%"
+    width="80%"
     :close-on-click-modal="false"
     :show-close="false"
     custom-class="event-info-dialog"
@@ -13,14 +13,19 @@
         <div class="header-left">
           <img
             class="trophy-icon"
-            src="@/assets/addClass/eventIcon.png"
-            alt="赛事"
+            :src="getClassImageIcon(eventData.priority)"
           />
           <div class="header-info">
-            <div class="event-name">{{ eventData?.competitionName || "赛事名称" }}</div>
+            <div class="event-name">
+              {{ eventData?.competitionName || "赛事名称" }}
+            </div>
             <div class="event-meta">
-              <span class="event-date">{{ eventData?.competitionDate || "日期" }}</span>
-              <span class="event-location">{{ eventData?.competitionLocation || "地点" }}</span>
+              <span class="event-date">{{
+                eventData?.competitionDate || "日期"
+              }}</span>
+              <span class="event-location">{{
+                eventData?.competitionLocation || "地点"
+              }}</span>
             </div>
           </div>
         </div>
@@ -36,47 +41,65 @@
           <!-- 排名信息 -->
           <div class="rankings">
             <div class="rank-item">
-              <span class="rank-label">全场排名</span>
-              <span class="rank-value">{{ competitionResult?.overallRank || "-" }}</span>
+              <span class="rank-label">全场排名:</span>
+              <span class="rank-value">{{
+                competitionResult?.overallRank || "-"
+              }}</span>
             </div>
             <div class="rank-item">
-              <span class="rank-label">分组排名</span>
-              <span class="rank-value">{{ competitionResult?.groupRank || "-" }}</span>
+              <span class="rank-label">分组排名:</span>
+              <span class="rank-value">{{
+                competitionResult?.groupRank || "-"
+              }}</span>
             </div>
             <div class="rank-item">
-              <span class="rank-label">性别排名</span>
-              <span class="rank-value">{{ competitionResult?.genderRank || "-" }}</span>
+              <span class="rank-label">性别排名:</span>
+              <span class="rank-value">{{
+                competitionResult?.genderRank || "-"
+              }}</span>
             </div>
           </div>
 
           <!-- 各段成绩 -->
           <div class="segment-results">
-            <div class="segment-item" v-if="competitionResult?.swimTime">
+            <div class="segment-item">
               <span class="segment-label">游泳成绩</span>
-              <span class="segment-value">{{ formatTime(competitionResult.swimTime) }}</span>
+              <span class="segment-value">{{
+                formatTime(competitionResult.swimTime)
+              }}</span>
             </div>
-            <div class="segment-item" v-if="competitionResult?.t1Time">
+            <div class="segment-item">
               <span class="segment-label">T1成绩</span>
-              <span class="segment-value">{{ formatTime(competitionResult.t1Time) }}</span>
+              <span class="segment-value">{{
+                formatTime(competitionResult.t1Time)
+              }}</span>
             </div>
-            <div class="segment-item" v-if="competitionResult?.cycleTime">
+            <div class="segment-item">
               <span class="segment-label">骑行成绩</span>
-              <span class="segment-value">{{ formatTime(competitionResult.cycleTime) }}</span>
+              <span class="segment-value">{{
+                formatTime(competitionResult.cycleTime)
+              }}</span>
             </div>
-            <div class="segment-item" v-if="competitionResult?.t2Time">
+            <div class="segment-item">
               <span class="segment-label">T2成绩</span>
-              <span class="segment-value">{{ formatTime(competitionResult.t2Time) }}</span>
+              <span class="segment-value">{{
+                formatTime(competitionResult.t2Time)
+              }}</span>
             </div>
-            <div class="segment-item" v-if="competitionResult?.runTime">
+            <div class="segment-item">
               <span class="segment-label">跑步成绩</span>
-              <span class="segment-value">{{ formatTime(competitionResult.runTime) }}</span>
+              <span class="segment-value">{{
+                formatTime(competitionResult.runTime)
+              }}</span>
             </div>
           </div>
 
           <!-- 总成绩 -->
-          <div class="total-result" v-if="competitionResult?.totalTime">
+          <div class="total-result">
             <span class="total-label">总成绩</span>
-            <span class="total-value">{{ formatTime(competitionResult.totalTime) }}</span>
+            <span class="total-value">{{
+              formatTime(competitionResult.totalTime)
+            }}</span>
           </div>
 
           <!-- 总结反馈 -->
@@ -115,11 +138,19 @@
                 />
               </div>
               <div class="activity-info">
-                <div class="activity-name">{{ getActivityName(activity.sportType) }}</div>
+                <div class="activity-name">
+                  {{ getActivityName(activity.sportType) }}
+                </div>
                 <div class="activity-details">
-                  <span class="activity-duration">{{ formatDuration(activity.duration) }}</span>
-                  <span class="activity-distance">{{ formatDistance(activity.distance, activity.sportType) }}</span>
-                  <span class="activity-tss">{{ formatTSS(activity.tss, activity.sportType) }}</span>
+                  <span class="activity-duration">{{
+                    formatDuration(activity.duration)
+                  }}</span>
+                  <span class="activity-distance">{{
+                    formatDistance(activity.distance, activity.sportType)
+                  }}</span>
+                  <span class="activity-tss">{{
+                    formatTSS(activity.tss, activity.sportType)
+                  }}</span>
                 </div>
               </div>
               <i
@@ -128,7 +159,10 @@
                 v-if="editable"
               ></i>
             </div>
-            <div v-if="!activityList || activityList.length === 0" class="empty-activity">
+            <div
+              v-if="!activityList || activityList.length === 0"
+              class="empty-activity"
+            >
               暂无运动记录
             </div>
           </div>
@@ -180,12 +214,22 @@ export default {
     },
   },
   methods: {
+    getClassImageIcon (priority) {
+      if (priority === "PRIMARY" || priority === 1) {
+        return require("@/assets/addClass/eventOne.png");
+      } else if (priority === "SECONDARY" || priority === 2) {
+        return require("@/assets/addClass/eventTwo.png");
+      } else {
+        return require("@/assets/addClass/eventThree.png");
+      }
+    },
     initData() {
       if (!this.eventData) return;
 
       // 初始化比赛结果数据
       this.competitionResult = this.eventData.competitionResult || {};
-      this.summaryText = this.eventData.summary || this.competitionResult.summary || "";
+      this.summaryText =
+        this.eventData.summary || this.competitionResult.summary || "";
 
       // 初始化运动记录列表
       this.activityList = this.eventData.activityList || [];
@@ -227,7 +271,9 @@ export default {
       const minutes = Math.floor((seconds % 3600) / 60);
       const secs = seconds % 60;
       if (hours > 0) {
-        return `${hours}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        return `${hours}:${String(minutes).padStart(2, "0")}:${String(
+          secs
+        ).padStart(2, "0")}`;
       }
       return `${minutes}:${String(secs).padStart(2, "0")}`;
     },
@@ -264,10 +310,7 @@ export default {
         2: require("@/assets/addClass/icon-run.png"),
         3: require("@/assets/addClass/icon-swim.png"),
       };
-      return (
-        iconMap[sportType] ||
-        require("@/assets/addClass/icon-other.png")
-      );
+      return iconMap[sportType] || require("@/assets/addClass/icon-other.png");
     },
     getActivityName(sportType) {
       const nameMap = {
@@ -286,6 +329,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+::v-deep .el-dialog__body {
+  padding-top: 0px !important;
+}
 .event-info-container {
   min-height: 600px;
 }
@@ -378,10 +424,10 @@ export default {
     margin-bottom: 30px;
 
     .rank-item {
-      flex: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      flex-direction: column;
+      flex: 1;
       padding: 15px;
       background: #f8f8f8;
       border-radius: 8px;
@@ -396,6 +442,7 @@ export default {
         font-size: 24px;
         font-weight: 600;
         color: #cc2323;
+        margin-left: 20px;
       }
     }
   }
@@ -555,4 +602,3 @@ export default {
   }
 }
 </style>
-

@@ -185,10 +185,78 @@ export default {
               onAdd: (e) => {
                 console.log("onAdd - 元素添加到容器", e);
                 // 防止拖拽错误元素
-                if (e.item.className.indexOf("card-body") > -1) {
-                  _this.getScheduleData();
-                  return;
+                // if (e.item.className.indexOf("card-body") > -1) {
+                //   _this.getScheduleData();
+                //   return;
+                // }
+
+                // 检查是否拖到了赛事容器
+                // 如果拖到了赛事容器，直接处理匹配逻辑
+                const isActivityDrag =
+                  e.item &&
+                  (e.item.classList.contains("sport-drap-handle") ||
+                    e.item.dataset?.activityid ||
+                    e.item.dataset?.manualactivityid);
+                console.log(isActivityDrag, "isActivityDrag");
+
+                if (isActivityDrag) {
+                  // 检查目标容器或其子元素是否是赛事容器
+                  const eventDropContainer =
+                    e.to.querySelector(".js-event-drop-container") ||
+                    e.to.closest(".js-event-drop-container") ||
+                    (e.to.classList.contains("js-event-drop-container")
+                      ? e.to
+                      : null);
+
+                  if (eventDropContainer) {
+                    console.log(
+                      "运动卡片拖到赛事容器，直接处理匹配逻辑",
+                      eventDropContainer
+                    );
+
+                    // 立即移除元素，避免显示
+                    if (e.item && e.item.parentNode) {
+                      e.item.parentNode.removeChild(e.item);
+                    }
+
+                    // 直接调用匹配逻辑
+                    if (typeof _this.handleMatchEvent === "function") {
+                      // 获取运动数据
+                      const originalItem = e.from.querySelector(
+                        `[data-activityid="${e.item.dataset.activityid}"], [data-manualactivityid="${e.item.dataset.manualactivityid}"]`
+                      );
+
+                      const activityId =
+                        e.item.dataset.activityid ||
+                        originalItem?.dataset?.activityid ||
+                        null;
+                      const manualActivityId =
+                        e.item.dataset.manualactivityid ||
+                        originalItem?.dataset?.manualactivityid ||
+                        null;
+                      const activityDate =
+                        e.item.dataset.date ||
+                        originalItem?.dataset?.date ||
+                        e.from.dataset?.date ||
+                        null;
+
+                      // 触发匹配逻辑
+                      _this.handleMatchEvent({
+                        eventId: eventDropContainer.dataset.id,
+                        eventDate:
+                          eventDropContainer.dataset.date || e.to.dataset.date,
+                        activityId: activityId,
+                        manualActivityId: manualActivityId,
+                        activityDate: activityDate,
+                      });
+                    } else {
+                      console.warn("handleMatchEvent is not implemented");
+                    }
+
+                    return; // 阻止 initScheduleDrag 处理
+                  }
                 }
+
                 _this.handleScheduleDragAdd(e);
               },
               onRemove: (e) => {
@@ -216,7 +284,10 @@ export default {
               name: "classDrag",
               pull: "clone",
             },
-            animation: 150,
+            swapThreshold: 0, // 禁用交换阈值
+            invertSwap: false, // 禁用反转交换
+            animation: 0, // 禁用动画，避免闪动
+            forceFallback: false, // 使用 HTML5 拖拽
             dataIdAttr: "data-id",
             scroll: true,
             scrollContainer: scrollContainerEl, // 指定滚动容器为课表外层容器
@@ -347,66 +418,6 @@ export default {
         });
       });
     },
-
-    /**
-     * 初始化赛事卡片拖拽（运动拖到赛事匹配）
-     */
-    initEventDrag() {
-      this.$nextTick(() => {
-        const _this = this;
-        document.querySelectorAll(".js-event-drop-container").forEach((el) => {
-          new Sortable(el, {
-            group: {
-              name: "classDrag",
-              pull: "clone",
-              put: function (to, from, dragEl) {
-                if (!to || !from || !dragEl) return false;
-                const targetDate = to.el?.dataset?.date;
-                const sourceDate = from.el?.dataset?.date;
-                if (!targetDate || !sourceDate) {
-                  return false;
-                }
-                if (targetDate !== sourceDate) {
-                  return false;
-                }
-                const hasActivityId =
-                  dragEl.dataset?.activityid ||
-                  dragEl.dataset?.manualactivityid;
-                return !!hasActivityId;
-              },
-            },
-            filter: ".js-event-drag-no-drag",
-            ghostClass: "is-drag-ghost",
-            chosenClass: "is-drag-chosen",
-            sort: false,
-            animation: 150,
-            onStart: (e) => {
-              _this.setDragBg(e);
-            },
-            onEnd: (e) => {
-              _this.restoreDragBg(e);
-            },
-            onAdd(e) {
-              if (e.item && e.item.parentNode) {
-                e.item.parentNode.removeChild(e.item);
-              }
-              if (typeof _this.handleMatchEvent !== "function") {
-                console.warn("handleMatchEvent is not implemented");
-                return;
-              }
-              _this.handleMatchEvent({
-                eventId: e.to.dataset.id,
-                eventDate: e.to.dataset.date,
-                activityId: e.item.dataset.activityid,
-                manualActivityId: e.item.dataset.manualactivityid,
-                activityDate: e.item.dataset.date,
-              });
-            },
-          });
-        });
-      });
-    },
-
     /**
      * 初始化所有拖拽功能
      */
@@ -415,7 +426,6 @@ export default {
       this.initScheduleDrag();
       this.initActivityDrag();
       this.initClassScheduleCardDrag();
-      this.initEventDrag();
     },
   },
 };
