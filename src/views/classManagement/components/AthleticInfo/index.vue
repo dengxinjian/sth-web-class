@@ -397,7 +397,7 @@
       </el-tab-pane>
     </el-tabs>
 
-    <span slot="footer" class="dialog-footer">
+    <span slot="footer" class="dialog-footer" v-if="activeMainTab !== 'base'">
       <el-button @click="onCancel">取消</el-button>
       <el-button type="primary" @click="onSave" :loading="loading"
         >保存</el-button
