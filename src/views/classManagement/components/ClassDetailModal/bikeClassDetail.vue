@@ -1027,7 +1027,8 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.$nextTick(async () => {
-            await this.getAthleticThreshold();
+            this.classesDate = res.result.classesDate;
+            await this.getAthleticThreshold(res.result.classesDate);
             this.classInfo = JSON.parse(res.result.classesJson);
             this.timeline = JSON.parse(res.result.classesJson).timeline;
             this.classInfo.id = res.result.id;
@@ -1047,7 +1048,7 @@ export default {
           classesTitle: this.classInfo.title,
           classesGroupId: this.classInfo.groupId,
           labels: this.classInfo.tags,
-          classesDate: this.classesDate + " 00:00:00",
+          classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
           sportType: "CYCLE",
           classesJson: JSON.stringify({
             ...this.classInfo,
@@ -1079,7 +1080,7 @@ export default {
               classesTitle: this.classInfo.title,
               classesGroupId: this.classInfo.groupId,
               labels: this.classInfo.tags,
-              classesDate: this.classesDate + " 00:00:00",
+              classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
               sportType: "CYCLE",
               classesJson: JSON.stringify({
                 ...this.classInfo,
@@ -1133,6 +1134,7 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
+        classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {

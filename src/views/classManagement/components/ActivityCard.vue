@@ -212,13 +212,21 @@
           解除匹配
         </div>
         <div
+          v-if="activity.classesJson"
+          class="context-menu-item"
+          @click="handleCopy"
+        >
+          <i class="el-icon-crop"></i>
+          复制
+        </div>
+        <div
           class="context-menu-item"
           @click="
             $emit('edit', activity);
             hideContextMenu();
           "
         >
-          <i class="el-icon-edit"></i>
+        <i class="el-icon-edit"></i>
           编辑
         </div>
         <div
@@ -406,6 +414,11 @@ export default {
     handleDelete() {
       this.hideContextMenu();
       this.$emit("delete", this.activity);
+    },
+    handleCopy() {
+      this.hideContextMenu();
+      console.log("handleCopy-activity-1", this.activity);
+      this.$emit("copy", this.activity);
     },
   },
 };

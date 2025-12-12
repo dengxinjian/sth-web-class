@@ -251,6 +251,13 @@ export const competitionApi = {
       url: "/api/competition/dropdown-options",
     });
   },
+  // 行政区域
+  getAdministrativeDivision(parentId = "") {
+    return getData({
+      url: "/resource/administrative-division",
+      parentId,
+    });
+  },
   // 426bc17606074ed298580208f3ece3b1
   // 创建赛事
   createCompetition(data, triUserId) {
