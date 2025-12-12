@@ -251,7 +251,13 @@ export const competitionApi = {
       url: "/api/competition/dropdown-options",
     });
   },
-  // 426bc17606074ed298580208f3ece3b1
+  // 查询赛事详情
+  getCompetitionDetail(id) {
+    return request({
+      url: `/api/competition/${id}`,
+      method: "get",
+    });
+  },
   // 创建赛事
   createCompetition(data, triUserId) {
     return request({

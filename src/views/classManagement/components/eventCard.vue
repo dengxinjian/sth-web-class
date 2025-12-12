@@ -300,7 +300,6 @@ export default {
   background-color: #ffffff;
   padding-top: 10px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
-  height: 100px;
 
   &:hover:not(.is-dragging) {
     transform: scale(1.02);

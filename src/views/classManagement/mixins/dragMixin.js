@@ -126,6 +126,9 @@ export default {
         const scrollContainerEl = document.querySelector(
           ".schedule-table-container"
         );
+        // 用于保存拖动过程中的目标赛事容器
+        let lastEventDropTarget = null;
+
         document
           .querySelectorAll(".js-schedule-drag-container")
           .forEach((el) => {
@@ -146,10 +149,12 @@ export default {
               onStart: (e) => {
                 console.log("onStart", e);
                 _this.setDragBg(e);
+                lastEventDropTarget = null; // 重置
               },
               onEnd: (e) => {
                 console.log("onEnd", e);
                 _this.restoreDragBg(e);
+                lastEventDropTarget = null; // 清理
               },
               onChoose: (e) => {
                 console.log("onChoose - 开始选择元素", e);
@@ -159,22 +164,60 @@ export default {
                 _this.restoreDragBg(e);
               },
               onMove: (evt, originalEvent) => {
+                console.log("onMove 触发", {
+                  dragged: evt.dragged,
+                  related: evt.related,
+                  target: originalEvent?.target,
+                  to: evt.to
+                });
+
                 const isActivityDrag =
                   evt.dragged &&
                   evt.dragged.classList &&
                   evt.dragged.classList.contains("sport-drap-handle");
-                const eventDropEl =
-                  (originalEvent &&
-                    originalEvent.target &&
-                    originalEvent.target.closest &&
-                    originalEvent.target.closest(".js-event-drop-container")) ||
-                  (evt.related &&
-                    evt.related.closest &&
-                    evt.related.closest(".js-event-drop-container"));
-                // 拖拽运动到赛事时，阻止课表容器接管排序，让赛事自身处理
-                if (isActivityDrag && eventDropEl) {
-                  return false;
+
+                console.log("isActivityDrag:", isActivityDrag);
+
+                if (isActivityDrag) {
+                  // 尝试多种方式查找赛事容器
+                  let eventDropEl = null;
+
+                  // 方式1: 从 originalEvent.target 查找
+                  if (originalEvent && originalEvent.target) {
+                    console.log("originalEvent.target:", originalEvent.target);
+                    eventDropEl = originalEvent.target.closest(".js-event-drop-container");
+                    if (eventDropEl) {
+                      console.log("从 originalEvent.target 找到赛事容器");
+                    }
+                  }
+
+                  // 方式2: 从 evt.related 查找
+                  if (!eventDropEl && evt.related) {
+                    console.log("evt.related:", evt.related);
+                    eventDropEl = evt.related.closest(".js-event-drop-container");
+                    if (eventDropEl) {
+                      console.log("从 evt.related 找到赛事容器");
+                    }
+                  }
+
+                  // 方式3: 检查 evt.related 本身是否是赛事容器
+                  if (!eventDropEl && evt.related && evt.related.classList?.contains("js-event-drop-container")) {
+                    eventDropEl = evt.related;
+                    console.log("evt.related 本身就是赛事容器");
+                  }
+
+                  console.log("最终 eventDropEl:", eventDropEl);
+
+                  // 保存目标赛事容器，供 onAdd 使用
+                  if (eventDropEl) {
+                    lastEventDropTarget = eventDropEl;
+                    console.log("onMove - 检测到赛事容器:", eventDropEl, "eventId:", eventDropEl.dataset.id);
+                  } else {
+                    lastEventDropTarget = null;
+                  }
                 }
+
+                // 允许拖放继续，在 onAdd 中处理
                 return true;
               },
               onChange: (evt) => {},
@@ -184,11 +227,10 @@ export default {
               },
               onAdd: (e) => {
                 console.log("onAdd - 元素添加到容器", e);
-                // 防止拖拽错误元素
-                // if (e.item.className.indexOf("card-body") > -1) {
-                //   _this.getScheduleData();
-                //   return;
-                // }
+                console.log("onAdd - e.related:", e.related);
+                console.log("onAdd - e.to:", e.to);
+                console.log("onAdd - e.item:", e.item);
+                console.log("onAdd - lastEventDropTarget:", lastEventDropTarget);
 
                 // 检查是否拖到了赛事容器
                 // 如果拖到了赛事容器，直接处理匹配逻辑
@@ -200,18 +242,83 @@ export default {
                 console.log(isActivityDrag, "isActivityDrag");
 
                 if (isActivityDrag) {
-                  // 检查目标容器或其子元素是否是赛事容器
-                  const eventDropContainer =
-                    e.to.querySelector(".js-event-drop-container") ||
-                    e.to.closest(".js-event-drop-container") ||
-                    (e.to.classList.contains("js-event-drop-container")
-                      ? e.to
-                      : null);
+                  // 使用在 onMove 中保存的目标赛事容器
+                  let eventDropContainer = lastEventDropTarget;
+
+                  // 如果 onMove 没有保存目标，尝试其他方法获取
+                  if (!eventDropContainer) {
+                    console.log("尝试查找赛事容器...");
+
+                    // 方法1: 从 e.related 查找
+                    if (e.related) {
+                      console.log("尝试从 e.related 查找");
+                      eventDropContainer =
+                        e.related.closest(".js-event-drop-container") ||
+                        (e.related.classList?.contains("js-event-drop-container")
+                          ? e.related
+                          : null);
+                      if (eventDropContainer) {
+                        console.log("从 e.related 找到赛事容器");
+                      }
+                    }
+
+                    // 方法2: 查找 e.to 的所有赛事容器子元素
+                    if (!eventDropContainer && e.to) {
+                      console.log("尝试从 e.to 查找所有赛事容器");
+                      const allEventContainers = e.to.querySelectorAll(".js-event-drop-container");
+                      console.log("找到的赛事容器数量:", allEventContainers.length);
+
+                      // 如果只有一个赛事容器，直接使用
+                      if (allEventContainers.length === 1) {
+                        eventDropContainer = allEventContainers[0];
+                        console.log("只有一个赛事容器，直接使用");
+                      } else if (allEventContainers.length > 1) {
+                        // 如果有多个赛事容器，需要找到运动卡片被插入到哪个赛事的后面
+                        console.log("有多个赛事容器，检查运动卡片的位置");
+
+                        // 获取 e.item 在 DOM 中的位置
+                        const itemIndex = Array.from(e.to.children).indexOf(e.item);
+                        console.log("运动卡片在容器中的索引:", itemIndex);
+
+                        // 向前查找最近的赛事容器
+                        for (let i = itemIndex - 1; i >= 0; i--) {
+                          const sibling = e.to.children[i];
+                          if (sibling.classList.contains("js-event-drop-container")) {
+                            eventDropContainer = sibling;
+                            console.log("找到前面的赛事容器，索引:", i);
+                            break;
+                          }
+                          const nestedEvent = sibling.querySelector(".js-event-drop-container");
+                          if (nestedEvent) {
+                            eventDropContainer = nestedEvent;
+                            console.log("找到前面兄弟元素内的赛事容器");
+                            break;
+                          }
+                        }
+                      }
+                    }
+                    // 方法3: 从 e.to 本身查找
+                    if (!eventDropContainer) {
+                      console.log("尝试从 e.to 本身查找");
+                      eventDropContainer =
+                        e.to.closest(".js-event-drop-container") ||
+                        (e.to.classList?.contains("js-event-drop-container")
+                          ? e.to
+                          : null);
+                      if (eventDropContainer) {
+                        console.log("从 e.to 本身找到赛事容器");
+                      }
+                    }
+                  }
+
+                  console.log("eventDropContainer:", eventDropContainer);
 
                   if (eventDropContainer) {
                     console.log(
                       "运动卡片拖到赛事容器，直接处理匹配逻辑",
-                      eventDropContainer
+                      eventDropContainer,
+                      "eventId:",
+                      eventDropContainer.dataset.id
                     );
 
                     // 立即移除元素，避免显示

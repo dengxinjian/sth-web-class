@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="80%"
+    width="900px"
     :close-on-click-modal="false"
     :show-close="false"
     custom-class="event-info-dialog"
@@ -15,21 +15,17 @@
             class="trophy-icon"
             :src="getClassImageIcon(eventData.priority)"
           />
-          <div class="header-info">
-            <div class="event-name">
-              {{ eventData?.competitionName || "赛事名称" }}
-            </div>
-            <div class="event-meta">
-              <span class="event-date">{{
-                eventData?.competitionDate || "日期"
-              }}</span>
-              <span class="event-location">{{
-                eventData?.competitionLocation || "地点"
-              }}</span>
-            </div>
-          </div>
+          <span class="event-name">{{ eventData?.competitionName }}</span>
+          <span class="event-date">{{ eventData?.competitionDate }}</span>
+          <span class="event-location">{{
+            eventData?.competitionLocation
+          }}</span>
         </div>
-        <i class="el-icon-close close-icon" @click="handleClose"></i>
+        <div class="header-actions">
+          <i class="el-icon-delete delete-icon" @click="handleDelete"></i>
+          <i class="el-icon-edit-outline edit-icon" @click="handleEdit"></i>
+          <i class="el-icon-close close-icon" @click="handleClose"></i>
+        </div>
       </div>
 
       <!-- 内容区域 -->
@@ -38,88 +34,98 @@
         <div class="content-left">
           <div class="section-title">比赛结果</div>
 
-          <!-- 排名信息 -->
-          <div class="rankings">
-            <div class="rank-item">
-              <span class="rank-label">全场排名:</span>
-              <span class="rank-value">{{
-                competitionResult?.overallRank || "-"
-              }}</span>
-            </div>
-            <div class="rank-item">
-              <span class="rank-label">分组排名:</span>
-              <span class="rank-value">{{
-                competitionResult?.groupRank || "-"
-              }}</span>
-            </div>
-            <div class="rank-item">
-              <span class="rank-label">性别排名:</span>
-              <span class="rank-value">{{
-                competitionResult?.genderRank || "-"
-              }}</span>
-            </div>
-          </div>
-
-          <!-- 各段成绩 -->
-          <div class="segment-results">
-            <div class="segment-item">
-              <span class="segment-label">游泳成绩</span>
-              <span class="segment-value">{{
-                formatTime(competitionResult.swimTime)
-              }}</span>
-            </div>
-            <div class="segment-item">
-              <span class="segment-label">T1成绩</span>
-              <span class="segment-value">{{
-                formatTime(competitionResult.t1Time)
-              }}</span>
-            </div>
-            <div class="segment-item">
-              <span class="segment-label">骑行成绩</span>
-              <span class="segment-value">{{
-                formatTime(competitionResult.cycleTime)
-              }}</span>
-            </div>
-            <div class="segment-item">
-              <span class="segment-label">T2成绩</span>
-              <span class="segment-value">{{
-                formatTime(competitionResult.t2Time)
-              }}</span>
-            </div>
-            <div class="segment-item">
-              <span class="segment-label">跑步成绩</span>
-              <span class="segment-value">{{
-                formatTime(competitionResult.runTime)
-              }}</span>
-            </div>
-          </div>
-
-          <!-- 总成绩 -->
-          <div class="total-result">
-            <span class="total-label">总成绩</span>
-            <span class="total-value">{{
-              formatTime(competitionResult.totalTime)
-            }}</span>
+          <!-- 比赛结果表格 -->
+          <div class="result-table-wrapper">
+            <table class="result-table">
+              <tbody>
+                <tr>
+                  <td class="label-cell">全场排名</td>
+                  <td class="value-cell">
+                    {{ competitionResult?.overallRank || "-" }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label-cell">分组排名</td>
+                  <td class="value-cell">
+                    {{ competitionResult?.groupRank || "-" }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="label-cell">性别排名</td>
+                  <td class="value-cell">
+                    {{ competitionResult?.genderRank || "-" }}
+                  </td>
+                </tr>
+                <tr
+                  v-if="
+                    eventData.competitionType == 2 ||
+                    eventData.competitionType == 5
+                  "
+                >
+                  <td class="label-cell">游泳成绩</td>
+                  <td class="value-cell">
+                    {{ competitionResult.swimmingResult || "-" }}
+                  </td>
+                </tr>
+                <tr v-if="eventData.competitionType == 2">
+                  <td class="label-cell">T1成绩</td>
+                  <td class="value-cell">
+                    {{ competitionResult.t1Result || "-" }}
+                  </td>
+                </tr>
+                <tr
+                  v-if="
+                    eventData.competitionType == 2 ||
+                    eventData.competitionType == 4
+                  "
+                >
+                  <td class="label-cell">骑行成绩</td>
+                  <td class="value-cell">
+                    {{ competitionResult.cyclingResult || "-" }}
+                  </td>
+                </tr>
+                <tr v-if="eventData.competitionType == 2">
+                  <td class="label-cell">T2成绩</td>
+                  <td class="value-cell">
+                    {{ competitionResult.t2Result || "-" }}
+                  </td>
+                </tr>
+                <tr
+                  v-if="
+                    eventData.competitionType == 2 ||
+                    eventData.competitionType == 1
+                  "
+                >
+                  <td class="label-cell">跑步成绩</td>
+                  <td class="value-cell">
+                    {{ competitionResult.runningResult || "-" }}
+                  </td>
+                </tr>
+                <tr class="highlight-row">
+                  <td class="label-cell">总成绩</td>
+                  <td class="value-cell">
+                    {{ competitionResult.totalResult || "-" }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- 总结反馈 -->
           <div class="summary-section">
-            <div class="summary-label">总结/反馈</div>
+            <div class="summary-header">
+              <span class="summary-label">总结/反馈</span>
+            </div>
             <el-input
               v-model="summaryText"
               type="textarea"
-              :rows="6"
+              :rows="5"
               placeholder="请输入总结反馈"
               maxlength="500"
               show-word-limit
               class="summary-textarea"
             />
           </div>
-
-          <!-- 编辑按钮 -->
-          <el-button type="primary" class="edit-button" @click="handleEdit">
-            编辑成绩
-          </el-button>
         </div>
 
         <!-- 右侧：运动记录 -->
@@ -127,52 +133,239 @@
           <div class="section-title">运动记录</div>
           <div class="activity-list">
             <div
-              v-for="(activity, index) in activityList"
+              v-for="(activity, index) in activityList.swim"
               :key="index"
               class="activity-item"
             >
-              <div class="activity-icon">
-                <img
-                  :src="getActivityIcon(activity.sportType)"
-                  :alt="getActivityName(activity.sportType)"
-                />
-              </div>
-              <div class="activity-info">
-                <div class="activity-name">
-                  {{ getActivityName(activity.sportType) }}
+              <div class="activity-left">
+                <div class="activity-icon">
+                  <img :src="getActivityIcon(activity.sportType)" />
+                  <span
+                    class="activity-name"
+                    v-if="
+                      (activity.classesJson && activity.classesJson.title) ||
+                      activity.activityName
+                    "
+                  >
+                    {{
+                      activity.classesJson
+                        ? activity.classesJson.title
+                        : activity.activityName
+                    }}
+                  </span>
+                  <span class="activity-name" v-else>
+                    {{ getSportTypeName(activity.sportType) }}_手动录入
+                  </span>
                 </div>
-                <div class="activity-details">
-                  <span class="activity-duration">{{
-                    formatDuration(activity.duration)
-                  }}</span>
-                  <span class="activity-distance">{{
-                    formatDistance(activity.distance, activity.sportType)
-                  }}</span>
-                  <span class="activity-tss">{{
-                    formatTSS(activity.tss, activity.sportType)
-                  }}</span>
+                <i
+                  class="el-icon-close activity-close"
+                  @click="handleRemoveActivity(index)"
+                ></i>
+              </div>
+              <div class="activity-details">
+                <div class="activity-time">{{ activity.duration }}</div>
+                <div class="activity-distance">
+                  {{ formatDistance(activity.distance, activity.sportType) }}
+                  <span v-if="activity.sportType === 3"> m </span>
+                  <span v-else>km</span>
+                </div>
+                <div class="activity-tss">
+                  {{ activity.sthValue ? activity.sthValue : "--" }}
+                  <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
                 </div>
               </div>
-              <i
-                class="el-icon-close activity-close"
-                @click="handleRemoveActivity(index)"
-                v-if="editable"
-              ></i>
             </div>
             <div
-              v-if="!activityList || activityList.length === 0"
-              class="empty-activity"
+              v-for="(activity, index) in activityList.otherT1"
+              :key="index"
+              class="activity-item"
             >
-              暂无运动记录
+              <div class="activity-left">
+                <div class="activity-icon">
+                  <img :src="getActivityIcon(activity.sportType)" />
+                  <span
+                    class="activity-name"
+                    v-if="
+                      (activity.classesJson && activity.classesJson.title) ||
+                      activity.activityName
+                    "
+                  >
+                    {{
+                      activity.classesJson
+                        ? activity.classesJson.title
+                        : activity.activityName
+                    }}
+                  </span>
+                  <span class="activity-name" v-else>
+                    {{ getSportTypeName(activity.sportType) }}_手动录入
+                  </span>
+                </div>
+                <i
+                  class="el-icon-close activity-close"
+                  @click="handleRemoveActivity(index)"
+                ></i>
+              </div>
+              <div class="activity-details">
+                <div class="activity-time">{{ activity.duration }}</div>
+                <div class="activity-distance">
+                  {{ formatDistance(activity.distance, activity.sportType) }}
+                  <span v-if="activity.sportType === 3"> m </span>
+                  <span v-else>km</span>
+                </div>
+                <div class="activity-tss">
+                  {{ activity.sthValue ? activity.sthValue : "--" }}
+                  <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-for="(activity, index) in activityList.cycle"
+              :key="index"
+              class="activity-item"
+            >
+              <div class="activity-left">
+                <div class="activity-icon">
+                  <img :src="getActivityIcon(activity.sportType)" />
+                  <span
+                    class="activity-name"
+                    v-if="
+                      (activity.classesJson && activity.classesJson.title) ||
+                      activity.activityName
+                    "
+                  >
+                    {{
+                      activity.classesJson
+                        ? activity.classesJson.title
+                        : activity.activityName
+                    }}
+                  </span>
+                  <span class="activity-name" v-else>
+                    {{ getSportTypeName(activity.sportType) }}_手动录入
+                  </span>
+                </div>
+                <i
+                  class="el-icon-close activity-close"
+                  @click="handleRemoveActivity(index)"
+                ></i>
+              </div>
+              <div class="activity-details">
+                <div class="activity-time">{{ activity.duration }}</div>
+                <div class="activity-distance">
+                  {{ formatDistance(activity.distance, activity.sportType) }}
+                  <span v-if="activity.sportType === 3"> m </span>
+                  <span v-else>km</span>
+                </div>
+                <div class="activity-tss">
+                  {{ activity.sthValue ? activity.sthValue : "--" }}
+                  <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-for="(activity, index) in activityList.otherT2"
+              :key="index"
+              class="activity-item"
+            >
+              <div class="activity-left">
+                <div class="activity-icon">
+                  <img :src="getActivityIcon(activity.sportType)" />
+                  <span
+                    class="activity-name"
+                    v-if="
+                      (activity.classesJson && activity.classesJson.title) ||
+                      activity.activityName
+                    "
+                  >
+                    {{
+                      activity.classesJson
+                        ? activity.classesJson.title
+                        : activity.activityName
+                    }}
+                  </span>
+                  <span class="activity-name" v-else>
+                    {{ getSportTypeName(activity.sportType) }}_手动录入
+                  </span>
+                </div>
+                <i
+                  class="el-icon-close activity-close"
+                  @click="handleRemoveActivity(index)"
+                ></i>
+              </div>
+              <div class="activity-details">
+                <div class="activity-time">{{ activity.duration }}</div>
+                <div class="activity-distance">
+                  {{ formatDistance(activity.distance, activity.sportType) }}
+                  <span v-if="activity.sportType === 3"> m </span>
+                  <span v-else>km</span>
+                </div>
+                <div class="activity-tss">
+                  {{ activity.sthValue ? activity.sthValue : "--" }}
+                  <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-for="(activity, index) in activityList.run"
+              :key="index"
+              class="activity-item"
+            >
+              <div class="activity-left">
+                <div class="activity-icon">
+                  <img :src="getActivityIcon(activity.sportType)" />
+                  <span
+                    class="activity-name"
+                    v-if="
+                      (activity.classesJson && activity.classesJson.title) ||
+                      activity.activityName
+                    "
+                  >
+                    {{
+                      activity.classesJson
+                        ? activity.classesJson.title
+                        : activity.activityName
+                    }}
+                  </span>
+                  <span class="activity-name" v-else>
+                    {{ getSportTypeName(activity.sportType) }}_手动录入
+                  </span>
+                </div>
+                <i
+                  class="el-icon-close activity-close"
+                  @click="handleRemoveActivity(index)"
+                ></i>
+              </div>
+              <div class="activity-details">
+                <div class="activity-time">{{ activity.duration }}</div>
+                <div class="activity-distance">
+                  {{ formatDistance(activity.distance, activity.sportType) }}
+                  <span v-if="activity.sportType === 3"> m </span>
+                  <span v-else>km</span>
+                </div>
+                <div class="activity-tss">
+                  {{ activity.sthValue ? activity.sthValue : "--" }}
+                  <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="edit-button-container">
+        <el-button type="primary" class="edit-button" @click="handleEditResult">
+          {{ checkIsEdit() ? "录入成绩" : "编辑成绩" }}
+        </el-button>
       </div>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import { competitionApi } from "../services/classManagement.js";
+import { getSportTypeName } from "../utils/helpers";
 export default {
   name: "EventInfo",
   props: {
@@ -190,31 +383,65 @@ export default {
       innerVisible: this.visible,
       summaryText: "",
       competitionResult: {},
-      activityList: [],
-      editable: true,
+      activityList: {
+        cycle: [],
+        run: [],
+        swim: [],
+        otherT1: [],
+        otherT2: [],
+      },
     };
   },
   watch: {
     visible(val) {
       this.innerVisible = val;
       if (val) {
+        console.log(val, "val");
         this.initData();
       }
     },
     innerVisible(val) {
       this.$emit("update:visible", val);
     },
-    eventData: {
-      handler(val) {
-        if (val && this.visible) {
-          this.initData();
-        }
-      },
-      deep: true,
-    },
   },
   methods: {
-    getClassImageIcon (priority) {
+    formatDistance(distance, sportType) {
+      let result = Math.round(distance / 10) / 100;
+      if (distance && typeof distance === "string" && distance.includes("km")) {
+        result = distance.replace("km", "");
+      }
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance;
+      }
+      if (!result || result === "0") {
+        result = "--";
+      }
+      if (sportType === 3 && result > 0) {
+        result = Math.round(distance);
+      }
+      return result;
+    },
+    getSportTypeName(sportType) {
+      return getSportTypeName(sportType);
+    },
+    //  校验当前 是录入成绩 还是编辑成绩 校验成绩是否为空 为空则提示录入成绩
+    checkIsEdit() {
+      if (
+        this.competitionResult.overallRank &&
+        this.competitionResult.groupRank &&
+        this.competitionResult.genderRank &&
+        this.competitionResult.swimmingResult &&
+        this.competitionResult.t1Result &&
+        this.competitionResult.cyclingResult &&
+        this.competitionResult.t2Result &&
+        this.competitionResult.runningResult &&
+        this.competitionResult.totalResult
+      ) {
+        return false;
+      }
+      return true;
+    },
+    getClassImageIcon(priority) {
       if (priority === "PRIMARY" || priority === 1) {
         return require("@/assets/addClass/eventOne.png");
       } else if (priority === "SECONDARY" || priority === 2) {
@@ -224,36 +451,40 @@ export default {
       }
     },
     initData() {
+      console.log(this.eventData, "this.eventData");
       if (!this.eventData) return;
-
-      // 初始化比赛结果数据
-      this.competitionResult = this.eventData.competitionResult || {};
-      this.summaryText =
-        this.eventData.summary || this.competitionResult.summary || "";
-
-      // 初始化运动记录列表
-      this.activityList = this.eventData.activityList || [];
 
       // 如果有 ID，可以加载详细数据
       if (this.eventData.id) {
+        console.log(this.eventData.id, "this.eventData.id");
         this.loadEventDetail();
       }
     },
     async loadEventDetail() {
       // TODO: 调用 API 加载赛事详情数据
-      // const res = await competitionApi.getCompetitionDetail(this.eventData.id);
-      // if (res.success) {
-      //   this.competitionResult = res.result.competitionResult || {};
-      //   this.activityList = res.result.activityList || [];
-      // }
+      const res = await competitionApi.getCompetitionDetail(this.eventData.id);
+      console.log(res, "res");
+      if (res.success) {
+        this.competitionResult = res.result || {};
+        this.activityList = res.result.deviceActivityBindView || [];
+        this.summaryText = this.competitionResult.feedback || "";
+      }
     },
     handleClose() {
       this.innerVisible = false;
       this.$emit("close");
     },
+    handleDelete() {
+      // TODO: 实现删除功能
+      this.$message.info("删除功能待实现");
+    },
     handleEdit() {
       // TODO: 实现编辑功能
       this.$message.info("编辑功能待实现");
+    },
+    handleEditResult() {
+      // TODO: 实现编辑成绩功能
+      this.$message.info("编辑成绩功能待实现");
     },
     handleRemoveActivity(index) {
       this.$confirm("确认移除该运动记录？", "提示", {
@@ -264,42 +495,6 @@ export default {
         this.activityList.splice(index, 1);
         // TODO: 调用 API 移除关联
       });
-    },
-    formatTime(seconds) {
-      if (!seconds && seconds !== 0) return "-";
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      if (hours > 0) {
-        return `${hours}:${String(minutes).padStart(2, "0")}:${String(
-          secs
-        ).padStart(2, "0")}`;
-      }
-      return `${minutes}:${String(secs).padStart(2, "0")}`;
-    },
-    formatDuration(seconds) {
-      if (!seconds && seconds !== 0) return "-";
-      return this.formatTime(seconds);
-    },
-    formatDistance(distance, sportType) {
-      if (!distance && distance !== 0) return "-";
-      // 游泳用米，其他用公里
-      if (sportType === "SWIM" || sportType === 3) {
-        return `${distance} m`;
-      }
-      return `${distance} km`;
-    },
-    formatTSS(tss, sportType) {
-      if (!tss && tss !== 0) return "-";
-      // 根据运动类型显示不同的 TSS 单位
-      if (sportType === "SWIM" || sportType === 3) {
-        return `${tss} sTSS`;
-      } else if (sportType === "RUN" || sportType === 2) {
-        return `${tss} rTSS`;
-      } else if (sportType === "CYCLE" || sportType === 1) {
-        return `${tss} TSS`;
-      }
-      return `${tss} hrTSS`;
     },
     getActivityIcon(sportType) {
       const iconMap = {
@@ -312,87 +507,91 @@ export default {
       };
       return iconMap[sportType] || require("@/assets/addClass/icon-other.png");
     },
-    getActivityName(sportType) {
-      const nameMap = {
-        SWIM: "开放游",
-        CYCLE: "骑行",
-        RUN: "跑步",
-        TRANSITION: "换项",
-        1: "骑行",
-        2: "跑步",
-        3: "开放游",
-      };
-      return nameMap[sportType] || "其他";
-    },
   },
 };
 </script>
 
 <style scoped lang="scss">
-::v-deep .el-dialog__body {
-  padding-top: 0px !important;
+::v-deep .el-dialog {
+  margin-top: 5vh !important;
 }
+::v-deep .event-info-dialog {
+  border-radius: 12px;
+
+  .el-dialog__header {
+    padding: 0;
+  }
+
+  .el-dialog__body {
+    padding: 24px !important;
+  }
+}
+
 .event-info-container {
-  min-height: 600px;
+  background: #fff;
 }
 
 .event-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #e5e5e5;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e8e8e8;
 
   .header-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
 
     .trophy-icon {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
     }
 
-    .header-info {
-      .event-name {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 5px;
-      }
+    .event-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
 
-      .event-meta {
-        display: flex;
-        gap: 20px;
-        font-size: 14px;
-        color: #666;
+    .event-date,
+    .event-location {
+      font-size: 13px;
+      color: #999;
+      position: relative;
+      padding-left: 12px;
 
-        .event-date,
-        .event-location {
-          &::before {
-            content: "";
-            display: inline-block;
-            width: 4px;
-            height: 4px;
-            background: #999;
-            border-radius: 50%;
-            margin-right: 8px;
-            vertical-align: middle;
-          }
-        }
+      &::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #ddd;
       }
     }
   }
 
-  .close-icon {
-    font-size: 20px;
-    color: #999;
-    cursor: pointer;
-    transition: color 0.3s;
+  .header-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
 
-    &:hover {
-      color: #333;
+    .delete-icon,
+    .edit-icon,
+    .close-icon {
+      font-size: 18px;
+      color: #999;
+      cursor: pointer;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #333;
+      }
+    }
+
+    .delete-icon:hover {
+      color: #f56c6c;
     }
   }
 }
@@ -400,7 +599,8 @@ export default {
 .event-content {
   display: flex;
   gap: 30px;
-  min-height: 500px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e8e8e8;
 
   .content-left,
   .content-right {
@@ -408,197 +608,236 @@ export default {
   }
 
   .section-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     color: #333;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #cc2323;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
   }
 }
 
+// 左侧比赛结果
 .content-left {
-  .rankings {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-
-    .rank-item {
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      flex: 1;
-      padding: 15px;
-      background: #f8f8f8;
-      border-radius: 8px;
-
-      .rank-label {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 8px;
-      }
-
-      .rank-value {
-        font-size: 24px;
-        font-weight: 600;
-        color: #cc2323;
-        margin-left: 20px;
-      }
-    }
-  }
-
-  .segment-results {
+  .result-table-wrapper {
     margin-bottom: 20px;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    overflow: hidden;
 
-    .segment-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
 
-      .segment-label {
-        font-size: 14px;
-        color: #666;
-      }
+      tbody {
+        tr {
+          border-bottom: 1px solid #e8e8e8;
 
-      .segment-value {
-        font-size: 14px;
-        font-weight: 500;
-        color: #333;
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &.highlight-row {
+            background: #f7f7f8;
+
+            td {
+              color: #333;
+              background: #f7f7f8 !important;
+            }
+
+            .value-cell.highlight {
+              color: #e42827;
+              font-weight: 600;
+              font-size: 15px;
+            }
+          }
+
+          td {
+            padding: 11px 16px;
+            font-size: 14px;
+            background: #fff;
+
+            &.label-cell {
+              color: #666;
+              font-weight: normal;
+              width: 40%;
+              border-right: 1px solid #e8e8e8;
+            }
+
+            &.value-cell {
+              color: #333;
+              font-weight: 500;
+              text-align: center;
+            }
+          }
+        }
       }
     }
   }
+}
 
-  .total-result {
+// 总结反馈
+.summary-section {
+  margin-bottom: 20px;
+
+  .summary-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    background: #fff5f5;
-    border-radius: 8px;
-    margin-bottom: 30px;
-
-    .total-label {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .total-value {
-      font-size: 20px;
-      font-weight: 600;
-      color: #cc2323;
-    }
-  }
-
-  .summary-section {
-    margin-bottom: 20px;
+    margin-bottom: 8px;
 
     .summary-label {
       font-size: 14px;
       font-weight: 500;
       color: #333;
-      margin-bottom: 10px;
-      display: block;
     }
 
-    .summary-textarea {
-      ::v-deep .el-textarea__inner {
-        font-size: 14px;
-        line-height: 1.6;
-      }
+    .summary-required {
+      font-size: 12px;
+      color: #e42827;
     }
   }
 
-  .edit-button {
-    width: 100%;
-    background: #cc2323;
-    border-color: #cc2323;
+  .summary-textarea {
+    ::v-deep .el-textarea__inner {
+      font-size: 13px;
+      line-height: 1.6;
+      border-color: #e8e8e8;
+      border-radius: 4px;
 
-    &:hover {
-      background: #a01d1d;
-      border-color: #a01d1d;
+      &:focus {
+        border-color: #e42827;
+      }
+    }
+
+    ::v-deep .el-input__count {
+      background: transparent;
+      font-size: 12px;
+      color: #999;
     }
   }
 }
 
+// 右侧运动记录
 .content-right {
   .activity-list {
-    max-height: 600px;
+    max-height: 500px;
     overflow-y: auto;
 
     .activity-item {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 15px;
-      background: #f8f8f8;
-      border-radius: 8px;
-      margin-bottom: 15px;
+      background: #fff;
+      border-radius: 6px;
+      margin-bottom: 10px;
       position: relative;
+      border: 1px solid #e8e8e8;
+      gap: 10px;
 
-      .activity-icon {
-        width: 40px;
-        height: 40px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .activity-left {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 50px;
         flex-shrink: 0;
+        min-width: 100px;
+        border-bottom: 1px solid #e8e8e8;
+        margin-left: 10px;
 
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
+        .activity-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            margin-right: 20px;
+          }
+        }
+
+        .activity-name {
+          font-size: 14px;
+          font-weight: 500;
+          color: #333;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100px;
+        }
+        i {
+          margin-right: 10px;
         }
       }
 
-      .activity-info {
+      .activity-details {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 14px;
+        color: #666;
         flex: 1;
-        min-width: 0;
+        justify-content: space-around;
+        min-height: 50px;
 
-        .activity-name {
-          font-size: 16px;
-          font-weight: 500;
-          color: #333;
-          margin-bottom: 8px;
-        }
-
-        .activity-details {
-          display: flex;
-          gap: 15px;
+        .activity-time,
+        .activity-distance,
+        .activity-tss {
+          white-space: nowrap;
+          font-weight: 600;
           font-size: 14px;
-          color: #666;
-
-          .activity-duration,
-          .activity-distance,
-          .activity-tss {
-            white-space: nowrap;
-          }
         }
       }
 
       .activity-close {
         font-size: 16px;
-        color: #999;
+        color: #d0d0d0;
         cursor: pointer;
         transition: color 0.3s;
         flex-shrink: 0;
 
         &:hover {
-          color: #cc2323;
+          color: #e42827;
         }
       }
     }
 
     .empty-activity {
       text-align: center;
-      padding: 40px;
-      color: #999;
-      font-size: 14px;
+      padding: 60px 20px;
+      color: #d0d0d0;
+      font-size: 13px;
     }
   }
 }
 
-::v-deep .event-info-dialog {
-  .el-dialog__body {
-    padding: 20px 30px;
+// 编辑按钮
+.edit-button {
+  width: 100px;
+  height: 35x;
+  line-height: 35px;
+  background: #e42827;
+  border-color: #e42827;
+  font-size: 14px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-top: 20px;
+  padding: 0;
+
+  &:hover,
+  &:focus {
+    background: #c31f1f;
+    border-color: #c31f1f;
   }
+}
+.edit-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
 }
 </style>
