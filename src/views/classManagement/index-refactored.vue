@@ -1193,7 +1193,7 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
-      if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可给团队人员添加课程，请加入团队后操作！");
+      if (!this.selectedAthletic) return this.$message.error("当前是教练模式，选择运动员后方可为其添加课表/录入运动/添加赛事！");
       this.classModalDataType = "add";
       this.isClass = true;
       this.addGroupId = groupId;
