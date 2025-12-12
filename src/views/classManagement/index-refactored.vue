@@ -478,8 +478,8 @@ export default {
       this.getScheduleData();
       this.getAthleticThreshold(this.selectedAthletic);
       this.getAuthorizedDeviceList();
-      this.getClassList();
     }
+    this.getClassList();
     console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
     if (this.$store.state.fromPath === "/plan/add") {
       this.isPlan = true;
@@ -630,10 +630,11 @@ export default {
       this.isEditMode = false;
     },
     handleInputActivity(date) {
-      if (!this.selectedAthletic)
+      if (!this.selectedAthletic) {
         return this.$message.error(
           "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
         );
+      }
       console.log(date, "date");
       this.inputActivityDate = date;
       this.showInputActivity = true;
@@ -702,10 +703,11 @@ export default {
       this.showAddEvent = false;
     },
     handleAddSchedule(date) {
-      if (!this.selectedAthletic)
+      if (!this.selectedAthletic) {
         return this.$message.error(
           "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
         );
+      }
       this.classModalDataType = "addSchedule";
       this.addScheduleDate = date;
       this.showSportTypeModal = true;
@@ -898,6 +900,7 @@ export default {
           ? classApi.getOfficialClasses
           : classApi.getClassesByUserId;
 
+      console.log(apiMethod, "this.classSearchInput");
       const res = await apiMethod(this.classSearchInput);
       if (res.success) {
         this.classList = res.result.map((item) => ({
@@ -1480,7 +1483,11 @@ export default {
      * 课程拖拽到日历
      */
     handleClassDragToSchedule(e) {
-      if (!this.selectedAthletic) return this.$message.error("当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事");
+      if (!this.selectedAthletic) {
+        return this.$message.error(
+          "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
+        );
+      }
       const classItem = this.findClassById(e.item.dataset.id);
       const params = {
         classesId: classItem.id,
