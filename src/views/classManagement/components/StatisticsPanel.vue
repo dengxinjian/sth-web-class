@@ -34,22 +34,22 @@
     <div class="schedule-table-cell-data">
       <div class="week-data-sth">
         <div>
-          <span style="color: #3e5cec; border-radius: 6px 0 0 0px;">{{ sthData.avgLong || 0 }}</span>
+          <span>{{ sthData.avgLong || 0 }}</span>
           <span>长期STH</span>
         </div>
         <div>
-          <span style="background-color: #e3423d;">{{ sthData.avgShort || 0 }}</span>
+          <span>{{ sthData.avgShort || 0 }}</span>
           <span>短期STH</span>
         </div>
         <div>
-          <span style="color: #e5702c; border-radius: 0 6px 0 0;">
+          <span>
             {{
               sthData.avgBalanceBig
                 ? sthData.avgBalanceBig - sthData.avgBalanceSmall
                 : 0
             }}
           </span>
-          <span>平衡</span>
+          <span>STH平衡</span>
         </div>
       </div>
 
@@ -199,31 +199,29 @@ export default {
 .week-data-sth {
   display: flex;
   flex-direction: row;
+  gap: 2px;
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
 
   > div {
-    width: 70px;
+    width: 60px;
     text-align: center;
     color: #fff;
     font-size: 12px;
     line-height: 22px;
-    font-weight: 600;
     display: flex;
     flex-direction: column;
 
     span:nth-child(1) {
-      background-color:#ffffff;
-      font-size: 18px;
-      line-height: 30px;
+      background-color: rgba(255, 255, 255, 0.46);
     }
   }
 
   > div:nth-child(1) {
     padding: 4px 0 0 4px;
     border-radius: 6px 0 0 6px;
-    background-color: #3e5cec;
+    background-color: rgba(93, 187, 246, 1);
 
     span:nth-child(1) {
       border-radius: 6px 0 0 6px;
@@ -231,21 +229,19 @@ export default {
   }
 
   > div:nth-child(2) {
-    width: 85px;
-    padding: 8px 8px 8px 8px;
+    padding: 4px 4px 6px 4px;
     border-radius: 6px;
-    background-color: #e3423d;
+    background-color: rgba(204, 35, 35, 1);
 
     span:nth-child(1) {
       border-radius: 6px;
-      font-size: 22px;
     }
   }
 
   > div:nth-child(3) {
     padding: 4px 4px 0 0;
     border-radius: 0 6px 6px 0;
-    background-color: #e5702c;
+    background-color: rgba(255, 181, 105, 1);
 
     span:nth-child(1) {
       border-radius: 0 6px 6px 0;
