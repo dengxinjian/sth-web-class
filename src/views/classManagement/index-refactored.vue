@@ -924,11 +924,6 @@ export default {
      * 获取日程数据
      */
     async getScheduleData() {
-      // 强制 Vue 检测数组变化
-      this.$nextTick(() => {
-        // 初始化拖拽
-        this.initAllDrag();
-      });
       if (!this.selectedAthletic) return;
       this.loading = true;
 
@@ -1032,11 +1027,11 @@ export default {
         });
         console.log(this.currentWeek, "this.currentWeek");
 
-        // // 强制 Vue 检测数组变化
-        // this.$nextTick(() => {
-        //   // 初始化拖拽
-        //   this.initAllDrag();
-        // });
+        // 强制 Vue 检测数组变化
+        this.$nextTick(() => {
+          // 初始化拖拽
+          this.initAllDrag();
+        });
       }
 
       this.loading = false;
@@ -1521,21 +1516,27 @@ export default {
 
       // 计算在“仅课程卡片”中的实际索引，忽略健康数据、赛事、运动记录等非课程元素
       let targetClassIndex = 0;
-      try {
-        const children = Array.from(e.to.children || []);
-        const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
-        children.forEach((child, idx) => {
-          if (
-            idx < newIndex &&
-            child.dataset &&
-            child.dataset.type === "classSchedule"
-          ) {
-            targetClassIndex += 1;
-          }
-        });
-      } catch (err) {
-        console.warn("计算课程拖拽索引失败，使用原始 newIndex", err);
-        targetClassIndex = e.newIndex || 0;
+      const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
+      const currentWeekData = [];
+      let topIndex = 0;
+      this.currentWeek.forEach((item) => {
+        if (item.commonDate.includes(e.to.dataset.date)) {
+          currentWeekData.push(...item.healthInfos);
+          currentWeekData.push(...item.competitionList);
+          topIndex = item.healthInfos.length + item.competitionList.length;
+          currentWeekData.push(...item.classSchedule);
+          currentWeekData.push(...item.activityList);
+        }
+      });
+
+      if (topIndex === 0) {
+        targetClassIndex = newIndex;
+      } else {
+        if (newIndex > topIndex) {
+          targetClassIndex = newIndex - topIndex;
+        } else {
+          targetClassIndex = 0;
+        }
       }
 
       // 移除拖拽产生的DOM元素，避免显示重复的课表
@@ -1564,6 +1565,7 @@ export default {
           currentData.splice(targetClassIndex, 0, newClassSchedule);
         }
       });
+      console.log(currentData, "currentData");
 
       // 生成排序数据
       currentData.forEach((item, index) => {
