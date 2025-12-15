@@ -248,7 +248,12 @@ export default {
   },
   methods: {
     async initData() {
-      // 先获取下拉框数据
+      // 如果是新增模式，先清除所有数据
+      if (!this.isEditMode) {
+        await this.clearAllData();
+      }
+
+      // 重新加载下拉框数据
       await this.loadAdministrativeRoot();
       await this.fetchDropdownOptions();
 
@@ -259,10 +264,38 @@ export default {
         await this.fillFormData(this.eventData);
       } else {
         // 重置表单
-        this.resetForm();
+        await this.resetForm();
+        // 设置默认值为中国
+        await this.setDefaultLocation();
       }
     },
-    resetForm() {
+    async clearAllData() {
+      // 清除所有表单数据
+      this.formData = {
+        priority: "PRIMARY",
+        eventName: "",
+        location: [],
+        competitionType: "",
+        distance: "",
+        customDistance: "",
+        competitionDistanceUnit: "km",
+      };
+      // 清除所有状态数据
+      this.showCustomDistance = false;
+      this.distanceOptions = [];
+      this.lastDistanceUnit = "km";
+      this.competitionTypeOptions = [];
+      this.distancesByType = {};
+      this.cityOptions = [];
+      this.cascaderKey = 0;
+      // 清除表单验证
+      await this.$nextTick();
+      if (this.$refs.eventForm) {
+        this.$refs.eventForm.clearValidate();
+        this.$refs.eventForm.resetFields();
+      }
+    },
+    async resetForm() {
       this.formData = {
         priority: "PRIMARY",
         eventName: "",
@@ -275,9 +308,29 @@ export default {
       this.showCustomDistance = false;
       this.distanceOptions = [];
       this.lastDistanceUnit = "km";
-      this.$nextTick(() => {
-        this.$refs.eventForm && this.$refs.eventForm.clearValidate();
-      });
+      await this.$nextTick();
+      this.$refs.eventForm && this.$refs.eventForm.clearValidate();
+    },
+    async setDefaultLocation() {
+      // 设置默认值为中国
+      if (this.cityOptions && this.cityOptions.length > 0) {
+        // 查找中国节点
+        const chinaOption = this.cityOptions.find(
+          (item) =>
+            String(item.value) === "100000" ||
+            item.adCode === "100000" ||
+            item.label?.includes("中国")
+        );
+        if (chinaOption) {
+          // 设置默认值为中国的 value
+          this.$set(this.formData, 'location', [chinaOption.value]);
+          // 等待级联选择器渲染
+          await this.$nextTick();
+          // 强制级联选择器重新渲染，确保默认值正确显示
+          this.cascaderKey += 1;
+          await this.$nextTick();
+        }
+      }
     },
     async fillFormData(data) {
       if (!data) return;
