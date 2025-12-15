@@ -233,6 +233,7 @@ export default {
     },
     eventData: {
       handler(val) {
+        console.log("******eventData",val);
         if (val && this.visible) {
           this.initData();
         }
@@ -247,6 +248,8 @@ export default {
   },
   methods: {
     async initData() {
+      console.log("******isEditMode",this.isEditMode);
+      console.log("******eventData",this.eventData);
       // 先获取下拉框数据
       await this.loadAdministrativeRoot();
       await this.fetchDropdownOptions();
@@ -464,12 +467,12 @@ export default {
             item.adCode === "100000" ||
             item.label?.includes("中国")
         ) || null;
-
       if (chinaRoot) {
         // 优先显示中国，其余国家保持可选
         const others = (rootList || []).filter(
           (item) => String(item.value) !== String(chinaRoot.value)
         );
+        console.log(others, "others");
         this.cityOptions = [
           {
             ...chinaRoot,
@@ -500,10 +503,22 @@ export default {
 
       const parentId = node && node.level > 0 ? node.value : "";
       const children = await this.fetchAdministrativeChildren(parentId);
+      // 当 node.level === 1 且 label !== '中国' 时，只显示两级（子节点标记为叶子节点）
+      const isLevel1NotChina = node && node.level === 1 && node.label !== '中国';
+
+      const newChildren = children.map(el => {
+        // 去除el中children字段
+        delete el.children;
+        return {
+          ...el,
+          // 如果是 level 1 且不是中国，则子节点标记为叶子节点，只显示两级
+          leaf: isLevel1NotChina ? true : el.leaf,
+        }
+      });
       if (node && node.level === 0) {
-        this.cityOptions = children;
+        this.cityOptions = newChildren;
       }
-      resolve(children);
+      resolve(newChildren);
     },
     async fetchAdministrativeChildren(parentId = "") {
       try {
@@ -903,7 +918,7 @@ export default {
           break;
         }
       }
-
+      console.log(labels, "labels");
       return labels;
     },
   },
