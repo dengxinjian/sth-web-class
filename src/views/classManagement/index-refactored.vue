@@ -282,6 +282,7 @@
     <EventInfo
       :visible.sync="showEventInfo"
       :event-data="currentEventData"
+      @delete="handleEventDetail"
       @close="showEventInfo = false"
     />
     <InputActivity

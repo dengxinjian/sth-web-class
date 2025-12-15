@@ -301,4 +301,19 @@ export const competitionApi = {
       requestData: data,
     });
   },
+  // 赛事解绑运动
+  unbindActivity(data) {
+    return submitData({
+      url: "/api/activity/activityUnBindCompetition",
+      requestData: data,
+    });
+  },
+  // 保存/更新比赛成绩
+  saveCompetitionResult(data) {
+    return request({
+      url: "/api/competition/result",
+      method: "post",
+      data,
+    });
+  },
 };
