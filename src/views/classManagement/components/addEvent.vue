@@ -248,8 +248,6 @@ export default {
   },
   methods: {
     async initData() {
-      console.log("******isEditMode",this.isEditMode);
-      console.log("******eventData",this.eventData);
       // 先获取下拉框数据
       await this.loadAdministrativeRoot();
       await this.fetchDropdownOptions();
@@ -295,10 +293,12 @@ export default {
       if (typeof locationValue === "string") {
         // 先解析并加载所有需要的数据
         const locationArray = await this.parseLocationString(locationValue);
+        // 确保所有路径数据都已加载到 cityOptions 中，以便级联选择器能够正确回显
+        await this.ensureLocationDataLoadedForDisplay(locationArray);
         // 确保 cityOptions 已更新
         await this.$nextTick();
-        // 设置值
-        this.formData.location = locationArray;
+        // 使用 $set 确保响应式更新
+        this.$set(this.formData, 'location', locationArray);
         // 等待级联选择器渲染
         await this.$nextTick();
         // 强制级联选择器重新渲染
@@ -307,17 +307,19 @@ export default {
       } else if (Array.isArray(locationValue)) {
         // 先解析并加载所有需要的数据
         const locationArray = await this.ensureLocationValues(locationValue);
+        // 确保所有路径数据都已加载到 cityOptions 中，以便级联选择器能够正确回显
+        await this.ensureLocationDataLoadedForDisplay(locationArray);
         // 确保 cityOptions 已更新
         await this.$nextTick();
-        // 设置值
-        this.formData.location = locationArray;
+        // 使用 $set 确保响应式更新
+        this.$set(this.formData, 'location', locationArray);
         // 等待级联选择器渲染
         await this.$nextTick();
         // 强制级联选择器重新渲染
         this.cascaderKey += 1;
         await this.$nextTick();
       } else {
-        this.formData.location = [];
+        this.$set(this.formData, 'location', []);
       }
 
       // 处理比赛类型：兼容 displayValue / value / 数字
@@ -432,8 +434,18 @@ export default {
         // 懒加载子级，保证后续匹配（如果不是最后一级）
         if (i < parts.length - 1 && !option.leaf && (!option.children || option.children.length === 0)) {
           const children = await this.fetchAdministrativeChildren(option.value);
-          this.$set(option, 'children', children);
-          currentOptions = children;
+          // 当父节点是 level 1（i === 0）且不是"中国"时，子节点标记为叶子节点，只显示两级
+          const isLevel1NotChina = i === 0 && option.label !== '中国';
+          const processedChildren = children.map(el => {
+            delete el.children;
+            return {
+              ...el,
+              // 如果是 level 1 且不是中国，则子节点标记为叶子节点，只显示两级
+              leaf: isLevel1NotChina ? true : el.leaf,
+            };
+          });
+          this.$set(option, 'children', processedChildren);
+          currentOptions = processedChildren;
         } else {
           currentOptions = option.children || [];
         }
@@ -457,6 +469,128 @@ export default {
       await this.$nextTick();
 
       return result;
+    },
+    async ensureLocationDataLoadedForDisplay(locationArray) {
+      // 确保路径上的所有节点都已加载到 cityOptions 中，以便级联选择器能够正确回显
+      // 这个方法专门用于回显时确保数据已加载
+      if (!Array.isArray(locationArray) || locationArray.length === 0) {
+        return;
+      }
+
+      let currentOptions = this.cityOptions;
+      let parentOption = null;
+
+      for (let i = 0; i < locationArray.length; i++) {
+        const value = String(locationArray[i]).trim();
+
+        // 在当前选项中查找匹配的节点
+        let option = currentOptions.find(
+          (opt) => String(opt.value) === value
+        );
+
+        if (!option) {
+          // 如果找不到，说明数据可能还没加载，尝试加载父节点的子节点
+          if (parentOption) {
+            const children = await this.fetchAdministrativeChildren(parentOption.value);
+            // 当父节点是 level 1（i === 1，因为此时 parentOption 是 level 1）且不是"中国"时，子节点标记为叶子节点
+            const isLevel1NotChina = i === 1 && parentOption.label !== '中国';
+            const processedChildren = children.map(el => {
+              delete el.children;
+              return {
+                ...el,
+                leaf: isLevel1NotChina ? true : el.leaf,
+              };
+            });
+            this.$set(parentOption, 'children', processedChildren);
+            currentOptions = processedChildren;
+            option = currentOptions.find(
+              (opt) => String(opt.value) === value
+            );
+          } else if (i === 0) {
+            // 如果是第一级，重新加载根节点
+            currentOptions = await this.fetchAdministrativeChildren("");
+            this.$set(this, 'cityOptions', currentOptions);
+            option = currentOptions.find(
+              (opt) => String(opt.value) === value
+            );
+          }
+        }
+
+        if (option) {
+          // 如果不是最后一级，确保子节点已加载
+          if (i < locationArray.length - 1 && !option.leaf) {
+            if (!option.children || option.children.length === 0) {
+              const children = await this.fetchAdministrativeChildren(option.value);
+              // 当父节点是 level 1（i === 0）且不是"中国"时，子节点标记为叶子节点
+              const isLevel1NotChina = i === 0 && option.label !== '中国';
+              const processedChildren = children.map(el => {
+                delete el.children;
+                return {
+                  ...el,
+                  leaf: isLevel1NotChina ? true : el.leaf,
+                };
+              });
+              this.$set(option, 'children', processedChildren);
+            }
+            currentOptions = option.children || [];
+          }
+          parentOption = option;
+        } else {
+          // 如果找不到匹配的节点，跳出循环
+          break;
+        }
+      }
+
+      // 确保响应式更新
+      await this.$nextTick();
+    },
+    async ensureLocationDataLoaded(locationArray) {
+      // 确保路径上的所有节点都已加载到 cityOptions 中，以便级联选择器能够正确回显
+      if (!Array.isArray(locationArray) || locationArray.length === 0) {
+        return;
+      }
+
+      let currentOptions = this.cityOptions;
+      let parentOption = null;
+
+      for (let i = 0; i < locationArray.length; i++) {
+        const value = String(locationArray[i]).trim();
+
+        // 在当前选项中查找匹配的节点
+        let option = currentOptions.find(
+          (opt) => String(opt.value) === value
+        );
+
+        if (!option) {
+          // 如果找不到，说明数据可能还没加载，尝试加载父节点的子节点
+          if (parentOption) {
+            const children = await this.fetchAdministrativeChildren(parentOption.value);
+            this.$set(parentOption, 'children', children);
+            currentOptions = children;
+            option = currentOptions.find(
+              (opt) => String(opt.value) === value
+            );
+          }
+        }
+
+        if (option) {
+          // 如果不是最后一级，确保子节点已加载
+          if (i < locationArray.length - 1 && !option.leaf) {
+            if (!option.children || option.children.length === 0) {
+              const children = await this.fetchAdministrativeChildren(option.value);
+              this.$set(option, 'children', children);
+            }
+            currentOptions = option.children || [];
+          }
+          parentOption = option;
+        } else {
+          // 如果找不到匹配的节点，跳出循环
+          break;
+        }
+      }
+
+      // 确保响应式更新
+      await this.$nextTick();
     },
     async loadAdministrativeRoot() {
       const rootList = await this.fetchAdministrativeChildren("");
