@@ -1,150 +1,41 @@
 <template>
-  <el-dialog
-    :visible.sync="innerVisible"
-    width="680px"
-    append-to-body
-    :before-close="onCancel"
-    class="add-class-title-modal summary-preview-modal"
-    :close-on-click-modal="false"
-  >
-    <span slot="title">概要</span>
-
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-width="90px"
-      size="small"
-    >
-      <el-form-item label="计划名称" prop="planTitle">
-        <span v-if="activeClassType === 'official'">{{ form.planTitle }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          v-model="form.planTitle"
-          maxlength="20"
-          show-word-limit
-          placeholder="请输入计划名称"
-          clearable
-        />
-      </el-form-item>
-
-      <el-form-item label="分组选择" prop="planGroupId">
-        <el-select
-          v-model="form.planGroupId"
-          placeholder="请选择分组"
-          filterable
-          clearable
-          style="width: 100%"
-          v-if="activeClassType !== 'official'"
-        >
-          <el-option
-            v-for="g in groupOptions"
-            :key="g.id"
-            :label="g.planClassesGroup"
-            :value="g.id"
-          />
-        </el-select>
-        <!-- <el-input v-else :readonly="true" :value="planInfo.planGroupName" /> -->
-        <span v-else>{{ planInfo.planGroupName }}</span>
-      </el-form-item>
-
-      <el-form-item label="团队" prop="teamId" v-if="loginType === '2' && form.teamId">
-        <el-select
-          v-model="form.teamId"
-          placeholder="请选择团队"
-          filterable
-          clearable
-          style="width: 100%"
-          v-if="activeClassType !== 'official'"
-        >
-          <el-option
-            v-for="g in teamOptions"
-            :key="g.id"
-            :label="g.teamName"
-            :value="g.id"
-          />
-        </el-select>
-        <span v-else>{{ planInfo.teamName }}</span>
-      </el-form-item>
-
-      <el-form-item label="计划源">
-        <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          placeholder="请输入计划源"
-          :value="planSource()"
-          disabled
-        />
-      </el-form-item>
-
-      <el-form-item label="拥有者">
-        <span v-if="activeClassType === 'official'">{{
-          planInfo.possessNickname
-        }}</span>
-        <el-input
-          v-else
-          :readonly="true"
-          :value="planInfo.possessNickname"
-          disabled
-        />
-      </el-form-item>
-
-      <el-form-item label="邮箱" prop="email">
-        <span v-if="activeClassType === 'official'">{{ form.email }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          v-model="form.email"
-          placeholder="请输入邮箱"
-          @change="validateEmail"
-        />
-      </el-form-item>
-
-      <el-form-item label="微信号" prop="weChat">
-        <span v-if="activeClassType === 'official'">{{ form.weChat }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          v-model="form.weChat"
-          placeholder="请输入微信号"
-        />
-      </el-form-item>
-
-      <el-form-item label="描述" prop="description">
-        <span v-if="activeClassType === 'official'">{{
-          form.description
-        }}</span>
-        <el-input
-          type="textarea"
-          v-else
-          :readonly="activeClassType === 'official'"
-          :rows="6"
-          :maxlength="500"
-          show-word-limit
-          v-model="form.description"
-          placeholder="请输入描述"
-        />
-      </el-form-item>
-
-      <el-form-item label="计划周期" prop="groupId">
-        <span>{{ weekNumber }}周</span>
-      </el-form-item>
-
-      <el-form-item label="统计">
+  <div class="hover-plan-detail">
+    <!-- <h2>概要</h2> -->
+    <div class="detail-row-box">
+      <div class="detail-row-title">计划名称</div>
+      <div class="detail-row-content">{{ planDetail.planTitle }}</div>
+    </div>
+    <div class="detail-row-box" v-if="planDetail?.teamName">
+      <div class="detail-row-title">团队</div>
+      <div class="detail-row-content">{{ planDetail.teamName }}</div>
+    </div>
+    <div class="detail-row-box">
+      <div class="detail-row-title">计划源</div>
+      <div class="detail-row-content">{{ planDetail.teamName ? `${planDetail.teamName} - ${planDetail.planSourceNickname}` : planDetail.planSourceNickname }}</div>
+    </div>
+    <div class="detail-row-box" v-for="item in renderColumns" :key="item.prop">
+      <div class="detail-row-title">{{ item.label }}</div>
+      <div class="detail-row-content">{{ planDetail[item.prop] }}</div>
+    </div>
+    <div class="detail-row-box">
+      <div class="detail-row-title">计划周期</div>
+      <div class="detail-row-content">{{ weekNumber }}周</div>
+    </div>
+    <div class="detail-row-box">
+      <div class="detail-row-title">统计</div>
+      <div class="detail-row-content">
         <el-row>
           <el-col :span="24">
             <el-row>
-              <el-col :span="8">类型</el-col>
-              <el-col :span="8">时长</el-col>
-              <el-col :span="8">距离</el-col>
+              <el-col :span="5" style="text-align: left;">类型</el-col>
+              <el-col :span="9">时长</el-col>
+              <el-col :span="9">距离</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
             <el-row>
-              <el-col :span="8">游泳</el-col>
-              <el-col :span="8"
+              <el-col :span="5" style="text-align: left;">游泳</el-col>
+              <el-col :span="9"
                 >{{
                   secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
                     ? "N/A"
@@ -155,15 +46,15 @@
                     : " /周"
                 }}</el-col
               >
-              <el-col :span="8"
+              <el-col :span="9"
                 >{{ getweekSwimmingDistance() || "N/A" }}
               </el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
             <el-row>
-              <el-col :span="8">骑行</el-col>
-              <el-col :span="8"
+              <el-col :span="5">骑行</el-col>
+              <el-col :span="9"
                 >{{
                   secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
                     ? "N/A"
@@ -174,13 +65,13 @@
                     : " /周"
                 }}</el-col
               >
-              <el-col :span="8">{{ getweekCycleDistance() || "N/A" }} </el-col>
+              <el-col :span="9">{{ getweekCycleDistance() || "N/A" }} </el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
             <el-row>
-              <el-col :span="8">跑步</el-col>
-              <el-col :span="8"
+              <el-col :span="5">跑步</el-col>
+              <el-col :span="9"
                 >{{
                   secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
                     ? "N/A"
@@ -191,13 +82,13 @@
                     : " /周"
                 }}</el-col
               >
-              <el-col :span="8">{{ getweekRunDistance() || "N/A" }}</el-col>
+              <el-col :span="9">{{ getweekRunDistance() || "N/A" }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
             <el-row>
-              <el-col :span="8">力量</el-col>
-              <el-col :span="8"
+              <el-col :span="5">力量</el-col>
+              <el-col :span="9"
                 >{{
                   secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
                     ? "N/A"
@@ -208,15 +99,15 @@
                     : " /周"
                 }}</el-col
               >
-              <el-col :span="8">{{
+              <el-col :span="9">{{
                 getweekPowerAndOtherDistance("STRENGTH") || "N/A"
               }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
             <el-row>
-              <el-col :span="8">其他</el-col>
-              <el-col :span="8"
+              <el-col :span="5">其他</el-col>
+              <el-col :span="9"
                 >{{
                   secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
                     ? "N/A"
@@ -227,15 +118,15 @@
                     : " /周"
                 }}</el-col
               >
-              <el-col :span="8">{{
+              <el-col :span="9">{{
                 getweekPowerAndOtherDistance("OTHER") || "N/A"
               }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
             <el-row>
-              <el-col :span="8">总计</el-col>
-              <el-col :span="8"
+              <el-col :span="5">总计</el-col>
+              <el-col :span="9"
                 >{{
                   secondsToHHMMSS(getweekDuration()) === "00:00:00"
                     ? "N/A"
@@ -247,90 +138,196 @@
                     : " /周"
                 }}</el-col
               >
-              <el-col :span="8">{{ getweekDistance() || "N/A" }}</el-col>
+              <el-col :span="9">{{ getweekDistance() || "N/A" }}</el-col>
+            </el-row>
+          </el-col>
+        </el-row>
+      </div>
+    </div>
+
+    <!-- <el-form ref="formRef" label-width="70px" size="small"> -->
+      <!-- <el-form-item label="计划名称" prop="planTitle">
+        <span>{{ planDetail.planTitle }}</span>
+      </el-form-item>
+
+      <el-form-item label="团队" prop="teamId" v-if="planDetail?.teamName">
+        <span>{{ planDetail.teamName }}</span>
+      </el-form-item>
+
+      <el-form-item label="计划源">
+        <span>{{ planDetail.teamName ? `${planDetail.teamName} - ${planDetail.planSourceNickname}` : planDetail.planSourceNickname }}</span>
+      </el-form-item>
+
+      <el-form-item label="邮箱" prop="email">
+        <span>{{ planDetail.email }}</span>
+      </el-form-item>
+
+      <el-form-item label="微信号" prop="weChat">
+        <span>{{ planDetail.weChat }}</span>
+      </el-form-item>
+
+      <el-form-item label="描述" prop="description">
+        <span>{{ planDetail.description }}</span>
+      </el-form-item>
+
+      <el-form-item label="计划周期" prop="groupId">
+        <span>{{ weekNumber }}周</span> -->
+      <!-- </el-form-item> -->
+
+      <!-- <el-form-item label="统计">
+        <el-row>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">类型</el-col>
+              <el-col :span="9">时长</el-col>
+              <el-col :span="9">距离</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">游泳</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekSwimmingDuration())
+                }}{{
+                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9"
+                >{{ getweekSwimmingDistance() || "N/A" }}
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">骑行</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekCycleDuration())
+                }}{{
+                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{ getweekCycleDistance() || "N/A" }} </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">跑步</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekRunDuration())
+                }}{{
+                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{ getweekRunDistance() || "N/A" }}</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">力量</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekPowerDuration())
+                }}{{
+                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{
+                getweekPowerAndOtherDistance("STRENGTH") || "N/A"
+              }}</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24">
+            <el-row>
+              <el-col :span="5">其他</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekOtherDuration())
+                }}{{
+                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{
+                getweekPowerAndOtherDistance("OTHER") || "N/A"
+              }}</el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
+            <el-row>
+              <el-col :span="5">总计</el-col>
+              <el-col :span="9"
+                >{{
+                  secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                    ? "N/A"
+                    : secondsToHHMMSS(getweekDuration())
+                }}
+                {{
+                  secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col
+              >
+              <el-col :span="9">{{ getweekDistance() || "N/A" }}</el-col>
             </el-row>
           </el-col>
         </el-row>
       </el-form-item>
-    </el-form>
-
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel" v-if="activeClassType === 'official'"
-        >关闭</el-button
-      >
-      <el-button @click="onCancel" v-if="activeClassType !== 'official'"
-        >取消</el-button
-      >
-      <el-button
-        type="primary"
-        v-if="activeClassType !== 'official'"
-        @click="onConfirm"
-        >确定</el-button
-      >
-    </span>
-  </el-dialog>
+    </el-form> -->
+  </div>
 </template>
-
 <script>
-import { getData, submitData } from "@/api/common.js";
+import { getData, submitData } from "@/utils/request";
 import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils/index";
+// 服务和工具导入
+import { planApi } from "../../services/planManagement";
 export default {
-  name: "SummaryPreview",
+  name: "HoverPlanDetail",
   props: {
-    visible: { type: Boolean, default: false },
-    value: { type: Boolean, default: undefined },
-    defaultTitle: { type: String, default: "" },
-    defaultGroupId: { type: [String, Number], default: undefined },
-    planInfo: { type: Object, default: () => ({}) },
-    planClasses: { type: Array, default: () => [] },
-    activeClassType: { type: String, default: "official" },
+    planInfo: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
-      innerVisible: this.visible || this.value || false,
-      form: {
-        planTitle: undefined,
-        planGroupId: undefined,
-        teamId: undefined,
-        email: undefined,
-        weChat: undefined,
-        description: undefined,
-      },
-      rules: {
-        planTitle: [
-          { required: true, message: "请输入计划标题", trigger: "blur" },
-          { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
-        ],
-        planGroupId: [
-          { required: true, message: "请选择分组", trigger: "change" },
-        ],
-        teamId: [{ required: false, message: "请选择团队", trigger: "change" }],
-        email: [
-          {
-            validator: (rule, value, callback) => {
-              if (!value) {
-                // 邮箱为可选，如果为空则不校验
-                callback();
-                return;
-              }
-              const emailRegex =
-                /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-              if (!emailRegex.test(value)) {
-                callback(new Error("请输入正确的邮箱地址"));
-              } else {
-                callback();
-              }
-            },
-            trigger: ["blur", "change"],
-          },
-        ],
-      },
+      renderColumns: [
+        // { label: "计划名称", prop: "planTitle" },
+        // { label: "团队", prop: "teamName" },
+        // { label: "计划源", prop: "planSourceNickname" },
+        { label: "邮箱", prop: "email" },
+        { label: "微信号", prop: "weChat" },
+        { label: "描述", prop: "description" },
+      ],
       groups: [],
       teams: [],
       emptyPlanClasses: [[], [], [], []],
       loginType: localStorage.getItem("loginType") || "",
       planList: [],
       weekNumber: 0,
+      form: {},
+      planDetail: {},
     };
   },
   computed: {
@@ -340,72 +337,35 @@ export default {
     teamOptions() {
       return Array.isArray(this.teams) ? this.teams : [];
     },
+    planClasses() {
+      // 从 planInfo 中获取计划列表数据
+      if (this.planInfo && this.planInfo.planList) {
+        return this.planInfo.planList;
+      }
+      if (this.planInfo && this.planInfo.dayDetails) {
+        return this.planInfo.dayDetails;
+      }
+      if (this.planList && this.planList.length > 0) {
+        return this.planList;
+      }
+      return [];
+    },
   },
   watch: {
-    visible(val) {
-      this.innerVisible = val;
-    },
-    value(val) {
-      if (typeof val !== "undefined") this.innerVisible = val;
-    },
-    innerVisible(val) {
-      this.$emit("update:visible", val);
-      this.$emit("input", val);
-      if (val) {
-        // 获取分组和团队列表
-        this.getGroupList();
-        this.getTeamList();
-        // 如果 planInfo 有数据，重置表单并回显数据；否则只重置表单
-        if (this.planInfo && Object.keys(this.planInfo).length > 0) {
-          this.resetForm();
-          this.$nextTick(() => {
-            this.form = {
-              planTitle: this.planInfo.planTitle || undefined,
-              planGroupId: this.planInfo.planGroupId,
-              teamId: this.planInfo.teamId || undefined,
-              email: this.planInfo.email || undefined,
-              weChat: this.planInfo.weChat || undefined,
-              description: this.planInfo.description || undefined,
-            };
-            // 清除表单验证状态
-            if (this.$refs.formRef) {
-              this.$refs.formRef.clearValidate();
-            }
-          });
-        } else {
-          // 没有 planInfo 数据，只重置表单
-          this.resetForm();
+    planInfo: {
+      handler(newVal) {
+        console.log("newVal-planInfo",newVal);
+        if (
+          newVal &&
+          typeof newVal === "object" &&
+          Object.keys(newVal).length > 0
+        ) {
+          this.getPlanDetail(newVal.id);
+          this.getPlanDayDetail(newVal.id);
         }
-      } else {
-        // clear validation when closing
-        this.$nextTick(
-          () =>
-            this.$refs.formRef &&
-            this.$refs.formRef.clearValidate &&
-            this.$refs.formRef.clearValidate()
-        );
-      }
-    },
-    planInfo(val) {
-      // 如果对话框已打开且有数据，则回显数据
-      if (this.innerVisible && val && Object.keys(val).length > 0) {
-        this.resetForm();
-        this.$nextTick(() => {
-          this.form = {
-            planTitle: val.planTitle || undefined,
-            planGroupId: val.planGroupId || undefined,
-            teamId: val.teamId || undefined,
-            email: val.email || undefined,
-            weChat: val.weChat || undefined,
-            description: val.description || undefined,
-            id: val.id,
-          };
-          // 清除表单验证状态
-          if (this.$refs.formRef) {
-            this.$refs.formRef.clearValidate();
-          }
-        });
-      }
+      },
+      immediate: true,
+      deep: true,
     },
     planClasses(newVal) {
       if (newVal && Array.isArray(newVal) && newVal.length > 0) {
@@ -422,7 +382,12 @@ export default {
           );
         const lastItem = newDayDetailList[newDayDetailList.length - 1];
         const day = lastItem?.day;
-        if (day != null && typeof day === 'number' && !isNaN(day) && isFinite(day)) {
+        if (
+          day != null &&
+          typeof day === "number" &&
+          !isNaN(day) &&
+          isFinite(day)
+        ) {
           this.weekNumber = Math.ceil(day / 7);
         } else {
           this.weekNumber = 0;
@@ -433,7 +398,7 @@ export default {
   methods: {
     secondsToHHMMSS,
     planSource() {
-      const currentTeamId = this.form.teamId || this.planInfo.teamId;
+      const currentTeamId = this.planDetail.teamId;
       const teamName =
         this.teamOptions.find((item) => item.id === currentTeamId)?.teamName ||
         this.planInfo.teamName ||
@@ -444,19 +409,105 @@ export default {
       if (!teamName) return owner;
       return `${teamName} - ${owner}`;
     },
-    getGroupList() {
-      getData({
-        url: "/api/planClassesGroup/option",
-      }).then((res) => {
-        this.groups = res.result;
-      });
+    loadPlanDetail(planId) {
+      // 如果需要加载完整的计划详情，可以在这里实现
+      // 考虑到这是 hover 场景，暂时不自动加载，避免性能问题
+      if (!planId) return;
+      // 可以在这里添加加载逻辑，如果需要的话
     },
-    getTeamList() {
-      getData({
-        url: "/api/team/coach/all-teams",
-      }).then((res) => {
-        this.teams = res.result;
+    /**
+     * 获取计划详情
+     */
+    async getPlanDetail(id) {
+      const res = await planApi.getPlanDetail(id);
+      this.planDetail = res.result;
+    },
+    async getPlanDayDetail(id) {
+      const resDayDetail = await planApi.getPlanDayDetail(id);
+      // 处理并重组数据
+      const completeData = this.completePlanDayData(resDayDetail.result);
+      const formattedData = this.formatPlanDayDetail(completeData);
+
+      // return formattedData;
+      this.planList = formattedData;
+    },
+    /**
+     * 处理计划日常详情数据，重组为按天分组的格式，并按每7天一组组成二维数组
+     * @param {Array} data - getPlanDayDetail接口返回的数据
+     * @returns {Array} 重组后的数据格式 [[{day: 1, details: [...]}, ...], [{day: 8, details: [...]}, ...], ...]
+     */
+    formatPlanDayDetail(data) {
+      const result = [];
+      // 将data中的28条数据，按每7天一组组成二维数组
+      for (let i = 0; i < data.length; i += 7) {
+        result.push(data.slice(i, i + 7));
+      }
+      return result;
+    },
+    /**
+     * 补充完整周数的数据
+     * 根据最后一条数据的day值除以7向上取整作为周数
+     * 如果周数小于4，则补充数据至4周（28天）
+     * 如果周数大于等于4，则补充数据至当前周数（周数 * 7天）
+     * @param {Array} data - getPlanDayDetail接口返回的原始数据
+     * @returns {Array} 补充完整后的数据
+     */
+    completePlanDayData(data) {
+      if (!Array.isArray(data) || data.length === 0) {
+        // 如果数据为空，返回28天的空数据（4周）
+        const result = [];
+        for (let day = 1; day <= 28; day++) {
+          result.push({
+            day: day,
+            details: [],
+            competitionDtoList: [],
+          });
+        }
+        return result;
+      }
+
+      // 创建day到数据的映射，方便查找
+      const dayMap = new Map();
+      data.forEach((item) => {
+        dayMap.set(item.day, item);
       });
+
+      // 找到最大的day值（最后一条数据的day）
+      const maxDay = Math.max(...data.map((item) => item.day));
+
+      // 计算周数：最后一条day的数值除以7向上取整
+      const weekCount = Math.ceil(maxDay / 7);
+
+      // 确定目标天数
+      let targetDays;
+      if (weekCount < 4) {
+        // 如果周数小于4，补充至4周（28天）
+        targetDays = 28;
+      } else {
+        // 如果周数大于等于4，补充至当前周数（周数 * 7天）
+        targetDays = weekCount * 7;
+      }
+
+      // 确保1到目标天数的数据都存在，如果中间有缺失的天数也要补充
+      const completeData = [];
+      for (let day = 1; day <= targetDays; day++) {
+        if (dayMap.has(day)) {
+          completeData.push(dayMap.get(day));
+        } else {
+          const newDayData = {
+            day: day,
+            details: [],
+            // 将原始数据中的competitionDtoList补充到新数据中
+            competitionDtoList:
+              data.find((item) => item.day === day)?.competitionDtoList || [],
+          };
+          completeData.push(newDayData);
+          // 同时更新dayMap，保持一致性
+          dayMap.set(day, newDayData);
+        }
+      }
+
+      return completeData;
     },
     onCancel() {
       this.innerVisible = false;
@@ -1160,30 +1211,138 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-.add-class-title-modal ::v-deep(.el-dialog__header) {
-  padding: 16px 24px;
-}
-.add-class-title-modal ::v-deep(.el-dialog__body) {
-  padding: 10px 24px 0 24px;
-}
-.dialog-footer {
-  display: flex;
-  justify-content: center;
-}
-.statistics-divider-wrapper {
-  margin: 8px 0;
-}
-.statistics-divider-wrapper ::v-deep(.el-divider__text) {
+.hover-plan-detail {
+  padding: 8px;
   font-size: 12px;
+  line-height: 1.5;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 16px;
+
+  .el-form {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .el-form-item {
+    margin-bottom: 8px;
+
+    .el-form-item__content {
+      overflow: hidden;
+      display: flex;
+      /* align-items: flex-start; */
+
+      span {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 6;
+        line-clamp: 6;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-word;
+        max-width: 100%;
+        font-size: 12px !important;
+        color: #999 !important;
+      }
+    }
+
+    &[prop="description"] .el-form-item__content span {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      white-space: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .el-row {
+    margin: 0 !important;
+
+    .el-col {
+      padding: 0 !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .detail-row-box {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    .detail-row-title {
+      width: 50px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .detail-row-content {
+      flex: 1;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 6;
+      line-clamp: 6;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-all;
+      font-size: 12px;
+      color: #999;
+      margin-left: 12px;
+    }
+  }
+}
+
+.detail-item {
+  display: flex;
+  margin-bottom: 6px;
+  align-items: flex-start;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  color: #909399;
+  margin-right: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #303133;
+  word-break: break-word;
 }
 </style>
 
 <style>
-/* 仅应用于当前弹窗的样式，用于 append-to-body 的 dialog */
-.el-dialog__wrapper.summary-preview-modal .el-dialog,
-.summary-preview-modal.el-dialog__wrapper .el-dialog {
-  margin-top: 5vh !important;
+.hover-plan-detail .el-form-item {
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.hover-plan-detail .el-form-item__label {
+  font-size: 14px !important;
+  line-height: 24px !important;
+  padding-top: 0 !important;
+}
+
+.hover-plan-detail .el-form-item__content {
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.hover-plan-detail .el-form-item__content span {
+  font-size: 12px !important;
+  color: #999 !important;
+}
+
+.hover-plan-detail .el-col {
+  padding: 0 !important;
 }
 </style>

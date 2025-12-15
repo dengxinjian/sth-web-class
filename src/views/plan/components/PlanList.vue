@@ -1,5 +1,5 @@
 <template>
-  <div class="class-container">
+  <div class="plan-container">
     <!-- 课程类型切换 -->
     <ul class="class-type-list">
       <li
@@ -40,7 +40,7 @@
         </div>
       </el-popover>
 
-      <el-input size="mini" v-model="searchInput" @input="handleSearch">
+      <el-input size="mini" v-model="searchInput" @input="handleSearch" clearable>
         <el-button
           slot="append"
           icon="el-icon-search"
@@ -50,7 +50,7 @@
     </div>
 
     <!-- 课程列表 -->
-    <div class="schedule-class-container">
+    <div class="schedule-plan-container">
       <el-collapse
         v-model="activeCollapse"
         accordion
@@ -106,7 +106,7 @@
                     <el-button
                       type="text"
                       :disabled="!item.groupId"
-                      @click="$emit('delete-group', item.groupId)"
+                      @click="$emit('delete-group', item)"
                     >
                       删除分组
                     </el-button>
@@ -117,7 +117,7 @@
             </div>
           </template>
 
-          <div class="js-class-drag-container" :key="item.timespan">
+          <div class="plan-js-class-drag-container" :key="item.timespan">
             <div
               class="plan-item"
               :class="{ active: selectedPlanId === classItem.id }"
@@ -125,7 +125,16 @@
               :key="classItem.id"
               @click="$emit('choose-plan', classItem.id, item.groupId)"
             >
-              <span>{{ classItem.planTitle }}</span>
+              <el-popover
+                placement="right"
+                width="320px"
+                trigger="hover"
+                :disabled="!classItem.planTitle"
+                popper-class="hover-plan-detail-popover"
+              >
+                <span slot="reference" @click.stop>{{ classItem.planTitle }}</span>
+                <HoverPlanDetail :planInfo="classItem"></HoverPlanDetail>
+              </el-popover>
             </div>
           </div>
         </el-collapse-item>
@@ -136,8 +145,12 @@
 
 <script>
 import { debounce } from "../../classManagement/uilt";
+import HoverPlanDetail from "./HoverPlanDetail/index.vue";
 export default {
   name: "PlanList",
+  components: {
+    HoverPlanDetail,
+  },
   props: {
     classList: {
       type: Array,
@@ -277,7 +290,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.class-container {
+.plan-container {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -323,7 +336,7 @@ export default {
     padding: 0 10px;
   }
 
-  .schedule-class-container {
+  .schedule-plan-container {
     padding: 5px 5px;
     background-color: #fff;
     flex: 1;

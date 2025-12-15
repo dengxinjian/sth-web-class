@@ -38,6 +38,8 @@
       <!-- 赛事地点 -->
       <el-form-item label="赛事地点" prop="location" required>
         <el-cascader
+          :key="cascaderKey"
+          ref="locationCascader"
           v-model="formData.location"
           :options="cityOptions"
           :props="cascaderProps"
@@ -118,7 +120,6 @@
 </template>
 
 <script>
-import { citys } from "@/views/classManagement/constants/citys";
 import { competitionApi } from "@/views/classManagement/services/classManagement";
 
 export default {
@@ -203,12 +204,15 @@ export default {
           },
         ],
       },
-      cityOptions: citys,
+      cityOptions: [],
+      cascaderKey: 0, // 用于强制级联选择器重新渲染
       cascaderProps: {
         value: "value",
         label: "label",
         children: "children",
-        expandTrigger: "hover",
+        expandTrigger: "click",
+        lazy: true,
+        lazyLoad: (node, resolve) => this.loadAdministrativeOptions(node, resolve),
       },
       competitionTypeOptions: [],
       distanceOptions: [],
@@ -229,6 +233,7 @@ export default {
     },
     eventData: {
       handler(val) {
+        console.log("******eventData",val);
         if (val && this.visible) {
           this.initData();
         }
@@ -244,13 +249,14 @@ export default {
   methods: {
     async initData() {
       // 先获取下拉框数据
+      await this.loadAdministrativeRoot();
       await this.fetchDropdownOptions();
 
       // 如果是编辑模式，回填数据
       if (this.isEditMode && this.eventData) {
         // 等待下拉数据加载完成后再回填
         await this.$nextTick();
-        this.fillFormData(this.eventData);
+        await this.fillFormData(this.eventData);
       } else {
         // 重置表单
         this.resetForm();
@@ -273,7 +279,7 @@ export default {
         this.$refs.eventForm && this.$refs.eventForm.clearValidate();
       });
     },
-    fillFormData(data) {
+    async fillFormData(data) {
       if (!data) return;
 
       // 回填优先级
@@ -285,11 +291,35 @@ export default {
       // 处理地点数据（兼容字符串与数组）
       const locationValue = data.location || data.competitionLocation;
       if (typeof locationValue === "string") {
-        this.formData.location = this.parseLocationString(locationValue);
+        // 先解析并加载所有需要的数据
+        const locationArray = await this.parseLocationString(locationValue);
+        // 确保所有路径数据都已加载到 cityOptions 中，以便级联选择器能够正确回显
+        await this.ensureLocationDataLoadedForDisplay(locationArray);
+        // 确保 cityOptions 已更新
+        await this.$nextTick();
+        // 使用 $set 确保响应式更新
+        this.$set(this.formData, 'location', locationArray);
+        // 等待级联选择器渲染
+        await this.$nextTick();
+        // 强制级联选择器重新渲染
+        this.cascaderKey += 1;
+        await this.$nextTick();
       } else if (Array.isArray(locationValue)) {
-        this.formData.location = locationValue;
+        // 先解析并加载所有需要的数据
+        const locationArray = await this.ensureLocationValues(locationValue);
+        // 确保所有路径数据都已加载到 cityOptions 中，以便级联选择器能够正确回显
+        await this.ensureLocationDataLoadedForDisplay(locationArray);
+        // 确保 cityOptions 已更新
+        await this.$nextTick();
+        // 使用 $set 确保响应式更新
+        this.$set(this.formData, 'location', locationArray);
+        // 等待级联选择器渲染
+        await this.$nextTick();
+        // 强制级联选择器重新渲染
+        this.cascaderKey += 1;
+        await this.$nextTick();
       } else {
-        this.formData.location = [];
+        this.$set(this.formData, 'location', []);
       }
 
       // 处理比赛类型：兼容 displayValue / value / 数字
@@ -327,25 +357,384 @@ export default {
         data.competitionDistanceUnit || "km";
       this.lastDistanceUnit = this.formData.competitionDistanceUnit;
     },
-    parseLocationString(locationStr) {
-      // 将字符串格式的地点（如：湖北/武汉）转换为级联选择器的 value 数组
+    async parseLocationString(locationStr) {
+      // 将字符串格式的地点（如：湖北/武汉）转换为级联选择器的 value 数组（动态接口）
       if (!locationStr) return [];
 
-      const parts = locationStr.split("/");
+      let parts = locationStr
+        .split("/")
+        .map((p) => (p ? String(p).trim() : ""))
+        .filter(Boolean);
+
+      // 仅保留前三层，避免历史数据带四级导致匹配失败
+      if (parts.length > 3) {
+        parts = parts.slice(0, 3);
+      }
+      return this.ensureLocationPath(parts, false);
+    },
+    async ensureLocationValues(values) {
+      if (!Array.isArray(values) || values.length === 0) return [];
+      let normalizedValues = values.map((v) =>
+        v === 0 ? "0" : String(v).trim()
+      );
+      // 仅保留前三层，避免历史数据带四级导致匹配失败
+      if (normalizedValues.length > 3) {
+        normalizedValues = normalizedValues.slice(0, 3);
+      }
+      return this.ensureLocationPath(normalizedValues, true);
+    },
+    async ensureLocationPath(parts, matchByValue) {
       const result = [];
       let currentOptions = this.cityOptions;
+      let parentId = "";
+      let parentOption = null;
+      const pathOptions = []; // 记录路径上的所有选项
 
-      for (const part of parts) {
-        const option = currentOptions.find((opt) => opt.label === part);
-        if (option) {
-          result.push(option.value);
-          currentOptions = option.children || [];
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+
+        if (!currentOptions || currentOptions.length === 0) {
+          currentOptions = await this.fetchAdministrativeChildren(parentId);
+          if (parentId === "") {
+            // 更新根节点
+            this.$set(this, 'cityOptions', currentOptions);
+          } else if (parentOption) {
+            // 更新父节点的 children
+            this.$set(parentOption, 'children', currentOptions);
+          }
+        }
+
+        const targetPart = String(part).trim();
+        let option = currentOptions.find(
+          (opt) =>
+            String(opt.value) === targetPart ||
+            (!matchByValue && String(opt.label).trim() === targetPart)
+        );
+
+        if (!option) {
+          // 尝试重新拉取后再匹配
+          currentOptions = await this.fetchAdministrativeChildren(parentId);
+          if (parentId === "") {
+            this.$set(this, 'cityOptions', currentOptions);
+          } else if (parentOption) {
+            this.$set(parentOption, 'children', currentOptions);
+          }
+          option = currentOptions.find(
+            (opt) =>
+              String(opt.value) === targetPart ||
+              (!matchByValue && String(opt.label).trim() === targetPart)
+          );
+        }
+
+        if (!option) break;
+
+        result.push(option.value);
+        pathOptions.push(option);
+
+        // 懒加载子级，保证后续匹配（如果不是最后一级）
+        if (i < parts.length - 1 && !option.leaf && (!option.children || option.children.length === 0)) {
+          const children = await this.fetchAdministrativeChildren(option.value);
+          // 当父节点是 level 1（i === 0）且不是"中国"时，子节点标记为叶子节点，只显示两级
+          const isLevel1NotChina = i === 0 && option.label !== '中国';
+          const processedChildren = children.map(el => {
+            delete el.children;
+            return {
+              ...el,
+              // 如果是 level 1 且不是中国，则子节点标记为叶子节点，只显示两级
+              leaf: isLevel1NotChina ? true : el.leaf,
+            };
+          });
+          this.$set(option, 'children', processedChildren);
+          currentOptions = processedChildren;
         } else {
+          currentOptions = option.children || [];
+        }
+
+        parentId = option.value;
+        parentOption = option;
+      }
+
+      // 如果根节点仅包含中国且路径未包含中国，则自动补齐
+      if (
+        this.cityOptions &&
+        this.cityOptions.length === 1 &&
+        String(this.cityOptions[0].value) === "100000" &&
+        result.length > 0 &&
+        String(result[0]) !== "100000"
+      ) {
+        result.unshift("100000");
+      }
+
+      // 确保所有数据都已更新
+      await this.$nextTick();
+
+      return result;
+    },
+    async ensureLocationDataLoadedForDisplay(locationArray) {
+      // 确保路径上的所有节点都已加载到 cityOptions 中，以便级联选择器能够正确回显
+      // 这个方法专门用于回显时确保数据已加载
+      if (!Array.isArray(locationArray) || locationArray.length === 0) {
+        return;
+      }
+
+      let currentOptions = this.cityOptions;
+      let parentOption = null;
+
+      for (let i = 0; i < locationArray.length; i++) {
+        const value = String(locationArray[i]).trim();
+
+        // 在当前选项中查找匹配的节点
+        let option = currentOptions.find(
+          (opt) => String(opt.value) === value
+        );
+
+        if (!option) {
+          // 如果找不到，说明数据可能还没加载，尝试加载父节点的子节点
+          if (parentOption) {
+            const children = await this.fetchAdministrativeChildren(parentOption.value);
+            // 当父节点是 level 1（i === 1，因为此时 parentOption 是 level 1）且不是"中国"时，子节点标记为叶子节点
+            const isLevel1NotChina = i === 1 && parentOption.label !== '中国';
+            const processedChildren = children.map(el => {
+              delete el.children;
+              return {
+                ...el,
+                leaf: isLevel1NotChina ? true : el.leaf,
+              };
+            });
+            this.$set(parentOption, 'children', processedChildren);
+            currentOptions = processedChildren;
+            option = currentOptions.find(
+              (opt) => String(opt.value) === value
+            );
+          } else if (i === 0) {
+            // 如果是第一级，重新加载根节点
+            currentOptions = await this.fetchAdministrativeChildren("");
+            this.$set(this, 'cityOptions', currentOptions);
+            option = currentOptions.find(
+              (opt) => String(opt.value) === value
+            );
+          }
+        }
+
+        if (option) {
+          // 如果不是最后一级，确保子节点已加载
+          if (i < locationArray.length - 1 && !option.leaf) {
+            if (!option.children || option.children.length === 0) {
+              const children = await this.fetchAdministrativeChildren(option.value);
+              // 当父节点是 level 1（i === 0）且不是"中国"时，子节点标记为叶子节点
+              const isLevel1NotChina = i === 0 && option.label !== '中国';
+              const processedChildren = children.map(el => {
+                delete el.children;
+                return {
+                  ...el,
+                  leaf: isLevel1NotChina ? true : el.leaf,
+                };
+              });
+              this.$set(option, 'children', processedChildren);
+            }
+            currentOptions = option.children || [];
+          }
+          parentOption = option;
+        } else {
+          // 如果找不到匹配的节点，跳出循环
           break;
         }
       }
 
-      return result;
+      // 确保响应式更新
+      await this.$nextTick();
+    },
+    async ensureLocationDataLoaded(locationArray) {
+      // 确保路径上的所有节点都已加载到 cityOptions 中，以便级联选择器能够正确回显
+      if (!Array.isArray(locationArray) || locationArray.length === 0) {
+        return;
+      }
+
+      let currentOptions = this.cityOptions;
+      let parentOption = null;
+
+      for (let i = 0; i < locationArray.length; i++) {
+        const value = String(locationArray[i]).trim();
+
+        // 在当前选项中查找匹配的节点
+        let option = currentOptions.find(
+          (opt) => String(opt.value) === value
+        );
+
+        if (!option) {
+          // 如果找不到，说明数据可能还没加载，尝试加载父节点的子节点
+          if (parentOption) {
+            const children = await this.fetchAdministrativeChildren(parentOption.value);
+            this.$set(parentOption, 'children', children);
+            currentOptions = children;
+            option = currentOptions.find(
+              (opt) => String(opt.value) === value
+            );
+          }
+        }
+
+        if (option) {
+          // 如果不是最后一级，确保子节点已加载
+          if (i < locationArray.length - 1 && !option.leaf) {
+            if (!option.children || option.children.length === 0) {
+              const children = await this.fetchAdministrativeChildren(option.value);
+              this.$set(option, 'children', children);
+            }
+            currentOptions = option.children || [];
+          }
+          parentOption = option;
+        } else {
+          // 如果找不到匹配的节点，跳出循环
+          break;
+        }
+      }
+
+      // 确保响应式更新
+      await this.$nextTick();
+    },
+    async loadAdministrativeRoot() {
+      const rootList = await this.fetchAdministrativeChildren("");
+      const chinaRoot =
+        (rootList || []).find(
+          (item) =>
+            String(item.value) === "100000" ||
+            item.adCode === "100000" ||
+            item.label?.includes("中国")
+        ) || null;
+      if (chinaRoot) {
+        // 优先显示中国，其余国家保持可选
+        const others = (rootList || []).filter(
+          (item) => String(item.value) !== String(chinaRoot.value)
+        );
+        console.log(others, "others");
+        this.cityOptions = [
+          {
+            ...chinaRoot,
+            leaf: false,
+            children: undefined,
+          },
+          ...others.map((item) => ({
+            ...item,
+            leaf: false,
+            children: undefined,
+          })),
+        ];
+      } else {
+        this.cityOptions = (rootList || []).map((item) => ({
+          ...item,
+          leaf: false,
+          children: undefined,
+        }));
+      }
+    },
+    async loadAdministrativeOptions(node, resolve) {
+      // 限制层级：只到省/直辖市 -> 市，level: 0根,1省,2市，3及以上不再加载
+      // 允许加载到 level 2（城市），阻止 level 3（区县）
+      if (node && node.level >= 3) {
+        resolve([]);
+        return;
+      }
+
+      const parentId = node && node.level > 0 ? node.value : "";
+      const children = await this.fetchAdministrativeChildren(parentId);
+      // 当 node.level === 1 且 label !== '中国' 时，只显示两级（子节点标记为叶子节点）
+      const isLevel1NotChina = node && node.level === 1 && node.label !== '中国';
+
+      const newChildren = children.map(el => {
+        // 去除el中children字段
+        delete el.children;
+        return {
+          ...el,
+          // 如果是 level 1 且不是中国，则子节点标记为叶子节点，只显示两级
+          leaf: isLevel1NotChina ? true : el.leaf,
+        }
+      });
+      if (node && node.level === 0) {
+        this.cityOptions = newChildren;
+      }
+      resolve(newChildren);
+    },
+    async fetchAdministrativeChildren(parentId = "") {
+      try {
+        const res = await competitionApi.getAdministrativeDivision(parentId);
+        const list = res?.result || res?.data || [];
+        if (!Array.isArray(list)) return [];
+        return list
+          .map((item) => this.normalizeDivisionItem(item))
+          .filter(Boolean);
+      } catch (error) {
+        console.error("获取行政区域失败:", error);
+        return [];
+      }
+    },
+    normalizeDivisionItem(item) {
+      if (!item) return null;
+      const value =
+        item.value ||
+        item.id ||
+        item.code ||
+        item.adCode ||
+        item.areaCode ||
+        item.divisionCode ||
+        item.regionCode ||
+        item.cityCode;
+      const label =
+        item.label ||
+        item.name ||
+        item.adName ||
+        item.fullName ||
+        item.fullname ||
+        item.divisionName ||
+        item.regionName ||
+        item.cityName ||
+        value;
+      const normalizedLabel = String(label).trim();
+      const normalizedValue = String(value).trim();
+      if (!value || !label) return null;
+
+      const children =
+        item.children && Array.isArray(item.children)
+          ? item.children
+            .map((child) => this.normalizeDivisionItem(child))
+            .filter(Boolean)
+          : undefined;
+
+      const level = item.level || item.levelType || "";
+      // 判断是否为城市级别（第3级）
+      const isCityLevel =
+        level === "city" ||
+        level === "CITY" ||
+        level === 2 ||
+        level === "2" ||
+        item.type === "city";
+
+      const mayHaveChildren =
+        (level === "country" ||
+          level === "province" ||
+          level === 1 ||
+          item.type === "province") &&
+        !isCityLevel; // 城市级别不包含在内
+
+      const hasChildren =
+        (children && children.length > 0) ||
+        item.hasChildren ||
+        item.isLeaf === false ||
+        item.childrenCount > 0 ||
+        mayHaveChildren;
+
+      // 四个直辖市和城市级别都不展示下一级
+      const directControlledCities = ["北京市", "天津市", "上海市", "重庆市"];
+      const isDirectControlledCity = directControlledCities.some(
+        (city) => normalizedLabel === city || normalizedLabel.includes(city)
+      );
+      const forceLeaf = isDirectControlledCity || isCityLevel;
+
+      return {
+        value: normalizedValue,
+        label: normalizedLabel,
+        children: forceLeaf ? undefined : children,
+        leaf: forceLeaf ? true : !hasChildren,
+      };
     },
     async fetchDropdownOptions() {
       try {
@@ -578,18 +967,26 @@ export default {
       this.$refs.eventForm && this.$refs.eventForm.resetFields();
       this.$emit("cancel");
     },
+    getLocationPathLabels() {
+      const cascader = this.$refs.locationCascader;
+      if (cascader && cascader.getCheckedNodes) {
+        const nodes = cascader.getCheckedNodes();
+        if (nodes && nodes.length > 0 && nodes[0].pathLabels) {
+          return nodes[0].pathLabels;
+        }
+      }
+      // fallback: 根据当前 options 计算
+      return this.getLocationLabels(this.formData.location, this.cityOptions);
+    },
     async handleConfirm() {
       this.$refs.eventForm.validate(async (valid) => {
         if (valid) {
           try {
             // 处理地点数据，转换为字符串格式（如：湖北/武汉）
             let locationStr = "";
-            if (this.formData.location && this.formData.location.length > 0) {
-              const selectedLabels = this.getLocationLabels(
-                this.formData.location,
-                this.cityOptions
-              );
-              locationStr = selectedLabels.join("/");
+            const pathLabels = this.getLocationPathLabels();
+            if (pathLabels && pathLabels.length > 0) {
+              locationStr = pathLabels.join("/");
             }
 
             // 获取比赛类型的 displayValue
@@ -604,8 +1001,8 @@ export default {
               this.formData.priority === "PRIMARY"
                 ? 1
                 : this.formData.priority === "SECONDARY"
-                ? 2
-                : 3;
+                  ? 2
+                  : 3;
 
             // 获取距离的 displayValue（如果不是 OTHER）
             const competitionDistance = this.distanceOptions.find(
@@ -655,7 +1052,7 @@ export default {
           break;
         }
       }
-
+      console.log(labels, "labels");
       return labels;
     },
   },

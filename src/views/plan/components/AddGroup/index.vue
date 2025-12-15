@@ -118,7 +118,7 @@ export default {
           }).then((res) => {
             if (res.success) {
               this.$emit("save", { ...this.form });
-              this.$message.success("新建分组成功");
+              this.$message.success("新增分组成功");
             }
           });
         }

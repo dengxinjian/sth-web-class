@@ -82,6 +82,12 @@
   width: 110px !important;
   min-width: 110px !important;
 }
+.hover-plan-detail-popover {
+  max-width: 320px !important;
+  width: 320px !important;
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+}
 .data-line-tabs {
   .el-tabs__nav-scroll {
       display: flex;

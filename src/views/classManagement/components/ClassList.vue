@@ -107,7 +107,7 @@
                     <el-button
                       type="text"
                       :disabled="!item.groupId"
-                      @click="$emit('delete-group', item.groupId)"
+                      @click="$emit('delete-group', item)"
                     >
                       删除分组
                     </el-button>
@@ -132,7 +132,6 @@
             :scroll-speed="10"
             ghost-class="is-plan-drag-ghost"
             :key="item.timespan"
-            filter=".official-class"
           >
             <ClassCard
               v-for="classItem in item.classesList"
@@ -142,7 +141,7 @@
               :group-id="item.groupId"
               @click="$emit('class-detail', classItem.id, classItem.sportType)"
               @move="$emit('move-class', classItem.id, item.groupId)"
-              @delete="$emit('delete-class', classItem.id)"
+              @delete="$emit('delete-class', classItem)"
               @copy="
                 $emit('copy-class', classItem, item.groupId, classItem.title)
               "

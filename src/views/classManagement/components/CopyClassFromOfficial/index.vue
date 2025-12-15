@@ -7,7 +7,7 @@
     class="move-group-modal"
     :close-on-click-modal="false"
   >
-    <span slot="title">添加课程</span>
+    <span slot="title">{{ activeClassType === "my" ? "复制课程" : "添加课程" }}</span>
 
     <el-form
       ref="formRef"

@@ -11,7 +11,7 @@
     >
       <div slot="title" class="dialog-header">
         <div class="header-title">
-          <div v-if="classData.classesJson?.title || classData.activityName">
+          <!-- <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input
               type="text"
@@ -26,9 +26,29 @@
               disabled
               :maxlength="50"
             />
-          </div>
+          </div> -->
+          <el-form
+            v-if="classData.classesJson?.title || classData.activityName"
+            ref="titleRef"
+            :model="form"
+            :rules="rules"
+            label-width="70px"
+          >
+            <el-form-item label="标题：" prop="title">
+              <el-input
+                type="text"
+                placeholder="标题"
+                v-model="form.title"
+                :disabled="
+                  !classData.classesJson?.title && !!classData.activityName
+                "
+                :maxlength="50"
+                style="width: 100%"
+              />
+            </el-form-item>
+          </el-form>
           <span v-else
-            >{{ getSportTypeName(classData.sportType) }}手动运动数据</span
+            >{{ getSportTypeName(classData.sportType) }}_手动录入数据</span
           >
         </div>
       </div>
@@ -59,7 +79,12 @@
                   classData.classesJson?.sportType
                 )
               }}
-              <span v-if="classData.classesJson.distanceUnit && classData.classesJson.distanceUnit !== 'km'">
+              <span
+                v-if="
+                  classData.classesJson?.distanceUnit &&
+                  classData.classesJson.distanceUnit !== 'km'
+                "
+              >
                 {{ classData.classesJson?.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -425,10 +450,16 @@
               </div>
               <div class="sync-params">
                 <span
-                  >平均速度：{{
-                    (sportDetail.avgSpeed * 3.6).toFixed(1)
+                  >平均{{ sportDetail.sportType === 1 ? "速度" : "配速" }}：{{
+                    sportDetail.avgSpeed
                   }}
-                  km/h</span
+                  {{
+                    sportDetail.sportType === 1
+                      ? "km/h"
+                      : sportDetail.sportType === 2
+                      ? "km"
+                      : "m"
+                  }}</span
                 >
                 <span>卡路里：{{ sportDetail.calories }} kcal</span>
               </div>
@@ -449,18 +480,70 @@
                   <td>单位</td>
                 </tr>
                 <tr>
+                  <td>心率</td>
+                  <td>{{ sportDetail.minHeartRate || "-" }}</td>
+                  <td>{{ sportDetail.avgHeartRate || "-" }}</td>
+                  <td>{{ sportDetail.maxHeartRate || "-" }}</td>
+                  <td>bpm</td>
+                </tr>
+                <tr v-if="sportDetail.sportType === 1">
                   <td>功率</td>
-                  <td>{{ sportDetail.minPower }}</td>
-                  <td>{{ sportDetail.avgPower }}</td>
-                  <td>{{ sportDetail.maxPower }}</td>
+                  <td>{{ sportDetail.minPower || "-" }}</td>
+                  <td>{{ sportDetail.avgPower || "-" }}</td>
+                  <td>{{ sportDetail.maxPower || "-" }}</td>
                   <td>w</td>
                 </tr>
+                <tr v-if="sportDetail.sportType !== 4">
+                  <td>{{ sportDetail.sportType === 1 ? "速度" : "配速" }}</td>
+                  <td>{{ sportDetail.minSpeed || "-" }}</td>
+                  <td>{{ sportDetail.avgSpeed || "-" }}</td>
+                  <td>{{ sportDetail.maxSpeed || "-" }}</td>
+                  <td>
+                    {{
+                      sportDetail.sportType === 1
+                        ? "km/h"
+                        : sportDetail.sportType === 2
+                        ? "km"
+                        : "m"
+                    }}
+                  </td>
+                </tr>
+                <tr v-if="sportDetail.sportType !== 4">
+                  <td>
+                    {{
+                      sportDetail.sportType === 1
+                        ? "踏频"
+                        : sportDetail.sportType === 2
+                        ? "步频"
+                        : "划频"
+                    }}
+                  </td>
+                  <td>{{ sportDetail.minCadence || "-" }}</td>
+                  <td>{{ sportDetail.avgCadence || "-" }}</td>
+                  <td>{{ sportDetail.maxCadence || "-" }}</td>
+                  <td>
+                    {{
+                      sportDetail.sportType === 1
+                        ? "rpm"
+                        : sportDetail.sportType === 2
+                        ? "spm"
+                        : "min"
+                    }}
+                  </td>
+                </tr>
+                <tr v-if="sportDetail.sportType === 2">
+                  <td>步幅</td>
+                  <td>{{ sportDetail.minStrideLength || "-" }}</td>
+                  <td>{{ sportDetail.avgStrideLength || "-" }}</td>
+                  <td>{{ sportDetail.maxStrideLength || "-" }}</td>
+                  <td>m</td>
+                </tr>
                 <tr>
-                  <td>心率</td>
-                  <td>{{ sportDetail.minHeartRate }}</td>
-                  <td>{{ sportDetail.avgHeartRate }}</td>
-                  <td>{{ sportDetail.maxHeartRate }}</td>
-                  <td>bpm</td>
+                  <td>温度</td>
+                  <td>{{ sportDetail.minTemperature || "-" }}</td>
+                  <td>{{ sportDetail.avgTemperature || "-" }}</td>
+                  <td>{{ sportDetail.maxTemperature || "-" }}</td>
+                  <td>-</td>
                 </tr>
               </table>
             </div>
@@ -537,7 +620,7 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="deleteClass(classData.id)" v-if="!isActivity"
+        <el-button @click="deleteClass(classData)" v-if="!isActivity"
           >删除</el-button
         >
         <el-button @click="handleClose">取消</el-button>
@@ -634,6 +717,18 @@ export default {
       showClassDetailModal: false,
       type: "edit",
       sportDetail: {},
+      form: {
+        title: "",
+      },
+      rules: {
+        title: [
+          {
+            required: true,
+            message: "请输入标题",
+            trigger: ["change", "blur"],
+          },
+        ],
+      },
     };
   },
   computed: {
@@ -685,11 +780,17 @@ export default {
             calories: 0,
             distanceUnit: "km",
           };
+          this.form.title = "";
         });
       } else {
         if (this.isActivity) {
           this.classData = this.classItem;
           console.log(this.classData, "classData");
+          // 同步标题到 form
+          this.form.title =
+            this.classData.classesJson?.title ||
+            this.classData.activityName ||
+            "";
           if (this.classData.activityId) {
             this.getSportDetail();
           } else {
@@ -813,6 +914,8 @@ export default {
             ...res.result,
             classesJson: classData,
           };
+          // 同步标题到 form
+          this.form.title = this.classData.classesJson?.title || "";
           this.actualData = {
             duration: this.classData.duration || "00:00:00",
             activityDuration: "00:00:00",
@@ -820,7 +923,8 @@ export default {
             sthValue: this.classData.sthValue || 0,
             calories: this.classData.calories || 0,
             distanceUnit:
-              this.classData.classesJson.distanceUnit && this.classData.classesJson.distanceUnit !== 'km'
+              this.classData.classesJson?.distanceUnit &&
+              this.classData.classesJson.distanceUnit !== "km"
                 ? "m"
                 : "km",
           };
@@ -833,13 +937,20 @@ export default {
     isTrainingAdvice(sportType) {
       return ["REMARK", "OTHER", "REST"].includes(sportType);
     },
-    deleteClass(id) {
-      this.$confirm("确认删除该课表？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
-        const res = await scheduleApi.deleteSchedule(id);
+    deleteClass(classData) {
+      this.$confirm(
+        `确认删除课表【${classData?.classesJson?.title}】？`,
+        "提示",
+        {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).then(async () => {
+        const res = await scheduleApi.deleteSchedule({
+          id: classData?.id,
+          triUserId: this.triUserId,
+        });
         if (res.success) {
           this.$message.success("删除成功");
           this.handleClose();
@@ -859,11 +970,161 @@ export default {
 
       return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
     },
+    // 将速度按运动类型格式化显示
+    formatSpeedBySport(sportType, min, avg, max) {
+      const toPace = (secondsPerUnit, unitLabel) => {
+        if (!secondsPerUnit || secondsPerUnit <= 0) return "-";
+        const minutes = Math.floor(secondsPerUnit / 60);
+        const seconds = Math.round(secondsPerUnit % 60);
+        return `${minutes}:${String(seconds).padStart(2, "0")}`;
+      };
+
+      const toKmPerHour = (val) => {
+        if (val === undefined || val === null) return "-";
+        return `${(val * 3.6).toFixed(1)}`;
+      };
+
+      const convertValue = (val) => {
+        const isSwim = sportType === "SWIM" || sportType === 3;
+        const isRun = sportType === "RUN" || sportType === 2;
+        const isCycle = sportType === "CYCLE" || sportType === 1;
+        console.log(val, "val");
+
+        if (!val || val === undefined || val === null || Number.isNaN(val)) {
+          return "-";
+        }
+        // val 预期为 m/s
+        if (isSwim) {
+          const secPer100m = 100 / val;
+          return toPace(secPer100m);
+        }
+        if (isRun) {
+          const secPerKm = 1000 / val;
+          return toPace(secPerKm);
+        }
+        if (isCycle) {
+          return toKmPerHour(val);
+        }
+        // 其他默认 km/h
+        return toKmPerHour(val);
+      };
+
+      return {
+        minSpeed: convertValue(min),
+        avgSpeed: convertValue(avg),
+        maxSpeed: convertValue(max),
+      };
+    },
+    // 将步频按运动类型格式化显示
+    formatCadenceBySport(sportType, min, avg, max) {
+      const formatVal = (val) =>
+        val === undefined || val === null || Number.isNaN(val)
+          ? "-"
+          : `${val} `;
+      return {
+        minCadence: formatVal(min),
+        avgCadence: formatVal(avg),
+        maxCadence: formatVal(max),
+      };
+    },
+    // 步幅格式化（单位米）
+    formatStride(min, avg, max) {
+      const formatVal = (val) =>
+        val === undefined || val === null || Number.isNaN(val)
+          ? "-"
+          : `${Number(val)} `;
+      return {
+        minStrideLength: formatVal(min),
+        avgStrideLength: formatVal(avg),
+        maxStrideLength: formatVal(max),
+      };
+    },
+    formatOutlineData(result = {}) {
+      const {
+        sportType = this.data.sportType,
+        duration = 0,
+        netDuration = 0,
+        distance = 0,
+        minSpeed,
+        avgSpeed,
+        maxSpeed,
+        calories = 0,
+        sthValue = 0,
+        totalAscent,
+        totalDescent,
+        minCadence,
+        avgCadence,
+        maxCadence,
+        minStrideLength,
+        avgStrideLength,
+        maxStrideLength,
+        minTemperature,
+        avgTemperature,
+        maxTemperature,
+        deviceType,
+        productName = "",
+        np,
+        if: intensityFactor,
+      } = result;
+      const formattedSpeeds = this.formatSpeedBySport(
+        sportType,
+        minSpeed,
+        avgSpeed,
+        maxSpeed
+      );
+      const formattedCadence = this.formatCadenceBySport(
+        sportType,
+        minCadence,
+        avgCadence,
+        maxCadence
+      );
+      const formattedStride =
+        sportType === 2
+          ? this.formatStride(minStrideLength, avgStrideLength, maxStrideLength)
+          : {
+              minStrideLength: "-",
+              avgStrideLength: "-",
+              maxStrideLength: "-",
+            };
+
+      const deviceTypeFormat = [
+        { en: "COROS", cn: "高驰" },
+        { en: "GARMIN", cn: "佳明中国" },
+        { en: "GARMIN", cn: "佳明国际" },
+        { en: "HUAMI", cn: "华米" },
+      ];
+      const deviceName =
+        deviceType && deviceTypeFormat[deviceType - 1]
+          ? deviceTypeFormat[deviceType - 1].en
+          : "";
+
+      return {
+        ...result,
+        sportType,
+        minSpeed: formattedSpeeds.minSpeed,
+        avgSpeed: formattedSpeeds.avgSpeed,
+        maxSpeed: formattedSpeeds.maxSpeed,
+        minCadence: formattedCadence.minCadence,
+        avgCadence: formattedCadence.avgCadence,
+        maxCadence: formattedCadence.maxCadence,
+        minStrideLength: formattedStride.minStrideLength,
+        avgStrideLength: formattedStride.avgStrideLength,
+        maxStrideLength: formattedStride.maxStrideLength,
+        minTemperature: minTemperature || "-",
+        avgTemperature: avgTemperature || "-",
+        maxTemperature: maxTemperature || "-",
+        totalAscent: totalAscent || "-",
+        totalDescent: totalDescent || "-",
+        np: np || "-",
+        if: intensityFactor || "-",
+        productName: `${deviceName || ""} ${productName || ""}`.trim(),
+      };
+    },
     // 查询运动详情
     getSportDetail() {
       scheduleApi.getActivityDetail(this.classData.activityId).then((res) => {
         if (res.success) {
-          this.sportDetail = res.result;
+          this.sportDetail = this.formatOutlineData(res.result);
           const actualData = {
             duration: this.translateSecondsToFormat(this.sportDetail.duration),
             activityDuration: this.translateSecondsToFormat(
@@ -1145,8 +1406,22 @@ export default {
         }
       });
     },
-    handleSave(flag) {
+    async handleSave(flag) {
       console.log(this.classData, "classData");
+      // 如果有标题表单且可编辑（有 classesJson.title），先验证并同步标题
+      if (this.$refs.titleRef && this.classData.classesJson?.title) {
+        try {
+          await this.$refs.titleRef.validate();
+          // 同步 form.title 到 classData.classesJson.title
+          if (!this.classData.classesJson) {
+            this.$set(this.classData, "classesJson", {});
+          }
+          this.$set(this.classData.classesJson, "title", this.form.title);
+        } catch (error) {
+          // 验证失败，不继续保存
+          return;
+        }
+      }
       // if (!this.isActivity || !this.classData.activityId) {
       //   this.saveClassSchedule(flag);
       // } else {
@@ -1224,13 +1499,13 @@ export default {
       if (
         distanceUnit === "m" &&
         result !== "--" &&
-        this.classData.classesJson.sportType !== "SWIM"
+        this.classData.classesJson?.sportType !== "SWIM"
       ) {
         result = result * 1000;
       } else if (
         distanceUnit === "km" &&
         result !== "--" &&
-        this.classData.classesJson.sportType === "SWIM"
+        this.classData.classesJson?.sportType === "SWIM"
       ) {
         result = result / 1000;
       }
@@ -1259,6 +1534,12 @@ export default {
       > span {
         flex: 1;
         white-space: nowrap;
+      }
+    }
+    ::v-deep .el-form-item {
+      margin-left: 0;
+      .el-form-item__content {
+        margin-left: 0 !important;
       }
     }
   }

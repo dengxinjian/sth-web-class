@@ -41,6 +41,9 @@
               >
                 解除匹配
               </el-button>
+              <el-button type="text" icon="el-icon-crop" @click="handleCopy">
+                复制
+              </el-button>
 
               <el-button type="text" icon="el-icon-edit" @click="$emit('edit', activity)">
                 编辑
@@ -212,13 +215,21 @@
           解除匹配
         </div>
         <div
+          v-if="activity.classesJson"
+          class="context-menu-item"
+          @click="handleCopy"
+        >
+          <i class="el-icon-crop"></i>
+          复制
+        </div>
+        <div
           class="context-menu-item"
           @click="
             $emit('edit', activity);
             hideContextMenu();
           "
         >
-          <i class="el-icon-edit"></i>
+        <i class="el-icon-edit"></i>
           编辑
         </div>
         <div
@@ -407,6 +418,11 @@ export default {
       this.hideContextMenu();
       this.$emit("delete", this.activity);
     },
+    handleCopy() {
+      this.hideContextMenu();
+      console.log("handleCopy-activity-1", this.activity);
+      this.$emit("copy", this.activity);
+    },
   },
 };
 </script>
@@ -510,7 +526,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;

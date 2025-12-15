@@ -37,7 +37,7 @@
       <div class="planned-schedule-header-title-right">
         <!-- 总运动时长距离sth总值 -->
         <div class="planned-schedule-header-title-right-total">
-          <span class="label">总运动时长:</span>
+          <span class="label">预估运动时长:</span>
           <span class="value">{{
             secondsToHHMMSS(getTotalDuration()) === "00:00:00"
               ? "--:--:--"
@@ -45,11 +45,11 @@
           }}</span>
         </div>
         <div class="planned-schedule-header-title-right-total">
-          <span class="label">总运动距离:</span>
+          <span class="label">预估运动距离:</span>
           <span class="value">{{ getTotalDistance() || "--" }}km</span>
         </div>
         <div class="planned-schedule-header-title-right-total">
-          <span class="label">总STH:</span>
+          <span class="label">预估STH:</span>
           <span class="value">{{ getTotalSth() > 100000 ? (getTotalSth() / 10000).toFixed(2) + "万" : getTotalSth() || "--" }}</span>
         </div>
       </div>

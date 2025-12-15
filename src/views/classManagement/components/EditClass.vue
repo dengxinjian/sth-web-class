@@ -9,12 +9,17 @@
       custom-class="edit-class-dialog"
       top="5vh"
     >
-      <div slot="title" class="dialog-header">
+      <!-- <div slot="title" class="dialog-header">
         <div class="header-title">
           <span>标题：</span>
           <el-input type="text" v-model="classTitle" :maxlength="50" />
         </div>
-      </div>
+      </div> -->
+      <el-form ref="titleRef" :model="form" :rules="rules" label-width="70px">
+        <el-form-item label="标题：" prop="classTitle">
+          <el-input type="text" placeholder="标题" v-model="form.classTitle" />
+        </el-form-item>
+      </el-form>
 
       <div class="class-detail-content" v-if="classData.classesJson">
         <!-- 顶部关键指标 -->
@@ -39,7 +44,12 @@
                   classData.sportType
                 )
               }}
-               <span v-if="classData.classesJson.distanceUnit && classData.classesJson.distanceUnit !== 'km'">
+              <span
+                v-if="
+                  classData.classesJson.distanceUnit &&
+                  classData.classesJson.distanceUnit !== 'km'
+                "
+              >
                 {{ classData.classesJson.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -135,7 +145,8 @@
                   </td>
                   <td>
                     {{
-                      classData.classesJson.distanceUnit && classData.classesJson.distanceUnit !== 'km'
+                      classData.classesJson.distanceUnit &&
+                      classData.classesJson.distanceUnit !== "km"
                         ? classData.classesJson.distanceUnit
                         : "km"
                     }}
@@ -240,7 +251,10 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click="deleteClass(classData.id)">删除</el-button>
         <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleEditSave(false)"
+        <el-button
+          type="primary"
+          @click="handleEditSave(false)"
+          style="background-color: #f5a623; border-color: #f5a623"
           >保存</el-button
         >
         <el-button type="danger" @click="handleEditSave(true)"
@@ -307,22 +321,19 @@ export default {
       },
       showAddClassModal: false,
       type: "edit",
+      form: {
+        classTitle: this.classData?.classesJson?.title || "",
+      },
+      rules: {
+        classTitle: [
+          {
+            required: true,
+            message: "请输入标题",
+            trigger: ["change", "blur"],
+          },
+        ],
+      },
     };
-  },
-  computed: {
-    classTitle: {
-      get() {
-        return (
-          (this.classData.classesJson && this.classData.classesJson.title) || ""
-        );
-      },
-      set(value) {
-        if (!this.classData.classesJson) {
-          this.$set(this.classData, "classesJson", {});
-        }
-        this.$set(this.classData.classesJson, "title", value);
-      },
-    },
   },
   watch: {
     visible(val) {
@@ -342,6 +353,7 @@ export default {
             sth: "",
             calories: "",
           };
+          this.form.classTitle = "";
         });
       } else {
         // this.getClassInfo(this.classItem.id);
@@ -353,6 +365,8 @@ export default {
           classData.classesJson = {};
         }
         this.classData = classData;
+        // 同步标题到 form
+        this.form.classTitle = classData.classesJson?.title || "";
       }
     },
   },
@@ -397,7 +411,15 @@ export default {
       this.showAddClassModal = false;
       this.$emit("close");
     },
-    handleEditSave(flag) {
+    async handleEditSave(flag) {
+      // await this.$refs.titleRef.validate();
+      // 获取 titleRef 的验证结果
+      await this.$refs.titleRef.validate();
+      // 同步 form.classTitle 到 classData.classesJson.title
+      if (!this.classData.classesJson) {
+        this.$set(this.classData, "classesJson", {});
+      }
+      this.$set(this.classData.classesJson, "title", this.form.classTitle);
       const data = JSON.parse(JSON.stringify(this.classData));
       data.classesJson = JSON.stringify(data.classesJson);
       this.$emit("save", data, flag);

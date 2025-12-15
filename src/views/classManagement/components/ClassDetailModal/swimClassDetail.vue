@@ -8,12 +8,12 @@
     :close-on-click-modal="false"
   >
     <span slot="title"
-      >{{ scheduleType === "add" ? "新建" : "编辑" }}游泳课表</span
+      >{{ scheduleType === "add" ? "新增" : "编辑" }}游泳课表</span
     >
 
     <div class="form-section">
-      <el-form :model="form" label-width="60px">
-        <el-form-item label="标题：">
+      <el-form ref="titleRef" :model="form" :rules="rules" label-width="70px">
+        <el-form-item label="标题：" prop="title">
           <el-input
             v-model="form.title"
             placeholder="标题"
@@ -97,7 +97,7 @@
             />
           </div>
         </div>
-        <el-form-item label="标签：">
+        <el-form-item label="标签" class="label-top">
           <el-select
             v-model="form.tags"
             placeholder="选择或输入标签内容"
@@ -178,6 +178,9 @@ export default {
         },
         this.data || {}
       ),
+      rules: {
+        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+      },
     };
   },
   computed: {
@@ -308,7 +311,7 @@ export default {
     },
     // 删除课程
     submitDeleteClass() {
-      this.$confirm("确认删除该课表？", "提示", {
+      this.$confirm(`确认删除课表【${this.form.title}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
@@ -333,7 +336,8 @@ export default {
     onCancel() {
       this.$emit("cancel");
     },
-    onSave(closeAfter) {
+    async onSave(closeAfter) {
+      await this.$refs.titleRef.validate();
       const payload = { ...this.form };
       if (this.form.id) {
         this.submitUpdateClass(closeAfter);
@@ -458,5 +462,15 @@ export default {
 .dialog-footer .el-button--danger {
   background: #d83b36;
   border-color: #d83b36;
+}
+.label-top ::v-deep(.el-form-item__label) {
+  display: block;
+  float: none;
+  text-align: left;
+  padding: 0 0 8px 0;
+  line-height: 1.5;
+}
+.label-top ::v-deep(.el-form-item__content) {
+  margin-left: 0 !important;
 }
 </style>

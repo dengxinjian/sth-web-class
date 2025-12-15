@@ -9,14 +9,19 @@
     custom-class="class-dialog"
   >
     <span slot="title"
-      >{{ scheduleType === "add" ? "新建" : "编辑" }}骑行课表
+      >{{ scheduleType === "add" ? "新增" : "编辑" }}骑行课表
     </span>
     <div class="basic-info">
       <div class="basic-info-item">
-        <div class="basic-info-title">
+        <!-- <div class="basic-info-title">
           <span>标题：</span>
           <el-input type="text" v-model="classInfo.title" />
-        </div>
+        </div> -->
+        <el-form ref="titleRef" :rules="rules" :model="classInfo" label-width="70px">
+          <el-form-item label="标题：" prop="title">
+            <el-input type="text" placeholder="标题" v-model="classInfo.title" />
+          </el-form-item>
+        </el-form>
         <div class="basic-info-total">
           <span>
             <img src="~@/assets/addClass/icon-bike.png" width="30" alt="" />
@@ -785,6 +790,9 @@ export default {
         targetSeconds: 20 * 60, // 计算出来的秒数
       },
       athleticThreshold: {},
+      rules: {
+        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+      },
     };
   },
   computed: {
@@ -1019,7 +1027,8 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.$nextTick(async () => {
-            await this.getAthleticThreshold();
+            this.classesDate = res.result.classesDate;
+            await this.getAthleticThreshold(res.result.classesDate);
             this.classInfo = JSON.parse(res.result.classesJson);
             this.timeline = JSON.parse(res.result.classesJson).timeline;
             this.classInfo.id = res.result.id;
@@ -1039,7 +1048,7 @@ export default {
           classesTitle: this.classInfo.title,
           classesGroupId: this.classInfo.groupId,
           labels: this.classInfo.tags,
-          classesDate: this.classesDate + " 00:00:00",
+          classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
           sportType: "CYCLE",
           classesJson: JSON.stringify({
             ...this.classInfo,
@@ -1071,7 +1080,7 @@ export default {
               classesTitle: this.classInfo.title,
               classesGroupId: this.classInfo.groupId,
               labels: this.classInfo.tags,
-              classesDate: this.classesDate + " 00:00:00",
+              classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
               sportType: "CYCLE",
               classesJson: JSON.stringify({
                 ...this.classInfo,
@@ -1125,6 +1134,7 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
+        classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
@@ -1138,7 +1148,9 @@ export default {
     onCancel() {
       this.$emit("cancel");
     },
-    onSave(closeAfter) {
+    async onSave(closeAfter) {
+      // 获取 titleRef 的验证结果
+      await this.$refs.titleRef.validate();
       const validation = checkFormBike(this.classInfo);
       if (!validation.isValid) {
         this.$message.error(validation.message);

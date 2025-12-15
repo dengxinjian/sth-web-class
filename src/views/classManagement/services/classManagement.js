@@ -94,9 +94,16 @@ export const scheduleApi = {
   },
 
   // 删除课表
-  deleteSchedule(id) {
-    return submitData({
-      url: `/api/classSchedule/deleteClassSchedule?id=${id}`,
+  deleteSchedule(params) {
+    // return submitData({
+    //   url: `/api/classSchedule/deleteClassSchedule?id=${id}`,
+    // });
+    return request({
+      url: `/api/classSchedule/deleteClassSchedule?id=${params.id}`,
+      method: "post",
+      headers: {
+        requestUserInfoId: params.triUserId,
+      },
     });
   },
 
@@ -242,6 +249,13 @@ export const competitionApi = {
   getDropdownOptions() {
     return getData({
       url: "/api/competition/dropdown-options",
+    });
+  },
+  // 行政区域
+  getAdministrativeDivision(parentId = "") {
+    return getData({
+      url: "/resource/administrative-division",
+      parentId,
     });
   },
   // 426bc17606074ed298580208f3ece3b1

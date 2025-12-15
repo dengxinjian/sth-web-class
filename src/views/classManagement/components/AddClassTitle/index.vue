@@ -7,7 +7,7 @@
     class="add-class-title-modal"
     :close-on-click-modal="false"
   >
-    <span slot="title">新建课程</span>
+    <span slot="title">新增课程</span>
 
     <el-form
       ref="formRef"

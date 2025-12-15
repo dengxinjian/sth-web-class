@@ -68,7 +68,7 @@
                 <el-button
                   type="text"
                   icon="el-icon-delete"
-                  @click.stop="$emit('delete', classItem.id)"
+                  @click.stop="$emit('delete', classItem)"
                 >
                   删除
                 </el-button>
@@ -406,7 +406,7 @@ export default {
     },
     handleDelete() {
       this.hideContextMenu();
-      this.$emit("delete", this.classItem.id);
+      this.$emit("delete", this.classItem);
     },
     handleCopy() {
       this.hideContextMenu();

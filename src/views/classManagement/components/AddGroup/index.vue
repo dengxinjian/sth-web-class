@@ -7,7 +7,7 @@
     class="add-group-modal"
      :close-on-click-modal="false"
   >
-    <span slot="title">{{ form.id ? '编辑分组' : '新建分组' }}</span>
+    <span slot="title">{{ form.id ? '编辑分组' : '新增分组' }}</span>
 
     <el-form
       ref="formRef"
@@ -109,7 +109,7 @@ export default {
           }).then(res => {
             if (res.success) {
               this.$emit('save', { ...this.form })
-              this.$message.success('新建分组成功')
+              this.$message.success('新增分组成功')
             }
           })
         }

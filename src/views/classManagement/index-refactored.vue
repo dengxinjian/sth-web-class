@@ -203,12 +203,7 @@
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
       @save="handleSaveClassDetail"
-      @cancel="
-        scheduleType = 'add';
-        showClassDetailModal = false;
-        classDetailData = {};
-        getScheduleData();
-      "
+      @cancel="handleResetClassDetail"
     />
 
     <CopyClassFromOfficial
@@ -333,6 +328,7 @@ import {
   isSportTypeMatch,
   generateSortData,
   getCompletionStatus,
+  getSportTypeName,
 } from "./utils/helpers";
 import { getLunarDate, secondsToHHMMSS } from "@/utils/index";
 import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
@@ -482,8 +478,8 @@ export default {
       this.getScheduleData();
       this.getAthleticThreshold(this.selectedAthletic);
       this.getAuthorizedDeviceList();
-      this.getClassList();
     }
+    this.getClassList();
     console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
     if (this.$store.state.fromPath === "/plan/add") {
       this.isPlan = true;
@@ -494,13 +490,27 @@ export default {
       console.log("handleChoosePlan");
       this.isPlan = isPlan;
     },
+    handleResetClassDetail() {
+      this.scheduleType = "add";
+      this.showClassDetailModal = false;
+      // 等待弹窗完全关闭后再重置数据，确保子组件能正确响应
+      this.$nextTick(() => {
+        // 彻底清空对象的所有属性
+        const keys = Object.keys(this.classDetailData);
+        keys.forEach((key) => {
+          this.$delete(this.classDetailData, key);
+        });
+        // 确保设置为全新的空对象
+        this.$set(this, "classDetailData", {});
+        this.getScheduleData();
+      });
+    },
     handleSaveClassDetail(data) {
-      console.log(data, "data", this.scheduleType);
       if (!data.classesTitle || data.classesTitle === "") {
         this.$message.error("课表标题不能为空");
         return;
       }
-      if (this.scheduleType === "add") {
+      if (this.scheduleType === "add" && !data.id) {
         scheduleApi
           .createSchedule({
             classesTitle: data.classesTitle,
@@ -512,6 +522,7 @@ export default {
             triUserId: this.selectedAthletic,
           })
           .then((res) => {
+            console.log("******创建课表", res);
             if (res.success) {
               this.classDetailData = res.result;
               this.scheduleType = "edit";
@@ -527,7 +538,7 @@ export default {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
       this.handlePasteClass(classesDate, classItem);
-      this.handleDeleteClassSchedule(classItem.id, true);
+      this.handleDeleteClassSchedule(classItem, true);
     },
     /**
      * 粘贴赛事
@@ -619,6 +630,11 @@ export default {
       this.isEditMode = false;
     },
     handleInputActivity(date) {
+      if (!this.selectedAthletic) {
+        return this.$message.error(
+          "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
+        );
+      }
       console.log(date, "date");
       this.inputActivityDate = date;
       this.showInputActivity = true;
@@ -687,6 +703,11 @@ export default {
       this.showAddEvent = false;
     },
     handleAddSchedule(date) {
+      if (!this.selectedAthletic) {
+        return this.$message.error(
+          "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
+        );
+      }
       this.classModalDataType = "addSchedule";
       this.addScheduleDate = date;
       this.showSportTypeModal = true;
@@ -713,12 +734,14 @@ export default {
           newData.classesJson
         ).updateClassInfoCalculatedValues();
       }
+      console.log(newData, "newData");
       // 计算时间距离STH
       if (["RUN", "CYCLE"].includes(newData.sportType)) {
         const res = await scheduleApi.calculateTimeDistanceSth({
           ...newData,
           classesJson: JSON.stringify(newData.classesJson),
           triUserId: this.selectedAthletic,
+          classesDate: date + " 00:00:00",
         });
 
         if (newData.sportType === "RUN") {
@@ -879,6 +902,7 @@ export default {
           ? classApi.getOfficialClasses
           : classApi.getClassesByUserId;
 
+      console.log(apiMethod, "this.classSearchInput");
       const res = await apiMethod(this.classSearchInput);
       if (res.success) {
         this.classList = res.result.map((item) => ({
@@ -1107,10 +1131,10 @@ export default {
       }
       console.log(device, "device");
 
-      if (device.syncStatus === 1) {
-        this.$message.info("该设备已同步成功");
-        return;
-      }
+      // if (device.syncStatus === 1) {
+      //   this.$message.info("该设备已同步成功");
+      //   return;
+      // }
 
       this.$confirm("确定同步课表至设备吗？", "提示", {
         confirmButtonText: "确定",
@@ -1122,10 +1146,12 @@ export default {
           deviceType: device.deviceType,
         });
         if (res.success) {
-          this.$message.success(res.result);
+          // this.$message.success(res.result);
+          this.$message.success("同步成功");
           this.getScheduleData();
         } else {
-          this.$message.error(res.message);
+          // this.$message.error(res.message);
+          this.$message.error("同步失败");
         }
       });
     },
@@ -1176,6 +1202,7 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
+      // if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可给团队人员添加课程，请加入团队后操作！");
       this.classModalDataType = "add";
       this.isClass = true;
       this.addGroupId = groupId;
@@ -1204,14 +1231,14 @@ export default {
     /**
      * 删除分组
      */
-    handleDeleteGroup(groupId) {
-      this.$confirm("确认删除该分组？", "提示", {
+    handleDeleteGroup(item) {
+      this.$confirm(`确认删除分组【${item.groupName}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       }).then(() => {
         // 调用删除分组API
-        groupApi.deleteGroup(groupId).then((res) => {
+        groupApi.deleteGroup(item.groupId).then((res) => {
           if (res.success) {
             this.$message.success("删除成功");
             this.getClassList();
@@ -1242,13 +1269,13 @@ export default {
     /**
      * 删除课程
      */
-    async handleDeleteClass(classId) {
-      this.$confirm("确认删除该课程？", "提示", {
+    async handleDeleteClass(classItem) {
+      this.$confirm(`确认删除课程【${classItem?.classesTitle}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await classApi.deleteClass(classId);
+        const res = await classApi.deleteClass(classItem?.id);
         if (res.success) {
           this.$message.success("删除成功");
           this.getClassList();
@@ -1311,22 +1338,31 @@ export default {
     /**
      * 删除课表
      */
-    async handleDeleteClassSchedule(classId, isCut = false) {
-      console.log(classId, "classId");
+    async handleDeleteClassSchedule(classItem, isCut = false) {
       if (!isCut) {
-        this.$confirm("确认删除该课表？", "提示", {
-          confirmButtonText: "删除",
-          cancelButtonText: "取消",
-          type: "warning",
-        }).then(async () => {
-          const res = await scheduleApi.deleteSchedule(classId);
+        this.$confirm(
+          `确认删除课表【${classItem?.classesJson?.title}】？`,
+          "提示",
+          {
+            confirmButtonText: "删除",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+        ).then(async () => {
+          const res = await scheduleApi.deleteSchedule({
+            id: classItem?.id,
+            triUserId: this.selectedAthletic,
+          });
           if (res.success) {
             this.$message.success("删除成功");
             this.getScheduleData();
           }
         });
       } else {
-        const res = await scheduleApi.deleteSchedule(classId);
+        const res = await scheduleApi.deleteSchedule({
+          id: classItem?.id,
+          triUserId: this.selectedAthletic,
+        });
       }
     },
 
@@ -1375,15 +1411,25 @@ export default {
       });
     },
 
+    getSportTypeName(sportType) {
+      return getSportTypeName(sportType);
+    },
+
     /**
      * 删除运动
      */
     handleDeleteActivity(activity) {
-      this.$confirm("确认删除该运动？", "提示", {
-        confirmButtonText: "删除",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
+      this.$confirm(
+        `确认删除运动【${this.getSportTypeName(
+          activity.sportType
+        )}_手动录入】？`,
+        "提示",
+        {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      ).then(async () => {
         const type = activity.activityId ? 1 : 2;
         const activityId = activity.activityId
           ? activity.activityId
@@ -1434,6 +1480,11 @@ export default {
      * 课程拖拽到日历
      */
     handleClassDragToSchedule(e) {
+      if (!this.selectedAthletic) {
+        return this.$message.error(
+          "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
+        );
+      }
       const classItem = this.findClassById(e.item.dataset.id);
       const params = {
         classesId: classItem.id,
@@ -1458,9 +1509,36 @@ export default {
 
       let newClassSchedule = {};
       const sortVoList = [];
+
+      // 课程模板拖拽的单独处理
       if (e.item.dataset.type === "classTemplate") {
         this.handleClassDragToSchedule(e);
         return;
+      }
+
+      // 计算在“仅课程卡片”中的实际索引，忽略健康数据、赛事、运动记录等非课程元素
+      let targetClassIndex = 0;
+      const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
+      const currentWeekData = [];
+      let topIndex = 0;
+      this.currentWeek.forEach((item) => {
+        if (item.commonDate.includes(e.to.dataset.date)) {
+          currentWeekData.push(...item.healthInfos);
+          currentWeekData.push(...item.competitionList);
+          topIndex = item.healthInfos.length + item.competitionList.length;
+          currentWeekData.push(...item.classSchedule);
+          currentWeekData.push(...item.activityList);
+        }
+      });
+
+      if (topIndex === 0) {
+        targetClassIndex = newIndex;
+      } else {
+        if (newIndex > topIndex) {
+          targetClassIndex = newIndex - topIndex;
+        } else {
+          targetClassIndex = 0;
+        }
       }
 
       // 移除拖拽产生的DOM元素，避免显示重复的课表
@@ -1485,9 +1563,11 @@ export default {
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(date)) {
           currentData = JSON.parse(JSON.stringify(item.classSchedule));
-          currentData.splice(e.newIndex, 0, newClassSchedule);
+          // 使用只包含课程的索引插入，避免健康数据和赛事影响排序
+          currentData.splice(targetClassIndex, 0, newClassSchedule);
         }
       });
+      console.log(currentData, "currentData");
 
       // 生成排序数据
       currentData.forEach((item, index) => {
@@ -1804,8 +1884,13 @@ export default {
       };
 
       if (this.classModalDataType === "addSchedule") {
-        this.showClassDetailModal = true;
+        // 新增模式，确保数据为空
+        this.scheduleType = "add";
+        this.classDetailData = {};
         this.classSportType = Map[item.key];
+        this.$nextTick(() => {
+          this.showClassDetailModal = true;
+        });
         console.log(this.addScheduleDate, "this.addScheduleDate");
         return;
       }

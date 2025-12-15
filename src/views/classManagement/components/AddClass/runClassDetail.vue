@@ -9,11 +9,11 @@
     custom-class="class-dialog"
   >
     <span slot="title">{{
-      type === "add" ? "新建跑步课程" : "编辑跑步课程"
+      type === "add" ? "新增跑步课程" : "编辑跑步课程"
     }}</span>
     <div class="basic-info">
       <div class="basic-info-item">
-        <div class="basic-info-title">
+        <!-- <div class="basic-info-title">
           <span>标题：</span>
           <el-input
             type="text"
@@ -21,7 +21,12 @@
             :maxlength="50"
             :disabled="originalType === 'official'"
           />
-        </div>
+        </div> -->
+        <el-form ref="titleRef" :rules="rules" :model="classInfo" label-width="70px">
+          <el-form-item label="标题：" prop="title">
+            <el-input type="text" placeholder="标题" v-model="classInfo.title" :disabled="originalType === 'official'" :maxlength="50" />
+          </el-form-item>
+        </el-form>
         <div class="basic-info-total">
           <span>
             <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
@@ -751,6 +756,9 @@ export default {
   data() {
     return {
       innerVisible: this.visible || this.value || false,
+      rules: {
+        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+      },
       timeline: [],
       maxIntensity: 1,
       existingTags: [], // 现有的标签
@@ -1140,7 +1148,8 @@ export default {
       this.innerVisible = false;
       this.$emit("cancel");
     },
-    onSave(closeAfter) {
+    async onSave(closeAfter) {
+      await this.$refs.titleRef.validate();
       const validation = checkForm(this.classInfo);
       if (!validation.isValid) {
         this.$message.error(validation.message);
