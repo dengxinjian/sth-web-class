@@ -41,6 +41,9 @@
               >
                 解除匹配
               </el-button>
+              <el-button type="text" icon="el-icon-crop" @click="handleCopy">
+                复制
+              </el-button>
 
               <el-button type="text" icon="el-icon-edit" @click="$emit('edit', activity)">
                 编辑
@@ -523,7 +526,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #606266;
+    color: #cc2323;
     cursor: pointer;
     display: flex;
     align-items: center;
