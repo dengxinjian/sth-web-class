@@ -44,7 +44,6 @@
           :options="cityOptions"
           :props="cascaderProps"
           placeholder="请选择赛事地点"
-          filterable
           clearable
           style="width: 100%"
         />
@@ -233,7 +232,6 @@ export default {
     },
     eventData: {
       handler(val) {
-        console.log("******eventData",val);
         if (val && this.visible) {
           this.initData();
         }
@@ -265,8 +263,6 @@ export default {
       } else {
         // 重置表单
         await this.resetForm();
-        // 设置默认值为中国
-        await this.setDefaultLocation();
       }
     },
     async clearAllData() {
@@ -310,27 +306,6 @@ export default {
       this.lastDistanceUnit = "km";
       await this.$nextTick();
       this.$refs.eventForm && this.$refs.eventForm.clearValidate();
-    },
-    async setDefaultLocation() {
-      // 设置默认值为中国
-      if (this.cityOptions && this.cityOptions.length > 0) {
-        // 查找中国节点
-        const chinaOption = this.cityOptions.find(
-          (item) =>
-            String(item.value) === "100000" ||
-            item.adCode === "100000" ||
-            item.label?.includes("中国")
-        );
-        if (chinaOption) {
-          // 设置默认值为中国的 value
-          this.$set(this.formData, 'location', [chinaOption.value]);
-          // 等待级联选择器渲染
-          await this.$nextTick();
-          // 强制级联选择器重新渲染，确保默认值正确显示
-          this.cascaderKey += 1;
-          await this.$nextTick();
-        }
-      }
     },
     async fillFormData(data) {
       if (!data) return;
