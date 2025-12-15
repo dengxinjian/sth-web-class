@@ -1,5 +1,5 @@
 <template>
-  <div class="class-container">
+  <div class="plan-container">
     <!-- 课程类型切换 -->
     <ul class="class-type-list">
       <li
@@ -50,7 +50,7 @@
     </div>
 
     <!-- 课程列表 -->
-    <div class="schedule-class-container">
+    <div class="schedule-plan-container">
       <el-collapse
         v-model="activeCollapse"
         accordion
@@ -117,7 +117,7 @@
             </div>
           </template>
 
-          <div class="js-class-drag-container" :key="item.timespan">
+          <div class="plan-js-class-drag-container" :key="item.timespan">
             <div
               class="plan-item"
               :class="{ active: selectedPlanId === classItem.id }"
@@ -290,7 +290,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.class-container {
+.plan-container {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -336,7 +336,7 @@ export default {
     padding: 0 10px;
   }
 
-  .schedule-class-container {
+  .schedule-plan-container {
     padding: 5px 5px;
     background-color: #fff;
     flex: 1;
