@@ -67,7 +67,10 @@
                   <td class="value-cell">
                     {{
                       competitionResult.swimmingResult
-                        ? formatTimeDisplay(competitionResult.swimmingResult, false)
+                        ? formatTimeDisplay(
+                            competitionResult.swimmingResult,
+                            false
+                          )
                         : "-"
                     }}
                   </td>
@@ -92,7 +95,10 @@
                   <td class="value-cell">
                     {{
                       competitionResult.cyclingResult
-                        ? formatTimeDisplay(competitionResult.cyclingResult, false)
+                        ? formatTimeDisplay(
+                            competitionResult.cyclingResult,
+                            false
+                          )
                         : "-"
                     }}
                   </td>
@@ -117,7 +123,10 @@
                   <td class="value-cell">
                     {{
                       competitionResult.runningResult
-                        ? formatTimeDisplay(competitionResult.runningResult, false)
+                        ? formatTimeDisplay(
+                            competitionResult.runningResult,
+                            false
+                          )
                         : "-"
                     }}
                   </td>
@@ -127,7 +136,10 @@
                   <td class="value-cell">
                     {{
                       competitionResult.totalResult
-                        ? formatTimeDisplay(competitionResult.totalResult, false)
+                        ? formatTimeDisplay(
+                            competitionResult.totalResult,
+                            false
+                          )
                         : "-"
                     }}
                   </td>
@@ -198,6 +210,7 @@
               :drag-class="'is-activity-drag-drag'"
               tag="div"
               :emptyInsertThreshold="10"
+              @end="handleDragEnd"
               class="draggable-activities-container"
             >
               <ActivityItem
@@ -247,6 +260,7 @@
               :drag-class="'is-activity-drag-drag'"
               tag="div"
               :emptyInsertThreshold="10"
+              @end="handleDragEnd"
               class="draggable-activities-container"
             >
               <ActivityItem
@@ -312,10 +326,7 @@
                 timer-type="hh:mm:ss"
               />
             </el-form-item>
-            <el-form-item
-              v-if="eventData.competitionType === 2"
-              label="T1成绩"
-            >
+            <el-form-item v-if="eventData.competitionType === 2" label="T1成绩">
               <TimeInput
                 ref="t1ResultInput"
                 v-model="editForm.t1Result"
@@ -335,10 +346,7 @@
                 timer-type="hh:mm:ss"
               />
             </el-form-item>
-            <el-form-item
-              v-if="eventData.competitionType === 2"
-              label="T2成绩"
-            >
+            <el-form-item v-if="eventData.competitionType === 2" label="T2成绩">
               <TimeInput
                 ref="t2ResultInput"
                 v-model="editForm.t2Result"
@@ -360,6 +368,7 @@
             </el-form-item>
             <el-form-item label="总成绩">
               <TimeInput
+                :disabled="eventData.competitionType !== 3"
                 ref="totalResultInput"
                 v-model="editForm.totalResult"
                 timer-type="hh:mm:ss"
@@ -550,33 +559,30 @@ export default {
         genderRank: this.competitionResult?.genderRank || "",
         swimmingResult: this.competitionResult?.swimmingResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.swimmingResult,
-            false
-          )
+              this.competitionResult.swimmingResult,
+              false
+            )
           : "",
         t1Result: this.competitionResult?.t1Result
           ? this.secondsToTimeFormat(this.competitionResult.t1Result, false)
           : "",
         cyclingResult: this.competitionResult?.cyclingResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.cyclingResult,
-            false
-          )
+              this.competitionResult.cyclingResult,
+              false
+            )
           : "",
         t2Result: this.competitionResult?.t2Result
           ? this.secondsToTimeFormat(this.competitionResult.t2Result, false)
           : "",
         runningResult: this.competitionResult?.runningResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.runningResult,
-            false
-          )
+              this.competitionResult.runningResult,
+              false
+            )
           : "",
         totalResult: this.competitionResult?.totalResult
-          ? this.secondsToTimeFormat(
-            this.competitionResult.totalResult,
-            false
-          )
+          ? this.secondsToTimeFormat(this.competitionResult.totalResult, false)
           : "",
         feedback: this.summaryText || "",
       };
@@ -623,7 +629,9 @@ export default {
       const totalSeconds = Math.floor(seconds);
       const minutes = Math.floor(totalSeconds / 60);
       const remainingSeconds = totalSeconds % 60;
-      return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+      return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+        .toString()
+        .padStart(2, "0")}`;
     },
     // 将秒数转换为时间格式（根据字段类型）
     secondsToTimeFormat(seconds, isMMSS = false) {
@@ -647,34 +655,24 @@ export default {
       return "-";
     },
     async handleSaveResult() {
-      // 验证必填字段
-      if (
-        !this.editForm.overallRank ||
-        !this.editForm.groupRank ||
-        !this.editForm.genderRank ||
-        !this.editForm.totalResult
-      ) {
-        this.$message.warning("请填写完整的比赛成绩信息");
-        return;
-      }
-
       try {
         // 准备保存数据，将时间字段转换为秒数
         const saveData = {
-          competitionId: this.eventData.id,
+          id: this.eventData.id,
           overallRank: this.editForm.overallRank,
           groupRank: this.editForm.groupRank,
           genderRank: this.editForm.genderRank,
-          totalResult: this.timeToSeconds(this.editForm.totalResult),
           feedback: this.editForm.feedback || "",
         };
-
         // 根据比赛类型添加相应的成绩字段
         if (
           this.eventData.competitionType === 2 ||
           this.eventData.competitionType === 5
         ) {
           saveData.swimmingResult = this.timeToSeconds(
+            this.editForm.swimmingResult
+          );
+          saveData.totalResult = this.timeToSeconds(
             this.editForm.swimmingResult
           );
         }
@@ -691,8 +689,10 @@ export default {
           saveData.cyclingResult = this.timeToSeconds(
             this.editForm.cyclingResult
           );
+          saveData.totalResult = this.timeToSeconds(
+            this.editForm.cyclingResult
+          );
         }
-
         if (
           this.eventData.competitionType === 2 ||
           this.eventData.competitionType === 1
@@ -700,6 +700,12 @@ export default {
           saveData.runningResult = this.timeToSeconds(
             this.editForm.runningResult
           );
+          saveData.totalResult = this.timeToSeconds(
+            this.editForm.runningResult
+          );
+        }
+        if (this.eventData.competitionType === 2) {
+          saveData.totalResult = 0;
         }
 
         // 调用 API 保存成绩
@@ -751,6 +757,22 @@ export default {
         3: require("@/assets/addClass/icon-swim.png"),
       };
       return iconMap[sportType] || require("@/assets/addClass/icon-other.png");
+    },
+    handleDragEnd(e) {
+      competitionApi
+        .moveActivityPosition({
+          competitionId: this.eventData.id,
+          t1: this.activityList.otherT1,
+          t2: this.activityList.otherT2,
+        })
+        .then((res) => {
+          if (res.success) {
+            this.$message.success("移动成功");
+          } else {
+            this.$message.error(res.message || "移动失败");
+            this.loadEventDetail();
+          }
+        });
     },
   },
 };

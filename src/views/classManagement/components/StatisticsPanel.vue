@@ -215,7 +215,7 @@ export default {
 
     span:nth-child(1) {
       background-color:#ffffff;
-      font-size: 18px;
+      font-size: 14px;
       line-height: 30px;
     }
   }
@@ -238,7 +238,7 @@ export default {
 
     span:nth-child(1) {
       border-radius: 6px;
-      font-size: 22px;
+      font-size: 16px;
     }
   }
 

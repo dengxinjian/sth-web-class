@@ -311,7 +311,15 @@ export const competitionApi = {
   // 保存/更新比赛成绩
   saveCompetitionResult(data) {
     return request({
-      url: "/api/competition/result",
+      url: "/api/competition/season-results",
+      method: "put",
+      data,
+    });
+  },
+  // 赛事运动位置移动
+  moveActivityPosition(data) {
+    return request({
+      url: "/api/activity/changeTransitionNode",
       method: "post",
       data,
     });
