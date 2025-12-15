@@ -283,12 +283,17 @@ export default {
       this.competitionTypeOptions = [];
       this.distancesByType = {};
       this.cityOptions = [];
-      this.cascaderKey = 0;
+      // 重置级联选择器，强制重新渲染
+      this.cascaderKey += 1;
       // 清除表单验证
       await this.$nextTick();
       if (this.$refs.eventForm) {
         this.$refs.eventForm.clearValidate();
         this.$refs.eventForm.resetFields();
+      }
+      // 如果级联选择器存在，也清除其状态
+      if (this.$refs.locationCascader) {
+        this.$refs.locationCascader.$refs.panel?.clearCheckedNodes?.();
       }
     },
     async resetForm() {
@@ -990,9 +995,15 @@ export default {
         ? sanitized
         : String(Math.trunc(num));
     },
-    handleClose() {
+    async handleClose() {
       this.innerVisible = false;
-      this.$refs.eventForm && this.$refs.eventForm.resetFields();
+      // 如果是新增模式，清除所有数据
+      if (!this.isEditMode) {
+        await this.clearAllData();
+      } else {
+        // 编辑模式只重置表单字段
+        this.$refs.eventForm && this.$refs.eventForm.resetFields();
+      }
       this.$emit("cancel");
     },
     getLocationPathLabels() {
