@@ -63,16 +63,17 @@
           @plan-item-move="$emit('plan-item-move', $event)"
           @plan-item-reorder="$emit('plan-item-reorder', $event)"
           @plan-library-drop="$emit('plan-library-drop', $event)"
+          @add-week="handleAddWeek"
         />
       </div>
     </div>
-    <div class="box-content" @click="handleAddWeek">
+    <!-- <div class="box-content" @click="handleAddWeek">
       <div class="box-plus-circle">
         <el-tooltip effect="dark" content="添加周" placement="top">
           <div class="box-plus">+</div>
         </el-tooltip>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

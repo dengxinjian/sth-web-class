@@ -8,7 +8,7 @@
     :close-on-click-modal="false"
   >
     <span slot="title">{{
-      type === "add" ? "新建休息课程" : "编辑休息课程"
+      type === "add" ? "新增休息课程" : "编辑休息课程"
     }}</span>
 
     <div class="form-section">

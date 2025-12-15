@@ -9,7 +9,7 @@
     custom-class="class-dialog"
   >
     <span slot="title">{{
-      type === "add" ? "新建骑行课程" : "编辑骑行课程"
+      type === "add" ? "新增骑行课程" : "编辑骑行课程"
     }}</span>
     <div class="basic-info">
       <div class="basic-info-item">
