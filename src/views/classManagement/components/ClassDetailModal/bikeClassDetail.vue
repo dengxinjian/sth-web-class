@@ -311,6 +311,7 @@
                 class="times-input"
                 size="small"
                 @blur="handleTimesChange(index)"
+                 @change="handleTimesChange(index)"
               />
             </div>
             <div

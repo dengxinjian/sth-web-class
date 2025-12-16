@@ -316,6 +316,7 @@
                 class="times-input"
                 size="small"
                 @blur="handleTimesChange(index)"
+                 @change="handleTimesChange(index)"
                 :disabled="originalType === 'official'"
               />
             </div>
