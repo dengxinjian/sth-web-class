@@ -357,8 +357,7 @@
                 v-model="item.times"
                 class="times-input"
                 size="small"
-                @input="handleTimesChange(index)"
-                @change="calculateTimeline(item.times)"
+                @change="handleTimesChange(index);calculateTimeline(item.times);"
               />
             </div>
             <div
@@ -930,7 +929,6 @@ export default {
     },
   },
   created() {
-    this.handleTimesChange = debounce(this.handleTimesChange, 500);
   },
   mounted() {
     if (this.innerVisible) {

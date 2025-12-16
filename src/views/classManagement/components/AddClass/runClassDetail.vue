@@ -344,8 +344,7 @@
                 v-model="item.times"
                 class="times-input"
                 size="small"
-                @input="handleTimesChange(index)"
-                @change="calculateTimeline(item.times)"
+                @change="handleTimesChange(index);calculateTimeline(item.times);"
                 :disabled="originalType === 'official'"
               />
             </div>
@@ -721,7 +720,7 @@ import Sortable from "sortablejs";
 import ExerciseProcessChart from "@/components/ExerciseProcessChart";
 import { getData, submitData } from "@/api/common.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
-import { debounce, checkForm } from "@/views/classManagement/uilt";
+import { checkForm } from "@/views/classManagement/uilt";
 import { mmssToSeconds, hhmmssToSeconds } from "@/utils/index";
 
 export default {
@@ -884,7 +883,6 @@ export default {
     },
   },
   created() {
-    this.handleTimesChange = debounce(this.handleTimesChange, 500);
   },
   mounted() {
     if (this.innerVisible) {
