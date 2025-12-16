@@ -1743,7 +1743,7 @@ export default {
         return;
       }
       if (eventDate && activityDate && eventDate !== activityDate) {
-        this.$message.warning("只能匹配同一天的赛事");
+        // this.$message.warning("只能匹配同一天的赛事");
         this.getScheduleData();
         return;
       }

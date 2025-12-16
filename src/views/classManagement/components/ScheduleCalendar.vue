@@ -664,16 +664,7 @@ export default {
 /* 拖拽克隆元素样式 - 红色矩形带渐变效果 */
 ::v-deep .is-drag-ghost {
   position: relative;
-  background: #cc2323 !important;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.25) 0%,
-    rgba(255, 220, 220, 0.3) 3%,
-    #cc2323 8%,
-    #cc2323 92%,
-    rgba(255, 200, 200, 0.4) 97%,
-    rgba(255, 255, 255, 0.2) 100%
-  ) !important;
+  background: #F92B30 !important;
   border-radius: 6px !important;
   border-left: 1px solid rgba(255, 255, 255, 0.5) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.5) !important;
