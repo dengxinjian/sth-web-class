@@ -40,7 +40,12 @@
         </div>
       </el-popover>
 
-      <el-input size="mini" v-model="searchInput" @input="handleSearch" clearable>
+      <el-input
+        size="mini"
+        v-model="searchInput"
+        @input="handleSearch"
+        clearable
+      >
         <el-button
           slot="append"
           icon="el-icon-search"
@@ -123,7 +128,7 @@
               :class="{ active: selectedPlanId === classItem.id }"
               v-for="classItem in item.classesList"
               :key="classItem.id"
-              @click="$emit('choose-plan', classItem.id, item.groupId)"
+              @click.stop="$emit('choose-plan', classItem.id, item.groupId)"
             >
               <el-popover
                 placement="right"
@@ -132,7 +137,33 @@
                 :disabled="!classItem.planTitle"
                 popper-class="hover-plan-detail-popover"
               >
-                <span slot="reference" @click.stop>{{ classItem.planTitle }}</span>
+                <span slot="reference">
+                  <div style="width: 100%; cursor: pointer">
+                    {{ classItem.planTitle }}
+                  </div>
+                  <div
+                    style="
+                      width: 100%;
+                      cursor: pointer;
+                      display: flex;
+                      flex-direction: row;
+                      align-items: center;
+                      gap: 5px;
+                    "
+                  >
+                    <el-rate
+                      v-model="classItem.level"
+                      :allow-half="true"
+                      disabled
+                      :colors="['#F92B30', '#F92B30', '#F92B30']"
+                      text-color="#999999"
+                      disabled-void-color="#E1E4EC"
+                    ></el-rate>
+                    <span style="font-size: 10px;color:#979FB0;">{{
+                      classItem.level ? '' : "未评分"
+                    }}</span>
+                  </div>
+                </span>
                 <HoverPlanDetail :planInfo="classItem"></HoverPlanDetail>
               </el-popover>
             </div>
@@ -396,11 +427,11 @@ export default {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  border-bottom: 1px solid #f1f1f1;
-  background-color: #f9f9f9;
+  border-bottom: 1px solid#c3c9d72e;
+  // background-color: #f9f9f9;
 }
 .plan-item:first-child {
-  border-top: 1px solid #f1f1f1;
+  border-top: 1px solid #c3c9d72e;
 }
 .plan-item:last-child {
   border-bottom: none;
@@ -410,11 +441,23 @@ export default {
   cursor: pointer;
 }
 .plan-item:active {
-  background-color: #f1f1f1;
+  background-color: #c3c9d72e;
   cursor: pointer;
 }
 .plan-item.active {
-  color: #cc2323;
-  background-color: rgba(204, 35, 35, 0.15);
+  // color: #cc2323;
+  // background-color: rgba(204, 35, 35, 0.15);
+  background: #c3c9d72e;
+}
+.plan-item.active:first-child {
+  border-bottom: 1px solid#01010126;
+  border-top: 1px solid #c3c9d72e;
+}
+.plan-item.active:last-child {
+  border-bottom: 1px solid #c3c9d72e;
+  border-bottom: none;
+}
+.plan-item ::v-deep(.el-rate__icon) {
+  font-size: 16px;
 }
 </style>

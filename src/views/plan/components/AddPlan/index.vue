@@ -119,6 +119,16 @@
           show-word-limit
         />
       </el-form-item>
+
+      <el-form-item label="计划难度" prop="level" class="rate-form-item">
+        <el-rate
+          v-model="form.level"
+          :allow-half="true"
+          :colors="['#F92B30', '#F92B30', '#F92B30']"
+          text-color="#999999"
+          disabled-void-color="#E1E4EC"
+        />
+      </el-form-item>
     </el-form>
 
     <span slot="footer" class="dialog-footer">
@@ -156,6 +166,7 @@ export default {
         email: undefined,
         weChat: undefined,
         description: undefined,
+        level: undefined,
       },
       rules: {
         planTitle: [
@@ -425,5 +436,9 @@ export default {
 .dialog-footer {
   display: flex;
   justify-content: center;
+}
+.rate-form-item ::v-deep(.el-rate__icon) {
+  font-size: 20px;
+  margin-top: 6px;
 }
 </style>
