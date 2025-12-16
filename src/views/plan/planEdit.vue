@@ -500,6 +500,7 @@ export default {
         email: this.planData.email,
         weChat: this.planData.weChat,
         description: this.planData.description,
+        level: this.planData.level,
         dayDetails: planList,
         planClassesId: this.planData.id,
       });
@@ -534,6 +535,7 @@ export default {
         weChat: this.planData.weChat,
         description: this.planData.description,
         dayDetails: planList,
+        level: this.planData.level,
       });
       if (res.success) {
         // 标记数据已保存
