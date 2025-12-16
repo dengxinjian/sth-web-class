@@ -155,12 +155,12 @@
                       v-model="classItem.level"
                       :allow-half="true"
                       disabled
-                      colors="['#F92B30', '#F92B30', '#F92B30']"
+                      :colors="['#F92B30', '#F92B30', '#F92B30']"
                       text-color="#999999"
                       disabled-void-color="#E1E4EC"
                     ></el-rate>
-                    <span>{{
-                      classItem.level ? classItem.level : "未评分"
+                    <span style="font-size: 10px;color:#979FB0;">{{
+                      classItem.level ? '' : "未评分"
                     }}</span>
                   </div>
                 </span>
@@ -456,5 +456,8 @@ export default {
 .plan-item.active:last-child {
   border-bottom: 1px solid #c3c9d72e;
   border-bottom: none;
+}
+.plan-item ::v-deep(.el-rate__icon) {
+  font-size: 16px;
 }
 </style>

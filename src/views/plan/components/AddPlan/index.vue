@@ -437,34 +437,8 @@ export default {
   display: flex;
   justify-content: center;
 }
-.rate-form-item {
-  margin-bottom: 18px;
-}
-.rate-form-item ::v-deep(.el-form-item) {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0;
-}
-.rate-form-item ::v-deep(.el-form-item__content) {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  line-height: 1;
-  flex: 1;
-}
-.rate-form-item ::v-deep(.el-form-item__label) {
-  line-height: 1;
-  padding-bottom: 0;
-  display: flex;
-  align-items: center;
-}
-.rate-form-item ::v-deep(.el-rate) {
-  display: flex;
-  align-items: center;
-  line-height: 1;
-}
 .rate-form-item ::v-deep(.el-rate__icon) {
-  font-size: 24px;
-  margin-bottom: 7px;
+  font-size: 20px;
+  margin-top: 6px;
 }
 </style>

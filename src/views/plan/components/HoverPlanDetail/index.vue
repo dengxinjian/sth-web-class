@@ -11,11 +11,33 @@
     </div>
     <div class="detail-row-box">
       <div class="detail-row-title">计划源</div>
-      <div class="detail-row-content">{{ planDetail.teamName ? `${planDetail.teamName} - ${planDetail.planSourceNickname}` : planDetail.planSourceNickname }}</div>
+      <div class="detail-row-content">
+        {{
+          planDetail.teamName
+            ? `${planDetail.teamName} - ${planDetail.planSourceNickname}`
+            : planDetail.planSourceNickname
+        }}
+      </div>
     </div>
     <div class="detail-row-box" v-for="item in renderColumns" :key="item.prop">
       <div class="detail-row-title">{{ item.label }}</div>
       <div class="detail-row-content">{{ planDetail[item.prop] }}</div>
+    </div>
+    <div class="detail-row-box">
+      <div class="detail-row-title">计划难度</div>
+      <div class="detail-row-content" style="display: flex; align-items: center; gap: 5px;">
+        <el-rate
+          v-model="planDetail.level"
+          :allow-half="true"
+          disabled
+          :colors="['#F92B30', '#F92B30', '#F92B30']"
+          text-color="#999999"
+          disabled-void-color="#E1E4EC"
+        ></el-rate>
+        <span style="font-size: 10px; color: #979fb0;margin-bottom: 1px;">{{
+          planDetail.level ? "" : "未评分"
+        }}</span>
+      </div>
     </div>
     <div class="detail-row-box">
       <div class="detail-row-title">计划周期</div>
@@ -27,14 +49,14 @@
         <el-row>
           <el-col :span="24">
             <el-row>
-              <el-col :span="5" style="text-align: left;">类型</el-col>
+              <el-col :span="5" style="text-align: left">类型</el-col>
               <el-col :span="9">时长</el-col>
               <el-col :span="9">距离</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
             <el-row>
-              <el-col :span="5" style="text-align: left;">游泳</el-col>
+              <el-col :span="5" style="text-align: left">游泳</el-col>
               <el-col :span="9"
                 >{{
                   secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
@@ -146,7 +168,7 @@
     </div>
 
     <!-- <el-form ref="formRef" label-width="70px" size="small"> -->
-      <!-- <el-form-item label="计划名称" prop="planTitle">
+    <!-- <el-form-item label="计划名称" prop="planTitle">
         <span>{{ planDetail.planTitle }}</span>
       </el-form-item>
 
@@ -172,9 +194,9 @@
 
       <el-form-item label="计划周期" prop="groupId">
         <span>{{ weekNumber }}周</span> -->
-      <!-- </el-form-item> -->
+    <!-- </el-form-item> -->
 
-      <!-- <el-form-item label="统计">
+    <!-- <el-form-item label="统计">
         <el-row>
           <el-col :span="24">
             <el-row>
@@ -354,7 +376,7 @@ export default {
   watch: {
     planInfo: {
       handler(newVal) {
-        console.log("newVal-planInfo",newVal);
+        // console.log("newVal-planInfo", newVal);
         if (
           newVal &&
           typeof newVal === "object" &&
@@ -420,6 +442,7 @@ export default {
      */
     async getPlanDetail(id) {
       const res = await planApi.getPlanDetail(id);
+      // console.log(res.result, "*======res.result-计划详情-概要展示");
       this.planDetail = res.result;
     },
     async getPlanDayDetail(id) {
@@ -520,7 +543,7 @@ export default {
           ...this.planInfo,
           ...this.form,
         };
-        console.log(params, "params");
+        // console.log(params, "params");
         submitData({
           url: "/api/planClasses/updatePlanClasses",
           requestData: params,
@@ -1317,6 +1340,11 @@ export default {
 .detail-value {
   color: #303133;
   word-break: break-word;
+}
+
+.hover-plan-detail ::v-deep(.el-rate__icon) {
+  font-size: 16px;
+  margin-top: 1px;
 }
 </style>
 

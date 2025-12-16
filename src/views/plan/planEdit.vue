@@ -363,6 +363,7 @@ export default {
         weChat: this.planData.weChat,
         description: this.planData.description,
         dayDetails: planList,
+        level: this.planData.level,
         planClassesId: this.planData.id,
       });
       if (res.success) {

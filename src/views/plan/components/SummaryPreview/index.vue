@@ -49,7 +49,11 @@
         <span v-else>{{ planInfo.planGroupName }}</span>
       </el-form-item>
 
-      <el-form-item label="团队" prop="teamId" v-if="loginType === '2' && form.teamId">
+      <el-form-item
+        label="团队"
+        prop="teamId"
+        v-if="loginType === '2' && form.teamId"
+      >
         <el-select
           v-model="form.teamId"
           placeholder="请选择团队"
@@ -127,7 +131,33 @@
           placeholder="请输入描述"
         />
       </el-form-item>
-
+      <el-form-item
+        label="计划难度"
+        prop="level"
+        class="rate-form-item-official"
+        v-if="activeClassType === 'official'"
+      >
+        <el-rate
+          v-model="form.level"
+          :allow-half="true"
+          :colors="['#F92B30', '#F92B30', '#F92B30']"
+          text-color="#999999"
+          disabled-void-color="#E1E4EC"
+          disabled
+        />
+        <span style="font-size: 14px; color: #979fb0;margin-top: 2px;">{{
+          form.level ? "" : "未评分"
+        }}</span>
+      </el-form-item>
+      <el-form-item label="计划难度" prop="level" class="rate-form-item" v-else>
+        <el-rate
+          v-model="form.level"
+          :allow-half="true"
+          :colors="['#F92B30', '#F92B30', '#F92B30']"
+          text-color="#999999"
+          disabled-void-color="#E1E4EC"
+        />
+      </el-form-item>
       <el-form-item label="计划周期" prop="groupId">
         <span>{{ weekNumber }}周</span>
       </el-form-item>
@@ -295,6 +325,7 @@ export default {
         email: undefined,
         weChat: undefined,
         description: undefined,
+        level: undefined,
       },
       rules: {
         planTitle: [
@@ -366,6 +397,7 @@ export default {
               email: this.planInfo.email || undefined,
               weChat: this.planInfo.weChat || undefined,
               description: this.planInfo.description || undefined,
+              level: this.planInfo.level || undefined,
             };
             // 清除表单验证状态
             if (this.$refs.formRef) {
@@ -399,6 +431,7 @@ export default {
             weChat: val.weChat || undefined,
             description: val.description || undefined,
             id: val.id,
+            level: val.level || undefined,
           };
           // 清除表单验证状态
           if (this.$refs.formRef) {
@@ -422,7 +455,12 @@ export default {
           );
         const lastItem = newDayDetailList[newDayDetailList.length - 1];
         const day = lastItem?.day;
-        if (day != null && typeof day === 'number' && !isNaN(day) && isFinite(day)) {
+        if (
+          day != null &&
+          typeof day === "number" &&
+          !isNaN(day) &&
+          isFinite(day)
+        ) {
           this.weekNumber = Math.ceil(day / 7);
         } else {
           this.weekNumber = 0;
@@ -469,7 +507,7 @@ export default {
           ...this.planInfo,
           ...this.form,
         };
-        console.log(params, "params");
+        // console.log(params, "params");
         submitData({
           url: "/api/planClasses/updatePlanClasses",
           requestData: params,
@@ -1177,6 +1215,22 @@ export default {
 }
 .statistics-divider-wrapper ::v-deep(.el-divider__text) {
   font-size: 12px;
+}
+.rate-form-item ::v-deep(.el-rate__icon) {
+  font-size: 20px;
+  margin-top: 6px;
+}
+.rate-form-item-official ::v-deep(.el-form-item__content) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rate-form-item-official ::v-deep(.el-rate) {
+  display: flex;
+  align-items: center;
+}
+.rate-form-item-official ::v-deep(.el-rate__icon) {
+  font-size: 20px;
 }
 </style>
 
