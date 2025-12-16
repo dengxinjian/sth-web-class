@@ -437,6 +437,7 @@ export default {
       this.editEventWeekNumber = null;
       this.editEventGlobalDay = null;
       this.showAddEvent = false;
+      this.isEditMode = false;
     },
     handleAddEvent() {
       this.currentEventData = {};

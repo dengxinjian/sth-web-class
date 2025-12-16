@@ -44,7 +44,6 @@
           :options="cityOptions"
           :props="cascaderProps"
           placeholder="请选择赛事地点"
-          filterable
           clearable
           style="width: 100%"
         />
@@ -233,7 +232,6 @@ export default {
     },
     eventData: {
       handler(val) {
-        console.log("******eventData",val);
         if (val && this.visible) {
           this.initData();
         }
@@ -248,7 +246,12 @@ export default {
   },
   methods: {
     async initData() {
-      // 先获取下拉框数据
+      // 如果是新增模式，先清除所有数据
+      if (!this.isEditMode) {
+        await this.clearAllData();
+      }
+
+      // 重新加载下拉框数据
       await this.loadAdministrativeRoot();
       await this.fetchDropdownOptions();
 
@@ -259,10 +262,41 @@ export default {
         await this.fillFormData(this.eventData);
       } else {
         // 重置表单
-        this.resetForm();
+        await this.resetForm();
       }
     },
-    resetForm() {
+    async clearAllData() {
+      // 清除所有表单数据
+      this.formData = {
+        priority: "PRIMARY",
+        eventName: "",
+        location: [],
+        competitionType: "",
+        distance: "",
+        customDistance: "",
+        competitionDistanceUnit: "km",
+      };
+      // 清除所有状态数据
+      this.showCustomDistance = false;
+      this.distanceOptions = [];
+      this.lastDistanceUnit = "km";
+      this.competitionTypeOptions = [];
+      this.distancesByType = {};
+      this.cityOptions = [];
+      // 重置级联选择器，强制重新渲染
+      this.cascaderKey += 1;
+      // 清除表单验证
+      await this.$nextTick();
+      if (this.$refs.eventForm) {
+        this.$refs.eventForm.clearValidate();
+        this.$refs.eventForm.resetFields();
+      }
+      // 如果级联选择器存在，也清除其状态
+      if (this.$refs.locationCascader) {
+        this.$refs.locationCascader.$refs.panel?.clearCheckedNodes?.();
+      }
+    },
+    async resetForm() {
       this.formData = {
         priority: "PRIMARY",
         eventName: "",
@@ -275,9 +309,8 @@ export default {
       this.showCustomDistance = false;
       this.distanceOptions = [];
       this.lastDistanceUnit = "km";
-      this.$nextTick(() => {
-        this.$refs.eventForm && this.$refs.eventForm.clearValidate();
-      });
+      await this.$nextTick();
+      this.$refs.eventForm && this.$refs.eventForm.clearValidate();
     },
     async fillFormData(data) {
       if (!data) return;
@@ -962,9 +995,15 @@ export default {
         ? sanitized
         : String(Math.trunc(num));
     },
-    handleClose() {
+    async handleClose() {
       this.innerVisible = false;
-      this.$refs.eventForm && this.$refs.eventForm.resetFields();
+      // 如果是新增模式，清除所有数据
+      if (!this.isEditMode) {
+        await this.clearAllData();
+      } else {
+        // 编辑模式只重置表单字段
+        this.$refs.eventForm && this.$refs.eventForm.resetFields();
+      }
       this.$emit("cancel");
     },
     getLocationPathLabels() {

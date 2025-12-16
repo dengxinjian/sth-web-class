@@ -34,22 +34,24 @@
     <div class="schedule-table-cell-data">
       <div class="week-data-sth">
         <div>
-          <span>{{ sthData.avgLong || 0 }}</span>
-          <span>长期STH</span>
+          <div style="color: #3e5cec">{{ sthData.avgLong || 0 }}</div>
+          <span style="line-height: 26px;">长期STH</span>
         </div>
         <div>
-          <span>{{ sthData.avgShort || 0 }}</span>
+          <div style="background-color: #f92b30">{{
+            sthData.avgShort || 0
+          }}</div>
           <span>短期STH</span>
         </div>
         <div>
-          <span>
+          <div style="color: #e5702c">
             {{
               sthData.avgBalanceBig
                 ? sthData.avgBalanceBig - sthData.avgBalanceSmall
                 : 0
             }}
-          </span>
-          <span>STH平衡</span>
+          </div>
+          <span style="line-height: 26px;"> 平衡</span>
         </div>
       </div>
 
@@ -91,46 +93,46 @@
 </template>
 
 <script>
-import { DEVICE_TYPE_DICT } from '../constants'
-import { getDeviceBrandIcon } from '../utils/helpers'
+import { DEVICE_TYPE_DICT } from "../constants";
+import { getDeviceBrandIcon } from "../utils/helpers";
 
 export default {
-  name: 'StatisticsPanel',
+  name: "StatisticsPanel",
   props: {
     sthData: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     statisticData: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     deviceList: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   methods: {
     getDeviceBrandIcon,
     getDeviceName(deviceType) {
-      return DEVICE_TYPE_DICT[deviceType] || '未知设备'
+      return DEVICE_TYPE_DICT[deviceType] || "未知设备";
     },
     handleDeviceChange(item) {
-      this.$emit('device-change', item)
+      this.$emit("device-change", item);
     },
     // 规范化百分比值，确保是 0-100 之间的有效数字
     normalizePercentage(value) {
       // 转换为数字
-      const num = Number(value)
+      const num = Number(value);
       // 如果不是有效数字，返回 0
       if (isNaN(num) || !isFinite(num)) {
-        return 0
+        return 0;
       }
       // 限制在 0-100 之间
-      return Math.max(0, Math.min(100, num))
-    }
-  }
-}
+      return Math.max(0, Math.min(100, num));
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -199,52 +201,63 @@ export default {
 .week-data-sth {
   display: flex;
   flex-direction: row;
-  gap: 2px;
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
 
   > div {
-    width: 60px;
+    width: 70px;
     text-align: center;
     color: #fff;
     font-size: 12px;
     line-height: 22px;
+    font-weight: 600;
     display: flex;
     flex-direction: column;
 
-    span:nth-child(1) {
-      background-color: rgba(255, 255, 255, 0.46);
+    div:nth-child(1) {
+      background-color: #ffffff;
+      font-size: 14px;
+      line-height: 26px;
+    }
+    div {
+      height: 26px;
     }
   }
 
   > div:nth-child(1) {
     padding: 4px 0 0 4px;
-    border-radius: 6px 0 0 6px;
-    background-color: rgba(93, 187, 246, 1);
+    border-radius: 5px 0 0 5px;
+    background-color: #385dff;
 
-    span:nth-child(1) {
-      border-radius: 6px 0 0 6px;
+    div:nth-child(1) {
+      border-radius: 3px 0 0 3px;
     }
   }
 
   > div:nth-child(2) {
-    padding: 4px 4px 6px 4px;
+    width: 88px;
+    padding: 4px 8px 8px 4px;
     border-radius: 6px;
-    background-color: rgba(204, 35, 35, 1);
+    background-color: #f92b30;
+    border: 1px solid #fff;
 
-    span:nth-child(1) {
+    div:nth-child(1) {
       border-radius: 6px;
+      font-family: PingFang TC;
+      font-weight: 600;
+      font-style: Semibold;
+      font-size: 18px;
     }
   }
 
   > div:nth-child(3) {
     padding: 4px 4px 0 0;
-    border-radius: 0 6px 6px 0;
-    background-color: rgba(255, 181, 105, 1);
+    border-radius: 0 5px 5px 0;
+    background-color: #f66700;
 
-    span:nth-child(1) {
-      border-radius: 0 6px 6px 0;
+    div:nth-child(1) {
+      border-radius: 0 3px 3px 0;
     }
   }
 }
@@ -280,4 +293,3 @@ export default {
   }
 }
 </style>
-
