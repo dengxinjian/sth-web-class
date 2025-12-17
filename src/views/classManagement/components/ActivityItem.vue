@@ -131,8 +131,6 @@ export default {
       font-weight: 500;
       color: #333;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       max-width: 100px;
     }
     i {

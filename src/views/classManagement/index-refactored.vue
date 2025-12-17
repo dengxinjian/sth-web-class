@@ -1052,6 +1052,23 @@ export default {
                 part.healthInfos && part.healthInfos.length > 0
                   ? [part.healthInfos[0]]
                   : [];
+              part.competitionList.forEach((i) => {
+                i.deviceActivityBindView.cycle.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.run.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.swim.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.otherT1.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.otherT2.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+              });
               competitionList = part.competitionList || [];
             }
           });
