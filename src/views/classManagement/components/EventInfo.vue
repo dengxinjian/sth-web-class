@@ -404,7 +404,7 @@
 
 <script>
 import { competitionApi } from "../services/classManagement.js";
-import { getSportTypeName } from "../utils/helpers";
+import { getSportTypeName, parseClassesJson } from "../utils/helpers";
 import draggable from "vuedraggable";
 import ActivityItem from "./ActivityItem.vue";
 import TimeInput from "@/views/classManagement/components/timeInpt";
@@ -518,6 +518,21 @@ export default {
       const res = await competitionApi.getCompetitionDetail(this.eventData.id);
       console.log(res, "res");
       if (res.success) {
+        res.result.deviceActivityBindView.cycle.forEach((item) => {
+          item.classesJson = parseClassesJson(item.classesJson);
+        });
+        res.result.deviceActivityBindView.run.forEach((item) => {
+          item.classesJson = parseClassesJson(item.classesJson);
+        });
+        res.result.deviceActivityBindView.swim.forEach((item) => {
+          item.classesJson = parseClassesJson(item.classesJson);
+        });
+        res.result.deviceActivityBindView.otherT1.forEach((item) => {
+          item.classesJson = parseClassesJson(item.classesJson);
+        });
+        res.result.deviceActivityBindView.otherT2.forEach((item) => {
+          item.classesJson = parseClassesJson(item.classesJson);
+        });
         this.competitionResult = res.result || {};
         this.activityList = res.result.deviceActivityBindView || [];
         this.summaryText = this.competitionResult.feedback || "";
