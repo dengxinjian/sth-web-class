@@ -65,6 +65,7 @@ export default {
       } else {
         result = Math.round(distance / 10) / 100;
       }
+      console.log(result, "------------result111");
       return result;
     },
     getSportTypeName(sportType) {

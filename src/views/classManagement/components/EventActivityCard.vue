@@ -183,10 +183,6 @@ export default {
       type: Object,
       required: true,
     },
-    date: {
-      type: String,
-      required: true,
-    },
   },
   data() {
     return {
@@ -234,8 +230,11 @@ export default {
         result = "--";
       }
       if (sportType === 3 && result > 0) {
-        result = this.activity.preciseDistance;
+        result = distance;
+      } else {
+        result = Math.round(distance / 10) / 100;
       }
+      console.log(result, "------------result111");
       return result;
     },
     getSportIcon(sportType) {
