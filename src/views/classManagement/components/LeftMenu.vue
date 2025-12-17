@@ -52,7 +52,7 @@ export default {
   },
   data() {
     return {
-      loginType: localStorage.getItem("loginType") || "2",
+      loginType: localStorage.getItem("loginType") || "1",
       menuBg: "#fff",
       menuText: "#333",
       menuActiveText: "#fff",
@@ -109,7 +109,16 @@ export default {
     //   immediate: true,
     // },
   },
+  mounted() {
+    this.$root.$on("identity-changed", this.handleIdentityChanged);
+  },
+  beforeDestroy() {
+    this.$root.$off("identity-changed", this.handleIdentityChanged);
+  },
   methods: {
+    handleIdentityChanged(loginType) {
+      this.loginType = loginType;
+    },
     handleMenuSelect(index) {
       this.handleTypeChange(index);
     },

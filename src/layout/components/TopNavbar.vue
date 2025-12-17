@@ -125,6 +125,9 @@ export default {
       )
         .then(() => {
           localStorage.setItem("loginType", this.loginType === "1" ? "2" : "1");
+          localStorage.setItem("activeName", this.loginType === "1" ? "class" : "athletic");
+          // 触发身份切换事件
+          this.$root.$emit("identity-changed", this.loginType === "1" ? "2" : "1");
           if (this.loginType === "2") {
             // 路由跳转，使用安全的错误处理
             if (this.$router) {
