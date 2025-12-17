@@ -104,9 +104,9 @@ service.interceptors.response.use(
       //       isPoint401 = false;
       //     });
       // }
-      store.dispatch("user/resetToken").then(() => {
-        location.reload();
-      });
+      // store.dispatch("user/resetToken").then(() => {
+      //   location.reload();
+      // });
     } else {
       Message({
         message: error.message,

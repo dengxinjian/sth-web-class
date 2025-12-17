@@ -248,7 +248,7 @@ export default {
     // 获取标签列表
     getTagList() {
       getData({
-        url: "/api/classesLabel/user/getLabelsByUserId",
+        url: "/training/api/classesLabel/user/getLabelsByUserId",
       }).then((res) => {
         if (res.success) {
           this.existingTags = res.result;
@@ -260,7 +260,7 @@ export default {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({
-        url: "/api/classSchedule/getClassScheduleById",
+        url: "/gateway/training/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
@@ -290,7 +290,7 @@ export default {
     // 更新课程
     submitUpdateClass(flag) {
       submitData({
-        url: "/api/classSchedule/updateClassSchedule",
+        url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.form.id,
         classesJson: JSON.stringify({ ...this.form }),
       }).then((res) => {
@@ -318,7 +318,7 @@ export default {
       })
         .then(() => {
           submitData({
-            url: "/api/classSchedule/deleteClassSchedule?id=" + this.form.id,
+            url: "/gateway/training/classSchedule/deleteClassSchedule?id=" + this.form.id,
           }).then((res) => {
             if (res.success) {
               this.resetForm();

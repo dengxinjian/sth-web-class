@@ -67,7 +67,7 @@ export default {
   methods: {
     getGroupList() {
       getData({
-        url: '/api/classesGroup/user/getClassesGroupsByUserId'
+        url: '/training/api/classesGroup/user/getClassesGroupsByUserId'
       }).then(res => {
         const groups = []
         res.result.forEach(item => {

@@ -896,7 +896,7 @@ export default {
             params.param2 = this.thresholdData.param2;
           }
           submitData({
-            url: "/api/classSchedule/updateThreshold",
+            url: "/gateway/user/updateThreshold",
             requestData: params,
           }).then((res) => {
             if (res.success) {
