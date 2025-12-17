@@ -1126,7 +1126,7 @@ export default {
       )?.commonDate;
 
       if (date && date < new Date().toISOString().split("T")[0]) {
-        this.$message.error("该课程已过期");
+        this.$message.error("该课表已过期");
         return;
       }
       console.log(device, "device");

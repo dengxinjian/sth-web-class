@@ -396,7 +396,7 @@ export default {
       this.hasCopiedClass = true;
       this.hasCutClass = true;
       this.$message({
-        message: "课程已剪切，右键点击目标日期可粘贴",
+        message: "课表已剪切，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
       });
