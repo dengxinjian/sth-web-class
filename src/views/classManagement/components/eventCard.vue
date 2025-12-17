@@ -24,7 +24,10 @@
         >
           <!-- 标题栏 -->
           <div class="body-title">
-            <div class="sport-type-icon">
+            <div
+              class="sport-type-icon"
+              :class="{ 'sport-type-icon-activity': eventItem.hasBind }"
+            >
               <img
                 class="image-icon"
                 :src="getClassImageIcon(eventItem.priority)"
@@ -77,9 +80,14 @@
             {{ eventItem.competitionName }}
           </div>
 
-          <div class="activity-info" v-if="eventItem.hasBind" style="margin-top: 10px;">
+          <div
+            class="activity-info"
+            v-if="eventItem.hasBind"
+            style="margin-top: 10px"
+          >
             <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem.deviceActivityBindView.swim"
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.swim"
               :key="`activity--${
                 activityItem.activityId ||
                 activityItem.manualActivityId ||
@@ -90,7 +98,8 @@
               :activity="activityItem"
             />
             <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem.deviceActivityBindView.otherT1"
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.otherT1"
               :key="`activity--${
                 activityItem.activityId ||
                 activityItem.manualActivityId ||
@@ -101,7 +110,8 @@
               :activity="activityItem"
             />
             <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem.deviceActivityBindView.cycle"
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.cycle"
               :key="`activity--${
                 activityItem.activityId ||
                 activityItem.manualActivityId ||
@@ -112,7 +122,8 @@
               :activity="activityItem"
             />
             <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem.deviceActivityBindView.otherT2"
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.otherT2"
               :key="`activity--${
                 activityItem.activityId ||
                 activityItem.manualActivityId ||
@@ -123,7 +134,8 @@
               :activity="activityItem"
             />
             <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem.deviceActivityBindView.run"
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.run"
               :key="`activity--${
                 activityItem.activityId ||
                 activityItem.manualActivityId ||
@@ -395,6 +407,13 @@ export default {
       .sport-type-icon {
         display: flex;
         align-content: center;
+        // width: 24px;
+        // height: 24px;
+        // border-radius: 50%;
+        // background: linear-gradient(114.04deg, #FFD657 0%, #FFECB0 32.71%, #FFD657 65.42%);
+        // display: flex;
+        // align-items: center;
+        // justify-content: center;
 
         .sport-type-name {
           width: 15px;
@@ -419,11 +438,20 @@ export default {
           background-color: #aaaaaa;
         }
       }
+      .sport-type-icon-activity {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #fff !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     .image-icon {
-      width: 18px;
-      height: 22px;
+      width: 12px;
+      height: 12px;
     }
 
     .title {
