@@ -7,25 +7,27 @@
     :data-date="date"
     draggable="true"
   >
-    <div
-      class="class-schedule-card-container js-plan-class-card"
-      data-type="classSchedule"
-    >
+    <div class="class-schedule-card-container js-plan-class-card">
       <div
         class="classScheduleCard"
         :class="{ 'is-dragging': isDragging }"
-        :style="cardStyle"
-        data-type="classSchedule"
         @click.stop="handleClick"
         @contextmenu.stop.prevent="showContextMenu"
       >
         <div
           class="card-body class-drap-handle"
-          style="background-color: white"
+          :style="
+            eventItem.hasBind
+              ? 'background: linear-gradient(114.04deg, #FFD657 0%, #FFECB0 32.71%, #FFD657 65.42%)'
+              : ''
+          "
         >
           <!-- 标题栏 -->
           <div class="body-title">
-            <div class="sport-type-icon">
+            <div
+              class="sport-type-icon"
+              :class="{ 'sport-type-icon-activity': eventItem.hasBind }"
+            >
               <img
                 class="image-icon"
                 :src="getClassImageIcon(eventItem.priority)"
@@ -74,7 +76,76 @@
             </el-popover>
           </div>
           <!-- 课程标题 -->
-          <div class="title">{{ eventItem.competitionName }}</div>
+          <div class="title">
+            {{ eventItem.competitionName }}
+          </div>
+
+          <div
+            class="activity-info"
+            v-if="eventItem.hasBind"
+            style="margin-top: 10px"
+          >
+            <EventActivityCard
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.swim"
+              :key="`activity--${
+                activityItem.activityId ||
+                activityItem.manualActivityId ||
+                activityIndex
+              }-${
+                activityItem.classScheduleId || 'unmatched'
+              }-${!!activityItem.classesJson}-${Date.now()}`"
+              :activity="activityItem"
+            />
+            <EventActivityCard
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.otherT1"
+              :key="`activity--${
+                activityItem.activityId ||
+                activityItem.manualActivityId ||
+                activityIndex
+              }-${
+                activityItem.classScheduleId || 'unmatched'
+              }-${!!activityItem.classesJson}-${Date.now()}`"
+              :activity="activityItem"
+            />
+            <EventActivityCard
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.cycle"
+              :key="`activity--${
+                activityItem.activityId ||
+                activityItem.manualActivityId ||
+                activityIndex
+              }-${
+                activityItem.classScheduleId || 'unmatched'
+              }-${!!activityItem.classesJson}-${Date.now()}`"
+              :activity="activityItem"
+            />
+            <EventActivityCard
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.otherT2"
+              :key="`activity--${
+                activityItem.activityId ||
+                activityItem.manualActivityId ||
+                activityIndex
+              }-${
+                activityItem.classScheduleId || 'unmatched'
+              }-${!!activityItem.classesJson}-${Date.now()}`"
+              :activity="activityItem"
+            />
+            <EventActivityCard
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.run"
+              :key="`activity--${
+                activityItem.activityId ||
+                activityItem.manualActivityId ||
+                activityIndex
+              }-${
+                activityItem.classScheduleId || 'unmatched'
+              }-${!!activityItem.classesJson}-${Date.now()}`"
+              :activity="activityItem"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -114,8 +185,12 @@
 </template>
 
 <script>
+import EventActivityCard from "./EventActivityCard.vue";
 export default {
   name: "EventCard",
+  components: {
+    EventActivityCard,
+  },
   props: {
     eventItem: {
       type: Object,
@@ -161,7 +236,7 @@ export default {
     document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
-    getClassImageIcon (priority) {
+    getClassImageIcon(priority) {
       if (priority === "PRIMARY" || priority === 1) {
         return require("@/assets/addClass/eventOne.png");
       } else if (priority === "SECONDARY" || priority === 2) {
@@ -298,7 +373,7 @@ export default {
   overflow: hidden;
   border-radius: 6px;
   background-color: #ffffff;
-  padding-top: 10px;
+  margin-top: 10px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
 
   &:hover:not(.is-dragging) {
@@ -317,8 +392,8 @@ export default {
 
   .card-body {
     width: 100%;
-    padding-left: 2px;
-    padding-right: 2px;
+    // padding-left: 2px;
+    // padding-right: 2px;
     padding-bottom: 5px;
 
     .body-title {
@@ -326,12 +401,19 @@ export default {
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      background-color: white;
+      // background-color: white;
       padding: 5px 3px;
 
       .sport-type-icon {
         display: flex;
         align-content: center;
+        // width: 24px;
+        // height: 24px;
+        // border-radius: 50%;
+        // background: linear-gradient(114.04deg, #FFD657 0%, #FFECB0 32.71%, #FFD657 65.42%);
+        // display: flex;
+        // align-items: center;
+        // justify-content: center;
 
         .sport-type-name {
           width: 15px;
@@ -356,11 +438,20 @@ export default {
           background-color: #aaaaaa;
         }
       }
+      .sport-type-icon-activity {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #fff !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     .image-icon {
-      width: 18px;
-      height: 22px;
+      width: 12px;
+      height: 12px;
     }
 
     .title {

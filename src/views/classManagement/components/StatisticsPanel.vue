@@ -34,22 +34,24 @@
     <div class="schedule-table-cell-data">
       <div class="week-data-sth">
         <div>
-          <span style="color: #3e5cec; border-radius: 6px 0 0 0px;">{{ sthData.avgLong || 0 }}</span>
-          <span>长期STH</span>
+          <div style="color: #3e5cec">{{ sthData.avgLong || 0 }}</div>
+          <span style="line-height: 26px;">长期STH</span>
         </div>
         <div>
-          <span style="background-color: #e3423d;">{{ sthData.avgShort || 0 }}</span>
+          <div style="background-color: #f92b30">{{
+            sthData.avgShort || 0
+          }}</div>
           <span>短期STH</span>
         </div>
         <div>
-          <span style="color: #e5702c; border-radius: 0 6px 0 0;">
+          <div style="color: #e5702c">
             {{
               sthData.avgBalanceBig
                 ? sthData.avgBalanceBig - sthData.avgBalanceSmall
                 : 0
             }}
-          </span>
-          <span>平衡</span>
+          </div>
+          <span style="line-height: 26px;"> 平衡</span>
         </div>
       </div>
 
@@ -213,17 +215,20 @@ export default {
     display: flex;
     flex-direction: column;
 
-    span:nth-child(1) {
-      background-color:#ffffff;
+    div:nth-child(1) {
+      background-color: #ffffff;
       font-size: 14px;
-      line-height: 30px;
+      line-height: 26px;
+    }
+    div {
+      height: 26px;
     }
   }
 
   > div:nth-child(1) {
     padding: 4px 0 0 4px;
-    border-radius: 6px 0 0 6px;
-    background-color: #3e5cec;
+    border-radius: 5px 0 0 5px;
+    background-color: #385dff;
 
     div:nth-child(1) {
       border-radius: 3px 0 0 3px;
@@ -231,21 +236,25 @@ export default {
   }
 
   > div:nth-child(2) {
-    width: 85px;
-    padding: 8px 8px 8px 8px;
+    width: 88px;
+    padding: 4px 8px 8px 4px;
     border-radius: 6px;
-    background-color: #e3423d;
+    background-color: #f92b30;
+    border: 1px solid #fff;
 
     div:nth-child(1) {
       border-radius: 6px;
-      font-size: 16px;
+      font-family: PingFang TC;
+      font-weight: 600;
+      font-style: Semibold;
+      font-size: 18px;
     }
   }
 
   > div:nth-child(3) {
     padding: 4px 4px 0 0;
-    border-radius: 0 6px 6px 0;
-    background-color: #e5702c;
+    border-radius: 0 5px 5px 0;
+    background-color: #f66700;
 
     div:nth-child(1) {
       border-radius: 0 3px 3px 0;

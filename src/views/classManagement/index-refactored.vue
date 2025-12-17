@@ -543,11 +543,11 @@ export default {
       }
       this.getScheduleData();
     },
-    handleCutClass(classesDate, classItem) {
+    async handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
       this.handlePasteClass(classesDate, classItem);
-      this.handleDeleteClassSchedule(classItem, true);
+      await this.handleDeleteClassSchedule(classItem, true);
     },
     /**
      * 粘贴赛事
@@ -1401,6 +1401,10 @@ export default {
           id: classItem?.id,
           triUserId: this.selectedAthletic,
         });
+        if (res.success) {
+          this.$message.success("课表剪切成功");
+          this.getScheduleData();
+        }
       }
     },
 
@@ -1745,7 +1749,7 @@ export default {
         return;
       }
       if (eventDate && activityDate && eventDate !== activityDate) {
-        this.$message.warning("只能匹配同一天的赛事");
+        // this.$message.warning("只能匹配同一天的赛事");
         this.getScheduleData();
         return;
       }

@@ -41,11 +41,11 @@ export default {
       if (cardElement) {
         cardElement.dataset.originalBg =
           cardElement.style.backgroundColor || "";
-        cardElement.style.backgroundColor = "#f7d7d7";
+        cardElement.style.backgroundColor = "#F92B3033";
       }
       if (cardBody && cardBody !== cardElement) {
         cardBody.dataset.originalBg = cardBody.style.backgroundColor || "";
-        cardBody.style.backgroundColor = "#f7d7d7";
+        cardBody.style.backgroundColor = "#F92B3033";
       }
       // console.log(cardBody, "cardBody");
     },

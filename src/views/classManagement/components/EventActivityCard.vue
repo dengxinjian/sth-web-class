@@ -1,11 +1,6 @@
 <template>
   <div style="position: relative">
-    <div
-      class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
-      :data-activityId="activity.activityId"
-      :data-manualActivityId="activity.manualActivityId"
-      :data-date="date"
-    >
+    <div class="classScheduleCard sportScheduleCard">
       <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
       <div
         :class="[
@@ -13,10 +8,6 @@
           'sport-drap-handle',
           activity.classScheduleId ? 'js-sport-card-noDrag' : '',
         ]"
-        :data-activityId="activity.activityId"
-        :data-manualActivityId="activity.manualActivityId"
-        :data-date="date"
-        @contextmenu.prevent.stop="showContextMenu"
       >
         <div class="body-title">
           <div class="sport-type-icon">
@@ -26,54 +17,15 @@
               alt=""
             />
           </div>
-          <el-popover
-            popper-class="athletic-btn-popover"
-            placement="right"
-            trigger="hover"
-          >
-            <div class="btn-list-hover">
-              <el-button
-                v-if="activity.classesJson"
-                type="text"
-                icon="el-icon-link"
-                @click="$emit('unbind', activity.classScheduleId)"
-              >
-                解除匹配
-              </el-button>
-              <el-button type="text" icon="el-icon-crop" @click="handleCopy">
-                复制
-              </el-button>
-
-              <el-button
-                type="text"
-                icon="el-icon-edit"
-                @click="$emit('edit', activity)"
-              >
-                编辑
-              </el-button>
-              <el-button
-                v-if="!activity.classesJson"
-                type="text"
-                icon="el-icon-delete"
-                @click="$emit('delete', activity)"
-              >
-                删除
-              </el-button>
-            </div>
-            <i class="el-icon-more" slot="reference" @click.stop></i>
-          </el-popover>
         </div>
 
-        <div
-          class="sport-record-data"
-          @click="
-            $emit('click', activity);
-            hideContextMenu();
-          "
-        >
+        <div class="sport-record-data">
           <div
             class="title"
-            v-if="(activity.classesJson && activity.classesJson.title) || activity.activityName"
+            v-if="
+              (activity.classesJson && activity.classesJson.title) ||
+              activity.activityName
+            "
           >
             {{
               activity.classesJson
@@ -205,51 +157,6 @@
         </div>
       </div>
     </div>
-
-    <!-- 自定义右键菜单 -->
-    <transition name="context-menu-fade">
-      <div
-        v-if="contextMenuVisible"
-        class="context-menu"
-        :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
-        @click.stop
-      >
-        <div
-          v-if="activity.classesJson"
-          class="context-menu-item"
-          @click="handleUnbind"
-        >
-          <i class="el-icon-link"></i>
-          解除匹配
-        </div>
-        <div
-          v-if="activity.classesJson"
-          class="context-menu-item"
-          @click="handleCopy"
-        >
-          <i class="el-icon-crop"></i>
-          复制
-        </div>
-        <div
-          class="context-menu-item"
-          @click="
-            $emit('edit', activity);
-            hideContextMenu();
-          "
-        >
-        <i class="el-icon-edit"></i>
-          编辑
-        </div>
-        <div
-          v-if="!activity.classesJson"
-          class="context-menu-item"
-          @click="handleDelete"
-        >
-          <i class="el-icon-delete"></i>
-          删除
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -294,10 +201,8 @@ export default {
     },
   },
   mounted() {
-    document.addEventListener("click", this.hideContextMenu);
   },
   beforeDestroy() {
-    document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
     truncateByLines,
@@ -342,102 +247,12 @@ export default {
     isRestType(sportType) {
       return ["REST", "REMARK", "OTHER"].includes(sportType);
     },
-    showContextMenu(event) {
-      // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
-      this.$nextTick(() => {
-        // 获取组件根元素
-        const rootElement = this.$el;
-        const rootRect = rootElement.getBoundingClientRect();
-
-        // 计算相对于组件根元素的初始坐标
-        let x = event.clientX - rootRect.left;
-        let y = event.clientY - rootRect.top;
-
-        // 先设置菜单可见，以便获取菜单尺寸
-        this.contextMenuX = x;
-        this.contextMenuY = y;
-        this.contextMenuVisible = true;
-
-        // 等待菜单渲染完成后再计算边界并调整位置
-        this.$nextTick(() => {
-          const menuElement = this.$el.querySelector(".context-menu");
-          if (!menuElement) return;
-
-          const menuRect = menuElement.getBoundingClientRect();
-          const menuWidth = menuRect.width;
-          const menuHeight = menuRect.height;
-
-          // 获取视口和容器边界
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
-          const containerWidth = rootRect.width;
-          const containerHeight = rootRect.height;
-
-          // 计算菜单在视口中的绝对位置
-          const menuAbsoluteX = rootRect.left + x;
-          const menuAbsoluteY = rootRect.top + y;
-
-          // 限制右边界（优先考虑视口，然后考虑容器）
-          if (menuAbsoluteX + menuWidth > viewportWidth) {
-            x = Math.min(
-              containerWidth - menuWidth - 5,
-              viewportWidth - rootRect.left - menuWidth - 5
-            );
-          } else if (x + menuWidth > containerWidth) {
-            x = containerWidth - menuWidth - 5;
-          }
-
-          // 限制左边界（确保不会超出容器左边界）
-          if (x < 0) {
-            x = 5;
-          }
-
-          // 限制下边界（优先考虑视口，然后考虑容器）
-          if (menuAbsoluteY + menuHeight > viewportHeight) {
-            y = Math.min(
-              containerHeight - menuHeight - 5,
-              viewportHeight - rootRect.top - menuHeight - 5
-            );
-          } else if (y + menuHeight > containerHeight) {
-            y = containerHeight - menuHeight - 5;
-          }
-
-          // 限制上边界（确保不会超出容器上边界）
-          if (y < 0) {
-            y = 5;
-          }
-
-          // 更新菜单位置（仅在需要调整时更新，避免不必要的闪烁）
-          if (this.contextMenuX !== x || this.contextMenuY !== y) {
-            this.contextMenuX = x;
-            this.contextMenuY = y;
-          }
-        });
-      });
-    },
-    hideContextMenu() {
-      this.contextMenuVisible = false;
-    },
-    handleUnbind() {
-      this.hideContextMenu();
-      this.$emit("unbind", this.activity.classScheduleId);
-    },
-    handleDelete() {
-      this.hideContextMenu();
-      this.$emit("delete", this.activity);
-    },
-    handleCopy() {
-      this.hideContextMenu();
-      console.log("handleCopy-activity-1", this.activity);
-      this.$emit("copy", this.activity);
-    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
-.classScheduleCard .card-body{
+.classScheduleCard .card-body {
   background-color: #fff;
 }
 .sportScheduleCard {
@@ -538,7 +353,7 @@ export default {
   .context-menu-item {
     padding: 8px 16px;
     font-size: 14px;
-    color: #cc2323;
+    color: #606266;
     cursor: pointer;
     display: flex;
     align-items: center;
