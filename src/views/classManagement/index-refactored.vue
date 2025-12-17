@@ -543,10 +543,10 @@ export default {
       }
       this.getScheduleData();
     },
-    handleCutClass(classesDate, classItem) {
+    async handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
-      this.handlePasteClass(classesDate, classItem);
+      await this.handlePasteClass(classesDate, classItem);
       this.handleDeleteClassSchedule(classItem, true);
     },
     /**
@@ -1164,7 +1164,7 @@ export default {
       )?.commonDate;
 
       if (date && date < new Date().toISOString().split("T")[0]) {
-        this.$message.error("该课程已过期");
+        this.$message.error("该课表已过期");
         return;
       }
       console.log(device, "device");
@@ -1401,6 +1401,10 @@ export default {
           id: classItem?.id,
           triUserId: this.selectedAthletic,
         });
+        if (res.success) {
+          this.$message.success("课表剪切成功");
+          this.getScheduleData();
+        }
       }
     },
 

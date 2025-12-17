@@ -132,7 +132,12 @@
                 :disabled="!classItem.planTitle"
                 popper-class="hover-plan-detail-popover"
               >
-                <span slot="reference" @click.stop>{{ classItem.planTitle }}</span>
+                <!-- <span slot="reference" @click.stop>{{ classItem.planTitle }}</span> -->
+                <span slot="reference">
+                  <div style="width: 100%; cursor: pointer">
+                    {{ classItem.planTitle }}
+                  </div>
+                </span>
                 <HoverPlanDetail :planInfo="classItem"></HoverPlanDetail>
               </el-popover>
             </div>
