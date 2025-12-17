@@ -772,12 +772,14 @@ export default {
           newData.classesJson
         ).updateClassInfoCalculatedValues();
       }
+      console.log(newData, "newData");
       // 计算时间距离STH
       if (["RUN", "CYCLE"].includes(newData.sportType)) {
         const res = await scheduleApi.calculateTimeDistanceSth({
           ...newData,
           classesJson: JSON.stringify(newData.classesJson),
           triUserId: this.selectedAthletic,
+          classesDate: date + " 00:00:00",
         });
 
         if (newData.sportType === "RUN") {

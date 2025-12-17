@@ -147,6 +147,7 @@
                 @unbind="$emit('unbind', $event)"
                 @delete="$emit('delete-activity', $event)"
                 @edit="$emit('edit-activity', activityItem)"
+                @copy="handleCopyActivity"
               />
 
               <!-- 添加课表 -->
@@ -215,7 +216,7 @@ import WeekRangePicker from "@/components/WeekRangePicker";
 import ScheduleClassCard from "./ScheduleClassCard.vue";
 import ActivityCard from "./ActivityCard.vue";
 import HealthDataCard from "./HealthDataCard.vue";
-import { WEEK_LIST } from "../constants";
+import { WEEK_LIST, ACTIVITY_TYPE_DICT } from "../constants";
 import { isToday, convertToLunar } from "../utils/helpers";
 import draggable from "vuedraggable";
 import EventCard from "./eventCard.vue";
@@ -405,6 +406,21 @@ export default {
       this.hasCopiedClass = true;
       // 清除剪切状态，因为复制操作会覆盖剪切操作
       this.hasCutClass = false;
+      this.$message({
+        message: "课表已复制，右键点击目标日期可粘贴",
+        type: "success",
+        duration: 2000,
+      });
+    },
+    handleCopyActivity(activity) {
+      this.copiedClass = {
+        classesJson: activity.classesJson,
+        sportType: ACTIVITY_TYPE_DICT[activity.sportType],
+        labels: activity.classesJson.labels,
+        classesTitle: activity.classesJson.title,
+        classesGroupId: activity.classesJson.groupId,
+      };
+      this.hasCopiedClass = true;
       this.$message({
         message: "课表已复制，右键点击目标日期可粘贴",
         type: "success",
