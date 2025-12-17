@@ -23,7 +23,7 @@
         </div>
         <div class="header-actions">
           <i class="el-icon-delete delete-icon" @click="handleDelete"></i>
-          <i class="el-icon-edit-outline edit-icon" @click="handleEdit"></i>
+          <i class="el-icon-edit-outline edit-icon" @click="handleEditResult"></i>
           <i class="el-icon-close close-icon" @click="handleClose"></i>
         </div>
       </div>
