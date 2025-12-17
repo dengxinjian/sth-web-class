@@ -534,10 +534,10 @@ export default {
       }
       this.getScheduleData();
     },
-    handleCutClass(classesDate, classItem) {
+    async handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
-      this.handlePasteClass(classesDate, classItem);
+      await this.handlePasteClass(classesDate, classItem);
       this.handleDeleteClassSchedule(classItem, true);
     },
     /**
@@ -1363,6 +1363,10 @@ export default {
           id: classItem?.id,
           triUserId: this.selectedAthletic,
         });
+        if (res.success) {
+          this.$message.success("课表剪切成功");
+          this.getScheduleData();
+        }
       }
     },
 
