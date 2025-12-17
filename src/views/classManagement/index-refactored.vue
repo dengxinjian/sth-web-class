@@ -283,7 +283,7 @@
       :visible.sync="showEventInfo"
       :event-data="currentEventData"
       @delete="handleEventDetail"
-      @close="showEventInfo = false"
+      @close="showEventInfo = false;getScheduleData()"
     />
     <InputActivity
       :visible.sync="showInputActivity"
@@ -546,8 +546,8 @@ export default {
     async handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
-      await this.handlePasteClass(classesDate, classItem);
-      this.handleDeleteClassSchedule(classItem, true);
+      this.handlePasteClass(classesDate, classItem);
+      await this.handleDeleteClassSchedule(classItem, true);
     },
     /**
      * 粘贴赛事
@@ -1052,6 +1052,23 @@ export default {
                 part.healthInfos && part.healthInfos.length > 0
                   ? [part.healthInfos[0]]
                   : [];
+              part.competitionList.forEach((i) => {
+                i.deviceActivityBindView.cycle.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.run.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.swim.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.otherT1.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+                i.deviceActivityBindView.otherT2.forEach((item) => {
+                  item.classesJson = parseClassesJson(item.classesJson);
+                })
+              });
               competitionList = part.competitionList || [];
             }
           });

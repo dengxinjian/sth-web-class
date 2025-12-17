@@ -65,6 +65,7 @@ export default {
       } else {
         result = Math.round(distance / 10) / 100;
       }
+      console.log(result, "------------result111");
       return result;
     },
     getSportTypeName(sportType) {
@@ -130,8 +131,6 @@ export default {
       font-weight: 500;
       color: #333;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       max-width: 100px;
     }
     i {

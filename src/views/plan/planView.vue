@@ -180,7 +180,7 @@ export default {
     },
     isPlan: {
       handler(newVal) {
-        console.log(newVal, "newVal");
+        // console.log(newVal, "newVal");
         if (newVal) {
           if (Object.keys(this.$route.query).length > 0) {
             const { id, planGroupId, type } = this.$route.query;
@@ -396,6 +396,7 @@ export default {
 
       const res = await apiMethod(this.planSearchInput);
       if (res.success) {
+        // console.log(res.result, "*======res.result");
         this.classList = res.result.map((item) => ({
           timespan: new Date().getTime(),
           ...item,
@@ -436,10 +437,10 @@ export default {
       this.classModalData = this.findClassById(classId);
     },
     handleViewPlanClass(classItem, clickPosition) {
-      if (!classItem) {
-        console.warn("handleViewPlanClass: classItem is required");
-        return;
-      }
+      // if (!classItem) {
+      //   console.warn("handleViewPlanClass: classItem is required");
+      //   return;
+      // }
       // 使用 classItem 作为课程数据
       this.classModalData = classItem;
       // 保存点击位置
