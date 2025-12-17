@@ -258,7 +258,13 @@ export const competitionApi = {
       parentId,
     });
   },
-  // 426bc17606074ed298580208f3ece3b1
+  // 查询赛事详情
+  getCompetitionDetail(id) {
+    return request({
+      url: `/api/competition/${id}`,
+      method: "get",
+    });
+  },
   // 创建赛事
   createCompetition(data, triUserId) {
     return request({
@@ -298,8 +304,31 @@ export const competitionApi = {
   // 赛事绑定运动
   bindActivity(data) {
     return submitData({
-      url: "/api/competition/bindActivity",
+      url: "/api/activity/activityBindCompetition",
       requestData: data,
+    });
+  },
+  // 赛事解绑运动
+  unbindActivity(data) {
+    return submitData({
+      url: "/api/activity/activityUnBindCompetition",
+      requestData: data,
+    });
+  },
+  // 保存/更新比赛成绩
+  saveCompetitionResult(data) {
+    return request({
+      url: "/api/competition/season-results",
+      method: "put",
+      data,
+    });
+  },
+  // 赛事运动位置移动
+  moveActivityPosition(data) {
+    return request({
+      url: "/api/activity/changeTransitionNode",
+      method: "post",
+      data,
     });
   },
 };

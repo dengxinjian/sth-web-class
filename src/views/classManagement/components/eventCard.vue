@@ -5,6 +5,7 @@
     data-type="planClass"
     :data-id="eventItem.id"
     :data-date="date"
+    draggable="true"
   >
     <div
       class="class-schedule-card-container js-plan-class-card"
