@@ -28,17 +28,19 @@
                 alt=""
               />
               <!-- 设备同步状态 -->
-              <div
-                v-for="device in classItem.syncStatusList"
-                :key="device.deviceType + device.syncStatus"
-                :class="[
-                  'sport-type-name',
-                  'sport-type-color' + device.syncStatus,
-                ]"
-                @click.stop="$emit('device-click', classItem, device)"
-              >
-                {{ getDeviceIcon(device.deviceType) }}
-              </div>
+              <template v-if="!isBeforeToday(date)">
+                <div
+                  v-for="device in classItem.syncStatusList"
+                  :key="device.deviceType + device.syncStatus"
+                  :class="[
+                    'sport-type-name',
+                    'sport-type-color' + device.syncStatus,
+                  ]"
+                  @click.stop="$emit('device-click', classItem, device)"
+                >
+                  {{ getDeviceIcon(device.deviceType) }}
+                </div>
+              </template>
             </div>
             <el-popover
               popper-class="athletic-btn-popover"
@@ -301,6 +303,14 @@ export default {
         result = "--";
       }
       return result;
+    },
+    isBeforeToday(dateStr) {
+      if (!dateStr) return false;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const targetDate = new Date(dateStr);
+      targetDate.setHours(0, 0, 0, 0);
+      return targetDate < today;
     },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单

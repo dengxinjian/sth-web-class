@@ -302,12 +302,16 @@
           >
             <div v-if="item.sections.length > 1" class="stage-header">
               <span class="stage-title">重复次数</span>
-              <el-input
-                v-model="item.times"
+              <el-input-number
+                :step="1"
+                :min="1"
+                controls-position="right"
+                :step-strictly="true"
+                v-model.number="item.times"
                 class="times-input"
                 size="small"
-                @input="handleTimesChange(index)"
-                @change="calculateTimeline(item.times)"
+                @blur="handleTimesChange(index)"
+                 @change="handleTimesChange(index)"
               />
             </div>
             <div
@@ -836,7 +840,6 @@ export default {
     },
   },
   created() {
-    this.handleTimesChange = debounce(this.handleTimesChange, 500);
   },
   mounted() {
     if (this.innerVisible) {
@@ -887,16 +890,22 @@ export default {
     handleTimesChange(stageIndex) {
       const stage = this.classInfo.stages[stageIndex];
       console.log(stage, "stage", stageIndex);
-      const times = Number(stage.times);
+
+      let times = Number(stage.times);
+      // 当输入框被清空或为非法值时，重置为 1
       if (isNaN(times) || times < 1) {
-        this.$set(this.classInfo.stages[stageIndex], "times", 1);
+        times = 1;
       } else if (!Number.isInteger(times)) {
-        this.$set(
-          this.classInfo.stages[stageIndex],
-          "times",
-          Math.max(1, Math.round(times))
-        );
+        times = Math.max(1, Math.round(times));
       }
+
+      // 强制写回到响应式数据，触发 el-input-number 重新渲染
+      this.$set(this.classInfo.stages[stageIndex], "times", times);
+
+      // 失焦后统一刷新时间线，保证视图和数据同步
+      this.$nextTick(() => {
+        this.calculateTimeline(times);
+      });
     },
     calculateThresholdFtpNum(thresholdFtp) {
       return new CalculateBike(this.athleticThreshold).calculateThresholdFtpNum(
