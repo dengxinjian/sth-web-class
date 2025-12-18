@@ -283,7 +283,10 @@
       :visible.sync="showEventInfo"
       :event-data="currentEventData"
       @delete="handleEventDetail"
-      @close="showEventInfo = false;getScheduleData()"
+      @close="
+        showEventInfo = false;
+        getScheduleData();
+      "
     />
     <InputActivity
       :visible.sync="showInputActivity"
@@ -724,12 +727,13 @@ export default {
         competitionApi.deleteCompetition(eventItem.id).then((res) => {
           if (res.success) {
             this.$message.success("赛事删除成功");
+            this.showEventInfo = false;
             this.getScheduleData();
           }
         });
       });
     },
-    handleEditEvent(eventItem) {
+    handleEditEvent(eventItem, type) {
       console.log(eventItem, "eventItem");
 
       // 获取今天的日期（只比较日期部分，不考虑时间）
@@ -755,7 +759,15 @@ export default {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       // 校验日期必须大于今天
-      if (diffDays > 0) {
+      if (diffDays >= 0) {
+        if (
+          type === "click" &&
+          diffDays === 0
+        ) {
+          this.currentEventData = eventItem;
+          this.showEventInfo = true;
+          return;
+        }
         this.currentEventData = eventItem;
         this.showAddEvent = true;
         this.isEditMode = true;
@@ -1086,19 +1098,19 @@ export default {
               part.competitionList.forEach((i) => {
                 i.deviceActivityBindView.cycle.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.run.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.swim.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.otherT1.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.otherT2.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
               });
               competitionList = part.competitionList || [];
             }

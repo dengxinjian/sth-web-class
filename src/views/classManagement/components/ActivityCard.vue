@@ -1,7 +1,7 @@
 <template>
   <div style="position: relative">
     <div
-      class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
+      class="classScheduleCard ActivityCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
       :data-activityId="activity.activityId"
       :data-manualActivityId="activity.manualActivityId"
       :data-date="date"

@@ -114,7 +114,7 @@
                 :event-item="eventItem"
                 :date="item.commonDate"
                 @delete="$emit('event-detail', eventItem)"
-                @edit="$emit('edit-event', eventItem)"
+                @edit="handleEditEvent"
                 @copy="handleCopyEvent"
                 @cut="handleCutEvent"
               />
@@ -279,6 +279,9 @@ export default {
   methods: {
     isToday,
     convertToLunar,
+    handleEditEvent(eventItem, type) {
+      this.$emit("edit-event", eventItem, type);
+    },
     handleDeviceClick(classItem, device) {
       this.$emit("device-click", classItem, device);
     },
@@ -680,7 +683,7 @@ export default {
 /* 拖拽克隆元素样式 - 红色矩形带渐变效果 */
 ::v-deep .is-drag-ghost {
   position: relative;
-  background: #F92B30 !important;
+  background: #f92b30 !important;
   border-radius: 6px !important;
   border-left: 1px solid rgba(255, 255, 255, 0.5) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.5) !important;
@@ -701,7 +704,7 @@ export default {
 
   /* 顶部光泽渐变效果 */
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -721,7 +724,7 @@ export default {
 
   /* 底部阴影渐变效果 */
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
@@ -793,5 +796,4 @@ export default {
 .context-menu-fade-leave-to {
   opacity: 0;
 }
-
 </style>

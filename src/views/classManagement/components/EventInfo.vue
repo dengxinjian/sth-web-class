@@ -23,7 +23,6 @@
         </div>
         <div class="header-actions">
           <i class="el-icon-delete delete-icon" @click="handleDelete"></i>
-          <i class="el-icon-edit-outline edit-icon" @click="handleEditResult"></i>
           <i class="el-icon-close close-icon" @click="handleClose"></i>
         </div>
       </div>
@@ -464,8 +463,81 @@ export default {
     innerVisible(val) {
       this.$emit("update:visible", val);
     },
+    // 监听成绩字段变化，自动计算总成绩（当 competitionType !== 3 时）
+    "editForm.swimmingResult"() {
+      if (this.eventData.competitionType !== 3) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.t1Result"() {
+      if (this.eventData.competitionType === 2) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.cyclingResult"() {
+      if (this.eventData.competitionType !== 3) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.t2Result"() {
+      if (this.eventData.competitionType === 2) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.runningResult"() {
+      if (this.eventData.competitionType !== 3) {
+        this.calculateTotalResult();
+      }
+    },
   },
   methods: {
+    /**
+     * 根据录入的成绩自动计算总成绩
+     */
+    calculateTotalResult() {
+      if (this.eventData.competitionType === 3) {
+        // 其他类型：不自动计算，保持手动输入
+        return;
+      }
+
+      let totalSeconds = 0;
+
+      if (this.eventData.competitionType === 1) {
+        // 路跑：总成绩 = 跑步成绩
+        totalSeconds = this.timeToSeconds(this.editForm.runningResult) || 0;
+      } else if (this.eventData.competitionType === 4) {
+        // 骑行：总成绩 = 骑行成绩
+        totalSeconds = this.timeToSeconds(this.editForm.cyclingResult) || 0;
+      } else if (this.eventData.competitionType === 5) {
+        // 游泳：总成绩 = 游泳成绩
+        totalSeconds = this.timeToSeconds(this.editForm.swimmingResult) || 0;
+      } else if (this.eventData.competitionType === 2) {
+        // 铁三：总成绩 = 游泳成绩 + T1成绩 + 骑行成绩 + T2成绩 + 跑步成绩
+        const swimming = this.timeToSeconds(this.editForm.swimmingResult) || 0;
+        const t1 = this.timeToSeconds(this.editForm.t1Result) || 0;
+        const cycling = this.timeToSeconds(this.editForm.cyclingResult) || 0;
+        const t2 = this.timeToSeconds(this.editForm.t2Result) || 0;
+        const running = this.timeToSeconds(this.editForm.runningResult) || 0;
+        totalSeconds = swimming + t1 + cycling + t2 + running;
+      }
+
+      // 将总秒数转换为时间格式并更新到表单
+      if (totalSeconds > 0) {
+        this.editForm.totalResult = this.secondsToTime(totalSeconds);
+      } else {
+        this.editForm.totalResult = "";
+      }
+    },
+    /**
+     * 将秒数转换为时间格式 (HH:MM:SS)
+     */
+    secondsToTime(seconds) {
+      if (!seconds || seconds <= 0) return "";
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    },
     formatDistance(distance, sportType) {
       let result = Math.round(distance / 10) / 100;
       if (distance && typeof distance === "string" && distance.includes("km")) {
@@ -559,7 +631,7 @@ export default {
     handleDelete() {
       // TODO: 实现删除功能
       this.$emit("delete", this.eventData);
-      this.handleClose();
+      // this.handleClose();
       // this.$message.info("删除功能待实现");
     },
     handleEdit() {
@@ -574,27 +646,27 @@ export default {
         genderRank: this.competitionResult?.genderRank || "",
         swimmingResult: this.competitionResult?.swimmingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.swimmingResult,
-              false
-            )
+            this.competitionResult.swimmingResult,
+            false
+          )
           : "",
         t1Result: this.competitionResult?.t1Result
           ? this.secondsToTimeFormat(this.competitionResult.t1Result, false)
           : "",
         cyclingResult: this.competitionResult?.cyclingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.cyclingResult,
-              false
-            )
+            this.competitionResult.cyclingResult,
+            false
+          )
           : "",
         t2Result: this.competitionResult?.t2Result
           ? this.secondsToTimeFormat(this.competitionResult.t2Result, false)
           : "",
         runningResult: this.competitionResult?.runningResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.runningResult,
-              false
-            )
+            this.competitionResult.runningResult,
+            false
+          )
           : "",
         totalResult: this.competitionResult?.totalResult
           ? this.secondsToTimeFormat(this.competitionResult.totalResult, false)
@@ -678,7 +750,9 @@ export default {
           groupRank: this.editForm.groupRank,
           genderRank: this.editForm.genderRank,
           feedback: this.editForm.feedback || "",
+          totalResult: this.timeToSeconds(this.editForm.totalResult),
         };
+
         // 根据比赛类型添加相应的成绩字段
         if (
           this.eventData.competitionType === 2 ||
@@ -708,6 +782,7 @@ export default {
             this.editForm.cyclingResult
           );
         }
+
         if (
           this.eventData.competitionType === 2 ||
           this.eventData.competitionType === 1
@@ -719,7 +794,7 @@ export default {
             this.editForm.runningResult
           );
         }
-        if (this.eventData.competitionType === 2) {
+        if (this.eventData.competitionType !== 3) {
           saveData.totalResult = 0;
         }
 
