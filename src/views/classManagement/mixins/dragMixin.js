@@ -14,39 +14,39 @@ export default {
      * 选中时设置浅红色背景
      */
     setDragBg(e) {
-      const cardElement =
-        e.item.closest(
-          ".classScheduleCard, .sportScheduleCard, .class-schedule-card-container"
-        ) || e.item;
-      if (cardElement) {
-        cardElement.dataset.originalBg =
-          cardElement.style.backgroundColor || "";
-        cardElement.style.backgroundColor = "#f7d7d7";
-      }
-      console.log(cardElement, "cardElement");
-      console.log(
-        cardElement.style.backgroundColor,
-        "cardElement.style.backgroundColor"
-      );
+      // const cardElement =
+      //   e.item.closest(
+      //     ".ActivityCard,.classScheduleCard,.sportScheduleCard,.class-schedule-card-container",
+      //   ) || e.item;
+      // if (cardElement) {
+      //   cardElement.dataset.originalBg =
+      //     cardElement.style.backgroundColor || "";
+      //   cardElement.style.backgroundColor = "#f7d7d7";
+      // }
+      // console.log(cardElement, "cardElement");
+      // console.log(
+      //   cardElement.style.backgroundColor,
+      //   "cardElement.style.backgroundColor"
+      // );
 
-      const cardBody =
-        (e.item.classList &&
-          (e.item.classList.contains("card-body") ||
-            e.item.classList.contains("sport-drap-handle") ||
-            e.item.classList.contains("class-drap-handle"))) ||
-        !cardElement
-          ? e.item
-          : cardElement.querySelector(".card-body");
+      // const cardBody =
+      //   (e.item.classList &&
+      //     (e.item.classList.contains("card-body") ||
+      //       e.item.classList.contains("sport-drap-handle") ||
+      //       e.item.classList.contains("class-drap-handle"))) ||
+      //   !cardElement
+      //     ? e.item
+      //     : cardElement.querySelector(".card-body");
 
-      if (cardElement) {
-        cardElement.dataset.originalBg =
-          cardElement.style.backgroundColor || "";
-        cardElement.style.backgroundColor = "#F92B3033";
-      }
-      if (cardBody && cardBody !== cardElement) {
-        cardBody.dataset.originalBg = cardBody.style.backgroundColor || "";
-        cardBody.style.backgroundColor = "#F92B3033";
-      }
+      // if (cardElement) {
+      //   cardElement.dataset.originalBg =
+      //     cardElement.style.backgroundColor || "";
+      //   cardElement.style.backgroundColor = "#F92B3033";
+      // }
+      // if (cardBody && cardBody !== cardElement) {
+      //   cardBody.dataset.originalBg = cardBody.style.backgroundColor || "";
+      //   cardBody.style.backgroundColor = "#F92B3033";
+      // }
       // console.log(cardBody, "cardBody");
     },
 

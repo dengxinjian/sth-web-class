@@ -46,6 +46,7 @@
                 <el-button
                   type="text"
                   icon="el-icon-edit"
+                  v-if="isCanEditEvent(eventItem)"
                   @click.stop="$emit('edit', eventItem)"
                 >
                   编辑
@@ -53,6 +54,7 @@
                 <el-button
                   type="text"
                   icon="el-icon-scissors"
+                  v-if="isCanEditEvent(eventItem)"
                   @click.stop="handleCut"
                 >
                   剪切
@@ -159,6 +161,7 @@
       >
         <div
           class="context-menu-item"
+          v-if="isCanEditEvent(eventItem)"
           @click.stop="
             $emit('edit', eventItem);
             hideContextMenu();
@@ -167,7 +170,11 @@
           <i class="el-icon-edit"></i>
           编辑
         </div>
-        <div class="context-menu-item" @click.stop="handleCut">
+        <div
+          class="context-menu-item"
+          v-if="isCanEditEvent(eventItem)"
+          @click.stop="handleCut"
+        >
           <i class="el-icon-scissors"></i>
           剪切
         </div>
@@ -229,6 +236,7 @@ export default {
       return { backgroundColor: "#fff" };
     },
   },
+
   mounted() {
     document.addEventListener("click", this.hideContextMenu);
   },
@@ -236,6 +244,46 @@ export default {
     document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
+    isCanEditEvent(eventItem) {
+      console.log(eventItem, "eventItem");
+      if (this.isPlan) {
+        return true;
+      }
+      // 获取今天的日期（只比较日期部分，不考虑时间）
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // 解析 eventItem.competitionDate（可能是 "YYYY-MM-DD" 格式或 Date 对象）
+      let eventDate;
+      if (typeof eventItem.competitionDate === "string") {
+        console.log(eventItem.competitionDate, "eventItem.competitionDate");
+        eventDate = new Date(eventItem.competitionDate);
+      } else if (eventItem.competitionDate instanceof Date) {
+        eventDate = new Date(eventItem.competitionDate);
+      } else {
+        return;
+      }
+
+      eventDate.setHours(0, 0, 0, 0);
+
+      // 计算天数差
+      const diffTime = eventDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      let flag = false;
+      // 校验日期必须大于今天
+      if (diffDays >= 0) {
+        flag = true;
+      } else {
+        flag = false;
+      }
+      if (
+        diffDays === 0 &&
+        (this.eventItem.hasBind === true || this.eventItem.totalResult)
+      ) {
+        flag = false;
+      }
+      return flag;
+    },
     getClassImageIcon(priority) {
       if (priority === "PRIMARY" || priority === 1) {
         return require("@/assets/addClass/eventOne.png");
@@ -328,7 +376,7 @@ export default {
         return;
       }
       this.hideContextMenu();
-      this.$emit("edit", this.eventItem);
+      this.$emit("edit", this.eventItem, "click");
     },
     hideContextMenu() {
       this.contextMenuVisible = false;

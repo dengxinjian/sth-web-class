@@ -283,7 +283,10 @@
       :visible.sync="showEventInfo"
       :event-data="currentEventData"
       @delete="handleEventDetail"
-      @close="showEventInfo = false;getScheduleData()"
+      @close="
+        showEventInfo = false;
+        getScheduleData();
+      "
     />
     <InputActivity
       :visible.sync="showInputActivity"
@@ -493,8 +496,39 @@ export default {
     if (this.$store.state.fromPath === "/plan/add") {
       this.isPlan = true;
     }
+    // 监听身份切换事件
+    this.$root.$on("identity-changed", this.handleIdentityChanged);
+  },
+  beforeDestroy() {
+    // 移除事件监听
+    this.$root.$off("identity-changed", this.handleIdentityChanged);
   },
   methods: {
+    /**
+     * 处理身份切换事件
+     */
+    handleIdentityChanged(loginType) {
+      console.log("监听到身份切换事件");
+      // 在这里添加你需要处理的逻辑
+      // 例如：重新加载数据、重置状态等
+      this.activeName = "class";
+      localStorage.setItem("activeName", "class");
+      console.log(this.activeName, "this.activeName");
+      // this.initMenuFromRoute();
+      if (localStorage.getItem("loginType") !== "1") {
+        this.getTeamAndAthleticData();
+      } else {
+        this.selectedAthletic = localStorage.getItem("triUserId");
+        this.getScheduleData();
+        this.getAthleticThreshold(this.selectedAthletic);
+        this.getAuthorizedDeviceList();
+      }
+      this.getClassList();
+      console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
+      if (this.$store.state.fromPath === "/plan/add") {
+        this.isPlan = true;
+      }
+    },
     handleChoosePlan(isPlan) {
       console.log("handleChoosePlan");
       this.isPlan = isPlan;
@@ -546,8 +580,8 @@ export default {
     async handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
-      this.handlePasteClass(classesDate, classItem);
-      await this.handleDeleteClassSchedule(classItem, true);
+      await this.handlePasteClass(classesDate, classItem);
+      this.handleDeleteClassSchedule(classItem, true);
     },
     /**
      * 粘贴赛事
@@ -693,12 +727,13 @@ export default {
         competitionApi.deleteCompetition(eventItem.id).then((res) => {
           if (res.success) {
             this.$message.success("赛事删除成功");
+            this.showEventInfo = false;
             this.getScheduleData();
           }
         });
       });
     },
-    handleEditEvent(eventItem) {
+    handleEditEvent(eventItem, type) {
       console.log(eventItem, "eventItem");
 
       // 获取今天的日期（只比较日期部分，不考虑时间）
@@ -724,7 +759,15 @@ export default {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       // 校验日期必须大于今天
-      if (diffDays > 0) {
+      if (diffDays >= 0) {
+        if (
+          type === "click" &&
+          diffDays === 0
+        ) {
+          this.currentEventData = eventItem;
+          this.showEventInfo = true;
+          return;
+        }
         this.currentEventData = eventItem;
         this.showAddEvent = true;
         this.isEditMode = true;
@@ -1055,19 +1098,19 @@ export default {
               part.competitionList.forEach((i) => {
                 i.deviceActivityBindView.cycle.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.run.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.swim.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.otherT1.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
                 i.deviceActivityBindView.otherT2.forEach((item) => {
                   item.classesJson = parseClassesJson(item.classesJson);
-                })
+                });
               });
               competitionList = part.competitionList || [];
             }
