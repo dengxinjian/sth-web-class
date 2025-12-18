@@ -1386,7 +1386,7 @@ export default {
     },
     saveActivityScheduleForManual(flag) {
       submitData({
-        url: "/api/manualDeviceActivity/update",
+        url: "/gateway/training/api/manualDeviceActivity/update",
         manualActivityId: this.classData.manualActivityId,
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,

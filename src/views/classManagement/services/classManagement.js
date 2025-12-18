@@ -67,20 +67,18 @@ export const classApi = {
 export const scheduleApi = {
   // 获取日历概览
   getCalendarOverview({ begin, end, triUserId }) {
-    return submitData({
+    return getData({
       url: "/gateway/training/activity/getCalenderOverview",
-      requestData: {
-        begin,
-        end,
-        triUserId,
-      },
+      begin,
+      end,
+      triUserId,
     });
   },
 
   // 获取健康数据
   getHealthData({ deviceType, date, triUserId }) {
     return getData({
-      url: "/api/health",
+      url: "/gateway/training/api/health",
       deviceType,
       date,
       triUserId,
@@ -112,7 +110,7 @@ export const scheduleApi = {
   // 运动详细
   getActivityDetail(activityId) {
     return getData({
-      url: "/api/classSchedule/getActivityDetail",
+      url: "/gateway/training/api/activity/getActivityDetail",
       activityId,
     });
   },
@@ -120,7 +118,7 @@ export const scheduleApi = {
   // 课表绑定运动
   bindActivity(data) {
     return submitData({
-      url: "/api/classSchedule/classBindingActivity",
+      url: "/gateway/training/api/classSchedule/classBindingActivity",
       requestData: data,
     });
   },
@@ -128,7 +126,7 @@ export const scheduleApi = {
   // 课表解绑运动
   unbindActivity(classScheduleId) {
     return submitData({
-      url: "/api/classSchedule/classUnbindActivity",
+      url: "/gateway/training/api/classSchedule/classUnbindActivity",
       requestData: { classScheduleId },
     });
   },
@@ -136,7 +134,7 @@ export const scheduleApi = {
   // 删除运动
   deleteActivity(activityId, type) {
     return submitData({
-      url: `/api/classSchedule/deleteActivity?activityId=${activityId}&type=${type}`,
+      url: `/gateway/training/api/activity/deleteActivity?activityId=${activityId}&type=${type}`,
     });
   },
 
@@ -158,7 +156,7 @@ export const scheduleApi = {
   // 录入运动
   createActivity(data) {
     return submitData({
-      url: "/api/manualDeviceActivity/create",
+      url: "/gateway/training/api/manualDeviceActivity/create",
       requestData: data,
     });
   },
@@ -277,7 +275,7 @@ export const competitionApi = {
       headers: {
         requestUserInfoId: triUserId,
       },
-    })
+    });
   },
 
   // 更新赛事
@@ -294,7 +292,7 @@ export const competitionApi = {
       },
       method: "put",
       data,
-    })
+    });
   },
   // 删除赛事
   deleteCompetition(id) {
