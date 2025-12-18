@@ -493,8 +493,39 @@ export default {
     if (this.$store.state.fromPath === "/plan/add") {
       this.isPlan = true;
     }
+    // 监听身份切换事件
+    this.$root.$on("identity-changed", this.handleIdentityChanged);
+  },
+  beforeDestroy() {
+    // 移除事件监听
+    this.$root.$off("identity-changed", this.handleIdentityChanged);
   },
   methods: {
+    /**
+     * 处理身份切换事件
+     */
+    handleIdentityChanged(loginType) {
+      console.log("监听到身份切换事件");
+      // 在这里添加你需要处理的逻辑
+      // 例如：重新加载数据、重置状态等
+      this.activeName = "class";
+      localStorage.setItem("activeName", "class");
+      console.log(this.activeName, "this.activeName");
+      // this.initMenuFromRoute();
+      if (localStorage.getItem("loginType") !== "1") {
+        this.getTeamAndAthleticData();
+      } else {
+        this.selectedAthletic = localStorage.getItem("triUserId");
+        this.getScheduleData();
+        this.getAthleticThreshold(this.selectedAthletic);
+        this.getAuthorizedDeviceList();
+      }
+      this.getClassList();
+      console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
+      if (this.$store.state.fromPath === "/plan/add") {
+        this.isPlan = true;
+      }
+    },
     handleChoosePlan(isPlan) {
       console.log("handleChoosePlan");
       this.isPlan = isPlan;
@@ -546,8 +577,8 @@ export default {
     async handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
-      this.handlePasteClass(classesDate, classItem);
-      await this.handleDeleteClassSchedule(classItem, true);
+      await this.handlePasteClass(classesDate, classItem);
+      this.handleDeleteClassSchedule(classItem, true);
     },
     /**
      * 粘贴赛事
