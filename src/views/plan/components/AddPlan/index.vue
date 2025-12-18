@@ -264,6 +264,7 @@ export default {
             email: val.email,
             weChat: val.weChat,
             description: val.description,
+            level: val.level,
           };
         });
         // 清除表单验证状态
@@ -386,6 +387,7 @@ export default {
         weChat: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.weChat : undefined,
         description: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.description : undefined,
         ownerName: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.ownerName : undefined,
+        level: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.level : undefined,
       };
       this.$nextTick(() => {
         if (this.$refs.formRef) {
@@ -406,7 +408,7 @@ export default {
           }),
         };
       }).filter(el => el.details.length > 0 || el.competitionDtoList.length > 0);
-      const res = await planApi.createSelfPlanByOffice({
+      const params = {
         planTitle: this.form.planTitle,
         planGroupId: this.form.planGroupId,
         teamId: this.form.teamId,
@@ -414,8 +416,10 @@ export default {
         weChat: this.form.weChat,
         description: this.form.description,
         officialPlanId: this.copyOfficialPlanInfo.id,
+        level: this.form.level,
         dayDetails: planData,
-      });
+      }
+      const res = await planApi.createSelfPlanByOffice(params);
       if (res.success) {
         this.$message.success("添加成功");
         this.onCancel();
