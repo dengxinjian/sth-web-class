@@ -54,7 +54,7 @@
                 <el-button
                   type="text"
                   icon="el-icon-scissors"
-                   v-if="isCanEditEvent(eventItem)"
+                  v-if="isCanEditEvent(eventItem)"
                   @click.stop="handleCut"
                 >
                   剪切
@@ -161,7 +161,7 @@
       >
         <div
           class="context-menu-item"
-           v-if="isCanEditEvent(eventItem)"
+          v-if="isCanEditEvent(eventItem)"
           @click.stop="
             $emit('edit', eventItem);
             hideContextMenu();
@@ -170,7 +170,11 @@
           <i class="el-icon-edit"></i>
           编辑
         </div>
-        <div class="context-menu-item" v-if="isCanEditEvent(eventItem)" @click.stop="handleCut">
+        <div
+          class="context-menu-item"
+          v-if="isCanEditEvent(eventItem)"
+          @click.stop="handleCut"
+        >
           <i class="el-icon-scissors"></i>
           剪切
         </div>
@@ -242,6 +246,9 @@ export default {
   methods: {
     isCanEditEvent(eventItem) {
       console.log(eventItem, "eventItem");
+      if (this.isPlan) {
+        return true;
+      }
       // 获取今天的日期（只比较日期部分，不考虑时间）
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -254,7 +261,6 @@ export default {
       } else if (eventItem.competitionDate instanceof Date) {
         eventDate = new Date(eventItem.competitionDate);
       } else {
-        this.$message.error("赛事日期格式无效");
         return;
       }
 
@@ -265,15 +271,14 @@ export default {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       let flag = false;
       // 校验日期必须大于今天
-      if (diffDays >= 0 && this.isPlan === false) {
+      if (diffDays >= 0) {
         flag = true;
       } else {
         flag = false;
       }
       if (
         diffDays === 0 &&
-        (this.eventItem.hasBind === true || this.eventItem.totalResult) &&
-        this.isPlan === false
+        (this.eventItem.hasBind === true || this.eventItem.totalResult)
       ) {
         flag = false;
       }
@@ -370,10 +375,6 @@ export default {
       if (this.isDragging) {
         return;
       }
-      console.log(
-        (this.eventItem.hasBind === true || this.eventItem.totalResult) &&
-          this.isPlan === false
-      );
       this.hideContextMenu();
       this.$emit("edit", this.eventItem, "click");
     },
