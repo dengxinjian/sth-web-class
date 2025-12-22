@@ -103,7 +103,7 @@ export default {
         // 由父组件决定具体新增/编辑接口，此处只派发规范化数据
         if (this.form.id) {
           submitData({
-            url: "/api/planClassesGroup/updatePlanClassesGroup",
+            url: "/training/api/planClassesGroup/updatePlanClassesGroup",
             requestData: { ...this.form },
           }).then((res) => {
             if (res.success) {
@@ -113,7 +113,7 @@ export default {
           });
         } else {
           submitData({
-            url: "/api/planClassesGroup/createPlanClassesGroup",
+            url: "/training/api/planClassesGroup/createPlanClassesGroup",
             requestData: { ...this.form },
           }).then((res) => {
             if (res.success) {

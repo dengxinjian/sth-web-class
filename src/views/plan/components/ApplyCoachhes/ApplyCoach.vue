@@ -410,7 +410,7 @@ export default {
     },
     getTeamList() {
       getData({
-        url: "/api/team/coach/all-teams",
+        url: "/consumer/api/team/coach/all-teams",
       }).then((res) => {
         this.teams = res.result;
       });
@@ -423,7 +423,7 @@ export default {
       this.teamGroupList = []
       if (!teamId) return;
       getData({
-        url: `/api/team/group/list/${teamId}`,
+        url: `/consumer/api/team/group/list/${teamId}`,
         teamId: teamId,
       }).then((res) => {
         const treeData = (res.result || [])
@@ -455,7 +455,7 @@ export default {
     },
     getMembersList(teamId) {
       getData({
-        url: `/api/team/info/${teamId}`,
+        url: `/consumer/api/team/info/${teamId}`,
         teamId: teamId,
       }).then((res) => {
         this.athletesList = res.result.athletes || [];
@@ -627,7 +627,7 @@ export default {
         targets,
       };
       submitData({
-        url: "/api/planClasses/applyPlanClasses",
+        url: "/training/api/planClasses/applyPlanClasses",
         requestData: params,
       })
         .then((res) => {

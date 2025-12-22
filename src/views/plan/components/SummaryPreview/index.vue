@@ -484,14 +484,14 @@ export default {
     },
     getGroupList() {
       getData({
-        url: "/api/planClassesGroup/option",
+        url: "/training/api/planClassesGroup/option",
       }).then((res) => {
         this.groups = res.result;
       });
     },
     getTeamList() {
       getData({
-        url: "/api/team/coach/all-teams",
+        url: "/consumer/api/team/coach/all-teams",
       }).then((res) => {
         this.teams = res.result;
       });
@@ -509,7 +509,7 @@ export default {
         };
         // console.log(params, "params");
         submitData({
-          url: "/api/planClasses/updatePlanClasses",
+          url: "/training/api/planClasses/updatePlanClasses",
           requestData: params,
         }).then((res) => {
           if (res.success) {

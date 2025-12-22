@@ -219,7 +219,7 @@ export default {
   methods: {
     getTeamList() {
       getData({
-        url: "/api/team/coach/all-teams",
+        url: "/consumer/api/team/coach/all-teams",
       }).then((res) => {
         this.ownerTeams = res.result;
       });

@@ -116,7 +116,7 @@ export default {
   methods: {
     getGroupList() {
       getData({
-        url: "/api/planClassesGroup/option",
+        url: "/training/api/planClassesGroup/option",
       }).then((res) => {
         this.groups = res.result;
       });
@@ -163,7 +163,7 @@ export default {
         };
         console.log(params, "params");
         submitData({
-          url: "/api/planClasses/copyPlanClasses",
+          url: "/training/api/planClasses/copyPlanClasses",
           requestData: params,
         }).then((res) => {
           if (res.success) {

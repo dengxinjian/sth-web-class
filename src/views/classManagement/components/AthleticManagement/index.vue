@@ -478,7 +478,7 @@ export default {
       if (!this.teamId) return;
 
       getData({
-        url: `/api/team/group/list/${this.teamId}`,
+        url: `/consumer/api/team/group/list/${this.teamId}`,
         // url: '/api/team/coach/all-teams',
         teamId: this.teamId,
       })

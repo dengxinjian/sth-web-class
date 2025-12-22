@@ -11,7 +11,7 @@ import request from "@/utils/request";
 export const teamApi = {
   // 获取所有团队
   getAllTeams() {
-    return getData({ url: "/api/team/coach/all-teams" });
+    return getData({ url: "/consumer/api/team/coach/all-teams" });
   },
 };
 

@@ -10,7 +10,7 @@ export const planApi = {
   // 获取用户计划列表（按分组）
   getPlansByUserId(titleKeyword = "") {
     return getData({
-      url: "/api/planClasses/listWithPlans",
+      url: "/training/api/planClasses/listWithPlans",
       titleKeyword,
     });
   },
@@ -18,7 +18,7 @@ export const planApi = {
   // 获取官方计划
   getOfficialPlans(titleKeyword = "") {
     return getData({
-      url: "/api/planClasses/official/listWithPlans",
+      url: "/training/api/planClasses/official/listWithPlans",
       titleKeyword,
     });
   },
@@ -26,7 +26,7 @@ export const planApi = {
   // 创建个人计划
   createSelfPlan(data) {
     return submitData({
-      url: "/api/planClasses/createPlanClasses",
+      url: "/training/api/planClasses/createPlanClasses",
       requestData: data,
     });
   },
@@ -34,7 +34,7 @@ export const planApi = {
   // 根据官方计划创建计划
   createSelfPlanByOffice(data) {
     return submitData({
-      url: "/api/planClasses/importOfficialPlan",
+      url: "/training/api/planClasses/importOfficialPlan",
       requestData: data,
     });
   },
@@ -42,7 +42,7 @@ export const planApi = {
   // 添加计划
   addPlan(data) {
     return submitData({
-      url: "/api/planClasses/createPlanClasses",
+      url: "/training/api/planClasses/createPlanClasses",
       requestData: data,
     });
   },
@@ -50,7 +50,7 @@ export const planApi = {
   // 更新计划
   updatePlan(data) {
     return submitData({
-      url: "/api/planClasses/updatePlanClassesDayDetail",
+      url: "/training/api/planClasses/updatePlanClassesDayDetail",
       requestData: data,
     });
   },
@@ -58,28 +58,28 @@ export const planApi = {
   // 获取计划详情
   getPlanDetail(id) {
     return getData({
-      url: `/api/planClasses/getPlanClassesById?id=${id}`,
+      url: `/training/api/planClasses/getPlanClassesById?id=${id}`,
     });
   },
 
   // 获取计划详情
   getPlanDayDetail(id) {
     return getData({
-      url: `/api/planClasses/getPlanClassesDayDetail?planClassesId=${id}`,
+      url: `/training/api/planClasses/getPlanClassesDayDetail?planClassesId=${id}`,
     });
   },
 
   // 删除计划
   deletePlan(id) {
     return submitData({
-      url: `/api/planClasses/delete?id=${id}`,
+      url: `/training/api/planClasses/delete?id=${id}`,
     });
   },
 
   // 计划限制数量
   getPlanLimitCount() {
     return getData({
-      url: "/api/planClasses/getUserPlanClassesCount",
+      url: "/training/api/planClasses/getUserPlanClassesCount",
     });
   },
 };
@@ -91,7 +91,7 @@ export const groupApi = {
   // 删除分组
   deleteGroup(id) {
     return submitData({
-      url: `/api/planClassesGroup/deletePlanClassesGroup?id=${id}`,
+      url: `/training/api/planClassesGroup/deletePlanClassesGroup?id=${id}`,
     });
   },
 };

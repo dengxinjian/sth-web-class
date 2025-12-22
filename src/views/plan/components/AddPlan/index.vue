@@ -325,7 +325,7 @@ export default {
     },
     getGroupList() {
       getData({
-        url: "/api/planClassesGroup/option",
+        url: "/training/api/planClassesGroup/option",
       }).then((res) => {
         this.groups = res.result;
         if (!this.currentGroupId) {
@@ -344,7 +344,7 @@ export default {
     },
     getTeamList() {
       getData({
-        url: "/api/team/coach/all-teams",
+        url: "/consumer/api/team/coach/all-teams",
       }).then((res) => {
         this.teams = res.result;
       });
