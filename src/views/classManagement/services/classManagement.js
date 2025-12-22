@@ -194,7 +194,7 @@ export const athleteApi = {
   // 获取授权设备列表
   getAuthorizedDevices(triUserId) {
     return getData({
-      url: "/api/classSchedule/authorizedDevice",
+      url: "/device/api/device/authorizedDevice",
       triUserId,
     });
   },
@@ -202,13 +202,13 @@ export const athleteApi = {
   // 更新授权设备
   updateAuthorizedDevice({ deviceId, syncFlag }) {
     return submitData({
-      url: `/api/classSchedule/updateAuthorizedDevice?deviceId=${deviceId}&syncFlag=${syncFlag}`,
+      url: `/device/api/device/updateAuthorizedDevice?deviceId=${deviceId}&syncFlag=${syncFlag}`,
     });
   },
   // 获取所有设备列表
   getDeviceList(triUserId) {
     return getData({
-      url: "/api/classSchedule/authorizedAllDevice",
+      url: "/device/api/device/authorizedAllDevice",
       triUserId,
     });
   },
@@ -221,7 +221,7 @@ export const groupApi = {
   // 创建分组
   createGroup(data) {
     return submitData({
-      url: "/api/classesGroup/create",
+      url: "/training/api/classesGroup/create",
       requestData: data,
     });
   },
@@ -229,7 +229,7 @@ export const groupApi = {
   // 更新分组
   updateGroup(data) {
     return submitData({
-      url: "/api/classesGroup/update",
+      url: "/training/api/classesGroup/update",
       requestData: data,
     });
   },
@@ -237,7 +237,7 @@ export const groupApi = {
   // 删除分组
   deleteGroup(id) {
     return submitData({
-      url: `/api/classesGroup/deleteClassesGroup?id=${id}`,
+      url: `/training/api/classesGroup/deleteClassesGroup?id=${id}`,
     });
   },
 };

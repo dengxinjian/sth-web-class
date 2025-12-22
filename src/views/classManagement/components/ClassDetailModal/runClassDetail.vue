@@ -1213,7 +1213,7 @@ export default {
       })
         .then(() => {
           submitData({
-            url: "/api/classes/deleteClasses?id=" + this.classInfo.id,
+            url: "/training/api/classes/deleteClasses?id=" + this.classInfo.id,
           }).then((res) => {
             if (res.success) {
               this.resetForm();
@@ -1233,7 +1233,7 @@ export default {
         return;
       }
       submitData({
-        url: "/api/classSchedule/calculateTimeDistanceSth",
+        url: "/gateway/training/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
@@ -1273,7 +1273,7 @@ export default {
       }
       console.log(JSON.stringify(this.classInfo));
       submitData({
-        url: "/api/classSchedule/calculateTimeDistanceSth",
+        url: "/gateway/training/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,

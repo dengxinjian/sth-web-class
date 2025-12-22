@@ -94,7 +94,7 @@ export default {
         // 由父组件决定具体新增/编辑接口，此处只派发规范化数据
         if (this.form.id) {
           submitData({
-            url: '/api/classesGroup/update',
+            url: '/training/api/classesGroup/update',
             requestData: { ...this.form }
           }).then(res => {
             if (res.success) {
@@ -104,7 +104,7 @@ export default {
           })
         } else {
           submitData({
-            url: '/api/classesGroup/create',
+            url: '/training/api/classesGroup/create',
             requestData: { ...this.form }
           }).then(res => {
             if (res.success) {

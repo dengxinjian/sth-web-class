@@ -144,7 +144,7 @@ export default {
       if (!this.classId) return;
       if (this.activeClassType !== "my") {
         submitData({
-          url: `/api/classes/createOfficial`,
+          url: `/training/api/classes/createOfficial`,
           classesGroupId: this.form.destinationId,
           id: this.classId,
         }).then((res) => {
@@ -159,7 +159,7 @@ export default {
         const classesJson = JSON.parse(JSON.stringify(this.data.classesJson));
         classesJson.title = this.form.title;
         submitData({
-          url: "/api/classes/create",
+          url: "/training/api/classes/create",
           classesGroupId: this.form.destinationId,
           labels: this.data.tags,
           sportType: this.data.sportType,

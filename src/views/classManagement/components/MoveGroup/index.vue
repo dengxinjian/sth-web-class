@@ -97,7 +97,7 @@ export default {
     },
     submitGroupMove() {
       submitData({
-        url: `/api/classesGroup/moveClassesGroupById?id=${this.id}&destinationId=${this.form.destinationId}`,
+        url: `/training/api/classesGroup/moveClassesGroupById?id=${this.id}&destinationId=${this.form.destinationId}`,
       }).then(res => {
         if (res.success) {
           this.$message.success('分组移动成功')
@@ -108,7 +108,7 @@ export default {
     },
     submitClassMove() {
       submitData({
-        url: `/api/classes/moveClasses?id=${this.classId}&destinationGroupId=${this.form.destinationId}`,
+        url: `/training/api/classes/moveClasses?id=${this.classId}&destinationGroupId=${this.form.destinationId}`,
       }).then(res => {
         if (res.success) {
           this.$message.success('课程移动成功')

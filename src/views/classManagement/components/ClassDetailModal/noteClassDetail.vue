@@ -203,7 +203,7 @@ export default {
         type: 'warning'
       }).then(() => {
         submitData({
-          url: '/api/classes/deleteClasses?id=' + this.form.id,
+          url: '/training/api/classes/deleteClasses?id=' + this.form.id,
         }).then(res => {
           if (res.success) {
             this.resetForm()

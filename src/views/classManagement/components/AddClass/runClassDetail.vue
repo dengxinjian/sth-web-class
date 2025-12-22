@@ -953,7 +953,7 @@ export default {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({
-        url: "/api/classes/getClassesById",
+        url: "/training/api/classes/getClassesById",
         id,
       }).then((res) => {
         if (res.success) {
@@ -1008,7 +1008,7 @@ export default {
       })
         .then(() => {
           submitData({
-            url: "/api/classes/deleteClasses?id=" + this.classInfo.id,
+            url: "/training/api/classes/deleteClasses?id=" + this.classInfo.id,
           }).then((res) => {
             if (res.success) {
               this.resetForm();
@@ -1028,7 +1028,7 @@ export default {
         return;
       }
       submitData({
-        url: "/api/classes/calculateTimeDistanceSth",
+        url: "/gateway/analysis/classesCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
@@ -1175,7 +1175,7 @@ export default {
         return;
       }
       submitData({
-        url: "/api/classes/calculateTimeDistanceSth",
+        url: "/gateway/analysis/classesCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,

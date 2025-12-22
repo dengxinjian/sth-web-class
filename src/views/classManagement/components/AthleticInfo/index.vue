@@ -716,7 +716,7 @@ export default {
     // 查询偏好数据
     getPreferenceData() {
       request({
-        url: "/sport-preference/by-current-type",
+        url: "/training/api/sport-preference/by-current-type",
         method: "get",
         headers: {
           requestUserInfoId: this.triUserId,
@@ -776,7 +776,7 @@ export default {
         params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
       params.totalTimes = this.totalTrainingCount;
       request({
-        url: "/sport-preference/create",
+        url: "/training/api/sport-preference/create",
         method: "post",
         data: params,
         headers: {
@@ -801,7 +801,7 @@ export default {
         params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
       params.totalTimes = this.totalTrainingCount;
       request({
-        url: `/sport-preference/${this.preferenceForm.id}`,
+        url: `/training/api/sport-preference/${this.preferenceForm.id}`,
         method: "put",
         data: params,
         headers: {
@@ -816,7 +816,7 @@ export default {
     },
     getAthleticInfo() {
       getData({
-        url: "/api/classSchedule/getUserProfile",
+        url: "/consumer/wx/getUserProfile",
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {

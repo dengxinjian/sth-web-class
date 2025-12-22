@@ -309,7 +309,7 @@ export default {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({
-        url: "/api/classes/getClassesById",
+        url: "/training/api/classes/getClassesById",
         id,
       }).then((res) => {
         if (res.success) {
@@ -356,7 +356,7 @@ export default {
       })
         .then(() => {
           submitData({
-            url: "/api/classes/deleteClasses?id=" + this.form.id,
+            url: "/training/api/classes/deleteClasses?id=" + this.form.id,
           }).then((res) => {
             if (res.success) {
               this.resetForm();
