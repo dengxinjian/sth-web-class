@@ -126,7 +126,7 @@ export const scheduleApi = {
   // 课表解绑运动
   unbindActivity(classScheduleId) {
     return submitData({
-      url: "/gateway/training/api/classSchedule/classUnbindActivity",
+      url: "/training/api/classSchedule/classUnbindActivity",
       requestData: { classScheduleId },
     });
   },
@@ -141,7 +141,7 @@ export const scheduleApi = {
   // 计算时间距离和STH
   calculateTimeDistanceSth(data) {
     return submitData({
-      url: "/api/classSchedule/calculateTimeDistanceSth",
+      url: "/gateway/training/classScheduleCalculateTimeDistanceSth",
       requestData: data,
     });
   },
@@ -149,14 +149,14 @@ export const scheduleApi = {
   // 重试课表同步
   retrySync({ classScheduleId, deviceType }) {
     return submitData({
-      url: `/api/classSchedule/retryClassScheduleSync?classScheduleId=${classScheduleId}&deviceType=${deviceType}`,
+      url: `/gateway/training/classSchedule/retryClassScheduleSync?classScheduleId=${classScheduleId}&deviceType=${deviceType}`,
     });
   },
 
   // 录入运动
   createActivity(data) {
     return submitData({
-      url: "/gateway/training/api/manualDeviceActivity/create",
+      url: "/training/api/manualDeviceActivity/create",
       requestData: data,
     });
   },

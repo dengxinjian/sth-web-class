@@ -123,7 +123,7 @@ export default {
       const endDate = `${year}-${month}-${String(lastDay).padStart(2, "0")}`;
 
       getData({
-        url: "/api/classSchedule/getStatistics",
+        url: "/training/api/classSchedule/getStatistics",
         begin: startDate,
         end: endDate,
         triUserId: this.triUserId || "ba10bb5a47f24cdda9f20a49492c3cb3",
