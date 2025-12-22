@@ -106,6 +106,7 @@
               :data-date="date"
               draggable="true"
               data-type="event"
+              @click="handleClickActivity"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -122,6 +123,7 @@
               :data-date="date"
               draggable="true"
               data-type="event"
+              @click="handleClickActivity"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -138,6 +140,7 @@
               :data-date="date"
               draggable="true"
               data-type="event"
+              @click="handleClickActivity"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -154,6 +157,7 @@
               :data-date="date"
               draggable="true"
               data-type="event"
+              @click="handleClickActivity"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -170,6 +174,7 @@
               :data-date="date"
               draggable="true"
               data-type="event"
+              @click="handleClickActivity"
             />
           </div>
         </div>
@@ -427,6 +432,10 @@ export default {
       if (this.type === "view") {
         this.$emit("view-class", this.eventItem);
       }
+    },
+    handleClickActivity(activity) {
+      console.log("handleClickActivity-activity-1", activity);
+      this.$emit("click-event-activity", activity);
     },
   },
 };

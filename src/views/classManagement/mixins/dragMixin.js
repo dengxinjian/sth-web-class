@@ -114,43 +114,6 @@ export default {
     },
 
     /**
-     * 初始化课程列表拖拽（从课程库拖到日历）
-     */
-    // initClassDrag() {
-    //   this.$nextTick(() => {
-    //     document.querySelectorAll(".js-class-drag-container").forEach((el) => {
-    //       new Sortable(el, {
-    //         group: { name: "classDrag", put: false, pull: "clone" },
-    //         animation: 150,
-    //         dataIdAttr: "data-id",
-    //         scroll: true,
-    //         scrollSpeed: 20,
-    //         scrollSensitivity: 30, // 增加敏感度
-    //         bubbleScroll: true,
-    //         ghostClass: "is-drag-ghost",
-    //         chosenClass: "is-drag-chosen",
-    //         onStart: (e) => {
-    //           this.setDragBg(e);
-    //         },
-    //         onEnd: (e) => {
-    //           console.log(e, "e===================");
-    //           this.restoreDragBg(e);
-    //           // 只有拖到日历容器(.js-schedule-drag-container)时才处理
-    //           // 避免拖到运动卡片(.js-sport-container-put)时也触发
-    //           if (
-    //             e.item.dataset.id &&
-    //             e.to.dataset.date &&
-    //             e.to.classList.contains("js-schedule-drag-container")
-    //           ) {
-    //             // this.handleClassDragToSchedule(e);
-    //           }
-    //         },
-    //       });
-    //     });
-    //   });
-    // },
-
-    /**
      * 初始化日历容器拖拽（课表排序和移动）
      */
     initScheduleDrag() {
@@ -190,10 +153,7 @@ export default {
                 _this.restoreDragBg(e);
                 lastEventDropTarget = null; // 清理
                 // 课程 ，课表 移动到运动
-                if (
-                  e.item.firstChild.dataset.type === "classSchedule" ||
-                  e.item.firstChild.dataset.type === "classTemplate"
-                ) {
+                if (e.item.firstChild.dataset.type === "classSchedule") {
                   console.log(e.item.firstChild, "e.item.firstChild");
                   if (
                     e.originalEvent.srcElement.offsetParent &&
@@ -269,84 +229,18 @@ export default {
                 console.log("onUnchoose - 取消选择", e);
                 _this.restoreDragBg(e);
               },
-              // onMove: (evt, originalEvent) => {
-              //   console.log("onMove 触发", {
-              //     evt: evt,
-              //     dragged: evt.dragged,
-              //     related: evt.related,
-              //     target: originalEvent?.target,
-              //     to: evt.to,
-              //   });
-
-              //   const isActivityDrag =
-              //     evt.dragged &&
-              //     evt.dragged.classList &&
-              //     evt.dragged.classList.contains("ActivityCard");
-
-              //   console.log("isActivityDrag:", isActivityDrag);
-
-              //   if (isActivityDrag) {
-              //     // 尝试多种方式查找赛事容器
-              //     let eventDropEl = null;
-
-              //     // 方式1: 从 originalEvent.target 查找
-              //     if (originalEvent && originalEvent.target) {
-              //       console.log("originalEvent.target:", originalEvent.target);
-              //       eventDropEl = originalEvent.target.closest(
-              //         ".js-event-drop-container"
-              //       );
-              //       if (eventDropEl) {
-              //         console.log("从 originalEvent.target 找到赛事容器");
-              //       }
-              //     }
-
-              //     // 方式2: 从 evt.related 查找
-              //     if (!eventDropEl && evt.related) {
-              //       console.log("evt.related:", evt.related);
-              //       eventDropEl = evt.related.closest(
-              //         ".js-event-drop-container"
-              //       );
-              //       if (eventDropEl) {
-              //         console.log("从 evt.related 找到赛事容器");
-              //       }
-              //     }
-
-              //     // 方式3: 检查 evt.related 本身是否是赛事容器
-              //     if (
-              //       !eventDropEl &&
-              //       evt.related &&
-              //       evt.related.classList?.contains("js-event-drop-container")
-              //     ) {
-              //       eventDropEl = evt.related;
-              //       console.log("evt.related 本身就是赛事容器");
-              //     }
-
-              //     console.log("最终 eventDropEl:", eventDropEl);
-
-              //     // 保存目标赛事容器，供 onAdd 使用
-              //     if (eventDropEl) {
-              //       lastEventDropTarget = eventDropEl;
-              //       console.log(
-              //         "onMove - 检测到赛事容器:",
-              //         eventDropEl,
-              //         "eventId:",
-              //         eventDropEl.dataset.id
-              //       );
-              //     } else {
-              //       lastEventDropTarget = null;
-              //     }
-              //   }
-
-              //   // 允许拖放继续，在 onAdd 中处理
-              //   return true;
-              // },
               onChange: (evt) => {},
               onUpdate: (e) => {
                 // 同一容器内排序时触发
                 console.log("onUpdate - 同一容器内排序", e);
                 if (
                   e.item.firstChild &&
-                  e.item.firstChild.dataset.type === "classSchedule"
+                  e.item.firstChild.dataset.type === "classSchedule" &&
+                  e.originalEvent.srcElement.offsetParent &&
+                  e.originalEvent.srcElement.offsetParent.dataset &&
+                  e.originalEvent.srcElement.offsetParent.dataset.type &&
+                  e.originalEvent.srcElement.offsetParent.dataset.type !==
+                    "activity"
                 ) {
                   _this.handleScheduleDragAdd(e);
                 }
@@ -388,7 +282,7 @@ export default {
                   return;
                 } else {
                   console.log(e, "e===================");
-                  _this.handleScheduleDragAdd(e);
+                  // _this.handleScheduleDragAdd(e);
                 }
               },
               onRemove: (e) => {
@@ -399,157 +293,6 @@ export default {
       });
     },
 
-    /**
-     * 初始化运动卡片拖拽（运动匹配）
-     */
-    // initActivityDrag() {
-    //   this.$nextTick(() => {
-    //     const _this = this;
-    //     const scrollContainerEl = document.querySelector(
-    //       ".schedule-table-container"
-    //     );
-    //     document.querySelectorAll(".js-sport-container-put").forEach((el) => {
-    //       new Sortable(el, {
-    //         sort: false,
-    //         filter: ".js-sport-card-noDrag",
-    //         group: {
-    //           name: "classDrag",
-    //           pull: "clone",
-    //         },
-    //         swapThreshold: 0, // 禁用交换阈值
-    //         invertSwap: false, // 禁用反转交换
-    //         animation: 0, // 禁用动画，避免闪动
-    //         forceFallback: false, // 使用 HTML5 拖拽
-    //         dataIdAttr: "data-id",
-    //         scroll: true,
-    //         scrollContainer: scrollContainerEl, // 指定滚动容器为课表外层容器
-    //         scrollSpeed: 20,
-    //         scrollSensitivity: 30, // 增加敏感度
-    //         bubbleScroll: true,
-    //         ghostClass: "is-drag-ghost",
-    //         chosenClass: "is-drag-chosen",
-    //         onStart: (e) => {
-    //           _this.setDragBg(e);
-    //         },
-    //         onMove: (evt) => {},
-    //         onAdd(e) {
-    //           console.log(e, "e");
-    //           if (e.item.className === "card-body") {
-    //             _this.getScheduleData();
-    //             return;
-    //           }
-    //           // 移除拖拽产生的DOM元素，避免显示重复的课表
-    //           if (e.item && e.item.parentNode) {
-    //             e.item.parentNode.removeChild(e.item);
-    //           }
-    //           _this.handleMatchClass({
-    //             classId: e.item.dataset.id,
-    //             activityId: e.to.dataset.activityid,
-    //             manualActivityId: e.to.dataset.manualactivityid,
-    //             type: e.item.dataset.type,
-    //           });
-    //         },
-    //         onEnd: (e) => {
-    //           _this.restoreDragBg(e);
-    //           // 清理拖拽产生的克隆运动卡片DOM
-    //           // 当运动卡片被拖拽时（pull: "clone"），会产生克隆元素
-    //           // 拖拽结束后，需要清理残留的克隆元素
-    //           console.log(e, "e");
-    //           if (e.pullMode === "clone") {
-    //             _this.$nextTick(() => {
-    //               // 检查克隆元素是否还在 DOM 中
-    //               if (e.item && document.body.contains(e.item)) {
-    //                 // 如果元素不在源容器中（说明是克隆元素）
-    //                 if (!e.from.contains(e.item)) {
-    //                   // 并且父节点存在，则删除克隆元素
-    //                   if (e.item.parentNode) {
-    //                     console.log("清理残留的克隆运动卡片", e.item);
-    //                     e.item.parentNode.removeChild(e.item);
-    //                   }
-    //                 }
-    //               }
-    //             });
-    //           }
-    //         },
-    //       });
-    //     });
-    //   });
-    // },
-
-    /**
-     * 初始化课表卡片拖拽（运动拖到课表匹配）
-     */
-    // initClassScheduleCardDrag() {
-    //   this.$nextTick(() => {
-    //     const _this = this;
-    //     document.querySelectorAll(".js-class-schedule-card").forEach((el) => {
-    //       new Sortable(el, {
-    //         group: {
-    //           name: "classDrag",
-    //           pull: "clone",
-    //           put: function (e, b) {
-    //             // 只允许同一天的运动拖到课表
-    //             if (
-    //               e.el.dataset.date === b.el.dataset.date &&
-    //               b.el.className.indexOf("sportScheduleCard") !== -1
-    //             ) {
-    //               return true;
-    //             } else {
-    //               return false;
-    //             }
-    //           },
-    //         },
-    //         animation: 150,
-    //         dataIdAttr: "data-id",
-    //         scroll: true,
-    //         scrollSpeed: 20,
-    //         scrollSensitivity: 30, // 增加敏感度
-    //         bubbleScroll: true,
-    //         ghostClass: "is-drag-ghost",
-    //         chosenClass: "is-drag-chosen",
-    //         onStart: (e) => {
-    //           _this.setDragBg(e);
-    //         },
-    //         onAdd(e) {
-    //           console.log(e, "e");
-    //           // 移除拖拽产生的DOM元素，避免显示重复的运动卡片
-    //           if (e.item && e.item.parentNode) {
-    //             e.item.parentNode.removeChild(e.item);
-    //           }
-    //           _this.handleMatchClass({
-    //             classId: e.to.dataset.id,
-    //             activityId: e.item.dataset.activityid,
-    //             manualActivityId: e.item.dataset.manualactivityid,
-    //             type: "",
-    //           });
-    //         },
-    //         onEnd: (e) => {
-    //           _this.restoreDragBg(e);
-    //           // 清理拖拽产生的克隆元素
-    //           // 当从课表卡片拖出运动卡片时（pull: "clone"），会产生克隆元素
-    //           if (e.pullMode === "clone") {
-    //             _this.$nextTick(() => {
-    //               // 检查克隆元素是否还在 DOM 中
-    //               if (e.item && document.body.contains(e.item)) {
-    //                 // 如果元素不在源容器中（说明是克隆元素）
-    //                 if (!e.from.contains(e.item)) {
-    //                   // 并且父节点存在，则删除克隆元素
-    //                   if (e.item.parentNode) {
-    //                     console.log(
-    //                       "清理残留的克隆运动卡片（从课表卡片）",
-    //                       e.item
-    //                     );
-    //                     e.item.parentNode.removeChild(e.item);
-    //                   }
-    //                 }
-    //               }
-    //             });
-    //           }
-    //         },
-    //       });
-    //     });
-    //   });
-    // },
     /**
      * 初始化所有拖拽功能
      */

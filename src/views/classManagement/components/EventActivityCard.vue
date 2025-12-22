@@ -1,6 +1,6 @@
 <template>
   <div style="position: relative">
-    <div class="classScheduleCard sportScheduleCard">
+    <div class="classScheduleCard sportScheduleCard" @click.stop="handleClick">
       <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
       <div
         :class="[
@@ -245,6 +245,9 @@ export default {
     },
     isRestType(sportType) {
       return ["REST", "REMARK", "OTHER"].includes(sportType);
+    },
+    handleClick() {
+      this.$emit("click", this.activity);
     },
   },
 };

@@ -17,7 +17,14 @@
           />
           <span class="event-name">{{ eventData?.competitionName }}</span>
           <span class="event-date">{{ eventData?.competitionDate }}</span>
-          <span class="event-date">{{ eventData?.competitionDistance }}</span>
+          <span class="event-date"
+            > {{
+              eventData.competitionDistance === "自定义"
+                ? eventData.competitionDistanceValue + " " +
+                  eventData.competitionDistanceUnit
+                : eventData?.competitionDistance
+            }}</span
+          >
           <span class="event-location">{{
             eventData?.competitionLocation
           }}</span>

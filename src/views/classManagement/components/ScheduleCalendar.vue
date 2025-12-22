@@ -117,6 +117,7 @@
                 @edit="handleEditEvent"
                 @copy="handleCopyEvent"
                 @cut="handleCutEvent"
+                @click-event-activity="handleClickEventActivity"
               />
               <!-- 课表卡片 -->
               <ScheduleClassCard
@@ -279,6 +280,10 @@ export default {
   methods: {
     isToday,
     convertToLunar,
+    handleClickEventActivity(activity) {
+      console.log("handleClickEventActivity-activity-1", activity);
+      this.$emit("click-event-activity", activity);
+    },
     handleEditEvent(eventItem, type) {
       this.$emit("edit-event", eventItem, type);
     },

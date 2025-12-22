@@ -74,6 +74,7 @@
           @event-detail="handleEventDetail"
           @edit-event="handleEditEvent"
           @input-activity="handleInputActivity"
+          @click-event-activity="handleEditActivity"
         />
 
         <!-- 右侧统计面板 -->
@@ -121,6 +122,7 @@
           @event-detail="handleEventDetail"
           @edit-event="handleEditEvent"
           @input-activity="handleInputActivity"
+          @click-event-activity="handleEditActivity"
         />
         <!-- 右侧统计面板 -->
         <StatisticsPanel
@@ -1733,6 +1735,7 @@ export default {
         });
       });
       console.log(currentActivity, "currentActivity");
+      console.log(currentClass, "currentClass");
 
       // 检查运动是否已经匹配过课表
       if (currentActivity.classScheduleId) {
