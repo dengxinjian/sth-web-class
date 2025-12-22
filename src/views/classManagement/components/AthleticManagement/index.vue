@@ -579,7 +579,7 @@ export default {
     getInvitationCode() {
       // TODO: 替换为实际的API地址
       getData({
-        url: "/api/team/invite/current/3", // 请替换为实际API
+        url: "/consumer/api/team/invite/current/3", // 请替换为实际API
         userType: 3,
       })
         .then((res) => {
@@ -599,7 +599,7 @@ export default {
     // 获取执教邀请码
     getCoachInvitationCode() {
       submitData({
-        url: "/api/team/invite/generate", // 请替换为实际API
+        url: "/consumer/api/team/invite/generate", // 请替换为实际API
         userType: 2,
       }).then((res) => {
         if (res.success) {
@@ -610,7 +610,7 @@ export default {
     // 创建邀请码
     createInvitationCode() {
       submitData({
-        url: "/api/team/invite/generate", // 请替换为实际API
+        url: "/consumer/api/team/invite/generate", // 请替换为实际API
         userType: 3,
       })
         .then((res) => {
@@ -844,7 +844,7 @@ export default {
 
       // TODO: 替换为实际的API地址
       submitData({
-        url: "/api/team/group", // 请替换为实际API
+        url: "/consumer/api/team/group", // 请替换为实际API
         requestData: params,
       })
         .then((res) => {
@@ -872,7 +872,7 @@ export default {
 
       // TODO: 替换为实际的API地址
       submitData({
-        url: `/api/team/group/${this.groupForm.id}`, // 请替换为实际API
+        url: `/consumer/api/team/group/${this.groupForm.id}`, // 请替换为实际API
         method: "put",
         requestData: params,
       })
@@ -895,7 +895,7 @@ export default {
     deleteGroup(groupId) {
       // TODO: 替换为实际的API地址
       submitData({
-        url: `/api/team/group/${groupId}`, // 请替换为实际API
+        url: `/consumer/api/team/group/${groupId}`, // 请替换为实际API
         groupId: groupId,
         method: "delete",
       })
@@ -938,7 +938,7 @@ export default {
       }
 
       submitData({
-        url: "/api/team/group/member/batch-set",
+        url: "/consumer/api/team/group/member/batch-set",
         requestData: params,
       })
         .then((res) => {

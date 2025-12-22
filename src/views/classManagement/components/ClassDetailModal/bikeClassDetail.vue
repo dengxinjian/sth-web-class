@@ -1133,7 +1133,7 @@ export default {
         return;
       }
       submitData({
-        url: "/gateway/training/classScheduleCalculateTimeDistanceSth",
+        url: "/gateway/analysis/classCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
@@ -1166,7 +1166,7 @@ export default {
         return;
       }
       submitData({
-        url: "/gateway/training/classScheduleCalculateTimeDistanceSth",
+        url: "/gateway/analysis/classCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,

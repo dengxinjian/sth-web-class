@@ -964,7 +964,7 @@ export default {
         return;
       }
       submitData({
-        url: "/gateway/analysis/classesCalculateTimeDistanceSth",
+        url: "/gateway/analysis/classCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         labels: this.classInfo.tags,
         sportType: "CYCLE",
@@ -993,7 +993,7 @@ export default {
         return;
       }
       submitData({
-        url: "/gateway/analysis/classesCalculateTimeDistanceSth",
+        url: "/gateway/analysis/classCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
         labels: this.classInfo.tags,
         sportType: "CYCLE",
