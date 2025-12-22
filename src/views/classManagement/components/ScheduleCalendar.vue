@@ -81,7 +81,7 @@
         <div class="schedule-table-body">
           <div
             v-for="(item, index) in currentWeek"
-            :key="`day-${item.commonDate || index}`"
+            :key="`day-${item.commonDate || index}-${item.timesp || Date.now()}`"
             class="schedule-table-cell"
           >
             <div class="schedule-table-cell-title">

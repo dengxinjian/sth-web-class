@@ -39,6 +39,7 @@
               @copy-class="handleCopyClassFromOfficial"
               @collapse-change="classSlideChange"
               @view-class="handleViewClass"
+              @class-drag-end="handleClassDragEndFromClassList"
             />
           </div>
         </div>
@@ -760,10 +761,7 @@ export default {
 
       // 校验日期必须大于今天
       if (diffDays >= 0) {
-        if (
-          type === "click" &&
-          diffDays === 0
-        ) {
+        if (type === "click" && diffDays === 0) {
           this.currentEventData = eventItem;
           this.showEventInfo = true;
           return;
@@ -1017,7 +1015,8 @@ export default {
       });
       if (res.success && res.result) {
         this.getStatisticData();
-        this.currentWeek = this.currentWeek.map((item) => {
+        // 创建新数组确保 Vue 响应式更新
+        const newCurrentWeek = this.currentWeek.map((item) => {
           let activityList = [];
           let classSchedule = [];
           let healthInfos = [];
@@ -1041,11 +1040,13 @@ export default {
                   preciseDistance: Math.round(i.distance),
                   oldActivitySthValue: i.sthValue,
                 }))
-                .filter((i) => !i.bindingManualActivityId);
+                .filter(
+                  (i) => !i.bindingManualActivityId && !i.bindCompetitionId
+                );
 
               // 处理虚拟运动记录
               part.manualDeviceActivityVoList.forEach((i) => {
-                if (!i.activityId) {
+                if (!i.activityId && !i.bindCompetitionId) {
                   activityList.push({
                     ...i,
                     classesJson: i.classesJson
@@ -1125,10 +1126,15 @@ export default {
             timesp: new Date().getTime(),
           };
         });
+        // 直接赋值新数组，确保 Vue 响应式更新
+        // 对于根级别的 data 属性，直接赋值即可触发响应式更新
+        this.currentWeek = [...newCurrentWeek];
         console.log(this.currentWeek, "this.currentWeek");
 
-        // 强制 Vue 检测数组变化
+        // 强制 Vue 检测数组变化并更新视图
         this.$nextTick(() => {
+          // 确保视图更新 - 使用 $forceUpdate 强制重新渲染
+          this.$forceUpdate();
           // 初始化拖拽
           this.initAllDrag();
         });
@@ -1605,9 +1611,10 @@ export default {
      * 日历拖拽添加
      */
     handleScheduleDragAdd(e) {
-      console.log(e);
-      const classId = e.item.dataset.id;
+      console.log(e, "======================");
+      const classId = e.item.firstChild.dataset.id;
       const date = e.to.dataset.date;
+      console.log(classId, date, "classId, date");
 
       let newClassSchedule = {};
       const sortVoList = [];
@@ -1644,14 +1651,17 @@ export default {
       }
 
       // 移除拖拽产生的DOM元素，避免显示重复的课表
-      if (e.item && e.item.parentNode) {
-        e.item.parentNode.removeChild(e.item);
-      }
+      // 注意：需要在数据操作前移除，避免 Vue 响应式更新导致 DOM 混乱
+      // if (e.item && e.item.parentNode) {
+      //   e.item.parentNode.removeChild(e.item);
+      // }
 
       // 删除原数据
       this.currentWeek.forEach((item) => {
-        if (item.commonDate.includes(e.item.dataset.date)) {
+        if (item.commonDate.includes(e.item.firstChild.dataset.date)) {
+          console.log(item.classSchedule, "item.classSchedule===============");
           item.classSchedule.forEach((itemClass, oldIndex) => {
+            console.log(itemClass.id, classId, "itemClass.id, classId");
             if (itemClass.id === +classId) {
               newClassSchedule = itemClass;
               item.classSchedule.splice(oldIndex, 1);
@@ -1664,12 +1674,13 @@ export default {
       let currentData = [];
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(date)) {
+          console.log(item.classSchedule, "item.classSchedule");
           currentData = JSON.parse(JSON.stringify(item.classSchedule));
           // 使用只包含课程的索引插入，避免健康数据和赛事影响排序
           currentData.splice(targetClassIndex, 0, newClassSchedule);
         }
       });
-      console.log(currentData, "currentData");
+      console.log(currentData, "currentData===============");
 
       // 生成排序数据
       currentData.forEach((item, index) => {
@@ -1698,11 +1709,12 @@ export default {
     /**
      * 运动和课表匹配
      */
-    handleMatchClass({ classId, activityId, manualActivityId, type }) {
+    handleMatchClass(data) {
+      const { classId, activityId, manualActivityId, type } = data;
       let currentClass = {};
       let currentActivity = {};
       let activityDate = "";
-      console.log(activityId, manualActivityId, "activityId, manualActivityId");
+      console.log(data, "data");
 
       this.currentWeek.forEach((item) => {
         item.activityList.forEach((activity) => {
@@ -1724,6 +1736,7 @@ export default {
 
       // 检查运动是否已经匹配过课表
       if (currentActivity.classScheduleId) {
+        this.getScheduleData();
         this.$message.warning("该运动已经匹配过课表");
         return;
       }
@@ -1731,6 +1744,7 @@ export default {
       // 判断是否从课程模板中拖拽
       if (type === "classTemplate") {
         currentClass = this.findClassById(classId);
+        console.log(currentClass, "currentClass===================");
         if (
           currentClass.sportType ===
           ACTIVITY_TYPE_DICT[currentActivity.sportType]
@@ -1976,9 +1990,9 @@ export default {
 
         // 运动类型中文名称映射
         const sportTypeNameMap = {
+          SWIM: "游泳",
           CYCLE: "骑行",
           RUN: "跑步",
-          SWIM: "游泳",
           STRENGTH: "力量",
           OTHER: "其他",
         };
@@ -1986,7 +2000,7 @@ export default {
         // 根据比赛类型生成允许的运动类型提示信息
         let allowedTypesText = "";
         if (normalizedCompetitionType === "TRIATHLON") {
-          allowedTypesText = "骑行、游泳、跑步";
+          allowedTypesText = "游泳、骑行、跑步、力量、其他";
         } else {
           // 获取允许的运动类型的中文名称
           const allowedNames = allowedSportTypes
@@ -2157,7 +2171,28 @@ export default {
      * 课程折叠变化 - 初始化拖拽
      */
     classSlideChange() {
-      this.initClassDrag();
+      // this.initClassDrag();
+    },
+
+    handleClassDragEndFromClassList(e) {
+      console.log(e, "handleClassDragEndFromClassList===================");
+      if (
+        e.originalEvent.srcElement.offsetParent &&
+        e.originalEvent.srcElement.offsetParent.dataset &&
+        e.originalEvent.srcElement.offsetParent.dataset.type &&
+        e.originalEvent.srcElement.offsetParent.dataset.type === "activity"
+      ) {
+        this.handleMatchClass({
+          classId: e.item.dataset.id,
+          activityId:
+            e.originalEvent.srcElement.offsetParent.dataset.activityid,
+          manualActivityId:
+            e.originalEvent.srcElement.offsetParent.dataset.manualactivityid,
+          type: e.item.dataset.type,
+        });
+      } else if (e.to.dataset.date) {
+        this.handleScheduleDragAdd(e);
+      }
     },
 
     /**

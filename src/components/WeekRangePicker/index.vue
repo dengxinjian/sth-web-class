@@ -58,7 +58,9 @@ export default {
       selectedYear: now.getFullYear(),
       selectedMonth: now.getMonth() + 1, // 1-12
       selectedWeekIndex: 0,
-      monthWeeks: []
+      monthWeeks: [],
+      // 内部程序切换年份时，避免 watcher 重置周索引
+      skipYearWatch: false
     }
   },
   computed: {
@@ -72,6 +74,11 @@ export default {
   },
   watch: {
     selectedYear() {
+      if (this.skipYearWatch) {
+        console.log('skipYearWatch=true, 跳过年份watcher')
+        return
+      }
+      console.log('年份watcher触发，重置为第1周')
       this.recomputeWeeks(() => {
         // 年份改变后，默认选择第1周
         this.selectedWeekIndex = 0
@@ -96,6 +103,21 @@ export default {
     })
   },
   methods: {
+    setYearMonth(year, month, after) {
+      // 标记跳过年份 watcher，防止重置周索引
+      this.skipYearWatch = true
+      console.log('setYearMonth 开始，skipYearWatch=true')
+      this.selectedYear = year
+      this.selectedMonth = month
+      this.recomputeWeeks(() => {
+        if (typeof after === 'function') after()
+        // 使用 $nextTick 确保 watcher 在 skipYearWatch=false 之前执行
+        this.$nextTick(() => {
+          this.skipYearWatch = false
+          console.log('setYearMonth 完成，skipYearWatch=false')
+        })
+      })
+    },
     handleMonthChange() {
       this.recomputeWeeks(() => {
         // 调整后默认选择第1周
@@ -121,7 +143,60 @@ export default {
     goThisWeek() {
       const today = new Date()
       const thisMonday = this.getMonday(today)
-      this.navigateToDate(thisMonday)
+      // 优先使用「周一所在的年月」显示，找不到再回退到「今天所在的年月」
+      const mondayYear = thisMonday.getFullYear()
+      const mondayMonth = thisMonday.getMonth() + 1
+      const todayYear = today.getFullYear()
+      const todayMonth = today.getMonth() + 1
+
+      console.log('===== goThisWeek 调试 =====')
+      console.log('today:', this.formatDate(today))
+      console.log('thisMonday:', this.formatDate(thisMonday))
+      console.log('mondayYear:', mondayYear, 'mondayMonth:', mondayMonth)
+      console.log('todayYear:', todayYear, 'todayMonth:', todayMonth)
+      console.log('当前选择:', this.selectedYear, '年', this.selectedMonth, '月', '第', this.selectedWeekIndex + 1, '周')
+
+      this.navigateToDateWithFallback(thisMonday, mondayYear, mondayMonth, todayYear, todayMonth)
+    },
+    navigateToDateWithFallback(targetDate, preferredYear, preferredMonth, fallbackYear = null, fallbackMonth = null) {
+      const targetStr = this.formatDate(targetDate)
+      console.log('navigateToDateWithFallback 调试:')
+      console.log('  targetDate:', targetStr)
+      console.log('  preferredYear:', preferredYear, 'preferredMonth:', preferredMonth)
+      console.log('  fallbackYear:', fallbackYear, 'fallbackMonth:', fallbackMonth)
+
+      // 先在首选的年月中查找目标周
+      this.setYearMonth(preferredYear, preferredMonth, () => {
+        console.log('  首选月份周列表:', this.monthWeeks.map(w => `${w.monday}~${w.sunday}`).join(' | '))
+        let idx = this.findWeekIndexContainingDate(targetDate)
+        console.log('  字符串匹配结果 idx:', idx)
+        if (idx < 0) {
+          // 兜底：使用时间戳比较，避免字符串比较边界问题
+          idx = this.findWeekIndexByDateValue(targetDate)
+          console.log('  时间戳兜底匹配结果 idx:', idx)
+        }
+        // 如果找不到且提供了后备年月，则尝试后备
+        if (idx < 0 && fallbackYear !== null && fallbackMonth !== null) {
+          if (fallbackYear !== preferredYear || fallbackMonth !== preferredMonth) {
+            console.log('  切换到后备年月:', fallbackYear, fallbackMonth)
+            this.setYearMonth(fallbackYear, fallbackMonth, () => {
+              console.log('  后备月份周列表:', this.monthWeeks.map(w => `${w.monday}~${w.sunday}`).join(' | '))
+              idx = this.findWeekIndexContainingDate(targetDate)
+              if (idx < 0) {
+                idx = this.findWeekIndexByDateValue(targetDate)
+              }
+              console.log('  后备月份最终 idx:', idx)
+              this.selectedWeekIndex = idx >= 0 ? idx : 0
+              console.log('  最终选择:', this.selectedYear, '年', this.selectedMonth, '月', '第', this.selectedWeekIndex + 1, '周')
+              this.emitWeekChange()
+            })
+            return
+          }
+        }
+        this.selectedWeekIndex = idx >= 0 ? idx : 0
+        console.log('  最终选择:', this.selectedYear, '年', this.selectedMonth, '月', '第', this.selectedWeekIndex + 1, '周')
+        this.emitWeekChange()
+      })
     },
     navigateToDate(targetDate) {
       // 根据目标日期更新 年/月/周
@@ -129,16 +204,20 @@ export default {
       const targetMonth = targetDate.getMonth() + 1
       // 只有当目标年份/月份与当前选择不同时才更新
       if (this.selectedYear !== targetYear || this.selectedMonth !== targetMonth) {
-        this.selectedYear = targetYear
-        this.selectedMonth = targetMonth
-        this.recomputeWeeks(() => {
-          const idx = this.findWeekIndexContainingDate(targetDate)
+        this.setYearMonth(targetYear, targetMonth, () => {
+          let idx = this.findWeekIndexContainingDate(targetDate)
+          if (idx < 0) {
+            idx = this.findWeekIndexByDateValue(targetDate)
+          }
           this.selectedWeekIndex = idx >= 0 ? idx : 0
           this.emitWeekChange()
         })
       } else {
         // 如果年份月份相同，只需要更新周索引
-        const idx = this.findWeekIndexContainingDate(targetDate)
+        let idx = this.findWeekIndexContainingDate(targetDate)
+        if (idx < 0) {
+          idx = this.findWeekIndexByDateValue(targetDate)
+        }
         if (idx >= 0 && this.selectedWeekIndex !== idx) {
           this.selectedWeekIndex = idx
           this.emitWeekChange()
@@ -233,6 +312,17 @@ export default {
       for (let i = 0; i < this.monthWeeks.length; i += 1) {
         const w = this.monthWeeks[i]
         if (target >= w.monday && target <= w.sunday) return i
+      }
+      return -1
+    },
+    // 使用时间戳比较，避免字符串比较边界问题
+    findWeekIndexByDateValue(date) {
+      const ts = date.getTime()
+      for (let i = 0; i < this.monthWeeks.length; i += 1) {
+        const w = this.monthWeeks[i]
+        const start = this.parseDate(w.monday).getTime()
+        const end = this.parseDate(w.sunday).getTime()
+        if (ts >= start && ts <= end) return i
       }
       return -1
     }

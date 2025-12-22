@@ -1,5 +1,9 @@
 <template>
-  <div class="health-data-card" @click="handleClick">
+  <div
+    class="health-data-card"
+    @click="handleClick"
+    @contextmenu.stop.prevent="showContextMenu"
+  >
     <div class="health-data-header">
       <div>
         <img
@@ -47,6 +51,9 @@ export default {
     handleClick() {
       // 点击卡片查看详情
       this.$emit("click", this.healthData);
+    },
+    showContextMenu() {
+      // this.$emit("contextmenu", this.healthData);
     },
   },
 };

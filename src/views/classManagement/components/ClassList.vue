@@ -132,6 +132,7 @@
             :scroll-speed="10"
             ghost-class="is-plan-drag-ghost"
             :key="item.timespan"
+            @end="handleClassDragEnd"
           >
             <ClassCard
               v-for="classItem in item.classesList"
@@ -226,6 +227,10 @@ export default {
       if (this.emitSearch) {
         this.emitSearch();
       }
+    },
+    handleClassDragEnd(e) {
+      console.log(e, "handleClassDragEnd===================");
+      this.$emit("class-drag-end", e);
     },
   },
 };

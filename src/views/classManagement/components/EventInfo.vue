@@ -17,6 +17,7 @@
           />
           <span class="event-name">{{ eventData?.competitionName }}</span>
           <span class="event-date">{{ eventData?.competitionDate }}</span>
+          <span class="event-date">{{ eventData?.competitionDistance }}</span>
           <span class="event-location">{{
             eventData?.competitionLocation
           }}</span>
@@ -56,12 +57,7 @@
                     {{ competitionResult?.genderRank || "-" }}
                   </td>
                 </tr>
-                <tr
-                  v-if="
-                    eventData.competitionType === 2 ||
-                    eventData.competitionType === 5
-                  "
-                >
+                <tr v-if="eventData.competitionType === 2">
                   <td class="label-cell">游泳成绩</td>
                   <td class="value-cell">
                     {{
@@ -84,12 +80,7 @@
                     }}
                   </td>
                 </tr>
-                <tr
-                  v-if="
-                    eventData.competitionType === 2 ||
-                    eventData.competitionType === 4
-                  "
-                >
+                <tr v-if="eventData.competitionType === 2">
                   <td class="label-cell">骑行成绩</td>
                   <td class="value-cell">
                     {{
@@ -112,12 +103,7 @@
                     }}
                   </td>
                 </tr>
-                <tr
-                  v-if="
-                    eventData.competitionType === 2 ||
-                    eventData.competitionType === 1
-                  "
-                >
+                <tr v-if="eventData.competitionType === 2">
                   <td class="label-cell">跑步成绩</td>
                   <td class="value-cell">
                     {{
@@ -177,13 +163,16 @@
             </div>
             <ActivityItem
               v-for="(activity, index) in activityList.swim"
-              :key="index"
+              :key="`swim-${index}`"
               :activity="activity"
               @remove="handleRemoveActivity"
             />
             <div
               style="margin-bottom: 10px"
-              v-if="eventData.competitionType === 2"
+              v-if="
+                activityList.otherT1.length > 0 ||
+                activityList.otherT2.length > 0
+              "
             >
               T1运动记录
             </div>
@@ -209,12 +198,12 @@
               :drag-class="'is-activity-drag-drag'"
               tag="div"
               :emptyInsertThreshold="10"
-              @end="handleDragEnd"
+              @add="handleDragAdd"
               class="draggable-activities-container"
             >
               <ActivityItem
                 v-for="(activity, index) in activityList.otherT1"
-                :key="index"
+                :key="`otherT1-${index}`"
                 :activity="activity"
                 @remove="handleRemoveActivity"
               />
@@ -227,13 +216,16 @@
             </div>
             <ActivityItem
               v-for="(activity, index) in activityList.cycle"
-              :key="index"
+              :key="`cycle-${index}`"
               :activity="activity"
               @remove="handleRemoveActivity"
             />
             <div
               style="margin-bottom: 10px"
-              v-if="eventData.competitionType === 2"
+              v-if="
+                activityList.otherT1.length > 0 ||
+                activityList.otherT2.length > 0
+              "
             >
               T2运动记录
             </div>
@@ -259,12 +251,12 @@
               :drag-class="'is-activity-drag-drag'"
               tag="div"
               :emptyInsertThreshold="10"
-              @end="handleDragEnd"
+              @add="handleDragAdd"
               class="draggable-activities-container"
             >
               <ActivityItem
                 v-for="(activity, index) in activityList.otherT2"
-                :key="index"
+                :key="`otherT2-${index}`"
                 :activity="activity"
                 @remove="handleRemoveActivity"
               />
@@ -274,7 +266,7 @@
             </div>
             <ActivityItem
               v-for="(activity, index) in activityList.run"
-              :key="index"
+              :key="`run-${index}`"
               :activity="activity"
               @remove="handleRemoveActivity"
             />
@@ -313,10 +305,7 @@
               />
             </el-form-item>
             <el-form-item
-              v-if="
-                eventData.competitionType === 2 ||
-                eventData.competitionType === 5
-              "
+              v-if="eventData.competitionType === 2"
               label="游泳成绩"
             >
               <TimeInput
@@ -333,10 +322,7 @@
               />
             </el-form-item>
             <el-form-item
-              v-if="
-                eventData.competitionType === 2 ||
-                eventData.competitionType === 4
-              "
+              v-if="eventData.competitionType === 2"
               label="骑行成绩"
             >
               <TimeInput
@@ -353,10 +339,7 @@
               />
             </el-form-item>
             <el-form-item
-              v-if="
-                eventData.competitionType === 2 ||
-                eventData.competitionType === 1
-              "
+              v-if="eventData.competitionType === 2"
               label="跑步成绩"
             >
               <TimeInput
@@ -367,7 +350,7 @@
             </el-form-item>
             <el-form-item label="总成绩">
               <TimeInput
-                :disabled="eventData.competitionType !== 3"
+                :disabled="eventData.competitionType === 2"
                 ref="totalResultInput"
                 v-model="editForm.totalResult"
                 timer-type="hh:mm:ss"
@@ -536,7 +519,10 @@ export default {
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
       const secs = seconds % 60;
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+        2,
+        "0"
+      )}:${String(secs).padStart(2, "0")}`;
     },
     formatDistance(distance, sportType) {
       let result = Math.round(distance / 10) / 100;
@@ -606,7 +592,9 @@ export default {
           item.classesJson = parseClassesJson(item.classesJson);
         });
         this.competitionResult = res.result || {};
+        console.log(this.competitionResult, "this.competitionResult");
         this.activityList = res.result.deviceActivityBindView || [];
+        console.log(this.activityList, "this.activityList");
         this.summaryText = this.competitionResult.feedback || "";
       }
     },
@@ -646,27 +634,27 @@ export default {
         genderRank: this.competitionResult?.genderRank || "",
         swimmingResult: this.competitionResult?.swimmingResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.swimmingResult,
-            false
-          )
+              this.competitionResult.swimmingResult,
+              false
+            )
           : "",
         t1Result: this.competitionResult?.t1Result
           ? this.secondsToTimeFormat(this.competitionResult.t1Result, false)
           : "",
         cyclingResult: this.competitionResult?.cyclingResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.cyclingResult,
-            false
-          )
+              this.competitionResult.cyclingResult,
+              false
+            )
           : "",
         t2Result: this.competitionResult?.t2Result
           ? this.secondsToTimeFormat(this.competitionResult.t2Result, false)
           : "",
         runningResult: this.competitionResult?.runningResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.runningResult,
-            false
-          )
+              this.competitionResult.runningResult,
+              false
+            )
           : "",
         totalResult: this.competitionResult?.totalResult
           ? this.secondsToTimeFormat(this.competitionResult.totalResult, false)
@@ -848,7 +836,7 @@ export default {
       };
       return iconMap[sportType] || require("@/assets/addClass/icon-other.png");
     },
-    handleDragEnd(e) {
+    handleDragAdd(e) {
       competitionApi
         .moveActivityPosition({
           competitionId: this.eventData.id,
@@ -858,6 +846,7 @@ export default {
         .then((res) => {
           if (res.success) {
             this.$message.success("移动成功");
+            this.loadEventDetail();
           } else {
             this.$message.error(res.message || "移动失败");
             this.loadEventDetail();
@@ -963,7 +952,7 @@ export default {
   .content-right {
     flex: 1;
     height: 500px;
-    overflow-y: auto;
+    // overflow-y: auto;
   }
 
   .section-title {

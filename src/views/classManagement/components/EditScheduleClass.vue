@@ -164,7 +164,7 @@
                       {{ formatDuration(classData.classesJson?.duration) }}
                     </div>
                   </td>
-                  <td>
+                  <td class="time-input-cell">
                     <div class="input-with-actions">
                       <span
                         class="modified-indicator"
@@ -216,7 +216,7 @@
                     <div>运动时长</div>
                   </td>
                   <td></td>
-                  <td>
+                  <td class="time-input-cell">
                     <div class="input-with-actions">
                       <span
                         class="modified-indicator"
@@ -845,7 +845,8 @@ export default {
             }
             console.log(this.actualData, "this.actualData");
           }
-        } else {
+        } else if (!this.classItem.manualActivityId) {
+          console.log(this.classItem, "this.classItem");
           this.getClassScheduleInfo(this.classItem.id);
         }
       }
@@ -1688,6 +1689,11 @@ export default {
         text-align: left;
         border-bottom: 1px solid #e5e5e5;
         vertical-align: middle;
+      }
+
+      /* 为包含 TimeInput 的单元格添加额外的底部内边距，确保错误消息有足够空间显示 */
+      td.time-input-cell {
+        // padding-bottom: 28px;
       }
 
       th {

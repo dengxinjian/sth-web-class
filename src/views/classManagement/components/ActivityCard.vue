@@ -5,6 +5,7 @@
       :data-activityId="activity.activityId"
       :data-manualActivityId="activity.manualActivityId"
       :data-date="date"
+      data-type="activity"
     >
       <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
       <div
@@ -73,7 +74,10 @@
         >
           <div
             class="title"
-            v-if="(activity.classesJson && activity.classesJson.title) || activity.activityName"
+            v-if="
+              (activity.classesJson && activity.classesJson.title) ||
+              activity.activityName
+            "
           >
             {{
               activity.classesJson
@@ -237,7 +241,7 @@
             hideContextMenu();
           "
         >
-        <i class="el-icon-edit"></i>
+          <i class="el-icon-edit"></i>
           编辑
         </div>
         <div
@@ -436,8 +440,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.classScheduleCard .card-body{
+.classScheduleCard .card-body {
   background-color: #fff;
 }
 .sportScheduleCard {

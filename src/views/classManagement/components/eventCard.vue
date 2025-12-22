@@ -13,6 +13,10 @@
         :class="{ 'is-dragging': isDragging }"
         @click.stop="handleClick"
         @contextmenu.stop.prevent="showContextMenu"
+        :data-id="eventItem.id"
+        :data-date="date"
+        draggable="true"
+        data-type="event"
       >
         <div
           class="card-body class-drap-handle"
@@ -98,6 +102,10 @@
                 activityItem.classScheduleId || 'unmatched'
               }-${!!activityItem.classesJson}-${Date.now()}`"
               :activity="activityItem"
+              :data-id="eventItem.id"
+              :data-date="date"
+              draggable="true"
+              data-type="event"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -110,6 +118,10 @@
                 activityItem.classScheduleId || 'unmatched'
               }-${!!activityItem.classesJson}-${Date.now()}`"
               :activity="activityItem"
+              :data-id="eventItem.id"
+              :data-date="date"
+              draggable="true"
+              data-type="event"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -122,6 +134,10 @@
                 activityItem.classScheduleId || 'unmatched'
               }-${!!activityItem.classesJson}-${Date.now()}`"
               :activity="activityItem"
+              :data-id="eventItem.id"
+              :data-date="date"
+              draggable="true"
+              data-type="event"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -134,6 +150,10 @@
                 activityItem.classScheduleId || 'unmatched'
               }-${!!activityItem.classesJson}-${Date.now()}`"
               :activity="activityItem"
+              :data-id="eventItem.id"
+              :data-date="date"
+              draggable="true"
+              data-type="event"
             />
             <EventActivityCard
               v-for="(activityItem, activityIndex) in eventItem
@@ -146,6 +166,10 @@
                 activityItem.classScheduleId || 'unmatched'
               }-${!!activityItem.classesJson}-${Date.now()}`"
               :activity="activityItem"
+              :data-id="eventItem.id"
+              :data-date="date"
+              draggable="true"
+              data-type="event"
             />
           </div>
         </div>
@@ -278,7 +302,12 @@ export default {
       }
       if (
         diffDays === 0 &&
-        (this.eventItem.hasBind === true || this.eventItem.totalResult)
+        (this.eventItem.hasBind === true ||
+          this.eventItem.totalResult ||
+          this.eventItem.overallRank ||
+          this.eventItem.groupRank ||
+          this.eventItem.genderRank ||
+          this.eventItem.feedback)
       ) {
         flag = false;
       }
