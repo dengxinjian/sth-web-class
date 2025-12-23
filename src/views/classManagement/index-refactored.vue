@@ -39,7 +39,6 @@
               @copy-class="handleCopyClassFromOfficial"
               @collapse-change="classSlideChange"
               @view-class="handleViewClass"
-              @class-drag-end="handleClassDragEndFromClassList"
             />
           </div>
         </div>
@@ -768,9 +767,9 @@ export default {
           this.showEventInfo = true;
           return;
         }
-        this.currentEventData = eventItem;
-        this.showAddEvent = true;
-        this.isEditMode = true;
+      this.currentEventData = eventItem;
+      this.showAddEvent = true;
+      this.isEditMode = true;
       } else {
         this.currentEventData = eventItem;
         this.showEventInfo = true;
@@ -1098,24 +1097,206 @@ export default {
                 part.healthInfos && part.healthInfos.length > 0
                   ? [part.healthInfos[0]]
                   : [];
+              const deviceActivityBindView = {
+                cycle: [],
+                run: [],
+                swim: [],
+                otherT1: [],
+                otherT2: [],
+              };
               part.competitionList.forEach((i) => {
                 i.deviceActivityBindView.cycle.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.cycle.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.cycle.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
                 });
                 i.deviceActivityBindView.run.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.run.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.run.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
                 });
                 i.deviceActivityBindView.swim.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.swim.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.swim.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                    console.log(item, "item==============");
+                  }
                 });
                 i.deviceActivityBindView.otherT1.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.otherT1.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.otherT1.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
                 });
                 i.deviceActivityBindView.otherT2.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.otherT2.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.otherT2.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
                 });
               });
-              competitionList = part.competitionList || [];
+              console.log(part.competitionList, " part.competitionList");
+              competitionList = part.competitionList.map((i) => ({
+                ...i,
+                deviceActivityBindView: deviceActivityBindView,
+              }));
             }
           });
 
@@ -1629,7 +1810,7 @@ export default {
 
       // 计算在“仅课程卡片”中的实际索引，忽略健康数据、赛事、运动记录等非课程元素
       let targetClassIndex = 0;
-      const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
+        const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
       const currentWeekData = [];
       let topIndex = 0;
       this.currentWeek.forEach((item) => {
@@ -1958,7 +2139,7 @@ export default {
 
       // 比赛类型到运动类型的映射（根据 value 匹配）
       const competitionTypeToSportTypes = {
-        TRIATHLON: ["CYCLE", "SWIM", "RUN", "OTHER"], // 铁三可以匹配骑行、游泳、跑步
+        TRIATHLON: ["CYCLE", "SWIM", "RUN", "OTHER"], // 铁三可以匹配骑行、游泳、跑步、其他
         RUNNING: ["RUN"], // 路跑只能匹配跑步
         CYCLE: ["CYCLE"], // 骑行只能匹配骑行
         SWIM: ["SWIM"], // 游泳只能匹配游泳
@@ -2003,7 +2184,8 @@ export default {
         // 根据比赛类型生成允许的运动类型提示信息
         let allowedTypesText = "";
         if (normalizedCompetitionType === "TRIATHLON") {
-          allowedTypesText = "游泳、骑行、跑步、力量、其他";
+          // 铁三：当前规则允许匹配「骑行、游泳、跑步、其他」
+          allowedTypesText = "骑行、游泳、跑步、其他";
         } else {
           // 获取允许的运动类型的中文名称
           const allowedNames = allowedSportTypes

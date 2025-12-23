@@ -243,6 +243,8 @@ export default {
                     "activity"
                 ) {
                   _this.handleScheduleDragAdd(e);
+                } else {
+                  _this.getScheduleData();
                 }
               },
               onAdd: (e) => {
@@ -282,7 +284,7 @@ export default {
                   return;
                 } else {
                   console.log(e, "e===================");
-                  // _this.handleScheduleDragAdd(e);
+                  _this.handleScheduleDragAdd(e);
                 }
               },
               onRemove: (e) => {

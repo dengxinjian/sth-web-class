@@ -17,10 +17,11 @@
           />
           <span class="event-name">{{ eventData?.competitionName }}</span>
           <span class="event-date">{{ eventData?.competitionDate }}</span>
-          <span class="event-date"
-            > {{
+          <span class="event-date">
+            {{
               eventData.competitionDistance === "自定义"
-                ? eventData.competitionDistanceValue + " " +
+                ? eventData.competitionDistanceValue +
+                  " " +
                   eventData.competitionDistanceUnit
                 : eventData?.competitionDistance
             }}</span
@@ -138,23 +139,22 @@
                 </tr>
               </tbody>
             </table>
-          </div>
-
-          <!-- 总结反馈 -->
-          <div class="summary-section">
-            <div class="summary-header">
-              <span class="summary-label">总结/反馈</span>
+            <!-- 总结反馈 -->
+            <div class="summary-section">
+              <div class="summary-header">
+                <span class="summary-label">总结/反馈</span>
+              </div>
+              <el-input
+                v-model="summaryText"
+                type="textarea"
+                :rows="5"
+                placeholder="请输入总结反馈"
+                maxlength="500"
+                show-word-limit
+                class="summary-textarea"
+                :disabled="true"
+              />
             </div>
-            <el-input
-              v-model="summaryText"
-              type="textarea"
-              :rows="5"
-              placeholder="请输入总结反馈"
-              maxlength="500"
-              show-word-limit
-              class="summary-textarea"
-              :disabled="true"
-            />
           </div>
         </div>
 
@@ -553,7 +553,13 @@ export default {
     //  校验当前 是录入成绩 还是编辑成绩 校验成绩是否为空 为空则提示录入成绩
     checkIsEdit() {
       // 如果总成绩为空，说明是录入模式
-      if (!this.competitionResult?.totalResult) {
+      if (
+        !this.competitionResult?.totalResult ||
+        this.competitionResult?.overallRank ||
+        this.competitionResult?.groupRank ||
+        this.competitionResult?.genderRank ||
+        this.competitionResult?.feedback
+      ) {
         return true;
       }
       // 如果有总成绩，说明是编辑模式
@@ -747,49 +753,18 @@ export default {
           feedback: this.editForm.feedback || "",
           totalResult: this.timeToSeconds(this.editForm.totalResult),
         };
-
-        // 根据比赛类型添加相应的成绩字段
-        if (
-          this.eventData.competitionType === 2 ||
-          this.eventData.competitionType === 5
-        ) {
+        if (this.eventData.competitionType === 2) {
           saveData.swimmingResult = this.timeToSeconds(
             this.editForm.swimmingResult
           );
-          saveData.totalResult = this.timeToSeconds(
-            this.editForm.swimmingResult
-          );
-        }
-
-        if (this.eventData.competitionType === 2) {
           saveData.t1Result = this.timeToSeconds(this.editForm.t1Result);
-          saveData.t2Result = this.timeToSeconds(this.editForm.t2Result);
-        }
-
-        if (
-          this.eventData.competitionType === 2 ||
-          this.eventData.competitionType === 4
-        ) {
           saveData.cyclingResult = this.timeToSeconds(
             this.editForm.cyclingResult
           );
-          saveData.totalResult = this.timeToSeconds(
-            this.editForm.cyclingResult
-          );
-        }
-
-        if (
-          this.eventData.competitionType === 2 ||
-          this.eventData.competitionType === 1
-        ) {
+          saveData.t2Result = this.timeToSeconds(this.editForm.t2Result);
           saveData.runningResult = this.timeToSeconds(
             this.editForm.runningResult
           );
-          saveData.totalResult = this.timeToSeconds(
-            this.editForm.runningResult
-          );
-        }
-        if (this.eventData.competitionType !== 3) {
           saveData.totalResult = 0;
         }
 
@@ -975,14 +950,17 @@ export default {
 .content-left {
   .result-table-wrapper {
     margin-bottom: 20px;
-    border: 1px solid #e8e8e8;
+    // border: 1px solid #e8e8e8;
     border-radius: 4px;
     overflow: hidden;
+    max-height: 480px;
+    overflow-y: auto;
 
     .result-table {
       width: 100%;
       border-collapse: collapse;
       background: #fff;
+      border: 1px solid #e8e8e8;
 
       tbody {
         tr {
@@ -1028,47 +1006,47 @@ export default {
         }
       }
     }
-  }
-}
+    // 总结反馈
+    .summary-section {
+      // margin-bottom: 20px;
+      margin-top: 20px;
 
-// 总结反馈
-.summary-section {
-  margin-bottom: 20px;
+      .summary-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
 
-  .summary-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+        .summary-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #333;
+        }
 
-    .summary-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .summary-required {
-      font-size: 12px;
-      color: #e42827;
-    }
-  }
-
-  .summary-textarea {
-    ::v-deep .el-textarea__inner {
-      font-size: 13px;
-      line-height: 1.6;
-      border-color: #e8e8e8;
-      border-radius: 4px;
-
-      &:focus {
-        border-color: #e42827;
+        .summary-required {
+          font-size: 12px;
+          color: #e42827;
+        }
       }
-    }
 
-    ::v-deep .el-input__count {
-      background: transparent;
-      font-size: 12px;
-      color: #999;
+      .summary-textarea {
+        ::v-deep .el-textarea__inner {
+          font-size: 13px;
+          line-height: 1.6;
+          border-color: #e8e8e8;
+          border-radius: 4px;
+
+          &:focus {
+            border-color: #e42827;
+          }
+        }
+
+        ::v-deep .el-input__count {
+          background: transparent;
+          font-size: 12px;
+          color: #999;
+        }
+      }
     }
   }
 }
@@ -1076,7 +1054,7 @@ export default {
 // 右侧运动记录
 .content-right {
   .activity-list {
-    max-height: 500px;
+    max-height: 480px;
     overflow-y: auto;
 
     .activity-item {

@@ -230,11 +230,8 @@ export default {
         result = "--";
       }
       if (sportType === 3 && result > 0) {
-        result = distance;
-      } else {
-        result = Math.round(distance / 10) / 100;
+        result = this.activity.preciseDistance;
       }
-      console.log(result, "------------result111");
       return result;
     },
     getSportIcon(sportType) {
