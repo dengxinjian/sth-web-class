@@ -716,7 +716,7 @@ export default {
     // 查询偏好数据
     getPreferenceData() {
       request({
-        url: "/training/api/sport-preference/by-current-type",
+        url: `/gateway/training/sport-preference/by-current-type?triUserId=${this.triUserId}`,
         method: "get",
         headers: {
           requestUserInfoId: this.triUserId,
@@ -829,7 +829,7 @@ export default {
     },
     getThresholdData() {
       getData({
-        url: "/api/classSchedule/getThresholdDetail",
+        url: "/consumer/wx/getThresholdDetail",
         type: this.activeSport,
         triUserId: this.triUserId,
       }).then((res) => {

@@ -218,7 +218,7 @@ export default {
     handleMiniprogramCode() {
       if (this.unionid) {
         getData({
-          url: "/api/wechat/getByUnionid",
+          url: "/consumer/api/wechat/getByUnionid",
           unionid: this.unionid,
         })
           .then((res) => {

@@ -1363,7 +1363,7 @@ export default {
         return;
       }
       submitData({
-        url: "/api/classSchedule/updateActivityDetail",
+        url: "/training/api/activity/updateActivityDetail",
         activityId: this.classData.activityId,
         classesJson: JSON.stringify(this.classData.classesJson),
         activityDuration:

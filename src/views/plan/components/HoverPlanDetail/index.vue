@@ -545,7 +545,7 @@ export default {
         };
         // console.log(params, "params");
         submitData({
-          url: "/api/planClasses/updatePlanClasses",
+          url: "/training/api/planClasses/updatePlanClasses",
           requestData: params,
         }).then((res) => {
           if (res.success) {

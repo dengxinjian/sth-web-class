@@ -141,7 +141,7 @@ export default {
     },
     getApplyHistory() {
       const params = {
-        url: "/api/applyPlanClassesHistory/listByPlanId",
+        url: "/gateway/training/planClasses/listApplyHistoryByPlanId",
         planClassesId: this.planInfo.id,
         pageNo: this.pagination.page,
         pageSize: this.pagination.limit,

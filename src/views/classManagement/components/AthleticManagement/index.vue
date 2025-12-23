@@ -771,7 +771,7 @@ export default {
         type: "warning",
       }).then(() => {
         submitData({
-          url: `/api/team/kick/${this.teamId}/${node.data.triUserId}/${node.data.userType}`,
+          url: `/consumer/api/team/kick/${this.teamId}/${node.data.triUserId}/${node.data.userType}`,
           method: "delete",
         })
           .then((res) => {
@@ -801,7 +801,7 @@ export default {
         type: "warning",
       }).then(() => {
         submitData({
-          url: `/api/team/kick/${this.teamId}/${node.data.triUserId}/${node.data.userType}`,
+          url: `/consumer/api/team/kick/${this.teamId}/${node.data.triUserId}/${node.data.userType}`,
           method: "delete",
         })
           .then((res) => {

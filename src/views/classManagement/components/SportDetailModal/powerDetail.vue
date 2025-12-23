@@ -212,7 +212,7 @@ export default {
     // 查询运动详情
     getSportDetail(id) {
       getData({
-        url: '/api/classSchedule/getActivityDetail',
+        url: '/gateway/training/activity/getActivityDetail',
         activityId: id
       }).then(res => {
         if (res.success) {

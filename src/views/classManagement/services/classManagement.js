@@ -249,27 +249,27 @@ export const competitionApi = {
   // 获取比赛类型和距离下拉框数据
   getDropdownOptions() {
     return getData({
-      url: "/api/competition/dropdown-options",
+      url: "/consumer/api/competition/dropdown-options",
     });
   },
   // 行政区域
   getAdministrativeDivision(parentId = "") {
     return getData({
-      url: "/resource/administrative-division",
+      url: "/training/api/resource/administrative-division",
       parentId,
     });
   },
   // 查询赛事详情
   getCompetitionDetail(id) {
     return request({
-      url: `/api/competition/${id}`,
+      url: `/consumer/api/competition/${id}`,
       method: "get",
     });
   },
   // 创建赛事
   createCompetition(data, triUserId) {
     return request({
-      url: "/api/competition",
+      url: "/consumer/api/competition",
       method: "post",
       data,
       headers: {
@@ -286,7 +286,7 @@ export const competitionApi = {
     //   requestData: data,
     // });
     return request({
-      url: "/api/competition",
+      url: "/consumer/api/competition",
       headers: {
         requestUserInfoId: triUserId,
       },
@@ -297,7 +297,7 @@ export const competitionApi = {
   // 删除赛事
   deleteCompetition(id) {
     return submitData({
-      url: `/api/competition/${id}`,
+      url: `/consumer/api/competition/${id}`,
       method: "delete",
     });
   },
@@ -319,7 +319,7 @@ export const competitionApi = {
   // 保存/更新比赛成绩
   saveCompetitionResult(data) {
     return request({
-      url: "/api/competition/season-results",
+      url: "/consumer/api/competition/season-results",
       method: "put",
       data,
     });
