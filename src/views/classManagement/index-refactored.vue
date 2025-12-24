@@ -239,18 +239,18 @@
 
     <EditScheduleClass
       :visible="showEditScheduleClass"
-      :class-item="classDetailData"
+      :class-item="isActivity ? activityDetailData : classDetailData"
       :is-activity="isActivity"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
       @close="
         showEditScheduleClass = false;
-        classDetailData = {};
+        isActivity ? (activityDetailData = {}) : (classDetailData = {});
       "
       @save="handleClassDetailSave"
       @delete="
         handleDeleteClassSchedule;
-        classDetailData = {};
+        isActivity ? (activityDetailData = {}) : (classDetailData = {});
       "
     />
 
@@ -440,6 +440,7 @@ export default {
       classSportType: "",
       classType: "class",
       classDetailData: {},
+      activityDetailData: {},
       addScheduleDate: "",
       copyClassFromOfficialClassId: "",
       copyClassFromOfficialGroupId: "",
@@ -860,7 +861,7 @@ export default {
     handleEditActivity(activity) {
       console.log(activity, "activity");
       this.showEditScheduleClass = true;
-      this.classDetailData = activity;
+      this.activityDetailData = activity;
       this.isActivity = true;
     },
     /**
@@ -1039,7 +1040,7 @@ export default {
                   ...i,
                   classesJson: i.classesJson
                     ? parseClassesJson(i.classesJson)
-                    : "",
+                    : {},
                   completion: i.classesJson
                     ? getCompletionStatus(i.percent)
                     : "",
@@ -1060,7 +1061,7 @@ export default {
                     ...i,
                     classesJson: i.classesJson
                       ? parseClassesJson(i.classesJson)
-                      : "",
+                      : {},
                     distance: Math.round(i.distance / 10) / 100,
                     preciseDistance: i.distance,
                   });
@@ -1074,7 +1075,7 @@ export default {
                         activityName: item.activityName,
                         classesJson: i.classesJson
                           ? parseClassesJson(i.classesJson)
-                          : "",
+                          : {},
                         distance: Math.round(i.distance / 10) / 100,
                         preciseDistance: Math.round(i.distance),
                         oldActivityDuration: item.oldActivityDuration,
@@ -1113,7 +1114,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1129,7 +1130,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1150,7 +1151,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1166,7 +1167,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1191,7 +1192,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1207,7 +1208,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1229,7 +1230,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1245,7 +1246,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1266,7 +1267,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1282,7 +1283,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1303,7 +1304,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1319,7 +1320,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : "",
+                        : {},
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1716,7 +1717,7 @@ export default {
       //   sportType,
       // };
       console.log(this.sportDetailData, "this.sportDetailData");
-      this.classDetailData = activity;
+      this.activityDetailData = activity;
       // this.showSportDetailModal = true;
       this.showEditScheduleClass = true;
       this.isActivity = true;
@@ -2678,8 +2679,13 @@ export default {
       console.log(flag, "flag");
       if (flag) {
         this.showClassDetailModal = false;
+        this.showEditScheduleClass = false;
         this.classSportType = "";
-        this.classDetailData = {};
+        if (this.isActivity) {
+          this.activityDetailData = {};
+        } else {
+          this.classDetailData = {};
+        }
       }
       this.getScheduleData();
       this.getClassList();

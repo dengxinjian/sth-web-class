@@ -630,7 +630,7 @@
         >
       </div>
     </el-dialog>
-    <ClassDetailModal
+    <!-- <ClassDetailModal
       :visible="showClassDetailModal"
       :type="normalizedSportType"
       scheduleType="edit"
@@ -640,7 +640,7 @@
       @save="$emit('save', $event)"
       @cancel="handleClassDetailClose"
       v-if="!isActivity"
-    />
+    /> -->
   </div>
 </template>
 
@@ -836,8 +836,9 @@ export default {
             // } else {
             //   this.actualData.distance = this.classData.distance;
             // }
-            if (this.classData.distanceUnit === "m") {
+            if (this.actualData.distanceUnit === "m") {
               this.actualData.distance = this.classData.preciseDistance;
+              console.log(this.actualData.distance, "=========this.actualData.distance");
               this.defaultData.distance = this.classData.preciseDistance;
             } else {
               this.actualData.distance = this.classData.preciseDistance / 1000;
