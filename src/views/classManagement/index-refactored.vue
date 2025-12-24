@@ -2139,14 +2139,14 @@ export default {
 
       // 比赛类型到运动类型的映射（根据 value 匹配）
       const competitionTypeToSportTypes = {
-        TRIATHLON: ["CYCLE", "SWIM", "RUN", "OTHER"], // 铁三可以匹配骑行、游泳、跑步、其他
+        TRIATHLON: ["SWIM", "CYCLE", "RUN", "OTHER"], // 铁三可以关联游泳、骑行、跑步、其他
         RUNNING: ["RUN"], // 路跑只能匹配跑步
         CYCLE: ["CYCLE"], // 骑行只能匹配骑行
         SWIM: ["SWIM"], // 游泳只能匹配游泳
-        OTHER: ["CYCLE", "SWIM", "RUN", "STRENGTH", "OTHER"], // 其他类型可以匹配所有运动类型
+        OTHER: ["SWIM", "CYCLE", "RUN", "OTHER", "STRENGTH"], // 其他类型可以关联游泳、骑行、跑步、其他、力量
       };
 
-      // 检查比赛类型和运动类型是否匹配
+      // 检查比赛类型和运动类型是否允许关联
       const allowedSportTypes =
         competitionTypeToSportTypes[normalizedCompetitionType];
       if (!allowedSportTypes || allowedSportTypes.length === 0) {
@@ -2156,16 +2156,13 @@ export default {
         const competitionTypeName =
           competitionInfo?.label || normalizedCompetitionType;
         this.$message.warning(
-          `比赛类型为${competitionTypeName}时，暂不支持匹配运动数据`
+          `比赛类型为${competitionTypeName}时，暂不支持关联运动数据`
         );
         this.getScheduleData();
         return;
       }
 
-      // 如果比赛类型为"其他"，则允许匹配所有运动类型，直接跳过检查
-      if (normalizedCompetitionType === "OTHER") {
-        // 允许匹配，继续后续处理
-      } else if (!allowedSportTypes.includes(activitySportType)) {
+      if (!allowedSportTypes.includes(activitySportType)) {
         const competitionInfo = Object.values(COMPETITION_TYPE_MAP).find(
           (item) => item.value === normalizedCompetitionType
         );
@@ -2184,7 +2181,7 @@ export default {
         // 根据比赛类型生成允许的运动类型提示信息
         let allowedTypesText = "";
         if (normalizedCompetitionType === "TRIATHLON") {
-          // 铁三：当前规则允许匹配「骑行、游泳、跑步、其他」
+          // 铁三：当前规则允许关联「骑行、游泳、跑步、其他」
           allowedTypesText = "骑行、游泳、跑步、其他";
         } else {
           // 获取允许的运动类型的中文名称
@@ -2195,13 +2192,13 @@ export default {
         }
 
         this.$message.warning(
-          `比赛类型为${competitionTypeName}时，只能匹配${allowedTypesText}的运动数据`
+          `比赛类型为${competitionTypeName}时，只能关联${allowedTypesText}的运动数据`
         );
         this.getScheduleData();
         return;
       }
 
-      // 匹配成功，继续后续处理
+      // 关联成功，继续后续处理
       competitionApi
         .bindActivity({
           activityId: activity.activityId,
@@ -2211,12 +2208,12 @@ export default {
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("匹配成功");
+            this.$message.success("关联成功");
           }
           this.getScheduleData();
         })
         .catch((err) => {
-          console.error("匹配失败:", err);
+          console.error("关联失败:", err);
           this.getScheduleData();
         });
       // const type = manualActivityId ? 2 : 1;
