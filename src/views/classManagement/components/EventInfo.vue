@@ -567,16 +567,17 @@ export default {
     checkIsEdit() {
       // 如果总成绩为空，说明是录入模式
       if (
-        !this.competitionResult?.totalResult ||
-        this.competitionResult?.overallRank ||
-        this.competitionResult?.groupRank ||
-        this.competitionResult?.genderRank ||
-        this.competitionResult?.feedback
+        this.eventData.hasBind === true ||
+        this.eventData.totalResult ||
+        this.eventData.overallRank ||
+        this.eventData.groupRank ||
+        this.eventData.genderRank ||
+        this.eventData.feedback
       ) {
+        return false;
+      } else {
         return true;
       }
-      // 如果有总成绩，说明是编辑模式
-      return false;
     },
     getClassImageIcon(priority) {
       if (priority === "PRIMARY" || priority === 1) {
@@ -663,27 +664,27 @@ export default {
         genderRank: this.competitionResult?.genderRank || "",
         swimmingResult: this.competitionResult?.swimmingResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.swimmingResult,
-            false
-          )
+              this.competitionResult.swimmingResult,
+              false
+            )
           : "",
         t1Result: this.competitionResult?.t1Result
           ? this.secondsToTimeFormat(this.competitionResult.t1Result, false)
           : "",
         cyclingResult: this.competitionResult?.cyclingResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.cyclingResult,
-            false
-          )
+              this.competitionResult.cyclingResult,
+              false
+            )
           : "",
         t2Result: this.competitionResult?.t2Result
           ? this.secondsToTimeFormat(this.competitionResult.t2Result, false)
           : "",
         runningResult: this.competitionResult?.runningResult
           ? this.secondsToTimeFormat(
-            this.competitionResult.runningResult,
-            false
-          )
+              this.competitionResult.runningResult,
+              false
+            )
           : "",
         totalResult: this.competitionResult?.totalResult
           ? this.secondsToTimeFormat(this.competitionResult.totalResult, false)

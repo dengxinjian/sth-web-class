@@ -1022,6 +1022,14 @@ export default {
           let classSchedule = [];
           let healthInfos = [];
           let competitionList = [];
+          let deviceActivityBindView = {
+            cycle: [],
+            run: [],
+            swim: [],
+            otherT1: [],
+            otherT2: [],
+            strength: [],
+          };
 
           res.result.forEach((part) => {
             if (item.commonDate === part.dataDate) {
@@ -1097,14 +1105,7 @@ export default {
                 part.healthInfos && part.healthInfos.length > 0
                   ? [part.healthInfos[0]]
                   : [];
-              const deviceActivityBindView = {
-                cycle: [],
-                run: [],
-                swim: [],
-                otherT1: [],
-                otherT2: [],
-                strength: [],
-              };
+
               part.competitionList.forEach((i) => {
                 i.deviceActivityBindView.cycle.forEach((item) => {
                   if (!item.manualActivityId) {
@@ -1179,6 +1180,10 @@ export default {
                         : 0,
                     });
                   }
+                  console.log(
+                    deviceActivityBindView.run,
+                    "============deviceActivityBindView.run"
+                  );
                 });
                 i.deviceActivityBindView.swim.forEach((item) => {
                   if (!item.manualActivityId) {
@@ -1329,12 +1334,18 @@ export default {
                     });
                   }
                 });
+                i.deviceActivityBindView = deviceActivityBindView;
+                deviceActivityBindView = {
+                  cycle: [],
+                  run: [],
+                  swim: [],
+                  otherT1: [],
+                  otherT2: [],
+                  strength: [],
+                };
               });
-              console.log(part.competitionList, " part.competitionList");
-              competitionList = part.competitionList.map((i) => ({
-                ...i,
-                deviceActivityBindView: deviceActivityBindView,
-              }));
+              competitionList = part.competitionList;
+              console.log(competitionList, "============competitionList");
             }
           });
 
@@ -2220,7 +2231,7 @@ export default {
         let allowedTypesText = "";
         if (normalizedCompetitionType === "TRIATHLON") {
           // 铁三：当前规则允许关联「骑行、游泳、跑步、其他」
-          allowedTypesText = "骑行、游泳、跑步、其他";
+          allowedTypesText = "游泳、骑行、跑步、其他";
         } else {
           // 获取允许的运动类型的中文名称
           const allowedNames = allowedSportTypes
