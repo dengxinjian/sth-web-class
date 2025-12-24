@@ -904,6 +904,8 @@ export default {
               this.$emit("save", res.result);
               this.loading = false;
             }
+          }).finally(() => {
+            this.loading = false;
           });
         })
         .catch(() => {
