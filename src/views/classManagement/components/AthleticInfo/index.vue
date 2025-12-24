@@ -164,7 +164,7 @@
                 v-model="preferenceForm.restDays"
                 multiple
                 :multiple-limit="3"
-                placeholder="请选择休息日,最多选择3天"
+                placeholder="长距离日不可选择"
                 class="week-select-multiple"
               >
                 <el-option

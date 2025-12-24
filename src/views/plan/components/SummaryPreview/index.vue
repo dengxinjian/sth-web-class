@@ -476,7 +476,7 @@ export default {
         this.teamOptions.find((item) => item.id === currentTeamId)?.teamName ||
         this.planInfo.teamName ||
         "";
-      const owner = this.planInfo.possessNickname || "";
+      const owner = this.planInfo.planSourceNickname || "";
       if (!teamName && !owner) return "";
       if (!owner) return teamName;
       if (!teamName) return owner;
