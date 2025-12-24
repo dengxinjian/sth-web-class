@@ -348,6 +348,22 @@ export default {
         url: "/api/team/coach/all-teams",
       }).then((res) => {
         this.teams = res.result;
+        if (this.teams.length === 0) {
+          this.getDefaultTeam();
+        }
+      });
+    },
+    getDefaultTeam() {
+      const _this = this;
+      getData({
+        url: "/api/team/my-team",
+      }).then((res) => {
+        _this.teams = [
+          {
+            id: res.result.id,
+            teamName: res.result.teamName
+          }
+        ];
       });
     },
     onCancel() {
