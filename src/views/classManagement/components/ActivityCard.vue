@@ -41,7 +41,12 @@
               >
                 解除匹配
               </el-button>
-              <el-button type="text" icon="el-icon-crop" @click="handleCopy">
+              <el-button
+                type="text"
+                icon="el-icon-crop"
+                v-if="activity.classesJson"
+                @click="handleCopy"
+              >
                 复制
               </el-button>
 

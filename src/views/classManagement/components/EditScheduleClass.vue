@@ -630,7 +630,7 @@
         >
       </div>
     </el-dialog>
-    <!-- <ClassDetailModal
+    <ClassDetailModal
       :visible="showClassDetailModal"
       :type="normalizedSportType"
       scheduleType="edit"
@@ -640,7 +640,7 @@
       @save="$emit('save', $event)"
       @cancel="handleClassDetailClose"
       v-if="!isActivity"
-    /> -->
+    />
   </div>
 </template>
 

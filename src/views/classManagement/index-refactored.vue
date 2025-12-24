@@ -1040,7 +1040,7 @@ export default {
                   ...i,
                   classesJson: i.classesJson
                     ? parseClassesJson(i.classesJson)
-                    : {},
+                    : null,
                   completion: i.classesJson
                     ? getCompletionStatus(i.percent)
                     : "",
@@ -1061,7 +1061,7 @@ export default {
                     ...i,
                     classesJson: i.classesJson
                       ? parseClassesJson(i.classesJson)
-                      : {},
+                      : null,
                     distance: Math.round(i.distance / 10) / 100,
                     preciseDistance: i.distance,
                   });
@@ -1075,7 +1075,7 @@ export default {
                         activityName: item.activityName,
                         classesJson: i.classesJson
                           ? parseClassesJson(i.classesJson)
-                          : {},
+                          : null,
                         distance: Math.round(i.distance / 10) / 100,
                         preciseDistance: Math.round(i.distance),
                         oldActivityDuration: item.oldActivityDuration,
@@ -1114,7 +1114,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1130,7 +1130,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1151,7 +1151,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1167,7 +1167,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1192,7 +1192,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1208,7 +1208,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1230,7 +1230,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1246,7 +1246,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1267,7 +1267,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1283,7 +1283,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
@@ -1304,7 +1304,7 @@ export default {
                       ...item,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       completion: item.classesJson
                         ? getCompletionStatus(i.percent)
                         : "",
@@ -1320,7 +1320,7 @@ export default {
                       activityName: item.activityName,
                       classesJson: item.classesJson
                         ? parseClassesJson(item.classesJson)
-                        : {},
+                        : null,
                       distance: Math.round(item.distance / 10) / 100,
                       preciseDistance: Math.round(item.distance),
                       oldActivityDuration: item.deviceActivity
