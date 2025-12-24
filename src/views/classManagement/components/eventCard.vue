@@ -176,6 +176,23 @@
               data-type="event"
               @click="handleClickActivity"
             />
+            <EventActivityCard
+              v-for="(activityItem, activityIndex) in eventItem
+                .deviceActivityBindView.strength"
+              :key="`activity--${
+                activityItem.activityId ||
+                activityItem.manualActivityId ||
+                activityIndex
+              }-${
+                activityItem.classScheduleId || 'unmatched'
+              }-${!!activityItem.classesJson}-${Date.now()}`"
+              :activity="activityItem"
+              :data-id="eventItem.id"
+              :data-date="date"
+              draggable="true"
+              data-type="event"
+              @click="handleClickActivity"
+            />
           </div>
         </div>
       </div>

@@ -767,9 +767,9 @@ export default {
           this.showEventInfo = true;
           return;
         }
-      this.currentEventData = eventItem;
-      this.showAddEvent = true;
-      this.isEditMode = true;
+        this.currentEventData = eventItem;
+        this.showAddEvent = true;
+        this.isEditMode = true;
       } else {
         this.currentEventData = eventItem;
         this.showEventInfo = true;
@@ -1103,6 +1103,7 @@ export default {
                 swim: [],
                 otherT1: [],
                 otherT2: [],
+                strength: [],
               };
               part.competitionList.forEach((i) => {
                 i.deviceActivityBindView.cycle.forEach((item) => {
@@ -1272,6 +1273,43 @@ export default {
                     });
                   } else {
                     deviceActivityBindView.otherT2.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
+                });
+                i.deviceActivityBindView.strength.forEach((item) => {
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.strength.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : "",
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.strength.push({
                       ...item,
                       activityName: item.activityName,
                       classesJson: item.classesJson
@@ -1810,7 +1848,7 @@ export default {
 
       // 计算在“仅课程卡片”中的实际索引，忽略健康数据、赛事、运动记录等非课程元素
       let targetClassIndex = 0;
-        const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
+      const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
       const currentWeekData = [];
       let topIndex = 0;
       this.currentWeek.forEach((item) => {

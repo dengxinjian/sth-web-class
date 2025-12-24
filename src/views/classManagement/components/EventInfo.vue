@@ -277,6 +277,18 @@
               :activity="activity"
               @remove="handleRemoveActivity"
             />
+            <div
+              style="margin-bottom: 10px"
+              v-if="activityList.strength.length > 0"
+            >
+              力量运动记录
+            </div>
+            <ActivityItem
+              v-for="(activity, index) in activityList.strength"
+              :key="`strength-${index}`"
+              :activity="activity"
+              @remove="handleRemoveActivity"
+            />
           </div>
         </div>
       </div>
@@ -426,6 +438,7 @@ export default {
         swim: [],
         otherT1: [],
         otherT2: [],
+        strength: [],
       },
       isEditing: false, // 是否正在编辑
       editForm: {
@@ -604,6 +617,9 @@ export default {
         res.result.deviceActivityBindView.otherT2.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
+        res.result.deviceActivityBindView.strength.forEach((item) => {
+          item.classesJson = parseClassesJson(item.classesJson);
+        });
         this.competitionResult = res.result || {};
         console.log(this.competitionResult, "this.competitionResult");
         this.activityList = res.result.deviceActivityBindView || [];
@@ -647,27 +663,27 @@ export default {
         genderRank: this.competitionResult?.genderRank || "",
         swimmingResult: this.competitionResult?.swimmingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.swimmingResult,
-              false
-            )
+            this.competitionResult.swimmingResult,
+            false
+          )
           : "",
         t1Result: this.competitionResult?.t1Result
           ? this.secondsToTimeFormat(this.competitionResult.t1Result, false)
           : "",
         cyclingResult: this.competitionResult?.cyclingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.cyclingResult,
-              false
-            )
+            this.competitionResult.cyclingResult,
+            false
+          )
           : "",
         t2Result: this.competitionResult?.t2Result
           ? this.secondsToTimeFormat(this.competitionResult.t2Result, false)
           : "",
         runningResult: this.competitionResult?.runningResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.runningResult,
-              false
-            )
+            this.competitionResult.runningResult,
+            false
+          )
           : "",
         totalResult: this.competitionResult?.totalResult
           ? this.secondsToTimeFormat(this.competitionResult.totalResult, false)

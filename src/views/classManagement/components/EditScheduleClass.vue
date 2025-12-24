@@ -1083,10 +1083,10 @@ export default {
         sportType === 2
           ? this.formatStride(minStrideLength, avgStrideLength, maxStrideLength)
           : {
-              minStrideLength: "-",
-              avgStrideLength: "-",
-              maxStrideLength: "-",
-            };
+            minStrideLength: "-",
+            avgStrideLength: "-",
+            maxStrideLength: "-",
+          };
 
       const deviceTypeFormat = [
         { en: "COROS", cn: "高驰" },
