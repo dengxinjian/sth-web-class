@@ -218,7 +218,7 @@
                   <td></td>
                   <td class="time-input-cell">
                     <div class="input-with-actions">
-                      <span
+                      <!-- <span
                         class="modified-indicator"
                         v-if="
                           classData.activityId &&
@@ -226,14 +226,14 @@
                             originalData.activityDuration
                         "
                         >*</span
-                      >
+                      > -->
                       <TimeInput
                         v-model="actualData.activityDuration"
                         size="small"
                         :disabled="isInputDisabled"
                       />
                       <div class="action-buttons">
-                        <el-button
+                        <!-- <el-button
                           type="text"
                           size="small"
                           @click="restoreField('activityDuration')"
@@ -245,7 +245,7 @@
                             ) || isInputDisabled
                           "
                           >还原</el-button
-                        >
+                        > -->
                         <el-button
                           type="text"
                           size="small"
@@ -503,8 +503,8 @@
                       sportDetail.sportType === 1
                         ? "km/h"
                         : sportDetail.sportType === 2
-                        ? "km"
-                        : "m"
+                        ? "/km"
+                        : "/100m"
                     }}
                   </td>
                 </tr>
@@ -527,7 +527,7 @@
                         ? "rpm"
                         : sportDetail.sportType === 2
                         ? "spm"
-                        : "min"
+                        : "/min"
                     }}
                   </td>
                 </tr>
@@ -1129,7 +1129,7 @@ export default {
           const actualData = {
             duration: this.translateSecondsToFormat(this.sportDetail.duration),
             activityDuration: this.translateSecondsToFormat(
-              this.sportDetail.netDuration
+              this.sportDetail.netDuration || 0
             ),
             distance: parseFloat(this.sportDetail.distance),
             sthValue: this.sportDetail.sthValue,
@@ -1147,7 +1147,7 @@ export default {
             this.actualData = {
               duration: this.classData.duration,
               activityDuration: this.translateSecondsToFormat(
-                this.classData.activityDuration
+                this.classData.activityDuration || 0
               ),
               sthValue: this.classData.sthValue,
               calories: this.classData.calories,
