@@ -381,7 +381,7 @@
                 type="textarea"
                 :rows="5"
                 placeholder="请输入总结反馈"
-                maxlength="500"
+                maxlength="1000"
                 show-word-limit
               />
             </el-form-item>
