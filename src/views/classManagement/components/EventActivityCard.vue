@@ -322,6 +322,10 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+      line-clamp: 5;
     }
   }
 }
