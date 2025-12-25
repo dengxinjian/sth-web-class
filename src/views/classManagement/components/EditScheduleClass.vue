@@ -43,7 +43,7 @@
                   !classData.classesJson?.title && !!classData.activityName
                 "
                 :maxlength="50"
-                style="width: 100%"
+                style="width: 30vw"
               />
             </el-form-item>
           </el-form>
