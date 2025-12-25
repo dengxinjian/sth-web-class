@@ -65,10 +65,10 @@
                 activity.classesJson.trainingAdvice
               "
             >
-              <pre v-if="activity.classesJson.summary" class="stage-details">
+              <pre v-if="activity.classesJson.summary" class="stage-details" style=" display: -webkit-box;">
                 {{ truncateByLines(activity.classesJson.summary) }}
               </pre>
-              <pre class="stage-details">
+              <pre class="stage-details" style=" display: -webkit-box;">
                 {{ truncateByLines(activity.classesJson.trainingAdvice) }}
               </pre>
             </template>
@@ -79,7 +79,7 @@
             >
               <CycleStageDetails
                 :class-data="activity.classesJson"
-                :max-stages="3"
+                :max-stages="2"
               />
             </template>
             <template
@@ -89,7 +89,7 @@
             >
               <RunStageDetails
                 :class-data="activity.classesJson"
-                :max-stages="3"
+                :max-stages="2"
               />
             </template>
 
@@ -322,7 +322,7 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
-      display: -webkit-box;
+      // display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 5;
       line-clamp: 5;
