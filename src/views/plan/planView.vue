@@ -560,6 +560,7 @@ export default {
                 teamId: _this.ownerTeams[0]?.id || null,
                 ownerName: localStorage.getItem("name").split("#")[0],
                 ownerId: localStorage.getItem("triUserId"),
+                loginType: parseInt(localStorage.getItem("loginType")),
               };
               _this.$emit("choose-plan", true);
               _this.handleAddPlan();

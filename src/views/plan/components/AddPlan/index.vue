@@ -378,6 +378,7 @@ export default {
         const params = {
           ...this.form,
           dayDetails: this.emptyPlanClasses,
+          loginType: parseInt(localStorage.getItem("loginType")),
         };
         // 将 params 保存到 planStore 中的 planData
         this.$store.dispatch("plan/savePlanData", params);
@@ -434,6 +435,7 @@ export default {
         officialPlanId: this.copyOfficialPlanInfo.id,
         level: this.form.level,
         dayDetails: planData,
+        loginType: parseInt(localStorage.getItem("loginType")),
       }
       const res = await planApi.createSelfPlanByOffice(params);
       if (res.success) {

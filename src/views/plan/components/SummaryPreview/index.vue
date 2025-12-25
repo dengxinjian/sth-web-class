@@ -471,16 +471,12 @@ export default {
   methods: {
     secondsToHHMMSS,
     planSource() {
-      const currentTeamId = this.form.teamId || this.planInfo.teamId;
-      const teamName =
-        this.teamOptions.find((item) => item.id === currentTeamId)?.teamName ||
-        this.planInfo.teamName ||
-        "";
+      const planSourceTeamIdName = this.planInfo.planSourceTeamIdName || "";
       const owner = this.planInfo.planSourceNickname || "";
-      if (!teamName && !owner) return "";
-      if (!owner) return teamName;
-      if (!teamName) return owner;
-      return `${teamName} - ${owner}`;
+      if (!planSourceTeamIdName && !owner) return "";
+      if (!owner) return planSourceTeamIdName;
+      if (!planSourceTeamIdName) return owner;
+      return `${planSourceTeamIdName} - ${owner}`;
     },
     getGroupList() {
       getData({
@@ -494,6 +490,22 @@ export default {
         url: "/api/team/coach/all-teams",
       }).then((res) => {
         this.teams = res.result;
+        if (this.teams.length === 0) {
+          this.getDefaultTeam();
+        }
+      });
+    },
+    getDefaultTeam() {
+      const _this = this;
+      getData({
+        url: "/api/team/my-team",
+      }).then((res) => {
+        _this.teams = [
+          {
+            id: res.result.id,
+            teamName: res.result.teamName
+          }
+        ];
       });
     },
     onCancel() {

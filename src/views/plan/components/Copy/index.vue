@@ -161,6 +161,7 @@ export default {
           level: this.planInfo.level,
           dayDetails: details,
           sourcePlanId: this.planInfo.id,
+          loginType: localStorage.getItem("loginType"),
         };
         console.log(params, "params");
         submitData({
