@@ -201,11 +201,9 @@
           <div v-if="activeSport === 1" class="row">
             <span class="label"><span class="required">*</span>阈值心率</span>
             <el-input
-              v-model.number="thresholdData.param2"
+              v-model="thresholdData.param2"
               :key="'hr-param2-' + activeSport"
-              step="1"
               class="pill-input"
-              type="number"
               @input="handleThresholdInput('param2', $event)"
             />
             <span class="suffix unit-red">bpm</span>
@@ -213,11 +211,9 @@
               ><span class="required">*</span>最大心率</span
             >
             <el-input
-              v-model.number="thresholdData.param1"
+              v-model="thresholdData.param1"
               :key="'hr-param1-' + activeSport"
-              step="1"
               class="pill-input"
-              type="number"
               @input="handleThresholdInput('param1', $event)"
             />
             <span class="suffix unit-red">bpm</span>
@@ -242,11 +238,9 @@
           <div v-else-if="activeSport === 2" class="row">
             <span class="label"><span class="required">*</span>阈值功率</span>
             <el-input
-              v-model.number="thresholdData.threshold"
+              v-model="thresholdData.threshold"
               :key="'bike-' + activeSport"
-              step="1"
               class="pill-input"
-              type="number"
               @input="handleThresholdInput('threshold', $event)"
             />
             <span class="suffix unit-red">w</span>
@@ -982,8 +976,11 @@ export default {
       }
     },
     handleThresholdInput(field, value) {
-      // 移除所有非数字字符
-      let numericValue = value.replace(/\D/g, "");
+      // 确保 value 是字符串类型
+      const strValue = String(value || "");
+
+      // 移除所有非数字字符（包括字母 e、小数点、负号等）
+      let numericValue = strValue.replace(/\D/g, "");
 
       // 限制最大长度为7位
       if (numericValue.length > 7) {
@@ -1002,7 +999,7 @@ export default {
         // 转换为正整数
         const intValue = parseInt(numericValue, 10);
         if (intValue > 0) {
-          this.thresholdData[field] = String(intValue);
+          this.thresholdData[field] = intValue;
         } else {
           this.thresholdData[field] = "";
         }
