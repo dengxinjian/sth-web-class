@@ -148,7 +148,7 @@
     <div v-if="hasMoreStages" class="stage-ellipsis">...</div>
   </div>
   <div v-else class="stage-details">
-    <div v-for="(stage, index) in classData.stages" :key="index" class="stage-item">
+    <div v-for="(stage, index) in displayStages" :key="index" class="stage-item">
       <div v-if="stage.times > 1">重复{{ stage.times }}次</div>
       <div v-for="(part, idx) in stage.sections" :key="idx" class="stage-item-content">
         <div>{{ part.title }}</div>
@@ -250,6 +250,7 @@
         <div v-if="part.lap">按LAP进入下一段落</div>
       </div>
     </div>
+    <div v-if="hasMoreStages" class="stage-ellipsis">...</div>
   </div>
 </template>
 

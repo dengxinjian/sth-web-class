@@ -15,7 +15,7 @@
             class="trophy-icon"
             :src="getClassImageIcon(eventData.priority)"
           />
-          <span class="event-name">{{ eventData?.competitionName }}</span>
+          <div class="event-name">{{ eventData?.competitionName }}</div>
           <span class="event-date">{{ eventData?.competitionDate }}</span>
           <span class="event-date">
             {{
@@ -932,6 +932,7 @@ export default {
       font-size: 16px;
       font-weight: 600;
       color: #333;
+      max-width: 400px;
     }
 
     .event-date,
