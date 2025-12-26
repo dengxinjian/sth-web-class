@@ -309,18 +309,21 @@
               <el-input
                 v-model="editForm.overallRank"
                 placeholder="请输入全场排名"
+                @input="handleRankInput('overallRank', $event)"
               />
             </el-form-item>
             <el-form-item label="分组排名">
               <el-input
                 v-model="editForm.groupRank"
                 placeholder="请输入分组排名"
+                @input="handleRankInput('groupRank', $event)"
               />
             </el-form-item>
             <el-form-item label="性别排名">
               <el-input
                 v-model="editForm.genderRank"
                 placeholder="请输入性别排名"
+                @input="handleRankInput('genderRank', $event)"
               />
             </el-form-item>
             <el-form-item
@@ -495,6 +498,36 @@ export default {
   },
   methods: {
     /**
+     * 处理排名输入，限制为正整数，最多7位
+     */
+    handleRankInput(field, value) {
+      // 移除所有非数字字符
+      let numericValue = value.replace(/\D/g, "");
+
+      // 限制最大长度为7位
+      if (numericValue.length > 7) {
+        numericValue = numericValue.slice(0, 7);
+      }
+
+      // 移除前导零
+      if (numericValue.length > 1 && numericValue[0] === "0") {
+        numericValue = numericValue.replace(/^0+/, "");
+      }
+
+      // 如果输入为空或只有0，则清空
+      if (numericValue === "" || numericValue === "0") {
+        this.editForm[field] = "";
+      } else {
+        // 转换为正整数
+        const intValue = parseInt(numericValue, 10);
+        if (intValue > 0) {
+          this.editForm[field] = String(intValue);
+        } else {
+          this.editForm[field] = "";
+        }
+      }
+    },
+    /**
      * 根据录入的成绩自动计算总成绩
      */
     calculateTotalResult() {
@@ -664,27 +697,27 @@ export default {
         genderRank: this.competitionResult?.genderRank || "",
         swimmingResult: this.competitionResult?.swimmingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.swimmingResult,
-              false
-            )
+            this.competitionResult.swimmingResult,
+            false
+          )
           : "",
         t1Result: this.competitionResult?.t1Result
           ? this.secondsToTimeFormat(this.competitionResult.t1Result, false)
           : "",
         cyclingResult: this.competitionResult?.cyclingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.cyclingResult,
-              false
-            )
+            this.competitionResult.cyclingResult,
+            false
+          )
           : "",
         t2Result: this.competitionResult?.t2Result
           ? this.secondsToTimeFormat(this.competitionResult.t2Result, false)
           : "",
         runningResult: this.competitionResult?.runningResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.runningResult,
-              false
-            )
+            this.competitionResult.runningResult,
+            false
+          )
           : "",
         totalResult: this.competitionResult?.totalResult
           ? this.secondsToTimeFormat(this.competitionResult.totalResult, false)
