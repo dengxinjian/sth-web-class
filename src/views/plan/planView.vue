@@ -161,6 +161,7 @@ export default {
       showMore: false,
       addPlanGroupId: null,
       ownerTeams: [],
+      defaultTeam: null,
 
       // 计划列表数据
       planSearchInput: "",
@@ -208,6 +209,7 @@ export default {
           this.getPlanList();
           // this.getPlanLimitCount();
           this.getTeamList();
+          this.getDefaultTeam(); // 个人初始团队id
         }
       },
       immediate: true,
@@ -222,6 +224,15 @@ export default {
         url: "/api/team/coach/all-teams",
       }).then((res) => {
         this.ownerTeams = res.result;
+      });
+    },
+    getDefaultTeam() {
+      const _this = this;
+      getData({
+        url: "/api/team/my-team",
+      }).then((res) => {
+        // console.log('=======个人初始团队',res.result);
+        _this.defaultTeam = res.result || null;
       });
     },
     async getPlanLimitCount() {
@@ -553,11 +564,14 @@ export default {
             //   );
             //   return;
             // }
+            // console.log('=======官方计划详情',_this.currentPlanDetail);
+            // console.log('=======个人初始团队',_this.defaultTeam);
             _this.$nextTick(() => {
               _this.copyOfficialPlanInfo = {
                 ..._this.currentPlanDetail,
                 planGroupId: null,
-                teamId: _this.ownerTeams[0]?.id || null,
+                teamId: localStorage.getItem("loginType") === '2' ? _this.ownerTeams.length === 0 ? _this.defaultTeam.id : null : null,
+                planSourceTeamId: _this.currentPlanDetail.teamId || null,
                 ownerName: localStorage.getItem("name").split("#")[0],
                 ownerId: localStorage.getItem("triUserId"),
                 loginType: parseInt(localStorage.getItem("loginType")),

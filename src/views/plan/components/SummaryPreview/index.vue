@@ -500,12 +500,7 @@ export default {
       getData({
         url: "/api/team/my-team",
       }).then((res) => {
-        _this.teams = [
-          {
-            id: res.result.id,
-            teamName: res.result.teamName
-          }
-        ];
+        _this.teams.push(res.result);
       });
     },
     onCancel() {

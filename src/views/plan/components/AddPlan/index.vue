@@ -8,7 +8,9 @@
     :close-on-click-modal="false"
     @close="onCancel"
   >
-    <span slot="title">{{ copyOfficialPlanInfo ? '添加计划' : '新增计划' }}</span>
+    <span slot="title">{{
+      copyOfficialPlanInfo ? "添加计划" : "新增计划"
+    }}</span>
 
     <el-form
       ref="formRef"
@@ -51,6 +53,7 @@
           filterable
           clearable
           style="width: 100%"
+          @change="handleTeamChange"
         >
           <el-option
             v-for="g in teamOptions"
@@ -61,7 +64,11 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="计划源" prop="planSource" v-if="!copyOfficialPlanInfo">
+      <el-form-item
+        label="计划源"
+        prop="planSource"
+        v-if="!copyOfficialPlanInfo"
+      >
         <el-input
           :readonly="true"
           placeholder="请输入计划源"
@@ -133,7 +140,9 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm" v-if="!copyOfficialPlanInfo">下一步</el-button>
+      <el-button type="primary" @click="onConfirm" v-if="!copyOfficialPlanInfo"
+        >下一步</el-button
+      >
       <el-button type="primary" @click="addPlan" v-else>确定</el-button>
     </span>
   </el-dialog>
@@ -231,6 +240,7 @@ export default {
             this.form.planGroupId = this.currentGroupId;
           });
         }
+        this.getDefaultTeam();
         this.getGroupList();
         this.getTeamList();
         // this.getTeamDetail();
@@ -259,7 +269,9 @@ export default {
             planTitle: val.planTitle,
             // planGroupId: this.currentGroupId,
             teamId: val.teamId,
-            planSource: val.teamName ? `${val.teamName} - ${val.possessNickname}` : val.possessNickname,
+            planSource: val.teamName
+              ? `${val.teamName} - ${val.possessNickname}`
+              : val.possessNickname,
             ownerName: val.ownerName,
             email: val.email,
             weChat: val.weChat,
@@ -309,16 +321,28 @@ export default {
       this.$refs.formRef && this.$refs.formRef.validateField("email");
     },
     handleTeamChange(val) {
-      if (this.copyOfficialPlanInfo) return;
+      // console.log('=======handleTeamChange',val);
+      // console.log('=======teams',this.teams);
+      if (this.copyOfficialPlanInfo) {
+        // console.log("=======copyOfficialPlanInfo", this.copyOfficialPlanInfo);
+        this.$nextTick(() => {
+          this.form = {
+            ...this.form,
+            planSource: `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}`,
+            planSourceId: this.copyOfficialPlanInfo.teamId,
+          };
+        });
+        return;
+      }
       const findTeam = this.teams.find((item) => item.id === val);
+      // console.log('=======findTeam',findTeam);
       if (findTeam) {
         if (findTeam.teamName && findTeam.teamOwnerNickname) {
           this.$nextTick(() => {
             this.form = {
               ...this.form,
               planSource: `${findTeam.teamName} - ${findTeam.teamOwnerNickname}`,
-              planSourceId: findTeam.teamOwnerId,
-              possessNickname: findTeam.teamOwnerNickname,
+              planSourceTeamId: findTeam.id,
             };
           });
         }
@@ -347,10 +371,12 @@ export default {
       getData({
         url: "/api/team/coach/all-teams",
       }).then((res) => {
-        this.teams = res.result;
-        if (this.teams.length === 0) {
-          this.getDefaultTeam();
-        }
+        this.teams = [...this.teams, ...res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find(t => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, []);
       });
     },
     getDefaultTeam() {
@@ -358,12 +384,18 @@ export default {
       getData({
         url: "/api/team/my-team",
       }).then((res) => {
-        _this.teams = [
-          {
-            id: res.result.id,
-            teamName: res.result.teamName
+        // 使用reduce根据id去重
+        _this.teams = [..._this.teams, res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find(t => t.id === team.id)) {
+            acc.push(team);
           }
-        ];
+          return acc;
+        }, []);
+        // 当教练身份添加时，teamId没有时，设置为res.result.id
+        if (_this.loginType === '2' && !_this.form.teamId && res.result && res.result.id) {
+          _this.form.teamId = res.result.id;
+          _this.form.planSource = `${res.result.teamName} - ${res.result.teamOwnerNickname}`;
+        }
       });
     },
     onCancel() {
@@ -380,6 +412,7 @@ export default {
           dayDetails: this.emptyPlanClasses,
           loginType: parseInt(localStorage.getItem("loginType")),
         };
+        // console.log('=======添加计划=====>params',params);
         // 将 params 保存到 planStore 中的 planData
         this.$store.dispatch("plan/savePlanData", params);
         // 跳转到 planEdit 页面
@@ -395,16 +428,36 @@ export default {
       const nameValue =
         localStorage.getItem("name")?.split("#")[0] || undefined;
       this.form = {
-        planTitle: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.planTitle : undefined,
-        planGroupId: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.planGroupId : undefined,
-        teamId: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.teamId : undefined,
-        planSource: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.teamName ? `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}` : this.copyOfficialPlanInfo.possessNickname : nameValue,
+        planTitle: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.planTitle
+          : undefined,
+        planGroupId: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.planGroupId
+          : undefined,
+        teamId: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.teamId
+          : undefined,
+        planSource: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.teamName
+            ? `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}`
+            : this.copyOfficialPlanInfo.possessNickname
+          : nameValue,
         possessNickname: nameValue,
-        email: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.email : undefined,
-        weChat: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.weChat : undefined,
-        description: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.description : undefined,
-        ownerName: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.ownerName : undefined,
-        level: this.copyOfficialPlanInfo ? this.copyOfficialPlanInfo.level : undefined,
+        email: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.email
+          : undefined,
+        weChat: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.weChat
+          : undefined,
+        description: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.description
+          : undefined,
+        ownerName: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.ownerName
+          : undefined,
+        level: this.copyOfficialPlanInfo
+          ? this.copyOfficialPlanInfo.level
+          : undefined,
       };
       this.$nextTick(() => {
         if (this.$refs.formRef) {
@@ -414,21 +467,28 @@ export default {
     },
     // 添加计划
     async addPlan() {
-      const planData = this.planList.flat().map(item => {
-        return {
-          ...item,
-          details: item.details.map(el => {
-            return {
-              ...el,
-              classesJson: JSON.stringify(el.classesJson),
-            }
-          }),
-        };
-      }).filter(el => el.details.length > 0 || el.competitionDtoList.length > 0);
+      const planData = this.planList
+        .flat()
+        .map((item) => {
+          return {
+            ...item,
+            details: item.details.map((el) => {
+              return {
+                ...el,
+                classesJson: JSON.stringify(el.classesJson),
+              };
+            }),
+          };
+        })
+        .filter(
+          (el) => el.details.length > 0 || el.competitionDtoList.length > 0
+        );
+      // console.log("=======planData-官方添加计划", planData);
       const params = {
         planTitle: this.form.planTitle,
         planGroupId: this.form.planGroupId,
         teamId: this.form.teamId,
+        planSourceTeamId: this.form.planSourceTeamId,
         email: this.form.email,
         weChat: this.form.weChat,
         description: this.form.description,
@@ -436,7 +496,7 @@ export default {
         level: this.form.level,
         dayDetails: planData,
         loginType: parseInt(localStorage.getItem("loginType")),
-      }
+      };
       const res = await planApi.createSelfPlanByOffice(params);
       if (res.success) {
         this.$message.success("添加成功");
