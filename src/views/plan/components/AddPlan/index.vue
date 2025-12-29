@@ -86,7 +86,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="创建者" v-if="copyOfficialPlanInfo">
+      <el-form-item label="计划源" v-if="copyOfficialPlanInfo">
         <el-input
           :readonly="true"
           placeholder="请输入计划源"
@@ -321,8 +321,8 @@ export default {
       this.$refs.formRef && this.$refs.formRef.validateField("email");
     },
     handleTeamChange(val) {
-      // console.log('=======handleTeamChange',val);
-      // console.log('=======teams',this.teams);
+      console.log('=======handleTeamChange',val);
+      console.log('=======teams',this.teams);
       if (this.copyOfficialPlanInfo) {
         // console.log("=======copyOfficialPlanInfo", this.copyOfficialPlanInfo);
         this.$nextTick(() => {
@@ -341,7 +341,7 @@ export default {
           this.$nextTick(() => {
             this.form = {
               ...this.form,
-              planSource: `${findTeam.teamName} - ${findTeam.teamOwnerNickname}`,
+              planSource: `${findTeam.teamName} - ${localStorage.getItem("name")?.split("#")[0]}`,
               planSourceTeamId: findTeam.id,
             };
           });
