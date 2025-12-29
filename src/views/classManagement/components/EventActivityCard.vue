@@ -1,6 +1,6 @@
 <template>
   <div style="position: relative">
-    <div class="classScheduleCard sportScheduleCard">
+    <div class="classScheduleCard sportScheduleCard" @click.stop="handleClick">
       <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
       <div
         :class="[
@@ -65,10 +65,10 @@
                 activity.classesJson.trainingAdvice
               "
             >
-              <pre v-if="activity.classesJson.summary" class="stage-details">
+              <pre v-if="activity.classesJson.summary" class="stage-details" style=" display: -webkit-box;">
                 {{ truncateByLines(activity.classesJson.summary) }}
               </pre>
-              <pre class="stage-details">
+              <pre class="stage-details" style=" display: -webkit-box;">
                 {{ truncateByLines(activity.classesJson.trainingAdvice) }}
               </pre>
             </template>
@@ -79,7 +79,7 @@
             >
               <CycleStageDetails
                 :class-data="activity.classesJson"
-                :max-stages="3"
+                :max-stages="2"
               />
             </template>
             <template
@@ -89,7 +89,7 @@
             >
               <RunStageDetails
                 :class-data="activity.classesJson"
-                :max-stages="3"
+                :max-stages="2"
               />
             </template>
 
@@ -230,11 +230,8 @@ export default {
         result = "--";
       }
       if (sportType === 3 && result > 0) {
-        result = distance;
-      } else {
-        result = Math.round(distance / 10) / 100;
+        result = this.activity.preciseDistance;
       }
-      console.log(result, "------------result111");
       return result;
     },
     getSportIcon(sportType) {
@@ -245,6 +242,9 @@ export default {
     },
     isRestType(sportType) {
       return ["REST", "REMARK", "OTHER"].includes(sportType);
+    },
+    handleClick() {
+      this.$emit("click", this.activity);
     },
   },
 };
@@ -322,6 +322,10 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
+      // display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+      line-clamp: 5;
     }
   }
 }

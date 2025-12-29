@@ -15,15 +15,23 @@
             class="trophy-icon"
             :src="getClassImageIcon(eventData.priority)"
           />
-          <span class="event-name">{{ eventData?.competitionName }}</span>
+          <div class="event-name">{{ eventData?.competitionName }}</div>
           <span class="event-date">{{ eventData?.competitionDate }}</span>
+          <span class="event-date">
+            {{
+              eventData.competitionDistance === "自定义"
+                ? eventData.competitionDistanceValue +
+                  " " +
+                  eventData.competitionDistanceUnit
+                : eventData?.competitionDistance
+            }}</span
+          >
           <span class="event-location">{{
             eventData?.competitionLocation
           }}</span>
         </div>
         <div class="header-actions">
           <i class="el-icon-delete delete-icon" @click="handleDelete"></i>
-          <i class="el-icon-edit-outline edit-icon" @click="handleEditResult"></i>
           <i class="el-icon-close close-icon" @click="handleClose"></i>
         </div>
       </div>
@@ -57,12 +65,7 @@
                     {{ competitionResult?.genderRank || "-" }}
                   </td>
                 </tr>
-                <tr
-                  v-if="
-                    eventData.competitionType === 2 ||
-                    eventData.competitionType === 5
-                  "
-                >
+                <tr v-if="eventData.competitionType === 2">
                   <td class="label-cell">游泳成绩</td>
                   <td class="value-cell">
                     {{
@@ -85,12 +88,7 @@
                     }}
                   </td>
                 </tr>
-                <tr
-                  v-if="
-                    eventData.competitionType === 2 ||
-                    eventData.competitionType === 4
-                  "
-                >
+                <tr v-if="eventData.competitionType === 2">
                   <td class="label-cell">骑行成绩</td>
                   <td class="value-cell">
                     {{
@@ -113,12 +111,7 @@
                     }}
                   </td>
                 </tr>
-                <tr
-                  v-if="
-                    eventData.competitionType === 2 ||
-                    eventData.competitionType === 1
-                  "
-                >
+                <tr v-if="eventData.competitionType === 2">
                   <td class="label-cell">跑步成绩</td>
                   <td class="value-cell">
                     {{
@@ -146,23 +139,22 @@
                 </tr>
               </tbody>
             </table>
-          </div>
-
-          <!-- 总结反馈 -->
-          <div class="summary-section">
-            <div class="summary-header">
-              <span class="summary-label">总结/反馈</span>
+            <!-- 总结反馈 -->
+            <div class="summary-section">
+              <div class="summary-header">
+                <span class="summary-label">总结/反馈</span>
+              </div>
+              <el-input
+                v-model="summaryText"
+                type="textarea"
+                :rows="5"
+                placeholder="请输入总结反馈"
+                maxlength="500"
+                show-word-limit
+                class="summary-textarea"
+                :disabled="true"
+              />
             </div>
-            <el-input
-              v-model="summaryText"
-              type="textarea"
-              :rows="5"
-              placeholder="请输入总结反馈"
-              maxlength="500"
-              show-word-limit
-              class="summary-textarea"
-              :disabled="true"
-            />
           </div>
         </div>
 
@@ -178,13 +170,16 @@
             </div>
             <ActivityItem
               v-for="(activity, index) in activityList.swim"
-              :key="index"
+              :key="`swim-${index}`"
               :activity="activity"
               @remove="handleRemoveActivity"
             />
             <div
               style="margin-bottom: 10px"
-              v-if="eventData.competitionType === 2"
+              v-if="
+                activityList.otherT1.length > 0 ||
+                activityList.otherT2.length > 0
+              "
             >
               T1运动记录
             </div>
@@ -210,12 +205,12 @@
               :drag-class="'is-activity-drag-drag'"
               tag="div"
               :emptyInsertThreshold="10"
-              @end="handleDragEnd"
+              @add="handleDragAdd"
               class="draggable-activities-container"
             >
               <ActivityItem
                 v-for="(activity, index) in activityList.otherT1"
-                :key="index"
+                :key="`otherT1-${index}`"
                 :activity="activity"
                 @remove="handleRemoveActivity"
               />
@@ -228,13 +223,16 @@
             </div>
             <ActivityItem
               v-for="(activity, index) in activityList.cycle"
-              :key="index"
+              :key="`cycle-${index}`"
               :activity="activity"
               @remove="handleRemoveActivity"
             />
             <div
               style="margin-bottom: 10px"
-              v-if="eventData.competitionType === 2"
+              v-if="
+                activityList.otherT1.length > 0 ||
+                activityList.otherT2.length > 0
+              "
             >
               T2运动记录
             </div>
@@ -260,12 +258,12 @@
               :drag-class="'is-activity-drag-drag'"
               tag="div"
               :emptyInsertThreshold="10"
-              @end="handleDragEnd"
+              @add="handleDragAdd"
               class="draggable-activities-container"
             >
               <ActivityItem
                 v-for="(activity, index) in activityList.otherT2"
-                :key="index"
+                :key="`otherT2-${index}`"
                 :activity="activity"
                 @remove="handleRemoveActivity"
               />
@@ -275,7 +273,19 @@
             </div>
             <ActivityItem
               v-for="(activity, index) in activityList.run"
-              :key="index"
+              :key="`run-${index}`"
+              :activity="activity"
+              @remove="handleRemoveActivity"
+            />
+            <div
+              style="margin-bottom: 10px"
+              v-if="activityList.strength.length > 0"
+            >
+              力量运动记录
+            </div>
+            <ActivityItem
+              v-for="(activity, index) in activityList.strength"
+              :key="`strength-${index}`"
               :activity="activity"
               @remove="handleRemoveActivity"
             />
@@ -299,25 +309,25 @@
               <el-input
                 v-model="editForm.overallRank"
                 placeholder="请输入全场排名"
+                @input="handleRankInput('overallRank', $event)"
               />
             </el-form-item>
             <el-form-item label="分组排名">
               <el-input
                 v-model="editForm.groupRank"
                 placeholder="请输入分组排名"
+                @input="handleRankInput('groupRank', $event)"
               />
             </el-form-item>
             <el-form-item label="性别排名">
               <el-input
                 v-model="editForm.genderRank"
                 placeholder="请输入性别排名"
+                @input="handleRankInput('genderRank', $event)"
               />
             </el-form-item>
             <el-form-item
-              v-if="
-                eventData.competitionType === 2 ||
-                eventData.competitionType === 5
-              "
+              v-if="eventData.competitionType === 2"
               label="游泳成绩"
             >
               <TimeInput
@@ -334,10 +344,7 @@
               />
             </el-form-item>
             <el-form-item
-              v-if="
-                eventData.competitionType === 2 ||
-                eventData.competitionType === 4
-              "
+              v-if="eventData.competitionType === 2"
               label="骑行成绩"
             >
               <TimeInput
@@ -354,10 +361,7 @@
               />
             </el-form-item>
             <el-form-item
-              v-if="
-                eventData.competitionType === 2 ||
-                eventData.competitionType === 1
-              "
+              v-if="eventData.competitionType === 2"
               label="跑步成绩"
             >
               <TimeInput
@@ -368,7 +372,7 @@
             </el-form-item>
             <el-form-item label="总成绩">
               <TimeInput
-                :disabled="eventData.competitionType !== 3"
+                :disabled="eventData.competitionType === 2"
                 ref="totalResultInput"
                 v-model="editForm.totalResult"
                 timer-type="hh:mm:ss"
@@ -380,7 +384,7 @@
                 type="textarea"
                 :rows="5"
                 placeholder="请输入总结反馈"
-                maxlength="500"
+                maxlength="1000"
                 show-word-limit
               />
             </el-form-item>
@@ -437,6 +441,7 @@ export default {
         swim: [],
         otherT1: [],
         otherT2: [],
+        strength: [],
       },
       isEditing: false, // 是否正在编辑
       editForm: {
@@ -464,8 +469,114 @@ export default {
     innerVisible(val) {
       this.$emit("update:visible", val);
     },
+    // 监听成绩字段变化，自动计算总成绩（当 competitionType !== 3 时）
+    "editForm.swimmingResult"() {
+      if (this.eventData.competitionType !== 3) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.t1Result"() {
+      if (this.eventData.competitionType === 2) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.cyclingResult"() {
+      if (this.eventData.competitionType !== 3) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.t2Result"() {
+      if (this.eventData.competitionType === 2) {
+        this.calculateTotalResult();
+      }
+    },
+    "editForm.runningResult"() {
+      if (this.eventData.competitionType !== 3) {
+        this.calculateTotalResult();
+      }
+    },
   },
   methods: {
+    /**
+     * 处理排名输入，限制为正整数，最多7位
+     */
+    handleRankInput(field, value) {
+      // 移除所有非数字字符
+      let numericValue = value.replace(/\D/g, "");
+
+      // 限制最大长度为7位
+      if (numericValue.length > 7) {
+        numericValue = numericValue.slice(0, 7);
+      }
+
+      // 移除前导零
+      if (numericValue.length > 1 && numericValue[0] === "0") {
+        numericValue = numericValue.replace(/^0+/, "");
+      }
+
+      // 如果输入为空或只有0，则清空
+      if (numericValue === "" || numericValue === "0") {
+        this.editForm[field] = "";
+      } else {
+        // 转换为正整数
+        const intValue = parseInt(numericValue, 10);
+        if (intValue > 0) {
+          this.editForm[field] = String(intValue);
+        } else {
+          this.editForm[field] = "";
+        }
+      }
+    },
+    /**
+     * 根据录入的成绩自动计算总成绩
+     */
+    calculateTotalResult() {
+      if (this.eventData.competitionType === 3) {
+        // 其他类型：不自动计算，保持手动输入
+        return;
+      }
+
+      let totalSeconds = 0;
+
+      if (this.eventData.competitionType === 1) {
+        // 路跑：总成绩 = 跑步成绩
+        totalSeconds = this.timeToSeconds(this.editForm.runningResult) || 0;
+      } else if (this.eventData.competitionType === 4) {
+        // 骑行：总成绩 = 骑行成绩
+        totalSeconds = this.timeToSeconds(this.editForm.cyclingResult) || 0;
+      } else if (this.eventData.competitionType === 5) {
+        // 游泳：总成绩 = 游泳成绩
+        totalSeconds = this.timeToSeconds(this.editForm.swimmingResult) || 0;
+      } else if (this.eventData.competitionType === 2) {
+        // 铁三：总成绩 = 游泳成绩 + T1成绩 + 骑行成绩 + T2成绩 + 跑步成绩
+        const swimming = this.timeToSeconds(this.editForm.swimmingResult) || 0;
+        const t1 = this.timeToSeconds(this.editForm.t1Result) || 0;
+        const cycling = this.timeToSeconds(this.editForm.cyclingResult) || 0;
+        const t2 = this.timeToSeconds(this.editForm.t2Result) || 0;
+        const running = this.timeToSeconds(this.editForm.runningResult) || 0;
+        totalSeconds = swimming + t1 + cycling + t2 + running;
+      }
+
+      // 将总秒数转换为时间格式并更新到表单
+      if (totalSeconds > 0) {
+        this.editForm.totalResult = this.secondsToTime(totalSeconds);
+      } else {
+        this.editForm.totalResult = "";
+      }
+    },
+    /**
+     * 将秒数转换为时间格式 (HH:MM:SS)
+     */
+    secondsToTime(seconds) {
+      if (!seconds || seconds <= 0) return "";
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+        2,
+        "0"
+      )}:${String(secs).padStart(2, "0")}`;
+    },
     formatDistance(distance, sportType) {
       let result = Math.round(distance / 10) / 100;
       if (distance && typeof distance === "string" && distance.includes("km")) {
@@ -488,11 +599,18 @@ export default {
     //  校验当前 是录入成绩 还是编辑成绩 校验成绩是否为空 为空则提示录入成绩
     checkIsEdit() {
       // 如果总成绩为空，说明是录入模式
-      if (!this.competitionResult?.totalResult) {
+      if (
+        this.eventData.hasBind === true ||
+        this.eventData.totalResult ||
+        this.eventData.overallRank ||
+        this.eventData.groupRank ||
+        this.eventData.genderRank ||
+        this.eventData.feedback
+      ) {
+        return false;
+      } else {
         return true;
       }
-      // 如果有总成绩，说明是编辑模式
-      return false;
     },
     getClassImageIcon(priority) {
       if (priority === "PRIMARY" || priority === 1) {
@@ -533,8 +651,13 @@ export default {
         res.result.deviceActivityBindView.otherT2.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
+        res.result.deviceActivityBindView.strength.forEach((item) => {
+          item.classesJson = parseClassesJson(item.classesJson);
+        });
         this.competitionResult = res.result || {};
+        console.log(this.competitionResult, "this.competitionResult");
         this.activityList = res.result.deviceActivityBindView || [];
+        console.log(this.activityList, "this.activityList");
         this.summaryText = this.competitionResult.feedback || "";
       }
     },
@@ -559,7 +682,7 @@ export default {
     handleDelete() {
       // TODO: 实现删除功能
       this.$emit("delete", this.eventData);
-      this.handleClose();
+      // this.handleClose();
       // this.$message.info("删除功能待实现");
     },
     handleEdit() {
@@ -574,27 +697,27 @@ export default {
         genderRank: this.competitionResult?.genderRank || "",
         swimmingResult: this.competitionResult?.swimmingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.swimmingResult,
-              false
-            )
+            this.competitionResult.swimmingResult,
+            false
+          )
           : "",
         t1Result: this.competitionResult?.t1Result
           ? this.secondsToTimeFormat(this.competitionResult.t1Result, false)
           : "",
         cyclingResult: this.competitionResult?.cyclingResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.cyclingResult,
-              false
-            )
+            this.competitionResult.cyclingResult,
+            false
+          )
           : "",
         t2Result: this.competitionResult?.t2Result
           ? this.secondsToTimeFormat(this.competitionResult.t2Result, false)
           : "",
         runningResult: this.competitionResult?.runningResult
           ? this.secondsToTimeFormat(
-              this.competitionResult.runningResult,
-              false
-            )
+            this.competitionResult.runningResult,
+            false
+          )
           : "",
         totalResult: this.competitionResult?.totalResult
           ? this.secondsToTimeFormat(this.competitionResult.totalResult, false)
@@ -678,48 +801,20 @@ export default {
           groupRank: this.editForm.groupRank,
           genderRank: this.editForm.genderRank,
           feedback: this.editForm.feedback || "",
+          totalResult: this.timeToSeconds(this.editForm.totalResult),
         };
-        // 根据比赛类型添加相应的成绩字段
-        if (
-          this.eventData.competitionType === 2 ||
-          this.eventData.competitionType === 5
-        ) {
+        if (this.eventData.competitionType === 2) {
           saveData.swimmingResult = this.timeToSeconds(
             this.editForm.swimmingResult
           );
-          saveData.totalResult = this.timeToSeconds(
-            this.editForm.swimmingResult
-          );
-        }
-
-        if (this.eventData.competitionType === 2) {
           saveData.t1Result = this.timeToSeconds(this.editForm.t1Result);
-          saveData.t2Result = this.timeToSeconds(this.editForm.t2Result);
-        }
-
-        if (
-          this.eventData.competitionType === 2 ||
-          this.eventData.competitionType === 4
-        ) {
           saveData.cyclingResult = this.timeToSeconds(
             this.editForm.cyclingResult
           );
-          saveData.totalResult = this.timeToSeconds(
-            this.editForm.cyclingResult
-          );
-        }
-        if (
-          this.eventData.competitionType === 2 ||
-          this.eventData.competitionType === 1
-        ) {
+          saveData.t2Result = this.timeToSeconds(this.editForm.t2Result);
           saveData.runningResult = this.timeToSeconds(
             this.editForm.runningResult
           );
-          saveData.totalResult = this.timeToSeconds(
-            this.editForm.runningResult
-          );
-        }
-        if (this.eventData.competitionType === 2) {
           saveData.totalResult = 0;
         }
 
@@ -773,7 +868,7 @@ export default {
       };
       return iconMap[sportType] || require("@/assets/addClass/icon-other.png");
     },
-    handleDragEnd(e) {
+    handleDragAdd(e) {
       competitionApi
         .moveActivityPosition({
           competitionId: this.eventData.id,
@@ -783,6 +878,7 @@ export default {
         .then((res) => {
           if (res.success) {
             this.$message.success("移动成功");
+            this.loadEventDetail();
           } else {
             this.$message.error(res.message || "移动失败");
             this.loadEventDetail();
@@ -836,6 +932,7 @@ export default {
       font-size: 16px;
       font-weight: 600;
       color: #333;
+      max-width: 400px;
     }
 
     .event-date,
@@ -888,7 +985,7 @@ export default {
   .content-right {
     flex: 1;
     height: 500px;
-    overflow-y: auto;
+    // overflow-y: auto;
   }
 
   .section-title {
@@ -904,14 +1001,17 @@ export default {
 .content-left {
   .result-table-wrapper {
     margin-bottom: 20px;
-    border: 1px solid #e8e8e8;
+    // border: 1px solid #e8e8e8;
     border-radius: 4px;
     overflow: hidden;
+    max-height: 480px;
+    overflow-y: auto;
 
     .result-table {
       width: 100%;
       border-collapse: collapse;
       background: #fff;
+      border: 1px solid #e8e8e8;
 
       tbody {
         tr {
@@ -957,47 +1057,47 @@ export default {
         }
       }
     }
-  }
-}
+    // 总结反馈
+    .summary-section {
+      // margin-bottom: 20px;
+      margin-top: 20px;
 
-// 总结反馈
-.summary-section {
-  margin-bottom: 20px;
+      .summary-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
 
-  .summary-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
+        .summary-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #333;
+        }
 
-    .summary-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .summary-required {
-      font-size: 12px;
-      color: #e42827;
-    }
-  }
-
-  .summary-textarea {
-    ::v-deep .el-textarea__inner {
-      font-size: 13px;
-      line-height: 1.6;
-      border-color: #e8e8e8;
-      border-radius: 4px;
-
-      &:focus {
-        border-color: #e42827;
+        .summary-required {
+          font-size: 12px;
+          color: #e42827;
+        }
       }
-    }
 
-    ::v-deep .el-input__count {
-      background: transparent;
-      font-size: 12px;
-      color: #999;
+      .summary-textarea {
+        ::v-deep .el-textarea__inner {
+          font-size: 13px;
+          line-height: 1.6;
+          border-color: #e8e8e8;
+          border-radius: 4px;
+
+          &:focus {
+            border-color: #e42827;
+          }
+        }
+
+        ::v-deep .el-input__count {
+          background: transparent;
+          font-size: 12px;
+          color: #999;
+        }
+      }
     }
   }
 }
@@ -1005,7 +1105,7 @@ export default {
 // 右侧运动记录
 .content-right {
   .activity-list {
-    max-height: 500px;
+    max-height: 480px;
     overflow-y: auto;
 
     .activity-item {

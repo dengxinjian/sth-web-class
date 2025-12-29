@@ -13,8 +13,8 @@
       <div class="detail-row-title">计划源</div>
       <div class="detail-row-content">
         {{
-          planDetail.teamName
-            ? `${planDetail.teamName} - ${planDetail.planSourceNickname}`
+          planDetail.planSourceTeamIdName
+            ? `${planDetail.planSourceTeamIdName} - ${planDetail.planSourceNickname}`
             : planDetail.planSourceNickname
         }}
       </div>
@@ -420,16 +420,12 @@ export default {
   methods: {
     secondsToHHMMSS,
     planSource() {
-      const currentTeamId = this.planDetail.teamId;
-      const teamName =
-        this.teamOptions.find((item) => item.id === currentTeamId)?.teamName ||
-        this.planInfo.teamName ||
-        "";
-      const owner = this.planInfo.possessNickname || "";
-      if (!teamName && !owner) return "";
-      if (!owner) return teamName;
-      if (!teamName) return owner;
-      return `${teamName} - ${owner}`;
+      const planSourceNickname = this.planInfo.planSourceTeamIdName || "";
+      const owner = this.planInfo.planSourceNickname || "";
+      if (!planSourceNickname && !owner) return "";
+      if (!owner) return planSourceNickname;
+      if (!planSourceNickname) return owner;
+      return `${planSourceNickname} - ${owner}`;
     },
     loadPlanDetail(planId) {
       // 如果需要加载完整的计划详情，可以在这里实现

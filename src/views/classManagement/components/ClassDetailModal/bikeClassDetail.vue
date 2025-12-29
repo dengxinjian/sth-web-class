@@ -19,7 +19,7 @@
         </div> -->
         <el-form ref="titleRef" :rules="rules" :model="classInfo" label-width="70px">
           <el-form-item label="标题：" prop="title">
-            <el-input type="text" placeholder="标题" v-model="classInfo.title" />
+            <el-input type="text" placeholder="标题" v-model="classInfo.title" maxlength="50" />
           </el-form-item>
         </el-form>
         <div class="basic-info-total">

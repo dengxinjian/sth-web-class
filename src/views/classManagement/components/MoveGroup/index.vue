@@ -58,13 +58,25 @@ export default {
     value(val) { if (typeof val !== 'undefined') this.innerVisible = val },
     innerVisible(val) {
       if (!val) {
-        this.$nextTick(() => this.$refs.formRef && this.$refs.formRef.clearValidate && this.$refs.formRef.clearValidate())
+        // 关闭时重置表单数据和验证状态
+        this.resetForm()
       } else {
+        // 打开时重置表单数据并获取分组列表
+        this.resetForm()
         this.getGroupList()
       }
     }
   },
   methods: {
+    // 重置表单数据
+    resetForm() {
+      this.form = { destinationId: '' }
+      this.$nextTick(() => {
+        if (this.$refs.formRef && this.$refs.formRef.clearValidate) {
+          this.$refs.formRef.clearValidate()
+        }
+      })
+    },
     getGroupList() {
       getData({
         url: '/training/api/classesGroup/user/getClassesGroupsByUserId'
@@ -79,6 +91,10 @@ export default {
           }
         })
         this.groups = groups
+        // 默认选择第一个分组
+        if (groups.length > 0) {
+          this.form.destinationId = groups[0].value
+        }
       })
     },
     onCancel() {

@@ -43,7 +43,7 @@
                   !classData.classesJson?.title && !!classData.activityName
                 "
                 :maxlength="50"
-                style="width: 100%"
+                style="width: 30vw"
               />
             </el-form-item>
           </el-form>
@@ -164,7 +164,7 @@
                       {{ formatDuration(classData.classesJson?.duration) }}
                     </div>
                   </td>
-                  <td>
+                  <td class="time-input-cell">
                     <div class="input-with-actions">
                       <span
                         class="modified-indicator"
@@ -216,9 +216,9 @@
                     <div>运动时长</div>
                   </td>
                   <td></td>
-                  <td>
+                  <td class="time-input-cell">
                     <div class="input-with-actions">
-                      <span
+                      <!-- <span
                         class="modified-indicator"
                         v-if="
                           classData.activityId &&
@@ -226,14 +226,14 @@
                             originalData.activityDuration
                         "
                         >*</span
-                      >
+                      > -->
                       <TimeInput
                         v-model="actualData.activityDuration"
                         size="small"
                         :disabled="isInputDisabled"
                       />
                       <div class="action-buttons">
-                        <el-button
+                        <!-- <el-button
                           type="text"
                           size="small"
                           @click="restoreField('activityDuration')"
@@ -245,7 +245,7 @@
                             ) || isInputDisabled
                           "
                           >还原</el-button
-                        >
+                        > -->
                         <el-button
                           type="text"
                           size="small"
@@ -503,8 +503,8 @@
                       sportDetail.sportType === 1
                         ? "km/h"
                         : sportDetail.sportType === 2
-                        ? "km"
-                        : "m"
+                        ? "/km"
+                        : "/100m"
                     }}
                   </td>
                 </tr>
@@ -527,7 +527,7 @@
                         ? "rpm"
                         : sportDetail.sportType === 2
                         ? "spm"
-                        : "min"
+                        : "/min"
                     }}
                   </td>
                 </tr>
@@ -836,8 +836,9 @@ export default {
             // } else {
             //   this.actualData.distance = this.classData.distance;
             // }
-            if (this.classData.distanceUnit === "m") {
+            if (this.actualData.distanceUnit === "m") {
               this.actualData.distance = this.classData.preciseDistance;
+              console.log(this.actualData.distance, "=========this.actualData.distance");
               this.defaultData.distance = this.classData.preciseDistance;
             } else {
               this.actualData.distance = this.classData.preciseDistance / 1000;
@@ -845,7 +846,8 @@ export default {
             }
             console.log(this.actualData, "this.actualData");
           }
-        } else {
+        } else if (!this.classItem.manualActivityId) {
+          console.log(this.classItem, "this.classItem");
           this.getClassScheduleInfo(this.classItem.id);
         }
       }
@@ -1082,10 +1084,10 @@ export default {
         sportType === 2
           ? this.formatStride(minStrideLength, avgStrideLength, maxStrideLength)
           : {
-              minStrideLength: "-",
-              avgStrideLength: "-",
-              maxStrideLength: "-",
-            };
+            minStrideLength: "-",
+            avgStrideLength: "-",
+            maxStrideLength: "-",
+          };
 
       const deviceTypeFormat = [
         { en: "COROS", cn: "高驰" },
@@ -1128,7 +1130,7 @@ export default {
           const actualData = {
             duration: this.translateSecondsToFormat(this.sportDetail.duration),
             activityDuration: this.translateSecondsToFormat(
-              this.sportDetail.netDuration
+              this.sportDetail.netDuration || 0
             ),
             distance: parseFloat(this.sportDetail.distance),
             sthValue: this.sportDetail.sthValue,
@@ -1146,7 +1148,7 @@ export default {
             this.actualData = {
               duration: this.classData.duration,
               activityDuration: this.translateSecondsToFormat(
-                this.classData.activityDuration
+                this.classData.activityDuration || 0
               ),
               sthValue: this.classData.sthValue,
               calories: this.classData.calories,
@@ -1688,6 +1690,11 @@ export default {
         text-align: left;
         border-bottom: 1px solid #e5e5e5;
         vertical-align: middle;
+      }
+
+      /* 为包含 TimeInput 的单元格添加额外的底部内边距，确保错误消息有足够空间显示 */
+      td.time-input-cell {
+        // padding-bottom: 28px;
       }
 
       th {

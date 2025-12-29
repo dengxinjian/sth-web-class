@@ -158,8 +158,10 @@ export default {
           email: this.planInfo.email,
           weChat: this.planInfo.weChat,
           description: this.planInfo.description,
+          level: this.planInfo.level,
           dayDetails: details,
           sourcePlanId: this.planInfo.id,
+          loginType: localStorage.getItem("loginType"),
         };
         console.log(params, "params");
         submitData({
