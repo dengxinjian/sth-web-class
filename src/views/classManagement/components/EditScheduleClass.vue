@@ -43,7 +43,7 @@
                   !classData.classesJson?.title && !!classData.activityName
                 "
                 :maxlength="50"
-                style="width: 100%"
+                style="width: 30vw"
               />
             </el-form-item>
           </el-form>
@@ -630,7 +630,7 @@
         >
       </div>
     </el-dialog>
-    <!-- <ClassDetailModal
+    <ClassDetailModal
       :visible="showClassDetailModal"
       :type="normalizedSportType"
       scheduleType="edit"
@@ -640,7 +640,7 @@
       @save="$emit('save', $event)"
       @cancel="handleClassDetailClose"
       v-if="!isActivity"
-    /> -->
+    />
   </div>
 </template>
 

@@ -17,7 +17,7 @@
       </div> -->
       <el-form ref="titleRef" :model="form" :rules="rules" label-width="70px">
         <el-form-item label="标题：" prop="classTitle">
-          <el-input type="text" placeholder="标题" v-model="form.classTitle" />
+          <el-input type="text" placeholder="标题" v-model="form.classTitle" maxlength="50" style="width:  95%;" />
         </el-form-item>
       </el-form>
 

@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { getSportTypeName } from "../utils/helpers";
+import { getClassImageIcon, getSportTypeName } from "../utils/helpers";
 
 export default {
   name: "ActivityItem",
@@ -72,15 +72,7 @@ export default {
       return getSportTypeName(sportType);
     },
     getActivityIcon(sportType) {
-      const iconMap = {
-        SWIM: require("@/assets/addClass/icon-swim.png"),
-        CYCLE: require("@/assets/addClass/icon-bike.png"),
-        RUN: require("@/assets/addClass/icon-run.png"),
-        1: require("@/assets/addClass/icon-bike.png"),
-        2: require("@/assets/addClass/icon-run.png"),
-        3: require("@/assets/addClass/icon-swim.png"),
-      };
-      return iconMap[sportType] || require("@/assets/addClass/icon-other.png");
+      return getClassImageIcon(sportType);
     },
     handleRemove() {
       this.$emit("remove", this.activity);

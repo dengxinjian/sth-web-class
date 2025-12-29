@@ -41,7 +41,12 @@
               >
                 解除匹配
               </el-button>
-              <el-button type="text" icon="el-icon-crop" @click="handleCopy">
+              <el-button
+                type="text"
+                icon="el-icon-crop"
+                v-if="activity.classesJson"
+                @click="handleCopy"
+              >
                 复制
               </el-button>
 
@@ -117,10 +122,10 @@
                 activity.classesJson.trainingAdvice
               "
             >
-              <pre v-if="activity.classesJson.summary" class="stage-details">
+              <pre v-if="activity.classesJson.summary" class="stage-details-p">
                 {{ truncateByLines(activity.classesJson.summary) }}
               </pre>
-              <pre class="stage-details">
+              <pre class="stage-details-p">
                 {{ truncateByLines(activity.classesJson.trainingAdvice) }}
               </pre>
             </template>
@@ -503,7 +508,7 @@ export default {
       cursor: pointer;
     }
 
-    .stage-details {
+    .stage-details-p {
       font-size: 12px;
       color: #999;
       padding: 5px 5px 0;
@@ -511,6 +516,10 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+      line-clamp: 5;
     }
   }
 }

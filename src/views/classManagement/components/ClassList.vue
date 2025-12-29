@@ -122,7 +122,7 @@
             class="js-class-drag-container"
             :list="item.classesList"
             :group="{ name: groupName, put: false, pull: 'clone' }"
-            :animation="180"
+            :animation="0"
             :sort="false"
             :force-fallback="true"
             :fallback-on-body="true"
