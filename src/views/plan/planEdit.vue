@@ -461,7 +461,7 @@ export default {
     },
     // 保存
     async handleSave(isExit = false) {
-      console.log(this.planData, "this.planData");
+      console.log("=====添加计划接口提交=====>this.planData",this.planData);
       this.isSaving = true; // 标记正在保存
       const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
       const planList = [];
@@ -498,6 +498,7 @@ export default {
         planTitle: this.planData.planTitle,
         planGroupId: this.planData.planGroupId,
         teamId: this.planData.teamId,
+        planSourceTeamId: this.planData.planSourceTeamId,
         email: this.planData.email,
         weChat: this.planData.weChat,
         description: this.planData.description,
@@ -528,10 +529,12 @@ export default {
     },
     // 添加计划
     async addPlan(planList, isExit = false) {
+      // console.log('=====添加计划接口提交-保存=====>this.planData',this.planData);
       const res = await planApi.addPlan({
         planTitle: this.planData.planTitle,
         planGroupId: this.planData.planGroupId,
         teamId: this.planData.teamId,
+        planSourceTeamId: this.planData.planSourceTeamId,
         email: this.planData.email,
         weChat: this.planData.weChat,
         description: this.planData.description,
@@ -600,12 +603,12 @@ export default {
       this.moveGroupId = groupId;
       this.moveType = "class";
       this.showMoveGroup = true;
-      console.log(
-        this.moveClassId,
-        this.moveGroupId,
-        this.moveType,
-        "this.moveClassId, this.moveGroupId, this.moveType"
-      );
+      // console.log(
+      //   this.moveClassId,
+      //   this.moveGroupId,
+      //   this.moveType,
+      //   "this.moveClassId, this.moveGroupId, this.moveType"
+      // );
     },
 
     /**
@@ -711,7 +714,7 @@ export default {
       // this.showAddClassModal = true;
     },
     handleCreatePlanCourse(data) {
-      console.log(data, "data");
+      // console.log(data, "data");
       this.CreatePlanCourseDialogData = { ...data };
       this.classModalDataType = "add";
       this.showAddClassModal = true;
@@ -720,9 +723,9 @@ export default {
      * 保存添加计划表课程
      */
     onSaveAddClass(saveData, flag) {
-      console.log(saveData, flag, "saveData, flag");
+      // console.log(saveData, flag, "saveData, flag");
       if (!this.selectedDay || !this.selectedDay.globalDay) {
-        console.error("selectedDay 信息不完整");
+        // console.error("selectedDay 信息不完整");
         this.showAddClassModal = false;
         return;
       }
@@ -767,7 +770,7 @@ export default {
         this.selectedSportType = null;
       }
       if (this.CreatePlanCourseDialogData.mode === "SAVE") {
-        console.log(saveData, "saveData");
+        // console.log(saveData, "saveData");
         this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
       } else {
         this.classModalDataType = "edit";
@@ -776,7 +779,7 @@ export default {
       this.$forceUpdate();
     },
     handleSaveAddClass(saveData, flag) {
-      console.log(saveData, flag, "saveData, flag");
+      // console.log(saveData, flag, "saveData, flag");
       if (!this.selectedDay || !this.selectedDay.globalDay) {
         console.error("selectedDay 信息不完整");
         this.showAddClassModal = false;

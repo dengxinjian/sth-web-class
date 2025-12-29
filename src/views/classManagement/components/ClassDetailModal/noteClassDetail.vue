@@ -12,7 +12,7 @@
       <div class="form-section">
         <el-form ref="titleRef" :model="form" :rules="rules" label-width="70px">
           <el-form-item label="标题：" prop="title">
-            <el-input v-model="form.title" placeholder="标题" class="pill-input" />
+            <el-input v-model="form.title" placeholder="标题" class="pill-input" maxlength="50" />
           </el-form-item>
 
           <div class="row">

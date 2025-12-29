@@ -73,6 +73,7 @@
           @event-detail="handleEventDetail"
           @edit-event="handleEditEvent"
           @input-activity="handleInputActivity"
+          @click-event-activity="handleEditActivity"
         />
 
         <!-- 右侧统计面板 -->
@@ -120,6 +121,7 @@
           @event-detail="handleEventDetail"
           @edit-event="handleEditEvent"
           @input-activity="handleInputActivity"
+          @click-event-activity="handleEditActivity"
         />
         <!-- 右侧统计面板 -->
         <StatisticsPanel
@@ -237,18 +239,18 @@
 
     <EditScheduleClass
       :visible="showEditScheduleClass"
-      :class-item="classDetailData"
+      :class-item="isActivity ? activityDetailData : classDetailData"
       :is-activity="isActivity"
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
       @close="
         showEditScheduleClass = false;
-        classDetailData = {};
+        isActivity ? (activityDetailData = {}) : (classDetailData = {});
       "
       @save="handleClassDetailSave"
       @delete="
         handleDeleteClassSchedule;
-        classDetailData = {};
+        isActivity ? (activityDetailData = {}) : (classDetailData = {});
       "
     />
 
@@ -283,7 +285,10 @@
       :visible.sync="showEventInfo"
       :event-data="currentEventData"
       @delete="handleEventDetail"
-      @close="showEventInfo = false;getScheduleData()"
+      @close="
+        showEventInfo = false;
+        getScheduleData();
+      "
     />
     <InputActivity
       :visible.sync="showInputActivity"
@@ -435,6 +440,7 @@ export default {
       classSportType: "",
       classType: "class",
       classDetailData: {},
+      activityDetailData: {},
       addScheduleDate: "",
       copyClassFromOfficialClassId: "",
       copyClassFromOfficialGroupId: "",
@@ -493,8 +499,39 @@ export default {
     if (this.$store.state.fromPath === "/plan/add") {
       this.isPlan = true;
     }
+    // 监听身份切换事件
+    this.$root.$on("identity-changed", this.handleIdentityChanged);
+  },
+  beforeDestroy() {
+    // 移除事件监听
+    this.$root.$off("identity-changed", this.handleIdentityChanged);
   },
   methods: {
+    /**
+     * 处理身份切换事件
+     */
+    handleIdentityChanged(loginType) {
+      console.log("监听到身份切换事件");
+      // 在这里添加你需要处理的逻辑
+      // 例如：重新加载数据、重置状态等
+      this.activeName = "class";
+      localStorage.setItem("activeName", "class");
+      console.log(this.activeName, "this.activeName");
+      // this.initMenuFromRoute();
+      if (localStorage.getItem("loginType") !== "1") {
+        this.getTeamAndAthleticData();
+      } else {
+        this.selectedAthletic = localStorage.getItem("triUserId");
+        this.getScheduleData();
+        this.getAthleticThreshold(this.selectedAthletic);
+        this.getAuthorizedDeviceList();
+      }
+      this.getClassList();
+      console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
+      if (this.$store.state.fromPath === "/plan/add") {
+        this.isPlan = true;
+      }
+    },
     handleChoosePlan(isPlan) {
       console.log("handleChoosePlan");
       this.isPlan = isPlan;
@@ -546,8 +583,8 @@ export default {
     async handleCutClass(classesDate, classItem) {
       console.log(classesDate, "classesDate");
       console.log(classItem, "classItem");
-      this.handlePasteClass(classesDate, classItem);
-      await this.handleDeleteClassSchedule(classItem, true);
+      await this.handlePasteClass(classesDate, classItem);
+      this.handleDeleteClassSchedule(classItem, true);
     },
     /**
      * 粘贴赛事
@@ -693,12 +730,13 @@ export default {
         competitionApi.deleteCompetition(eventItem.id).then((res) => {
           if (res.success) {
             this.$message.success("赛事删除成功");
+            this.showEventInfo = false;
             this.getScheduleData();
           }
         });
       });
     },
-    handleEditEvent(eventItem) {
+    handleEditEvent(eventItem, type) {
       console.log(eventItem, "eventItem");
 
       // 获取今天的日期（只比较日期部分，不考虑时间）
@@ -724,7 +762,12 @@ export default {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       // 校验日期必须大于今天
-      if (diffDays > 0) {
+      if (diffDays >= 0) {
+        if (type === "click" && diffDays === 0) {
+          this.currentEventData = eventItem;
+          this.showEventInfo = true;
+          return;
+        }
         this.currentEventData = eventItem;
         this.showAddEvent = true;
         this.isEditMode = true;
@@ -818,7 +861,7 @@ export default {
     handleEditActivity(activity) {
       console.log(activity, "activity");
       this.showEditScheduleClass = true;
-      this.classDetailData = activity;
+      this.activityDetailData = activity;
       this.isActivity = true;
     },
     /**
@@ -974,11 +1017,20 @@ export default {
       });
       if (res.success && res.result) {
         this.getStatisticData();
-        this.currentWeek = this.currentWeek.map((item) => {
+        // 创建新数组确保 Vue 响应式更新
+        const newCurrentWeek = this.currentWeek.map((item) => {
           let activityList = [];
           let classSchedule = [];
           let healthInfos = [];
           let competitionList = [];
+          let deviceActivityBindView = {
+            cycle: [],
+            run: [],
+            swim: [],
+            otherT1: [],
+            otherT2: [],
+            strength: [],
+          };
 
           res.result.forEach((part) => {
             if (item.commonDate === part.dataDate) {
@@ -988,7 +1040,7 @@ export default {
                   ...i,
                   classesJson: i.classesJson
                     ? parseClassesJson(i.classesJson)
-                    : "",
+                    : null,
                   completion: i.classesJson
                     ? getCompletionStatus(i.percent)
                     : "",
@@ -998,16 +1050,18 @@ export default {
                   preciseDistance: Math.round(i.distance),
                   oldActivitySthValue: i.sthValue,
                 }))
-                .filter((i) => !i.bindingManualActivityId);
+                .filter(
+                  (i) => !i.bindingManualActivityId && !i.bindCompetitionId
+                );
 
               // 处理虚拟运动记录
               part.manualDeviceActivityVoList.forEach((i) => {
-                if (!i.activityId) {
+                if (!i.activityId && !i.bindCompetitionId) {
                   activityList.push({
                     ...i,
                     classesJson: i.classesJson
                       ? parseClassesJson(i.classesJson)
-                      : "",
+                      : null,
                     distance: Math.round(i.distance / 10) / 100,
                     preciseDistance: i.distance,
                   });
@@ -1021,7 +1075,7 @@ export default {
                         activityName: item.activityName,
                         classesJson: i.classesJson
                           ? parseClassesJson(i.classesJson)
-                          : "",
+                          : null,
                         distance: Math.round(i.distance / 10) / 100,
                         preciseDistance: Math.round(i.distance),
                         oldActivityDuration: item.oldActivityDuration,
@@ -1052,24 +1106,247 @@ export default {
                 part.healthInfos && part.healthInfos.length > 0
                   ? [part.healthInfos[0]]
                   : [];
+
               part.competitionList.forEach((i) => {
                 i.deviceActivityBindView.cycle.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
-                })
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.cycle.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.cycle.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
+                });
                 i.deviceActivityBindView.run.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
-                })
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.run.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.run.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
+                  console.log(
+                    deviceActivityBindView.run,
+                    "============deviceActivityBindView.run"
+                  );
+                });
                 i.deviceActivityBindView.swim.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
-                })
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.swim.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.swim.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                    console.log(item, "item==============");
+                  }
+                });
                 i.deviceActivityBindView.otherT1.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
-                })
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.otherT1.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.otherT1.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
+                });
                 i.deviceActivityBindView.otherT2.forEach((item) => {
-                  item.classesJson = parseClassesJson(item.classesJson);
-                })
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.otherT2.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.otherT2.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
+                });
+                i.deviceActivityBindView.strength.forEach((item) => {
+                  if (!item.manualActivityId) {
+                    deviceActivityBindView.strength.push({
+                      ...item,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      completion: item.classesJson
+                        ? getCompletionStatus(i.percent)
+                        : "",
+                      distance: Math.round(item.distance / 10) / 100,
+                      oldActivityDuration: item.duration,
+                      oldActivityDistance: Math.round(item.distance),
+                      preciseDistance: Math.round(item.distance),
+                      oldActivitySthValue: item.sthValue,
+                    });
+                  } else {
+                    deviceActivityBindView.strength.push({
+                      ...item,
+                      activityName: item.activityName,
+                      classesJson: item.classesJson
+                        ? parseClassesJson(item.classesJson)
+                        : null,
+                      distance: Math.round(item.distance / 10) / 100,
+                      preciseDistance: Math.round(item.distance),
+                      oldActivityDuration: item.deviceActivity
+                        ? item.deviceActivity.duration
+                        : 0,
+                      oldActivityDistance: item.deviceActivity
+                        ? Math.round(item.deviceActivity.distance)
+                        : 0,
+                      oldActivitySthValue: item.deviceActivity
+                        ? item.deviceActivity.sthValue
+                        : 0,
+                    });
+                  }
+                });
+                i.deviceActivityBindView = deviceActivityBindView;
+                deviceActivityBindView = {
+                  cycle: [],
+                  run: [],
+                  swim: [],
+                  otherT1: [],
+                  otherT2: [],
+                  strength: [],
+                };
               });
-              competitionList = part.competitionList || [];
+              competitionList = part.competitionList;
+              console.log(competitionList, "============competitionList");
             }
           });
 
@@ -1082,16 +1359,20 @@ export default {
             timesp: new Date().getTime(),
           };
         });
+        // 直接赋值新数组，确保 Vue 响应式更新
+        // 对于根级别的 data 属性，直接赋值即可触发响应式更新
+        this.currentWeek = [...newCurrentWeek];
         console.log(this.currentWeek, "this.currentWeek");
-
-        // 强制 Vue 检测数组变化
-        this.$nextTick(() => {
-          // 初始化拖拽
-          this.initAllDrag();
-        });
       }
-
-      this.loading = false;
+      this.$nextTick(() => {
+        // 确保视图更新 - 使用 $forceUpdate 强制重新渲染
+        this.$forceUpdate();
+        // 初始化拖拽
+        this.initAllDrag();
+        setTimeout(() => {
+          this.loading = false;
+        }, 1000);
+      });
     },
 
     /**
@@ -1435,7 +1716,7 @@ export default {
       //   sportType,
       // };
       console.log(this.sportDetailData, "this.sportDetailData");
-      this.classDetailData = activity;
+      this.activityDetailData = activity;
       // this.showSportDetailModal = true;
       this.showEditScheduleClass = true;
       this.isActivity = true;
@@ -1551,20 +1832,23 @@ export default {
         classesDate: e.to.dataset.date,
         sportType: classItem.sportType,
       };
-      // 移除克隆的DOM元素，避免显示课程模板
-      if (e.item && e.item.parentNode) {
-        e.item.parentNode.removeChild(e.item);
-      }
-      this.AddScheduleClass(params, "", e.newIndex);
+      // // 移除克隆的DOM元素，避免显示课程模板
+      // if (e.item && e.item.parentNode) {
+      //   e.item.parentNode.removeChild(e.item);
+      // }
+      this.$nextTick(() => {
+        this.AddScheduleClass(params, "", e.newIndex);
+      });
     },
 
     /**
      * 日历拖拽添加
      */
     handleScheduleDragAdd(e) {
-      console.log(e);
-      const classId = e.item.dataset.id;
+      console.log(e, "======================");
+      const classId = e.item.firstChild.dataset.id;
       const date = e.to.dataset.date;
+      console.log(classId, date, "classId, date");
 
       let newClassSchedule = {};
       const sortVoList = [];
@@ -1601,14 +1885,17 @@ export default {
       }
 
       // 移除拖拽产生的DOM元素，避免显示重复的课表
-      if (e.item && e.item.parentNode) {
-        e.item.parentNode.removeChild(e.item);
-      }
+      // 注意：需要在数据操作前移除，避免 Vue 响应式更新导致 DOM 混乱
+      // if (e.item && e.item.parentNode) {
+      //   e.item.parentNode.removeChild(e.item);
+      // }
 
       // 删除原数据
       this.currentWeek.forEach((item) => {
-        if (item.commonDate.includes(e.item.dataset.date)) {
+        if (item.commonDate.includes(e.item.firstChild.dataset.date)) {
+          console.log(item.classSchedule, "item.classSchedule===============");
           item.classSchedule.forEach((itemClass, oldIndex) => {
+            console.log(itemClass.id, classId, "itemClass.id, classId");
             if (itemClass.id === +classId) {
               newClassSchedule = itemClass;
               item.classSchedule.splice(oldIndex, 1);
@@ -1621,12 +1908,13 @@ export default {
       let currentData = [];
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(date)) {
+          console.log(item.classSchedule, "item.classSchedule");
           currentData = JSON.parse(JSON.stringify(item.classSchedule));
           // 使用只包含课程的索引插入，避免健康数据和赛事影响排序
           currentData.splice(targetClassIndex, 0, newClassSchedule);
         }
       });
-      console.log(currentData, "currentData");
+      console.log(currentData, "currentData===============");
 
       // 生成排序数据
       currentData.forEach((item, index) => {
@@ -1655,11 +1943,12 @@ export default {
     /**
      * 运动和课表匹配
      */
-    handleMatchClass({ classId, activityId, manualActivityId, type }) {
+    handleMatchClass(data) {
+      const { classId, activityId, manualActivityId, type } = data;
       let currentClass = {};
       let currentActivity = {};
       let activityDate = "";
-      console.log(activityId, manualActivityId, "activityId, manualActivityId");
+      console.log(data, "data");
 
       this.currentWeek.forEach((item) => {
         item.activityList.forEach((activity) => {
@@ -1678,9 +1967,11 @@ export default {
         });
       });
       console.log(currentActivity, "currentActivity");
+      console.log(currentClass, "currentClass");
 
       // 检查运动是否已经匹配过课表
       if (currentActivity.classScheduleId) {
+        this.getScheduleData();
         this.$message.warning("该运动已经匹配过课表");
         return;
       }
@@ -1688,6 +1979,7 @@ export default {
       // 判断是否从课程模板中拖拽
       if (type === "classTemplate") {
         currentClass = this.findClassById(classId);
+        console.log(currentClass, "currentClass===================");
         if (
           currentClass.sportType ===
           ACTIVITY_TYPE_DICT[currentActivity.sportType]
@@ -1898,14 +2190,14 @@ export default {
 
       // 比赛类型到运动类型的映射（根据 value 匹配）
       const competitionTypeToSportTypes = {
-        TRIATHLON: ["CYCLE", "SWIM", "RUN", "OTHER"], // 铁三可以匹配骑行、游泳、跑步
+        TRIATHLON: ["SWIM", "CYCLE", "RUN", "OTHER"], // 铁三可以关联游泳、骑行、跑步、其他
         RUNNING: ["RUN"], // 路跑只能匹配跑步
         CYCLE: ["CYCLE"], // 骑行只能匹配骑行
         SWIM: ["SWIM"], // 游泳只能匹配游泳
-        OTHER: ["CYCLE", "SWIM", "RUN", "STRENGTH", "OTHER"], // 其他类型可以匹配所有运动类型
+        OTHER: ["SWIM", "CYCLE", "RUN", "OTHER", "STRENGTH"], // 其他类型可以关联游泳、骑行、跑步、其他、力量
       };
 
-      // 检查比赛类型和运动类型是否匹配
+      // 检查比赛类型和运动类型是否允许关联
       const allowedSportTypes =
         competitionTypeToSportTypes[normalizedCompetitionType];
       if (!allowedSportTypes || allowedSportTypes.length === 0) {
@@ -1915,16 +2207,13 @@ export default {
         const competitionTypeName =
           competitionInfo?.label || normalizedCompetitionType;
         this.$message.warning(
-          `比赛类型为${competitionTypeName}时，暂不支持匹配运动数据`
+          `比赛类型为${competitionTypeName}时，暂不支持关联运动数据`
         );
         this.getScheduleData();
         return;
       }
 
-      // 如果比赛类型为"其他"，则允许匹配所有运动类型，直接跳过检查
-      if (normalizedCompetitionType === "OTHER") {
-        // 允许匹配，继续后续处理
-      } else if (!allowedSportTypes.includes(activitySportType)) {
+      if (!allowedSportTypes.includes(activitySportType)) {
         const competitionInfo = Object.values(COMPETITION_TYPE_MAP).find(
           (item) => item.value === normalizedCompetitionType
         );
@@ -1933,9 +2222,9 @@ export default {
 
         // 运动类型中文名称映射
         const sportTypeNameMap = {
+          SWIM: "游泳",
           CYCLE: "骑行",
           RUN: "跑步",
-          SWIM: "游泳",
           STRENGTH: "力量",
           OTHER: "其他",
         };
@@ -1943,7 +2232,8 @@ export default {
         // 根据比赛类型生成允许的运动类型提示信息
         let allowedTypesText = "";
         if (normalizedCompetitionType === "TRIATHLON") {
-          allowedTypesText = "骑行、游泳、跑步";
+          // 铁三：当前规则允许关联「骑行、游泳、跑步、其他」
+          allowedTypesText = "游泳、骑行、跑步、其他";
         } else {
           // 获取允许的运动类型的中文名称
           const allowedNames = allowedSportTypes
@@ -1953,13 +2243,13 @@ export default {
         }
 
         this.$message.warning(
-          `比赛类型为${competitionTypeName}时，只能匹配${allowedTypesText}的运动数据`
+          `比赛类型为${competitionTypeName}时，只能关联${allowedTypesText}的运动数据`
         );
         this.getScheduleData();
         return;
       }
 
-      // 匹配成功，继续后续处理
+      // 关联成功，继续后续处理
       competitionApi
         .bindActivity({
           activityId: activity.activityId,
@@ -1969,12 +2259,12 @@ export default {
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("匹配成功");
+            this.$message.success("关联成功");
           }
           this.getScheduleData();
         })
         .catch((err) => {
-          console.error("匹配失败:", err);
+          console.error("关联失败:", err);
           this.getScheduleData();
         });
       // const type = manualActivityId ? 2 : 1;
@@ -2106,7 +2396,7 @@ export default {
 
       if (res.success) {
         this.getScheduleData();
-        this.getClassList();
+        // this.getClassList();
       }
     },
 
@@ -2114,7 +2404,28 @@ export default {
      * 课程折叠变化 - 初始化拖拽
      */
     classSlideChange() {
-      this.initClassDrag();
+      // this.initClassDrag();
+    },
+
+    handleClassDragEndFromClassList(e) {
+      console.log(e, "handleClassDragEndFromClassList===================");
+      if (
+        e.originalEvent.srcElement.offsetParent &&
+        e.originalEvent.srcElement.offsetParent.dataset &&
+        e.originalEvent.srcElement.offsetParent.dataset.type &&
+        e.originalEvent.srcElement.offsetParent.dataset.type === "activity"
+      ) {
+        this.handleMatchClass({
+          classId: e.item.dataset.id,
+          activityId:
+            e.originalEvent.srcElement.offsetParent.dataset.activityid,
+          manualActivityId:
+            e.originalEvent.srcElement.offsetParent.dataset.manualactivityid,
+          type: e.item.dataset.type,
+        });
+      } else if (e.to.dataset.date) {
+        this.handleScheduleDragAdd(e);
+      }
     },
 
     /**
@@ -2369,8 +2680,13 @@ export default {
       console.log(flag, "flag");
       if (flag) {
         this.showClassDetailModal = false;
+        this.showEditScheduleClass = false;
         this.classSportType = "";
-        this.classDetailData = {};
+        if (this.isActivity) {
+          this.activityDetailData = {};
+        } else {
+          this.classDetailData = {};
+        }
       }
       this.getScheduleData();
       this.getClassList();

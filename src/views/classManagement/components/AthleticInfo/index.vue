@@ -164,7 +164,7 @@
                 v-model="preferenceForm.restDays"
                 multiple
                 :multiple-limit="3"
-                placeholder="请选择休息日,最多选择3天"
+                placeholder="长距离日不可选择"
                 class="week-select-multiple"
               >
                 <el-option
@@ -201,20 +201,20 @@
           <div v-if="activeSport === 1" class="row">
             <span class="label"><span class="required">*</span>阈值心率</span>
             <el-input
-              v-model.number="thresholdData.param2"
+              v-model="thresholdData.param2"
               :key="'hr-param2-' + activeSport"
-              step="1"
               class="pill-input"
+              @input="handleThresholdInput('param2', $event)"
             />
             <span class="suffix unit-red">bpm</span>
             <span class="label right-gap"
               ><span class="required">*</span>最大心率</span
             >
             <el-input
-              v-model.number="thresholdData.param1"
+              v-model="thresholdData.param1"
               :key="'hr-param1-' + activeSport"
-              step="1"
               class="pill-input"
+              @input="handleThresholdInput('param1', $event)"
             />
             <span class="suffix unit-red">bpm</span>
           </div>
@@ -238,10 +238,10 @@
           <div v-else-if="activeSport === 2" class="row">
             <span class="label"><span class="required">*</span>阈值功率</span>
             <el-input
-              v-model.number="thresholdData.threshold"
+              v-model="thresholdData.threshold"
               :key="'bike-' + activeSport"
-              step="1"
               class="pill-input"
+              @input="handleThresholdInput('threshold', $event)"
             />
             <span class="suffix unit-red">w</span>
           </div>
@@ -285,8 +285,9 @@
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="LT">
-              <div style="margin-left: 5px;margin-right: 5px;">
-                ............................................................................... LT1:
+              <div style="margin-left: 5px; margin-right: 5px">
+                ...............................................................................
+                LT1:
               </div>
               <div>{{ thresholdData.zone2[1] }} {{ thresholdData.unit }}</div>
             </div>
@@ -305,8 +306,9 @@
               <div class="zoneTd">{{ thresholdData.unit }}</div>
             </div>
             <div class="LT">
-              <div style="margin-left: 5px;margin-right: 5px;">
-                ............................................................................... LT2:
+              <div style="margin-left: 5px; margin-right: 5px">
+                ...............................................................................
+                LT2:
               </div>
               <div>{{ thresholdData.zone4[1] }} {{ thresholdData.unit }}</div>
             </div>
@@ -898,13 +900,17 @@ export default {
           submitData({
             url: "/gateway/user/updateThreshold",
             requestData: params,
-          }).then((res) => {
-            if (res.success) {
-              this.$message.success("阈值保存成功");
-              this.$emit("save", res.result);
+          })
+            .then((res) => {
+              if (res.success) {
+                this.$message.success("阈值保存成功");
+                this.$emit("save", res.result);
+                this.loading = false;
+              }
+            })
+            .finally(() => {
               this.loading = false;
-            }
-          });
+            });
         })
         .catch(() => {
           this.$message({
@@ -967,6 +973,36 @@ export default {
       // 只允许数字0-9
       if (!/^\d$/.test(event.key)) {
         event.preventDefault();
+      }
+    },
+    handleThresholdInput(field, value) {
+      // 确保 value 是字符串类型
+      const strValue = String(value || "");
+
+      // 移除所有非数字字符（包括字母 e、小数点、负号等）
+      let numericValue = strValue.replace(/\D/g, "");
+
+      // 限制最大长度为7位
+      if (numericValue.length > 7) {
+        numericValue = numericValue.slice(0, 7);
+      }
+
+      // 移除前导零
+      if (numericValue.length > 1 && numericValue[0] === "0") {
+        numericValue = numericValue.replace(/^0+/, "");
+      }
+
+      // 如果输入为空或只有0，则清空
+      if (numericValue === "" || numericValue === "0") {
+        this.thresholdData[field] = "";
+      } else {
+        // 转换为正整数
+        const intValue = parseInt(numericValue, 10);
+        if (intValue > 0) {
+          this.thresholdData[field] = intValue;
+        } else {
+          this.thresholdData[field] = "";
+        }
       }
     },
   },

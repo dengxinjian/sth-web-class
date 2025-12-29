@@ -188,6 +188,7 @@ export default {
               password: ps,
             })
             .then(() => {
+              localStorage.setItem('loginType', this.loginType);
               this.$router.push({
                 path: "/",
                 query: this.otherQuery,

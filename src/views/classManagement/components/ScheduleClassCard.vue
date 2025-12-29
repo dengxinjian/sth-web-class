@@ -139,12 +139,12 @@
             "
           >
             <!-- 概要 -->
-            <pre v-if="classItem.classesJson.summary" class="stage-details">
+            <pre v-if="classItem.classesJson.summary" class="stage-details-p">
           {{ truncateByLines(classItem.classesJson.summary) }}
         </pre
             >
             <!-- 训练建议 -->
-            <pre class="stage-details">
+            <pre class="stage-details-p">
   {{ truncateByLines(classItem.classesJson.trainingAdvice) }}</pre
             >
           </template>
@@ -153,7 +153,7 @@
           <template v-else-if="classItem.sportType === 'CYCLE'">
             <CycleStageDetails
               :class-data="classItem.classesJson"
-              :max-stages="3"
+              :max-stages="2"
             />
           </template>
 
@@ -161,7 +161,7 @@
           <template v-else-if="classItem.sportType === 'RUN'">
             <RunStageDetails
               :class-data="classItem.classesJson"
-              :max-stages="3"
+              :max-stages="2"
             />
           </template>
 
@@ -176,7 +176,7 @@
               class="time-stage"
               :style="{ flex: stage.duration }"
             >
-              <div style="display: flex; gap: 1px; height: 16px">
+              <div style="display: flex; gap: 1px; height: 16px" v-if="stage.stageTimeline.length > 0">
                 <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
                   <ExerciseProcessChart
                     :exerciseList="stage.stageTimeline"
@@ -489,7 +489,7 @@ export default {
       font-weight: bold;
     }
 
-    .stage-details {
+    .stage-details-p {
       font-size: 12px;
       color: #999;
       padding: 5px 5px 0;
@@ -497,6 +497,11 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+      line-clamp: 5;
+      // margin-bottom: 5px;
     }
   }
 }

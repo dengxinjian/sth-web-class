@@ -18,6 +18,7 @@
             v-model="form.title"
             placeholder="标题"
             class="pill-input"
+            maxlength="50"
           />
         </el-form-item>
 

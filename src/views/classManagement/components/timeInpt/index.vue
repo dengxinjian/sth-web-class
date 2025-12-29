@@ -268,6 +268,9 @@ export default {
 <style scoped>
 .time-input-wrapper {
   position: relative;
+  /* 为错误消息预留空间，避免与输入框重叠 */
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .time-input {
@@ -277,11 +280,13 @@ export default {
 .error-message {
   color: #f56c6c;
   font-size: 12px;
-  line-height: 1;
+  line-height: 1.5;
   padding-top: 4px;
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: relative;
+  /* 使用相对定位，让错误消息占据正常的文档流空间，避免重叠 */
+  display: block;
+  min-height: 18px;
+  word-break: break-word;
 }
 
 .el-icon-time {

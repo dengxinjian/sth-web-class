@@ -1,10 +1,11 @@
 <template>
   <div style="position: relative">
     <div
-      class="classScheduleCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
+      class="classScheduleCard ActivityCard sportScheduleCard js-sport-container-put js-sport-container-noDrag"
       :data-activityId="activity.activityId"
       :data-manualActivityId="activity.manualActivityId"
       :data-date="date"
+      data-type="activity"
     >
       <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
       <div
@@ -40,7 +41,12 @@
               >
                 解除匹配
               </el-button>
-              <el-button type="text" icon="el-icon-crop" @click="handleCopy">
+              <el-button
+                type="text"
+                icon="el-icon-crop"
+                v-if="activity.classesJson"
+                @click="handleCopy"
+              >
                 复制
               </el-button>
 
@@ -73,7 +79,10 @@
         >
           <div
             class="title"
-            v-if="(activity.classesJson && activity.classesJson.title) || activity.activityName"
+            v-if="
+              (activity.classesJson && activity.classesJson.title) ||
+              activity.activityName
+            "
           >
             {{
               activity.classesJson
@@ -113,10 +122,10 @@
                 activity.classesJson.trainingAdvice
               "
             >
-              <pre v-if="activity.classesJson.summary" class="stage-details">
+              <pre v-if="activity.classesJson.summary" class="stage-details-p">
                 {{ truncateByLines(activity.classesJson.summary) }}
               </pre>
-              <pre class="stage-details">
+              <pre class="stage-details-p">
                 {{ truncateByLines(activity.classesJson.trainingAdvice) }}
               </pre>
             </template>
@@ -237,7 +246,7 @@
             hideContextMenu();
           "
         >
-        <i class="el-icon-edit"></i>
+          <i class="el-icon-edit"></i>
           编辑
         </div>
         <div
@@ -436,8 +445,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.classScheduleCard .card-body{
+.classScheduleCard .card-body {
   background-color: #fff;
 }
 .sportScheduleCard {
@@ -500,7 +508,7 @@ export default {
       cursor: pointer;
     }
 
-    .stage-details {
+    .stage-details-p {
       font-size: 12px;
       color: #999;
       padding: 5px 5px 0;
@@ -508,6 +516,10 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+      line-clamp: 5;
     }
   }
 }

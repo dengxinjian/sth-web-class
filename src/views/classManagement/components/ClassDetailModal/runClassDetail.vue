@@ -28,6 +28,7 @@
               type="text"
               placeholder="标题"
               v-model="classInfo.title"
+              maxlength="50"
             />
           </el-form-item>
         </el-form>
