@@ -45,8 +45,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: loginAccount.trim() })
         .then((response) => {
-          console.log(response,"res================")
-          const { token, nicknameTag, triUserId } = response.result;
+          const { token, nicknameTag, triUserId } = response;
           commit("SET_TOKEN", token);
           commit("SET_NAME", nicknameTag);
           localStorage.setItem("name", nicknameTag);
