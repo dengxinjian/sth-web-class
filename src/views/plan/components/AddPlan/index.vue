@@ -325,13 +325,13 @@ export default {
       console.log("=======teams", this.teams);
       if (this.copyOfficialPlanInfo) {
         // console.log("=======copyOfficialPlanInfo", this.copyOfficialPlanInfo);
-        this.$nextTick(() => {
-          this.form = {
-            ...this.form,
-            planSource: `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}`,
-            planSourceId: this.copyOfficialPlanInfo.teamId,
-          };
-        });
+        // this.$nextTick(() => {
+        //   this.form = {
+        //     ...this.form,
+        //     planSource: `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}`,
+        //     planSourceId: this.copyOfficialPlanInfo.teamId,
+        //   };
+        // });
         return;
       }
       const findTeam = this.teams.find((item) => item.id === val);
