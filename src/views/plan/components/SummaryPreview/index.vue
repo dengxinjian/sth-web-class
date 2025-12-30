@@ -385,6 +385,7 @@ export default {
       this.$emit("input", val);
       if (val) {
         // 获取分组和团队列表
+        this.getDefaultTeam();
         this.getGroupList();
         this.getTeamList();
         // 如果 planInfo 有数据，重置表单并回显数据；否则只重置表单
@@ -497,10 +498,12 @@ export default {
       getData({
         url: "/api/team/coach/all-teams",
       }).then((res) => {
-        this.teams = res.result;
-        if (this.teams.length === 0) {
-          this.getDefaultTeam();
-        }
+        this.teams = [...this.teams, res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, []);
       });
     },
     handleTeamChange(val) {
@@ -532,7 +535,12 @@ export default {
       getData({
         url: "/api/team/my-team",
       }).then((res) => {
-        _this.teams.push(res.result);
+        _this.teams = [..._this.teams, res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, []);
       });
     },
     onCancel() {

@@ -261,6 +261,7 @@ export default {
       }
     },
     copyOfficialPlanInfo(val) {
+      console.log('=======copyOfficialPlanInfo-当前--传入',val);
       if (val) {
         this.$nextTick(() => {
           this.form = {
@@ -269,9 +270,9 @@ export default {
             planTitle: val.planTitle,
             // planGroupId: this.currentGroupId,
             teamId: val.teamId,
-            planSource: val.teamName
-              ? `${val.teamName} - ${val.possessNickname}`
-              : val.possessNickname,
+            planSource: val.planSourceTeamIdName
+              ? `${val.planSourceTeamIdName} - ${val.planSourceNickname}`
+              : val.planSourceNickname,
             ownerName: val.ownerName,
             email: val.email,
             weChat: val.weChat,
@@ -393,6 +394,7 @@ export default {
           }
           return acc;
         }, []);
+        // console.log('=======teams-当前---默认',_this.teams);
         // 当教练身份添加时，teamId没有时，设置为res.result.id
         if (
           _this.loginType === "2" &&
