@@ -60,6 +60,7 @@
           filterable
           clearable
           style="width: 100%"
+          @change="handleTeamChange"
           v-if="activeClassType !== 'official'"
         >
           <el-option
@@ -73,12 +74,12 @@
       </el-form-item>
 
       <el-form-item label="计划源">
-        <span v-if="activeClassType === 'official'">{{ planSource() }}</span>
+        <span v-if="activeClassType === 'official'">{{ form.planSource }}</span>
         <el-input
           v-else
           :readonly="activeClassType === 'official'"
           placeholder="请输入计划源"
-          :value="planSource()"
+          :value="form.planSource"
           disabled
         />
       </el-form-item>
@@ -145,7 +146,7 @@
           disabled-void-color="#E1E4EC"
           disabled
         />
-        <span style="font-size: 14px; color: #979fb0;margin-top: 2px;">{{
+        <span style="font-size: 14px; color: #979fb0; margin-top: 2px">{{
           form.level ? "" : "未评分"
         }}</span>
       </el-form-item>
@@ -388,6 +389,7 @@ export default {
         this.getTeamList();
         // 如果 planInfo 有数据，重置表单并回显数据；否则只重置表单
         if (this.planInfo && Object.keys(this.planInfo).length > 0) {
+          console.log("=======planInfo-当前-打开", this.planInfo);
           this.resetForm();
           this.$nextTick(() => {
             this.form = {
@@ -398,6 +400,9 @@ export default {
               weChat: this.planInfo.weChat || undefined,
               description: this.planInfo.description || undefined,
               level: this.planInfo.level || undefined,
+              planSource: this.planInfo.planSourceTeamIdName
+                ? `${this.planInfo.planSourceTeamIdName} - ${this.planInfo.planSourceNickname}`
+                : this.planInfo.planSourceNickname,
             };
             // 清除表单验证状态
             if (this.$refs.formRef) {
@@ -431,6 +436,9 @@ export default {
             weChat: val.weChat || undefined,
             description: val.description || undefined,
             id: val.id,
+            planSource: val.planSourceTeamIdName
+              ? `${val.planSourceTeamIdName} - ${val.planSourceNickname}`
+              : val.planSourceNickname,
             level: val.level || undefined,
           };
           // 清除表单验证状态
@@ -495,6 +503,30 @@ export default {
         }
       });
     },
+    handleTeamChange(val) {
+      if (this.copyOfficialPlanInfo) {
+        return;
+      }
+      const selfTriUserId = localStorage.getItem("triUserId");
+      if (selfTriUserId !== this.planInfo.planSourceTriUserId) {
+        return;
+      }
+      const findTeam = this.teams.find((item) => item.id === val);
+      // console.log('=======findTeam-summary',findTeam);
+      if (findTeam) {
+        if (findTeam.teamName && findTeam.teamOwnerNickname) {
+          this.$nextTick(() => {
+            this.form = {
+              ...this.form,
+              planSource: `${findTeam.teamName} - ${
+                localStorage.getItem("name")?.split("#")[0]
+              }`,
+              planSourceTeamId: findTeam.id,
+            };
+          });
+        }
+      }
+    },
     getDefaultTeam() {
       const _this = this;
       getData({
@@ -512,7 +544,7 @@ export default {
         if (!valid) return;
         const params = {
           ...this.planInfo,
-          ...this.form,
+          ...this.form
         };
         // console.log(params, "params");
         submitData({

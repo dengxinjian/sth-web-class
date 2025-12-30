@@ -86,7 +86,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="创建者" v-if="copyOfficialPlanInfo">
+      <el-form-item label="计划源" v-if="copyOfficialPlanInfo">
         <el-input
           :readonly="true"
           placeholder="请输入计划源"
@@ -321,17 +321,17 @@ export default {
       this.$refs.formRef && this.$refs.formRef.validateField("email");
     },
     handleTeamChange(val) {
-      // console.log('=======handleTeamChange',val);
-      // console.log('=======teams',this.teams);
+      console.log("=======handleTeamChange", val);
+      console.log("=======teams", this.teams);
       if (this.copyOfficialPlanInfo) {
         // console.log("=======copyOfficialPlanInfo", this.copyOfficialPlanInfo);
-        this.$nextTick(() => {
-          this.form = {
-            ...this.form,
-            planSource: `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}`,
-            planSourceId: this.copyOfficialPlanInfo.teamId,
-          };
-        });
+        // this.$nextTick(() => {
+        //   this.form = {
+        //     ...this.form,
+        //     planSource: `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}`,
+        //     planSourceId: this.copyOfficialPlanInfo.teamId,
+        //   };
+        // });
         return;
       }
       const findTeam = this.teams.find((item) => item.id === val);
@@ -341,7 +341,9 @@ export default {
           this.$nextTick(() => {
             this.form = {
               ...this.form,
-              planSource: `${findTeam.teamName} - ${findTeam.teamOwnerNickname}`,
+              planSource: `${findTeam.teamName} - ${
+                localStorage.getItem("name")?.split("#")[0]
+              }`,
               planSourceTeamId: findTeam.id,
             };
           });
@@ -372,7 +374,7 @@ export default {
         url: "/api/team/coach/all-teams",
       }).then((res) => {
         this.teams = [...this.teams, ...res.result].reduce((acc, team) => {
-          if (team && team.id && !acc.find(t => t.id === team.id)) {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
           }
           return acc;
@@ -386,15 +388,30 @@ export default {
       }).then((res) => {
         // 使用reduce根据id去重
         _this.teams = [..._this.teams, res.result].reduce((acc, team) => {
-          if (team && team.id && !acc.find(t => t.id === team.id)) {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
           }
           return acc;
         }, []);
         // 当教练身份添加时，teamId没有时，设置为res.result.id
-        if (_this.loginType === '2' && !_this.form.teamId && res.result && res.result.id) {
-          _this.form.teamId = res.result.id;
-          _this.form.planSource = `${res.result.teamName} - ${res.result.teamOwnerNickname}`;
+        if (
+          _this.loginType === "2" &&
+          !_this.form.teamId &&
+          res.result &&
+          res.result.id
+        ) {
+          if (_this.copyOfficialPlanInfo) {
+            const findTeam = _this.teams.find(
+              (item) => item.id === _this.copyOfficialPlanInfo.teamId
+            );
+            if (!findTeam || !_this.copyOfficialPlanInfo.teamId) {
+              _this.form.teamId = res.result.id;
+            }
+          } else {
+            _this.form.teamId = res.result.id;
+            _this.form.planSourceTeamId = res.result.id;
+            _this.form.planSource = `${res.result.teamName} - ${res.result.teamOwnerNickname}`;
+          }
         }
       });
     },
@@ -407,10 +424,12 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
+        // console.log('=======form-当前',this.form);
         const params = {
           ...this.form,
           dayDetails: this.emptyPlanClasses,
           loginType: parseInt(localStorage.getItem("loginType")),
+          planSourceTeamId: this.form.planSourceTeamId || this.form.teamId,
         };
         // console.log('=======添加计划=====>params',params);
         // 将 params 保存到 planStore 中的 planData
