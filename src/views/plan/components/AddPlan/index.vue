@@ -409,6 +409,7 @@ export default {
             }
           } else {
             _this.form.teamId = res.result.id;
+            _this.form.planSourceTeamId = res.result.id;
             _this.form.planSource = `${res.result.teamName} - ${res.result.teamOwnerNickname}`;
           }
         }
@@ -423,10 +424,12 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
+        // console.log('=======form-当前',this.form);
         const params = {
           ...this.form,
           dayDetails: this.emptyPlanClasses,
           loginType: parseInt(localStorage.getItem("loginType")),
+          planSourceTeamId: this.form.planSourceTeamId || this.form.teamId,
         };
         // console.log('=======添加计划=====>params',params);
         // 将 params 保存到 planStore 中的 planData
