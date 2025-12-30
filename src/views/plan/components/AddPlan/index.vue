@@ -321,8 +321,8 @@ export default {
       this.$refs.formRef && this.$refs.formRef.validateField("email");
     },
     handleTeamChange(val) {
-      console.log('=======handleTeamChange',val);
-      console.log('=======teams',this.teams);
+      console.log("=======handleTeamChange", val);
+      console.log("=======teams", this.teams);
       if (this.copyOfficialPlanInfo) {
         // console.log("=======copyOfficialPlanInfo", this.copyOfficialPlanInfo);
         this.$nextTick(() => {
@@ -341,7 +341,9 @@ export default {
           this.$nextTick(() => {
             this.form = {
               ...this.form,
-              planSource: `${findTeam.teamName} - ${localStorage.getItem("name")?.split("#")[0]}`,
+              planSource: `${findTeam.teamName} - ${
+                localStorage.getItem("name")?.split("#")[0]
+              }`,
               planSourceTeamId: findTeam.id,
             };
           });
@@ -372,7 +374,7 @@ export default {
         url: "/api/team/coach/all-teams",
       }).then((res) => {
         this.teams = [...this.teams, ...res.result].reduce((acc, team) => {
-          if (team && team.id && !acc.find(t => t.id === team.id)) {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
           }
           return acc;
@@ -386,15 +388,29 @@ export default {
       }).then((res) => {
         // 使用reduce根据id去重
         _this.teams = [..._this.teams, res.result].reduce((acc, team) => {
-          if (team && team.id && !acc.find(t => t.id === team.id)) {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
           }
           return acc;
         }, []);
         // 当教练身份添加时，teamId没有时，设置为res.result.id
-        if (_this.loginType === '2' && !_this.form.teamId && res.result && res.result.id) {
-          _this.form.teamId = res.result.id;
-          _this.form.planSource = `${res.result.teamName} - ${res.result.teamOwnerNickname}`;
+        if (
+          _this.loginType === "2" &&
+          !_this.form.teamId &&
+          res.result &&
+          res.result.id
+        ) {
+          if (_this.copyOfficialPlanInfo) {
+            const findTeam = _this.teams.find(
+              (item) => item.id === _this.copyOfficialPlanInfo.teamId
+            );
+            if (!findTeam || !_this.copyOfficialPlanInfo.teamId) {
+              _this.form.teamId = res.result.id;
+            }
+          } else {
+            _this.form.teamId = res.result.id;
+            _this.form.planSource = `${res.result.teamName} - ${res.result.teamOwnerNickname}`;
+          }
         }
       });
     },
