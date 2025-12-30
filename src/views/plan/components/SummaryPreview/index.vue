@@ -389,7 +389,7 @@ export default {
         this.getTeamList();
         // 如果 planInfo 有数据，重置表单并回显数据；否则只重置表单
         if (this.planInfo && Object.keys(this.planInfo).length > 0) {
-          // console.log("=======planInfo-当前-打开", this.planInfo);
+          console.log("=======planInfo-当前-打开", this.planInfo);
           this.resetForm();
           this.$nextTick(() => {
             this.form = {
@@ -505,6 +505,10 @@ export default {
     },
     handleTeamChange(val) {
       if (this.copyOfficialPlanInfo) {
+        return;
+      }
+      const selfTriUserId = localStorage.getItem("triUserId");
+      if (selfTriUserId !== this.planInfo.planSourceTriUserId) {
         return;
       }
       const findTeam = this.teams.find((item) => item.id === val);
