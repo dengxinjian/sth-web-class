@@ -498,7 +498,7 @@ export default {
       getData({
         url: "/api/team/coach/all-teams",
       }).then((res) => {
-        this.teams = [...this.teams, res.result].reduce((acc, team) => {
+        this.teams = [...this.teams, ...res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
           }
