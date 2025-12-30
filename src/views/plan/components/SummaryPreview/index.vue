@@ -544,8 +544,7 @@ export default {
         if (!valid) return;
         const params = {
           ...this.planInfo,
-          ...this.form,
-          planSourceTeamId: this.form.planSourceTeamId || this.form.teamId,
+          ...this.form
         };
         // console.log(params, "params");
         submitData({
