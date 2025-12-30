@@ -1,7 +1,7 @@
 <template>
   <div class="week-statistic">
     <!-- 设备同步设置 -->
-    <div class="schedule-table-header-cell-data">
+    <!-- <div class="schedule-table-header-cell-data">
       <el-popover placement="bottom-end" width="180" trigger="hover">
         <div
           v-for="item in deviceList"
@@ -28,7 +28,7 @@
           />
         </span>
       </el-popover>
-    </div>
+    </div> -->
 
     <!-- STH数据 -->
     <div class="schedule-table-cell-data">

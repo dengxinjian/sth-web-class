@@ -419,8 +419,9 @@ export default {
   border: 1px solid #e5e5e5;
   // transition: all 0.3s ease;
   overflow: hidden;
-  border-radius: 6px;
-  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
+  border-radius: 5px;
+  box-shadow: 0px 2px 6px 0px #00000026;
+  background-color: #fff;
 
   &:hover {
     transform: scale(1.02);
