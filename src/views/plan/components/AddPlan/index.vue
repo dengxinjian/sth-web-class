@@ -295,7 +295,7 @@ export default {
     },
     getTeamDetail() {
       getData({
-        url: "/api/team/my-team",
+        url: "/gateway/team/my-team",
       }).then((res) => {
         this.teamInfo = res.result;
         if (this.teamInfo.teamName && this.teamInfo.teamOwnerNickname) {
@@ -382,7 +382,7 @@ export default {
     getDefaultTeam() {
       const _this = this;
       getData({
-        url: "/api/team/my-team",
+        url: "/gateway/team/my-team",
       }).then((res) => {
         // 使用reduce根据id去重
         _this.teams = [..._this.teams, res.result].reduce((acc, team) => {

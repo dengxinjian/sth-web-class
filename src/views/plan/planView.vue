@@ -229,7 +229,7 @@ export default {
     getDefaultTeam() {
       const _this = this;
       getData({
-        url: "/api/team/my-team",
+        url: "/gateway/team/my-team",
       }).then((res) => {
         // console.log('=======个人初始团队',res.result);
         _this.defaultTeam = res.result || null;

@@ -498,7 +498,7 @@ export default {
     getDefaultTeam() {
       const _this = this;
       getData({
-        url: "/api/team/my-team",
+        url: "/gateway/team/my-team",
       }).then((res) => {
         _this.teams.push(res.result);
       });
