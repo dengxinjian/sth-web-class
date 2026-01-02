@@ -72,7 +72,10 @@ export const planApi = {
   // 删除计划
   deletePlan(id) {
     return submitData({
-      url: `/training/api/planClasses/delete?id=${id}`,
+      url: `/training/api/planClasses/delete`,
+      requestData: {
+        id,
+      },
     });
   },
 
