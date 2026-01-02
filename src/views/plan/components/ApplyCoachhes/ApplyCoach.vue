@@ -627,7 +627,7 @@ export default {
         targets,
       };
       submitData({
-        url: "/training/api/planClasses/applyPlanClasses",
+        url: "/gateway/training/planClasses/applyPlanClasses",
         requestData: params,
       })
         .then((res) => {
