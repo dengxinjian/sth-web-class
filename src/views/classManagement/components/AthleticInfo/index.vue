@@ -843,6 +843,7 @@ export default {
         // 使用 Vue.set 确保响应式更新，或者直接赋值新对象
         this.thresholdData = {
           ...result,
+          threshold: result.threshold ? +result.threshold : "",
           zone1: result.zone1 || [],
           zone2: result.zone2 || [],
           zone3: result.zone3 || [],
