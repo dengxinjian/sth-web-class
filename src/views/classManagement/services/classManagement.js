@@ -149,7 +149,12 @@ export const scheduleApi = {
   // 重试课表同步
   retrySync({ classScheduleId, deviceType }) {
     return submitData({
-      url: `/gateway/training/classSchedule/retryClassScheduleSync?classScheduleId=${classScheduleId}&deviceType=${deviceType}`,
+      // url: `/gateway/training/classSchedule/retryClassScheduleSync?classScheduleId=${classScheduleId}&deviceType=${deviceType}`,
+      url: `/gateway/training/classSchedule/retryClassScheduleSync`,
+      requestData: {
+        classScheduleId,
+        deviceType,
+      },
     });
   },
 
