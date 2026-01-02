@@ -118,7 +118,7 @@ export const scheduleApi = {
   // 课表绑定运动
   bindActivity(data) {
     return submitData({
-      url: "/gateway/training/api/classSchedule/classBindingActivity",
+      url: "/gateway/training/classSchedule/classBindingActivity",
       requestData: data,
     });
   },
