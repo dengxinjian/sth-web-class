@@ -134,7 +134,7 @@ export const scheduleApi = {
   // 删除运动
   deleteActivity(activityId, type) {
     return submitData({
-      url: `/gateway/training/api/activity/deleteActivity?activityId=${activityId}&type=${type}`,
+      url: `/training/api/activity/deleteActivity?activityId=${activityId}&type=${type}`,
     });
   },
 
