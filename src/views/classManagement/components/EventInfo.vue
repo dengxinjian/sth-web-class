@@ -636,27 +636,34 @@ export default {
       const res = await competitionApi.getCompetitionDetail(this.eventData.id);
       console.log(res, "res");
       if (res.success) {
-        res.result.deviceActivityBindView.cycle.forEach((item) => {
+        res.result?.deviceActivityBindView?.cycle.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
-        res.result.deviceActivityBindView.run.forEach((item) => {
+        res.result?.deviceActivityBindView?.run.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
-        res.result.deviceActivityBindView.swim.forEach((item) => {
+        res.result?.deviceActivityBindView?.swim.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
-        res.result.deviceActivityBindView.otherT1.forEach((item) => {
+        res.result?.deviceActivityBindView?.otherT1.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
-        res.result.deviceActivityBindView.otherT2.forEach((item) => {
+        res.result?.deviceActivityBindView?.otherT2.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
-        res.result.deviceActivityBindView.strength.forEach((item) => {
+        res.result?.deviceActivityBindView?.strength.forEach((item) => {
           item.classesJson = parseClassesJson(item.classesJson);
         });
         this.competitionResult = res.result || {};
         console.log(this.competitionResult, "this.competitionResult");
-        this.activityList = res.result.deviceActivityBindView || [];
+        this.activityList = res.result?.deviceActivityBindView ||{
+          cycle: [],
+          run: [],
+          swim: [],
+          otherT1: [],
+          otherT2: [],
+          strength: [],
+        };
         console.log(this.activityList, "this.activityList");
         this.summaryText = this.competitionResult.feedback || "";
       }
