@@ -891,7 +891,7 @@ export default {
             params.param2 = this.thresholdData.param2;
           }
           submitData({
-            url: "/api/user/updateThreshold",
+            url: "/consumer/wx/updateThreshold",
             requestData: params,
           })
             .then((res) => {

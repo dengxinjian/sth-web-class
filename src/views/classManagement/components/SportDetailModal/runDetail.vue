@@ -829,7 +829,7 @@ export default {
     // 查询课表数据
     getClassInfo(id) {
       getData({
-        url: "/api/classSchedule/getClassScheduleById",
+        url: "/training/api/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {

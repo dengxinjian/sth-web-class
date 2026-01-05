@@ -2,7 +2,9 @@ import request from "@/utils/request";
 
 export function login(data) {
   return request({
-    url: "/api/auth/login",
+    // url: "/api/auth/login",
+    // url: `/gateway/auth/wx/loginMockPhone?phone=${data.phone}`,
+    url: `/gateway/auth/wx/loginMock?openid=${data.openid}`,
     method: "post",
     data,
   });

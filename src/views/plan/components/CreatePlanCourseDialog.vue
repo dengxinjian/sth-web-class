@@ -141,7 +141,7 @@ export default {
   methods: {
     fetchGroups() {
       getData({
-        url: "/api/classesGroup/user/getClassesGroupsByUserId",
+        url: "/training/api/classesGroup/user/getClassesGroupsByUserId",
       }).then((res) => {
         this.groups = Array.isArray(res.result) ? res.result : [];
       });

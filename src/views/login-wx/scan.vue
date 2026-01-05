@@ -87,7 +87,7 @@ export default {
     handleLoginSuccess(code, state) {
       // 调用微信登录回调接口，同时传递code和state参数
       getData({
-        url: "/api/wechat/callback",
+        url: "/consumer/api/wechat/callback",
         code: code,
         state: state,
       })
