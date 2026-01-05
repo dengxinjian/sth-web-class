@@ -919,7 +919,7 @@ export default {
     getClassScheduleInfo(id) {
       if (!this.classItem.classesJson) return;
       getData({
-        url: "/training/api/classSchedule/getClassScheduleById",
+        url: "/gateway/training/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {

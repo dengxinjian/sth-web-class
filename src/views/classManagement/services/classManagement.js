@@ -100,7 +100,7 @@ export const scheduleApi = {
     //   url: `/api/classSchedule/deleteClassSchedule?id=${id}`,
     // });
     return request({
-      url: `/training/api/classSchedule/deleteClassSchedule?id=${params.id}`,
+      url: `/gateway/training/classSchedule/deleteClassSchedulegateway/training/classSchedule/getClassScheduleById?id=${params.id}`,
       method: "post",
       headers: {
         requestUserInfoId: params.triUserId,

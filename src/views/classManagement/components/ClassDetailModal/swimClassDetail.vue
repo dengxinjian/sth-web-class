@@ -261,7 +261,7 @@ export default {
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
       getData({
-        url: "/training/api/classSchedule/getClassScheduleById",
+        url: "/gateway/training/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
@@ -319,7 +319,7 @@ export default {
       })
         .then(() => {
           submitData({
-            url: "/training/api/classSchedule/deleteClassSchedule?id=" + this.form.id,
+            url: "/gateway/training/classSchedule/deleteClassSchedule?id=" + this.form.id,
           }).then((res) => {
             if (res.success) {
               this.resetForm();

@@ -197,7 +197,7 @@ export default {
     getClassInfo(id) {
       if (!this.data.classesJson) return;
       getData({
-        url: "/training/api/classSchedule/getClassScheduleById",
+        url: "/gateway/training/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
