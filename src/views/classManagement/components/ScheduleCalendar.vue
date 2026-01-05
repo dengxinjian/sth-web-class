@@ -3,7 +3,7 @@
     <div class="schedule-table-container">
       <div class="schedule-table">
         <!-- 顶部控制栏 -->
-        <div class="schedule-top">
+        <!-- <div class="schedule-top">
           <WeekRangePicker @week-change="$emit('week-change', $event)" />
           <div class="schedule-search">
             <div v-if="loginType === '2'">
@@ -60,10 +60,10 @@
               刷新
             </el-button>
           </div>
-        </div>
+        </div> -->
 
         <!-- 周表头 -->
-        <div class="schedule-table-header">
+        <!-- <div class="schedule-table-header">
           <div
             v-for="(item, index) in weekList"
             :key="item.id"
@@ -75,20 +75,22 @@
             {{ item.name }}
             {{ isToday(currentWeek[index]?.commonDate) ? "（今天）" : "" }}
           </div>
-        </div>
+        </div> -->
 
         <!-- 日程内容 -->
         <div class="schedule-table-body">
           <div
             v-for="(item, index) in currentWeek"
-            :key="`day-${item.commonDate || index}-${item.timesp || Date.now()}`"
+            :key="`day-${item.commonDate || index}-${
+              item.timesp || Date.now()
+            }`"
             class="schedule-table-cell"
           >
             <div class="schedule-table-cell-title">
-              <span> {{ item?.commonDate }}</span>
-              <span style="display: inline-block; transform: scale(0.8)">
-                （{{ convertToLunar(item?.commonDate).dateStr }}）</span
-              >
+              <div>{{ new Date(item?.commonDate).getDate() }}</div>
+              <div>
+                （{{ convertToLunar(item?.commonDate).dateStr }}）
+              </div>
             </div>
             <div
               class="schedule-table-cell-item js-schedule-drag-container"
@@ -552,37 +554,6 @@ export default {
   // height: 100%;
 }
 
-.schedule-top {
-  padding: 10px;
-  background-color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-  max-width: 1640px;
-  flex-wrap: wrap;
-  gap: 10px;
-
-  .schedule-search {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-
-    > div {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
-
-      span {
-        font-size: 14px;
-        color: #333;
-      }
-    }
-  }
-}
-
 .schedule-table-header {
   display: flex;
   background-color: #f8f8f8;
@@ -614,17 +585,33 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 120px;
+    min-width: 190px;
     background-color: #fff;
+    box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
 
     .schedule-table-cell-title {
-      font-size: 12px;
-      text-align: center;
-      line-height: 30px;
-      background-color: #f8f8f8;
+      line-height: 40px;
       margin: 4px 0;
       flex-shrink: 0;
+      font-family: PingFang SC;
+      font-weight: 600;
+      font-style: Semibold;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      div:first-child {
+        text-align: center;
+      }
+      div:last-child {
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 12px;
+        color: #666666;
+
+      }
     }
 
     .schedule-table-cell-item {
@@ -637,6 +624,8 @@ export default {
       transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
       will-change: transform; /* 提示浏览器优化渲染 */
       /* 显示添加入口：整个单元格悬停时展示 */
+      background-color: #f6f6f6;
+      height: 100%;
       &:hover {
         .box-content {
           opacity: 1;

@@ -43,46 +43,153 @@
           </div>
         </div>
 
-        <!-- 日程表 -->
-        <ScheduleCalendar
-          :current-week="currentWeek"
-          :team-list="teamList"
-          :athletic-list="athleticList"
-          :selected-team="selectedTeam"
-          :selected-athletic="selectedAthletic"
-          @week-change="onWeekChange"
-          @team-change="handleTeamChange"
-          @athletic-change="handleAthleticChange"
-          @show-info="showAthleticInfoDialog = true"
-          @show-statistic="showMonthStatisticDialog = true"
-          @refresh="handleRefresh"
-          @class-detail="handleClassScheduleDetail"
-          @activity-detail="handleSportDetail"
-          @delete-schedule="handleDeleteClassSchedule"
-          @unbind="handleUnbind"
-          @delete-activity="handleDeleteActivity"
-          @device-click="handleDeviceClick"
-          @edit-schedule="handleEditClassSchedule"
-          @edit-activity="handleEditActivity"
-          @paste-class="handlePasteClass"
-          @cut-class="handleCutClass"
-          @paste-event="handlePasteEvent"
-          @cut-event="handleCutEvent"
-          @view-health-data="handleViewHealthData"
-          @add-schedule="handleAddSchedule"
-          @event-detail="handleEventDetail"
-          @edit-event="handleEditEvent"
-          @input-activity="handleInputActivity"
-          @click-event-activity="handleEditActivity"
-        />
+        <div style="width: 100%">
+          <div class="schedule-top">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex: 1;
+                justify-content: space-between;
+              "
+            >
+              <WeekRangePicker @week-change="onWeekChange" />
+              <div style="display: flex; align-items: center; gap: 10px">
+                <div v-if="loginType === '2'">
+                  <span>团队：</span>
+                  <el-select
+                    :value="selectedTeam"
+                    size="mini"
+                    placeholder="选择团队"
+                    @change="handleTeamChange"
+                    style="width: 160px"
+                  >
+                    <el-option
+                      v-for="t in teamList"
+                      :key="t.id"
+                      :label="t.name"
+                      :value="t.id"
+                    />
+                  </el-select>
+                </div>
+                <div v-if="loginType === '2'">
+                  <span>运动员：</span>
+                  <el-select
+                    :value="selectedAthletic"
+                    size="mini"
+                    placeholder="选择人员"
+                    @change="handleAthleticChange"
+                    style="width: 100px"
+                  >
+                    <el-option
+                      v-for="t in athleticList"
+                      :key="t.triUserId"
+                      :label="t.name"
+                      :value="t.triUserId"
+                    />
+                  </el-select>
+                </div>
+              </div>
+            </div>
+            <div class="schedule-search">
+              <!-- <el-button
+                type="text"
+                size="mini"
+                :disabled="!selectedAthletic"
+                @click="showAthleticInfoDialog = true"
+              >
+                信息查看
+              </el-button> -->
+              <img
+                src="@/assets/addClass/userInfo.png"
+                alt=""
+                @click="showAthleticInfoDialog = true"
+              />
+              <img
+                src="@/assets/addClass/Statistics.png"
+                alt=""
+                @click="showMonthStatisticDialog = true"
+              />
+              <div class="schedule-table-header-cell-data">
+                <el-popover placement="bottom-end" width="180" trigger="hover">
+                  <div
+                    v-for="item in deviceList"
+                    :key="item.id"
+                    style="
+                      display: flex;
+                      flex-direction: row;
+                      gap: 10px;
+                      margin: 10px 0;
+                    "
+                  >
+                    <img
+                      :src="getDeviceBrandIcon(item.deviceType)"
+                      alt=""
+                      class="device-brand-icon"
+                    />
+                    <el-switch
+                      v-model="item.enabled"
+                      :inactive-text="getDeviceName(item.deviceType)"
+                      @change="handleDeviceChange(item)"
+                    ></el-switch>
+                  </div>
+                  <span slot="reference" class="device-filter-reference">
+                    <img src="@/assets/addClass/Synchronization.png" alt="" />
+                  </span>
+                </el-popover>
+              </div>
+              <img
+                src="@/assets/addClass/Refresh.png"
+                alt=""
+                @click="handleRefresh"
+              />
+            </div>
+          </div>
 
-        <!-- 右侧统计面板 -->
-        <StatisticsPanel
-          :sth-data="sthData"
-          :statistic-data="statisticData"
-          :device-list="deviceList"
-          @device-change="handleDeviceChange"
-        />
+          <div style="display: flex; width: 100%">
+            <!-- 日程表 -->
+            <ScheduleCalendar
+              :current-week="currentWeek"
+              :team-list="teamList"
+              :athletic-list="athleticList"
+              :selected-team="selectedTeam"
+              :selected-athletic="selectedAthletic"
+              @week-change="onWeekChange"
+              @team-change="handleTeamChange"
+              @athletic-change="handleAthleticChange"
+              @show-info="showAthleticInfoDialog = true"
+              @show-statistic="showMonthStatisticDialog = true"
+              @refresh="handleRefresh"
+              @class-detail="handleClassScheduleDetail"
+              @activity-detail="handleSportDetail"
+              @delete-schedule="handleDeleteClassSchedule"
+              @unbind="handleUnbind"
+              @delete-activity="handleDeleteActivity"
+              @device-click="handleDeviceClick"
+              @edit-schedule="handleEditClassSchedule"
+              @edit-activity="handleEditActivity"
+              @paste-class="handlePasteClass"
+              @cut-class="handleCutClass"
+              @paste-event="handlePasteEvent"
+              @cut-event="handleCutEvent"
+              @view-health-data="handleViewHealthData"
+              @add-schedule="handleAddSchedule"
+              @event-detail="handleEventDetail"
+              @edit-event="handleEditEvent"
+              @input-activity="handleInputActivity"
+              @click-event-activity="handleEditActivity"
+            />
+
+            <!-- 右侧统计面板 -->
+            <StatisticsPanel
+              :sth-data="sthData"
+              :statistic-data="statisticData"
+              :device-list="deviceList"
+              @device-change="handleDeviceChange"
+            />
+          </div>
+        </div>
       </div>
       <div
         class="content-container"
@@ -323,6 +430,7 @@ import AddEvent from "./components/addEvent.vue";
 import InputActivity from "./components/InputActivity.vue";
 import PlanView from "../plan/planView.vue";
 import EventInfo from "./components/EventInfo.vue";
+import WeekRangePicker from "@/components/WeekRangePicker/index.vue";
 
 // 服务和工具导入
 import {
@@ -334,13 +442,14 @@ import {
   groupApi,
   competitionApi,
 } from "./services/classManagement";
-import { ACTIVITY_TYPE_DICT } from "./constants";
+import { ACTIVITY_TYPE_DICT ,DEVICE_TYPE_DICT} from "./constants";
 import {
   parseClassesJson,
   isSportTypeMatch,
   generateSortData,
   getCompletionStatus,
   getSportTypeName,
+  getDeviceBrandIcon
 } from "./utils/helpers";
 import { getLunarDate, secondsToHHMMSS } from "@/utils/index";
 import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
@@ -373,6 +482,7 @@ export default {
     InputActivity,
     PlanView,
     EventInfo,
+    WeekRangePicker,
   },
   mixins: [dragMixin],
   data() {
@@ -380,6 +490,7 @@ export default {
       loading: false,
       activeName: "class",
       activeClassType: "my",
+      loginType: localStorage.getItem("loginType") || "2",
 
       // 团队和运动员数据
       teamList: [],
@@ -507,6 +618,10 @@ export default {
     this.$root.$off("identity-changed", this.handleIdentityChanged);
   },
   methods: {
+    getDeviceBrandIcon,
+    getDeviceName(deviceType) {
+      return DEVICE_TYPE_DICT[deviceType] || "未知设备";
+    },
     /**
      * 处理身份切换事件
      */
@@ -2779,6 +2894,34 @@ export default {
 
   .el-dialog__body {
     padding: 0;
+  }
+}
+.schedule-top {
+  // padding: 10px;
+  height: 58px;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 1640px;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0px 1px 0px 0px #00000026;
+  border-bottom: 1px solid #e5e5e5;
+  .schedule-search {
+    width: 230px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    padding-right: 20px;
+    img {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
   }
 }
 </style>

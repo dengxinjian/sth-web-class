@@ -907,7 +907,7 @@ export default {
     getClassScheduleInfo(id) {
       if (!this.classItem.classesJson) return;
       getData({
-        url: "/gateway/training/classSchedule/getClassScheduleById",
+        url: "/api/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
@@ -1333,7 +1333,7 @@ export default {
             : this.actualData.distance;
       }
       submitData({
-        url: "/gateway/training/classSchedule/updateClassSchedule",
+        url: "/api/classSchedule/updateClassSchedule",
         id: this.isActivity
           ? this.classData.classScheduleId
           : this.classData.id,

@@ -112,7 +112,7 @@ export default {
   methods: {
     getGroupList() {
       getData({
-        url: "/training/api/classesGroup/user/getClassesGroupsByUserId",
+        url: "/api/classesGroup/user/getClassesGroupsByUserId",
       }).then((res) => {
         this.groups = res.result;
       });

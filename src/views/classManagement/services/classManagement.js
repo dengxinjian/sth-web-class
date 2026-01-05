@@ -22,7 +22,7 @@ export const classApi = {
   // 获取用户课程列表（按分组）
   getClassesByUserId(classesTitle = "") {
     return getData({
-      url: "/training/api/classes/getClassesByUserIdGroupedWithName",
+      url: "/api/classes/getClassesByUserIdGroupedWithName",
       classesTitle,
     });
   },
@@ -30,7 +30,7 @@ export const classApi = {
   // 获取官方课程列表
   getOfficialClasses(classesTitle = "") {
     return getData({
-      url: "/training/api/classes/getOfficialGroupedWithName",
+      url: "/api/classes/getOfficialGroupedWithName",
       classesTitle,
     });
   },
@@ -38,25 +38,25 @@ export const classApi = {
   // 删除课程
   deleteClass(id) {
     return submitData({
-      url: `/training/api/classes/deleteClasses?id=${id}`,
+      url: `/api/classes/deleteClasses?id=${id}`,
     });
   },
   createClass(data) {
     return submitData({
-      url: "/training/api/classes/create",
+      url: "/api/classes/create",
       requestData: data,
     });
   },
   updateClass(data) {
     return submitData({
-      url: "/training/api/classes/update",
+      url: "/api/classes/update",
       requestData: data,
     });
   },
   // 获取当前人 课程配置数
   getCurrentUserClassConfigCount() {
     return getData({
-      url: "/training/api/classes/getUserClassesCount",
+      url: "/api/classes/getUserClassesCount",
     });
   },
 };
@@ -68,7 +68,7 @@ export const scheduleApi = {
   // 获取日历概览
   getCalendarOverview({ begin, end, triUserId }) {
     return getData({
-      url: "/gateway/training/activity/getCalenderOverview",
+      url: "/api/classSchedule/getCalenderOverview",
       begin,
       end,
       triUserId,
@@ -78,7 +78,7 @@ export const scheduleApi = {
   // 获取健康数据
   getHealthData({ deviceType, date, triUserId }) {
     return getData({
-      url: "/gateway/training/api/health",
+      url: "/api/health",
       deviceType,
       date,
       triUserId,
@@ -88,7 +88,7 @@ export const scheduleApi = {
   // 创建课表
   createSchedule(data) {
     return submitData({
-      url: "/gateway/training/classSchedule/create",
+      url: "/api/classSchedule/create",
       requestData: data,
     });
   },
@@ -96,10 +96,10 @@ export const scheduleApi = {
   // 删除课表
   deleteSchedule(params) {
     // return submitData({
-    //   url: `/gateway/training/classSchedule/deleteClassSchedule?id=${id}`,
+    //   url: `/api/classSchedule/deleteClassSchedule?id=${id}`,
     // });
     return request({
-      url: `/gateway/training/classSchedule/deleteClassSchedule?id=${params.id}`,
+      url: `/api/classSchedule/deleteClassSchedule?id=${params.id}`,
       method: "post",
       headers: {
         requestUserInfoId: params.triUserId,
@@ -110,7 +110,7 @@ export const scheduleApi = {
   // 运动详细
   getActivityDetail(activityId) {
     return getData({
-      url: "/gateway/training/api/activity/getActivityDetail",
+      url: "/api/classSchedule/getActivityDetail",
       activityId,
     });
   },
@@ -174,7 +174,7 @@ export const statisticsApi = {
   // 获取周统计数据
   getWeekStatistics({ begin, end, triUserId }) {
     return getData({
-      url: "/training/api/classSchedule/getStatistics",
+      url: "/api/classSchedule/getStatistics",
       begin,
       end,
       triUserId,
@@ -184,13 +184,12 @@ export const statisticsApi = {
 
 /**
  * 运动员相关API
- * 接口未替换完成
  */
 export const athleteApi = {
   // 获取运动员配置
   getUserProfile(triUserId, date) {
     return getData({
-      url: "/consumer/wx/getUserProfile",
+      url: "/api/classSchedule/getUserProfile",
       triUserId,
       date,
     });
@@ -280,7 +279,7 @@ export const competitionApi = {
       headers: {
         requestUserInfoId: triUserId,
       },
-    });
+    })
   },
 
   // 更新赛事
@@ -297,7 +296,7 @@ export const competitionApi = {
       },
       method: "put",
       data,
-    });
+    })
   },
   // 删除赛事
   deleteCompetition(id) {
