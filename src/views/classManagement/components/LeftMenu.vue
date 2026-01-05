@@ -185,8 +185,8 @@ export default {
     }
 
     .menu-icon {
-      width: 28px;
-      height: 28px;
+      width: 20px;
+      height: 20px;
       margin-bottom: 4px;
       display: block;
       flex-shrink: 0;
@@ -194,10 +194,14 @@ export default {
 
     span {
       font-size: 12px;
-      font-weight: 500;
       line-height: 1.2;
       margin-top: 0;
       transition: color 0.2s ease;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 12px;
+      line-height: 12px;
     }
   }
 }

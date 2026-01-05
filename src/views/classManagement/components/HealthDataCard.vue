@@ -94,8 +94,8 @@ export default {
       color: #333;
     }
     .health-data-icon {
-      width: 20px;
-      height: 15px;
+      width: 24px;
+      height: 24px;
       margin-right: 5px;
     }
   }

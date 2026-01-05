@@ -187,6 +187,6 @@ export default {
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 </style>

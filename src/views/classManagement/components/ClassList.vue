@@ -6,13 +6,25 @@
         :class="{ active: activeClassType === 'my' }"
         @click="handleClassTypeChange('my')"
       >
-        <img src="~@/assets/addClass/title-mine.png" alt="" />
+        <!-- <img src="~@/assets/addClass/title-mine.png" alt="" /> -->
+        <div
+          class="title"
+          :class="{ 'active-title': activeClassType === 'my' }"
+        >
+          我的课程
+        </div>
       </li>
       <li
         :class="{ active: activeClassType === 'official' }"
         @click="handleClassTypeChange('official')"
       >
-        <img src="~@/assets/addClass/title-official.png" alt="" />
+        <!-- <img src="~@/assets/addClass/title-official.png" alt="" /> -->
+        <div
+          class="title"
+          :class="{ 'active-title': activeClassType === 'official' }"
+        >
+          官方课程
+        </div>
       </li>
     </ul>
 
@@ -26,17 +38,9 @@
         popper-class="add-class-btn-popover"
       >
         <el-button type="primary" size="mini" slot="reference">新增</el-button>
-        <div style="display: flex; flex-direction: column; gap: 10px">
-          <span>
-            <el-button type="primary" size="mini" @click="$emit('add-class')">
-              新增课程
-            </el-button>
-          </span>
-          <span>
-            <el-button type="primary" size="mini" @click="$emit('add-group')">
-              新增分组
-            </el-button>
-          </span>
+        <div style="display: flex; flex-direction: column; gap: 5px">
+          <div class="add-class-btn" @click="$emit('add-class')">新增课程</div>
+          <div class="add-class-btn" @click="$emit('add-group')">新增分组</div>
         </div>
       </el-popover>
 
@@ -44,13 +48,15 @@
         size="mini"
         v-model="searchInput"
         clearable
+        prefix-icon="el-icon-search"
         @input="handleSearch"
       >
-        <el-button
+        <!-- <el-button
           slot="append"
           icon="el-icon-search"
           @click="handleSearch"
-        ></el-button>
+        ></el-button> -->
+        <!-- <i class="el-icon-search" slot="prepend" @click="handleSearch"></i> -->
       </el-input>
     </div>
 
@@ -62,7 +68,11 @@
         @change="$emit('collapse-change')"
         v-loading="loading"
       >
-        <el-collapse-item v-for="item in classList" :key="item.groupId" :name="item.groupId">
+        <el-collapse-item
+          v-for="item in classList"
+          :key="item.groupId"
+          :name="item.groupId"
+        >
           <template slot="title">
             <div class="schedule-class-title">
               <div class="group-name">
@@ -259,18 +269,32 @@ export default {
         width: 64px;
         margin-bottom: 4px;
       }
+      .title {
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 15px;
+        color: #939393;
+      }
+      .active-title {
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 15px;
+        color: #101010;
+      }
     }
 
     li.active::after {
       content: "";
       position: absolute;
-      bottom: 0;
-      left: 50%;
-      margin-left: -10px;
-      width: 20px;
+      bottom: -10px;
+      left: 26%;
+      // margin-left: -10px;
+      width: 60px;
       height: 4px;
       border-radius: 2px;
-      background-color: #cc2323;
+      background-color: #f92b30;
     }
   }
 
@@ -336,5 +360,25 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.add-class-btn {
+  width: 88px;
+  height: 32px;
+  border-radius: 5px;
+  font-family: PingFang SC;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 14px;
+  text-align: center;
+  line-height: 32px;
+  color: #101010;
+  cursor: pointer;
+  &:hover {
+    background-color: #c3c9d740;
+    font-family: PingFang SC;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 14px;
+  }
 }
 </style>

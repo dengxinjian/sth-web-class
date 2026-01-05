@@ -42,6 +42,8 @@
                 </div>
               </template>
             </div>
+            <!-- 课程标题 -->
+            <div class="title">{{ classItem.classesJson.title }}</div>
             <el-popover
               popper-class="athletic-btn-popover"
               placement="right"
@@ -49,42 +51,43 @@
               :tabindex="9999"
             >
               <div class="btn-list-hover">
-                <el-button
-                  type="text"
-                  icon="el-icon-edit"
+                <div
+                  class="btn-list-hover-item"
                   @click.stop="$emit('edit', classItem)"
                 >
                   编辑
-                </el-button>
-                <el-button
-                  type="text"
-                  icon="el-icon-scissors"
+                </div>
+                <div
+                  class="btn-list-hover-item"
                   @click.stop="$emit('cut', classItem)"
                 >
                   剪切
-                </el-button>
-                <el-button
-                  type="text"
-                  icon="el-icon-crop"
+                </div>
+                <div
+                  class="btn-list-hover-item"
                   @click.stop="$emit('copy', classItem)"
                 >
                   复制
-                </el-button>
+                </div>
 
-                <el-button
-                  type="text"
-                  icon="el-icon-delete"
+                <div
+                  class="btn-list-hover-item"
+                  style="color: #F92B30;"
                   @click.stop="$emit('delete', classItem)"
                 >
                   删除
-                </el-button>
+                </div>
               </div>
-              <i class="el-icon-more" slot="reference" @click.stop></i>
+              <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
+              <img
+                src="@/assets/addClass/Component 117.png"
+                alt=""
+                @click.stop
+                slot="reference"
+                style="width: 16px; height: 16px"
+              />
             </el-popover>
           </div>
-
-          <!-- 课程标题 -->
-          <div class="title">{{ classItem.classesJson.title }}</div>
 
           <!-- 运动类型 -->
           <div class="keyword">
@@ -120,10 +123,10 @@
 
           <!-- STH -->
           <div
-            style="display: flex; gap: 4px"
+            style="display: flex; gap: 4px;margin-top: 4px;"
             v-if="!isRestType(classItem.sportType)"
           >
-            <div class="keyword">
+          <div class="keyword" style="margin-top: 0px;">
               {{
                 !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
               }}
@@ -176,7 +179,10 @@
               class="time-stage"
               :style="{ flex: stage.duration }"
             >
-              <div style="display: flex; gap: 1px; height: 16px" v-if="stage.stageTimeline.length > 0">
+              <div
+                style="display: flex; gap: 1px; height: 16px"
+                v-if="stage.stageTimeline.length > 0"
+              >
                 <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
                   <ExerciseProcessChart
                     :exerciseList="stage.stageTimeline"
@@ -206,21 +212,11 @@
             hideContextMenu();
           "
         >
-          <i class="el-icon-edit"></i>
           编辑
         </div>
-        <div class="context-menu-item" @click="handleCut">
-          <i class="el-icon-scissors"></i>
-          剪切
-        </div>
-        <div class="context-menu-item" @click="handleCopy">
-          <i class="el-icon-crop"></i>
-          复制
-        </div>
-        <div class="context-menu-item" @click="handleDelete">
-          <i class="el-icon-delete"></i>
-          删除
-        </div>
+        <div class="context-menu-item" @click="handleCut">剪切</div>
+        <div class="context-menu-item" @click="handleCopy">复制</div>
+        <div class="context-menu-item" @click="handleDelete" style="color: #F92B30;">删除</div>
       </div>
     </transition>
   </div>
@@ -265,9 +261,9 @@ export default {
         this.classItem.classesJson.duration &&
         this.classItem.classesJson.duration !== "00:00:00"
       ) {
-        return { backgroundColor: "rgba(204, 35, 35, 1)", height: "10px" };
+        return { backgroundColor: "#B20000", height: "6px" };
       }
-      return { backgroundColor: "#fff", height: "10px" };
+      return { backgroundColor: "#fff", height: "6px" };
     },
   },
   mounted() {
@@ -407,6 +403,7 @@ export default {
 <style lang="scss" scoped>
 .class-schedule-card-container {
   margin-bottom: 5px;
+  margin-top: 5px;
   .sport-drap-handle {
     display: none;
   }
@@ -422,6 +419,7 @@ export default {
   border-radius: 5px;
   box-shadow: 0px 2px 6px 0px #00000026;
   background-color: #fff;
+  padding-bottom: 10px;
 
   &:hover {
     transform: scale(1.02);
@@ -433,9 +431,8 @@ export default {
 
   .card-body {
     width: 100%;
-    padding-left: 2px;
-    padding-right: 2px;
     padding-bottom: 5px;
+    padding: 0 10px;
 
     .body-title {
       display: flex;
@@ -481,19 +478,33 @@ export default {
     }
 
     .title {
-      font-size: 14px;
-      font-weight: bold;
+      font-size: 15px;
+      font-weight: 400;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-left: 6px;
+      font-family: PingFang SC;
+      font-style: Regular;
+      color: #101010;
     }
 
     .keyword {
       font-size: 12px;
       font-weight: bold;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 13px;
+      letter-spacing: 0%;
+      vertical-align: middle;
+      color: #101010;
+      margin-top: 4px;
     }
 
     .stage-details-p {
-      font-size: 12px;
-      color: #999;
-      padding: 5px 5px 0;
+      // padding: 5px 5px 0;
       line-height: 16px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -502,6 +513,12 @@ export default {
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 5;
       line-clamp: 5;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 12px;
+      color: #101010;
+
       // margin-bottom: 5px;
     }
   }
@@ -511,8 +528,25 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  .el-button {
-    margin-left: 0;
+  .btn-list-hover-item {
+    width: 60px;
+    height: 32px;
+    border-radius: 5px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    text-align: center;
+    line-height: 32px;
+    color: #101010;
+    cursor: pointer;
+    &:hover {
+      background-color: #c3c9d740;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+    }
   }
 }
 
@@ -528,25 +562,29 @@ export default {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   z-index: 99999;
   padding: 4px 0;
-  min-width: 120px;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .context-menu-item {
-    padding: 8px 16px;
+    width: 60px;
+    height: 32px;
+    border-radius: 5px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
     font-size: 14px;
-    color: #cc2323;
+    text-align: center;
+    line-height: 32px;
+    color: #101010;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-
-    i {
-      font-size: 16px;
-    }
-
     &:hover {
-      background-color: #f5f7fa;
-      color: #cc2323;
+      background-color: #c3c9d740;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
     }
   }
 }

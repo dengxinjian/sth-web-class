@@ -49,16 +49,11 @@
           ></i>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item @click.native="logout">
-            <el-button type="primary" size="small" style="width: 100%">{{
-              $t("navbar.logOut")
-            }}</el-button>
-          </el-dropdown-item>
           <el-dropdown-item @click.native="changeIdentify">
             <el-button
               type="primary"
               size="small"
-              style="width: 100%; margin-top: 10px; border: none"
+              style="width: 100%; margin-bottom: 10px; border: none"
               :style="{
                 background:
                   loginType === '1'
@@ -68,6 +63,12 @@
               class="change-identify-button"
               >{{ `切换成${loginType == "1" ? "教练" : "运动员"}` }}</el-button
             >
+          </el-dropdown-item>
+
+          <el-dropdown-item @click.native="logout">
+            <el-button type="info" size="small" style="width: 100%">{{
+              $t("navbar.logOut")
+            }}</el-button>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>

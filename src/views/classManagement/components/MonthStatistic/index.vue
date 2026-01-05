@@ -7,7 +7,7 @@
     :close-on-click-modal="false"
     class="month-statistic-dialog"
   >
-    <span slot="title">月度统计</span>
+    <span slot="title" class="month-statistic-title">运动数据统计</span>
 
     <div class="statistic-content">
       <!-- 统计数据展示 -->
@@ -17,15 +17,28 @@
         class="month-data-item"
       >
         <div class="month-data-text">
-          <span>{{ item.title }}:</span>
+          <div style="display: flex; align-items: center">
+            <img
+              :src="item.icon"
+              alt=""
+              v-if="item.icon"
+              style="width: 24px; height: 24px; margin-right: 10px"
+            />{{ item.title }}:
+          </div>
           <div>
             <span
               >{{ item.actualValue }}
-              {{ item.key === "totalSTH" ? item.actualValueUnit : item.unit }}</span
+              {{
+                item.key === "totalSTH" ? item.actualValueUnit : item.unit
+              }}</span
             >
+          </div>
+          <div>
             <span style="padding-left: 5px"
               >{{ item.planValue || 0 }}
-              {{ item.key === "totalSTH" ? item.planValueUnit : item.unit }}</span
+              {{
+                item.key === "totalSTH" ? item.planValueUnit : item.unit
+              }}</span
             >
           </div>
         </div>
@@ -142,19 +155,26 @@ export default {
               if (item.key === "totalSTH") {
                 return {
                   ...item,
-                  actualValue: parseInt(item.actualValue) > 100000 ? unitConversion(
-                    actualValue,
-                    statisticKeyToTitle[item.key]?.unit
-                  ) : item.actualValue,
-                  actualValueUnit: parseInt(item.actualValue) > 100000 ? "万" : "",
+                  actualValue:
+                    parseInt(item.actualValue) > 100000
+                      ? unitConversion(
+                          actualValue,
+                          statisticKeyToTitle[item.key]?.unit
+                        )
+                      : item.actualValue,
+                  actualValueUnit:
+                    parseInt(item.actualValue) > 100000 ? "万" : "",
                   title: statisticKeyToTitle[item.key]?.title,
                   color: statisticKeyToTitle[item.key]?.color,
                   icon: statisticKeyToTitle[item.key]?.icon,
                   unit: statisticKeyToTitle[item.key]?.unit,
-                  planValue: parseInt(item.planValue) > 100000 ? unitConversion(
-                    planValue,
-                    statisticKeyToTitle[item.key]?.unit
-                  ) : item.planValue,
+                  planValue:
+                    parseInt(item.planValue) > 100000
+                      ? unitConversion(
+                          planValue,
+                          statisticKeyToTitle[item.key]?.unit
+                        )
+                      : item.planValue,
                   planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
                 };
               }
@@ -206,6 +226,12 @@ export default {
 </script>
 
 <style scoped>
+.month-statistic-title {
+  font-family: PingFang SC;
+  font-weight: 600;
+  font-style: Semibold;
+  font-size: 16px;
+}
 .month-statistic-dialog ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
 }
@@ -225,6 +251,9 @@ export default {
 
 .statistic-content {
   padding: 20px 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 30px;
 }
 
 .month-data-sth {
@@ -281,44 +310,50 @@ export default {
 }
 
 .month-data-item {
-  margin-bottom: 15px;
+  margin-bottom: 0;
 }
 
 .month-data-text {
   display: flex;
   flex-direction: row;
   gap: 5px;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
+  justify-content: space-between;
 }
 
 .month-data-text div {
-  text-align: right;
+  /* text-align: right; */
 }
 
 .month-data-text span,
 .month-data-text div {
-  flex: 1;
-  font-size: 12px;
-  color: #333;
+  /* flex: 1; */
+  font-family: PingFang SC;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 14px;
+  line-height: 14px;
+  color: #101010;
 }
-
-.month-data-text span:nth-child(2) {
-  color: #999;
-}
-
-.month-data-text > span {
-  font-family: PingFangSC, PingFang SC;
-  font-weight: 500;
-  color: #000000;
-}
+/* ::v-deep(.el-dialog__footer) {
+  padding: 0px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+} */
 
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  /* padding: 10px 24px; */
 }
 
 .dialog-footer .el-button {
-  min-width: 120px;
-  border-radius: 22px;
+  min-width: 100px;
+  border-radius: 5px;
+  font-family: PingFang SC;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 14px;
+  color: #101010;
 }
 </style>

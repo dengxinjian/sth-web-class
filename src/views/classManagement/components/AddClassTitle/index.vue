@@ -152,6 +152,8 @@ export default {
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  /* justify-content: center; */
+  /* justify-content: space-between; */
 }
 </style>

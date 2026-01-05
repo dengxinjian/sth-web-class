@@ -43,7 +43,7 @@
           </div>
         </div>
 
-        <div style="width: 100%">
+        <div>
           <div class="schedule-top">
             <div
               style="
@@ -442,14 +442,14 @@ import {
   groupApi,
   competitionApi,
 } from "./services/classManagement";
-import { ACTIVITY_TYPE_DICT ,DEVICE_TYPE_DICT} from "./constants";
+import { ACTIVITY_TYPE_DICT, DEVICE_TYPE_DICT } from "./constants";
 import {
   parseClassesJson,
   isSportTypeMatch,
   generateSortData,
   getCompletionStatus,
   getSportTypeName,
-  getDeviceBrandIcon
+  getDeviceBrandIcon,
 } from "./utils/helpers";
 import { getLunarDate, secondsToHHMMSS } from "@/utils/index";
 import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
@@ -2883,6 +2883,11 @@ export default {
 </style>
 
 <style lang="scss">
+.device-brand-icon {
+  width: 22px;
+  margin-right: 10px;
+}
+
 .health-view-dialog {
   margin-top: 5vh !important;
   border-radius: 8px;

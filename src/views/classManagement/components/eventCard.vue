@@ -17,15 +17,13 @@
         :data-date="date"
         draggable="true"
         data-type="event"
+        :style="
+          eventItem.hasBind
+            ? 'background: linear-gradient(114.04deg, #FFD657 0%, #FFECB0 32.71%, #FFD657 65.42%)'
+            : ''
+        "
       >
-        <div
-          class="card-body class-drap-handle"
-          :style="
-            eventItem.hasBind
-              ? 'background: linear-gradient(114.04deg, #FFD657 0%, #FFECB0 32.71%, #FFD657 65.42%)'
-              : ''
-          "
-        >
+        <div class="card-body class-drap-handle">
           <!-- 标题栏 -->
           <div class="body-title">
             <div
@@ -78,122 +76,128 @@
                   删除
                 </el-button>
               </div>
-              <i class="el-icon-more" slot="reference" @click.stop></i>
+              <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
+              <img
+                src="@/assets/addClass/Component 117.png"
+                alt=""
+                @click.stop
+                slot="reference"
+                style="width: 16px; height: 16px"
+              />
             </el-popover>
           </div>
           <!-- 课程标题 -->
           <div class="title">
             {{ eventItem.competitionName }}
           </div>
-
-          <div
-            class="activity-info"
-            v-if="eventItem.hasBind"
-            style="margin-top: 10px"
-          >
-            <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem
-                .deviceActivityBindView.swim"
-              :key="`activity--${
-                activityItem.activityId ||
-                activityItem.manualActivityId ||
-                activityIndex
-              }-${
-                activityItem.classScheduleId || 'unmatched'
-              }-${!!activityItem.classesJson}-${Date.now()}`"
-              :activity="activityItem"
-              :data-id="eventItem.id"
-              :data-date="date"
-              draggable="true"
-              data-type="event"
-              @click="handleClickActivity"
-            />
-            <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem
-                .deviceActivityBindView.otherT1"
-              :key="`activity--${
-                activityItem.activityId ||
-                activityItem.manualActivityId ||
-                activityIndex
-              }-${
-                activityItem.classScheduleId || 'unmatched'
-              }-${!!activityItem.classesJson}-${Date.now()}`"
-              :activity="activityItem"
-              :data-id="eventItem.id"
-              :data-date="date"
-              draggable="true"
-              data-type="event"
-              @click="handleClickActivity"
-            />
-            <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem
-                .deviceActivityBindView.cycle"
-              :key="`activity--${
-                activityItem.activityId ||
-                activityItem.manualActivityId ||
-                activityIndex
-              }-${
-                activityItem.classScheduleId || 'unmatched'
-              }-${!!activityItem.classesJson}-${Date.now()}`"
-              :activity="activityItem"
-              :data-id="eventItem.id"
-              :data-date="date"
-              draggable="true"
-              data-type="event"
-              @click="handleClickActivity"
-            />
-            <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem
-                .deviceActivityBindView.otherT2"
-              :key="`activity--${
-                activityItem.activityId ||
-                activityItem.manualActivityId ||
-                activityIndex
-              }-${
-                activityItem.classScheduleId || 'unmatched'
-              }-${!!activityItem.classesJson}-${Date.now()}`"
-              :activity="activityItem"
-              :data-id="eventItem.id"
-              :data-date="date"
-              draggable="true"
-              data-type="event"
-              @click="handleClickActivity"
-            />
-            <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem
-                .deviceActivityBindView.run"
-              :key="`activity--${
-                activityItem.activityId ||
-                activityItem.manualActivityId ||
-                activityIndex
-              }-${
-                activityItem.classScheduleId || 'unmatched'
-              }-${!!activityItem.classesJson}-${Date.now()}`"
-              :activity="activityItem"
-              :data-id="eventItem.id"
-              :data-date="date"
-              draggable="true"
-              data-type="event"
-              @click="handleClickActivity"
-            />
-            <EventActivityCard
-              v-for="(activityItem, activityIndex) in eventItem
-                .deviceActivityBindView.strength"
-              :key="`activity--${
-                activityItem.activityId ||
-                activityItem.manualActivityId ||
-                activityIndex
-              }-${
-                activityItem.classScheduleId || 'unmatched'
-              }-${!!activityItem.classesJson}-${Date.now()}`"
-              :activity="activityItem"
-              :data-id="eventItem.id"
-              :data-date="date"
-              draggable="true"
-              data-type="event"
-              @click="handleClickActivity"
-            />
-          </div>
+        </div>
+        <div
+          class="activity-info"
+          v-if="eventItem.hasBind"
+          style="margin-top: 10px"
+        >
+          <EventActivityCard
+            v-for="(activityItem, activityIndex) in eventItem
+              .deviceActivityBindView.swim"
+            :key="`activity--${
+              activityItem.activityId ||
+              activityItem.manualActivityId ||
+              activityIndex
+            }-${
+              activityItem.classScheduleId || 'unmatched'
+            }-${!!activityItem.classesJson}-${Date.now()}`"
+            :activity="activityItem"
+            :data-id="eventItem.id"
+            :data-date="date"
+            draggable="true"
+            data-type="event"
+            @click="handleClickActivity"
+          />
+          <EventActivityCard
+            v-for="(activityItem, activityIndex) in eventItem
+              .deviceActivityBindView.otherT1"
+            :key="`activity--${
+              activityItem.activityId ||
+              activityItem.manualActivityId ||
+              activityIndex
+            }-${
+              activityItem.classScheduleId || 'unmatched'
+            }-${!!activityItem.classesJson}-${Date.now()}`"
+            :activity="activityItem"
+            :data-id="eventItem.id"
+            :data-date="date"
+            draggable="true"
+            data-type="event"
+            @click="handleClickActivity"
+          />
+          <EventActivityCard
+            v-for="(activityItem, activityIndex) in eventItem
+              .deviceActivityBindView.cycle"
+            :key="`activity--${
+              activityItem.activityId ||
+              activityItem.manualActivityId ||
+              activityIndex
+            }-${
+              activityItem.classScheduleId || 'unmatched'
+            }-${!!activityItem.classesJson}-${Date.now()}`"
+            :activity="activityItem"
+            :data-id="eventItem.id"
+            :data-date="date"
+            draggable="true"
+            data-type="event"
+            @click="handleClickActivity"
+          />
+          <EventActivityCard
+            v-for="(activityItem, activityIndex) in eventItem
+              .deviceActivityBindView.otherT2"
+            :key="`activity--${
+              activityItem.activityId ||
+              activityItem.manualActivityId ||
+              activityIndex
+            }-${
+              activityItem.classScheduleId || 'unmatched'
+            }-${!!activityItem.classesJson}-${Date.now()}`"
+            :activity="activityItem"
+            :data-id="eventItem.id"
+            :data-date="date"
+            draggable="true"
+            data-type="event"
+            @click="handleClickActivity"
+          />
+          <EventActivityCard
+            v-for="(activityItem, activityIndex) in eventItem
+              .deviceActivityBindView.run"
+            :key="`activity--${
+              activityItem.activityId ||
+              activityItem.manualActivityId ||
+              activityIndex
+            }-${
+              activityItem.classScheduleId || 'unmatched'
+            }-${!!activityItem.classesJson}-${Date.now()}`"
+            :activity="activityItem"
+            :data-id="eventItem.id"
+            :data-date="date"
+            draggable="true"
+            data-type="event"
+            @click="handleClickActivity"
+          />
+          <EventActivityCard
+            v-for="(activityItem, activityIndex) in eventItem
+              .deviceActivityBindView.strength"
+            :key="`activity--${
+              activityItem.activityId ||
+              activityItem.manualActivityId ||
+              activityIndex
+            }-${
+              activityItem.classScheduleId || 'unmatched'
+            }-${!!activityItem.classesJson}-${Date.now()}`"
+            :activity="activityItem"
+            :data-id="eventItem.id"
+            :data-date="date"
+            draggable="true"
+            data-type="event"
+            @click="handleClickActivity"
+          />
         </div>
       </div>
     </div>
@@ -478,6 +482,8 @@ export default {
   background-color: #ffffff;
   margin-top: 10px;
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
+  padding-bottom: 10px;
+  // padding: 0 10px;
 
   &:hover:not(.is-dragging) {
     transform: scale(1.02);
@@ -498,6 +504,7 @@ export default {
     // padding-left: 2px;
     // padding-right: 2px;
     padding-bottom: 5px;
+    padding: 0 10px;
 
     .body-title {
       display: flex;
@@ -558,8 +565,13 @@ export default {
     }
 
     .title {
-      font-size: 14px;
-      font-weight: bold;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 15px;
+      letter-spacing: 0%;
+      vertical-align: middle;
+      color: #101010;
     }
 
     .keyword {

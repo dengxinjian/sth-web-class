@@ -22,8 +22,26 @@
         <div class="calendar-title">
           <span class="nav-arrow" @click.stop="goPrevMonthInCalendar">&lt;</span>
           <div class="date-text">
-            <span>{{ selectedYear }}年</span>
-            <span>{{ selectedMonth }}月</span>
+            <select
+              class="year-select"
+              :value="selectedYear"
+              @change="handleYearChangeInCalendar"
+              @click.stop
+            >
+              <option v-for="year in yearOptions" :key="year" :value="year">
+                {{ year }}年
+              </option>
+            </select>
+            <select
+              class="month-select"
+              :value="selectedMonth"
+              @change="handleMonthChangeInCalendar"
+              @click.stop
+            >
+              <option v-for="month in monthOptions" :key="month" :value="month">
+                {{ month }}月
+              </option>
+            </select>
           </div>
           <span class="nav-arrow" @click.stop="goNextMonthInCalendar">&gt;</span>
         </div>
@@ -79,11 +97,11 @@ export default {
   props: {
     minYear: {
       type: Number,
-      default: () => new Date().getFullYear() - 5,
+      default: () => new Date().getFullYear() - 10,
     },
     maxYear: {
       type: Number,
-      default: () => new Date().getFullYear() + 5,
+      default: () => new Date().getFullYear() + 10,
     },
     valueFormat: {
       // 返回日期的格式，暂仅支持 'YYYY-MM-DD'
@@ -123,6 +141,9 @@ export default {
       }
       return options;
     },
+    monthOptions() {
+      return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    },
     // 计算日历日期数组
     calendarDates() {
       const dates = [];
@@ -147,14 +168,19 @@ export default {
       for (let i = firstDayOfWeek - 1; i >= 0; i--) {
         const day = prevMonthLastDay - i;
         const date = new Date(year, month - 2, day);
+        const dateStr = this.formatDate(date);
+        const isToday = date.getTime() === today.getTime();
+        const isSelected = this.selectedDates.includes(dateStr);
+        const isInRange = this.isDateInSelectedWeek(dateStr);
+
         dates.push({
           day,
           date,
-          dateStr: this.formatDate(date),
+          dateStr,
           isCurrentMonth: false,
-          isToday: false,
-          isSelected: false,
-          isInRange: false,
+          isToday,
+          isSelected,
+          isInRange,
         });
       }
 
@@ -181,14 +207,19 @@ export default {
       const remainingDays = 42 - dates.length;
       for (let day = 1; day <= remainingDays; day++) {
         const date = new Date(year, month, day);
+        const dateStr = this.formatDate(date);
+        const isToday = date.getTime() === today.getTime();
+        const isSelected = this.selectedDates.includes(dateStr);
+        const isInRange = this.isDateInSelectedWeek(dateStr);
+
         dates.push({
           day,
           date,
-          dateStr: this.formatDate(date),
+          dateStr,
           isCurrentMonth: false,
-          isToday: false,
-          isSelected: false,
-          isInRange: false,
+          isToday,
+          isSelected,
+          isInRange,
         });
       }
 
@@ -339,7 +370,7 @@ export default {
       });
     },
 
-    // 日历中的前一月（不触发week-change）
+    // 日历中的前一月
     goPrevMonthInCalendar() {
       if (this.selectedMonth === 1) {
         this.selectedYear--;
@@ -347,10 +378,14 @@ export default {
       } else {
         this.selectedMonth--;
       }
-      this.recomputeWeeks();
+      this.recomputeWeeks(() => {
+        // 切换月份后，选择该月的第一周
+        this.selectedWeekIndex = 0;
+        this.updateSelectedWeek();
+      });
     },
 
-    // 日历中的后一月（不触发week-change）
+    // 日历中的后一月
     goNextMonthInCalendar() {
       if (this.selectedMonth === 12) {
         this.selectedYear++;
@@ -358,7 +393,31 @@ export default {
       } else {
         this.selectedMonth++;
       }
-      this.recomputeWeeks();
+      this.recomputeWeeks(() => {
+        // 切换月份后，选择该月的第一周
+        this.selectedWeekIndex = 0;
+        this.updateSelectedWeek();
+      });
+    },
+
+    // 处理日历中年份选择变化
+    handleYearChangeInCalendar(event) {
+      this.selectedYear = parseInt(event.target.value, 10);
+      this.recomputeWeeks(() => {
+        // 切换年份后，选择该月的第一周
+        this.selectedWeekIndex = 0;
+        this.updateSelectedWeek();
+      });
+    },
+
+    // 处理日历中月份选择变化
+    handleMonthChangeInCalendar(event) {
+      this.selectedMonth = parseInt(event.target.value, 10);
+      this.recomputeWeeks(() => {
+        // 切换月份后，选择该月的第一周
+        this.selectedWeekIndex = 0;
+        this.updateSelectedWeek();
+      });
     },
 
     // 更新选中的周
@@ -500,7 +559,7 @@ export default {
                 this.selectedWeekIndex + 1,
                 "周"
               );
-              this.emitWeekChange();
+              this.updateSelectedWeek();
             });
             return;
           }
@@ -516,7 +575,7 @@ export default {
           this.selectedWeekIndex + 1,
           "周"
         );
-        this.emitWeekChange();
+        this.updateSelectedWeek();
       });
     },
     navigateToDate(targetDate) {
@@ -534,7 +593,7 @@ export default {
             idx = this.findWeekIndexByDateValue(targetDate);
           }
           this.selectedWeekIndex = idx >= 0 ? idx : 0;
-          this.emitWeekChange();
+          this.updateSelectedWeek();
         });
       } else {
         // 如果年份月份相同，只需要更新周索引
@@ -544,7 +603,7 @@ export default {
         }
         if (idx >= 0 && this.selectedWeekIndex !== idx) {
           this.selectedWeekIndex = idx;
-          this.emitWeekChange();
+          this.updateSelectedWeek();
         }
       }
     },
@@ -766,6 +825,8 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   padding: 16px;
+  padding-left: 0;
+  padding-right: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 }
@@ -779,7 +840,6 @@ export default {
   font-size: 14px;
   font-weight: 500;
   color: #333;
-  margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid #f0f0f0;
 
@@ -808,6 +868,39 @@ export default {
     font-size: 14px;
     font-weight: 500;
     color: #333;
+  }
+
+  .year-select,
+  .month-select {
+    padding: 4px 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .year-select:hover,
+  .month-select:hover {
+    border-color: #40a9ff;
+  }
+
+  .year-select:focus,
+  .month-select:focus {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+  }
+
+  .year-select {
+    min-width: 80px;
+  }
+
+  .month-select {
+    min-width: 65px;
   }
 }
 

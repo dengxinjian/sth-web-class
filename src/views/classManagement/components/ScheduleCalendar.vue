@@ -159,7 +159,8 @@
                 @click="handleAddSchedule(item.commonDate)"
               >
                 <div class="box-plus-circle">
-                  <div class="box-plus">+</div>
+                  <!-- <div class="box-plus">+</div> -->
+                   <img src="~@/assets/addClass/add-circle.png" alt="" style="width: 24px;height: 24px;">
                 </div>
               </div>
             </div>
@@ -180,7 +181,6 @@
                     hideContextMenu();
                   "
                 >
-                  <i class="el-icon-plus"></i>
                   <span>添加</span>
                 </div>
                 <!-- 录入运动 只有在当前日期小于等于今天时才显示-->
@@ -194,7 +194,6 @@
                     hideContextMenu();
                   "
                 >
-                  <i class="el-icon-plus"></i>
                   <span>录入运动</span>
                 </div>
                 <div
@@ -202,7 +201,6 @@
                   class="context-menu-item"
                   @click="handlePaste"
                 >
-                  <i class="el-icon-document-copy"></i>
                   <span>粘贴</span>
                 </div>
               </div>
@@ -586,6 +584,7 @@ export default {
     display: flex;
     flex-direction: column;
     min-width: 190px;
+    max-width: 190px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
@@ -752,35 +751,39 @@ export default {
 }
 
 .context-menu {
-  position: fixed;
+  position: absolute;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   z-index: 99999;
   padding: 4px 0;
-  min-width: 120px;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .context-menu-item {
-    padding: 8px 16px;
+    width: 60px;
+    height: 32px;
+    border-radius: 5px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
     font-size: 14px;
-    color: #cc2323;
+    text-align: center;
+    line-height: 32px;
+    color: #101010;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-
-    i {
-      font-size: 16px;
-    }
-
     &:hover {
-      background-color: #f5f7fa;
-      color: #cc2323;
+      background-color: #c3c9d740;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
     }
   }
 }
-
 .context-menu-fade-enter-active,
 .context-menu-fade-leave-active {
   transition: opacity 0.2s ease;
