@@ -80,7 +80,8 @@ export const scheduleApi = {
     return getData({
       url: "/gateway/training/health",
       deviceType,
-      date,
+      startDate: date,
+      endDate: date,
       triUserId,
     });
   },
@@ -279,7 +280,7 @@ export const competitionApi = {
       headers: {
         requestUserInfoId: triUserId,
       },
-    })
+    });
   },
 
   // 更新赛事
@@ -296,7 +297,7 @@ export const competitionApi = {
       },
       method: "put",
       data,
-    })
+    });
   },
   // 删除赛事
   deleteCompetition(id) {
