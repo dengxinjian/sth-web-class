@@ -608,7 +608,7 @@ export default {
       // 处理 competitionDistanceValue：确保是正确的数值
       let competitionDistanceValue = eventItem.competitionDistanceValue;
       if (typeof competitionDistanceValue === "string") {
-        competitionDistanceValue = parseFloat(competitionDistanceValue) || "";
+        competitionDistanceValue = parseFloat(competitionDistanceValue) || 0;
       }
       // 如果单位是 km，需要转换为米（但这里应该保持原值，因为 API 可能已经处理）
       // 根据 addEvent.vue，如果单位是 km，customDistance * 1000，但这里 eventItem 应该已经是正确的值
