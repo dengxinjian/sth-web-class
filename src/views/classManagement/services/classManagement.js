@@ -111,7 +111,7 @@ export const scheduleApi = {
   // 运动详细
   getActivityDetail(activityId) {
     return getData({
-      url: "/gateway/training/classSchedule/getActivityDetail",
+      url: "/gateway/training/activity/getActivityDetail",
       activityId,
     });
   },
