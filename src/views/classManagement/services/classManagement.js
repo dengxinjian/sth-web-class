@@ -266,7 +266,7 @@ export const competitionApi = {
   // 查询赛事详情
   getCompetitionDetail(id) {
     return request({
-      url: `/consumer/api/competition/${id}`,
+      url: `/gateway/competition/${id}`,
       method: "get",
     });
   },
@@ -309,14 +309,14 @@ export const competitionApi = {
   // 赛事绑定运动
   bindActivity(data) {
     return submitData({
-      url: "/training/api/activity/activityBindCompetition",
+      url: "/gateway/training/web/activity/activityBindCompetition",
       requestData: data,
     });
   },
   // 赛事解绑运动
   unbindActivity(data) {
     return submitData({
-      url: "/training/api/activity/activityUnBindCompetition",
+      url: "/gateway/training/web/activity/activityUnBindCompetition",
       requestData: data,
     });
   },
@@ -331,7 +331,7 @@ export const competitionApi = {
   // 赛事运动位置移动
   moveActivityPosition(data) {
     return request({
-      url: "/training/api/activity/changeTransitionNode",
+      url: "/training/api/activity/web/changeTransitionNode",
       method: "post",
       data,
     });
