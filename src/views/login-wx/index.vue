@@ -219,7 +219,7 @@ export default {
     handleMiniprogramCode() {
       if (this.unionid) {
         getData({
-          url: "/consumer/api/wechat/getByUnionid",
+          url: "/gateway/wechat/getByUnionid",
           unionid: this.unionid,
         })
           .then((res) => {
@@ -284,7 +284,7 @@ export default {
 
       try {
         const res = await getData({
-          url: `/consumer/api/wechat/wechatScanLogin/${this.sceneId}`,
+          url: `/gateway/wechat/wechatScanLogin/${this.sceneId}`,
         });
 
         if (res.code === "100000" && res.result && res.result) {
