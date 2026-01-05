@@ -146,7 +146,7 @@ export default {
 
 <style lang="scss" scoped>
 .schedule-class {
-  background-color: #f8f8f8;
+  background-color: #fff;
   margin-bottom: 10px;
   padding: 5px 10px;
   border-radius: 6px;
@@ -156,9 +156,15 @@ export default {
     display: flex;
     gap: 6px;
     justify-content: space-between;
+    margin-bottom: 10px;
 
     > div {
       flex: 1;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 14px;
+      line-height: 14px;
     }
   }
 
@@ -167,6 +173,7 @@ export default {
     justify-content: flex-start;
     gap: 10px;
     align-items: center;
+    margin-bottom: 10px;
 
     img {
       width: 20px;
@@ -195,6 +202,9 @@ export default {
   }
 }
 
+.schedule-class:hover {
+  background-color: #c3c9d740;
+}
 .btn-list-hover {
   display: flex;
   flex-direction: column;

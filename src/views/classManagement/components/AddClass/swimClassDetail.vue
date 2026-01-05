@@ -297,7 +297,7 @@ export default {
     // 获取标签列表
     getTagList() {
       getData({
-        url: "/training/api/classesLabel/user/getLabelsByUserId",
+        url: "/api/classesLabel/user/getLabelsByUserId",
       }).then((res) => {
         if (res.success) {
           this.existingTags = res.result || [];

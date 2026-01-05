@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="600px"
+    width="880px"
     :before-close="handleClose"
     append-to-body
     class="athletic-info-dialog"
@@ -11,131 +11,138 @@
     <el-tabs v-model="activeMainTab" @tab-click="handleTabClick">
       <el-tab-pane label="运动偏好" name="preference">
         <div class="preference-form">
-          <div class="section-title">{{ matchTypeToName[lastMatchType] }}</div>
+          <div class="section-header">
+            <div class="section-title">{{ matchTypeToName[lastMatchType] }}</div>
+            <div class="section-count">
+              <span>综合次数</span>
+              <span class="count-value">{{ totalTrainingCount }}</span>
+            </div>
+          </div>
 
-          <div
-            class="form-row"
-            v-if="lastMatchType === 2 || lastMatchType === 3"
-          >
-            <span class="form-label">游泳训练次数偏好设置</span>
-            <el-input-number
-              v-model="preferenceForm.swimTimes"
-              :min="0"
-              :max="14"
-              :step="1"
-              :precision="0"
-              controls-position="right"
-              class="count-input"
-              @keydown.native="preventDecimal"
-            />
+          <div class="form-grid">
+            <div
+              class="form-row"
+              v-if="lastMatchType === 2 || lastMatchType === 3"
+            >
+              <span class="form-label">游泳训练次数偏好设置</span>
+              <el-input-number
+                v-model="preferenceForm.swimTimes"
+                :min="0"
+                :max="14"
+                :step="1"
+                :precision="0"
+                controls-position="right"
+                class="count-input"
+                @keydown.native="preventDecimal"
+              />
+            </div>
+
+            <div
+              class="form-row"
+              v-if="lastMatchType === 2 || lastMatchType === 4"
+            >
+              <span class="form-label">骑行训练次数偏好设置</span>
+              <el-input-number
+                v-model="preferenceForm.cycleTimes"
+                :min="0"
+                :max="14"
+                :step="1"
+                :precision="0"
+                controls-position="right"
+                class="count-input"
+                @keydown.native="preventDecimal"
+              />
+            </div>
+
+            <div
+              class="form-row"
+              v-if="lastMatchType === 1 || lastMatchType === 2"
+            >
+              <span class="form-label">跑步训练次数偏好设置</span>
+              <el-input-number
+                v-model="preferenceForm.runTimes"
+                :min="0"
+                :max="14"
+                :step="1"
+                :precision="0"
+                controls-position="right"
+                class="count-input"
+                @keydown.native="preventDecimal"
+              />
+            </div>
+
+            <div class="form-row">
+              <span class="form-label">力量训练次数偏好设置</span>
+              <el-input-number
+                v-model="preferenceForm.strengthTimes"
+                :min="0"
+                :max="14"
+                :step="1"
+                :precision="0"
+                controls-position="right"
+                class="count-input"
+                @keydown.native="preventDecimal"
+              />
+            </div>
           </div>
 
           <div
-            class="form-row"
-            v-if="lastMatchType === 2 || lastMatchType === 4"
-          >
-            <span class="form-label">骑行训练次数偏好设置</span>
-            <el-input-number
-              v-model="preferenceForm.cycleTimes"
-              :min="0"
-              :max="14"
-              :step="1"
-              :precision="0"
-              controls-position="right"
-              class="count-input"
-              @keydown.native="preventDecimal"
-            />
-          </div>
-
-          <div
-            class="form-row"
-            v-if="lastMatchType === 1 || lastMatchType === 2"
-          >
-            <span class="form-label">跑步训练次数偏好设置</span>
-            <el-input-number
-              v-model="preferenceForm.runTimes"
-              :min="0"
-              :max="14"
-              :step="1"
-              :precision="0"
-              controls-position="right"
-              class="count-input"
-              @keydown.native="preventDecimal"
-            />
-          </div>
-
-          <div class="form-row">
-            <span class="form-label">力量训练次数偏好设置</span>
-            <el-input-number
-              v-model="preferenceForm.strengthTimes"
-              :min="0"
-              :max="14"
-              :step="1"
-              :precision="0"
-              controls-position="right"
-              class="count-input"
-              @keydown.native="preventDecimal"
-            />
-          </div>
-
-          <div class="form-row total-row">
-            <span class="form-label">综合次数：</span>
-            <span class="total-count">{{ totalTrainingCount }}</span>
-          </div>
-
-          <div
-            class="section-title"
+            class="section-header"
             v-if="
               lastMatchType === 1 || lastMatchType === 2 || lastMatchType === 4
             "
           >
-            长距离偏好设置
+            <div class="section-title">长距离偏好设置</div>
           </div>
 
-          <div
-            class="form-row"
-            v-if="lastMatchType === 1 || lastMatchType === 2"
-          >
-            <span class="form-label">长距离跑步</span>
-            <el-select
-              v-model="preferenceForm.runLongDays"
-              placeholder="请选择"
-              class="week-select"
+          <div class="form-grid">
+            <div
+              class="form-row"
+              v-if="lastMatchType === 1 || lastMatchType === 2"
             >
-              <el-option label="无" :value="0" />
-              <el-option
-                v-for="day in availableDaysForLongDistance"
-                :key="'run-' + day.value"
-                :label="day.label"
-                :value="day.value"
-              />
-            </el-select>
-          </div>
+              <span class="form-label">长距离跑步</span>
+              <el-select
+                v-model="preferenceForm.runLongDays"
+                placeholder="请选择"
+                class="week-select"
+              >
+                <el-option label="无" :value="0" />
+                <el-option
+                  v-for="day in availableDaysForLongDistance"
+                  :key="'run-' + day.value"
+                  :label="day.label"
+                  :value="day.value"
+                />
+              </el-select>
+            </div>
 
-          <div
-            class="form-row"
-            v-if="lastMatchType === 2 || lastMatchType === 4"
-          >
-            <span class="form-label">长距离骑行</span>
-            <el-select
-              v-model="preferenceForm.cycleLongDays"
-              placeholder="请选择"
-              class="week-select"
+            <div
+              class="form-row"
+              v-if="lastMatchType === 2 || lastMatchType === 4"
             >
-              <el-option label="无" :value="0" />
+              <span class="form-label">长距离骑行</span>
+              <el-select
+                v-model="preferenceForm.cycleLongDays"
+                placeholder="请选择"
+                class="week-select"
+              >
+                <el-option label="无" :value="0" />
 
-              <el-option
-                v-for="day in availableDaysForLongDistance"
-                :key="'bike-' + day.value"
-                :label="day.label"
-                :value="day.value"
-              />
-            </el-select>
+                <el-option
+                  v-for="day in availableDaysForLongDistance"
+                  :key="'bike-' + day.value"
+                  :label="day.label"
+                  :value="day.value"
+                />
+              </el-select>
+            </div>
           </div>
 
-          <div class="section-title">休息日偏好</div>
+          <div class="section-header rest-day-section">
+            <div class="section-title">休息日偏好</div>
+          </div>
 
-          <div class="form-row">
+          <div class="rest-day-radio">
             <el-radio-group
               v-model="preferenceForm.hasRestDay"
               @change="handleHasRestDayChange"
@@ -146,35 +153,20 @@
           </div>
 
           <div v-if="preferenceForm.hasRestDay" class="rest-day-config">
-            <!-- <div class="form-row">
-              <el-select
-                v-model="preferenceForm.restDayCount"
-                placeholder="请选择"
-                class="week-select"
-                @change="handleRestDayCountChange"
-              >
-                <el-option label="一天" :value="1" />
-                <el-option label="两天" :value="2" />
-                <el-option label="三天" :value="3" />
-              </el-select>
-            </div> -->
-
-            <div class="form-row">
-              <el-select
-                v-model="preferenceForm.restDays"
-                multiple
-                :multiple-limit="3"
-                placeholder="长距离日不可选择"
-                class="week-select-multiple"
-              >
-                <el-option
-                  v-for="day in availableRestDays"
-                  :key="'rest-' + day.value"
-                  :label="day.label"
-                  :value="day.value"
-                />
-              </el-select>
-            </div>
+            <el-select
+              v-model="preferenceForm.restDays"
+              multiple
+              :multiple-limit="3"
+              placeholder="长距离日不可选择"
+              class="week-select-multiple"
+            >
+              <el-option
+                v-for="day in availableRestDays"
+                :key="'rest-' + day.value"
+                :label="day.label"
+                :value="day.value"
+              />
+            </el-select>
           </div>
         </div>
       </el-tab-pane>
@@ -899,7 +891,7 @@ export default {
             params.param2 = this.thresholdData.param2;
           }
           submitData({
-            url: "/gateway/user/updateThreshold",
+            url: "/api/user/updateThreshold",
             requestData: params,
           })
             .then((res) => {
@@ -1010,7 +1002,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped >
 .athletic-info-dialog ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
 }
@@ -1158,18 +1150,18 @@ export default {
   padding-left: 0;
   padding-right: 0;
 }
-.dialog-footer {
+/* .dialog-footer {
   display: flex;
-  justify-content: center;
-}
-.dialog-footer .el-button {
+  justify-content: center; */
+/* } */
+/* .dialog-footer .el-button {
   min-width: 120px;
   border-radius: 22px;
-}
-.dialog-footer .el-button--primary {
+} */
+/* .dialog-footer .el-button--primary {
   background: #d83b36;
   border-color: #d83b36;
-}
+} */
 
 .zoneTr {
   display: flex;
@@ -1190,41 +1182,70 @@ export default {
 }
 
 .preference-form {
-  padding: 10px 0;
-  max-height: 400px;
+  max-height: 500px;
+  padding-bottom: 20px;
   overflow-y: auto;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-top: 24px;
+}
+
+.section-header:first-child {
+  margin-top: 0;
 }
 
 .section-title {
   font-size: 16px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 20px;
-  margin-top: 24px;
 }
 
-.section-title:first-child {
-  margin-top: 0;
+.section-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+}
+
+.count-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e65b55;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+  margin-bottom: 24px;
 }
 
 .form-row {
   display: flex;
   align-items: center;
-  margin-bottom: 18px;
+  gap: 12px;
 }
 
 .form-label {
-  flex: 0 0 200px;
+  flex: 0 0 auto;
+  white-space: nowrap;
   color: #333;
   font-size: 14px;
 }
 
 .count-input {
-  width: 240px;
+  flex: 1;
+  min-width: 0;
 }
 
 .count-input ::v-deep(.el-input__inner) {
-  border-radius: 22px;
+  border-radius: 4px;
   height: 40px;
   border: 1px solid #e5e6eb;
   padding: 0 50px 0 16px;
@@ -1237,66 +1258,67 @@ export default {
 }
 
 .week-select {
-  width: 240px;
+  flex: 1;
+  min-width: 0;
 }
 
 .week-select ::v-deep(.el-input__inner) {
-  border-radius: 22px;
+  border-radius: 4px;
   height: 40px;
   border: 1px solid #e5e6eb;
   padding: 0 36px 0 16px;
 }
 
 .week-select-multiple {
-  width: 300px;
+  width: 100%;
 }
 
 .week-select-multiple ::v-deep(.el-input__inner) {
-  border-radius: 22px;
+  border-radius: 4px;
   min-height: 40px;
   border: 1px solid #e5e6eb;
-  padding: 0 36px 0 16px;
-  line-height: 38px;
+  padding: 4px 36px 4px 12px;
+  line-height: 32px;
 }
 
 .week-select-multiple ::v-deep(.el-select__tags) {
   max-width: calc(100% - 40px);
-  padding-left: 8px;
+  padding-left: 4px;
 }
 
 .week-select-multiple ::v-deep(.el-tag) {
   background: #e65b55;
   border-color: #e65b55;
   color: #fff;
-  border-radius: 12px;
+  border-radius: 4px;
   height: 24px;
-  line-height: 24px;
-  margin: 7px 4px 7px 0;
+  line-height: 22px;
+  margin: 4px 4px 4px 0;
+  padding: 0 8px;
+  font-size: 13px;
 }
 
 .week-select-multiple ::v-deep(.el-tag__close) {
   background-color: transparent;
   color: #fff;
+  right: -2px;
 }
 
 .week-select-multiple ::v-deep(.el-tag__close:hover) {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.total-row {
-  margin-top: 12px;
-  margin-bottom: 24px;
+.rest-day-section {
+  margin-top: 32px;
+  margin-bottom: 16px;
 }
 
-.total-count {
-  font-size: 18px;
-  font-weight: 600;
-  color: #e65b55;
+.rest-day-radio {
+  margin-bottom: 16px;
 }
 
 .rest-day-config {
-  margin-left: 20px;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .preference-form ::v-deep(.el-radio) {

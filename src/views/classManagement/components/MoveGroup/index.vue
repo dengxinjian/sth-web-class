@@ -79,7 +79,7 @@ export default {
     },
     getGroupList() {
       getData({
-        url: '/training/api/classesGroup/user/getClassesGroupsByUserId'
+        url: '/api/classesGroup/user/getClassesGroupsByUserId'
       }).then(res => {
         const groups = []
         res.result.forEach(item => {
@@ -146,7 +146,7 @@ export default {
 }
 .dialog-footer{
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 </style>
 

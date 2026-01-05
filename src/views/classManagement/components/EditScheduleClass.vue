@@ -9,9 +9,9 @@
       custom-class="edit-class-dialog"
       top="5vh"
     >
-      <div slot="title" class="dialog-header">
-        <div class="header-title">
-          <!-- <div v-if="classData.classesJson?.title || classData.activityName">
+      <span slot="title" class="dialog-title">课表简介</span>
+      <div class="header-title">
+        <!-- <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input
               type="text"
@@ -27,92 +27,96 @@
               :maxlength="50"
             />
           </div> -->
-          <el-form
-            v-if="classData.classesJson?.title || classData.activityName"
-            ref="titleRef"
-            :model="form"
-            :rules="rules"
-            label-width="70px"
-          >
-            <el-form-item label="标题：" prop="title">
-              <el-input
-                type="text"
-                placeholder="标题"
-                v-model="form.title"
-                :disabled="
-                  !classData.classesJson?.title && !!classData.activityName
-                "
-                :maxlength="50"
-                style="width: 30vw"
-              />
-            </el-form-item>
-          </el-form>
-          <span v-else
-            >{{ getSportTypeName(classData.sportType) }}_手动录入数据</span
-          >
-        </div>
+        <el-form
+          v-if="classData.classesJson?.title || classData.activityName"
+          ref="titleRef"
+          :model="form"
+          :rules="rules"
+          label-width="70px"
+        >
+          <el-form-item label="标题：" prop="title">
+            <el-input
+              type="text"
+              placeholder="标题"
+              v-model="form.title"
+              :disabled="
+                !classData.classesJson?.title && !!classData.activityName
+              "
+              :maxlength="50"
+              style="width: 100%"
+            />
+          </el-form-item>
+        </el-form>
+        <span v-else
+          >{{ getSportTypeName(classData.sportType) }}_手动录入数据</span
+        >
       </div>
 
       <div class="class-detail-content">
         <!-- 顶部关键指标 -->
         <div class="key-metrics">
-          <div class="metric-item">
-            <img
-              class="sport-icon"
-              :src="getSportIcon(classData.sportType)"
-              alt=""
-            />
-          </div>
-          <div class="metric-item">
-            <div class="metric-value" v-if="!isActivity">
-              {{ formatDuration(classData.classesJson?.duration) }}
+          <div style="display: flex; align-items: center; gap: 50px">
+            <div class="metric-item">
+              <img
+                class="sport-icon"
+                :src="getSportIcon(classData.sportType)"
+                alt=""
+              />
             </div>
-            <div class="metric-value" v-else>
-              {{ formatDuration(classData.duration) }}
+            <div class="metric-item">
+              <div class="metric-value" v-if="!isActivity">
+                {{ formatDuration(classData.classesJson?.duration) }}
+              </div>
+              <div class="metric-value" v-else>
+                {{ formatDuration(classData.duration) }}
+              </div>
             </div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-value" v-if="!isActivity">
-              {{
-                scheduleFormatDistance(
-                  classData.classesJson?.distance,
-                  classData.classesJson?.sportType
-                )
-              }}
-              <span
-                v-if="
-                  classData.classesJson?.distanceUnit &&
-                  classData.classesJson.distanceUnit !== 'km'
-                "
-              >
-                {{ classData.classesJson?.distanceUnit }}
-              </span>
-              <span v-else>km</span>
+            <div class="metric-item">
+              <div class="metric-value" v-if="!isActivity">
+                {{
+                  scheduleFormatDistance(
+                    classData.classesJson?.distance,
+                    classData.classesJson?.sportType
+                  )
+                }}
+                <span
+                  v-if="
+                    classData.classesJson?.distanceUnit &&
+                    classData.classesJson.distanceUnit !== 'km'
+                  "
+                >
+                  {{ classData.classesJson?.distanceUnit }}
+                </span>
+                <span v-else>km</span>
+              </div>
+              <div class="metric-value" v-else>
+                {{
+                  actualformatDistance(
+                    classData.preciseDistance,
+                    classData.sportType
+                  )
+                }}
+                <span v-if="classData.sportType === 3"> m </span>
+                <span v-else>km</span>
+              </div>
             </div>
-            <div class="metric-value" v-else>
-              {{
-                actualformatDistance(
-                  classData.preciseDistance,
-                  classData.sportType
-                )
-              }}
-              <span v-if="classData.sportType === 3"> m </span>
-              <span v-else>km</span>
-            </div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-value" v-if="!isActivity">
-              {{ classData.classesJson?.sth || "--" }} STH
-            </div>
-            <div class="metric-value" v-else>
-              {{ classData.sthValue || "--" }} STH
+            <div class="metric-item">
+              <div class="metric-value" v-if="!isActivity">
+                {{ classData.classesJson?.sth || "--" }} STH
+              </div>
+              <div class="metric-value" v-else>
+                {{ classData.sthValue || "--" }} STH
+              </div>
             </div>
           </div>
           <div
             class="metric-item"
             v-if="!isActivity && !isRestType(classData.sportType)"
           >
-            <el-button type="primary" @click="handleEditClassDetail"
+            <el-button
+              type="primary"
+              @click="handleEditClassDetail"
+              class="edit-class-detail-btn"
               >编辑课表详情</el-button
             >
           </div>
@@ -620,14 +624,19 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="deleteClass(classData)" v-if="!isActivity"
-          >删除</el-button
-        >
-        <el-button @click="handleClose">取消</el-button>
-        <el-button type="primary" @click="handleSave(false)">保存</el-button>
-        <el-button type="danger" @click="handleSave(true)"
-          >保存并关闭</el-button
-        >
+        <img
+          src="@/assets/addClass/dele.png"
+          alt=""
+          class="delete-icon"
+          @click="deleteClass(classData)"
+        />
+        <div>
+          <el-button @click="handleClose">取消</el-button>
+          <el-button type="primary" @click="handleSave(false)">保存</el-button>
+          <el-button type="primary" @click="handleSave(true)"
+            >保存并关闭</el-button
+          >
+        </div>
       </div>
     </el-dialog>
     <ClassDetailModal
@@ -838,7 +847,10 @@ export default {
             // }
             if (this.actualData.distanceUnit === "m") {
               this.actualData.distance = this.classData.preciseDistance;
-              console.log(this.actualData.distance, "=========this.actualData.distance");
+              console.log(
+                this.actualData.distance,
+                "=========this.actualData.distance"
+              );
               this.defaultData.distance = this.classData.preciseDistance;
             } else {
               this.actualData.distance = this.classData.preciseDistance / 1000;
@@ -907,7 +919,7 @@ export default {
     getClassScheduleInfo(id) {
       if (!this.classItem.classesJson) return;
       getData({
-        url: "/gateway/training/classSchedule/getClassScheduleById",
+        url: "/api/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
@@ -1084,10 +1096,10 @@ export default {
         sportType === 2
           ? this.formatStride(minStrideLength, avgStrideLength, maxStrideLength)
           : {
-            minStrideLength: "-",
-            avgStrideLength: "-",
-            maxStrideLength: "-",
-          };
+              minStrideLength: "-",
+              avgStrideLength: "-",
+              maxStrideLength: "-",
+            };
 
       const deviceTypeFormat = [
         { en: "COROS", cn: "高驰" },
@@ -1333,7 +1345,7 @@ export default {
             : this.actualData.distance;
       }
       submitData({
-        url: "/gateway/training/classSchedule/updateClassSchedule",
+        url: "/api/classSchedule/updateClassSchedule",
         id: this.isActivity
           ? this.classData.classScheduleId
           : this.classData.id,
@@ -1564,9 +1576,11 @@ export default {
   .key-metrics {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 10px;
     margin-bottom: 20px;
     padding: 15px 0;
+    padding-top: 0;
+    justify-content: space-between;
 
     .metric-item {
       display: flex;
@@ -1574,14 +1588,16 @@ export default {
       gap: 10px;
 
       .sport-icon {
-        width: 40px;
-        height: 40px;
+        width: 24px;
+        height: 24px;
       }
 
       .metric-value {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 14px;
+        color: #101010;
       }
     }
   }
@@ -1689,53 +1705,58 @@ export default {
         padding: 10px;
         text-align: left;
         border-bottom: 1px solid #e5e5e5;
-        vertical-align: middle;
-      }
-
-      /* 为包含 TimeInput 的单元格添加额外的底部内边距，确保错误消息有足够空间显示 */
-      td.time-input-cell {
-        // padding-bottom: 28px;
       }
 
       th {
         background-color: #f5f7fa;
         font-weight: 600;
         color: #333;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 12px;
+        color: #101010;
       }
 
       td:first-child {
-        color: #606266;
+        width: 80px;
+        color: #666666;
         white-space: nowrap;
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Medium;
+        font-size: 12px;
       }
 
       td:nth-child(2) {
-        color: #333;
+        width: 100px;
+        color: #101010;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 12px;
+      }
+
+      td:nth-child(3) {
+        width: 120px;
       }
 
       td:last-child {
-        color: #909399;
-      }
-
-      .unit-cell {
-        text-align: left !important;
-        padding-left: 15px !important;
-        color: #909399;
+        width: 50px;
+        color: #666666;
+        white-space: nowrap;
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Medium;
+        font-size: 12px;
       }
 
       ::v-deep .el-input__inner {
         border: 1px solid #dcdfe6;
       }
 
-      ::v-deep .el-input,
-      ::v-deep .el-input-number,
-      ::v-deep .time-input {
-        width: 110px !important;
-        max-width: 110px;
-        flex-shrink: 0;
-      }
-
-      ::v-deep .time-input .el-input {
-        width: 110px !important;
+      ::v-deep .el-input {
+        max-width: 120px;
       }
     }
   }
@@ -1758,9 +1779,12 @@ export default {
       margin-bottom: 10px;
 
       .section-title {
-        font-size: 14px;
-        font-weight: 600;
         color: #333;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 14px;
+        color: #101010;
       }
     }
 
@@ -1812,11 +1836,23 @@ export default {
 
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 10px;
+  .delete-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
 }
 .dialog-footer .el-button {
-  min-width: 120px;
-  border-radius: 22px;
+  min-width: 102px;
+  border-radius: 5px;
+  font-family: PingFang SC;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 12px;
+  padding: 0px;
+  height: 32px;
 }
 .dialog-footer .el-button--warning {
   background: #f5a623;
@@ -1825,5 +1861,22 @@ export default {
 .dialog-footer .el-button--danger {
   background: #d83b36;
   border-color: #d83b36;
+}
+.edit-class-detail-btn {
+  width: 116px;
+  color: #101010;
+  font-family: PingFang SC;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #f92b30;
+  font-family: PingFang SC;
+  font-style: Medium;
+  background-color: #fff;
+  color: #f92b30;
+  height: 32px;
+  line-height: 32px;
+  padding: 0px;
 }
 </style>

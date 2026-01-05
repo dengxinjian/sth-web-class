@@ -24,47 +24,52 @@
         >
           <div class="btn-list-hover">
             <span v-if="showMoveBtn">
-              <el-button
-                type="text"
+              <div
+                class="btn-list-hover-item"
                 @click.stop="
                   $emit('move', classItem.id);
                   handleClose();
                 "
               >
-                移动分组
-              </el-button>
+                移动
+              </div>
             </span>
 
             <span v-if="showDeleteBtn">
-              <el-button
-                type="text"
+              <div
+                class="btn-list-hover-item"
                 @click.stop="
                   showEditClass = true;
                   handleClose();
                 "
               >
-                编辑课程
-              </el-button>
+                编辑
+              </div>
             </span>
 
             <span v-if="showCopyBtn">
-              <el-button
-                type="text"
+              <div
+                class="btn-list-hover-item"
                 @click.stop="
                   $emit('copy', classItem);
                   handleClose();
                 "
               >
                 {{ copyBtnText }}
-              </el-button>
+              </div>
             </span>
             <span v-if="showDeleteBtn">
-              <el-button type="text" @click.stop="handleDelete()">
-                删除课程
-              </el-button>
+              <div class="btn-list-hover-item" @click.stop="handleDelete()" style="color: #F92B30;">删除</div>
             </span>
           </div>
-          <i class="el-icon-more" slot="reference" @click.stop></i>
+          <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
+          <img
+            src="@/assets/addClass/Component 117.png"
+            alt=""
+            @click.stop
+            slot="reference"
+            style="width: 16px; height: 16px"
+          />
         </el-popover>
         <span v-if="!showDeleteBtn">
           <el-button
@@ -130,7 +135,12 @@
                         classItem.sportType
                       )
                     }}
-                   <span v-if="classItem.classesJson?.distanceUnit && classItem.classesJson.distanceUnit !== 'km'">
+                    <span
+                      v-if="
+                        classItem.classesJson?.distanceUnit &&
+                        classItem.classesJson.distanceUnit !== 'km'
+                      "
+                    >
                       {{ classItem.classesJson.distanceUnit }}
                     </span>
                     <span v-else>km</span>
@@ -336,7 +346,7 @@ export default {
       return true;
     },
     copyBtnText() {
-      return this.activeClassType === "official" ? "添加课程" : "复制课程";
+      return this.activeClassType === "official" ? "添加" : "复制";
     },
   },
   watch: {
@@ -445,33 +455,50 @@ export default {
     }
 
     .image-icon {
-      width: 40px;
+      width: 24px;
+      height: 24px;
     }
 
     .title {
       font-size: 14px;
-      font-weight: bold;
       margin-left: 10px;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 15px;
+      color: #101010;
     }
 
     .keyword {
       font-size: 14px;
-      font-weight: bold;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+      color: #101010;
     }
     .section-title {
       font-size: 14px;
-      font-weight: bold;
       margin-top: 10px;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+      color: #101010;
     }
 
     .stage-details {
-      font-size: 12px;
       color: #999;
       padding: 5px 5px 0;
       line-height: 16px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 14px;
+      color: #101010;
     }
   }
 }
@@ -480,6 +507,26 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  .btn-list-hover-item {
+    width: 60px;
+    height: 32px;
+    border-radius: 5px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    text-align: center;
+    line-height: 32px;
+    color: #101010;
+    cursor: pointer;
+    &:hover {
+      background-color: #c3c9d740;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+    }
+  }
 }
 
 .time-stage {

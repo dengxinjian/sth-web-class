@@ -197,7 +197,7 @@ export default {
     getClassInfo(id) {
       if (!this.data.classesJson) return;
       getData({
-        url: "/gateway/training/classSchedule/getClassScheduleById",
+        url: "/api/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
@@ -222,7 +222,7 @@ export default {
     // 更新课程
     submitUpdateClass(flag) {
       submitData({
-        url: "/gateway/training/classSchedule/updateClassSchedule",
+        url: "/api/classSchedule/updateClassSchedule",
         id: this.form.id,
         classesJson: JSON.stringify({ ...this.form }),
       }).then((res) => {

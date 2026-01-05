@@ -1,7 +1,7 @@
 <template>
   <div style="position: relative">
     <div class="classScheduleCard sportScheduleCard" @click.stop="handleClick">
-      <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
+      <div :style="{ backgroundColor: bgColor, height: '6px' }"></div>
       <div
         :class="[
           'card-body',
@@ -17,9 +17,6 @@
               alt=""
             />
           </div>
-        </div>
-
-        <div class="sport-record-data">
           <div
             class="title"
             v-if="
@@ -36,6 +33,9 @@
           <div class="title" v-else>
             {{ getSportTypeName(activity.sportType) }}_手动录入
           </div>
+        </div>
+
+        <div class="sport-record-data">
           <div class="keyword">
             {{ restoreVerification("duration") ? "" : "*" }}
             {{ activity.duration }}
@@ -48,8 +48,8 @@
               <span v-else>km</span>
             </div>
           </div>
-          <div style="display: flex; gap: 4px">
-            <div class="keyword">
+          <div style="display: flex; gap: 4px;margin-top: 4px;">
+            <div class="keyword" style="margin-top: 0px;">
               {{ restoreVerification("sthValue") ? "" : "*" }}
               {{ activity.sthValue ? activity.sthValue : "--" }}
             </div>
@@ -65,10 +65,10 @@
                 activity.classesJson.trainingAdvice
               "
             >
-              <pre v-if="activity.classesJson.summary" class="stage-details" style=" display: -webkit-box;">
+              <pre v-if="activity.classesJson.summary" class="stage-details-p" style=" display: -webkit-box;">
                 {{ truncateByLines(activity.classesJson.summary) }}
               </pre>
-              <pre class="stage-details" style=" display: -webkit-box;">
+              <pre class="stage-details-p" style=" display: -webkit-box;">
                 {{ truncateByLines(activity.classesJson.trainingAdvice) }}
               </pre>
             </template>
@@ -278,10 +278,9 @@ export default {
 
   .card-body {
     width: 100%;
-    padding-left: 2px;
-    padding-right: 2px;
     padding-bottom: 5px;
-    // background-color: #fff;
+    padding: 0 10px;
+    padding-bottom: 10px;
 
     .body-title {
       display: flex;
@@ -293,6 +292,32 @@ export default {
       .sport-type-icon {
         display: flex;
         align-content: center;
+
+        .sport-type-name {
+          width: 15px;
+          height: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          margin-left: 5px;
+          font-weight: 700;
+          color: #fff;
+          cursor: pointer;
+        }
+
+        .sport-type-color1 {
+          background-color: #7fb135;
+        }
+        .sport-type-color2 {
+          background-color: #c72a29;
+        }
+        .sport-type-color3 {
+          background-color: #f5a623;
+        }
+        .sport-type-color0 {
+          background-color: #aaaaaa;
+        }
       }
     }
 
@@ -301,31 +326,48 @@ export default {
     }
 
     .title {
-      font-size: 14px;
-      font-weight: bold;
+      font-size: 15px;
+      font-weight: 400;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-left: 6px;
+      font-family: PingFang SC;
+      font-style: Regular;
+      color: #101010;
     }
 
     .keyword {
       font-size: 12px;
       font-weight: bold;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 13px;
+      letter-spacing: 0%;
+      vertical-align: middle;
+      color: #101010;
+      margin-top: 4px;
     }
 
-    .sport-record-data {
-      cursor: pointer;
-    }
-
-    .stage-details {
-      font-size: 12px;
-      color: #999;
-      padding: 5px 5px 0;
+    .stage-details-p {
+      // padding: 5px 5px 0;
       line-height: 16px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;
-      // display: -webkit-box;
+      display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 5;
       line-clamp: 5;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 12px;
+      color: #101010;
+
+      // margin-bottom: 5px;
     }
   }
 }
