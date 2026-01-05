@@ -9,6 +9,7 @@
       custom-class="edit-class-dialog"
       top="5vh"
     >
+      <div slot="title" class="dialog-title">课程简介</div>
       <!-- <div slot="title" class="dialog-header">
         <div class="header-title">
           <span>标题：</span>
@@ -17,51 +18,62 @@
       </div> -->
       <el-form ref="titleRef" :model="form" :rules="rules" label-width="70px">
         <el-form-item label="标题：" prop="classTitle">
-          <el-input type="text" placeholder="标题" v-model="form.classTitle" maxlength="50" style="width:  95%;" />
+          <el-input
+            type="text"
+            placeholder="标题"
+            v-model="form.classTitle"
+            maxlength="50"
+            style="width: 100%"
+          />
         </el-form-item>
       </el-form>
 
       <div class="class-detail-content" v-if="classData.classesJson">
         <!-- 顶部关键指标 -->
         <div class="key-metrics">
-          <div class="metric-item">
-            <img
-              class="sport-icon"
-              :src="getSportIcon(classData.sportType)"
-              alt=""
-            />
-          </div>
-          <div class="metric-item">
-            <div class="metric-value">
-              {{ formatDuration(classData.classesJson?.duration) }}
+          <div style="display: flex; align-items: center; gap: 50px">
+            <div class="metric-item">
+              <img
+                class="sport-icon"
+                :src="getSportIcon(classData.sportType)"
+                alt=""
+              />
             </div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-value">
-              {{
-                formatDistance(
-                  classData.classesJson?.distance,
-                  classData.sportType
-                )
-              }}
-              <span
-                v-if="
-                  classData.classesJson.distanceUnit &&
-                  classData.classesJson.distanceUnit !== 'km'
-                "
-              >
-                {{ classData.classesJson.distanceUnit }}
-              </span>
-              <span v-else>km</span>
+            <div class="metric-item">
+              <div class="metric-value">
+                {{ formatDuration(classData.classesJson?.duration) }}
+              </div>
             </div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-value">
-              {{ classData.classesJson?.sth || "--" }} STH
+            <div class="metric-item">
+              <div class="metric-value">
+                {{
+                  formatDistance(
+                    classData.classesJson?.distance,
+                    classData.sportType
+                  )
+                }}
+                <span
+                  v-if="
+                    classData.classesJson.distanceUnit &&
+                    classData.classesJson.distanceUnit !== 'km'
+                  "
+                >
+                  {{ classData.classesJson.distanceUnit }}
+                </span>
+                <span v-else>km</span>
+              </div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-value">
+                {{ classData.classesJson?.sth || "--" }} STH
+              </div>
             </div>
           </div>
           <div class="metric-item" v-if="!isRestType(classData.sportType)">
-            <el-button type="primary" @click="handleEditClassDetail"
+            <el-button
+              type="primary"
+              @click="handleEditClassDetail"
+              class="edit-class-detail-btn"
               >编辑课程详情</el-button
             >
           </div>
@@ -249,17 +261,22 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button @click="deleteClass(classData.id)">删除</el-button>
-        <el-button @click="handleClose">取消</el-button>
-        <el-button
-          type="primary"
-          @click="handleEditSave(false)"
-          style="background-color: #f5a623; border-color: #f5a623"
-          >保存</el-button
-        >
-        <el-button type="danger" @click="handleEditSave(true)"
-          >保存并关闭</el-button
-        >
+        <!-- <el-button @click="deleteClass(classData.id)">删除</el-button> -->
+        <img
+          src="@/assets/addClass/dele.png"
+          alt=""
+          class="delete-icon"
+          @click="deleteClass(classData.id)"
+        />
+        <div>
+          <el-button @click="handleClose">取消</el-button>
+          <el-button type="primary" @click="handleEditSave(false)"
+            >保存</el-button
+          >
+          <el-button type="primary" @click="handleEditSave(true)"
+            >保存并关闭</el-button
+          >
+        </div>
       </div>
     </el-dialog>
     <AddClassModal
@@ -453,6 +470,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.dialog-title {
+  color: #101010;
+  font-family: PingFang SC;
+  font-weight: 600;
+  font-style: Semibold;
+  font-size: 16px;
+}
 .dialog-header {
   display: flex;
   justify-content: space-between;
@@ -490,10 +514,11 @@ export default {
   .key-metrics {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 10px;
     margin-bottom: 20px;
     padding: 15px 0;
     padding-top: 0;
+    justify-content: space-between;
 
     .metric-item {
       display: flex;
@@ -501,14 +526,16 @@ export default {
       gap: 10px;
 
       .sport-icon {
-        width: 40px;
-        height: 40px;
+        width: 24px;
+        height: 24px;
       }
 
       .metric-value {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 14px;
+        color: #101010;
       }
     }
   }
@@ -545,17 +572,30 @@ export default {
         background-color: #f5f7fa;
         font-weight: 600;
         color: #333;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 12px;
+        color: #101010;
       }
 
       td:first-child {
         width: 80px;
-        color: #606266;
+        color: #666666;
         white-space: nowrap;
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Medium;
+        font-size: 12px;
       }
 
       td:nth-child(2) {
         width: 100px;
-        color: #333;
+        color: #101010;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 12px;
       }
 
       td:nth-child(3) {
@@ -564,7 +604,12 @@ export default {
 
       td:last-child {
         width: 50px;
-        color: #909399;
+        color: #666666;
+        white-space: nowrap;
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Medium;
+        font-size: 12px;
       }
 
       ::v-deep .el-input__inner {
@@ -584,9 +629,12 @@ export default {
       margin-bottom: 10px;
 
       .section-title {
-        font-size: 14px;
-        font-weight: 600;
         color: #333;
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 14px;
+        color: #101010;
       }
     }
 
@@ -603,7 +651,6 @@ export default {
     max-height: 500px;
     overflow-y: auto;
     gap: 10px;
-    padding-right: 8px;
 
     /* 自定义滚动条样式 */
     &::-webkit-scrollbar {
@@ -635,14 +682,28 @@ export default {
     scrollbar-color: #c1c1c1 #f5f7fa;
   }
 }
-
+::v-deep .el-dialog__footer {
+  border-top: 1px solid #e5e5e5;
+}
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 10px;
+  .delete-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
 }
 .dialog-footer .el-button {
-  min-width: 120px;
-  border-radius: 22px;
+  min-width: 102px;
+  border-radius: 5px;
+  font-family: PingFang SC;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 12px;
+  padding: 0px;
+  height: 32px;
 }
 .dialog-footer .el-button--warning {
   background: #f5a623;
@@ -651,5 +712,22 @@ export default {
 .dialog-footer .el-button--danger {
   background: #d83b36;
   border-color: #d83b36;
+}
+.edit-class-detail-btn {
+  width: 116px;
+  color: #101010;
+  font-family: PingFang SC;
+  font-weight: 500;
+  font-style: Medium;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid #f92b30;
+  font-family: PingFang SC;
+  font-style: Medium;
+  background-color: #fff;
+  color: #f92b30;
+  height: 32px;
+  line-height: 32px;
+  padding: 0px;
 }
 </style>

@@ -7,7 +7,7 @@
       :data-date="date"
       data-type="activity"
     >
-      <div :style="{ backgroundColor: bgColor, height: '10px' }"></div>
+      <div :style="{ backgroundColor: bgColor, height: '6px' }"></div>
       <div
         :class="[
           'card-body',
@@ -27,56 +27,6 @@
               alt=""
             />
           </div>
-          <el-popover
-            popper-class="athletic-btn-popover"
-            placement="right"
-            trigger="hover"
-          >
-            <div class="btn-list-hover">
-              <el-button
-                v-if="activity.classesJson"
-                type="text"
-                icon="el-icon-link"
-                @click="$emit('unbind', activity.classScheduleId)"
-              >
-                解除匹配
-              </el-button>
-              <el-button
-                type="text"
-                icon="el-icon-crop"
-                v-if="activity.classesJson"
-                @click="handleCopy"
-              >
-                复制
-              </el-button>
-
-              <el-button
-                type="text"
-                icon="el-icon-edit"
-                @click="$emit('edit', activity)"
-              >
-                编辑
-              </el-button>
-              <el-button
-                v-if="!activity.classesJson"
-                type="text"
-                icon="el-icon-delete"
-                @click="$emit('delete', activity)"
-              >
-                删除
-              </el-button>
-            </div>
-            <i class="el-icon-more" slot="reference" @click.stop></i>
-          </el-popover>
-        </div>
-
-        <div
-          class="sport-record-data"
-          @click="
-            $emit('click', activity);
-            hideContextMenu();
-          "
-        >
           <div
             class="title"
             v-if="
@@ -93,6 +43,57 @@
           <div class="title" v-else>
             {{ getSportTypeName(activity.sportType) }}_手动录入
           </div>
+          <el-popover
+            popper-class="athletic-btn-popover"
+            placement="right"
+            trigger="hover"
+          >
+            <div class="btn-list-hover">
+              <div
+                class="btn-list-hover-item"
+                v-if="activity.classesJson"
+                @click="$emit('unbind', activity.classScheduleId)"
+              >
+                解除匹配
+              </div>
+              <div
+                class="btn-list-hover-item"
+                v-if="activity.classesJson"
+                @click="handleCopy"
+              >
+                复制
+              </div>
+
+              <div class="btn-list-hover-item" @click="$emit('edit', activity)">
+                编辑
+              </div>
+              <div
+                class="btn-list-hover-item"
+                style="color: #f92b30"
+                v-if="!activity.classesJson"
+                @click="$emit('delete', activity)"
+              >
+                删除
+              </div>
+            </div>
+            <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
+            <img
+              src="~@/assets/addClass/Component 117.png"
+              alt=""
+              @click.stop
+              slot="reference"
+              style="width: 16px; height: 16px"
+            />
+          </el-popover>
+        </div>
+
+        <div
+          class="sport-record-data"
+          @click="
+            $emit('click', activity);
+            hideContextMenu();
+          "
+        >
           <div class="keyword">
             {{ restoreVerification("duration") ? "" : "*" }}
             {{ activity.duration }}
@@ -105,8 +106,8 @@
               <span v-else>km</span>
             </div>
           </div>
-          <div style="display: flex; gap: 4px">
-            <div class="keyword">
+          <div style="display: flex; gap: 4px;margin-top: 4px;">
+            <div class="keyword" style="margin-top: 0px;">
               {{ restoreVerification("sthValue") ? "" : "*" }}
               {{ activity.sthValue ? activity.sthValue : "--" }}
             </div>
@@ -191,7 +192,7 @@
             <!-- 训练强度可视化 -->
             <div
               v-if="activity.classesJson.timeline"
-              style="height: 16px; display: flex; gap: 1px"
+              style="height: 16px; display: flex; gap: 1px ;margin-top: 10px;"
             >
               <div
                 v-for="(stage, index) in activity.classesJson.timeline"
@@ -228,7 +229,6 @@
           class="context-menu-item"
           @click="handleUnbind"
         >
-          <i class="el-icon-link"></i>
           解除匹配
         </div>
         <div
@@ -236,7 +236,6 @@
           class="context-menu-item"
           @click="handleCopy"
         >
-          <i class="el-icon-crop"></i>
           复制
         </div>
         <div
@@ -246,7 +245,6 @@
             hideContextMenu();
           "
         >
-          <i class="el-icon-edit"></i>
           编辑
         </div>
         <div
@@ -254,7 +252,6 @@
           class="context-menu-item"
           @click="handleDelete"
         >
-          <i class="el-icon-delete"></i>
           删除
         </div>
       </div>
@@ -472,10 +469,9 @@ export default {
 
   .card-body {
     width: 100%;
-    padding-left: 2px;
-    padding-right: 2px;
     padding-bottom: 5px;
-    // background-color: #fff;
+    padding: 0 10px;
+    padding-bottom: 10px;
 
     .body-title {
       display: flex;
@@ -487,6 +483,32 @@ export default {
       .sport-type-icon {
         display: flex;
         align-content: center;
+
+        .sport-type-name {
+          width: 15px;
+          height: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          margin-left: 5px;
+          font-weight: 700;
+          color: #fff;
+          cursor: pointer;
+        }
+
+        .sport-type-color1 {
+          background-color: #7fb135;
+        }
+        .sport-type-color2 {
+          background-color: #c72a29;
+        }
+        .sport-type-color3 {
+          background-color: #f5a623;
+        }
+        .sport-type-color0 {
+          background-color: #aaaaaa;
+        }
       }
     }
 
@@ -495,23 +517,33 @@ export default {
     }
 
     .title {
-      font-size: 14px;
-      font-weight: bold;
+      font-size: 15px;
+      font-weight: 400;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-left: 6px;
+      font-family: PingFang SC;
+      font-style: Regular;
+      color: #101010;
     }
 
     .keyword {
       font-size: 12px;
       font-weight: bold;
-    }
-
-    .sport-record-data {
-      cursor: pointer;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 13px;
+      letter-spacing: 0%;
+      vertical-align: middle;
+      color: #101010;
+      margin-top: 4px;
     }
 
     .stage-details-p {
-      font-size: 12px;
-      color: #999;
-      padding: 5px 5px 0;
+      // padding: 5px 5px 0;
       line-height: 16px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -520,6 +552,13 @@ export default {
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 5;
       line-clamp: 5;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 12px;
+      color: #101010;
+
+      // margin-bottom: 5px;
     }
   }
 }
@@ -528,8 +567,25 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  .el-button {
-    margin-left: 0;
+  .btn-list-hover-item {
+    width: 60px;
+    height: 32px;
+    border-radius: 5px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    text-align: center;
+    line-height: 32px;
+    color: #101010;
+    cursor: pointer;
+    &:hover {
+      background-color: #c3c9d740;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
+    }
   }
 }
 
@@ -545,25 +601,29 @@ export default {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   z-index: 99999;
   padding: 4px 0;
-  min-width: 120px;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .context-menu-item {
-    padding: 8px 16px;
+    width: 60px;
+    height: 32px;
+    border-radius: 5px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
     font-size: 14px;
-    color: #cc2323;
+    text-align: center;
+    line-height: 32px;
+    color: #101010;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-
-    i {
-      font-size: 16px;
-    }
-
     &:hover {
-      background-color: #f5f7fa;
-      color: #cc2323;
+      background-color: #c3c9d740;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
     }
   }
 }

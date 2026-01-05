@@ -1,15 +1,16 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="800px"
+    width="600px"
     append-to-body
     :before-close="onCancel"
     class="sport-type-modal"
     :close-on-click-modal="false"
   >
-    <div class="add-class-img">
+    <span slot="title">选择运动类型</span>
+    <!-- <div class="add-class-img">
       <img :src="currentIcon" alt="" />
-    </div>
+    </div> -->
     <div class="type-grid">
       <div
         v-for="item in types"
@@ -17,56 +18,19 @@
         class="type-card"
         @click="onSelect(item)"
       >
-        <img
-          v-if="item.key === 'rest'"
-          src="~@/assets/addClass/type-rest.png"
-          alt=""
-        />
-        <img
-          v-else-if="item.key === 'note'"
-          src="~@/assets/addClass/type-remark.png"
-          alt=""
-        />
-        <img
-          v-else-if="item.key === 'other'"
-          src="~@/assets/addClass/type-others.png"
-          alt=""
-        />
-        <img
-          v-else-if="item.key === 'strength'"
-          src="~@/assets/addClass/type-power.png"
-          alt=""
-        />
-        <img
-          v-else-if="item.key === 'run'"
-          src="~@/assets/addClass/type-run.png"
-          alt=""
-        />
-        <img
-          v-else-if="item.key === 'ride'"
-          src="~@/assets/addClass/type-bike.png"
-          alt=""
-        />
-        <img
-          v-else-if="item.key === 'swim'"
-          src="~@/assets/addClass/type-swim.png"
-          alt=""
-        />
+        <img :src="item.icon" alt="" />
+        <div>{{ item.name }}</div>
       </div>
     </div>
-    <div class="add-event-img" v-if="!isClass">
-      <img src="~@/assets/addClass/addEvent.png" alt="" />
+    <div class="add-event-title" v-if="!isClass">
+      <span>添加赛事</span>
     </div>
-    <div class="event-grid" v-if="!isClass">
-      <div class="event-card" @click="onSelectEvent('event')">
-        <img class="event-icon" src="~@/assets/addClass/eventIcon.png" alt="" />
-        <img class="event-name" src="~@/assets/addClass/event.png" alt="" />
+    <div class="type-grid" v-if="!isClass">
+      <div class="type-card" @click="onSelectEvent('event')">
+        <img src="~@/assets/addClass/eventIcon.png" alt="" />
+        <div>赛事</div>
       </div>
     </div>
-
-    <!-- <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel">取消</el-button>
-    </span> -->
   </el-dialog>
 </template>
 
@@ -89,13 +53,41 @@ export default {
     return {
       innerVisible: this.visible || this.value || false,
       types: [
-        { key: "strength", name: "力量" },
-        { key: "other", name: "其他" },
-        { key: "note", name: "备忘录" },
-        { key: "rest", name: "休息" },
-        { key: "swim", name: "游泳" },
-        { key: "ride", name: "骑行" },
-        { key: "run", name: "跑步" },
+        {
+          key: "strength",
+          name: "力量",
+          icon: require("@/assets/addClass/icon-power.png"),
+        },
+        {
+          key: "other",
+          name: "其他",
+          icon: require("@/assets/addClass/icon-other.png"),
+        },
+        {
+          key: "note",
+          name: "备忘录",
+          icon: require("@/assets/addClass/icon-note.png"),
+        },
+        {
+          key: "rest",
+          name: "休息",
+          icon: require("@/assets/addClass/icon-rest.png"),
+        },
+        {
+          key: "swim",
+          name: "游泳",
+          icon: require("@/assets/addClass/icon-swim.png"),
+        },
+        {
+          key: "ride",
+          name: "骑行",
+          icon: require("@/assets/addClass/icon-bike.png"),
+        },
+        {
+          key: "run",
+          name: "跑步",
+          icon: require("@/assets/addClass/icon-run.png"),
+        },
       ],
     };
   },
@@ -148,151 +140,44 @@ export default {
   display: flex;
   gap: 20px;
   padding: 10px 6px 0 6px;
-  flex-wrap: wrap-reverse;
-  justify-content: center;
+  flex-wrap: wrap;
+}
+.add-event-title {
+  color: #101010;
+  margin-top: 30px;
+  font-family: PingFang SC;
+  font-weight: 600;
+  font-style: Semibold;
+  font-size: 16px;
+  margin-bottom: 14px;
 }
 .type-card {
-  flex: 0 0 calc(25% - 15px);
-  height: 120px;
-  border: 1px dashed #dcdfe6;
-  border-radius: 6px;
+  border-radius: 8px;
+  border: 1px solid #00000026;
+  background: #ffffff1f;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  background: #fafafa;
-}
-.type-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-.type-card > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 6px;
-  background: #fff;
-}
-.icon-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.type-name {
-  font-weight: 600;
-  color: #333;
-}
-
-/* 渐变背景（接近示意图） */
-.bg-swim {
-  background: linear-gradient(180deg, #e6f5ff 0%, #d8ecff 100%);
-}
-.bg-ride {
-  background: linear-gradient(180deg, #f5e8ff 0%, #efe2ff 100%);
-}
-.bg-run {
-  background: linear-gradient(180deg, #ffe8ef 0%, #ffe2ea 100%);
-}
-.bg-strength {
-  background: linear-gradient(180deg, #f7f7f7 0%, #f2f2f2 100%);
-}
-.bg-other {
-  background: linear-gradient(180deg, #fff6df 0%, #fff1c9 100%);
-}
-.bg-note {
-  background: linear-gradient(180deg, #fff0ea 0%, #ffe8e0 100%);
-}
-.bg-rest {
-  background: linear-gradient(180deg, #e9fff6 0%, #e2fff2 100%);
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: center;
-}
-.add-class-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-.add-class-img img {
-  width: 100px;
-  height: 100%;
-  object-fit: cover;
-}
-.add-event-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-  margin-top: 40px;
-}
-.add-event-img img {
-  width: 100px;
-  height: 100%;
-  object-fit: cover;
-}
-.event-grid {
-  display: flex;
-  gap: 20px;
-  padding: 10px 6px 0 6px;
-  flex-wrap: wrap-reverse;
-  justify-content: center;
-  margin-top: 30px;
-}
-.event-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-.event-card {
-  flex: 0 0 calc(25% - 15px);
-  height: 120px;
-  border: 1px dashed #dcdfe6;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: linear-gradient(
-    180deg,
-    #ffffff 20%,
-    #ffffff 20%,
-    #fff6df 20%,
-    #fff1c9 100%
-  );
-  position: relative;
-  width: 168px;
-  .event-icon {
-    position: absolute;
-    top: -30px;
-    left: 50px;
-    width: 64px;
-    height: 84px;
+  img {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
   }
-  .event-name {
-    width: 45px;
-    height: 20px;
-    margin-top: 40px;
+  div {
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    color: #101010;
   }
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  /* &:hover {
+    background: #ffffff33;
+  } */
 }
 </style>

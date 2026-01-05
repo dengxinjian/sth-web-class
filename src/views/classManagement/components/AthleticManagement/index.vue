@@ -51,61 +51,61 @@
           trigger="hover"
         >
           <div class="btn-list-hover">
-            <el-button
+            <div
+              class="btn-list-hover-item"
               v-if="node.data.isGroup"
-              type="text"
-              size="mini"
               @click="handleAddGroup"
-              >新增分组</el-button
             >
-            <el-button
+              新增
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="
                 node.data.isGroup &&
                 node.data.id !== 'unGrouped' &&
                 node.data.id !== 'coach'
               "
-              type="text"
-              size="mini"
               @click="handleEditGroup(node)"
-              >编辑分组</el-button
             >
-            <el-button
+              编辑
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="
                 node.data.isGroup &&
                 node.data.id !== 'unGrouped' &&
                 node.data.id !== 'coach'
               "
-              type="text"
-              size="mini"
               @click="handleDeleteGroup(node)"
-              >删除分组</el-button
             >
+              删除
+            </div>
             <!-- <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button> -->
-            <el-button
+            <div
+              class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              type="text"
-              size="mini"
               @click="handleMoveAthletic(node)"
-              >移动分组</el-button
             >
-            <el-button
+              移动
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              type="text"
-              size="mini"
               @click="handleMoveOutAthletic(node)"
-              >解绑</el-button
             >
-            <el-button
+              解绑
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id === 'coach'"
-              type="text"
-              size="mini"
               @click="handleMoveOutCoach(node)"
-              >解绑</el-button
             >
+              解绑
+            </div>
           </div>
-          <el-button type="text" size="mini" slot="reference">
+          <div class="btn-list-hover-item" slot="reference">
             <i class="el-icon-more"></i>
-          </el-button>
+          </div>
         </el-popover>
       </span>
     </el-tree>
@@ -129,57 +129,57 @@
           trigger="hover"
         >
           <div class="btn-list-hover">
-            <el-button
+            <div
+              class="btn-list-hover-item"
               v-if="node.data.isGroup"
-              type="text"
-              size="mini"
               @click="handleAddGroup"
-              >新增分组</el-button
             >
-            <el-button
+              新增
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="
                 node.data.isGroup && node.data.id && node.data.id !== 'coach'
               "
-              type="text"
-              size="mini"
               @click="handleEditGroup(node)"
-              >编辑分组</el-button
             >
-            <el-button
+              编辑
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="
                 node.data.isGroup && node.data.id && node.data.id !== 'coach'
               "
-              type="text"
-              size="mini"
               @click="handleDeleteGroup(node)"
-              >删除分组</el-button
             >
+              删除
+            </div>
             <!-- <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button> -->
-            <el-button
+            <div
+              class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              type="text"
-              size="mini"
               @click="handleMoveAthletic(node)"
-              >移动分组</el-button
             >
-            <el-button
+              移动
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              type="text"
-              size="mini"
               @click="handleMoveOutAthletic(node)"
-              >解绑</el-button
             >
-            <el-button
+              解绑
+            </div>
+            <div
+              class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id === 'coach'"
-              type="text"
-              size="mini"
               @click="handleMoveOutCoach(node)"
-              >解绑</el-button
             >
+              解绑
+            </div>
           </div>
-          <el-button type="text" size="mini" slot="reference">
+          <div class="btn-list-hover-item" slot="reference">
             <i class="el-icon-more"></i>
-          </el-button>
+          </div>
         </el-popover>
       </span>
     </el-tree>
@@ -987,19 +987,24 @@ export default {
   font-size: 12px;
   padding-right: 8px;
 }
-.btn-list-hover {
-  width: 80px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  .el-button {
-    margin-left: 0;
-    padding: 4px 8px;
-    font-size: 12px;
-    text-align: left;
-    &:hover {
-      background-color: #f5f7fa;
-    }
+.btn-list-hover-item {
+  width: 60px;
+  height: 32px;
+  border-radius: 5px;
+  font-family: PingFang SC;
+  font-weight: 400;
+  font-style: Regular;
+  font-size: 14px;
+  text-align: center;
+  line-height: 32px;
+  color: #101010;
+  cursor: pointer;
+  &:hover {
+    background-color: #c3c9d740;
+    font-family: PingFang SC;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 14px;
   }
 }
 .athletic-btn {
@@ -1075,14 +1080,13 @@ export default {
   text-align: center;
 
   .invite-illustration {
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
 
     .athlete-illustration {
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-
       .athlete-figure {
         width: 40px;
         height: 40px;
@@ -1119,9 +1123,11 @@ export default {
 
   .invite-title {
     font-size: 20px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 15px;
+    color: #101010;
+    font-family: PingFang SC;
+    font-weight: 600;
+    font-style: Semibold;
+    font-size: 16px;
   }
 
   .invite-description {
@@ -1129,6 +1135,10 @@ export default {
     font-size: 14px;
     line-height: 1.5;
     margin-bottom: 25px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
+    margin-top: 10px;
 
     div {
       margin-bottom: 5px;
@@ -1136,8 +1146,8 @@ export default {
   }
 
   .invite-code-container {
-    background: #fff5f5;
-    border: 2px solid #ff4757;
+    background: #f92b300d;
+    border: 1px solid #f92b30;
     border-radius: 8px;
     padding: 15px 15px;
     margin-bottom: 15px;
@@ -1147,23 +1157,28 @@ export default {
     gap: 10px;
 
     .invite-code-label {
-      color: #333;
-      font-weight: 500;
+      color: #101010;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 14px;
     }
 
     .invite-code-value {
-      color: #ff4757;
-      font-weight: bold;
-      font-size: 16px;
-      font-family: "Courier New", monospace;
-      letter-spacing: 1px;
+      font-family: PingFang SC;
+      font-weight: 600;
+      font-style: Semibold;
+      font-size: 14px;
+      color: #f92b30;
     }
   }
 
   .invite-code-tip {
-    color: #999;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
     font-size: 12px;
-    line-height: 1.4;
+    color: #939393;
   }
 }
 
@@ -1173,11 +1188,16 @@ export default {
   gap: 15px;
 
   .copy-btn {
-    background: #ff4757;
-    border-color: #ff4757;
+    background: #f92b30;
+    border: 1px solid #f92b30;
     padding: 12px 30px;
     font-size: 14px;
     font-weight: 500;
+    font-family: PingFang SC;
+    font-weight: 500;
+    font-style: Medium;
+    font-size: 14px;
+    line-height: 8px;
 
     &:hover {
       background: #ff3742;
@@ -1186,13 +1206,16 @@ export default {
   }
 
   .regenerate-btn {
-    background: #333;
-    border-color: #333;
+    border-color: #101010;
+    background: #101010;
     color: #fff;
     padding: 12px 30px;
     font-size: 14px;
     font-weight: 500;
-
+    font-family: PingFang SC;
+    font-weight: 500;
+    font-style: Medium;
+    line-height: 8px;
     &:hover {
       background: #555;
       border-color: #555;
