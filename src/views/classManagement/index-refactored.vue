@@ -268,6 +268,7 @@
       v-model="showSportDetailModal"
       :type="sportDetailData.sportType"
       :data="sportDetailData"
+      :selectedAthletic="selectedAthletic"
       @cancel="onCancelSportDetail"
     />
     <AddClassTitle

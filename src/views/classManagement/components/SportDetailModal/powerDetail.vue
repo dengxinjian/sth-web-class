@@ -141,6 +141,10 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    selectedAthletic: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -194,7 +198,7 @@ export default {
         this.getClassInfo(this.data.id);
       }
       if (this.data.activityId) {
-        this.getSportDetail(this.data.activityId);
+        this.getSportDetail(this.data.activityId, this.selectedAthletic);
       }
     },
     // 编辑进入弹框时，查询课程数据
@@ -210,10 +214,11 @@ export default {
       })
     },
     // 查询运动详情
-    getSportDetail(id) {
+    getSportDetail(id, triUserId) {
       getData({
         url: '/gateway/training/activity/getActivityDetail',
-        activityId: id
+        activityId: id,
+        triUserId
       }).then(res => {
         if (res.success) {
           this.sportDetail = res.result

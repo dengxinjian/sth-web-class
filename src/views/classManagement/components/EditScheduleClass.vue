@@ -1136,7 +1136,7 @@ export default {
     },
     // 查询运动详情
     getSportDetail() {
-      scheduleApi.getActivityDetail(this.classData.activityId).then((res) => {
+      scheduleApi.getActivityDetail(this.classData.activityId, this.triUserId).then((res) => {
         if (res.success) {
           this.sportDetail = this.formatOutlineData(res.result);
           const actualData = {

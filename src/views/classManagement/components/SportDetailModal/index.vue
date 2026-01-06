@@ -6,6 +6,7 @@
       :is="currentComponent"
       :key="componentKey"
       :value="value"
+      :selectedAthletic="selectedAthletic"
       :data="$attrs.data"
       v-on="$listeners"
     />
@@ -37,6 +38,10 @@ export default {
     value: {
       type: Boolean,
       default: false
+    },
+    selectedAthletic: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -74,6 +79,12 @@ export default {
       if (newVal !== oldVal) {
         this.componentKey = Date.now()
         console.log('运动类型改变，更新 componentKey:', this.componentKey)
+      }
+    },
+    selectedAthletic(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.componentKey = Date.now()
+        console.log('运动员改变，更新 componentKey:', this.componentKey)
       }
     }
   }
