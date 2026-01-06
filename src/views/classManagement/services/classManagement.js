@@ -310,14 +310,14 @@ export const competitionApi = {
   // 赛事绑定运动
   bindActivity(data) {
     return submitData({
-      url: "/gateway/training/web/activity/activityBindCompetition",
+      url: "/gateway/activity/web/activityBindCompetition",
       requestData: data,
     });
   },
   // 赛事解绑运动
   unbindActivity(data) {
     return submitData({
-      url: "/gateway/training/web/activity/activityUnBindCompetition",
+      url: "/gateway/activity/web/activityUnBindCompetition",
       requestData: data,
     });
   },
