@@ -78,7 +78,7 @@ export const scheduleApi = {
   // 获取健康数据
   getHealthData({ deviceType, date, triUserId }) {
     return getData({
-      url: "/training/api/health",
+      url: "/gateway/training/health",
       deviceType,
       startDate: date,
       endDate: date,
