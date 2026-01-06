@@ -78,7 +78,7 @@ export const scheduleApi = {
   // 获取健康数据
   getHealthData({ deviceType, date, triUserId }) {
     return getData({
-      url: "/gateway/training/health",
+      url: "/training/api/health",
       deviceType,
       startDate: date,
       endDate: date,
@@ -100,7 +100,7 @@ export const scheduleApi = {
     //   url: `/api/classSchedule/deleteClassSchedule?id=${id}`,
     // });
     return request({
-      url: `/gateway/training/classSchedule/deleteClassSchedulegateway/training/classSchedule/getClassScheduleById?id=${params.id}`,
+      url: `/gateway/training/classSchedule/deleteClassSchedule?id=${params.id}`,
       method: "post",
       headers: {
         requestUserInfoId: params.triUserId,

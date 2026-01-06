@@ -1172,7 +1172,7 @@ export default {
     // 更新课表
     submitUpdateClass(flag) {
       submitData({
-        url: "/training/api/classSchedule/updateClassSchedule",
+        url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.classInfo.id,
         classesJson: JSON.stringify({
           ...this.classInfo,

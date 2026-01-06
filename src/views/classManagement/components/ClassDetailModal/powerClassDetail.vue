@@ -289,7 +289,7 @@ export default {
     // 更新课程
     submitUpdateClass(flag) {
       submitData({
-        url: "/training/api/classSchedule/updateClassSchedule",
+        url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.form.id,
         classesJson: JSON.stringify({ ...this.form }),
       }).then((res) => {

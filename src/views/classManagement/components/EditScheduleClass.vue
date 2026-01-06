@@ -1345,7 +1345,7 @@ export default {
             : this.actualData.distance;
       }
       submitData({
-        url: "/training/api/classSchedule/updateClassSchedule",
+        url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.isActivity
           ? this.classData.classScheduleId
           : this.classData.id,
