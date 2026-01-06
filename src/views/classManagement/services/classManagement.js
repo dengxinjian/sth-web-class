@@ -151,7 +151,7 @@ export const scheduleApi = {
   retrySync({ classScheduleId, deviceType }) {
     return submitData({
       // url: `/gateway/training/classSchedule/retryClassScheduleSync?classScheduleId=${classScheduleId}&deviceType=${deviceType}`,
-      url: `/training/api/classSchedule/retryClassScheduleSync`,
+      url: `/gateway/training/classSchedule/retryClassScheduleSync`,
       requestData: {
         classScheduleId,
         deviceType,
