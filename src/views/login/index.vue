@@ -20,7 +20,7 @@
         <el-input
           ref="username"
           v-model="loginForm.userName"
-          placeholder="请输入用户手机号"
+          placeholder="请输入用户openid"
           name="username"
           type="text"
           tabindex="1"

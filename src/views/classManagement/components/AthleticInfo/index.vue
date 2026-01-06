@@ -816,6 +816,7 @@ export default {
         if (res.success) {
           this.baseForm = res.result;
           this.lastMatchType = res.result.lastMatchType;
+          window.localStorage.setItem("avatarUrl", res.result.avatarUrl);
           // this.thresholds = res.result.thresholdRecordList
           // this.currentThreshold = this.thresholds.find(item => item.thresholdType === this.activeSport)
         }

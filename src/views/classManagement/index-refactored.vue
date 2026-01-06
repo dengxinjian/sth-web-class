@@ -1524,6 +1524,7 @@ export default {
      */
     async getAthleticThreshold(id, date) {
       const res = await athleteApi.getUserProfile(id, date);
+      window.localStorage.setItem("avatarUrl", res.result.avatarUrl);
       res.result.thresholdRecordList.forEach((item) => {
         switch (item.thresholdType) {
           case 1:

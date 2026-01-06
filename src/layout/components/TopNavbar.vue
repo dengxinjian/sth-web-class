@@ -41,7 +41,7 @@
       <!-- <el-divider direction="vertical"></el-divider> -->
       <el-dropdown trigger="click">
         <div class="user-info">
-          <img src="../../assets/logo-sth.png" alt="" />
+          <img :src="userAvatar" alt="" />
           <span>{{ name }}</span>
           <i
             class="el-icon-caret-bottom"
@@ -101,6 +101,7 @@ export default {
       shopOptions: (state) => state.userInfo.shopOptions,
       shopName: (state) => state.userInfo.shopName,
       userType: (state) => state.userInfo.userType,
+      userInfo: (state) => state.user.userInfo,
     }),
     showLogo() {
       return this.$store.state.settings.sidebarLogo;
@@ -116,8 +117,32 @@ export default {
     showShop() {
       return this.shopOptions.length > 0;
     },
+    // userAvatar() {
+    //   console.log('=========userAvatar---*********=========', localStorage.getItem("avatarUrl"));
+    //   if (localStorage.getItem("avatarUrl")) {
+    //     return localStorage.getItem("avatarUrl");
+    //   }
+    //   // 监听 userInfo 中的 avatarUrl 字段
+    //   if (this.userInfo && this.userInfo.avatarUrl) {
+    //     return this.userInfo.avatarUrl;
+    //   }
+    //   // 如果没有值，使用静态图片
+    //   return require("@/assets/logo-sth.png");
+    // },
   },
-
+  // 使用watch监听 localStorage.getItem("avatarUrl") 的变化
+  watch: {
+    "localStorage.getItem('avatarUrl')": {
+      handler(newVal) {
+        this.getUserAvatar()
+      },
+      immediate: true,
+    },
+  },
+  mounted() {
+    // this.userAvatar = localStorage.getItem("avatarUrl");
+    // this.getUserAvatar()
+  },
   methods: {
     ...mapMutations({
       SET_SHOP_NAME: "userInfo/SET_SHOP_NAME",
@@ -139,6 +164,9 @@ export default {
         // 用户点击了取消，或者发生了错误
         console.log("取消退出或发生错误:", error);
       }
+    },
+    getUserAvatar() {
+      this.userAvatar = localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png");
     },
     changeIdentify() {
       this.$confirm(
