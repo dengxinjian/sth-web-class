@@ -43,7 +43,7 @@
               </template>
             </div>
             <!-- 课程标题 -->
-            <div class="title">{{ classItem.classesJson.title }}</div>
+            <div class="title">{{ (classItem.classesJson && classItem.classesJson.title) || "--" }}</div>
             <el-popover
               popper-class="athletic-btn-popover"
               placement="right"
@@ -96,7 +96,7 @@
 
           <!-- 时长 -->
           <div class="keyword">
-            {{ formatDuration(classItem.classesJson.duration) }}
+            {{ formatDuration(classItem.classesJson && classItem.classesJson.duration) }}
           </div>
 
           <!-- 距离 -->
@@ -104,12 +104,13 @@
             <div class="keyword">
               {{
                 formatDistance(
-                  classItem.classesJson.distance,
+                  classItem.classesJson && classItem.classesJson.distance,
                   classItem.sportType
                 )
               }}
               <span
                 v-if="
+                  classItem.classesJson &&
                   classItem.classesJson.distanceUnit &&
                   classItem.classesJson.distanceUnit !== 'km'
                 "
@@ -128,7 +129,7 @@
           >
           <div class="keyword" style="margin-top: 0px;">
               {{
-                !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
+                !classItem.classesJson || !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
               }}
             </div>
             <div>
@@ -137,8 +138,9 @@
           </div>
           <template
             v-if="
-              classItem.classesJson.summary ||
-              classItem.classesJson.trainingAdvice
+              classItem.classesJson &&
+              (classItem.classesJson.summary ||
+              classItem.classesJson.trainingAdvice)
             "
           >
             <!-- 概要 -->
@@ -153,7 +155,7 @@
           </template>
 
           <!-- 骑行详情 -->
-          <template v-else-if="classItem.sportType === 'CYCLE'">
+          <template v-else-if="classItem.sportType === 'CYCLE' && classItem.classesJson">
             <CycleStageDetails
               :class-data="classItem.classesJson"
               :max-stages="2"
@@ -161,7 +163,7 @@
           </template>
 
           <!-- 跑步详情 -->
-          <template v-else-if="classItem.sportType === 'RUN'">
+          <template v-else-if="classItem.sportType === 'RUN' && classItem.classesJson">
             <RunStageDetails
               :class-data="classItem.classesJson"
               :max-stages="2"
@@ -170,7 +172,7 @@
 
           <!-- 训练强度可视化 -->
           <div
-            v-if="classItem.classesJson.timeline"
+            v-if="classItem.classesJson && classItem.classesJson.timeline"
             style="height: 16px; display: flex; gap: 1px"
           >
             <div
@@ -258,6 +260,7 @@ export default {
       // 过期且有时长的课程显示为红色
       if (
         isExpired(this.date) &&
+        this.classItem.classesJson &&
         this.classItem.classesJson.duration &&
         this.classItem.classesJson.duration !== "00:00:00"
       ) {

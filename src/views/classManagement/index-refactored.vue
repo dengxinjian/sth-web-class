@@ -944,16 +944,16 @@ export default {
         if (newData.sportType === "RUN") {
           newData.classesJson = {
             ...newData.classesJson,
-            duration: secondsToHHMMSS(res.result.time || 0),
-            distance: (res.result.distance || 0) + "km",
-            sth: res.result.sth,
+            duration: secondsToHHMMSS((res.result && res.result.time) || 0),
+            distance: ((res.result && res.result.distance) || 0) + "km",
+            sth: (res.result && res.result.sth) || null,
           };
         } else if (newData.sportType === "CYCLE") {
           newData.classesJson = {
             ...newData.classesJson,
             duration: newData.classesJson.duration,
             distance: newData.classesJson.distance,
-            sth: res.result.sth,
+            sth: (res.result && res.result.sth) || null,
           };
         }
       }
@@ -2403,13 +2403,13 @@ export default {
       };
       // 模拟课程数据 - 这里可以从课程列表中选择
       const courseData = {
-        name: classItem.classesJson.title,
-        duration: classItem.classesJson.duration,
-        sth: classItem.classesJson.sth,
+        name: (classItem.classesJson && classItem.classesJson.title) || null,
+        duration: (classItem.classesJson && classItem.classesJson.duration) || null,
+        sth: (classItem.classesJson && classItem.classesJson.sth) || null,
         id: classItem.id,
         classesJson: classItem.classesJson,
-        distance: classItem.classesJson.distance,
-        distanceUnit: classItem.classesJson.distanceUnit,
+        distance: (classItem.classesJson && classItem.classesJson.distance) || null,
+        distanceUnit: (classItem.classesJson && classItem.classesJson.distanceUnit) || null,
         sportType: classItem.sportType,
       };
       console.log(exerciseData, "exerciseData");
@@ -2454,16 +2454,16 @@ export default {
         if (data.sportType === "RUN") {
           calculatedClassesJson = {
             ...calculatedClassesJson,
-            duration: secondsToHHMMSS(res.result.time || 0),
-            distance: (res.result.distance || 0) + "km",
-            sth: res.result.sth,
+            duration: secondsToHHMMSS((res.result && res.result.time) || 0),
+            distance: ((res.result && res.result.distance) || 0) + "km",
+            sth: (res.result && res.result.sth) || null,
           };
         } else if (data.sportType === "CYCLE") {
           calculatedClassesJson = {
             ...calculatedClassesJson,
             duration: calculatedClassesJson.duration,
             distance: calculatedClassesJson.distance,
-            sth: res.result.sth,
+            sth: (res.result && res.result.sth) || null,
           };
         }
       }
