@@ -142,7 +142,7 @@ export const scheduleApi = {
   // 计算时间距离和STH
   calculateTimeDistanceSth(data) {
     return submitData({
-      url: "/gateway/analysis/classCalculateTimeDistanceSth",
+      url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
       requestData: data,
     });
   },
