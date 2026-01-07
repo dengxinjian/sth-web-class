@@ -58,7 +58,7 @@ export const planApi = {
   // 获取计划详情
   getPlanDetail(id) {
     return getData({
-      url: `/training/api/planClasses/getPlanClassesById?id=${id}`,
+      url: `/gateway/training/planClasses/getPlanClassesById?id=${id}`,
     });
   },
 
