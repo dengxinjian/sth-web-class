@@ -88,7 +88,7 @@ export const scheduleApi = {
   // 创建课表
   createSchedule(data) {
     return submitData({
-      url: "/training/api/classSchedule/create",
+      url: "/gateway/training/classSchedule/create",
       requestData: data,
     });
   },
