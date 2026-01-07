@@ -306,6 +306,7 @@ export default {
       if (val) {
         // reset form when opening
         this.resetForm();
+        this.getDefaultTeam();
         this.getTeamList();
       } else {
         // clear validation when closing
@@ -412,7 +413,25 @@ export default {
       getData({
         url: "/consumer/api/team/coach/all-teams",
       }).then((res) => {
-        this.teams = res.result;
+        this.teams = [...this.teams, ...res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, []);
+      });
+    },
+    getDefaultTeam() {
+      const _this = this;
+      getData({
+        url: "/gateway/team/my-team",
+      }).then((res) => {
+        _this.teams = [..._this.teams, res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, []);
       });
     },
     getTeamGroupList(teamId) {
