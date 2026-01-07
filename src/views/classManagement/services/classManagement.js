@@ -302,7 +302,7 @@ export const competitionApi = {
   // 删除赛事
   deleteCompetition(id) {
     return submitData({
-      url: `/consumer/api/competition/${id}`,
+      url: `/gateway/competition/${id}`,
       method: "delete",
     });
   },
