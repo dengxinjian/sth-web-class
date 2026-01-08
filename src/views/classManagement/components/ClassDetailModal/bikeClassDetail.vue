@@ -1176,6 +1176,7 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
+        classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
