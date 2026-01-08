@@ -29,6 +29,17 @@ export default {
 </script>
 
 <style lang="scss">
+.el-dialog {
+  border-radius: 12px;
+}
+.el-dialog__body {
+  padding-top: 0px;
+}
+.el-dialog__header {
+  // padding-top: 25px;
+  padding: 25px;
+  padding-bottom: 10px;
+}
 .el-button--primary {
   background: #f92b30;
   border: none;
@@ -49,6 +60,7 @@ export default {
 }
 .el-dialog__footer {
   border-top: 1px solid #e5e5e5;
+  padding-bottom: 10px;
   .el-button {
     min-width: 102px;
     border-radius: 5px;

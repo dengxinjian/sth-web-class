@@ -6,6 +6,8 @@
         <span class="date-display"
           >{{ selectedYear }}年{{ selectedMonth }}月</span
         >
+        <i class="el-icon-caret-top" v-if="showCalendar"></i>
+        <i class="el-icon-caret-bottom" v-else></i>
       </div>
       <div class="trigger-right">
         <span class="nav-arrow" @click.stop="goPrevWeek">&lt;</span>
@@ -20,7 +22,9 @@
       <div class="week-range-picker-calendar">
         <!-- 日历标题 -->
         <div class="calendar-title">
-          <span class="nav-arrow" @click.stop="goPrevMonthInCalendar">&lt;</span>
+          <span class="nav-arrow" @click.stop="goPrevMonthInCalendar"
+            >&lt;</span
+          >
           <div class="date-text">
             <select
               class="year-select"
@@ -43,7 +47,9 @@
               </option>
             </select>
           </div>
-          <span class="nav-arrow" @click.stop="goNextMonthInCalendar">&gt;</span>
+          <span class="nav-arrow" @click.stop="goNextMonthInCalendar"
+            >&gt;</span
+          >
         </div>
 
         <!-- 星期表头 -->
@@ -475,21 +481,16 @@ export default {
     goThisWeek() {
       const today = new Date();
       const thisMonday = this.getMonday(today);
-      // 优先使用「周一所在的年月」显示，找不到再回退到「今天所在的年月」
-      const mondayYear = thisMonday.getFullYear();
-      const mondayMonth = thisMonday.getMonth() + 1;
-      const todayYear = today.getFullYear();
-      const todayMonth = today.getMonth() + 1;
+      const targetYear = thisMonday.getFullYear();
+      const targetMonth = thisMonday.getMonth() + 1;
 
-      // 更新年月显示
-      this.selectedYear = todayYear;
-      this.selectedMonth = todayMonth;
-
-      this.recomputeWeeks(() => {
-        const currentIndex = this.findWeekIndexContainingDate(today);
-        if (currentIndex >= 0) {
-          this.selectedWeekIndex = currentIndex;
+      // 直接定位到「周一所在的年月」，避免需要點兩次
+      this.setYearMonth(targetYear, targetMonth, () => {
+        let idx = this.findWeekIndexContainingDate(thisMonday);
+        if (idx < 0) {
+          idx = this.findWeekIndexByDateValue(thisMonday);
         }
+        this.selectedWeekIndex = idx >= 0 ? idx : 0;
         this.updateSelectedWeek();
       });
     },
@@ -741,8 +742,17 @@ export default {
 .trigger-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  /* gap: 12px; */
   cursor: pointer;
+  margin-right: 10px;
+  .el-icon-caret-top {
+    font-size: 12px;
+    color: #666;
+  }
+  .el-icon-caret-bottom {
+    font-size: 12px;
+     color: #666;
+  }
 }
 
 .trigger-right {
@@ -763,8 +773,8 @@ export default {
     background: #fafafa;
   }
   .nav-arrow:hover {
-    background: #F92B301A;
-    color: #F92B30;
+    background: #f92b301a;
+    color: #f92b30;
   }
 }
 
@@ -772,7 +782,7 @@ export default {
   font-size: 14px;
   font-weight: 600;
   color: #333;
-  min-width: 100px;
+  min-width: 90px;
   text-align: center;
 }
 

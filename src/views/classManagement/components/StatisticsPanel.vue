@@ -57,8 +57,8 @@
 
       <!-- 统计数据列表 -->
       <div
-        v-for="item in statisticData"
-        :key="item.title"
+        v-for="(item, idx) in statisticData"
+        :key="item.key || item.statKey || `${item.title}-${idx}`"
         class="week-data-item"
       >
         <div class="week-data-text">

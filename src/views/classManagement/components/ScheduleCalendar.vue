@@ -619,7 +619,7 @@ export default {
       line-height: 18px;
       color: #333;
       cursor: pointer;
-      padding-bottom: 20px;
+      padding-bottom: 100px;
       transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
       will-change: transform; /* 提示浏览器优化渲染 */
       /* 显示添加入口：整个单元格悬停时展示 */
