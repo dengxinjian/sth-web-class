@@ -1109,6 +1109,7 @@ export default {
                 section.targetUnit === "m"
                   ? (targetDistance / 1000) * times
                   : targetDistance * times;
+              console.log(distanceIncrement, "distanceIncrement");
               this.classInfo.distance = this.preciseAdd(
                 this.classInfo.distance,
                 distanceIncrement
@@ -1117,7 +1118,7 @@ export default {
 
               if (section.range === "target") {
                 const timer =
-                  section.targetDistance *
+                  distanceIncrement *
                   mmssToSeconds(section.targetSpeed) *
                   Number(stage.times || 1);
                 this.classInfo.duration += timer;
@@ -1126,7 +1127,7 @@ export default {
                 const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
                 const timer3 = (timer1 + timer2) / 2;
                 this.classInfo.duration +=
-                  section.targetDistance * timer3 * Number(stage.times || 1);
+                  distanceIncrement * timer3 * Number(stage.times || 1);
               }
             }
           }

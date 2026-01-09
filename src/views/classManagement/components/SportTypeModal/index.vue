@@ -25,7 +25,7 @@
     <div class="add-event-title" v-if="!isClass">
       <span>添加赛事</span>
     </div>
-    <div class="type-grid" v-if="!isClass">
+    <div class="type-grid" v-if="!isClass" style="padding-bottom: 100px;">
       <div class="type-card" @click="onSelectEvent('event')">
         <img src="~@/assets/addClass/eventIcon.png" alt="" />
         <div>赛事</div>
@@ -54,6 +54,21 @@ export default {
       innerVisible: this.visible || this.value || false,
       types: [
         {
+          key: "swim",
+          name: "游泳",
+          icon: require("@/assets/addClass/icon-swim.png"),
+        },
+        {
+          key: "ride",
+          name: "骑行",
+          icon: require("@/assets/addClass/icon-bike.png"),
+        },
+        {
+          key: "run",
+          name: "跑步",
+          icon: require("@/assets/addClass/icon-run.png"),
+        },
+        {
           key: "strength",
           name: "力量",
           icon: require("@/assets/addClass/icon-power.png"),
@@ -72,21 +87,6 @@ export default {
           key: "rest",
           name: "休息",
           icon: require("@/assets/addClass/icon-rest.png"),
-        },
-        {
-          key: "swim",
-          name: "游泳",
-          icon: require("@/assets/addClass/icon-swim.png"),
-        },
-        {
-          key: "ride",
-          name: "骑行",
-          icon: require("@/assets/addClass/icon-bike.png"),
-        },
-        {
-          key: "run",
-          name: "跑步",
-          icon: require("@/assets/addClass/icon-run.png"),
         },
       ],
     };
@@ -130,26 +130,22 @@ export default {
 </script>
 
 <style scoped>
-.sport-type-modal ::v-deep(.el-dialog__header) {
-  padding: 16px 24px;
-}
 .sport-type-modal ::v-deep(.el-dialog__body) {
   padding: 10px 24px 30px 24px;
 }
 .type-grid {
   display: flex;
-  gap: 20px;
-  padding: 10px 6px 0 6px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 .add-event-title {
   color: #101010;
-  margin-top: 30px;
+  margin-top: 4cqb;
   font-family: PingFang SC;
   font-weight: 600;
   font-style: Semibold;
   font-size: 16px;
-  margin-bottom: 14px;
+  margin-bottom: 24px;
 }
 .type-card {
   border-radius: 8px;
@@ -158,7 +154,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  /* padding: 10px; */
+  padding: 8px 16px 8px 8px;
   cursor: pointer;
   img {
     width: 24px;

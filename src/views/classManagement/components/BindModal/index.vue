@@ -45,9 +45,6 @@
                     : exerciseData[0].duration
                 }}
               </div>
-              <div class="card-sth">
-                {{ exerciseData[0].sth == 0 ? "--" : exerciseData[0].sth }} STH
-              </div>
               <div class="card-distance">
                 {{
                   formatDistance(
@@ -59,6 +56,9 @@
                   exerciseData[0].distanceUnit
                 }}</span>
                 <span v-else>km</span>
+              </div>
+              <div class="card-sth">
+                {{ exerciseData[0].sth == 0 ? "--" : exerciseData[0].sth }} STH
               </div>
             </div>
           </div>
@@ -82,15 +82,15 @@
                     : courseData.duration
                 }}
               </div>
-              <div class="card-sth">
-                {{ courseData.sth == 0 ? "--" : courseData.sth }} STH
-              </div>
               <div class="card-distance">
                 {{ formatDistance(courseData.distance, courseData.sportType) }}
                 <span v-if="courseData.sportType === 'SWIM'">{{
                   courseData.distanceUnit
                 }}</span>
                 <span v-else>km</span>
+              </div>
+              <div class="card-sth">
+                {{ courseData.sth == 0 ? "--" : courseData.sth }} STH
               </div>
             </div>
           </div>
@@ -113,7 +113,8 @@
             class="course-card"
             style="
               border: 1px solid #f92b30;
-              box-shadow: 0px 2px 4px 0px #f92b3026;
+              box-shadow: 0px 4px 12px 0px #f92b3026;
+              background: #f92b3008;
             "
           >
             <div class="card-icon">
@@ -398,6 +399,10 @@ export default {
     border-bottom: 15px solid transparent;
   }
 }
+// ::v-deep(.el-dialog__body) {
+//   padding-top: 0px;
+//   // padding: 10px 24px 30px 24px;
+// }
 
 .dialog-footer {
   display: flex;

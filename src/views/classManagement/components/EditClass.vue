@@ -9,7 +9,7 @@
       custom-class="edit-class-dialog"
       top="5vh"
     >
-      <div slot="title" class="dialog-title">课程简介</div>
+      <!-- <div slot="title" class="dialog-title">课程简介</div> -->
       <!-- <div slot="title" class="dialog-header">
         <div class="header-title">
           <span>标题：</span>

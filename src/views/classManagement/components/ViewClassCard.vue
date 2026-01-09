@@ -23,18 +23,6 @@
           v-if="type === 'edit' && showDeleteBtn"
         >
           <div class="btn-list-hover">
-            <span v-if="showMoveBtn">
-              <div
-                class="btn-list-hover-item"
-                @click.stop="
-                  $emit('move', classItem.id);
-                  handleClose();
-                "
-              >
-                移动
-              </div>
-            </span>
-
             <span v-if="showDeleteBtn">
               <div
                 class="btn-list-hover-item"
@@ -56,6 +44,17 @@
                 "
               >
                 {{ copyBtnText }}
+              </div>
+            </span>
+            <span v-if="showMoveBtn">
+              <div
+                class="btn-list-hover-item"
+                @click.stop="
+                  $emit('move', classItem.id);
+                  handleClose();
+                "
+              >
+                移动
               </div>
             </span>
             <span v-if="showDeleteBtn">
