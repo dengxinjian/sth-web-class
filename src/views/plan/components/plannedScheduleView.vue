@@ -41,8 +41,20 @@
         </el-popover>
       </div>
       <div class="planned-schedule-header-title-right">
+        <div class="planned-schedule-header-title-right-total-label">总时长/总距离/总STH</div>
+        <div class="planned-schedule-header-title-right-total-value">
+          <span>{{
+            secondsToHHMMSS(getTotalDuration()) === "00:00:00"
+              ? "--:--:--"
+              : secondsToHHMMSS(getTotalDuration())
+          }}</span>/<span class="planned-schedule-header-title-right-total-value">{{ getTotalDistance() || "--" }}km</span><span class="planned-schedule-header-title-right-total-value">{{
+            getTotalSth() > 100000
+              ? (getTotalSth() / 10000).toFixed(2) + "万"
+              : getTotalSth() || "--"
+          }}</span>
+        </div>
         <!-- 总运动时长距离sth总值 -->
-        <div class="planned-schedule-header-title-right-total">
+        <!-- <div class="planned-schedule-header-title-right-total">
           <span class="label">预估运动时长:</span>
           <span class="value">{{
             secondsToHHMMSS(getTotalDuration()) === "00:00:00"
@@ -61,7 +73,7 @@
               ? (getTotalSth() / 10000).toFixed(2) + "万"
               : getTotalSth() || "--"
           }}</span>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="planned-schedule-container-planned">
@@ -391,17 +403,21 @@ export default {
   flex-direction: column;
   background: #fff;
   height: 100%;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  // box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-sizing: border-box;
 
   .planned-schedule-header {
     width: 100%;
-    border-bottom: 1px solid rgba(228, 231, 237, 0.8);
+    height: 60px;
+    // border-bottom: 1px solid rgba(228, 231, 237, 0.8);
     // padding: 16px 20px;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    // background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid #00000026;
+    box-sizing: border-box;
     position: relative;
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     position: relative;
 
     &::after {
@@ -411,7 +427,7 @@ export default {
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #409eff, transparent);
+      // background: linear-gradient(90deg, transparent, #409eff, transparent);
       opacity: 0.3;
     }
 
@@ -436,18 +452,20 @@ export default {
 
     .planned-schedule-header-title-left {
       flex: 0.85;
-      height: 100%;
+      height: 60px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: relative;
-      padding: 0 20px;
+      // padding: 0 20px;
+      border-right: 1px solid #00000026;
+      // padding: 0 10px;
       box-sizing: border-box;
 
       .planned-schedule-header-title-left-title {
         font-size: 18px;
         font-weight: 600;
-        margin-bottom: 10px;
+        // margin-bottom: 10px;
         box-sizing: border-box;
         color: #303133;
         // position: absolute;
@@ -463,13 +481,23 @@ export default {
 
     .planned-schedule-header-title-right {
       flex: 0.15;
-      min-width: 240px;
+      height: 60px;
+      // min-width: 240px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 10px;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0 10px;
+      box-sizing: border-box;
       gap: 5px;
-
+      .planned-schedule-header-title-right-total-label{
+        font-size: 12px;
+        color: #666666;
+      }
+      .planned-schedule-header-title-right-total-value{
+        font-size: 14px;
+        color:#101010;
+      }
       .planned-schedule-header-title-right-total {
         margin-bottom: 2px;
         width: 100%;
@@ -554,5 +582,6 @@ export default {
   align-items: center;
   background: #c3c9d740;
   border-radius: 50%;
+  margin-right: 10px;
 }
 </style>
