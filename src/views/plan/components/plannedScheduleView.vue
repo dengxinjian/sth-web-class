@@ -17,7 +17,7 @@
           <div class="add-class-btn-popover-more-list">
             <div v-for="(el, idx) in optionsArray" :key="idx">
               <div
-                class="add-class-btn-popover-more-list-item"
+                :class="idx === 5 ? 'add-class-btn-popover-more-list-item-del' : 'add-class-btn-popover-more-list-item'"
                 :key="idx"
                 @click="$emit('options-click', el, idx)"
               >
@@ -31,7 +31,13 @@
             slot="reference"
             @click.stop
           ></i> -->
-          <el-button type="text" slot="reference">操作</el-button>
+          <!-- <el-button type="text" slot="reference">操作</el-button> -->
+          <span class="more-icon-span" slot="reference"
+            ><img
+              src="@/assets/plan/more.png"
+              alt="更多"
+              style="width: 16px; height: 16px"
+          /></span>
         </el-popover>
       </div>
       <div class="planned-schedule-header-title-right">
@@ -50,7 +56,11 @@
         </div>
         <div class="planned-schedule-header-title-right-total">
           <span class="label">预估STH:</span>
-          <span class="value">{{ getTotalSth() > 100000 ? (getTotalSth() / 10000).toFixed(2) + "万" : getTotalSth() || "--" }}</span>
+          <span class="value">{{
+            getTotalSth() > 100000
+              ? (getTotalSth() / 10000).toFixed(2) + "万"
+              : getTotalSth() || "--"
+          }}</span>
         </div>
       </div>
     </div>
@@ -272,33 +282,76 @@ export default {
   background-color: #fff;
   padding: 0 0 0 8px;
   box-sizing: border-box;
-  & .add-class-btn-popover-more-list-item {
+  .add-class-btn-popover-more-list-item {
     width: 100%;
     height: 36px;
     line-height: 36px;
     text-align: center;
     background-color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    color: #333333;
-    border-bottom: 1px solid #eeeeee;
-
+    font-size: 14px;
+    color: #101010;
     &:hover {
       cursor: pointer;
+      font-weight: 600;
       // background: rgba(64, 158, 255, 0.5);
       // color: #409eff;
-      color: #bc362e;
-      background: rgba(204, 35, 35, 0.05);
-      border-bottom: 1px solid #bc362e;
+      // color: #bc362e;
+      background: #c3c9d740;
+      border-radius: 5px;
+      // border-bottom: 1px solid #bc362e;
     }
 
     &:active {
       background: rgba(64, 158, 255, 0.18);
     }
   }
-  // & .add-class-btn-popover-more-list-item:last-child {
-  //   border-bottom: none !important;
-  //   color: #bc362e; // 删除按钮颜色 标准红色
+  .add-class-btn-popover-more-list-item-del{
+    width: 100%;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    background-color: #fff;
+    font-size: 14px;
+    color: #f92b30;
+    &:hover {
+      cursor: pointer;
+      font-weight: 600;
+      // background: rgba(64, 158, 255, 0.5);
+      // color: #409eff;
+      // color: #bc362e;
+      background: #c3c9d740;
+      border-radius: 5px;
+      // border-bottom: 1px solid #bc362e;
+    }
+
+    &:active {
+      background: rgba(64, 158, 255, 0.18);
+    }
+  }
+  // .add-class-btn-popover-more-list-item:last-child {
+  //   width: 100%;
+  //   height: 36px;
+  //   line-height: 36px;
+  //   text-align: center;
+  //   background-color: #fff;
+  //   font-size: 14px;
+  //   color: #F92B30;
+  //   // border-bottom: 1px solid #eeeeee;
+
+  //   &:hover {
+  //     cursor: pointer;
+  //     font-weight: 600;
+  //     // background: rgba(64, 158, 255, 0.5);
+  //     // color: #409eff;
+  //     // color: #bc362e;
+  //     background: #C3C9D740;
+  //     border-radius: 5px;
+  //     // border-bottom: 1px solid #bc362e;
+  //   }
+
+  //   &:active {
+  //     background: rgba(64, 158, 255, 0.18);
+  //   }
   // }
 }
 
@@ -315,7 +368,7 @@ export default {
     background-color: #fff;
     font-size: 12px;
     font-weight: bold;
-    color: #333333;
+    color: #101010;
     border-bottom: 1px solid #eeeeee;
 
     &:hover {
@@ -490,5 +543,16 @@ export default {
       box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
     }
   }
+}
+.more-icon-span {
+  cursor: pointer;
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #c3c9d740;
+  border-radius: 50%;
 }
 </style>
