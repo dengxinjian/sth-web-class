@@ -9,11 +9,11 @@
   >
     <span slot="title">历史</span>
 
-    <el-table v-if="loginType === '2'" :data="tableData" style="width: 100%">
-      <el-table-column prop="teamName" label="团队名称" width="180" />
-      <el-table-column prop="applyNickname" label="昵称" width="180" />
-      <el-table-column prop="applyTimeRange" label="应用时间" width="260" />
-      <el-table-column prop="applyStatusDesc" label="应用状态" width="120">
+    <el-table v-if="loginType === '2'" :data="tableData" border style="width: 100%">
+      <el-table-column prop="teamName" label="团队名称" width="180" align="center" />
+      <el-table-column prop="applyNickname" label="昵称" width="180" align="center" />
+      <el-table-column prop="applyTimeRange" label="应用时间" width="260" align="center" />
+      <el-table-column prop="applyStatusDesc" label="应用状态" width="120" align="center">
         <template slot-scope="scope">
           <span :class="getStatusClass(scope.row.applyStatus)">
             {{ scope.row.applyStatusDesc }}
@@ -22,9 +22,9 @@
       </el-table-column>
     </el-table>
     <el-table v-else :data="tableData" style="width: 100%">
-      <el-table-column prop="applyNickname" label="昵称" />
-      <el-table-column prop="applyTimeRange" label="应用时间" />
-      <el-table-column prop="applyStatusDesc" label="应用状态" width="120">
+      <el-table-column prop="applyNickname" label="昵称" align="center" />
+      <el-table-column prop="applyTimeRange" label="应用时间" align="center" />
+      <el-table-column prop="applyStatusDesc" label="应用状态" width="120" align="center">
         <template slot-scope="scope">
           <span :class="getStatusClass(scope.row.applyStatus)">
             {{ scope.row.applyStatusDesc }}
@@ -32,6 +32,16 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagination.page"
+      :page-sizes="[10, 20, 50, 100]"
+      :page-size="pagination.limit"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      style="margin-top: 20px; text-align: right"
+    /> -->
     <el-pagination
       v-if="loginType === '2' || total > 10"
       @size-change="handleSizeChange"
@@ -41,7 +51,7 @@
       :page-size="pagination.limit"
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
-      style="margin-top: 20px; text-align: right"
+      style="margin-top: 20px; text-align: right;margin-bottom: 20px;"
     />
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">关闭</el-button>
@@ -157,6 +167,7 @@ export default {
             return {
               ...el,
               teamName: el.teamName || "/",
+              applyTimeRange: this.formatDateRange(el.applyTimeRange),
             };
           });
 
@@ -244,6 +255,14 @@ export default {
       }
       return "";
     },
+    // 格式化日期范围为中文年月日格式
+    formatDateRange(dateRange) {
+      if (!dateRange) return dateRange;
+      // 格式: "2026-01-10 ~ 2026-01-13" -> "2026年1月10日 ~ 2026年1月13日"
+      return dateRange.replace(/(\d{4})-(\d{1,2})-(\d{1,2})/g, (match, year, month, day) => {
+        return `${year}年${parseInt(month)}月${parseInt(day)}日`;
+      });
+    },
   },
 };
 </script>
@@ -257,7 +276,7 @@ export default {
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 .statistics-divider-wrapper {
   margin: 8px 0;
@@ -268,14 +287,26 @@ export default {
 
 /* 应用状态颜色 */
 .status-applying {
-  color: #409eff; /* 蓝色 - 应用中 */
+  font-size: 12px;
+  color: #385DFF; /* 蓝色 - 应用中 */
+  background: #385DFF1F;
+  padding: 6px 6px;
+  border-radius: 3px;
 }
 
 .status-success {
-  color: #67c23a; /* 绿色 - 成功 */
+  font-size: 12px;
+  color: #00A781; /* 绿色 - 成功 */
+  background: #00A7811F;
+  padding: 6px 6px;
+  border-radius: 3px;
 }
 
 .status-failed {
-  color: #f56c6c; /* 红色 - 失败 */
+  font-size: 12px;
+  color: #F92B30; /* 红色 - 失败 */
+  background: #F92B301F;
+  padding: 6px 6px;
+  border-radius: 3px;
 }
 </style>

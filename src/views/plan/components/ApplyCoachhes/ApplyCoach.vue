@@ -15,6 +15,7 @@
       :rules="rules"
       :label-width="loginType === '2' ? '145px' : '90px'"
       size="small"
+      label-width="80px"
     >
       <template v-if="loginType === '2'">
         <el-form-item label="团队选择" prop="teamId">
@@ -23,7 +24,7 @@
             placeholder="请选择团队"
             filterable
             clearable
-            style="width: 90%"
+            style="width: 100%"
             @change="getTeamGroupList(form.teamId)"
           >
             <el-option
@@ -58,7 +59,7 @@
             :options="teamGroupList"
             :props="memberProps"
             clearable
-            style="width: 90%"
+            style="width: 100%"
             collapse-tags
             @change="handleCascaderChange"
             collapse-tags
@@ -102,77 +103,72 @@
           >
           </el-date-picker>
         </el-form-item>
-        <!-- <el-form-item v-if="form.athleteType === 2" label="成员">
-          <el-row :gutter="8">
-            <el-col :span="6">方式</el-col>
-            <el-col :span="8">时间</el-col>
+        <div style="padding: 0 0 0 14px; box-sizing: border-box;" v-if="form.athleteType === 2">
+          <el-row
+            :gutter="8"
+            class="member-row member-row-header"
+          >
+            <el-col :span="4">
+              <span class="member-name">成员</span>
+            </el-col>
+            <el-col :span="7">
+              <span class="member-name">方式</span>
+            </el-col>
+            <el-col :span="9">
+              <span class="member-name">时间</span>
+            </el-col>
+            <el-col :span="1">
+              <span class="member-name"></span>
+            </el-col>
           </el-row>
-        </el-form-item> -->
-        <!-- <el-form-item
-        :label="item.userNickname"
-        v-for="(item, index) in members"
-        :key="index"
-        :rules="[
-          { required: true, message: '请选择方式', trigger: 'change' },
-          { required: true, message: '请选择时间', trigger: 'change' },
-        ]"
-      > -->
-        <el-row :gutter="24" class="member-row" v-if="form.athleteType === 2">
-          <el-col :span="6" align="right"
-            ><span class="member-name">成员</span></el-col
+        </div>
+        <div style="padding: 0 0 0 14px; box-sizing: border-box;" v-if="form.athleteType === 2 && members.length > 0">
+          <el-row
+            :gutter="24"
+            class="member-row"
+            v-for="(item, index) in members"
+            :key="index"
           >
-          <el-col :span="7" align="left"
-            ><span class="member-name">方式</span></el-col
-          >
-          <el-col :span="9" align="left"
-            ><span class="member-name">时间</span></el-col
-          >
-          <el-col :span="1" align="left"
-            ><span class="member-name"></span
-          ></el-col>
-        </el-row>
-        <div class="member-row-wrapper" v-if="form.athleteType === 2 && members.length > 0">
-            <el-row
-              :gutter="24"
-              class="member-row"
-              v-for="(item, index) in members"
-              :key="index"
-            >
-              <el-col :span="6" align="right">
-                <span class="member-name">{{ item.userNickname }}</span>
-              </el-col>
-              <el-col :span="7" align="left">
-                <el-select
-                  v-model="item.applyMode"
-                  placeholder="请选择"
-                  size="small"
-                >
-                  <el-option label="以开始日期" :value="1"></el-option>
-                  <el-option label="以结束日期" :value="2"></el-option>
-                </el-select>
-              </el-col>
-              <el-col :span="9" align="left">
-                <el-date-picker
-                  v-model="item.applyDate"
-                  value-format="yyyy-MM-dd"
-                  type="date"
-                  placeholder="选择日期"
-                  style="width: 100%"
-                  :picker-options="pickerOptions"
-                  size="small"
-                >
-                </el-date-picker>
-              </el-col>
-              <el-col :span="1" align="left">
-                <i
+            <el-col :span="4">
+              <span class="member-name"><span style="color: #F92B30;font-weight: bold;font-size: 14px;margin-right: 2px;">*</span>{{ item.userNickname }}</span>
+            </el-col>
+            <el-col :span="7" align="left">
+              <el-select
+                v-model="item.applyMode"
+                placeholder="请选择"
+                size="small"
+              >
+                <el-option label="以开始日期" :value="1"></el-option>
+                <el-option label="以结束日期" :value="2"></el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="9" align="left">
+              <el-date-picker
+                v-model="item.applyDate"
+                value-format="yyyy-MM-dd"
+                type="date"
+                placeholder="选择日期"
+                style="width: 100%"
+                :picker-options="pickerOptions"
+                size="small"
+              >
+              </el-date-picker>
+            </el-col>
+            <el-col :span="1" align="left">
+              <img
+                src="@/assets/plan/close.png"
+                alt="删除"
+                class="delete-icon-img"
+                @click="removeMember(item, index)"
+              />
+              <!-- <i
                   class="el-icon-circle-close delete-icon"
                   @click="removeMember(item, index)"
-                ></i>
-              </el-col>
-            </el-row>
+                ></i> -->
+            </el-col>
+          </el-row>
         </div>
       </template>
-      <!-- </el-form-item> -->
       <template v-else>
         <el-form-item label="方式" prop="applyMode">
           <el-select
@@ -197,15 +193,12 @@
           </el-date-picker>
         </el-form-item>
       </template>
-      <!-- <el-form-item label="">
-        <a href="javascript:void(0)" @click="viewApplyHistory" style="color: #409EFF;">应用历史</a>
-      </el-form-item> -->
     </el-form>
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
       <el-button type="primary" @click="onConfirm" :loading="loading"
-        >应用</el-button
+        >确定</el-button
       >
     </span>
   </el-dialog>
@@ -437,9 +430,9 @@ export default {
     getTeamGroupList(teamId) {
       this.form.athleteIds = [];
       this.members = [];
-      this.teamGroupList = []
-      if (!teamId) return
-      this.teamGroupList = []
+      this.teamGroupList = [];
+      if (!teamId) return;
+      this.teamGroupList = [];
       if (!teamId) return;
       getData({
         url: `/consumer/api/team/group/list/${teamId}`,
@@ -618,10 +611,11 @@ export default {
             } else if (findPersons.length > 1) {
               let names = "";
               if (findPersons.length > 10) {
-                names = findPersons
-                  .slice(0, 10)
-                  .map((person) => person.userNickname)
-                  .join("、") + `...等${findPersons.length}位运动员`;
+                names =
+                  findPersons
+                    .slice(0, 10)
+                    .map((person) => person.userNickname)
+                    .join("、") + `...等${findPersons.length}位运动员`;
               } else {
                 names = findPersons
                   .map((person) => person.userNickname)
@@ -710,7 +704,7 @@ export default {
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 .statistics-divider-wrapper {
   margin: 8px 0;
@@ -731,10 +725,18 @@ export default {
 .member-name {
   display: inline-block;
   width: 100%;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
   vertical-align: middle;
   /* text-align: right; */
+}
+.member-row-header {
+  height: 42px;
+  line-height: 42px;
+  font-size: 12px;
+  color: #666;
+  border-bottom: 1px solid #00000026;
 }
 .member-row {
   display: flex;
@@ -769,5 +771,10 @@ export default {
 .member-row ::v-deep(.el-col) {
   display: flex;
   align-items: center;
+}
+.delete-icon-img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
 }
 </style>

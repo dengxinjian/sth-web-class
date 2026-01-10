@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="540px"
+    width="600px"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -46,7 +46,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm">保存</el-button>
+      <el-button type="primary" @click="onConfirm">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -200,7 +200,7 @@ export default {
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 .statistics-divider-wrapper {
   margin: 8px 0;

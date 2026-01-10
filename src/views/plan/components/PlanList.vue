@@ -26,16 +26,18 @@
         popper-class="add-class-btn-popover"
       >
         <el-button type="primary" size="mini" slot="reference">新增</el-button>
-        <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; flex-direction: column; gap: 6px;width: 100px;">
           <span>
-            <el-button type="primary" size="mini" @click="$emit('add-plan')">
+            <!-- <el-button type="primary" size="mini" @click="$emit('add-plan')">
               新增计划
-            </el-button>
+            </el-button> -->
+            <div class="add-class-btn" @click="$emit('add-plan')">新增计划</div>
           </span>
           <span>
-            <el-button type="primary" size="mini" @click="$emit('add-group')">
+            <!-- <el-button type="primary" size="mini" @click="$emit('add-group')">
               新增分组
-            </el-button>
+            </el-button> -->
+            <div class="add-class-btn" @click="$emit('add-group')">新增分组</div>
           </span>
         </div>
       </el-popover>
@@ -460,5 +462,19 @@ export default {
 }
 .plan-item ::v-deep(.el-rate__icon) {
   font-size: 16px;
+}
+.add-class-btn{
+  width:84px;
+  height:32px;
+  text-align: center;
+  line-height: 32px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #101010;
+  &:hover{
+    cursor: pointer;
+    background-color: #C3C9D740;
+    font-weight: 600;
+  }
 }
 </style>

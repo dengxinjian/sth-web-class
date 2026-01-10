@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="680px"
+    width="1000px"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal summary-preview-modal"
@@ -16,273 +16,403 @@
       label-width="90px"
       size="small"
     >
-      <el-form-item label="计划名称" prop="planTitle">
-        <span v-if="activeClassType === 'official'">{{ form.planTitle }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          v-model="form.planTitle"
-          maxlength="20"
-          show-word-limit
-          placeholder="请输入计划名称"
-          clearable
-        />
-      </el-form-item>
+      <el-row>
+        <el-col :span="24">
+          <el-form-item label="计划名称" prop="planTitle">
+            <span v-if="activeClassType === 'official'">{{
+              form.planTitle
+            }}</span>
+            <el-input
+              v-else
+              :readonly="activeClassType === 'official'"
+              v-model="form.planTitle"
+              maxlength="20"
+              show-word-limit
+              placeholder="请输入计划名称"
+              clearable
+            />
+          </el-form-item>
+        </el-col>
 
-      <el-form-item label="分组选择" prop="planGroupId">
-        <el-select
-          v-model="form.planGroupId"
-          placeholder="请选择分组"
-          filterable
-          clearable
-          style="width: 100%"
-          v-if="activeClassType !== 'official'"
-        >
-          <el-option
-            v-for="g in groupOptions"
-            :key="g.id"
-            :label="g.planClassesGroup"
-            :value="g.id"
-          />
-        </el-select>
-        <!-- <el-input v-else :readonly="true" :value="planInfo.planGroupName" /> -->
-        <span v-else>{{ planInfo.planGroupName }}</span>
-      </el-form-item>
+        <el-col :span="12">
+          <el-form-item label="分组选择" prop="planGroupId">
+            <el-select
+              v-model="form.planGroupId"
+              placeholder="请选择分组"
+              filterable
+              clearable
+              style="width: 100%"
+              v-if="activeClassType !== 'official'"
+            >
+              <el-option
+                v-for="g in groupOptions"
+                :key="g.id"
+                :label="g.planClassesGroup"
+                :value="g.id"
+              />
+            </el-select>
+            <!-- <el-input v-else :readonly="true" :value="planInfo.planGroupName" /> -->
+            <span v-else>{{ planInfo.planGroupName }}</span>
+          </el-form-item>
+        </el-col>
 
-      <el-form-item
-        label="团队"
-        prop="teamId"
-        v-if="loginType === '2' && form.teamId"
-      >
-        <el-select
-          v-model="form.teamId"
-          placeholder="请选择团队"
-          filterable
-          clearable
-          style="width: 100%"
-          @change="handleTeamChange"
-          v-if="activeClassType !== 'official'"
-        >
-          <el-option
-            v-for="g in teamOptions"
-            :key="g.id"
-            :label="g.teamName"
-            :value="g.id"
-          />
-        </el-select>
-        <span v-else>{{ planInfo.teamName }}</span>
-      </el-form-item>
+        <el-col :span="12">
+          <el-form-item
+            label="团队"
+            prop="teamId"
+            v-if="loginType === '2' && form.teamId"
+          >
+            <el-select
+              v-model="form.teamId"
+              placeholder="请选择团队"
+              filterable
+              clearable
+              style="width: 100%"
+              @change="handleTeamChange"
+              v-if="activeClassType !== 'official'"
+            >
+              <el-option
+                v-for="g in teamOptions"
+                :key="g.id"
+                :label="g.teamName"
+                :value="g.id"
+              />
+            </el-select>
+            <span v-else>{{ planInfo.teamName }}</span>
+          </el-form-item>
+        </el-col>
 
-      <el-form-item label="计划源">
-        <span v-if="activeClassType === 'official'">{{ form.planSource }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          placeholder="请输入计划源"
-          :value="form.planSource"
-          disabled
-        />
-      </el-form-item>
+        <el-col :span="12">
+          <el-form-item label="计划源">
+            <span v-if="activeClassType === 'official'">{{
+              form.planSource
+            }}</span>
+            <el-input
+              v-else
+              :readonly="activeClassType === 'official'"
+              placeholder="请输入计划源"
+              :value="form.planSource"
+              disabled
+            />
+          </el-form-item>
+        </el-col>
 
-      <el-form-item label="拥有者">
-        <span v-if="activeClassType === 'official'">{{
-          planInfo.possessNickname
-        }}</span>
-        <el-input
-          v-else
-          :readonly="true"
-          :value="planInfo.possessNickname"
-          disabled
-        />
-      </el-form-item>
+        <el-col :span="12">
+          <el-form-item label="拥有者">
+            <span v-if="activeClassType === 'official'">{{
+              planInfo.possessNickname
+            }}</span>
+            <el-input
+              v-else
+              :readonly="true"
+              :value="planInfo.possessNickname"
+              disabled
+            />
+          </el-form-item>
+        </el-col>
 
-      <el-form-item label="邮箱" prop="email">
-        <span v-if="activeClassType === 'official'">{{ form.email }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          v-model="form.email"
-          placeholder="请输入邮箱"
-          @change="validateEmail"
-        />
-      </el-form-item>
+        <el-col :span="12">
+          <el-form-item label="邮箱" prop="email">
+            <span v-if="activeClassType === 'official'">{{ form.email }}</span>
+            <el-input
+              v-else
+              :readonly="activeClassType === 'official'"
+              v-model="form.email"
+              placeholder="请输入邮箱"
+              @change="validateEmail"
+            />
+          </el-form-item>
+        </el-col>
 
-      <el-form-item label="微信号" prop="weChat">
-        <span v-if="activeClassType === 'official'">{{ form.weChat }}</span>
-        <el-input
-          v-else
-          :readonly="activeClassType === 'official'"
-          v-model="form.weChat"
-          placeholder="请输入微信号"
-        />
-      </el-form-item>
+        <el-col :span="12">
+          <el-form-item label="微信号" prop="weChat">
+            <span v-if="activeClassType === 'official'">{{ form.weChat }}</span>
+            <el-input
+              v-else
+              :readonly="activeClassType === 'official'"
+              v-model="form.weChat"
+              placeholder="请输入微信号"
+            />
+          </el-form-item>
+        </el-col>
 
-      <el-form-item label="描述" prop="description">
-        <span v-if="activeClassType === 'official'">{{
-          form.description
-        }}</span>
-        <el-input
-          type="textarea"
-          v-else
-          :readonly="activeClassType === 'official'"
-          :rows="6"
-          :maxlength="500"
-          show-word-limit
-          v-model="form.description"
-          placeholder="请输入描述"
-        />
-      </el-form-item>
-      <el-form-item
-        label="计划难度"
-        prop="level"
-        class="rate-form-item-official"
-        v-if="activeClassType === 'official'"
-      >
-        <el-rate
-          v-model="form.level"
-          :allow-half="true"
-          :colors="['#F92B30', '#F92B30', '#F92B30']"
-          text-color="#999999"
-          disabled-void-color="#E1E4EC"
-          disabled
-        />
-        <span style="font-size: 14px; color: #979fb0; margin-top: 2px">{{
-          form.level ? "" : "未评分"
-        }}</span>
-      </el-form-item>
-      <el-form-item label="计划难度" prop="level" class="rate-form-item" v-else>
-        <el-rate
-          v-model="form.level"
-          :allow-half="true"
-          :colors="['#F92B30', '#F92B30', '#F92B30']"
-          text-color="#999999"
-          disabled-void-color="#E1E4EC"
-        />
-      </el-form-item>
-      <el-form-item label="计划周期" prop="groupId">
-        <span>{{ weekNumber }}周</span>
-      </el-form-item>
-
-      <el-form-item label="统计">
-        <el-row>
-          <el-col :span="24">
-            <el-row>
-              <el-col :span="8">类型</el-col>
-              <el-col :span="8">时长</el-col>
-              <el-col :span="8">距离</el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="24">
-            <el-row>
-              <el-col :span="8">游泳</el-col>
-              <el-col :span="8"
-                >{{
-                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                    ? "N/A"
-                    : secondsToHHMMSS(getweekSwimmingDuration())
-                }}{{
-                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col
+        <el-col :span="24">
+          <el-form-item label="描述" prop="description">
+            <span v-if="activeClassType === 'official'">{{
+              form.description
+            }}</span>
+            <el-input
+              type="textarea"
+              v-else
+              :readonly="activeClassType === 'official'"
+              :rows="6"
+              :maxlength="500"
+              show-word-limit
+              v-model="form.description"
+              placeholder="请输入描述"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" v-if="activeClassType === 'official'">
+          <el-form-item
+            label="计划难度"
+            prop="level"
+            class="rate-form-item-official"
+          >
+            <el-rate
+              v-model="form.level"
+              :allow-half="true"
+              :colors="['#F92B30', '#F92B30', '#F92B30']"
+              text-color="#999999"
+              disabled-void-color="#E1E4EC"
+              disabled
+            />
+            <span style="font-size: 14px; color: #979fb0; margin-top: 2px">{{
+              form.level ? "" : "未评分"
+            }}</span>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" v-else>
+          <el-form-item label="计划难度" prop="level" class="rate-form-item">
+            <el-rate
+              v-model="form.level"
+              :allow-half="true"
+              :colors="['#F92B30', '#F92B30', '#F92B30']"
+              text-color="#999999"
+              disabled-void-color="#E1E4EC"
+            />
+          </el-form-item>
+        </el-col>
+        <!-- <el-form-item label="计划周期" prop="groupId">
+          <span>{{ weekNumber }}周</span>
+        </el-form-item> -->
+        <el-col :span="24">
+          <el-row>
+            <el-col :span="2" style="text-align: right; line-height: 42px"
+              >计划周期</el-col
+            >
+            <el-col :span="20" style="text-align: left; padding-left: 10px">
+              <el-col
+                :span="24"
+                style="
+                  line-height: 42px;
+                  font-weight: 600;
+                  color: #101010;
+                  border-bottom: 1px solid #00000026;
+                  padding: 0 24px;
+                  box-sizing: border-box;
+                "
+                >{{ weekNumber }}周</el-col
               >
-              <el-col :span="8"
-                >{{ getweekSwimmingDistance() || "N/A" }}
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-col :span="24" style="margin-bottom: 14px;">
+          <el-row>
+            <el-col :span="2" style="text-align: right; line-height: 42px"
+              >统计</el-col
+            >
+            <el-col :span="20" style="text-align: left; padding-left: 10px">
+              <el-col :span="24" class="summary-preview-table-header">
+                <el-row>
+                  <el-col :span="8">类型</el-col>
+                  <el-col :span="8">时长</el-col>
+                  <el-col :span="8">距离</el-col>
+                </el-row>
               </el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="24">
-            <el-row>
-              <el-col :span="8">骑行</el-col>
-              <el-col :span="8"
-                >{{
-                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                    ? "N/A"
-                    : secondsToHHMMSS(getweekCycleDuration())
-                }}{{
-                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col
-              >
-              <el-col :span="8">{{ getweekCycleDistance() || "N/A" }} </el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="24">
-            <el-row>
-              <el-col :span="8">跑步</el-col>
-              <el-col :span="8"
-                >{{
-                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                    ? "N/A"
-                    : secondsToHHMMSS(getweekRunDuration())
-                }}{{
-                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col
-              >
-              <el-col :span="8">{{ getweekRunDistance() || "N/A" }}</el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="24">
-            <el-row>
-              <el-col :span="8">力量</el-col>
-              <el-col :span="8"
-                >{{
-                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                    ? "N/A"
-                    : secondsToHHMMSS(getweekPowerDuration())
-                }}{{
-                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col
-              >
-              <el-col :span="8">{{
-                getweekPowerAndOtherDistance("STRENGTH") || "N/A"
-              }}</el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="24">
-            <el-row>
-              <el-col :span="8">其他</el-col>
-              <el-col :span="8"
-                >{{
-                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
-                    ? "N/A"
-                    : secondsToHHMMSS(getweekOtherDuration())
-                }}{{
-                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col
-              >
-              <el-col :span="8">{{
-                getweekPowerAndOtherDistance("OTHER") || "N/A"
-              }}</el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
-            <el-row>
-              <el-col :span="8">总计</el-col>
-              <el-col :span="8"
-                >{{
-                  secondsToHHMMSS(getweekDuration()) === "00:00:00"
-                    ? "N/A"
-                    : secondsToHHMMSS(getweekDuration())
-                }}
-                {{
-                  secondsToHHMMSS(getweekDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col
-              >
-              <el-col :span="8">{{ getweekDistance() || "N/A" }}</el-col>
-            </el-row>
-          </el-col>
-        </el-row>
-      </el-form-item>
+              <el-col :span="24" class="summary-preview-table-content">
+                <el-row>
+                  <el-col :span="8">游泳</el-col>
+                  <el-col :span="8">{{ getweekSwimmingDuration() }}</el-col>
+                  <el-col :span="8">{{ getweekSwimmingDistance() }}</el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="24" class="summary-preview-table-content">
+                <el-row>
+                  <el-col :span="8">骑行</el-col>
+                  <el-col :span="8">{{ getweekCycleDuration() }}</el-col>
+                  <el-col :span="8">{{ getweekCycleDistance() }}</el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="24" class="summary-preview-table-content">
+                <el-row>
+                  <el-col :span="8">跑步</el-col>
+                  <el-col :span="8">{{ getweekRunDuration() }}</el-col>
+                  <el-col :span="8">{{ getweekRunDistance() }}</el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="24" class="summary-preview-table-content">
+                <el-row>
+                  <el-col :span="8">力量</el-col>
+                  <el-col :span="8">{{ getweekPowerDuration() }}</el-col>
+                  <el-col :span="8">{{
+                    getweekPowerAndOtherDistance("STRENGTH")
+                  }}</el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="24" class="summary-preview-table-content">
+                <el-row>
+                  <el-col :span="8">其他</el-col>
+                  <el-col :span="8"
+                    >{{
+                      secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                        ? "N/A"
+                        : secondsToHHMMSS(getweekOtherDuration())
+                    }}{{
+                      secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                        ? ""
+                        : " /周"
+                    }}</el-col
+                  >
+                  <el-col :span="8">{{
+                    getweekPowerAndOtherDistance("OTHER") || "N/A"
+                  }}</el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="24" class="summary-preview-table-content-red">
+                <el-row>
+                  <el-col :span="8">总计</el-col>
+                  <el-col :span="8"
+                    >{{
+                      secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                        ? "N/A"
+                        : secondsToHHMMSS(getweekDuration())
+                    }}
+                    {{
+                      secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                        ? ""
+                        : " /周"
+                    }}</el-col
+                  >
+                  <el-col :span="8">{{ getweekDistance() || "N/A" }}</el-col>
+                </el-row>
+              </el-col>
+            </el-col>
+          </el-row>
+        </el-col>
+        <!-- <el-form-item label="统计">
+          <el-row>
+            <el-col :span="24">
+              <el-row>
+                <el-col :span="8">类型</el-col>
+                <el-col :span="8">时长</el-col>
+                <el-col :span="8">距离</el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="24">
+              <el-row>
+                <el-col :span="8">游泳</el-col>
+                <el-col :span="8"
+                  >{{
+                    secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                      ? "N/A"
+                      : secondsToHHMMSS(getweekSwimmingDuration())
+                  }}{{
+                    secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                      ? ""
+                      : " /周"
+                  }}</el-col
+                >
+                <el-col :span="8"
+                  >{{ getweekSwimmingDistance() || "N/A" }}
+                </el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="24">
+              <el-row>
+                <el-col :span="8">骑行</el-col>
+                <el-col :span="8"
+                  >{{
+                    secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                      ? "N/A"
+                      : secondsToHHMMSS(getweekCycleDuration())
+                  }}{{
+                    secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                      ? ""
+                      : " /周"
+                  }}</el-col
+                >
+                <el-col :span="8"
+                  >{{ getweekCycleDistance() || "N/A" }}
+                </el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="24">
+              <el-row>
+                <el-col :span="8">跑步</el-col>
+                <el-col :span="8"
+                  >{{
+                    secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                      ? "N/A"
+                      : secondsToHHMMSS(getweekRunDuration())
+                  }}{{
+                    secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                      ? ""
+                      : " /周"
+                  }}</el-col
+                >
+                <el-col :span="8">{{ getweekRunDistance() || "N/A" }}</el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="24">
+              <el-row>
+                <el-col :span="8">力量</el-col>
+                <el-col :span="8"
+                  >{{
+                    secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                      ? "N/A"
+                      : secondsToHHMMSS(getweekPowerDuration())
+                  }}{{
+                    secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                      ? ""
+                      : " /周"
+                  }}</el-col
+                >
+                <el-col :span="8">{{
+                  getweekPowerAndOtherDistance("STRENGTH") || "N/A"
+                }}</el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="24">
+              <el-row>
+                <el-col :span="8">其他</el-col>
+                <el-col :span="8"
+                  >{{
+                    secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                      ? "N/A"
+                      : secondsToHHMMSS(getweekOtherDuration())
+                  }}{{
+                    secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                      ? ""
+                      : " /周"
+                  }}</el-col
+                >
+                <el-col :span="8">{{
+                  getweekPowerAndOtherDistance("OTHER") || "N/A"
+                }}</el-col>
+              </el-row>
+            </el-col>
+            <el-col :span="24" style="border-top: 1px dashed #e5e6eb">
+              <el-row>
+                <el-col :span="8">总计</el-col>
+                <el-col :span="8"
+                  >{{
+                    secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                      ? "N/A"
+                      : secondsToHHMMSS(getweekDuration())
+                  }}
+                  {{
+                    secondsToHHMMSS(getweekDuration()) === "00:00:00"
+                      ? ""
+                      : " /周"
+                  }}</el-col
+                >
+                <el-col :span="8">{{ getweekDistance() || "N/A" }}</el-col>
+              </el-row>
+            </el-col>
+          </el-row>
+        </el-form-item> -->
+      </el-row>
     </el-form>
 
     <span slot="footer" class="dialog-footer">
@@ -552,7 +682,7 @@ export default {
         if (!valid) return;
         const params = {
           ...this.planInfo,
-          ...this.form
+          ...this.form,
         };
         // console.log(params, "params");
         submitData({
@@ -1255,7 +1385,7 @@ export default {
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 .statistics-divider-wrapper {
   margin: 8px 0;
@@ -1278,6 +1408,35 @@ export default {
 }
 .rate-form-item-official ::v-deep(.el-rate__icon) {
   font-size: 20px;
+}
+.summary-preview-table-header {
+  height: 42px;
+  line-height: 42px;
+  font-size: 14px;
+  color: #666666;
+  border-bottom: 1px solid #00000026;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+.summary-preview-table-content {
+  height: 42px;
+  line-height: 42px;
+  font-size: 14px;
+  color: #101010;
+  border-bottom: 1px solid #00000026;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+.summary-preview-table-content-red{
+  height: 42px;
+  line-height: 42px;
+  font-size: 14px;
+  color: #F92B30;
+  font-weight: 600;
+  border-bottom: 1px solid #00000026;
+  background: #F92B3008;
+  padding: 0 24px;
+  box-sizing: border-box;
 }
 </style>
 

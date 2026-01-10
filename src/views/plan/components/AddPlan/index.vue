@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="520px"
+    width="880px"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -538,7 +538,8 @@ export default {
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-end;
 }
 .rate-form-item ::v-deep(.el-rate__icon) {
   font-size: 20px;

@@ -141,13 +141,14 @@ export default {
 
 <style scoped>
 .add-group-modal ::v-deep(.el-dialog__header) {
-  padding: 16px 24px;
+  padding: 16px 35px;
 }
 .add-group-modal ::v-deep(.el-dialog__body) {
-  padding: 10px 24px 0 24px;
+  padding: 16px 24px 24px 24px;
 }
 .dialog-footer {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-end;
 }
 </style>
