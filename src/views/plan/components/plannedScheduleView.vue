@@ -2,7 +2,7 @@
   <div class="planned-schedule-container">
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
-        <div></div>
+        <div style="width: 32px; height: 32px;"></div>
         <div class="planned-schedule-header-title-left-title">
           {{ planTitle || "计划日程" }}
         </div>
@@ -47,7 +47,7 @@
             secondsToHHMMSS(getTotalDuration()) === "00:00:00"
               ? "--:--:--"
               : secondsToHHMMSS(getTotalDuration())
-          }}</span>/<span class="planned-schedule-header-title-right-total-value">{{ getTotalDistance() || "--" }}km</span><span class="planned-schedule-header-title-right-total-value">{{
+          }}</span>/<span class="planned-schedule-header-title-right-total-value">{{ getTotalDistance() || "--" }}km</span>/<span class="planned-schedule-header-title-right-total-value">{{
             getTotalSth() > 100000
               ? (getTotalSth() / 10000).toFixed(2) + "万"
               : getTotalSth() || "--"
@@ -409,6 +409,7 @@ export default {
   .planned-schedule-header {
     width: 100%;
     height: 60px;
+    padding-right: 15px;
     // border-bottom: 1px solid rgba(228, 231, 237, 0.8);
     // padding: 16px 20px;
     // background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -458,16 +459,16 @@ export default {
       align-items: center;
       position: relative;
       // padding: 0 20px;
-      border-right: 1px solid #00000026;
-      // padding: 0 10px;
+      border-right: 2px solid #00000026;
+      padding: 0 10px;
       box-sizing: border-box;
 
       .planned-schedule-header-title-left-title {
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 600;
         // margin-bottom: 10px;
         box-sizing: border-box;
-        color: #303133;
+        color: #101010;
         // position: absolute;
         // left: 50%;
         // transform: translateX(-50%);
@@ -487,7 +488,7 @@ export default {
       flex-direction: column;
       align-items: flex-start;
       justify-content: center;
-      padding: 0 10px;
+      padding: 0 20px;
       box-sizing: border-box;
       gap: 5px;
       .planned-schedule-header-title-right-total-label{
@@ -582,6 +583,5 @@ export default {
   align-items: center;
   background: #c3c9d740;
   border-radius: 50%;
-  margin-right: 10px;
 }
 </style>

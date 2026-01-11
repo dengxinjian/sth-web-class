@@ -2,7 +2,7 @@
   <div class="planned-schedule-container">
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
-        <div>
+        <div style="width: 200px;">
           <el-button type="info" style="margin-left: 20px" @click="handleCancel"
             >取消</el-button
           >
@@ -24,8 +24,20 @@
         </div>
       </div>
       <div class="planned-schedule-header-title-right">
+        <div class="planned-schedule-header-title-right-total-label">总时长/总距离/总STH</div>
+        <div class="planned-schedule-header-title-right-total-value">
+          <span>{{
+            secondsToHHMMSS(getTotalDuration()) === "00:00:00"
+              ? "--:--:--"
+              : secondsToHHMMSS(getTotalDuration())
+          }}</span>/<span class="planned-schedule-header-title-right-total-value">{{ getTotalDistance() || "--" }}km</span>/<span class="planned-schedule-header-title-right-total-value">{{
+            getTotalSth() > 100000
+              ? (getTotalSth() / 10000).toFixed(2) + "万"
+              : getTotalSth() || "--"
+          }}</span>
+        </div>
         <!-- 总运动时长距离sth总值 -->
-        <div class="planned-schedule-header-title-right-total">
+        <!-- <div class="planned-schedule-header-title-right-total">
           <span class="label">总运动时长:</span>
           <span class="value">{{
             secondsToHHMMSS(getTotalDuration()) === "00:00:00"
@@ -44,7 +56,7 @@
               ? (getTotalSth() / 10000).toFixed(2) + "万"
               : getTotalSth() || "--"
           }}</span>
-        </div>
+        </div> -->
       </div>
     </div>
     <div class="planned-schedule-container-planned">
@@ -295,9 +307,13 @@ export default {
 
   .planned-schedule-header {
     width: 100%;
-    border-bottom: 1px solid rgba(228, 231, 237, 0.8);
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    height: 60px;
+    padding-right: 15px;
+    // border-bottom: 1px solid rgba(228, 231, 237, 0.8);
+    // background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid #00000026;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     position: relative;
@@ -309,41 +325,58 @@ export default {
       left: 0;
       right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #409eff, transparent);
+      // background: linear-gradient(90deg, transparent, #409eff, transparent);
       opacity: 0.3;
     }
 
     .planned-schedule-header-title-left {
       flex: 0.85;
+      height: 60px;
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       position: relative;
+      border-right: 2px solid #00000026;
+      padding: 0 10px;
+      box-sizing: border-box;
 
       .planned-schedule-header-title-left-title {
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 600;
-        color: #303133;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        color: #101010;
+        box-sizing: border-box;
+        text-align: center;
+        // position: absolute;
+        // left: 50%;
+        // transform: translateX(-50%);
       }
 
       .planned-schedule-header-title-left-button {
-        margin-left: auto;
-        margin-right: 20px;
+        width: 200px;
+        // margin-left: auto;
+        // margin-right: 20px;
       }
     }
 
     .planned-schedule-header-title-right {
       flex: 0.15;
-      min-width: 200px;
+      height: 60px;
+      // min-width: 200px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 10px;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0 20px;
+      box-sizing: border-box;
       gap: 5px;
-
+      .planned-schedule-header-title-right-total-label{
+        font-size: 12px;
+        color: #666666;
+      }
+      .planned-schedule-header-title-right-total-value{
+        font-size: 14px;
+        color:#101010;
+      }
       .planned-schedule-header-title-right-total {
         margin-bottom: 2px;
         width: 100%;

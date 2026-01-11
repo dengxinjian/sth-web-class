@@ -11,7 +11,7 @@
         style="display: flex"
       >
         <div class="schedule-boxes-wrapper-content">
-          <div class="week-header">第 {{ item.weekIndex + 1 }}周</div>
+          <!-- <div class="week-header">第 {{ item.weekIndex + 1 }}周</div> -->
           <div class="schedule-boxes-container">
             <div
               v-for="(box, boxIndex) in boxes"
@@ -21,7 +21,9 @@
             >
               <div class="box-header">
                 <div class="box-day-text">
-                  Day {{ item.weekIndex * 7 + boxIndex + 1 }}
+                  <span v-if="boxIndex === 0" class="box-day-text-week">周{{ item.weekIndex + 1 }}</span>
+                  <span v-if="boxIndex === 0" class="box-day-text-day">DAY</span>
+                  <span>{{ item.weekIndex * 7 + boxIndex + 1 }}</span>
                 </div>
               </div>
               <div
@@ -208,13 +210,13 @@
         <div class="schedule-boxes-wrapper-content-right">
           <div class="activity-item">
             <div class="activity">
-              <span class="label">STH:</span>
+              <span class="label">STH</span>
               <span class="value">{{
                 getweekSth(item.weekIndex) || "--"
               }}</span>
             </div>
             <div class="activity">
-              <span class="label">时长/距离:</span>
+              <span class="label">时长/距离</span>
               <span class="value"
                 >{{
                   secondsToHHMMSS(getweekDuration(item.weekIndex)) ===
@@ -226,7 +228,7 @@
               >
             </div>
             <div class="activity">
-              <span class="label">游泳时长/距离:</span>
+              <span class="label">游泳时长/距离</span>
               <span class="value"
                 >{{
                   secondsToHHMMSS(getweekSwimmingDuration(item.weekIndex)) ===
@@ -245,7 +247,7 @@
               >
             </div>
             <div class="activity">
-              <span class="label">骑行时长/距离:</span>
+              <span class="label">骑行时长/距离</span>
               <span class="value"
                 >{{
                   secondsToHHMMSS(getweekCycleDuration(item.weekIndex)) ===
@@ -257,7 +259,7 @@
               >
             </div>
             <div class="activity">
-              <span class="label">跑步时长/距离:</span>
+              <span class="label">跑步时长/距离</span>
               <span class="value"
                 >{{
                   secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ===
@@ -269,7 +271,7 @@
               >
             </div>
             <div class="activity">
-              <span class="label">力量时长:</span>
+              <span class="label">力量时长</span>
               <span class="value">{{
                 secondsToHHMMSS(getweekPowerDuration(item.weekIndex)) ===
                 "00:00:00"
@@ -278,7 +280,7 @@
               }}</span>
             </div>
             <div class="activity">
-              <span class="label">其他时长:</span>
+              <span class="label">其他时长</span>
               <span class="value">{{
                 secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ===
                 "00:00:00"
@@ -1427,30 +1429,38 @@ export default {
   max-width: 100%; // 确保不超过容器宽度
   padding: 0;
   position: relative;
-  border-left: 1px solid #e5e5e5;
-  border-right: 1px solid #e5e5e5;
-  background-color: #f8f8f8;
-  min-height: 200px;
-  margin-bottom: 10px;
+  border-left: 1px solid #00000026;
+  border-right: 1px solid #00000026;
+  border-bottom: 1px solid #00000026;
+  // background-color: #f8f8f8;
+  min-height: 248px;
+  // margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
 
   .box-header {
     width: 100%;
-    padding: 12px 0 0 0;
+    padding: 12px 0 0 12px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    border-bottom: 1px solid #e5e5e5;
-    background-color: #f5f5f5;
+    // align-items: center;
+    // border-bottom: 1px solid #e5e5e5;
+    // background-color: #f5f5f5;
 
     .box-day-text {
-      font-size: 14px;
-      color: #303133;
+      font-size: 12px;
+      color: #101010;
       font-weight: 600;
       margin-bottom: 8px;
-      text-align: center;
+      // text-align: center;
+      .box-day-text-week {
+        color: #F92B30;
+        margin-right: 12px;
+      }
+      .box-day-text-day {
+        color: #101010;
+      }
     }
 
     .box-divider {
@@ -1609,10 +1619,10 @@ export default {
 .schedule-boxes-wrapper-content-right {
   flex: 0.15;
   background-color: #fff;
-  padding: 10px;
+  padding:0 20px;
   display: flex;
   flex-direction: column;
-  min-width: 200px;
+  min-width: 248px;
 }
 
 .activity-summary-header {
@@ -1630,34 +1640,44 @@ export default {
 }
 
 .activity-item {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #00000026;
   padding-top: 20px;
 
-  &:last-child {
-    border-bottom: none;
-  }
+  // &:last-child {
+  //   border-bottom: none;
+  // }
 
   > div {
-    font-size: 13px;
+    font-size: 14px;
     color: #606266;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    line-height: 1.8;
+    // line-height: 1.8;
     white-space: nowrap;
 
     .label {
+      display: inline-block;
+      width: 90px;
       flex: 0 0 auto;
-      margin-right: 8px;
+      color: #666666 !important;
+      text-align: left;
+      margin-right: 12px;
     }
 
     .value {
+      width: 80px;
       flex: 0 0 auto;
-      text-align: right;
+      text-align: left;
+      color: #101010 !important;
+      font-weight: 600;
     }
   }
 
@@ -1665,8 +1685,8 @@ export default {
     margin-bottom: 2px;
 
     .label {
-      font-weight: 500;
-      color: #303133;
+      font-weight: 400;
+      color: #666666 !important;
     }
   }
 }
