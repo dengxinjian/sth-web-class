@@ -12,7 +12,9 @@
       <el-tab-pane label="运动偏好" name="preference">
         <div class="preference-form">
           <div class="section-header">
-            <div class="section-title">{{ matchTypeToName[lastMatchType] }}</div>
+            <div class="section-title">
+              {{ matchTypeToName[lastMatchType] }}
+            </div>
             <div class="section-count">
               <span>综合次数</span>
               <span class="count-value">{{ totalTrainingCount }}</span>
@@ -330,13 +332,6 @@
       </el-tab-pane>
       <el-tab-pane label="基本信息" name="base">
         <el-form :model="baseForm" label-width="80px" class="base-form">
-          <el-form-item label="昵称">
-            <el-input
-              v-model="baseForm.nickname"
-              placeholder="请输入昵称"
-              disabled
-            />
-          </el-form-item>
           <el-form-item label="头像">
             <div class="avatar-uploader">
               <el-upload
@@ -347,7 +342,8 @@
                 :auto-upload="false"
                 :on-change="onAvatarChange"
                 accept="image/*"
-                disabled
+                :multiple="false"
+                :disabled="loginType === '2'"
               >
                 <img
                   v-if="baseForm.avatarUrl"
@@ -358,8 +354,18 @@
               </el-upload>
             </div>
           </el-form-item>
+          <el-form-item label="昵称">
+            <el-input
+              v-model="baseForm.nickname"
+              placeholder="请输入昵称"
+              :disabled="loginType === '2'"
+            />
+          </el-form-item>
           <el-form-item label="性别">
-            <el-radio-group v-model="baseForm.gender" disabled>
+            <el-radio-group
+              v-model="baseForm.gender"
+              :disabled="loginType === '2'"
+            >
               <el-radio :label="1">男</el-radio>
               <el-radio :label="2">女</el-radio>
             </el-radio-group>
@@ -369,7 +375,7 @@
               <el-input
                 v-model.number="baseForm.height"
                 placeholder="cm"
-                disabled
+                :disabled="loginType === '2'"
               />
               <span class="unit">CM</span>
             </div>
@@ -379,7 +385,7 @@
               <el-input
                 v-model.number="baseForm.weight"
                 placeholder="kg"
-                disabled
+                :disabled="loginType === '2'"
               />
               <span class="unit">KG</span>
             </div>
@@ -394,6 +400,16 @@
     <span slot="footer" class="dialog-footer" v-if="activeMainTab !== 'base'">
       <el-button @click="onCancel">取消</el-button>
       <el-button type="primary" @click="onSave" :loading="loading"
+        >保存</el-button
+      >
+    </span>
+    <span
+      slot="footer"
+      class="dialog-footer"
+      v-if="activeMainTab === 'base' && loginType === '1'"
+    >
+      <el-button @click="onCancel">取消</el-button>
+      <el-button type="primary" @click="onSaveInfo" :loading="loading"
         >保存</el-button
       >
     </span>
@@ -816,6 +832,7 @@ export default {
         if (res.success) {
           this.baseForm = res.result;
           this.lastMatchType = res.result.lastMatchType;
+          localStorage.setItem("nickname", res.result.nicknameTag);
           window.localStorage.setItem("avatarUrl", res.result.avatarUrl);
           // this.thresholds = res.result.thresholdRecordList
           // this.currentThreshold = this.thresholds.find(item => item.thresholdType === this.activeSport)
@@ -913,13 +930,76 @@ export default {
           });
         });
     },
+    onSaveInfo() {
+      const { matchTypeList,nickname,birthday,slogan, avatarUrl, gender, height, weight } = this.baseForm;
+      const matchType = matchTypeList[0]?.matchType;
+      const openid = matchTypeList[0]?.openid;
+      const params = {
+        nickname: nickname,
+        openid: openid,
+        matchType: matchType,
+        avatarUrl: avatarUrl,
+        gender: gender,
+        height: height,
+        weight: weight,
+        slogan: slogan,
+        birthday: birthday,
+      };
+      submitData({
+        url: "/consumer/wx/updatePersonalProfile",
+        requestData: params,
+      })
+        .then((res) => {
+          if (res.success) {
+            this.$message.success("个人信息保存成功");
+            this.$emit("save", res.result);
+            this.loading = false;
+            this.getAthleticInfo();
+          }
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
     noopRequest() {},
     onAvatarChange(file) {
+      console.log("上传图片文件====", file);
+      // 获取文件对象（Element UI 上传组件返回的是包含 raw 属性的对象）
+      const fileObj = file.raw || file;
+
+      // 使用 FileReader 将文件转为 base64
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.baseForm.avatar = e.target.result;
+        const base64 = e.target.result;
+        console.log("文件转为base64成功");
+
+        // 将 base64 格式图片上传
+        submitData({
+          url: "/consumer/wx/avatar",
+          requestData: {
+            file: base64,
+          },
+        })
+          .then((res) => {
+            console.log("上传图片文件成功====", res);
+            if (res.success) {
+              this.$message.success("图片上传成功");
+              this.baseForm.avatar = res.result.avatarUrl;
+            }
+          })
+          .catch((err) => {
+            console.log("上传图片文件失败====", err);
+            this.$message.error("图片上传失败");
+          });
       };
-      reader.readAsDataURL(file.raw);
+
+      reader.onerror = () => {
+        console.log("文件读取失败");
+        this.$message.error("文件读取失败");
+      };
+
+      // 读取文件为 Data URL (base64 格式)
+      reader.readAsDataURL(fileObj);
     },
     handleSportChange(val) {
       console.log(val);
@@ -1003,7 +1083,7 @@ export default {
 };
 </script>
 
-<style scoped >
+<style scoped>
 .athletic-info-dialog ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
 }
@@ -1030,11 +1110,11 @@ export default {
   border-color: #d9d9d9;
 }
 .base-form ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner) {
-  border-color: #e74c3c;
+  border-color: #f92b30;
 }
 .base-form
   ::v-deep(.el-radio__input.is-disabled.is-checked .el-radio__inner::after) {
-  background: #e74c3c;
+  background: #f92b30;
 }
 .athletic-info-dialog .avatar-uploader {
   display: inline-block;
@@ -1090,11 +1170,11 @@ export default {
   margin-left: 24px;
 }
 .required {
-  color: #e65b55;
+  color: #f92b30;
   margin-right: 4px;
 }
 .unit-red {
-  color: #e65b55;
+  color: #f92b30;
 }
 .sport-tabs ::v-deep(.el-tabs__nav-wrap::after) {
   height: 0;
@@ -1117,7 +1197,7 @@ export default {
   padding-right: 24px;
 }
 .sport-tabs ::v-deep(.el-tabs__item.is-active) {
-  background: #e65b55;
+  background: #f92b30;
   color: #fff;
 }
 .pill-input .el-input__inner {
@@ -1173,7 +1253,7 @@ export default {
   display: flex;
   flex-direction: row;
   line-height: 34px;
-  color: #c7483e;
+  color: #f92b30;
 }
 .zoneTd {
   flex: 0 0 80px;
@@ -1217,7 +1297,7 @@ export default {
 .count-value {
   font-size: 18px;
   font-weight: 600;
-  color: #e65b55;
+  color: #f92b30;
 }
 
 .form-grid {
@@ -1288,8 +1368,8 @@ export default {
 }
 
 .week-select-multiple ::v-deep(.el-tag) {
-  background: #e65b55;
-  border-color: #e65b55;
+  background: #f92b30;
+  border-color: #f92b30;
   color: #fff;
   border-radius: 4px;
   height: 24px;
@@ -1327,11 +1407,11 @@ export default {
 }
 
 .preference-form ::v-deep(.el-radio__input.is-checked .el-radio__inner) {
-  border-color: #e65b55;
-  background: #e65b55;
+  border-color: #f92b30;
+  background: #f92b30;
 }
 
 .preference-form ::v-deep(.el-radio__input.is-checked + .el-radio__label) {
-  color: #e65b55;
+  color: #f92b30;
 }
 </style>

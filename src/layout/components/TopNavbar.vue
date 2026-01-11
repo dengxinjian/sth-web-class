@@ -92,6 +92,12 @@ export default {
       title: "强者之心",
       name: localStorage.getItem("name"),
       loginType: localStorage.getItem("loginType"),
+      triUserId: localStorage.getItem("triUserId"),
+      userAvatar: localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png"),
+      // 用于触发 watch 的响应式属性
+      avatarUrlWatcher: localStorage.getItem("avatarUrl"),
+      loginTypeWatcher: localStorage.getItem("loginType"),
+      nameWatcher: localStorage.getItem("name"),
     };
   },
   computed: {
@@ -117,31 +123,44 @@ export default {
     showShop() {
       return this.shopOptions.length > 0;
     },
-    // userAvatar() {
-    //   console.log('=========userAvatar---*********=========', localStorage.getItem("avatarUrl"));
-    //   if (localStorage.getItem("avatarUrl")) {
-    //     return localStorage.getItem("avatarUrl");
-    //   }
-    //   // 监听 userInfo 中的 avatarUrl 字段
-    //   if (this.userInfo && this.userInfo.avatarUrl) {
-    //     return this.userInfo.avatarUrl;
-    //   }
-    //   // 如果没有值，使用静态图片
-    //   return require("@/assets/logo-sth.png");
-    // },
   },
-  // 使用watch监听 localStorage.getItem("avatarUrl") 的变化
+  // 使用watch监听 localStorage 的变化
   watch: {
-    "localStorage.getItem('avatarUrl')": {
+    avatarUrlWatcher: {
       handler(newVal) {
-        this.getUserAvatar()
+        this.getAthleticInfo();
+      },
+      immediate: true,
+    },
+    loginTypeWatcher: {
+      handler(newVal) {
+        this.getAthleticInfo();
+      },
+      immediate: true,
+    },
+    nameWatcher: {
+      handler(newVal) {
+        this.getAthleticInfo();
       },
       immediate: true,
     },
   },
   mounted() {
-    // this.userAvatar = localStorage.getItem("avatarUrl");
-    // this.getUserAvatar()
+    this.triUserId = localStorage.getItem("triUserId");
+    this.getAthleticInfo();
+    // 监听 localStorage 的变化（跨标签页）
+    window.addEventListener("storage", this.handleStorageChange);
+    // 定期检查 localStorage 的变化（同标签页内）
+    this.storageCheckInterval = setInterval(() => {
+      this.checkLocalStorageChanges();
+    }, 500);
+  },
+  beforeDestroy() {
+    // 清理事件监听器和定时器
+    window.removeEventListener("storage", this.handleStorageChange);
+    if (this.storageCheckInterval) {
+      clearInterval(this.storageCheckInterval);
+    }
   },
   methods: {
     ...mapMutations({
@@ -165,6 +184,26 @@ export default {
         console.log("取消退出或发生错误:", error);
       }
     },
+    getAthleticInfo() {
+      getData({
+        url: "/consumer/wx/getUserProfile",
+        triUserId: this.triUserId,
+      }).then((res) => {
+        if (res.success) {
+          this.name = res.result.nicknameTag;
+          this.userAvatar = res.result.avatarUrl;
+          // 更新 localStorage 和 watcher 属性
+          if (res.result.nicknameTag) {
+            localStorage.setItem("name", res.result.nicknameTag);
+            this.nameWatcher = res.result.nicknameTag;
+          }
+          if (res.result.avatarUrl) {
+            localStorage.setItem("avatarUrl", res.result.avatarUrl);
+            this.avatarUrlWatcher = res.result.avatarUrl;
+          }
+        }
+      });
+    },
     getUserAvatar() {
       this.userAvatar = localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png");
     },
@@ -179,16 +218,17 @@ export default {
         }
       )
         .then(() => {
-          localStorage.setItem("loginType", this.loginType === "1" ? "2" : "1");
+          const newLoginType = this.loginType === "1" ? "2" : "1";
+          localStorage.setItem("loginType", newLoginType);
           localStorage.setItem(
             "activeName",
             this.loginType === "1" ? "class" : "athletic"
           );
+          // 更新响应式属性以触发 watch
+          this.loginTypeWatcher = newLoginType;
+          this.loginType = newLoginType;
           // 触发身份切换事件
-          this.$root.$emit(
-            "identity-changed",
-            this.loginType === "1" ? "2" : "1"
-          );
+          this.$root.$emit("identity-changed", newLoginType);
           if (this.loginType === "2") {
             // 路由跳转，使用安全的错误处理
             if (this.$router) {
@@ -203,6 +243,38 @@ export default {
           }
         })
         .catch(() => {});
+    },
+    // 处理 storage 事件（跨标签页）
+    handleStorageChange(e) {
+      if (e.key === "avatarUrl") {
+        this.avatarUrlWatcher = e.newValue;
+        this.userAvatar = e.newValue || require("@/assets/logo-sth.png");
+      } else if (e.key === "loginType") {
+        this.loginTypeWatcher = e.newValue;
+        this.loginType = e.newValue;
+      } else if (e.key === "name") {
+        this.nameWatcher = e.newValue;
+        this.name = e.newValue;
+      }
+    },
+    // 检查 localStorage 的变化（同标签页内）
+    checkLocalStorageChanges() {
+      const currentAvatarUrl = localStorage.getItem("avatarUrl");
+      const currentLoginType = localStorage.getItem("loginType");
+      const currentName = localStorage.getItem("name");
+
+      if (currentAvatarUrl !== this.avatarUrlWatcher) {
+        this.avatarUrlWatcher = currentAvatarUrl;
+        this.userAvatar = currentAvatarUrl || require("@/assets/logo-sth.png");
+      }
+      if (currentLoginType !== this.loginTypeWatcher) {
+        this.loginTypeWatcher = currentLoginType;
+        this.loginType = currentLoginType;
+      }
+      if (currentName !== this.nameWatcher) {
+        this.nameWatcher = currentName;
+        this.name = currentName;
+      }
     },
     chooseShop(e) {
       const name = this.shopOptions.find((item) => item.value === e).label;
