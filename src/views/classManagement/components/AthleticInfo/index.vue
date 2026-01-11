@@ -332,67 +332,82 @@
       </el-tab-pane>
       <el-tab-pane label="基本信息" name="base">
         <el-form :model="baseForm" label-width="80px" class="base-form">
-          <el-form-item label="头像">
-            <div class="avatar-uploader">
-              <el-upload
-                class="avatar-upload"
-                action=""
-                :http-request="noopRequest"
-                :show-file-list="false"
-                :auto-upload="false"
-                :on-change="onAvatarChange"
-                accept="image/*"
-                :multiple="false"
-                :disabled="loginType === '2'"
-              >
-                <img
-                  v-if="baseForm.avatarUrl"
-                  :src="baseForm.avatarUrl"
-                  class="avatar"
+          <el-row>
+            <el-col :span="16" :offset="4">
+              <el-form-item label="">
+                <div class="avatar-uploader">
+                  <el-upload
+                    class="avatar-upload"
+                    action=""
+                    :http-request="noopRequest"
+                    :show-file-list="false"
+                    :auto-upload="false"
+                    :on-change="onAvatarChange"
+                    accept="image/*"
+                    :multiple="false"
+                    :disabled="loginType === '2'"
+                    style="margin-right: 80px"
+                  >
+                    <img
+                      v-if="baseForm.avatarUrl"
+                      :src="baseForm.avatarUrl"
+                      class="avatar"
+                    />
+                    <i v-else class="el-icon-plus avatar-uploader-icon" />
+                  </el-upload>
+                </div>
+              </el-form-item>
+            </el-col>
+            <el-col :span="16" :offset="4">
+              <el-form-item label="昵称">
+                <el-input
+                  v-model="baseForm.nickname"
+                  placeholder="请输入昵称"
+                  :disabled="loginType === '2'"
                 />
-                <i v-else class="el-icon-plus avatar-uploader-icon" />
-              </el-upload>
-            </div>
-          </el-form-item>
-          <el-form-item label="昵称">
-            <el-input
-              v-model="baseForm.nickname"
-              placeholder="请输入昵称"
-              :disabled="loginType === '2'"
-            />
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-radio-group
-              v-model="baseForm.gender"
-              :disabled="loginType === '2'"
-            >
-              <el-radio :label="1">男</el-radio>
-              <el-radio :label="2">女</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="身高">
-            <div class="inline-field">
-              <el-input
-                v-model.number="baseForm.height"
-                placeholder="cm"
-                :disabled="loginType === '2'"
-              />
-              <span class="unit">CM</span>
-            </div>
-          </el-form-item>
-          <el-form-item label="体重">
-            <div class="inline-field">
-              <el-input
-                v-model.number="baseForm.weight"
-                placeholder="kg"
-                :disabled="loginType === '2'"
-              />
-              <span class="unit">KG</span>
-            </div>
-          </el-form-item>
-          <el-form-item label="BMI">
-            <span>{{ bmiDisplay }}</span>
-          </el-form-item>
+              </el-form-item>
+            </el-col>
+            <el-col :span="16" :offset="4">
+              <el-form-item label="性别">
+                <el-radio-group
+                  v-model="baseForm.gender"
+                  :disabled="loginType === '2'"
+                >
+                  <el-radio :label="1">男</el-radio>
+                  <el-radio :label="2">女</el-radio>
+                </el-radio-group>
+              </el-form-item>
+            </el-col>
+            <el-col :span="16" :offset="4">
+              <el-form-item label="身高">
+                <div class="inline-field">
+                  <el-input
+                    v-model.number="baseForm.height"
+                    placeholder="cm"
+                    :disabled="loginType === '2'"
+                  />
+                  <span class="unit">CM</span>
+                </div>
+              </el-form-item>
+            </el-col>
+            <el-col :span="16" :offset="4">
+              <el-form-item label="体重">
+                <div class="inline-field">
+                  <el-input
+                    v-model.number="baseForm.weight"
+                    placeholder="kg"
+                    :disabled="loginType === '2'"
+                  />
+                  <span class="unit">KG</span>
+                </div>
+              </el-form-item>
+            </el-col>
+            <el-col :span="16" :offset="4">
+              <el-form-item label="BMI">
+                <span>{{ bmiDisplay }}</span>
+              </el-form-item>
+            </el-col>
+          </el-row>
         </el-form>
       </el-tab-pane>
     </el-tabs>
@@ -931,7 +946,16 @@ export default {
         });
     },
     onSaveInfo() {
-      const { matchTypeList,nickname,birthday,slogan, avatarUrl, gender, height, weight } = this.baseForm;
+      const {
+        matchTypeList,
+        nickname,
+        birthday,
+        slogan,
+        avatarUrl,
+        gender,
+        height,
+        weight,
+      } = this.baseForm;
       const matchType = matchTypeList[0]?.matchType;
       const openid = matchTypeList[0]?.openid;
       const params = {
@@ -1117,7 +1141,9 @@ export default {
   background: #f92b30;
 }
 .athletic-info-dialog .avatar-uploader {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .avatar-upload {
   width: 80px;
@@ -1304,7 +1330,8 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px 32px;
-  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #00000026;
 }
 
 .form-row {
