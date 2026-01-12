@@ -14,7 +14,13 @@
     <div class="form-section">
       <el-form ref="titleRef" :rules="rules" :model="form" label-width="70px">
         <el-form-item label="标题：" prop="title">
-          <el-input type="text" placeholder="标题" v-model="form.title" :disabled="originalType === 'official'" :maxlength="50" />
+          <el-input
+            type="text"
+            placeholder="标题"
+            v-model="form.title"
+            :disabled="originalType === 'official'"
+            :maxlength="50"
+          />
         </el-form-item>
 
         <div class="row">
@@ -89,6 +95,56 @@
               class="summary-textarea"
               :disabled="originalType === 'official'"
             />
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="section-header">
+            <span class="section-title">链接</span>
+            <img
+              src="~@/assets/addClass/add.png"
+              style="cursor: pointer"
+              width="20"
+              height="20"
+              alt=""
+              @click="handleAddLink"
+            />
+          </div>
+          <div class="summary-input-container">
+            <el-row
+              class="link-row"
+              v-for="(item, index) in form.list"
+              :key="index"
+              :gutter="8"
+              style="margin-bottom: 8px"
+            >
+              <el-col :span="4" style="margin-bottom: 4px">
+                <el-input
+                  size="small"
+                  v-model="item.title"
+                  placeholder="请输入链接标题"
+                />
+              </el-col>
+              <el-col :span="4" style="margin-bottom: 4px">
+                <el-select
+                  size="small"
+                  style="width: 100%"
+                  v-model="item.type"
+                  placeholder="请选择链接类型"
+                >
+                  <el-option label="http" value="1" />
+                  <el-option label="小程序链接" value="2" />
+                  <el-option label="其他" value="3" />
+                </el-select>
+              </el-col>
+              <el-col :span="16">
+                <el-input
+                  size="small"
+                  v-model="item.url"
+                  placeholder="请输入链接"
+                />
+              </el-col>
+            </el-row>
           </div>
         </div>
 
@@ -200,12 +256,13 @@ export default {
           duration: "",
           sth: "",
           summary: "",
+          list: [{ title: "", type: '1', url: "" }], // 链接列表
           tags: "",
         },
         this.data || {}
       ),
       rules: {
-        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+        title: [{ required: true, message: "请输入标题", trigger: "change" }],
       },
     };
   },
@@ -392,6 +449,9 @@ export default {
       // }
       this.$emit("delete");
     },
+    handleAddLink() {
+      this.form.list.push({ title: "", type: '1', url: "" });
+    },
     resetForm() {
       // 清空表单数据，但保留传入的title
       this.form = {
@@ -404,6 +464,7 @@ export default {
         duration: "",
         sth: "",
         summary: "",
+        list: [{ title: "", type: '1', url: "" }], // 链接列表
         tips: "",
       };
     },
@@ -503,5 +564,25 @@ export default {
 }
 .label-top ::v-deep(.el-form-item__content) {
   margin-left: 0 !important;
+}
+
+.section-header {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .section-title {
+    font-family: PingFangSC, PingFang SC;
+    font-weight: 500;
+    font-size: 16px;
+    color: #000000;
+    line-height: 20px;
+
+    &.required::after {
+      content: "*";
+      color: #f56c6c;
+      margin-left: 4px;
+    }
+  }
 }
 </style>

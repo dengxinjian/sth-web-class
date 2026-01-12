@@ -165,6 +165,55 @@
 
         <div class="edit-section">
           <div class="section-header">
+            <span class="section-title">链接</span>
+            <img
+              src="~@/assets/addClass/add.png"
+              style="cursor: pointer"
+              width="20"
+              height="20"
+              alt=""
+              @click="handleAddLink"
+            />
+          </div>
+          <div class="summary-input-container">
+            <el-row
+              class="link-row"
+              v-for="(item, index) in classInfo.list"
+              :key="index"
+              style="margin-bottom: 16px;"
+            >
+              <el-col :span="24" style="margin-bottom: 4px">
+                <el-input
+                  size="small"
+                  v-model="item.title"
+                  placeholder="请输入链接标题"
+                />
+              </el-col>
+              <el-col :span="24" style="margin-bottom: 4px">
+                <el-select
+                  size="small"
+                  style="width: 100%"
+                  v-model="item.type"
+                  placeholder="请选择链接类型"
+                >
+                  <el-option label="http" value="1" />
+                  <el-option label="小程序链接" value="2" />
+                  <el-option label="其他" value="3" />
+                </el-select>
+              </el-col>
+              <el-col :span="24">
+                <el-input
+                  size="small"
+                  v-model="item.url"
+                  placeholder="请输入链接"
+                />
+              </el-col>
+            </el-row>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="section-header">
             <span class="section-title">训练建议</span>
           </div>
           <div class="summary-input-container">
@@ -847,6 +896,7 @@ export default {
   data() {
     return {
       innerVisible: this.visible || this.value || false,
+      localClassesDate: this.classesDate, // Local copy to avoid mutating prop
       timeline: [],
       maxIntensity: 1,
       existingTags: ["标签1", "标签2", "标签3"], // 现有的标签
@@ -861,6 +911,7 @@ export default {
         sth: "",
         mode: 1, // 模式
         summary: "", // 概要
+        list: [{ title: "", type: "1", url: "" }], // 链接列表
         tags: [],
         stages: [],
 
@@ -921,7 +972,7 @@ export default {
         } else {
           // 如果没有ID，说明是新增，重置表单
           this.resetForm();
-          this.getAthleticThreshold(this.classesDate);
+          this.getAthleticThreshold(this.localClassesDate);
         }
       }
     },
@@ -933,6 +984,10 @@ export default {
         this.resetForm();
       }
     },
+    classesDate(val) {
+      // Sync prop changes to local data property
+      this.localClassesDate = val;
+    },
   },
   created() {},
   mounted() {
@@ -941,6 +996,9 @@ export default {
     }
   },
   methods: {
+    handleAddLink() {
+      this.classInfo.list.push({ title: "", type: '1', url: "" });
+    },
     formatDistance(distance, sportType) {
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
@@ -1096,7 +1154,7 @@ export default {
       }).then((res) => {
         if (res.success) {
           this.$nextTick(async () => {
-            this.classesDate = res.result.classesDate;
+            this.localClassesDate = res.result.classesDate;
             await this.getAthleticThreshold(res.result.classesDate);
             this.classInfo = JSON.parse(res.result.classesJson);
             this.timeline = JSON.parse(res.result.classesJson).timeline;
@@ -1116,8 +1174,8 @@ export default {
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
         classesDate: !this.data.id
-          ? this.classesDate + " 00:00:00"
-          : this.classesDate,
+          ? this.localClassesDate + " 00:00:00"
+          : this.localClassesDate,
         sportType: "RUN",
         classesJson: JSON.stringify({
           ...this.classInfo,
@@ -1240,8 +1298,8 @@ export default {
         labels: this.classInfo.tags,
         sportType: "RUN",
         classesDate: !this.data.id
-          ? this.classesDate + " 00:00:00"
-          : this.classesDate,
+          ? this.localClassesDate + " 00:00:00"
+          : this.localClassesDate,
         classesJson: JSON.stringify({
           ...this.classInfo,
           timeline: this.timeline,
@@ -1279,8 +1337,8 @@ export default {
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
         classesDate: !this.data.id
-          ? this.classesDate + " 00:00:00"
-          : this.classesDate,
+          ? this.localClassesDate + " 00:00:00"
+          : this.localClassesDate,
         sportType: "RUN",
         classesJson: JSON.stringify({
           ...this.classInfo,
@@ -1324,6 +1382,7 @@ export default {
         sth: "",
         mode: 1, // 模式
         summary: "", // 概要
+        list: [{ title: "", type: "1", url: "" }], // 链接列表
         tags: [],
         stages: [],
 
@@ -1951,6 +2010,9 @@ export default {
 
   .section-header {
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     .section-title {
       font-family: PingFangSC, PingFang SC;

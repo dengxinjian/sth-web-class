@@ -9,6 +9,7 @@
       :scheduleType="scheduleType"
       :triUserId="triUserId"
       :classesDate="classesDate"
+      :originalType="originalType"
       v-on="$listeners"
     />
   </div>
@@ -72,6 +73,10 @@ export default {
     classesDate: {
       type: String,
       default: "",
+    },
+    originalType: {
+      type: String,
+      default: "my",
     },
   },
   data() {

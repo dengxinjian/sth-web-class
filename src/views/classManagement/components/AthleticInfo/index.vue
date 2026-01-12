@@ -954,7 +954,7 @@ export default {
             params.param2 = this.thresholdData.param2;
           }
           submitData({
-            url: "/consumer/wx/updateThreshold",
+            url: "/gateway/user/updateThreshold",
             requestData: params,
           })
             .then((res) => {
@@ -1020,7 +1020,7 @@ export default {
             params.param2 = this.thresholdData.param2;
           }
           submitData({
-            url: "/consumer/wx/updateThreshold",
+            url: "/gateway/user/updateThreshold",
             requestData: params,
           })
             .then((res) => {

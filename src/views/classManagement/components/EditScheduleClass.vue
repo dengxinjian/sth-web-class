@@ -571,7 +571,35 @@
                 ></el-input>
               </div>
             </div>
-
+            <div
+              v-if="
+                classData.classesJson?.list &&
+                classData.classesJson.list.length > 0
+              "
+            >
+              <div class="section">
+                <div class="section-header">
+                  <span class="section-title">链接</span>
+                </div>
+              </div>
+              <div class="section-content">
+                <div
+                  class="link-item"
+                  v-for="(item, index) in classData.classesJson.list"
+                  :key="index"
+                >
+                  <div class="link-item-title">
+                    {{ item.title }} <a :href="item.url" target="_blank" style="color: #409EFF; text-decoration: none;">{{ item.url }}</a>
+                  </div>
+                  <div
+                    class="link-item-button"
+                    @click="handleCopyUrl(item.url)"
+                  >
+                    复制
+                  </div>
+                </div>
+              </div>
+            </div>
             <!-- 训练建议 -->
             <div class="section" v-if="!isTrainingAdvice(classData.sportType)">
               <div class="section-header">
@@ -866,6 +894,33 @@ export default {
     },
   },
   methods: {
+    async handleCopyUrl(url) {
+      if (!url) {
+        this.$message.warning("链接地址为空");
+        return;
+      }
+      try {
+        // 使用现代 Clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+          this.$message.success("复制成功");
+        } else {
+          // 降级方案：使用传统的复制方法
+          const textArea = document.createElement("textarea");
+          textArea.value = url;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textArea);
+          this.$message.success("复制成功");
+        }
+      } catch (err) {
+        console.error("复制失败:", err);
+        this.$message.error("复制失败");
+      }
+    },
     restoreVerification(field) {
       if (this.isInputDisabled) {
         return true;
@@ -928,6 +983,7 @@ export default {
             ...res.result,
             classesJson: classData,
           };
+          console.log("====当前课表数据====this.classData", this.classData);
           // 同步标题到 form
           this.form.title = this.classData.classesJson?.title || "";
           this.actualData = {
@@ -1136,66 +1192,70 @@ export default {
     },
     // 查询运动详情
     getSportDetail() {
-      scheduleApi.getActivityDetail(this.classData.activityId, this.triUserId).then((res) => {
-        if (res.success) {
-          this.sportDetail = this.formatOutlineData(res.result);
-          const actualData = {
-            duration: this.translateSecondsToFormat(this.sportDetail.duration),
-            activityDuration: this.translateSecondsToFormat(
-              this.sportDetail.netDuration || 0
-            ),
-            distance: parseFloat(this.sportDetail.distance),
-            sthValue: this.sportDetail.sthValue,
-            calories: this.sportDetail.calories,
-            distanceUnit: this.sportDetail.sportType === 3 ? "m" : "km",
-          };
-          actualData.distance =
-            actualData.distanceUnit === "km"
-              ? actualData.distance / 1000
-              : actualData.distance;
-          this.defaultData = JSON.parse(JSON.stringify(actualData));
-          if (!this.classData.manualActivityId) {
-            this.actualData = actualData;
-          } else {
-            this.actualData = {
-              duration: this.classData.duration,
-              activityDuration: this.translateSecondsToFormat(
-                this.classData.activityDuration || 0
+      scheduleApi
+        .getActivityDetail(this.classData.activityId, this.triUserId)
+        .then((res) => {
+          if (res.success) {
+            this.sportDetail = this.formatOutlineData(res.result);
+            const actualData = {
+              duration: this.translateSecondsToFormat(
+                this.sportDetail.duration
               ),
-              sthValue: this.classData.sthValue,
-              calories: this.classData.calories,
+              activityDuration: this.translateSecondsToFormat(
+                this.sportDetail.netDuration || 0
+              ),
+              distance: parseFloat(this.sportDetail.distance),
+              sthValue: this.sportDetail.sthValue,
+              calories: this.sportDetail.calories,
+              distanceUnit: this.sportDetail.sportType === 3 ? "m" : "km",
             };
-            if (!this.classData.distanceUnit) {
-              this.$set(
-                this.actualData,
-                "distanceUnit",
-                this.sportDetail.sportType === 3 ? "m" : "km"
-              );
+            actualData.distance =
+              actualData.distanceUnit === "km"
+                ? actualData.distance / 1000
+                : actualData.distance;
+            this.defaultData = JSON.parse(JSON.stringify(actualData));
+            if (!this.classData.manualActivityId) {
+              this.actualData = actualData;
             } else {
+              this.actualData = {
+                duration: this.classData.duration,
+                activityDuration: this.translateSecondsToFormat(
+                  this.classData.activityDuration || 0
+                ),
+                sthValue: this.classData.sthValue,
+                calories: this.classData.calories,
+              };
+              if (!this.classData.distanceUnit) {
+                this.$set(
+                  this.actualData,
+                  "distanceUnit",
+                  this.sportDetail.sportType === 3 ? "m" : "km"
+                );
+              } else {
+                this.$set(
+                  this.actualData,
+                  "distanceUnit",
+                  this.classData.distanceUnit
+                );
+              }
               this.$set(
                 this.actualData,
-                "distanceUnit",
-                this.classData.distanceUnit
+                "distance",
+                this.actualData.distanceUnit === "km"
+                  ? this.classData.preciseDistance / 1000
+                  : this.classData.preciseDistance
               );
+              console.log(this.actualData, "this.actualData");
+              this.defaultData = JSON.parse(JSON.stringify(this.actualData));
             }
-            this.$set(
-              this.actualData,
-              "distance",
-              this.actualData.distanceUnit === "km"
-                ? this.classData.preciseDistance / 1000
-                : this.classData.preciseDistance
+            // 保存原始数据
+            this.originalData = JSON.parse(JSON.stringify(actualData));
+            this.originalData.distance = parseFloat(
+              this.sportDetail.distance.toFixed(0)
             );
-            console.log(this.actualData, "this.actualData");
-            this.defaultData = JSON.parse(JSON.stringify(this.actualData));
+            console.log(this.originalData, "originalData");
           }
-          // 保存原始数据
-          this.originalData = JSON.parse(JSON.stringify(actualData));
-          this.originalData.distance = parseFloat(
-            this.sportDetail.distance.toFixed(0)
-          );
-          console.log(this.originalData, "originalData");
-        }
-      });
+        });
     },
     // 还原字段到原始值
     restoreField(field) {
@@ -1831,6 +1891,33 @@ export default {
     /* Firefox 滚动条样式 */
     scrollbar-width: thin;
     scrollbar-color: #c1c1c1 #f5f7fa;
+  }
+}
+
+.link-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+  .link-item-title {
+    flex: 0.9;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    line-height: 1.5;
+  }
+  .link-item-button {
+    flex: 0.11;
+    color: #f92b30;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 10px;
+    text-align: center;
   }
 }
 

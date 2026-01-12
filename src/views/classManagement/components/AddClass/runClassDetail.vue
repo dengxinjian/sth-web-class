@@ -176,6 +176,55 @@
 
         <div class="edit-section">
           <div class="section-header">
+            <span class="section-title">链接</span>
+            <img
+              src="~@/assets/addClass/add.png"
+              style="cursor: pointer"
+              width="20"
+              height="20"
+              alt=""
+              @click="handleAddLink"
+            />
+          </div>
+          <div class="summary-input-container">
+            <el-row
+              class="link-row"
+              v-for="(item, index) in classInfo.list"
+              :key="index"
+              style="margin-bottom: 16px;"
+            >
+              <el-col :span="24" style="margin-bottom: 4px">
+                <el-input
+                  size="small"
+                  v-model="item.title"
+                  placeholder="请输入链接标题"
+                />
+              </el-col>
+              <el-col :span="24" style="margin-bottom: 4px">
+                <el-select
+                  size="small"
+                  style="width: 100%"
+                  v-model="item.type"
+                  placeholder="请选择链接类型"
+                >
+                  <el-option label="http" value="1" />
+                  <el-option label="小程序链接" value="2" />
+                  <el-option label="其他" value="3" />
+                </el-select>
+              </el-col>
+              <el-col :span="24">
+                <el-input
+                  size="small"
+                  v-model="item.url"
+                  placeholder="请输入链接"
+                />
+              </el-col>
+            </el-row>
+          </div>
+        </div>
+
+        <div class="edit-section">
+          <div class="section-header">
             <span class="section-title">训练建议</span>
           </div>
           <div class="summary-input-container">
@@ -788,6 +837,7 @@ export default {
         sth: "",
         mode: 1, // 模式
         summary: "", // 概要
+        list: [{ title: "", type: "1", url: "" }], // 链接列表
         tags: [],
         stages: [],
 
@@ -905,6 +955,9 @@ export default {
     }
   },
   methods: {
+    handleAddLink() {
+      this.classInfo.list.push({ title: "", type: '1', url: "" });
+    },
     formatDistance(distance, sportType) {
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
@@ -1212,6 +1265,7 @@ export default {
         sth: "",
         mode: 1, // 模式
         summary: "", // 概要
+        list: [{ title: "", type: "1", url: "" }], // 链接列表
         tags: [],
         stages: [],
 
@@ -1855,6 +1909,9 @@ export default {
 
   .section-header {
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     .section-title {
       font-family: PingFangSC, PingFang SC;

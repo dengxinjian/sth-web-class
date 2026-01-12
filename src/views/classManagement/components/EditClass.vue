@@ -211,7 +211,30 @@
                 ></el-input>
               </div>
             </div>
-
+            <div
+              v-if="
+                classData.classesJson?.list &&
+                classData.classesJson.list.length > 0
+              "
+            >
+              <div class="section">
+                <div class="section-header">
+                  <span class="section-title">链接</span>
+                </div>
+              </div>
+              <div class="section-content">
+                <div
+                  class="link-item"
+                  v-for="(item, index) in classData.classesJson.list"
+                  :key="index"
+                >
+                  <div class="link-item-title">
+                    {{ item.title }} <a :href="item.url" target="_blank" style="color: #409EFF; text-decoration: none;">{{ item.url }}</a>
+                  </div>
+                  <div class="link-item-button" @click="handleCopyUrl(item.url)">复制</div>
+                </div>
+              </div>
+            </div>
             <!-- 训练建议 -->
             <div class="section" v-if="!isTrainingAdvice(classData.sportType)">
               <div class="section-header">
@@ -465,6 +488,33 @@ export default {
       }
       return result;
     },
+    async handleCopyUrl(url) {
+      if (!url) {
+        this.$message.warning("链接地址为空");
+        return;
+      }
+      try {
+        // 使用现代 Clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+          this.$message.success("复制成功");
+        } else {
+          // 降级方案：使用传统的复制方法
+          const textArea = document.createElement("textarea");
+          textArea.value = url;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textArea);
+          this.$message.success("复制成功");
+        }
+      } catch (err) {
+        console.error("复制失败:", err);
+        this.$message.error("复制失败");
+      }
+    },
   },
 };
 </script>
@@ -643,6 +693,33 @@ export default {
         font-family: inherit;
         line-height: 1.6;
       }
+    }
+  }
+
+  .link-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    .link-item-title {
+      flex: 0.9;
+      word-wrap: break-word;
+      word-break: break-all;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      line-height: 1.5;
+    }
+    .link-item-button {
+      flex: 0.1;
+      color: #f92b30;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 10px;
+      text-align: center;
     }
   }
 
