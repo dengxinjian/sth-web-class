@@ -340,7 +340,7 @@
               <div class="zoneTd">{{ thresholdData.zone5C[0] }}</div>
               <div class="zoneTd">~</div>
               <div class="zoneTd">max</div>
-              <div class="zoneTd">{{ thresholdData.unit }}</div>
+              <!-- <div class="zoneTd">{{ thresholdData.unit }}</div> -->
             </div>
           </div>
         </div>
