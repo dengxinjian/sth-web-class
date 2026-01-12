@@ -174,47 +174,54 @@
       </el-tab-pane>
       <el-tab-pane label="阈值" name="threshold">
         <el-tabs v-model="activeSport" class="sport-tabs">
-          <el-tab-pane label="心率" :name="1" />
+          <el-tab-pane label="心率" :name="1" size="small" />
           <el-tab-pane
             v-if="lastMatchType === 2 || lastMatchType === 3"
             label="游泳"
             :name="4"
+            size="small"
           />
           <el-tab-pane
             v-if="lastMatchType === 2 || lastMatchType === 4"
             label="骑车"
             :name="2"
+            size="small"
           />
           <el-tab-pane
             v-if="lastMatchType === 1 || lastMatchType === 2"
             label="跑步"
             :name="3"
+            size="small"
           />
         </el-tabs>
         <div class="threshold-form">
           <div v-if="activeSport === 1" class="row">
-            <span class="label"><span class="required">*</span>阈值心率</span>
-            <el-input
-              v-model="thresholdData.param2"
-              :key="'hr-param2-' + activeSport"
-              class="pill-input"
-              @input="handleThresholdInput('param2', $event)"
-            />
-            <span class="suffix unit-red">bpm</span>
-            <span class="label right-gap"
-              ><span class="required">*</span>最大心率</span
-            >
-            <el-input
-              v-model="thresholdData.param1"
-              :key="'hr-param1-' + activeSport"
-              class="pill-input"
-              @input="handleThresholdInput('param1', $event)"
-            />
-            <span class="suffix unit-red">bpm</span>
+            <div>
+              <span class="label"><span class="required">*</span>阈值心率</span>
+              <el-input
+                v-model="thresholdData.param2"
+                :key="'hr-param2-' + activeSport"
+                class="pill-input"
+                @input="handleThresholdInput('param2', $event)"
+              />
+              <span class="suffix unit-red">bpm</span>
+              <span class="label right-gap"
+                ><span class="required">*</span>最大心率</span
+              >
+              <el-input
+                v-model="thresholdData.param1"
+                :key="'hr-param1-' + activeSport"
+                class="pill-input"
+                @input="handleThresholdInput('param1', $event)"
+              />
+              <span class="suffix unit-red">bpm</span>
+            </div>
+            <div class="reset-btn" @click="resetThresholdData">重置</div>
           </div>
           <div v-else-if="activeSport === 4" class="row">
-            <span class="label"><span class="required">*</span>阈值配速</span>
-            <!-- <el-time-picker
+            <div style="display: flex; align-items: center">
+              <span class="label"><span class="required">*</span>阈值配速</span>
+              <!-- <el-time-picker
               v-model="thresholdData.thresholdTimeValue"
               :key="'swim-' + activeSport"
               value-format="mm:ss"
@@ -222,26 +229,32 @@
               popper-class="hide-hour"
               class="pill-input"
             /> -->
-            <TimeInput
-              v-model="thresholdData.thresholdTimeValue"
-              :key="'swim-' + activeSport"
-              timerType="mm:ss"
-            />
-            <span class="suffix unit-red">min/100m</span>
+              <TimeInput
+                v-model="thresholdData.thresholdTimeValue"
+                :key="'swim-' + activeSport"
+                timerType="mm:ss"
+              />
+              <span class="suffix unit-red">min/100m</span>
+            </div>
+            <div class="reset-btn" @click="resetThresholdData">重置</div>
           </div>
           <div v-else-if="activeSport === 2" class="row">
-            <span class="label"><span class="required">*</span>阈值功率</span>
-            <el-input
-              v-model="thresholdData.threshold"
-              :key="'bike-' + activeSport"
-              class="pill-input"
-              @input="handleThresholdInput('threshold', $event)"
-            />
-            <span class="suffix unit-red">w</span>
+            <div style="display: flex; align-items: center">
+              <span class="label"><span class="required">*</span>阈值功率</span>
+              <el-input
+                v-model="thresholdData.threshold"
+                :key="'bike-' + activeSport"
+                class="pill-input"
+                @input="handleThresholdInput('threshold', $event)"
+              />
+              <span class="suffix unit-red">w</span>
+            </div>
+            <div class="reset-btn" @click="resetThresholdData">重置</div>
           </div>
           <div v-else-if="activeSport === 3" class="row">
-            <span class="label"><span class="required">*</span>阈值配速</span>
-            <!-- <el-time-picker
+            <div style="display: flex; align-items: center">
+              <span class="label"><span class="required">*</span>阈值配速</span>
+              <!-- <el-time-picker
               v-model="thresholdData.thresholdTimeValue"
               :key="'run-' + activeSport"
               value-format="mm:ss"
@@ -249,12 +262,14 @@
               popper-class="hide-hour"
               class="pill-input"
             /> -->
-            <TimeInput
-              v-model="thresholdData.thresholdTimeValue"
-              :key="'run-' + activeSport"
-              timerType="mm:ss"
-            />
-            <span class="suffix unit-red">min/km</span>
+              <TimeInput
+                v-model="thresholdData.thresholdTimeValue"
+                :key="'run-' + activeSport"
+                timerType="mm:ss"
+              />
+              <span class="suffix unit-red">min/km</span>
+            </div>
+            <div class="reset-btn" @click="resetThresholdData">重置</div>
           </div>
           <div class="zoneContainer">
             <div class="zoneTr">
@@ -414,8 +429,15 @@
 
     <span slot="footer" class="dialog-footer" v-if="activeMainTab !== 'base'">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onSave" :loading="loading"
+      <el-button type="primary" @click="onSave(false)" :loading="loading"
         >保存</el-button
+      >
+      <el-button
+        type="primary"
+        @click="onSave(true)"
+        :loading="loading"
+        v-if="activeMainTab === 'threshold'"
+        >保存并关闭</el-button
       >
     </span>
     <span
@@ -502,6 +524,10 @@ export default {
         3: "游泳模式",
         4: "骑行模式",
       },
+      originParam1: "",
+      originParam2: "",
+      originThresholdTimeValue: "",
+      originThreshold: "",
     };
   },
   computed: {
@@ -612,7 +638,7 @@ export default {
           this.getPreferenceData();
         }
         this.getAthleticInfo();
-        this.getThresholdData();
+        this.getThresholdData(true);
 
         // 检查当前选中的阈值类型是否可用
         this.$nextTick(() => {
@@ -626,7 +652,7 @@ export default {
       }
     },
     activeSport(val) {
-      this.getThresholdData();
+      this.getThresholdData(true);
     },
     // 监听运动模式变化，自动切换到可用的阈值类型
     lastMatchType(newType) {
@@ -801,7 +827,7 @@ export default {
         params.cycleLongDays === 0 ? [] : [params.cycleLongDays];
       params.totalTimes = this.totalTrainingCount;
       request({
-        url: "/training/api/sport-preference/create",
+        url: "/gateway/training/sport-preference/create",
         method: "post",
         data: params,
         headers: {
@@ -854,7 +880,7 @@ export default {
         }
       });
     },
-    getThresholdData() {
+    getThresholdData(isFirst = false) {
       getData({
         url: "/consumer/wx/getThresholdDetail",
         type: this.activeSport,
@@ -864,6 +890,16 @@ export default {
         // 处理时间格式转换
         if (this.activeSport === 4 || this.activeSport === 3) {
           result.thresholdTimeValue = secondsToMMSS(+result.threshold);
+          if (isFirst) {
+            this.originThresholdTimeValue = result.thresholdTimeValue;
+          }
+        }
+        if (isFirst && this.activeSport === 1) {
+          this.originParam1 = result.param1;
+          this.originParam2 = result.param2;
+        }
+        if (isFirst && this.activeSport === 2) {
+          this.originthreshold = result.threshold;
         }
         // 使用 Vue.set 确保响应式更新，或者直接赋值新对象
         this.thresholdData = {
@@ -879,6 +915,66 @@ export default {
         };
       });
     },
+    resetThresholdData() {
+      this.$confirm(
+        "阈值更新将会影响运动员的相关设置及训练计划, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          if (this.activeSport === 4 || this.activeSport === 3) {
+            this.thresholdData.thresholdTimeValue =
+              this.originThresholdTimeValue;
+          } else if (this.activeSport === 2) {
+            this.thresholdData.threshold = this.originThreshold;
+          } else if (this.activeSport === 1) {
+            this.thresholdData.param1 = this.originParam1;
+            this.thresholdData.param2 = this.originParam2;
+          }
+          this.loading = true;
+          const params = {
+            thresholdType: this.activeSport,
+            param1: "",
+            param2: "",
+            threshold: "",
+            triUserId: this.triUserId,
+          };
+          if (this.activeSport === 4 || this.activeSport === 3) {
+            params.threshold = mmssToSeconds(
+              this.thresholdData.thresholdTimeValue
+            );
+          } else if (this.activeSport === 2) {
+            params.threshold = this.thresholdData.threshold;
+          } else if (this.activeSport === 1) {
+            params.param1 = this.thresholdData.param1;
+            params.param2 = this.thresholdData.param2;
+          }
+          submitData({
+            url: "/consumer/wx/updateThreshold",
+            requestData: params,
+          })
+            .then((res) => {
+              if (res.success) {
+                this.$message.success("阈值保存成功");
+                this.getThresholdData();
+                this.loading = false;
+              }
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消更新",
+          });
+        });
+    },
     handleClose() {
       this.onCancel();
     },
@@ -886,7 +982,7 @@ export default {
       this.innerVisible = false;
       this.$emit("cancel");
     },
-    onSave() {
+    onSave(type) {
       if (this.activeMainTab === "preference") {
         if (this.preferenceForm.id) {
           this.savePreferenceData();
@@ -930,7 +1026,10 @@ export default {
             .then((res) => {
               if (res.success) {
                 this.$message.success("阈值保存成功");
-                this.$emit("save", res.result);
+                if (type) {
+                  this.$emit("save", res.result);
+                }
+                this.getThresholdData();
                 this.loading = false;
               }
             })
@@ -989,7 +1088,6 @@ export default {
     },
     noopRequest() {},
     onAvatarChange(file) {
-      console.log("上传图片文件====", file);
       // 获取文件对象（Element UI 上传组件返回的是包含 raw 属性的对象）
       const fileObj = file.raw || file;
 
@@ -1002,7 +1100,6 @@ export default {
         data: formData,
       })
         .then((res) => {
-          console.log("上传图片文件成功====", res);
           if (res.success) {
             this.$message.success("图片上传成功");
             this.baseForm.avatarUrl = res.result;
@@ -1133,6 +1230,15 @@ export default {
   justify-content: center;
   align-items: center;
 }
+.reset-btn {
+  border: 1px solid #00000026;
+  font-size: 14px;
+  color: #101010;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
 .avatar-upload {
   width: 80px;
   height: 80px;
@@ -1166,6 +1272,7 @@ export default {
 .threshold-form .row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 18px;
 }
 .threshold-form .label {
@@ -1176,7 +1283,7 @@ export default {
   max-width: 140px;
 }
 .threshold-form .suffix {
-  flex: 1 0 40px;
+  flex: 1 0 70px;
   margin: 0 12px 0 6px;
   color: #666;
 }
@@ -1271,6 +1378,9 @@ export default {
 }
 .zoneTd {
   flex: 0 0 80px;
+  color: #101010;
+  font-size: 14px;
+  font-weight: 400;
 }
 .zoneTd:nth-child(1) {
   flex: 0 0 140px;
