@@ -945,7 +945,7 @@ export default {
           });
         });
     },
-    onSaveInfo() {
+    onSaveInfo(flay = true) {
       const {
         matchTypeList,
         nickname,
@@ -975,8 +975,10 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.$message.success("个人信息保存成功");
-            this.$emit("save", res.result);
+            if (flay) {
+              this.$message.success("个人信息保存成功");
+              this.$emit("save", res.result);
+            }
             this.loading = false;
             this.getAthleticInfo();
           }
@@ -992,38 +994,24 @@ export default {
       const fileObj = file.raw || file;
 
       // 使用 FileReader 将文件转为 base64
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target.result;
-        console.log("文件转为base64成功");
-
-        // 将 base64 格式图片上传
-        submitData({
-          url: "/consumer/wx/avatar",
-          requestData: {
-            file: base64,
-          },
+      const formData = new FormData();
+      formData.append("file", fileObj);
+      request({
+        url: "/consumer/wx/avatar",
+        method: "post",
+        data: formData,
+      })
+        .then((res) => {
+          console.log("上传图片文件成功====", res);
+          if (res.success) {
+            this.$message.success("图片上传成功");
+            this.baseForm.avatarUrl = res.result;
+            this.onSaveInfo(false);
+          }
         })
-          .then((res) => {
-            console.log("上传图片文件成功====", res);
-            if (res.success) {
-              this.$message.success("图片上传成功");
-              this.baseForm.avatar = res.result.avatarUrl;
-            }
-          })
-          .catch((err) => {
-            console.log("上传图片文件失败====", err);
-            this.$message.error("图片上传失败");
-          });
-      };
-
-      reader.onerror = () => {
-        console.log("文件读取失败");
-        this.$message.error("文件读取失败");
-      };
-
-      // 读取文件为 Data URL (base64 格式)
-      reader.readAsDataURL(fileObj);
+        .catch((err) => {
+          this.$message.error("图片上传失败");
+        });
     },
     handleSportChange(val) {
       console.log(val);
