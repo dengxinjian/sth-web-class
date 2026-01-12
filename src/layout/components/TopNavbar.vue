@@ -73,6 +73,40 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <div class="vip-dialog-mask">
+      <div class="mask-container">
+        <div class="container-top-box">
+          <div class="container-top-box-title">订阅</div>
+          <img src="~@/assets/plan/close.png" alt="" class="close-icon" />
+        </div>
+        <div class="container-content">
+          <div class="container-content-title-box">
+            <div class="container-content-title">
+              <img
+                src="~@/assets/vip/per_title.png"
+                alt=""
+                class="container-content-title-img"
+              />
+              <img src="~@/assets/vip/jiao.png" alt="" class="container-content-title-bg">
+            </div>
+          </div>
+          <div class="content-box">
+            <div class="content-box-title">权益说明</div>
+            <div class="content-box-list">
+              <div
+                class="list-item"
+                v-for="item in vipInfoList"
+                :key="item.label"
+              >
+                <img :src="item.img" alt="" />
+                <div class="list-item-title">{{ item.label }}</div>
+              </div>
+            </div>
+            <div class="content-box-btn">立即预约，免费试用</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -93,11 +127,30 @@ export default {
       name: localStorage.getItem("name"),
       loginType: localStorage.getItem("loginType"),
       triUserId: localStorage.getItem("triUserId"),
-      userAvatar: localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png"),
+      userAvatar:
+        localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png"),
       // 用于触发 watch 的响应式属性
       avatarUrlWatcher: localStorage.getItem("avatarUrl"),
       loginTypeWatcher: localStorage.getItem("loginType"),
       nameWatcher: localStorage.getItem("name"),
+      vipDialogVisible: true,
+      activeTab: "1",
+      vipInfoList: [
+        { label: "教练执教", img: require("@/assets/vip/vip_1.png") },
+        {
+          label: "无上限的个人课程空间",
+          img: require("@/assets/vip/vip_2.png"),
+        },
+        {
+          label: "无上限的个人计划上限",
+          img: require("@/assets/vip/vip_3.png"),
+        },
+        {
+          label: "团队教练3人上限（包含主教练）",
+          img: require("@/assets/vip/vip_4.png"),
+        },
+        { label: "团队运动员15人上限", img: require("@/assets/vip/vip_5.png") },
+      ],
     };
   },
   computed: {
@@ -205,7 +258,8 @@ export default {
       });
     },
     getUserAvatar() {
-      this.userAvatar = localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png");
+      this.userAvatar =
+        localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png");
     },
     changeIdentify() {
       this.$confirm(
@@ -218,6 +272,8 @@ export default {
         }
       )
         .then(() => {
+          this.vipDialogVisible = true;
+          return;
           const newLoginType = this.loginType === "1" ? "2" : "1";
           localStorage.setItem("loginType", newLoginType);
           localStorage.setItem(
@@ -429,6 +485,152 @@ export default {
           right: -20px;
           top: 25px;
           font-size: 12px;
+        }
+      }
+    }
+  }
+}
+.vip-dialog-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  .mask-container {
+    width: 880px;
+    min-height: 500px;
+    background: #fff;
+    border-radius: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    // 背景图 从顶部，不变形，高度不变，宽度自适应
+    background-image: url("~@/assets/professional_vip.png");
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: 100% auto;
+    .container-top-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      .container-top-box-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #101010;
+      }
+      .close-icon {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+      }
+    }
+    .container-content {
+      width: 100%;
+      height: 520px;
+      background: #fff;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+      padding: 16px;
+      box-sizing: border-box;
+      position: relative;
+      .container-content-title-box {
+        width: 850px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        left: 0;
+        top: -38px;
+        .container-content-title {
+          width: 120px;
+          height: 40px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: #fff;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+          position: relative;
+          .container-content-title-img {
+            width: 57px;
+            height: 16px;
+          }
+          .container-content-title-bg{
+            width: 144px;
+            height: 12px;
+            position: absolute;
+            left: -12px;
+            bottom: 0;
+          }
+        }
+      }
+      .content-box {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #f8e7e5;
+        background: linear-gradient(180deg, #f8e7e5 0%, #ffffff 30%);
+        border-radius: 8px;
+        padding: 20px 40px 40px 16px;
+        box-sizing: border-box;
+        position: relative;
+        .content-box-title {
+          text-align: center;
+          color: #101010;
+          font-size: 14px;
+          font-weight: 600;
+        }
+        .content-box-list {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+          margin-top: 26px;
+          // 每行3等分，可以换行，行距为10px
+          column-gap: 16px;
+          row-gap: 10px;
+          margin-top: 16px;
+          .list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            // 每行3个，减去2个gap（16px * 2 = 32px）
+            width: calc((100% - 32px) / 3);
+            box-sizing: border-box;
+            img {
+              width: 30px;
+              height: 30px;
+              margin-right: 13px;
+              flex-shrink: 0;
+            }
+            .list-item-title {
+              font-size: 13px;
+              color: #101010;
+            }
+          }
+        }
+        .content-box-btn {
+          width: 352px;
+          height: 32px;
+          border-radius: 6px;
+          background: linear-gradient(
+            90.94deg,
+            #2a2a2a 10%,
+            #b81300 50%,
+            #2a2a2a 90%
+          );
+          text-align: center;
+          line-height: 32px;
+          font-size: 14px;
+          color: #fff;
+          cursor: pointer;
+          position: fixed;
+          left: 264px;
+          bottom: 32px;
         }
       }
     }
