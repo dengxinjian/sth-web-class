@@ -73,11 +73,11 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <div class="vip-dialog-mask">
+    <div class="vip-dialog-mask" v-if="vipDialogVisible">
       <div class="mask-container">
         <div class="container-top-box">
           <div class="container-top-box-title">订阅</div>
-          <img src="~@/assets/plan/close.png" alt="" class="close-icon" />
+          <img src="~@/assets/plan/close.png" alt="" class="close-icon" @click="vipDialogVisible = false" />
         </div>
         <div class="container-content">
           <div class="container-content-title-box">
@@ -87,7 +87,11 @@
                 alt=""
                 class="container-content-title-img"
               />
-              <img src="~@/assets/vip/jiao.png" alt="" class="container-content-title-bg">
+              <img
+                src="~@/assets/vip/jiao.png"
+                alt=""
+                class="container-content-title-bg"
+              />
             </div>
           </div>
           <div class="content-box">
@@ -102,7 +106,9 @@
                 <div class="list-item-title">{{ item.label }}</div>
               </div>
             </div>
-            <div class="content-box-btn">立即预约，免费试用</div>
+            <div class="content-box-btn" @click="handleSubscribeVip">
+              立即预约，免费试用
+            </div>
           </div>
         </div>
       </div>
@@ -113,7 +119,7 @@
 <script>
 import { mapGetters, mapState, mapMutations } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
-import { getData } from "@/api/common";
+import { getData, submitData } from "@/api/common";
 
 export default {
   name: "TopNavbar",
@@ -133,7 +139,7 @@ export default {
       avatarUrlWatcher: localStorage.getItem("avatarUrl"),
       loginTypeWatcher: localStorage.getItem("loginType"),
       nameWatcher: localStorage.getItem("name"),
-      vipDialogVisible: true,
+      vipDialogVisible: false,
       activeTab: "1",
       vipInfoList: [
         { label: "教练执教", img: require("@/assets/vip/vip_1.png") },
@@ -261,7 +267,81 @@ export default {
       this.userAvatar =
         localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png");
     },
-    changeIdentify() {
+    resetPageData() {
+      const newLoginType = this.loginType === "1" ? "2" : "1";
+      localStorage.setItem("loginType", newLoginType);
+      localStorage.setItem(
+        "activeName",
+        this.loginType === "1" ? "class" : "athletic"
+      );
+      // 更新响应式属性以触发 watch
+      this.loginTypeWatcher = newLoginType;
+      this.loginType = newLoginType;
+      // 触发身份切换事件
+      this.$root.$emit("identity-changed", newLoginType);
+      if (this.loginType === "2") {
+        // 路由跳转，使用安全的错误处理
+        if (this.$router) {
+          const pushResult = this.$router.push("/timeTable/class");
+          if (pushResult && typeof pushResult.catch === "function") {
+            pushResult.catch(() => {});
+          }
+        }
+        this.reload();
+      } else {
+        this.reload();
+      }
+    },
+    async handleSubscribeVip() {
+      const _this = this;
+      submitData({
+        url: "/consumer/api/vipSubscribe/subscribe",
+        requestData: {
+          identityType: "R",
+          subscribeType: 1,
+        },
+      }).then((res) => {
+        if (res.success) {
+          _this.vipDialogVisible = false;
+          _this.$message.success("订阅成功");
+          _this.resetPageData();
+        } else {
+          _this.$message.error(res.message);
+        }
+      });
+    },
+    async handleCancelSubscribeVip() {
+      submitData({
+        url: "/consumer/api/vipSubscribe/cancelSubscribe",
+        requestData: {
+          identityType: "R",
+          subscribeType: 1,
+        },
+      }).then((res) => {});
+    },
+    async getSubscribeInfo() {
+      const _this = this;
+      getData({
+        url: "/consumer/api/vipSubscribe/getSubscribeRecords",
+        triUserId: this.triUserId,
+        identityType: "R",
+      }).then((res) => {
+        if (res.success) {
+          if (res.result.length === 0) {
+            _this.vipDialogVisible = true;
+          } else {
+            const result = res.result[0];
+            if (result.subscribeType === 1) {
+              _this.resetPageData();
+            } else {
+              _this.vipDialogVisible = true;
+            }
+          }
+        }
+      });
+    },
+    async changeIdentify() {
+      const _this = this;
       this.$confirm(
         `确定切换成${this.loginType === "1" ? "教练" : "运动员"}身份吗?`,
         "提示",
@@ -272,30 +352,11 @@ export default {
         }
       )
         .then(() => {
-          this.vipDialogVisible = true;
-          return;
-          const newLoginType = this.loginType === "1" ? "2" : "1";
-          localStorage.setItem("loginType", newLoginType);
-          localStorage.setItem(
-            "activeName",
-            this.loginType === "1" ? "class" : "athletic"
-          );
-          // 更新响应式属性以触发 watch
-          this.loginTypeWatcher = newLoginType;
-          this.loginType = newLoginType;
-          // 触发身份切换事件
-          this.$root.$emit("identity-changed", newLoginType);
-          if (this.loginType === "2") {
-            // 路由跳转，使用安全的错误处理
-            if (this.$router) {
-              const pushResult = this.$router.push("/timeTable/class");
-              if (pushResult && typeof pushResult.catch === "function") {
-                pushResult.catch(() => {});
-              }
-            }
-            this.reload();
+          if (_this.loginType === "1") {
+            _this.getSubscribeInfo();
+            // _this.handleCancelSubscribeVip()
           } else {
-            this.reload();
+            _this.resetPageData();
           }
         })
         .catch(() => {});
@@ -540,12 +601,12 @@ export default {
       box-sizing: border-box;
       position: relative;
       .container-content-title-box {
-        width: 850px;
+        width: 750px;
         display: flex;
         justify-content: center;
         align-items: center;
         position: absolute;
-        left: 0;
+        left: 50px;
         top: -38px;
         .container-content-title {
           width: 120px;
@@ -561,7 +622,7 @@ export default {
             width: 57px;
             height: 16px;
           }
-          .container-content-title-bg{
+          .container-content-title-bg {
             width: 144px;
             height: 12px;
             position: absolute;
