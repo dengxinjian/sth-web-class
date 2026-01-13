@@ -203,6 +203,7 @@
                 :key="'hr-param2-' + activeSport"
                 class="pill-input"
                 @input="handleThresholdInput('param2', $event)"
+                @blur="getThresholdPreviewList"
               />
               <span class="suffix unit-red">bpm</span>
               <span class="label right-gap"
@@ -213,6 +214,7 @@
                 :key="'hr-param1-' + activeSport"
                 class="pill-input"
                 @input="handleThresholdInput('param1', $event)"
+                @blur="getThresholdPreviewList"
               />
               <span class="suffix unit-red">bpm</span>
             </div>
@@ -233,6 +235,7 @@
                 v-model="thresholdData.thresholdTimeValue"
                 :key="'swim-' + activeSport"
                 timerType="mm:ss"
+                @handleBlur="getThresholdPreviewList"
               />
               <span class="suffix unit-red">min/100m</span>
             </div>
@@ -246,6 +249,7 @@
                 :key="'bike-' + activeSport"
                 class="pill-input"
                 @input="handleThresholdInput('threshold', $event)"
+                @blur="getThresholdPreviewList"
               />
               <span class="suffix unit-red">w</span>
             </div>
@@ -266,6 +270,7 @@
                 v-model="thresholdData.thresholdTimeValue"
                 :key="'run-' + activeSport"
                 timerType="mm:ss"
+                @handleBlur="getThresholdPreviewList"
               />
               <span class="suffix unit-red">min/km</span>
             </div>
@@ -645,8 +650,8 @@ export default {
           const availableTypes = this.getAvailableThresholdTypes(
             this.lastMatchType
           );
-          if (!availableTypes.includes(this.activeSport)) {
-            this.activeSport = 1;
+          if (!availableTypes.includes(Number(this.activeSport))) {
+            this.activeSport = "1";
           }
         });
       }
@@ -658,9 +663,9 @@ export default {
     lastMatchType(newType) {
       // 检查当前选中的阈值类型是否在可用的类型中
       const availableTypes = this.getAvailableThresholdTypes(newType);
-      if (!availableTypes.includes(this.activeSport)) {
+      if (!availableTypes.includes(Number(this.activeSport))) {
         // 如果当前选中的类型不可用，切换到心率(1)
-        this.activeSport = 1;
+        this.activeSport = "1";
       }
     },
     // 监听休息日变化，自动清除与休息日冲突的长距离训练日
@@ -883,22 +888,22 @@ export default {
     getThresholdData(isFirst = false) {
       getData({
         url: "/consumer/wx/getThresholdDetail",
-        type: this.activeSport,
+        type: Number(this.activeSport),
         triUserId: this.triUserId,
       }).then((res) => {
         const result = res.result[0];
         // 处理时间格式转换
-        if (this.activeSport === 4 || this.activeSport === 3) {
+        if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
           result.thresholdTimeValue = secondsToMMSS(+result.threshold);
           if (isFirst) {
             this.originThresholdTimeValue = result.thresholdTimeValue;
           }
         }
-        if (isFirst && this.activeSport === 1) {
+        if (isFirst && Number(this.activeSport) === 1) {
           this.originParam1 = result.param1;
           this.originParam2 = result.param2;
         }
-        if (isFirst && this.activeSport === 2) {
+        if (isFirst && Number(this.activeSport) === 2) {
           this.originthreshold = result.threshold;
         }
         // 使用 Vue.set 确保响应式更新，或者直接赋值新对象
@@ -915,65 +920,48 @@ export default {
         };
       });
     },
-    resetThresholdData() {
-      this.$confirm(
-        "阈值更新将会影响运动员的相关设置及训练计划, 是否继续?",
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+    // 获取阈值预览列表
+    getThresholdPreviewList() {
+      let threshold = "";
+      if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
+        threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue);
+      } else if (Number(this.activeSport) === 2) {
+        threshold = Number(this.thresholdData.threshold);
+      }
+      submitData({
+        url: "/gateway/user/editThresholdPreview",
+        requestData: {
+          openid: "",
+          thresholdType: Number(this.activeSport),
+          threshold: threshold,
+          param1:
+            Number(this.activeSport) === 1
+              ? Number(this.thresholdData.param1)
+              : "",
+          param2:
+            Number(this.activeSport) === 1
+              ? Number(this.thresholdData.param2)
+              : "",
+          triUserId: this.triUserId,
+        },
+      }).then((res) => {
+        const result = res.result;
+        if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
+          result.thresholdTimeValue = secondsToMMSS(+result.threshold);
         }
-      )
-        .then(() => {
-          if (this.activeSport === 4 || this.activeSport === 3) {
-            this.thresholdData.thresholdTimeValue =
-              this.originThresholdTimeValue;
-          } else if (this.activeSport === 2) {
-            this.thresholdData.threshold = this.originThreshold;
-          } else if (this.activeSport === 1) {
-            this.thresholdData.param1 = this.originParam1;
-            this.thresholdData.param2 = this.originParam2;
-          }
-          this.loading = true;
-          const params = {
-            thresholdType: this.activeSport,
-            param1: "",
-            param2: "",
-            threshold: "",
-            triUserId: this.triUserId,
-          };
-          if (this.activeSport === 4 || this.activeSport === 3) {
-            params.threshold = mmssToSeconds(
-              this.thresholdData.thresholdTimeValue
-            );
-          } else if (this.activeSport === 2) {
-            params.threshold = this.thresholdData.threshold;
-          } else if (this.activeSport === 1) {
-            params.param1 = this.thresholdData.param1;
-            params.param2 = this.thresholdData.param2;
-          }
-          submitData({
-            url: "/gateway/user/updateThreshold",
-            requestData: params,
-          })
-            .then((res) => {
-              if (res.success) {
-                this.$message.success("阈值保存成功");
-                this.getThresholdData();
-                this.loading = false;
-              }
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消更新",
-          });
-        });
+        this.thresholdData = { ...this.thresholdData, ...result };
+      });
+    },
+    resetThresholdData() {
+      if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
+        this.thresholdData.thresholdTimeValue = this.originThresholdTimeValue;
+      } else if (Number(this.activeSport) === 2) {
+        this.thresholdData.threshold = Number(this.originthreshold);
+      } else if (Number(this.activeSport) === 1) {
+        this.thresholdData.param1 = Number(this.originParam1);
+        this.thresholdData.param2 = Number(this.originParam2);
+      }
+      this.getThresholdPreviewList();
     },
     handleClose() {
       this.onCancel();
@@ -1003,21 +991,21 @@ export default {
         .then(() => {
           this.loading = true;
           const params = {
-            thresholdType: this.activeSport,
+            thresholdType: Number(this.activeSport),
             param1: "",
             param2: "",
             threshold: "",
             triUserId: this.triUserId,
           };
-          if (this.activeSport === 4 || this.activeSport === 3) {
+          if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
             params.threshold = mmssToSeconds(
               this.thresholdData.thresholdTimeValue
             );
-          } else if (this.activeSport === 2) {
-            params.threshold = this.thresholdData.threshold;
-          } else if (this.activeSport === 1) {
-            params.param1 = this.thresholdData.param1;
-            params.param2 = this.thresholdData.param2;
+          } else if (Number(this.activeSport) === 2) {
+            params.threshold = Number(this.thresholdData.threshold);
+          } else if (Number(this.activeSport) === 1) {
+            params.param1 = Number(this.thresholdData.param1);
+            params.param2 = Number(this.thresholdData.param2);
           }
           submitData({
             url: "/gateway/user/updateThreshold",
@@ -1183,6 +1171,9 @@ export default {
         const intValue = parseInt(numericValue, 10);
         if (intValue > 0) {
           this.thresholdData[field] = intValue;
+          if (field === 'param1') {
+            this.thresholdData.param2 = Math.ceil(intValue * 0.88);
+          }
         } else {
           this.thresholdData[field] = "";
         }

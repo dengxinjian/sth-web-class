@@ -75,6 +75,7 @@ export default {
     // 处理失焦事件 - 进行格式转换和校验
     handleBlur() {
       this.validateAndConvert();
+      this.$emit("handleBlur");
     },
 
     // 处理聚焦事件
