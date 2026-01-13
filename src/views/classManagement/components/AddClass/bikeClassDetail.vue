@@ -857,7 +857,7 @@ export default {
               typeof this.data.classesJson === "string"
                 ? JSON.parse(this.data.classesJson)
                 : this.data.classesJson;
-            this.classInfo = {...classesJson, links: [{ title: "", type: "1", url: "" }]};
+            this.classInfo = {...classesJson, links: classesJson?.links || [{ title: "", type: "1", url: "" }]};
             this.timeline = classesJson.timeline;
             this.maxIntensity = classesJson.maxIntensity;
             this.classInfo.id = this.data.id;
@@ -872,7 +872,7 @@ export default {
           this.handleClassDrag();
           this.resetForm();
         } else {
-          this.classInfo = this.data.classesJson;
+          this.classInfo = {...this.data.classesJson, links: this.data.classesJson?.links || [{ title: "", type: "1", url: "" }]};
           this.timeline = this.data.classesJson.timeline;
           this.maxIntensity = this.data.classesJson.maxIntensity;
           this.classInfo.groupId = this.data.groupId;

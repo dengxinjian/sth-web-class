@@ -9,8 +9,8 @@
       custom-class="edit-class-dialog"
       top="5vh"
     >
-      <span slot="title" class="dialog-title">课表简介</span>
-      <div class="header-title">
+      <!-- <span slot="title" class="dialog-title">课表简介</span> -->
+      <div class="header-title" style="margin-top: 16px;">
         <!-- <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input

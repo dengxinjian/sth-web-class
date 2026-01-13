@@ -116,7 +116,7 @@
               v-for="(item, index) in form.links"
               :key="index"
               :gutter="8"
-              style="margin-bottom: 8px"
+              style="margin-bottom: 16px"
             >
               <el-col :span="24" style="margin-bottom: 4px">
                 <el-row
