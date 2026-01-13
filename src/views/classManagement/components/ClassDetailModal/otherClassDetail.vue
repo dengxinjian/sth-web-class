@@ -104,19 +104,36 @@
           <div class="summary-input-container">
             <el-row
               class="link-row"
-              v-for="(item, index) in form.list"
+              v-for="(item, index) in form.links"
               :key="index"
               :gutter="8"
-              style="margin-bottom: 8px"
+              style="margin-bottom: 16px"
             >
-              <el-col :span="4" style="margin-bottom: 4px">
-                <el-input
-                  size="small"
-                  v-model="item.title"
-                  placeholder="请输入链接标题"
-                />
+            <el-col :span="24" style="margin-bottom: 4px">
+                <el-row style="height: 100%;display: flex;align-items: center;justify-content: flex-start;">
+                  <el-col :span="23">
+                    <el-input
+                      size="small"
+                      v-model="item.title"
+                      placeholder="请输入链接标题"
+                    />
+                  </el-col>
+                  <el-col :span="1" v-if="form.links.length > 1">
+                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
+                      <i
+                      class="el-icon-remove-outline"
+                      @click="handleRemoveLink(index)"
+                      style="
+                        cursor: pointer;
+                        font-size: 19px;
+                        color: #d83b36;
+                      "
+                    ></i>
+                    </div>
+                  </el-col>
+                </el-row>
               </el-col>
-              <el-col :span="4" style="margin-bottom: 4px">
+              <el-col :span="23" style="margin-bottom: 4px">
                 <el-select
                   size="small"
                   style="width: 100%"
@@ -128,7 +145,7 @@
                   <el-option label="其他" value="3" />
                 </el-select>
               </el-col>
-              <el-col :span="16">
+              <el-col :span="23">
                 <el-input
                   size="small"
                   v-model="item.url"
@@ -197,7 +214,7 @@ export default {
           sth: "",
           summary: "",
           tags: [],
-          list: [{ title: "", type: "1", url: "" }], // 链接列表
+          links: [{ title: "", type: "1", url: "" }], // 链接列表
         },
         this.data || {}
       ),
@@ -245,7 +262,10 @@ export default {
   },
   methods: {
     handleAddLink() {
-      this.form.list.push({ title: "", type: '1', url: "" });
+      this.form.links.push({ title: "", type: '1', url: "" });
+    },
+    handleRemoveLink(index) {
+      this.form.links.splice(index, 1);
     },
     // 编辑进入弹框时，查询课程数据
     getClassInfo(id) {
@@ -255,7 +275,7 @@ export default {
         id,
       }).then((res) => {
         if (res.success) {
-          this.form = JSON.parse(res.result.classesJson);
+          this.form = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || [{ title: "", type: "1", url: "" }]}
           this.form.id = res.result.id;
         }
       });
@@ -352,7 +372,7 @@ export default {
         sth: "",
         summary: "",
         tips: "",
-        list: [{ title: "", type: "1", url: "" }], // 链接列表
+        links: [{ title: "", type: "1", url: "" }], // 链接列表
       };
     },
   },

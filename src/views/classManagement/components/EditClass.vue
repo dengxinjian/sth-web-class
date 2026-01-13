@@ -213,8 +213,8 @@
             </div>
             <div
               v-if="
-                classData.classesJson?.list &&
-                classData.classesJson.list.length > 0
+                classData.classesJson?.links &&
+                classData.classesJson.links.length > 0
               "
             >
               <div class="section">
@@ -225,7 +225,7 @@
               <div class="section-content">
                 <div
                   class="link-item"
-                  v-for="(item, index) in classData.classesJson.list"
+                  v-for="(item, index) in classData.classesJson.links"
                   :key="index"
                 >
                   <div class="link-item-title">

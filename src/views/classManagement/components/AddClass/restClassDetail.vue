@@ -14,7 +14,13 @@
     <div class="form-section">
       <el-form ref="titleRef" :rules="rules" :model="form" label-width="70px">
         <el-form-item label="标题：" prop="title">
-          <el-input type="text" placeholder="标题" v-model="form.title" :disabled="originalType === 'official'" :maxlength="50" />
+          <el-input
+            type="text"
+            placeholder="标题"
+            v-model="form.title"
+            :disabled="originalType === 'official'"
+            :maxlength="50"
+          />
         </el-form-item>
 
         <div class="row">
@@ -69,19 +75,46 @@
           <div class="summary-input-container">
             <el-row
               class="link-row"
-              v-for="(item, index) in form.list"
+              v-for="(item, index) in form.links"
               :key="index"
               :gutter="8"
               style="margin-bottom: 8px"
             >
-              <el-col :span="4" style="margin-bottom: 4px">
-                <el-input
-                  size="small"
-                  v-model="item.title"
-                  placeholder="请输入链接标题"
-                />
+              <el-col :span="24" style="margin-bottom: 4px">
+                <el-row
+                  style="
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                  "
+                >
+                  <el-col :span="23">
+                    <el-input
+                      size="small"
+                      v-model="item.title"
+                      placeholder="请输入链接标题"
+                    />
+                  </el-col>
+                  <el-col :span="1" v-if="form.links.length > 1">
+                    <div
+                      style="
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                      "
+                    >
+                      <i
+                        class="el-icon-remove-outline"
+                        @click="handleRemoveLink(index)"
+                        style="cursor: pointer; font-size: 19px; color: #d83b36"
+                      ></i>
+                    </div>
+                  </el-col>
+                </el-row>
               </el-col>
-              <el-col :span="4" style="margin-bottom: 4px">
+              <el-col :span="23" style="margin-bottom: 4px">
                 <el-select
                   size="small"
                   style="width: 100%"
@@ -93,7 +126,7 @@
                   <el-option label="其他" value="3" />
                 </el-select>
               </el-col>
-              <el-col :span="16">
+              <el-col :span="23">
                 <el-input
                   size="small"
                   v-model="item.url"
@@ -177,12 +210,12 @@ export default {
           sth: "",
           summary: "",
           tags: [],
-          list: [{ title: "", type: '1', url: "" }], // 链接列表
+          links: [{ title: "", type: "1", url: "" }], // 链接列表
         },
         this.data || {}
       ),
       rules: {
-        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+        title: [{ required: true, message: "请输入标题", trigger: "change" }],
       },
     };
   },
@@ -209,9 +242,10 @@ export default {
         if (this.data.id && this.originalType === "my") {
           // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
           if (this.data.classesJson) {
-            const classesJson = typeof this.data.classesJson === 'string'
-              ? JSON.parse(this.data.classesJson)
-              : this.data.classesJson;
+            const classesJson =
+              typeof this.data.classesJson === "string"
+                ? JSON.parse(this.data.classesJson)
+                : this.data.classesJson;
             this.form = classesJson;
             this.form.id = this.data.id;
             this.form.groupId = this.data.classesGroupId || this.data.groupId;
@@ -222,7 +256,12 @@ export default {
         } else if (this.originalType === "my") {
           this.resetForm();
         } else {
-          this.form = this.data.classesJson;
+          this.form = {
+            ...this.data.classesJson,
+            links: this.data.classesJson?.links || [
+              { title: "", type: "1", url: "" },
+            ],
+          };
         }
       }
     },
@@ -230,10 +269,14 @@ export default {
       if (this.data.id && this.originalType === "my") {
         // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
         if (this.data.classesJson) {
-          const classesJson = typeof this.data.classesJson === 'string'
-            ? JSON.parse(this.data.classesJson)
-            : this.data.classesJson;
-          this.form = classesJson;
+          const classesJson =
+            typeof this.data.classesJson === "string"
+              ? JSON.parse(this.data.classesJson)
+              : this.data.classesJson;
+          this.form = {
+            ...classesJson,
+            links: classesJson?.links || [{ title: "", type: "1", url: "" }],
+          };
           this.form.id = this.data.id;
           this.form.groupId = this.data.classesGroupId || this.data.groupId;
         } else {
@@ -243,7 +286,12 @@ export default {
       } else if (this.originalType === "my") {
         this.resetForm();
       } else {
-        this.form = this.data.classesJson;
+        this.form = {
+          ...this.data.classesJson,
+          links: this.data.classesJson?.links || [
+            { title: "", type: "1", url: "" },
+          ],
+        };
       }
     },
   },
@@ -260,7 +308,12 @@ export default {
         id,
       }).then((res) => {
         if (res.success) {
-          this.form = JSON.parse(res.result.classesJson);
+          this.form = {
+            ...JSON.parse(res.result.classesJson),
+            links: JSON.parse(res.result.classesJson)?.links || [
+              { title: "", type: "1", url: "" },
+            ],
+          };
           this.form.groupId = res.result.classesGroupId;
           this.form.id = res.result.id;
         }
@@ -336,7 +389,7 @@ export default {
       this.$emit("delete", this.form);
     },
     handleAddLink() {
-      this.form.list.push({ title: "", type: '1', url: "" });
+      this.form.links.push({ title: "", type: "1", url: "" });
     },
     resetForm() {
       // 清空表单数据，但保留传入的title
@@ -351,8 +404,11 @@ export default {
         sth: "",
         summary: "",
         tips: "",
-        list: [{ title: "", type: '1', url: "" }], // 链接列表
+        links: [{ title: "", type: "1", url: "" }], // 链接列表
       };
+    },
+    handleRemoveLink(index) {
+      this.form.links.splice(index, 1);
     },
   },
 };

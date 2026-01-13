@@ -17,9 +17,19 @@
           <span>标题：</span>
           <el-input type="text" v-model="classInfo.title" />
         </div> -->
-        <el-form ref="titleRef" :rules="rules" :model="classInfo" label-width="70px">
+        <el-form
+          ref="titleRef"
+          :rules="rules"
+          :model="classInfo"
+          label-width="70px"
+        >
           <el-form-item label="标题：" prop="title">
-            <el-input type="text" placeholder="标题" v-model="classInfo.title" maxlength="50" />
+            <el-input
+              type="text"
+              placeholder="标题"
+              v-model="classInfo.title"
+              maxlength="50"
+            />
           </el-form-item>
         </el-form>
         <div class="basic-info-total">
@@ -169,18 +179,35 @@
           <div class="summary-input-container">
             <el-row
               class="link-row"
-              v-for="(item, index) in classInfo.list"
+              v-for="(item, index) in classInfo.links"
               :key="index"
-              style="margin-bottom: 16px;"
+              style="margin-bottom: 16px"
             >
               <el-col :span="24" style="margin-bottom: 4px">
-                <el-input
-                  size="small"
-                  v-model="item.title"
-                  placeholder="请输入链接标题"
-                />
+                <el-row style="height: 100%;display: flex;align-items: center;justify-content: flex-start;">
+                  <el-col :span="22">
+                    <el-input
+                      size="small"
+                      v-model="item.title"
+                      placeholder="请输入链接标题"
+                    />
+                  </el-col>
+                  <el-col :span="2" v-if="classInfo.links.length > 1">
+                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
+                      <i
+                      class="el-icon-remove-outline"
+                      @click="handleRemoveLink(index)"
+                      style="
+                        cursor: pointer;
+                        font-size: 19px;
+                        color: #d83b36;
+                      "
+                    ></i>
+                    </div>
+                  </el-col>
+                </el-row>
               </el-col>
-              <el-col :span="24" style="margin-bottom: 4px">
+              <el-col :span="22" style="margin-bottom: 4px">
                 <el-select
                   size="small"
                   style="width: 100%"
@@ -192,7 +219,7 @@
                   <el-option label="其他" value="3" />
                 </el-select>
               </el-col>
-              <el-col :span="24">
+              <el-col :span="22">
                 <el-input
                   size="small"
                   v-model="item.url"
@@ -360,7 +387,7 @@
                 class="times-input"
                 size="small"
                 @blur="handleTimesChange(index)"
-                 @change="handleTimesChange(index)"
+                @change="handleTimesChange(index)"
               />
             </div>
             <div
@@ -815,7 +842,7 @@ export default {
         sth: "",
         mode: 1, // 模式
         summary: "", // 概要
-        list: [{ title: "", type: "1", url: "" }], // 链接列表
+        links: [{ title: "", type: "1", url: "" }], // 链接列表
         tags: [],
         stages: [],
 
@@ -845,7 +872,7 @@ export default {
       },
       athleticThreshold: {},
       rules: {
-        title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+        title: [{ required: true, message: "请输入标题", trigger: "change" }],
       },
     };
   },
@@ -889,8 +916,7 @@ export default {
       }
     },
   },
-  created() {
-  },
+  created() {},
   mounted() {
     if (this.innerVisible) {
       this.getTagList();
@@ -898,7 +924,7 @@ export default {
   },
   methods: {
     handleAddLink() {
-      this.classInfo.list.push({ title: "", type: '1', url: "" });
+      this.classInfo.links.push({ title: "", type: "1", url: "" });
     },
     formatDistance(distance, sportType) {
       let result = "";
@@ -1091,7 +1117,12 @@ export default {
           this.$nextTick(async () => {
             this.classesDate = res.result.classesDate;
             await this.getAthleticThreshold(res.result.classesDate);
-            this.classInfo = JSON.parse(res.result.classesJson);
+            this.classInfo = {
+              ...JSON.parse(res.result.classesJson),
+              links: JSON.parse(res.result.classesJson)?.links || [
+                { title: "", type: "1", url: "" },
+              ],
+            };
             this.timeline = JSON.parse(res.result.classesJson).timeline;
             this.classInfo.id = res.result.id;
             this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
@@ -1110,7 +1141,9 @@ export default {
           classesTitle: this.classInfo.title,
           classesGroupId: this.classInfo.groupId,
           labels: this.classInfo.tags,
-          classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
+          classesDate: !this.data.id
+            ? this.classesDate + " 00:00:00"
+            : this.classesDate,
           sportType: "CYCLE",
           classesJson: JSON.stringify({
             ...this.classInfo,
@@ -1142,7 +1175,9 @@ export default {
               classesTitle: this.classInfo.title,
               classesGroupId: this.classInfo.groupId,
               labels: this.classInfo.tags,
-              classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
+              classesDate: !this.data.id
+                ? this.classesDate + " 00:00:00"
+                : this.classesDate,
               sportType: "CYCLE",
               classesJson: JSON.stringify({
                 ...this.classInfo,
@@ -1156,6 +1191,9 @@ export default {
         }
         if (flag) this.onCancel();
       });
+    },
+    handleRemoveLink(index) {
+      this.classInfo.links.splice(index, 1);
     },
     // 删除课程
     submitDeleteClass() {
@@ -1196,7 +1234,9 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
-        classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
+        classesDate: !this.data.id
+          ? this.classesDate + " 00:00:00"
+          : this.classesDate,
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
@@ -1229,7 +1269,9 @@ export default {
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
         }),
-        classesDate: !this.data.id ? this.classesDate + " 00:00:00" : this.classesDate,
+        classesDate: !this.data.id
+          ? this.classesDate + " 00:00:00"
+          : this.classesDate,
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
@@ -1261,7 +1303,7 @@ export default {
         sth: "",
         mode: 1, // 模式
         summary: "", // 概要
-        list: [{ title: "", type: "1", url: "" }], // 链接列表
+        links: [{ title: "", type: "1", url: "" }], // 链接列表
         tags: [],
         stages: [],
 
