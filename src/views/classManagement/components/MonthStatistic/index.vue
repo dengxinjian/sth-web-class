@@ -8,7 +8,19 @@
     class="month-statistic-dialog"
   >
     <span slot="title" class="month-statistic-title">运动数据统计</span>
-
+    <div class="month-statistic-date-picker">
+      <el-date-picker
+        v-model="monthDateRange"
+        type="daterange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        size="small"
+        value-format="yyyy-MM-dd"
+        @change="onDateRangeChange"
+      >
+      </el-date-picker>
+    </div>
     <div class="statistic-content">
       <!-- 统计数据展示 -->
       <div
@@ -89,6 +101,7 @@ export default {
       selectedMonth: "",
       sthData: {},
       statisticData: [],
+      monthDateRange: [],
     };
   },
   watch: {
@@ -134,7 +147,75 @@ export default {
       // 计算月份最后一天
       const lastDay = new Date(year, month, 0).getDate();
       const endDate = `${year}-${month}-${String(lastDay).padStart(2, "0")}`;
-
+      this.monthDateRange = [startDate, endDate];
+      getData({
+        url: "/training/api/classSchedule/getStatistics",
+        begin: startDate,
+        end: endDate,
+        triUserId: this.triUserId || "ba10bb5a47f24cdda9f20a49492c3cb3",
+      })
+        .then((res) => {
+          if (res.success) {
+            this.statisticData = res.result.statisticsVoList.map((item) => {
+              const actualValue =
+                item.key === "totalSTH"
+                  ? Math.round(item.actualValue / 100) / 100
+                  : item.actualValue;
+              const planValue =
+                item.key === "totalSTH"
+                  ? Math.round(item.planValue / 100) / 100
+                  : item.planValue;
+              if (item.key === "totalSTH") {
+                return {
+                  ...item,
+                  actualValue:
+                    parseInt(item.actualValue) > 100000
+                      ? unitConversion(
+                          actualValue,
+                          statisticKeyToTitle[item.key]?.unit
+                        )
+                      : item.actualValue,
+                  actualValueUnit:
+                    parseInt(item.actualValue) > 100000 ? "万" : "",
+                  title: statisticKeyToTitle[item.key]?.title,
+                  color: statisticKeyToTitle[item.key]?.color,
+                  icon: statisticKeyToTitle[item.key]?.icon,
+                  unit: statisticKeyToTitle[item.key]?.unit,
+                  planValue:
+                    parseInt(item.planValue) > 100000
+                      ? unitConversion(
+                          planValue,
+                          statisticKeyToTitle[item.key]?.unit
+                        )
+                      : item.planValue,
+                  planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
+                };
+              }
+              return {
+                ...item,
+                actualValue: unitConversion(
+                  actualValue,
+                  statisticKeyToTitle[item.key]?.unit
+                ),
+                title: statisticKeyToTitle[item.key]?.title,
+                color: statisticKeyToTitle[item.key]?.color,
+                icon: statisticKeyToTitle[item.key]?.icon,
+                unit: statisticKeyToTitle[item.key]?.unit,
+                planValue,
+              };
+            });
+            this.sthData = res.result.avgSthRespDto;
+          }
+        })
+        .catch((error) => {
+          console.error("获取月度统计数据失败:", error);
+          this.$message.error("获取月度统计数据失败");
+        });
+    },
+    // 日期范围变化处理
+    onDateRangeChange(val) {
+      if (!val) return;
+      const [startDate, endDate] = val;
       getData({
         url: "/training/api/classSchedule/getStatistics",
         begin: startDate,
@@ -273,6 +354,12 @@ export default {
   line-height: 22px;
   display: flex;
   flex-direction: column;
+}
+
+.month-statistic-date-picker{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .month-data-sth > div span:nth-child(1) {

@@ -456,7 +456,7 @@ import { getLunarDate, secondsToHHMMSS } from "@/utils/index";
 import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
 import { CalculateRun, CalculateBike } from "./uilt";
 import dragMixin from "./mixins/dragMixin";
-
+import { getData } from "@/api/common";
 export default {
   name: "ClassManagement",
   components: {
@@ -599,7 +599,8 @@ export default {
     console.log(this.activeName, "this.activeName");
     // this.initMenuFromRoute();
     if (localStorage.getItem("loginType") !== "1") {
-      this.getTeamAndAthleticData();
+      this.getDefaultTeam();
+      // this.getTeamAndAthleticData();
     } else {
       this.selectedAthletic = localStorage.getItem("triUserId");
       this.getScheduleData();
@@ -635,7 +636,8 @@ export default {
       console.log(this.activeName, "this.activeName");
       // this.initMenuFromRoute();
       if (localStorage.getItem("loginType") !== "1") {
-        this.getTeamAndAthleticData();
+        this.getDefaultTeam();
+        // this.getTeamAndAthleticData();
       } else {
         this.selectedAthletic = localStorage.getItem("triUserId");
         this.getScheduleData();
@@ -1023,16 +1025,35 @@ export default {
       this.classSearchInput = keyword;
       this.getClassList();
     },
+    async getDefaultTeam() {
+      const _this = this;
+      const res = await getData({
+        url: "/gateway/team/my-team",
+      });
+      if (res.success) {
+        console.log("res.result=====默认团队=====",res.result);
+        _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, []);
+        _this.getTeamAndAthleticData();
+      }
+    },
 
     /**
      * 获取团队和运动员数据
      */
     async getTeamAndAthleticData() {
+      const _this = this;
       const res = await teamApi.getAllTeams();
+      console.log("res=====获取团队和运动员数据===总团队数据=====",res);
       if (res.success) {
-        this.teamList = res.result.map((item) => ({
+        this.teamList = [..._this.teamList,...res.result].map((item) => ({
           id: item.id,
           name: item.teamName,
+          teamOwnerId: item.teamOwnerId,
           members: item.members.map((member) => ({
             id: member.id,
             name: member.userNickname,
@@ -1040,10 +1061,12 @@ export default {
             lastMatchType: member.lastMatchType,
           })),
         }));
-
+        console.log("this.teamList=====汇总后的团队=====",this.teamList);
         // 默认选中第一个团队
         if (this.teamList.length > 0) {
-          this.selectedTeam = this.teamList[0].id;
+          const triUserId = localStorage.getItem("triUserId");
+          // this.selectedTeam = this.teamList[0].id;
+          this.selectedTeam = this.teamList.find(item => item.teamOwnerId === triUserId)?.id;
           this.getAthleticList();
           this.getScheduleData();
         }
@@ -2404,12 +2427,15 @@ export default {
       // 模拟课程数据 - 这里可以从课程列表中选择
       const courseData = {
         name: (classItem.classesJson && classItem.classesJson.title) || null,
-        duration: (classItem.classesJson && classItem.classesJson.duration) || null,
+        duration:
+          (classItem.classesJson && classItem.classesJson.duration) || null,
         sth: (classItem.classesJson && classItem.classesJson.sth) || null,
         id: classItem.id,
         classesJson: classItem.classesJson,
-        distance: (classItem.classesJson && classItem.classesJson.distance) || null,
-        distanceUnit: (classItem.classesJson && classItem.classesJson.distanceUnit) || null,
+        distance:
+          (classItem.classesJson && classItem.classesJson.distance) || null,
+        distanceUnit:
+          (classItem.classesJson && classItem.classesJson.distanceUnit) || null,
         sportType: classItem.sportType,
       };
       console.log(exerciseData, "exerciseData");

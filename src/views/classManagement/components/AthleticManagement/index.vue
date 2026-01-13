@@ -117,12 +117,21 @@
       :highlight-current="true"
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
-        <span
+        <el-tooltip v-if="node.level === 1" :content="node.label" placement="top">
+          <span class="tree-label-text"
+            >{{ node.label }}
+            <span v-if="node.data.isGroup"
+              >({{ node.data.membersCount }})</span
+            ></span
+          >
+        </el-tooltip>
+        <span v-else class="tree-label-text"
           >{{ node.label }}
           <span v-if="node.data.isGroup"
             >({{ node.data.membersCount }})</span
           ></span
         >
+
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
@@ -1221,5 +1230,13 @@ export default {
       border-color: #555;
     }
   }
+}
+.tree-label-text {
+  display: inline-block;
+  max-width: 158px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 </style>

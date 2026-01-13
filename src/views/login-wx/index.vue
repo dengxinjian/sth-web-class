@@ -19,33 +19,35 @@
       <div class="content-overlay">
         <div class="text-content">
           <h1>强者之心</h1>
-          <p>让科学普及训练</p>
+          <!-- <p style="margin-bottom: 300px;">让科学普及训练</p> -->
+          <p style="margin-bottom: 300px;font-size: 32px;font-weight: 400;">2025.H2 强者觉醒 敬请期待！</p>
           <!-- <p>敬请期待！</p> -->
           <div class="contact-info">
-            <h2>联系我们</h2>
+            <h5 style="font-size: 32px;font-weight: 400;">联系我们</h5>
             <!-- <div class="contact-item">
                         <span class="contact-label">电话：</span>
                         <span class="contact-value">000-0000-0000</span>
                     </div> -->
-            <div class="contact-item">
-              <span class="contact-label">邮箱：</span>
-              <span class="contact-value">service@strongtri.com</span>
+            <div class="contact-item" style="margin-bottom: 100px;">
+              <!-- <span class="contact-label">邮箱：</span> -->
+              <span class="contact-value" style="font-size: 24px;text-decoration: underline;">service@strongtri.com</span>
             </div>
           </div>
         </div>
       </div>
       <div class="wx-login-block">
-        <div class="elite-title">
-          <img
+        <!-- <div class="elite-title"> -->
+        <!-- <img
             src="./imgs/PREMIUM.svg"
             alt="ELITE"
             width="112px"
             style="margin-top: 12px"
             v-if="loginType === '2'"
-          />
-          <!-- <span v-else>ELITE</span> -->
-          <img src="./imgs/title.png" alt="ELITE" style="scale: 0.45" v-else />
-        </div>
+          /> -->
+        <!-- <span v-else>ELITE</span> -->
+        <!-- <img src="./imgs/title.png" alt="ELITE" style="scale: 0.45" v-else /> -->
+        <!-- </div> -->
+        <div>微信登录</div>
         <div
           id="wx-login-container"
           :class="wx - login - container"
@@ -70,11 +72,7 @@
           </div> -->
           <div class="miniprogram-code">
             <div class="miniprogram-title">请使用微信扫码</div>
-            <img
-              :src="miniprogramUrl"
-              alt="小程序码"
-              class="miniprogram-img"
-            />
+            <img :src="miniprogramUrl" alt="小程序码" class="miniprogram-img" />
             <div class="miniprogram-subtitle">扫码进入小程序</div>
             <el-button @click="handleMiniprogramCode">我已完成</el-button>
           </div>
@@ -82,36 +80,47 @@
         <!-- 扫码关注服务号 -->
         <div
           id="wx-login-container"
-          :class="'wx-login-container ' + (!isAgreement ? ' noAgreement' : '')"
+          class="wx-login-container"
           v-if="!isNewUser"
         >
           <img class="qrcode-img" :src="qrcodeUrl" alt="扫码二维码" />
           <div class="qrcode-subtitle" v-if="isExpire">
             <div></div>
-            <img src="./imgs/refresh.png" alt="二维码已过期" width="50" height="50" @click.stop="refreshQrCode" />
-            <div>二维码已过期，请重新获取</div>
+            <img
+              src="./imgs/refresh.png"
+              alt="二维码已过期"
+              width="50"
+              height="50"
+              @click.stop="refreshQrCode"
+            />
+            <div>
+              <div>二维码已过期</div>
+              <div>请重新获取</div>
+            </div>
+          </div>
+          <div class="qrcode-subtitle-box">
+            <div>使用微信扫一扫登录</div>
+            <div>“强者之心 STH”</div>
           </div>
         </div>
-        <div v-if="!isAgreement" class="wx-login-cover"></div>
-        <div style="margin-bottom: 20px" v-if="!isNewUser">
+        <!-- <div v-if="!isAgreement" class="wx-login-cover"></div> -->
+        <!-- <div style="margin-bottom: 20px" v-if="!isNewUser">
           <el-radio-group v-model="loginType" @change="handleLoginTypeChange">
             <el-radio label="1">运动员</el-radio>
             <el-radio label="2">教练</el-radio>
           </el-radio-group>
-        </div>
-        <div
-          style="display: flex; align-items: center; font-size: 14px"
-          v-if="!isNewUser"
-        >
+        </div> -->
+        <div style="display: flex; align-items: center; font-size: 14px">
           <el-checkbox
             v-model="isAgreement"
             label=""
             style="margin-right: 5px"
           ></el-checkbox>
           <span>我已阅读并同意</span>
-          <router-link to="/agreement" style="color: #0924f5"
+          <!-- <router-link to="/agreement" style="color: #f92b30"
             >《课程配置器用户协议》</router-link
-          >
+          > -->
+          <span style="color: #f92b30; cursor: pointer;" @click="openMask">《课程配置器用户协议》</span>
         </div>
       </div>
     </div>
@@ -137,6 +146,131 @@
         </p>
       </div>
     </footer>
+    <div class="mask" v-if="isShowAgreement">
+      <div class="mask-content">
+        <div class="mask-content-header">
+          <div class="mask-content-header-title">课程配置器用户协议</div>
+          <div class="mask-content-header-close">
+            <img src="./imgs/close.png" @click.stop="closeMask" />
+          </div>
+        </div>
+        <div class="mask-content-body">
+          <div>
+            重要提示：请在使用<text class="blod">【强者之心网页版】</text>（以下简称“本平台”或“我们”）的服务之前，仔细阅读本用户协议（以下简称“本协议”）。您一旦注册、登录、使用或以任何方式使用本服务，即表示您已充分理解并完全同意本协议的全部内容，并承诺遵守本协议及所有适用的法律法规。如果您不同意本协议的任何条款，请立即停止使用本服务。​
+          </div>
+          <div class="title blod">一、 服务定义</div>
+          <div>
+            1.1
+            本平台仅提供一个在线运动课程配置工具（以下简称“本工具”），允许教练用户创建、编辑、管理和分发运动课程计划（以下简称“课表”）。
+          </div>
+          <div>1.2 运动员用户可以查看、接收由教练分发的课表。</div>
+          <div>
+            1.3
+            本平台本身不生产、编辑或审核任何具体的课表内容，课表内容完全由教练用户独立创建和负责。
+          </div>
+          <div class="title">二、 用户身份与责任划分</div>
+          <div>2.1 教练用户（以下简称“教练”）​</div>
+          <div>
+            a.
+            您确认并承诺，您是具备相关资质的专业体育教练或健康专业人士，了解运动科学知识，能够为运动员制定安全、科学、合理的训练计划。
+          </div>
+          <div>
+            b.
+            您独立承担由您创建、配置、分发的所有课表内容的全部责任。这包括但不限于课表的科学性、安全性、合理性、有效性以及其对特定运动员的适用性。
+          </div>
+          <div>
+            c.
+            您有责任在布置课表前，充分了解运动员的身体健康状况、运动能力、伤病史等信息，并据此制定个性化的训练方案。禁止布置超出运动员合理能力范围的、可能导致受伤的高风险课程。​​
+          </div>
+          <div>
+            d.
+            您理解并同意，您与运动员之间存在的任何服务关系或纠纷，均由您与运动员自行解决，与本平台无关。
+          </div>
+          <div>2.2 运动员用户（以下简称“运动员”）</div>
+          <div>
+            a.
+            您明确知悉并同意，您从教练处接收的任何课表，其执行与训练完全基于您个人的自愿选择，并自行承担所有风险。
+          </div>
+          <div>
+            b.
+            在开始任何训练计划之前，您有责任自行咨询医生或其他合格的医疗专业人员，确认自身身体状况适合该课表所要求的训练强度。​​
+            如果您有已知或疑似的心脏病、高血压、关节伤病、怀孕或其他任何可能因运动而加重的健康状况，必须在执行课表前获得医生的许可。
+          </div>
+          <div>
+            c.
+            您有责任在训练过程中聆听身体的信号，如感到疼痛、眩晕、呼吸困难或其他不适，应立即停止训练并及时就医。
+          </div>
+          <div>
+            d.
+            您理解，教练提供的课表仅为建议，您需要根据自身的实时身体状况灵活调整训练强度、时长和内容。
+          </div>
+          <div>2.3 平台方​</div>
+          <div>
+            a.
+            本平台仅作为技术工具提供方，不涉及任何具体的体育训练指导或医疗服务。我们不对任何课表内容的准确性、科学性、安全性、有效性或适用性作出任何明示或暗示的声明或保证。
+          </div>
+          <div>
+            b.
+            本平台不对因以下情况导致的任何直接、间接、附带、特殊、惩罚性或后果性的损害或损失（包括但不限于人身伤害、财产损失、利润损失、数据丢失）承担任何责任：​
+          </div>
+          <div>教练配置的课表内容存在错误、不科学或不安全；</div>
+          <div>运动员未咨询医生或忽视自身身体状况而执行课表；</div>
+          <div>运动员错误理解或错误执行课表内容；</div>
+          <div>训练过程中发生的任何意外事故。</div>
+          <div>
+            c.
+            本平台无法也不会对每一位教练的资质、每一份课表的内容进行实质性审查。
+          </div>
+          <div class="title">三、 免责声明</div>
+          <div>
+            您特此同意，使用本工具和任何课表的风险完全由您自己承担。本服务以“现状”和“可用”的基础提供。本平台明确否认所有明示或暗示的保证，包括但不限于对适销性、特定用途适用性和非侵权性的暗示保证。​
+          </div>
+          <div>
+            本平台不保证服务不中断、及时、安全或无错误。您从本平台或通过本服务获得的任何口头或书面建议或信息，均不构成未在本协议中明确规定的任何保证。
+          </div>
+          <div class="title">四、 知识产权​</div>
+          <div>
+            4.1
+            本工具相关的软件、界面、设计、文案、logo等所有知识产权归本平台所有。
+          </div>
+          <div>
+            4.2
+            教练独立创建的课表内容，其知识产权归该教练所有。但教练授予本平台一项全球性、免版税的非独占许可，允许本平台为了提供服务（如存储、分发、展示）而使用、托管、传输其课表内容。
+          </div>
+          <div class="title">五、 隐私政策</div>
+          <div>
+            关于我们如何收集、使用和披露您的个人信息，请参阅我们单独的《隐私政策》。该政策构成本协议的一部分。
+          </div>
+          <div class="title">六、 协议修改与终止</div>
+          <div>
+            6.1
+            本平台有权根据需要不时地修改本协议的任何条款。一旦条款发生变更，我们将在网站上公布修订后的协议。您继续使用服务即表示您接受修订后的协议。
+          </div>
+          <div>
+            6.2
+            本平台有权因任何原因，在不事先通知的情况下，终止向您提供全部或部分服务。
+          </div>
+          <div class="title">七、 适用法律与争议解决​</div>
+          <div>
+            7.1 本协议的订立、执行和解释及争议的解决均应适用中华人民共和国法律。
+          </div>
+          <div>
+            7.2
+            因本协议引起的或与本协议有关的任何争议，应首先通过友好协商解决；协商不成的，任何一方均有权将争议提交至【本平台运营公司所在地】有管辖权的人民法院诉讼解决。
+          </div>
+          <div>
+            再次重申：运动健身存在固有风险，可能导致受伤。您在使用本工具和任何课表前，已充分了解并自愿承担这些风险。本平台仅为信息传输和技术服务提供者，不承担任何因使用课表内容而产生的责任。
+          </div>
+          <div>请根据您的身体状况，谨慎训练，量力而行。</div>
+          <!-- <div style="text-align: center; margin: 20px 0">
+            <el-button type="default" @click="goBack">返回</el-button>
+          </div> -->
+        </div>
+        <div class="mask-content-footer">
+          <div class="mask-content-footer-button" @click="closeMask">确认</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -170,7 +304,11 @@ export default {
       expireTimer: null, // 二维码过期定时器
       // 是否过期
       isExpire: false,
-      miniprogramUrl: process.env.NODE_ENV === "production" ? require("@/views/login-wx/imgs/miniprogram.png") : require("@/views/login-wx/imgs/miniprogram-test.png"),
+      isShowAgreement: false,
+      miniprogramUrl:
+        process.env.NODE_ENV === "production"
+          ? require("@/views/login-wx/imgs/miniprogram.png")
+          : require("@/views/login-wx/imgs/miniprogram-test.png"),
     };
   },
   mounted() {
@@ -186,6 +324,12 @@ export default {
     this.clearExpireTimer();
   },
   methods: {
+    openMask() {
+      this.isShowAgreement = true;
+    },
+    closeMask() {
+      this.isShowAgreement = false;
+    },
     refreshQrCode() {
       setTimeout(() => {
         this.isExpire = false;
@@ -345,7 +489,7 @@ export default {
             // 过期时间
             this.expireTimestamp = res.timestamp;
             // console.log("this.expireTimestamp", this.expireTimestamp);
-            this.expireTime = (res.result.expireSeconds - 25) || 0;
+            this.expireTime = res.result.expireSeconds - 25 || 0;
             this.sceneId = res.result.sceneId;
             this.qrcodeUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${res.result.ticket}`;
 
@@ -816,21 +960,23 @@ footer {
   opacity: 0.9;
 }
 .wx-login-block {
+  width: 400px;
+  height: 500px;
   position: absolute;
   top: 50%;
-  right: 10%;
+  right: 100px;
   z-index: 1000;
   transform: translateY(-50%);
-  width: 340px;
-  height: 550px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: #ffffffeb;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-top: 80px;
+  justify-content: space-between;
+  // padding-top: 80px;
+  padding: 32px 0 62px 0;
+  box-sizing: border-box;
 
   .elite-title {
     font-size: 24px;
@@ -952,14 +1098,6 @@ footer {
   opacity: 0.8;
 }
 
-.qrcode-img {
-  width: 200px;
-  height: 200px;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 60px;
-}
-
 /* 登录状态样式 */
 .miniprogram-code {
   width: 200px;
@@ -1004,9 +1142,28 @@ footer {
   color: #1890ff;
 }
 
-.qrcode-subtitle{
+.qrcode-img {
+  width: 200px;
+  height: 200px;
+  border: none;
+  border-radius: 8px;
+  // margin-bottom: 60px;
+}
+
+.qrcode-subtitle-box {
+  font-size: 14px;
+  line-height: 22px;
+  color: #666666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.qrcode-subtitle {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 200px;
   height: 200px;
@@ -1015,7 +1172,6 @@ footer {
   color: #fff;
   font-size: 12px;
   text-align: center;
-  margin-bottom: 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1024,9 +1180,11 @@ footer {
   & > img {
     cursor: pointer;
   }
-  & > div{
+  & > div {
+    font-size: 14px;
+    line-height: 22px;
     margin-bottom: 30px;
-    color:#fff;
+    color: #fff;
   }
 }
 
@@ -1047,6 +1205,96 @@ footer {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+.mask {
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+.mask-content {
+  width: 880px;
+  height: 640px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  .mask-content-header {
+    height: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .mask-content-header-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .mask-content-header-close {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      & > img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .mask-content-header-close:hover {
+      opacity: 0.8;
+    }
+  }
+  .mask-content-body {
+    margin-top: 20px;
+    height: 512px;
+    overflow-y: scroll;
+    font-size: 14px;
+    line-height: 22px;
+    letter-spacing: 1px;
+    /* 隐藏滚动条但保持滚动功能 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 和 Edge */
+    &::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+    .blod{
+      font-weight: 600;
+    }
+    .title{
+      margin: 16px 0;
+      font-weight: 600;
+    }
+  }
+  .mask-content-footer {
+    width: 880px;
+    height: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px -1px 0px 0px #00000026;
+    background-color: #fff;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    .mask-content-footer-button {
+      width: 200px;
+      height: 32px;
+      background: #f92b30;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+      line-height: 32px;
+      border-radius: 5px;
+    }
+    .mask-content-footer-button:hover {
+      opacity: 0.8;
+    }
   }
 }
 </style>

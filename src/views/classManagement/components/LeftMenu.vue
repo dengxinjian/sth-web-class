@@ -17,7 +17,7 @@
         data-menu-index="athletic"
       >
         <img :src="athleticIconSrc" alt="" class="menu-icon" />
-        <span slot="title">运动员</span>
+        <span slot="title">团队</span>
       </el-menu-item>
       <el-menu-item
         index="class"
@@ -204,6 +204,10 @@ export default {
       line-height: 12px;
     }
   }
+}
+
+.menu-item-custom span{
+  color: #666;
 }
 
 .type-change-list {

@@ -77,7 +77,12 @@
       <div class="mask-container">
         <div class="container-top-box">
           <div class="container-top-box-title">订阅</div>
-          <img src="~@/assets/plan/close.png" alt="" class="close-icon" @click="vipDialogVisible = false" />
+          <img
+            src="~@/assets/plan/close.png"
+            alt=""
+            class="close-icon"
+            @click="vipDialogVisible = false"
+          />
         </div>
         <div class="container-content">
           <div class="container-content-title-box">
@@ -103,7 +108,22 @@
                 :key="item.label"
               >
                 <img :src="item.img" alt="" />
-                <div class="list-item-title">{{ item.label }}</div>
+                <div class="list-item-content">
+                  <!-- <div class="list-item-title">{{ item.title }}</div> -->
+                  <div class="list-item-sub-title">{{ item.subTitle }}</div>
+                  <div
+                    class="list-item-content-item"
+                    v-for="child in item.children"
+                    :key="child.idx"
+                  >
+                    <div class="list-item-content-icon-box">
+                      <span class="list-item-content-icon"></span>
+                    </div>
+                    <span class="list-item-content-text">{{
+                      child.label
+                    }}</span>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="content-box-btn" @click="handleSubscribeVip">
@@ -133,6 +153,7 @@ export default {
       name: localStorage.getItem("name"),
       loginType: localStorage.getItem("loginType"),
       triUserId: localStorage.getItem("triUserId"),
+      webIdentityType: localStorage.getItem("webIdentityType"),
       userAvatar:
         localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png"),
       // 用于触发 watch 的响应式属性
@@ -142,21 +163,53 @@ export default {
       vipDialogVisible: false,
       activeTab: "1",
       vipInfoList: [
-        { label: "教练执教", img: require("@/assets/vip/vip_1.png") },
         {
-          label: "无上限的个人课程空间",
+          title: "会员标识",
+          subTitle: "会员专属图标",
+          img: require("@/assets/vip/vip_1.png"),
+          children: [{ idx: 1, label: "头像框带有会员专属标识" }],
+        },
+        {
+          title: "团队管理",
+          subTitle: "科学管理",
           img: require("@/assets/vip/vip_2.png"),
+          children: [
+            { idx: 1, label: "运动员管理" },
+            { idx: 2, label: "执教管理" },
+            { idx: 3, label: "团队课程管理" },
+            { idx: 4, label: "团队计划管理" },
+          ],
         },
         {
-          label: "无上限的个人计划上限",
+          title: "数据总览",
+          subTitle: "可视化分析",
           img: require("@/assets/vip/vip_3.png"),
+          children: [
+            { idx: 1, label: "解放90%的行政时间" },
+            { idx: 2, label: "成员数据可视化仪，一眼掌握团队全局" },
+          ],
         },
         {
-          label: "团队教练3人上限（包含主教练）",
+          title: "效率与专业",
+          subTitle: "数据决策",
           img: require("@/assets/vip/vip_4.png"),
+          children: [
+            { idx: 1, label: "拥有“数据透视眼”，精准识别谁已过度、谁临突破" },
+            { idx: 2, label: "每一次计划调整都有据可依，大幅提升教练权威" },
+          ],
         },
-        { label: "团队运动员15人上限", img: require("@/assets/vip/vip_5.png") },
+        {
+          title: "价值体现",
+          subTitle: "价值提升与变现",
+          img: require("@/assets/vip/vip_5.png"),
+          children: [
+            { idx: 1, label: "管理增值，实现教练价值的杠杆化" },
+            { idx: 2, label: "课程库和计划模板系统化、产品化" },
+            { idx: 3, label: "自动生成学员成长报告和团队训练年鉴" },
+          ],
+        },
       ],
+      userInfo: null,
     };
   },
   computed: {
@@ -249,8 +302,12 @@ export default {
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
+          console.log("=====获取用户信息---切换=====", res);
+          this.userInfo = res.result;
           this.name = res.result.nicknameTag;
           this.userAvatar = res.result.avatarUrl;
+          localStorage.setItem("webIdentityType", res.result.webIdentityType);
+          this.webIdentityType = res.result.webIdentityType;
           // 更新 localStorage 和 watcher 属性
           if (res.result.nicknameTag) {
             localStorage.setItem("name", res.result.nicknameTag);
@@ -267,7 +324,8 @@ export default {
       this.userAvatar =
         localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png");
     },
-    resetPageData() {
+    async resetPageData() {
+      await this.updateUserInfo();
       const newLoginType = this.loginType === "1" ? "2" : "1";
       localStorage.setItem("loginType", newLoginType);
       localStorage.setItem(
@@ -291,6 +349,24 @@ export default {
       } else {
         this.reload();
       }
+    },
+    async updateUserInfo() {
+      console.log('=====更新用户信息=====', this.userInfo);
+      console.log('=====更新用户信息-webIdentityType=====', this.webIdentityType);
+      const params = {
+        ...this.userInfo,
+        webIdentityType: !this.webIdentityType || this.webIdentityType === 'null' || this.webIdentityType === "R" ? "C" : "R",
+        identityType: !this.webIdentityType || this.webIdentityType === 'null' || this.webIdentityType === "R" ? "C" : "R",
+      }
+      submitData({
+        url: "/consumer/wx/updatePersonalProfile",
+        requestData: params,
+      })
+        .then((res) => {
+          if (res.success) {
+            this.getAthleticInfo();
+          }
+        })
     },
     async handleSubscribeVip() {
       const _this = this;
@@ -656,9 +732,11 @@ export default {
           row-gap: 10px;
           margin-top: 16px;
           .list-item {
+            // width: 33.33%;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            align-items: flex-start;
+            justify-content: flex-start;
+            // gap: 10px;
             // 每行3个，减去2个gap（16px * 2 = 32px）
             width: calc((100% - 32px) / 3);
             box-sizing: border-box;
@@ -671,6 +749,40 @@ export default {
             .list-item-title {
               font-size: 13px;
               color: #101010;
+            }
+            .list-item-content {
+              .list-item-sub-title {
+                height: 30px;
+                line-height: 30px;
+                font-size: 15px;
+                font-weight: 600;
+              }
+              .list-item-content-item {
+                display: flex;
+                align-items: flex-start;
+                margin-top: 8px;
+                .list-item-content-icon-box {
+                  height: 20px;
+                  width: 6px !important;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: 6px;
+                }
+                .list-item-content-icon {
+                  width: 5px;
+                  height: 5px;
+                  border-radius: 5px;
+                  background: #000;
+                }
+                .list-item-content-text {
+                  flex: 1;
+                  font-size: 14px;
+                  line-height: 20px;
+                  font-weight: 400;
+                  color: #101010;
+                }
+              }
             }
           }
         }
