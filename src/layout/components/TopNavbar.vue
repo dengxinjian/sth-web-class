@@ -300,6 +300,7 @@ export default {
       getData({
         url: "/consumer/wx/getUserProfile",
         triUserId: this.triUserId,
+        clientType: 'web',
       }).then((res) => {
         if (res.success) {
           console.log("=====获取用户信息---切换=====", res);
@@ -738,6 +739,7 @@ export default {
             // 每行3个，减去2个gap（16px * 2 = 32px）
             width: calc((100% - 32px) / 3);
             box-sizing: border-box;
+            margin-bottom: 16px;
             img {
               width: 30px;
               height: 30px;
@@ -760,7 +762,7 @@ export default {
                 align-items: flex-start;
                 margin-top: 8px;
                 .list-item-content-icon-box {
-                  height: 20px;
+                  height: 16px;
                   width: 6px !important;
                   display: flex;
                   align-items: center;
@@ -768,17 +770,17 @@ export default {
                   margin-right: 6px;
                 }
                 .list-item-content-icon {
-                  width: 5px;
-                  height: 5px;
-                  border-radius: 5px;
-                  background: #000;
+                  width: 4px;
+                  height: 4px;
+                  border-radius: 4px;
+                  background: #999;
                 }
                 .list-item-content-text {
                   flex: 1;
-                  font-size: 14px;
-                  line-height: 20px;
+                  font-size: 12px;
+                  line-height: 16px;
                   font-weight: 400;
-                  color: #101010;
+                  color: #999;
                 }
               }
             }

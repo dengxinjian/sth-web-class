@@ -188,11 +188,12 @@ export const statisticsApi = {
  */
 export const athleteApi = {
   // 获取运动员配置
-  getUserProfile(triUserId, date) {
+  getUserProfile(triUserId, date, clientType = 'web') {
     return getData({
       url: "/consumer/wx/getUserProfile",
       triUserId,
       date,
+      clientType,
     });
   },
 

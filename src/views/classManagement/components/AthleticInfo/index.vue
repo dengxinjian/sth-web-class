@@ -874,6 +874,7 @@ export default {
       getData({
         url: "/consumer/wx/getUserProfile",
         triUserId: this.triUserId,
+        clientType: 'web',
       }).then((res) => {
         if (res.success) {
           this.baseForm = res.result;
