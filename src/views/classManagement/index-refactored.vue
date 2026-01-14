@@ -1031,7 +1031,6 @@ export default {
         url: "/gateway/team/my-team",
       });
       if (res.success) {
-        console.log("res.result=====默认团队=====",res.result);
         _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
@@ -1048,20 +1047,18 @@ export default {
     async getTeamAndAthleticData() {
       const _this = this;
       const res = await teamApi.getAllTeams();
-      console.log("res=====获取团队和运动员数据===总团队数据=====",res);
       if (res.success) {
         this.teamList = [..._this.teamList,...res.result].map((item) => ({
           id: item.id,
           name: item.teamName,
           teamOwnerId: item.teamOwnerId,
-          members: item.members.map((member) => ({
+          members: res.result.length > 0 ? item.members.map((member) => ({
             id: member.id,
             name: member.userNickname,
             triUserId: member.triUserId,
             lastMatchType: member.lastMatchType,
-          })),
+          })) : [],
         }));
-        console.log("this.teamList=====汇总后的团队=====",this.teamList);
         // 默认选中第一个团队
         if (this.teamList.length > 0) {
           const triUserId = localStorage.getItem("triUserId");
