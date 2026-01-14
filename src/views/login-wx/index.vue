@@ -84,6 +84,7 @@
           v-if="!isNewUser"
         >
           <img class="qrcode-img" :src="qrcodeUrl" alt="扫码二维码" />
+          <div v-if="!isAgreement" class="wx-login-cover"></div>
           <div class="qrcode-subtitle" v-if="isExpire">
             <div></div>
             <img
@@ -315,8 +316,8 @@ export default {
     this.getScanQrCode();
     // this.checkUrlParams();
     this.initSlider();
-    this.loginType = localStorage.getItem("loginType") || "1";
-    localStorage.setItem("loginType", this.loginType);
+    // this.loginType = localStorage.getItem("loginType") || "1";
+    // localStorage.setItem("loginType", this.loginType);
   },
   beforeDestroy() {
     clearInterval(this.carouselTimer);
@@ -460,13 +461,15 @@ export default {
         // this.startPolling();
         return;
       }
-
       this.$message.success("登录成功");
 
       // 保存用户信息到 Vuex
       this.$store.commit("user/SET_TOKEN", result.jwt);
       this.$store.commit("user/SET_NAME", result.nicknameTag);
-
+      const { userInfo } = result;
+      const loginType = userInfo?.webIdentityType && userInfo?.webIdentityType === "C" ? "2" : "1";
+      localStorage.setItem("loginType", loginType);
+      localStorage.setItem("webIdentityType", userInfo?.webIdentityType);
       // 保存用户信息到 localStorage
       localStorage.setItem("triUserId", result.triUserId);
       localStorage.setItem("name", result.nicknameTag);
@@ -991,14 +994,6 @@ footer {
     font-weight: bold;
   }
 }
-.wx-login-cover {
-  position: absolute;
-  top: 80px;
-  left: 0;
-  z-index: 1000;
-  width: 340px;
-  height: 300px;
-}
 .wx-login-container {
   position: relative;
 }
@@ -1161,6 +1156,19 @@ footer {
   margin-top: 24px;
 }
 
+.wx-login-cover {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 8px;
+}
+
 .qrcode-subtitle {
   position: absolute;
   top: 0;
@@ -1291,6 +1299,7 @@ footer {
       text-align: center;
       line-height: 32px;
       border-radius: 5px;
+      cursor: pointer;
     }
     .mask-content-footer-button:hover {
       opacity: 0.8;

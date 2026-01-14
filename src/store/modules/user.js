@@ -45,13 +45,14 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ openid: loginAccount.trim() })
         .then((response) => {
-          console.log('=====登录返回数据=====', response);
           const { token, nicknameTag, triUserId,webIdentityType } = response.result;
           commit("SET_TOKEN", token);
           commit("SET_NAME", nicknameTag);
           localStorage.setItem("name", nicknameTag);
           localStorage.setItem("triUserId", triUserId);
           localStorage.setItem("webIdentityType", webIdentityType);
+          const loginType = webIdentityType && webIdentityType === "C" ? "2" : "1";
+          localStorage.setItem("loginType", loginType);
           setToken(token);
           resolve();
         })
