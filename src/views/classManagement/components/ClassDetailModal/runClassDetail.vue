@@ -1280,6 +1280,7 @@ export default {
           );
           this.$message.success("课表保存成功");
         }
+        console.log(flag, "flag");
         if (flag) this.onCancel();
       });
     },
