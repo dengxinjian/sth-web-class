@@ -86,7 +86,7 @@
             }`"
             class="schedule-table-cell"
           >
-            <div class="schedule-table-cell-title">
+            <div :class=" item.commonDate === today ? 'schedule-table-cell-title-cur' : 'schedule-table-cell-title'">
               <div>{{ new Date(item?.commonDate).getDate() }}</div>
               <div>
                 （{{ convertToLunar(item?.commonDate).dateStr }}）
@@ -269,6 +269,7 @@ export default {
       copiedEvent: null, // 保存复制的赛事数据
       hasCutEvent: false, // 是否已剪切过赛事
       cutEvent: null, // 保存剪切的赛事信息（用于删除原位置）
+      today: new Date().toISOString().split('T')[0], // 当前日期
     };
   },
   mounted() {
@@ -591,7 +592,7 @@ export default {
 
     .schedule-table-cell-title {
       line-height: 40px;
-      margin: 4px 0;
+      padding: 40px 0;
       flex-shrink: 0;
       font-family: PingFang SC;
       font-weight: 600;
@@ -609,6 +610,33 @@ export default {
         font-style: Regular;
         font-size: 12px;
         color: #666666;
+
+      }
+    }
+
+    .schedule-table-cell-title-cur {
+      line-height: 40px;
+      padding: 4px 0;
+      flex-shrink: 0;
+      font-family: PingFang SC;
+      font-weight: 600;
+      font-style: Semibold;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      background-color: #F92B300D;
+      color: #F92B30;
+      border: 1px solid #F92B304D;
+      div:first-child {
+        text-align: center;
+      }
+      div:last-child {
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 12px;
+        color: #F92B30;
 
       }
     }

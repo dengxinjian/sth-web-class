@@ -10,8 +10,30 @@
         <i class="el-icon-caret-bottom" v-else></i>
       </div>
       <div class="trigger-right">
-        <span class="nav-arrow" @click.stop="goPrevWeek">&lt;</span>
-        <span class="nav-arrow" @click.stop="goNextWeek">&gt;</span>
+        <span class="nav-arrow-left" @click.stop="goPrevWeek">
+          <img
+            class="week-img-left"
+            src="@/assets/addClass/arrow.png"
+            alt="next"
+          />
+          <img
+            class="week-img-left-active"
+            src="@/assets/addClass/arrow-active.png"
+            alt="next"
+          />
+        </span>
+        <span class="nav-arrow" @click.stop="goNextWeek">
+          <img
+            class="week-img-right"
+            src="@/assets/addClass/arrow.png"
+            alt="next"
+          />
+          <img
+            class="week-img-right-active"
+            src="@/assets/addClass/arrow-active.png"
+            alt="next"
+          />
+        </span>
 
         <button class="today-button" @click.stop="goThisWeek">当周</button>
       </div>
@@ -22,34 +44,71 @@
       <div class="week-range-picker-calendar">
         <!-- 日历标题 -->
         <div class="calendar-title">
-          <span class="nav-arrow" @click.stop="goPrevMonthInCalendar"
-            >&lt;</span
+          <span
+            class="calendar-title-arrow-left"
+            @click.stop="goPrevMonthInCalendar"
           >
+            <img
+              class="arrow-img-left"
+              src="@/assets/addClass/arrow.png"
+              alt="next"
+            />
+            <img
+              class="arrow-img-left-active"
+              src="@/assets/addClass/arrow-active.png"
+              alt="next"
+            />
+          </span>
           <div class="date-text">
-            <select
+            <el-select
               class="year-select"
-              :value="selectedYear"
+              v-model="selectedYear"
               @change="handleYearChangeInCalendar"
               @click.stop
+              size="mini"
             >
-              <option v-for="year in yearOptions" :key="year" :value="year">
-                {{ year }}年
-              </option>
-            </select>
-            <select
+              <!-- <el-option v-for="year in yearOptionsArr" :key="year.value" :value="year.value">
+                {{ year.label }}
+              </el-option> -->
+              <el-option
+                v-for="year in yearOptionsArr"
+                :key="`year-${year.value}`"
+                :value="year.value"
+                :label="year.label"
+              >
+              </el-option>
+            </el-select>
+            <el-select
               class="month-select"
-              :value="selectedMonth"
+              v-model="selectedMonth"
               @change="handleMonthChangeInCalendar"
               @click.stop
+              size="mini"
             >
-              <option v-for="month in monthOptions" :key="month" :value="month">
-                {{ month }}月
-              </option>
-            </select>
+              <el-option
+                v-for="month in monthOptionsArr"
+                :key="`month-${month.value}`"
+                :value="month.value"
+                :label="month.label"
+              >
+              </el-option>
+            </el-select>
           </div>
-          <span class="nav-arrow" @click.stop="goNextMonthInCalendar"
-            >&gt;</span
+          <span
+            class="calendar-title-arrow-right"
+            @click.stop="goNextMonthInCalendar"
           >
+            <img
+              class="arrow-img-right"
+              src="@/assets/addClass/arrow.png"
+              alt="next"
+            />
+            <img
+              class="arrow-img-right-active"
+              src="@/assets/addClass/arrow-active.png"
+              alt="next"
+            />
+          </span>
         </div>
 
         <!-- 星期表头 -->
@@ -147,8 +206,31 @@ export default {
       }
       return options;
     },
+    yearOptionsArr() {
+      const options = [];
+      for (let y = this.minYear; y <= this.maxYear; y += 1) {
+        options.push({ value: y, label: `${y}年` });
+      }
+      return options;
+    },
     monthOptions() {
       return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    },
+    monthOptionsArr() {
+      return [
+        { value: 1, label: "1月" },
+        { value: 2, label: "2月" },
+        { value: 3, label: "3月" },
+        { value: 4, label: "4月" },
+        { value: 5, label: "5月" },
+        { value: 6, label: "6月" },
+        { value: 7, label: "7月" },
+        { value: 8, label: "8月" },
+        { value: 9, label: "9月" },
+        { value: 10, label: "10月" },
+        { value: 11, label: "11月" },
+        { value: 12, label: "12月" },
+      ];
     },
     // 计算日历日期数组
     calendarDates() {
@@ -407,8 +489,8 @@ export default {
     },
 
     // 处理日历中年份选择变化
-    handleYearChangeInCalendar(event) {
-      this.selectedYear = parseInt(event.target.value, 10);
+    handleYearChangeInCalendar(value) {
+      this.selectedYear = value;
       this.recomputeWeeks(() => {
         // 切换年份后，选择该月的第一周
         this.selectedWeekIndex = 0;
@@ -418,7 +500,8 @@ export default {
 
     // 处理日历中月份选择变化
     handleMonthChangeInCalendar(event) {
-      this.selectedMonth = parseInt(event.target.value, 10);
+      console.log("handleMonthChangeInCalendar", event);
+      this.selectedMonth = parseInt(event, 10);
       this.recomputeWeeks(() => {
         // 切换月份后，选择该月的第一周
         this.selectedWeekIndex = 0;
@@ -751,7 +834,7 @@ export default {
   }
   .el-icon-caret-bottom {
     font-size: 12px;
-     color: #666;
+    color: #666;
   }
 }
 
@@ -776,6 +859,66 @@ export default {
     background: #f92b301a;
     color: #f92b30;
   }
+
+  .nav-arrow-left {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    color: #999;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    background: #fafafa;
+  }
+  .nav-arrow-left:hover {
+    background: #f92b301a;
+    color: #f92b30;
+  }
+}
+
+.week-img-right {
+  width: 12px;
+  height: 12px;
+  display: block;
+}
+
+.week-img-right-active {
+  width: 12px;
+  height: 12px;
+  transform: rotate(180deg);
+  display: none;
+}
+
+.week-img-left {
+  width: 12px;
+  height: 12px;
+  transform: rotate(180deg);
+  display: block;
+}
+
+.week-img-left-active {
+  width: 12px;
+  height: 12px;
+  display: none;
+}
+
+.trigger-right .nav-arrow-left:hover .week-img-left {
+  display: none;
+}
+
+.trigger-right .nav-arrow-left:hover .week-img-left-active {
+  display: block;
+}
+
+.trigger-right .nav-arrow:hover .week-img-right {
+  display: none;
+}
+
+.trigger-right .nav-arrow:hover .week-img-right-active {
+  display: block;
 }
 
 .date-display {
@@ -798,9 +941,9 @@ export default {
 }
 
 .today-button:hover {
-  color: #1890ff;
-  border-color: #40a9ff;
-  background: #f0f7ff;
+  color: #f92b30;
+  border-color: #f92b30;
+  background: #f92b300d;
 }
 
 .temperature-display {
@@ -835,8 +978,8 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
   padding: 16px;
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 8px;
+  padding-right: 8px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 }
@@ -853,7 +996,7 @@ export default {
   padding-bottom: 12px;
   border-bottom: 1px solid #f0f0f0;
 
-  .nav-arrow {
+  .calendar-title-arrow-right {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -866,7 +1009,25 @@ export default {
     transition: all 0.2s;
   }
 
-  .nav-arrow:hover {
+  .calendar-title-arrow-right:hover {
+    background: #f92b301a;
+    color: #f92b30;
+  }
+
+  .calendar-title-arrow-left {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    color: #999;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .calendar-title-arrow-left:hover {
     background: #f92b301a;
     color: #f92b30;
   }
@@ -882,27 +1043,27 @@ export default {
 
   .year-select,
   .month-select {
-    padding: 4px 8px;
+    width: 90px;
+    /* padding: 4px 8px; */
     font-size: 14px;
     font-weight: 500;
     color: #333;
-    border: 1px solid #d9d9d9;
+    /* border: 1px solid #d9d9d9; */
     border-radius: 4px;
     background: #fff;
     cursor: pointer;
     transition: all 0.2s;
     outline: none;
   }
-
   .year-select:hover,
   .month-select:hover {
-    border-color: #40a9ff;
+    border-color: rgba(249, 43, 48, 0.6);
   }
 
   .year-select:focus,
   .month-select:focus {
-    border-color: #1890ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+    border-color: #f92b30;
+    box-shadow: 0 0 0 2px #f92b300d;
   }
 
   .year-select {
@@ -912,6 +1073,52 @@ export default {
   .month-select {
     min-width: 65px;
   }
+
+  .year-select option:hover,
+  .month-select option:hover {
+    background-color: rgba(249, 43, 48, 0.5);
+  }
+}
+
+.arrow-img-left {
+  width: 12px;
+  height: 12px;
+  transform: rotate(180deg);
+  display: block;
+}
+.arrow-img-left-active {
+  width: 12px;
+  height: 12px;
+  display: none;
+}
+
+.calendar-title .calendar-title-arrow-left:hover .arrow-img-left {
+  display: none;
+}
+
+.calendar-title .calendar-title-arrow-left:hover .arrow-img-left-active {
+  display: block;
+}
+
+.arrow-img-right {
+  width: 12px;
+  height: 12px;
+  display: block;
+}
+
+.arrow-img-right-active {
+  width: 12px;
+  height: 12px;
+  transform: rotate(180deg);
+  display: none;
+}
+
+.calendar-title .calendar-title-arrow-right:hover .arrow-img-right {
+  display: none;
+}
+
+.calendar-title .calendar-title-arrow-right:hover .arrow-img-right-active {
+  display: block;
 }
 
 /* 星期表头 */
@@ -966,18 +1173,18 @@ export default {
 }
 
 .date-cell.is-selected {
-  background: #1890ff;
+  background: rgba(249, 43, 48, 0.5);
   color: #fff;
   font-weight: 600;
 }
 
 .date-cell.is-in-range {
-  background: #e6f7ff;
-  color: #1890ff;
+  background: #f92b300d;
+  color: #f92b30;
 }
 
 .date-cell.is-in-range:hover {
-  background: #bae7ff;
+  background: #f92b304d;
 }
 
 /* 底部信息栏 */
@@ -993,6 +1200,6 @@ export default {
 }
 
 .week-info span {
-  color: #1890ff;
+  color: #f92b30;
 }
 </style>

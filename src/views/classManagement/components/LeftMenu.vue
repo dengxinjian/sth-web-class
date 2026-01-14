@@ -133,7 +133,7 @@ export default {
 
 <style lang="scss" scoped>
 .left-menu {
-  width: 80px;
+  width: 60px;
   height: 100%;
   background-color: #fff;
 }
@@ -141,11 +141,11 @@ export default {
 // el-menu 样式定制
 :deep(.type-change-menu) {
   border-right: none;
-  width: 80px;
+  width: 60px;
   min-height: 100%;
 
   .el-menu-item {
-    height: 74px;
+    height: 56px;
     line-height: 1;
     padding: 0 !important;
     margin: 0 !important;
