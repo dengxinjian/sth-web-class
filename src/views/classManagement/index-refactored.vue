@@ -2819,7 +2819,7 @@ export default {
     /**
      * 保存课程详情
      */
-    handleClassDetailSave(flag) {
+    handleClassDetailSave(data,flag) {
       console.log(flag, "flag");
       if (flag) {
         this.showClassDetailModal = false;
