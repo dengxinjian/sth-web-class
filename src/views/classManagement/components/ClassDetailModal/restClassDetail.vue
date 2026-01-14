@@ -74,7 +74,7 @@
                       placeholder="请输入链接标题"
                     />
                   </el-col>
-                  <el-col :span="1" v-if="form.links.length > 1">
+                  <el-col :span="1">
                     <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
                       <i
                       class="el-icon-remove-outline"

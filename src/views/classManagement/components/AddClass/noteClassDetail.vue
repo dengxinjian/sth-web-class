@@ -87,7 +87,7 @@
                       placeholder="请输入链接标题"
                     />
                   </el-col>
-                  <el-col :span="1" v-if="form.links.length > 1">
+                  <el-col :span="1">
                     <div
                       style="
                         height: 100%;
@@ -250,11 +250,13 @@ export default {
         } else if (this.originalType === "my") {
           this.resetForm();
         } else {
+          const classesJson =
+            typeof this.data.classesJson === "string"
+              ? JSON.parse(this.data.classesJson)
+              : this.data.classesJson;
           this.form = {
-            ...this.data.classesJson,
-            links: this.data.classesJson?.links || [
-              { title: "", type: "1", url: "" },
-            ],
+            ...classesJson,
+            links: classesJson?.links || [{ title: "", type: "1", url: "" }],
           };
         }
       }
@@ -280,11 +282,13 @@ export default {
       } else if (this.originalType === "my") {
         this.resetForm();
       } else {
+        const classesJson =
+            typeof this.data.classesJson === "string"
+              ? JSON.parse(this.data.classesJson)
+              : this.data.classesJson;
         this.form = {
-          ...this.data.classesJson,
-          links: this.data.classesJson?.links || [
-            { title: "", type: "1", url: "" },
-          ],
+          ...classesJson,
+          links: classesJson?.links || [{ title: "", type: "1", url: "" }],
         };
       }
     },

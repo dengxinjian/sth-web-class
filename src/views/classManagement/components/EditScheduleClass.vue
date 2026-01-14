@@ -585,7 +585,7 @@
               <div class="section-content">
                 <div
                   class="link-item"
-                  v-for="(item, index) in classData.classesJson.links"
+                  v-for="(item, index) in filteredLinks"
                   :key="index"
                 >
                   <div class="link-item-title">
@@ -788,6 +788,10 @@ export default {
 
       // 如果是数字类型，使用常量映射转换为字符串
       return ACTIVITY_TYPE_DICT[this.classData.sportType] || "RUN";
+    },
+    filteredLinks() {
+      const links = this.classData.classesJson?.links || [];
+      return links.filter(item => item.url);
     },
   },
   watch: {

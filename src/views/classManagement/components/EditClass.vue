@@ -225,7 +225,7 @@
               <div class="section-content">
                 <div
                   class="link-item"
-                  v-for="(item, index) in classData.classesJson.links"
+                  v-for="(item, index) in filteredLinks"
                   :key="index"
                 >
                   <div class="link-item-title">
@@ -374,6 +374,15 @@ export default {
         ],
       },
     };
+  },
+  computed: {
+    filteredLinks() {
+      const links = this.classData.classesJson?.links || [];
+      if (links.length <= 1) {
+        return [];
+      }
+      return links.filter(item => item.url);
+    },
   },
   watch: {
     visible(val) {

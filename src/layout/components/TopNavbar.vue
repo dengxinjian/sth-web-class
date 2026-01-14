@@ -219,7 +219,7 @@ export default {
       shopOptions: (state) => state.userInfo.shopOptions,
       shopName: (state) => state.userInfo.shopName,
       userType: (state) => state.userInfo.userType,
-      userInfo: (state) => state.user.userInfo,
+      // userInfo: (state) => state.user.userInfo,
     }),
     showLogo() {
       return this.$store.state.settings.sidebarLogo;
@@ -353,14 +353,12 @@ export default {
     async updateUserInfo() {
       console.log('=====更新用户信息=====', this.userInfo);
       console.log('=====更新用户信息-webIdentityType=====', this.webIdentityType);
-      const params = {
-        ...this.userInfo,
-        webIdentityType: !this.webIdentityType || this.webIdentityType === 'null' || this.webIdentityType === "R" ? "C" : "R",
-        identityType: !this.webIdentityType || this.webIdentityType === 'null' || this.webIdentityType === "R" ? "C" : "R",
-      }
+      // const clinetType = !this.webIdentityType || this.webIdentityType === 'null' || this.webIdentityType === "R" ? "C" : "R";
       submitData({
-        url: "/consumer/wx/updatePersonalProfile",
-        requestData: params,
+        url: "/consumer/wx/switchIdentity?clinetType=web",
+        requestData: {
+          clinetType: 'web'
+        },
       })
         .then((res) => {
           if (res.success) {

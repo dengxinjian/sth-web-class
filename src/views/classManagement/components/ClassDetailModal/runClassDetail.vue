@@ -191,7 +191,7 @@
                       placeholder="请输入链接标题"
                     />
                   </el-col>
-                  <el-col :span="2" v-if="classInfo.links.length > 1">
+                  <el-col :span="2">
                     <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
                       <i
                       class="el-icon-remove-outline"

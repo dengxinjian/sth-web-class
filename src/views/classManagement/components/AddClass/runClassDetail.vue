@@ -209,7 +209,7 @@
                       placeholder="请输入链接标题"
                     />
                   </el-col>
-                  <el-col :span="2" v-if="classInfo.links.length > 1">
+                  <el-col :span="2">
                     <div
                       style="
                         height: 100%;
@@ -924,7 +924,10 @@ export default {
               typeof this.data.classesJson === "string"
                 ? JSON.parse(this.data.classesJson)
                 : this.data.classesJson;
-            this.classInfo = classesJson;
+            this.classInfo = {
+              ...classesJson,
+              links: classesJson?.links || [{ title: "", type: "1", url: "" }],
+            };
             this.timeline = classesJson.timeline;
             this.maxIntensity = classesJson.maxIntensity;
             this.classInfo.id = this.data.id;
@@ -938,7 +941,14 @@ export default {
           this.resetForm();
         } else {
           console.log(this.data, "this.data");
-          this.classInfo = this.data.classesJson;
+          const classesJson =
+            typeof this.data.classesJson === "string"
+              ? JSON.parse(this.data.classesJson)
+              : this.data.classesJson;
+          this.classInfo = {
+            ...classesJson,
+            links: classesJson?.links || [{ title: "", type: "1", url: "" }],
+          };
           this.timeline = this.data.classesJson.timeline;
           this.maxIntensity = this.data.classesJson.maxIntensity;
           this.classInfo.groupId = this.data.classesGroupId;
