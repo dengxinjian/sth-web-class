@@ -1885,16 +1885,18 @@ export default {
       .phase-details {
         .phase-item {
           font-size: 12px;
-          padding: 12px 8px;
+          // padding: 12px 8px;
+          padding: 12px 0px;
           margin-bottom: 8px;
-          background-color: #f8f9fa;
+          // background-color: #f8f9fa;
           border-radius: 6px;
-          color: #333;
-          transition: all 0.3s ease;
+          color: #666666;
+          // color: #333;
+          // transition: all 0.3s ease;
 
           &:hover {
-            background-color: #e9ecef;
-            transform: translateX(4px);
+            // background-color: #e9ecef;
+            // transform: translateX(4px);
           }
           > div {
             margin-bottom: 8px;
@@ -2045,10 +2047,13 @@ export default {
 
       .stage-section {
         background-color: #fff;
-        border: 2px solid #e4e7ed;
-        padding: 5px;
+        // border: 2px solid #e4e7ed;
+        // padding: 5px;
+        padding:16px;
+        border-radius: 8px !important;
         margin-bottom: 10px;
-        box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+        // box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+        border: 1px solid #00000026;
         .times-input {
           width: 130px;
         }
@@ -2178,7 +2183,7 @@ export default {
 }
 
 .phase-item-content {
-  background-color: #efefef;
+  // background-color: #efefef;
   padding: 5px 10px;
 }
 </style>

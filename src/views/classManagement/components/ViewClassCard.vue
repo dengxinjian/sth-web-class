@@ -489,7 +489,7 @@ export default {
     .stage-details {
       color: #999;
       padding: 5px 5px 0;
-      line-height: 16px;
+      line-height: 20px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: pre-line;

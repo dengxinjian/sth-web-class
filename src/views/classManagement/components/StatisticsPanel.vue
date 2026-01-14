@@ -35,12 +35,12 @@
       <div class="week-data-sth">
         <div>
           <div style="color: #3e5cec">{{ sthData.avgLong || 0 }}</div>
-          <span style="line-height: 26px;">长期STH</span>
+          <span style="line-height: 26px">长期STH</span>
         </div>
         <div>
-          <div style="background-color: #f92b30">{{
-            sthData.avgShort || 0
-          }}</div>
+          <div style="background-color: #f92b30">
+            {{ sthData.avgShort || 0 }}
+          </div>
           <span>短期STH</span>
         </div>
         <div>
@@ -51,7 +51,7 @@
                 : 0
             }}
           </div>
-          <span style="line-height: 26px;"> 平衡</span>
+          <span style="line-height: 26px"> 平衡</span>
         </div>
       </div>
 
@@ -62,24 +62,36 @@
         class="week-data-item"
       >
         <div class="week-data-text">
-          <div style="display: flex; align-items: center">
-            <img
+          <div style="display: flex; align-items: center;justify-content: space-between;">
+            <div style="display: flex; align-items: center;width: 80px;">
+              <img
+                v-if="item.icon"
+                style="width: 20px; margin-right: 10px"
+                :src="item.icon"
+                alt=""
+              />
+              <div style="text-align: left">{{ item.title }}</div>
+            </div>
+            <div style="text-align: center;">{{ item.actualValue }} {{ item.unit }}</div>
+            <div style="width: 60px;text-align: right;">{{ item.actualValue }} {{ item.unit }}</div>
+            <!-- <img
               v-if="item.icon"
               style="width: 20px; margin-right: 10px"
               :src="item.icon"
               alt=""
             />
-            <p>{{ item.title }}:</p>
+            <p style="width: 40px;text-align: left;">{{ item.title }}</p>
             <div
               style="
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                width: 120px !important;
               "
             >
               <span>{{ item.actualValue }} {{ item.unit }}</span>
               <span>{{ item.planValue }} {{ item.unit }}</span>
-            </div>
+            </div> -->
           </div>
         </div>
         <el-progress
@@ -266,8 +278,9 @@ export default {
   margin-bottom: 10px;
 
   .week-data-text {
-    display: flex;
-    flex-direction: row;
+    width: 100%;
+    // display: flex;
+    // flex-direction: row;
     margin-bottom: 5px;
 
     div {
@@ -276,7 +289,7 @@ export default {
 
     span,
     div {
-      flex: 1;
+      // flex: 1;
       font-size: 12px;
       color: #333;
 

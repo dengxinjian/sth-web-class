@@ -651,7 +651,7 @@ export default {
       transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
       will-change: transform; /* 提示浏览器优化渲染 */
       /* 显示添加入口：整个单元格悬停时展示 */
-      background-color: #f6f6f6;
+      // background-color: #f6f6f6;
       height: 100%;
       &:hover {
         .box-content {
@@ -696,6 +696,9 @@ export default {
         }
       }
     }
+  }
+  .schedule-table-cell:first-child {
+    border-left: none;
   }
 }
 ::v-deep .is-drag-chosen {
