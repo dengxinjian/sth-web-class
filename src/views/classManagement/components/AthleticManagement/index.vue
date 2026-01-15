@@ -28,23 +28,28 @@
       default-expand-all
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
-        <span
-          >{{ node.label }}
-          <span
-            v-if="
-              !node.data.isGroup &&
-              node.data.userType === 1 &&
-              !isCurrentUser(node.data.triUserId)
-            "
-            >（主教练）</span
-          >
-          <span v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)"
-            >（我）</span
-          >
-          <span v-if="node.data.isGroup"
-            >({{ node.data.membersCount }})</span
-          ></span
+        <el-tooltip
+          :content="node.label"
+          placement="top"
+          :disabled="!node.label || node.label.length * 16 <= 148"
         >
+          <span class="tree-label-text-athletic"
+            >{{ node.label }}
+            <span
+              v-if="
+                !node.data.isGroup &&
+                node.data.userType === 1 &&
+                !isCurrentUser(node.data.triUserId)
+              "
+              >（主教练）</span
+            >
+            <span
+              v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)"
+              >（我）</span
+            >
+            <span v-if="node.data.isGroup">({{ node.data.membersCount }})</span>
+          </span>
+        </el-tooltip>
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
@@ -117,7 +122,11 @@
       :highlight-current="true"
     >
       <span class="athletic-btn-list" slot-scope="{ node }">
-        <el-tooltip v-if="node.level === 1" :content="node.label" placement="top">
+        <el-tooltip
+          v-if="node.level === 1"
+          :content="node.label"
+          placement="top"
+        >
           <span class="tree-label-text"
             >{{ node.label }}
             <span v-if="node.data.isGroup"
@@ -1234,6 +1243,14 @@ export default {
 .tree-label-text {
   display: inline-block;
   max-width: 158px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.tree-label-text-athletic {
+  display: inline-block;
+  max-width: 148px !important;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
