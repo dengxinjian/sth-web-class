@@ -219,8 +219,7 @@
             </div>
             <div
               v-if="
-                classData.classesJson?.links &&
-                classData.classesJson.links.length > 0
+                filteredLinks.length > 0
               "
             >
               <div class="section">
@@ -400,10 +399,7 @@ export default {
   computed: {
     filteredLinks() {
       const links = this.classData.classesJson?.links || [];
-      if (links.length <= 1) {
-        return [];
-      }
-      return links.filter((item) => item.url);
+      return links.filter((item) => item.url !== '' && item.url !== null && item.url !== undefined);
     },
   },
   watch: {

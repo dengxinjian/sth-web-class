@@ -573,8 +573,7 @@
             </div>
             <div
               v-if="
-                classData.classesJson?.links &&
-                classData.classesJson.links.length > 0
+                filteredLinks.length > 0
               "
             >
               <div class="section">
@@ -802,7 +801,7 @@ export default {
     },
     filteredLinks() {
       const links = this.classData.classesJson?.links || [];
-      return links.filter((item) => item.url);
+      return links.filter((item) => item.url !== '' && item.url !== null && item.url !== undefined);
     },
   },
   watch: {
