@@ -25,17 +25,17 @@
       <!-- 统计数据展示 -->
       <div
         v-for="item in statisticData"
-        :key="item.title"
+        :key="item.key"
         class="month-data-item"
       >
         <div class="month-data-text">
-          <div style="display: flex; align-items: center">
+          <div style="display: flex; align-items: center;width: 90px;">
             <img
               :src="item.icon"
               alt=""
               v-if="item.icon"
               style="width: 24px; height: 24px; margin-right: 10px"
-            />{{ item.title }}:
+            />{{ item.title }}
           </div>
           <div>
             <span
@@ -45,7 +45,7 @@
               }}</span
             >
           </div>
-          <div>
+          <div style="width: 90px;text-align: right;">
             <span style="padding-left: 5px"
               >{{ item.planValue || 0 }}
               {{
@@ -204,6 +204,7 @@ export default {
                 planValue,
               };
             });
+            console.log(this.statisticData, "this.statisticData====获取-getMonthStatisticData");
             this.sthData = res.result.avgSthRespDto;
           }
         })

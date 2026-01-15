@@ -847,7 +847,7 @@ export default {
     // 查询运动详情
     getSportDetail(id, triUserId) {
       getData({
-        url: "/training/api/activity/getActivityInfo",
+        url: "/gateway/training/activity/getActivityDetail",
         activityId: id,
         triUserId
       }).then((res) => {
