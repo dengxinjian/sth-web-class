@@ -212,7 +212,7 @@
             placeholder="请输入分组名称"
           ></el-input>
         </el-form-item>
-        <el-form-item label="分组描述" prop="description">
+        <!-- <el-form-item label="分组描述" prop="description">
           <el-input
             type="textarea"
             v-model="groupForm.description"
@@ -220,7 +220,7 @@
             :rows="3"
           >
           </el-input>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showGroupDialog = false">取消</el-button>

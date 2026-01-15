@@ -10,7 +10,7 @@
       top="5vh"
     >
       <!-- <span slot="title" class="dialog-title">课表简介</span> -->
-      <div class="header-title" style="margin-top: 16px;">
+      <div class="header-title" style="margin-top: 16px">
         <!-- <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input
@@ -583,21 +583,32 @@
                 </div>
               </div>
               <div class="section-content">
-                <div
-                  class="link-item"
-                  v-for="(item, index) in filteredLinks"
-                  :key="index"
+                <template
+                  v-for="(item, index) in classData.classesJson?.links"
+                  :ref="`linkItem-${index}`"
                 >
-                  <div class="link-item-title">
-                    {{ item.title }} <a :href="item.url" target="_blank" style="color: #409EFF; text-decoration: none;">{{ item.url }}</a>
-                  </div>
                   <div
-                    class="link-item-button"
-                    @click="handleCopyUrl(item.url)"
+                    class="link-item"
+                    :key="`linkItem-${index}`"
+                    v-if="item.url"
                   >
-                    复制
+                    <div class="link-item-title">
+                      {{ item.title }}
+                      <a
+                        :href="item.url"
+                        target="_blank"
+                        style="color: #409eff; text-decoration: none"
+                        >{{ item.url }}</a
+                      >
+                    </div>
+                    <div
+                      class="link-item-button"
+                      @click="handleCopyUrl(item.url)"
+                    >
+                      复制
+                    </div>
                   </div>
-                </div>
+                </template>
               </div>
             </div>
             <!-- 训练建议 -->
@@ -791,7 +802,7 @@ export default {
     },
     filteredLinks() {
       const links = this.classData.classesJson?.links || [];
-      return links.filter(item => item.url);
+      return links.filter((item) => item.url);
     },
   },
   watch: {
@@ -826,7 +837,7 @@ export default {
       } else {
         if (this.isActivity) {
           this.classData = this.classItem;
-          console.log(this.classData, "classData");
+          console.log(this.classData, "classData====获取");
           // 同步标题到 form
           this.form.title =
             this.classData.classesJson?.title ||
@@ -835,12 +846,14 @@ export default {
           if (this.classData.activityId) {
             this.getSportDetail();
           } else {
+            console.log(this.classData, "classData====获取2");
             this.actualData = {
               duration: this.classData.duration || "00:00:00",
-              activityDuration:
-                this.translateSecondsToFormat(
-                  this.classData.activityDuration
-                ) || "00:00:00",
+              // activityDuration:
+              //   this.translateSecondsToFormat(
+              //     this.classData.activityDuration
+              //   ) || "00:00:00",
+              activityDuration: this.classData.activityDuration || "00:00:00",
               distance: this.classData.distance || 0,
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
@@ -851,13 +864,13 @@ export default {
                   ? "m"
                   : "km"),
             };
-            console.log(this.classData, "classData");
             this.defaultData = {
               duration: this.classData.duration || "00:00:00",
-              activityDuration:
-                this.translateSecondsToFormat(
-                  this.classData.activityDuration
-                ) || "00:00:00",
+              // activityDuration:
+              //   this.translateSecondsToFormat(
+              //     this.classData.activityDuration
+              //   ) || "00:00:00",
+              activityDuration: this.classData.activityDuration || "00:00:00",
               distance: this.classData.distance || 0,
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
@@ -891,7 +904,7 @@ export default {
             console.log(this.actualData, "this.actualData");
           }
         } else if (!this.classItem.manualActivityId) {
-          console.log(this.classItem, "this.classItem");
+          console.log(this.classItem, "this.classItem====获取3");
           this.getClassScheduleInfo(this.classItem.id);
         }
       }

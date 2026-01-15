@@ -23,7 +23,7 @@
           class="title"
           :class="{ 'active-title': activeClassType === 'official' }"
         >
-          官方课程
+          示例课程
         </div>
       </li>
     </ul>

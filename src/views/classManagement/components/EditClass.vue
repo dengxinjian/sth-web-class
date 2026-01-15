@@ -16,7 +16,13 @@
           <el-input type="text" v-model="classTitle" :maxlength="50" />
         </div>
       </div> -->
-      <el-form ref="titleRef" :model="form" :rules="rules" label-width="70px" style="margin-top: 16px;">
+      <el-form
+        ref="titleRef"
+        :model="form"
+        :rules="rules"
+        label-width="70px"
+        style="margin-top: 16px"
+      >
         <el-form-item label="标题：" prop="classTitle">
           <el-input
             type="text"
@@ -223,16 +229,32 @@
                 </div>
               </div>
               <div class="section-content">
-                <div
-                  class="link-item"
-                  v-for="(item, index) in filteredLinks"
-                  :key="index"
+                <template
+                  v-for="(item, index) in classData.classesJson?.links"
+                  :ref="`linkItem-${index}`"
                 >
-                  <div class="link-item-title">
-                    {{ item.title }} <a :href="item.url" target="_blank" style="color: #409EFF; text-decoration: none;">{{ item.url }}</a>
+                  <div
+                    class="link-item"
+                    :key="`linkItem-${index}`"
+                    v-if="item.url"
+                  >
+                    <div class="link-item-title">
+                      {{ item.title }}
+                      <a
+                        :href="item.url"
+                        target="_blank"
+                        style="color: #409eff; text-decoration: none"
+                        >{{ item.url }}</a
+                      >
+                    </div>
+                    <div
+                      class="link-item-button"
+                      @click="handleCopyUrl(item.url)"
+                    >
+                      复制
+                    </div>
                   </div>
-                  <div class="link-item-button" @click="handleCopyUrl(item.url)">复制</div>
-                </div>
+                </template>
               </div>
             </div>
             <!-- 训练建议 -->
@@ -381,7 +403,7 @@ export default {
       if (links.length <= 1) {
         return [];
       }
-      return links.filter(item => item.url);
+      return links.filter((item) => item.url);
     },
   },
   watch: {
