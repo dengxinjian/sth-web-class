@@ -308,7 +308,7 @@ export default {
   }
 
   .schedule-class-container {
-    padding: 5px 5px;
+    padding: 5px 0px;
     background-color: #fff;
     flex: 1;
     overflow-y: auto;

@@ -147,16 +147,16 @@ export default {
 <style lang="scss" scoped>
 .schedule-class {
   background-color: #fff;
-  margin-bottom: 10px;
-  padding: 5px 10px;
-  border-radius: 6px;
+  // margin-bottom: 10px;
+  padding: 14px 10px 5px 10px;
+  // border-radius: 6px;
   cursor: pointer;
 
   .schedule-class-info-item-title {
     display: flex;
     gap: 6px;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
 
     > div {
       flex: 1;
@@ -203,7 +203,7 @@ export default {
 }
 
 .schedule-class:hover {
-  background-color: #c3c9d740;
+  background-color: rgba(195, 201, 215, 0.2);
 }
 .btn-list-hover {
   display: flex;
