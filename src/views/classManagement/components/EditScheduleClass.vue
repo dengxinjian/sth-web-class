@@ -836,7 +836,7 @@ export default {
       } else {
         if (this.isActivity) {
           this.classData = this.classItem;
-          console.log(this.classData, "classData====获取");
+          console.log(this.classData,this.isActivity, "classData====获取-this.isActivity");
           // 同步标题到 form
           this.form.title =
             this.classData.classesJson?.title ||
@@ -1235,9 +1235,10 @@ export default {
             } else {
               this.actualData = {
                 duration: this.classData.duration,
-                activityDuration: this.translateSecondsToFormat(
-                  this.classData.activityDuration || 0
-                ),
+                // activityDuration: this.translateSecondsToFormat(
+                //   this.classData.activityDuration || 0
+                // ),
+                activityDuration: typeof this.classData.activityDuration === 'string' ? this.classData.activityDuration : this.translateSecondsToFormat(this.classData.activityDuration || 0),
                 sthValue: this.classData.sthValue,
                 calories: this.classData.calories,
               };
