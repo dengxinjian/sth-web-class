@@ -462,6 +462,8 @@
                       ? "km/h"
                       : sportDetail.sportType === 2
                       ? "km"
+                      : sportDetail.sportType === 3
+                      ? "/100m"
                       : "m"
                   }}</span
                 >
