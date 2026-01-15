@@ -217,18 +217,124 @@
                 ></el-input>
               </div>
             </div>
-            <div
-              v-if="
-                filteredLinks.length > 0
-              "
-            >
+            <div>
               <div class="section">
                 <div class="section-header">
                   <span class="section-title">链接</span>
+                  <img
+                    src="~@/assets/addClass/add.png"
+                    style="cursor: pointer; margin-right: 5px"
+                    width="20"
+                    height="20"
+                    alt=""
+                    @click="handleAddLink"
+                  />
                 </div>
               </div>
               <div class="section-content">
-                <template
+                <el-row
+                  class="link-row"
+                  v-for="(item, index) in classData.classesJson?.links"
+                  :key="index"
+                  style="margin-bottom: 16px"
+                >
+                  <el-col :span="24" style="margin-bottom: 4px">
+                    <el-row
+                      style="
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                      "
+                    >
+                      <el-col :span="22">
+                        <el-input
+                          size="small"
+                          v-model="item.title"
+                          placeholder="请输入链接标题"
+                        />
+                      </el-col>
+                      <el-col :span="2">
+                        <div
+                          style="
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-end;
+                            margin-right: 5px;
+                          "
+                        >
+                          <i
+                            class="el-icon-remove-outline"
+                            @click="handleRemoveLink(index)"
+                            style="
+                              cursor: pointer;
+                              font-size: 19px;
+                              color: #d83b36;
+                            "
+                          ></i>
+                        </div>
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                  <el-col :span="22" style="margin-bottom: 4px">
+                    <el-select
+                      size="small"
+                      style="width: 100%"
+                      v-model="item.type"
+                      placeholder="请选择链接类型"
+                    >
+                      <el-option label="网页链接" value="1" />
+                      <el-option label="小程序链接" value="2" />
+                      <el-option label="其他" value="3" />
+                    </el-select>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-row
+                      style="
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                      "
+                    >
+                      <el-col :span="22">
+                        <el-input
+                          size="small"
+                          v-model="item.url"
+                          placeholder="请输入链接"
+                        />
+                      </el-col>
+                      <el-col :span="2">
+                        <div
+                          style="
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-end;
+                            margin-right: 5px;
+                          "
+                        >
+                          <i
+                            class="el-icon-document-copy"
+                            @click="handleCopyUrl(item.url)"
+                            style="
+                              cursor: pointer;
+                              font-size: 19px;
+                              color: #d83b36;
+                            "
+                          ></i>
+                        </div>
+                      </el-col>
+                    </el-row>
+                    <!-- <el-input
+                      size="small"
+                      v-model="item.url"
+                      placeholder="请输入链接"
+                    /> -->
+                  </el-col>
+                </el-row>
+                <!-- <template
                   v-for="(item, index) in classData.classesJson?.links"
                   :ref="`linkItem-${index}`"
                 >
@@ -253,7 +359,7 @@
                       复制
                     </div>
                   </div>
-                </template>
+                </template> -->
               </div>
             </div>
             <!-- 训练建议 -->
@@ -399,7 +505,9 @@ export default {
   computed: {
     filteredLinks() {
       const links = this.classData.classesJson?.links || [];
-      return links.filter((item) => item.url !== '' && item.url !== null && item.url !== undefined);
+      return links.filter(
+        (item) => item.url !== "" && item.url !== null && item.url !== undefined
+      );
     },
   },
   watch: {
@@ -427,9 +535,26 @@ export default {
         // 确保 classesJson 被正确解析
         const classData = { ...this.classItem };
         if (classData.classesJson) {
-          classData.classesJson = parseClassesJson(classData.classesJson);
+          classData.classesJson = {
+            ...parseClassesJson(classData.classesJson),
+            links: parseClassesJson(classData.classesJson)?.links || [
+              {
+                title: "",
+                type: "1",
+                url: "",
+              },
+            ],
+          };
         } else {
-          classData.classesJson = {};
+          classData.classesJson = {
+            links: [
+              {
+                title: "",
+                type: "1",
+                url: "",
+              },
+            ],
+          };
         }
         this.classData = classData;
         // 同步标题到 form
@@ -452,6 +577,20 @@ export default {
     //     }
     //   });
     // },
+    handleAddLink() {
+      this.classData.classesJson?.links?.push({
+        title: "",
+        type: "1",
+        url: "",
+      });
+    },
+    handleRemoveLink(index) {
+      this.classData.classesJson?.links?.splice(index, 1);
+    },
+    handleCopyUrl(url) {
+      navigator.clipboard.writeText(url);
+      this.$message.success("复制成功");
+    },
     isRestType(sportType) {
       return ["REST", "REMARK"].includes(sportType);
     },
@@ -704,7 +843,9 @@ export default {
 
     .section-header {
       margin-bottom: 10px;
-
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       .section-title {
         color: #333;
         font-family: PingFang SC;

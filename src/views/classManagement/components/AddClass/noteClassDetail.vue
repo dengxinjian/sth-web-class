@@ -87,7 +87,7 @@
                       placeholder="请输入链接标题"
                     />
                   </el-col>
-                  <el-col :span="1">
+                  <el-col :span="1" v-if="form.links.length > 1">
                     <div
                       style="
                         height: 100%;
@@ -112,7 +112,7 @@
                   v-model="item.type"
                   placeholder="请选择链接类型"
                 >
-                  <el-option label="http" value="1" />
+                  <el-option label="网页链接" value="1" />
                   <el-option label="小程序链接" value="2" />
                   <el-option label="其他" value="3" />
                 </el-select>

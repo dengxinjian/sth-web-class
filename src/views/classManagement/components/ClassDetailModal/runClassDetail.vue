@@ -192,7 +192,7 @@
                     />
                   </el-col>
                   <el-col :span="2">
-                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
+                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;" v-if="classInfo.links.length > 1">
                       <i
                       class="el-icon-remove-outline"
                       @click="handleRemoveLink(index)"
@@ -213,7 +213,7 @@
                   v-model="item.type"
                   placeholder="请选择链接类型"
                 >
-                  <el-option label="http" value="1" />
+                  <el-option label="网页链接" value="1" />
                   <el-option label="小程序链接" value="2" />
                   <el-option label="其他" value="3" />
                 </el-select>

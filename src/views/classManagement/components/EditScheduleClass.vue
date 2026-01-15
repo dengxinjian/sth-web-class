@@ -573,18 +573,124 @@
                 ></el-input>
               </div>
             </div>
-            <div
-              v-if="
-                filteredLinks.length > 0
-              "
-            >
+            <div>
               <div class="section">
                 <div class="section-header">
                   <span class="section-title">链接</span>
+                  <img
+                    src="~@/assets/addClass/add.png"
+                    style="cursor: pointer;margin-right: 5px;"
+                    width="20"
+                    height="20"
+                    alt=""
+                    @click="handleAddLink"
+                  />
                 </div>
               </div>
               <div class="section-content">
-                <template
+                <el-row
+                  class="link-row"
+                  v-for="(item, index) in classData.classesJson?.links"
+                  :key="index"
+                  style="margin-bottom: 16px"
+                >
+                  <el-col :span="24" style="margin-bottom: 4px">
+                    <el-row
+                      style="
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                      "
+                    >
+                      <el-col :span="22">
+                        <el-input
+                          size="small"
+                          v-model="item.title"
+                          placeholder="请输入链接标题"
+                        />
+                      </el-col>
+                      <el-col :span="2">
+                        <div
+                          style="
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-end;
+                            margin-right: 5px;
+                          "
+                        >
+                          <i
+                            class="el-icon-remove-outline"
+                            @click="handleRemoveLink(index)"
+                            style="
+                              cursor: pointer;
+                              font-size: 19px;
+                              color: #d83b36;
+                            "
+                          ></i>
+                        </div>
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                  <el-col :span="22" style="margin-bottom: 4px">
+                    <el-select
+                      size="small"
+                      style="width: 100%"
+                      v-model="item.type"
+                      placeholder="请选择链接类型"
+                    >
+                      <el-option label="网页链接" value="1" />
+                      <el-option label="小程序链接" value="2" />
+                      <el-option label="其他" value="3" />
+                    </el-select>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-row
+                      style="
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                      "
+                    >
+                      <el-col :span="22">
+                        <el-input
+                          size="small"
+                          v-model="item.url"
+                          placeholder="请输入链接"
+                        />
+                      </el-col>
+                      <el-col :span="2">
+                        <div
+                          style="
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: flex-end;
+                            margin-right: 5px;
+                          "
+                        >
+                          <i
+                            class="el-icon-document-copy"
+                            @click="handleCopyUrl(item.url)"
+                            style="
+                              cursor: pointer;
+                              font-size: 19px;
+                              color: #d83b36;
+                            "
+                          ></i>
+                        </div>
+                      </el-col>
+                    </el-row>
+                    <!-- <el-input
+                      size="small"
+                      v-model="item.url"
+                      placeholder="请输入链接"
+                    /> -->
+                  </el-col>
+                </el-row>
+                <!-- <template
                   v-for="(item, index) in classData.classesJson?.links"
                   :ref="`linkItem-${index}`"
                 >
@@ -609,7 +715,7 @@
                       复制
                     </div>
                   </div>
-                </template>
+                </template> -->
               </div>
             </div>
             <!-- 训练建议 -->
@@ -803,7 +909,9 @@ export default {
     },
     filteredLinks() {
       const links = this.classData.classesJson?.links || [];
-      return links.filter((item) => item.url !== '' && item.url !== null && item.url !== undefined);
+      return links.filter(
+        (item) => item.url !== "" && item.url !== null && item.url !== undefined
+      );
     },
   },
   watch: {
@@ -838,7 +946,11 @@ export default {
       } else {
         if (this.isActivity) {
           this.classData = this.classItem;
-          console.log(this.classData,this.isActivity, "classData====获取-this.isActivity");
+          console.log(
+            this.classData,
+            this.isActivity,
+            "classData====获取-this.isActivity"
+          );
           // 同步标题到 form
           this.form.title =
             this.classData.classesJson?.title ||
@@ -847,6 +959,16 @@ export default {
           if (this.classData.activityId) {
             this.getSportDetail();
           } else {
+            this.classData.classesJson = {
+              ...this.classData.classesJson,
+              links: this.classData.classesJson?.links || [
+                {
+                  title: "",
+                  type: "1",
+                  url: "",
+                },
+              ],
+            };
             console.log(this.classData, "classData====获取2");
             this.actualData = {
               duration: this.classData.duration || "00:00:00",
@@ -912,6 +1034,20 @@ export default {
     },
   },
   methods: {
+    handleCopyUrl(url) {
+      navigator.clipboard.writeText(url);
+      this.$message.success("复制成功");
+    },
+    handleAddLink() {
+      this.classData.classesJson?.links?.push({
+        title: "",
+        type: "1",
+        url: "",
+      });
+    },
+    handleRemoveLink(index) {
+      this.classData.classesJson?.links?.splice(index, 1);
+    },
     async handleCopyUrl(url) {
       if (!url) {
         this.$message.warning("链接地址为空");
@@ -999,7 +1135,16 @@ export default {
           const classData = JSON.parse(res.result.classesJson);
           this.classData = {
             ...res.result,
-            classesJson: classData,
+            classesJson: {
+              ...classData,
+              links: classData?.links || [
+                {
+                  title: "",
+                  type: "1",
+                  url: "",
+                },
+              ],
+            },
           };
           console.log("====当前课表数据====this.classData", this.classData);
           // 同步标题到 form
@@ -1219,9 +1364,12 @@ export default {
               duration: this.translateSecondsToFormat(
                 this.sportDetail.duration
               ),
-              activityDuration: this.translateSecondsToFormat(
-                this.sportDetail.netDuration || 0
-              ),
+              activityDuration:
+                typeof this.sportDetail.netDuration === "string"
+                  ? this.sportDetail.netDuration
+                  : this.translateSecondsToFormat(
+                      this.sportDetail.netDuration || 0
+                    ),
               distance: parseFloat(this.sportDetail.distance),
               sthValue: this.sportDetail.sthValue,
               calories: this.sportDetail.calories,
@@ -1240,7 +1388,12 @@ export default {
                 // activityDuration: this.translateSecondsToFormat(
                 //   this.classData.activityDuration || 0
                 // ),
-                activityDuration: typeof this.classData.activityDuration === 'string' ? this.classData.activityDuration : this.translateSecondsToFormat(this.classData.activityDuration || 0),
+                activityDuration:
+                  typeof this.classData.activityDuration === "string"
+                    ? this.classData.activityDuration
+                    : this.translateSecondsToFormat(
+                        this.classData.activityDuration || 0
+                      ),
                 sthValue: this.classData.sthValue,
                 calories: this.classData.calories,
               };
@@ -1844,6 +1997,9 @@ export default {
   }
   .section-header {
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   .section-title {
     font-size: 14px;
