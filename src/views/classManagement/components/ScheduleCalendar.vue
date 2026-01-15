@@ -584,8 +584,8 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 190px;
-    max-width: 190px;
+    min-width: 194px;
+    max-width: 194px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
