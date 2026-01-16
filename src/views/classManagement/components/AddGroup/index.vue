@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    width="420px"
+    width="540px"
     append-to-body
     :before-close="onCancel"
     class="add-group-modal"
@@ -18,7 +18,9 @@
     >
       <el-form-item label="分组名称" prop="classesGroupName">
         <el-input
+          type="textarea"
           v-model="form.classesGroupName"
+          :rows="3"
           maxlength="50"
           show-word-limit
           placeholder="请输入分组名称"

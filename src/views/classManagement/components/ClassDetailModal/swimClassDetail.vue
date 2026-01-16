@@ -58,7 +58,11 @@
                 placeholder="00:00:00"
                 class="pill-time"
               /> -->
-            <TimeInput v-model="form.duration" size="small" />
+            <TimeInput 
+              v-model="form.duration" 
+              size="small" 
+              @handleBlur="handleDurationBlur"
+            />
           </div>
           <div class="row-item">
             <span class="label">STH</span>
@@ -435,6 +439,10 @@ export default {
     },
     async onSave(closeAfter) {
       await this.$refs.titleRef.validate();
+      // 校验时长不能为0
+      if (!this.validateDuration()) {
+        return;
+      }
       const payload = { ...this.form };
       if (this.form.id) {
         this.submitUpdateClass(closeAfter);
@@ -476,6 +484,63 @@ export default {
         return Number(numeric.toFixed(2));
       }
       return Math.trunc(numeric);
+    },
+    // 校验时长不能为0
+    validateDuration() {
+      const duration = this.form.duration;
+      
+      // 如果为空或未定义，视为0
+      if (!duration || (typeof duration === 'string' && duration.trim() === "")) {
+        this.$message.error("时长不能为0");
+        return false;
+      }
+      
+      const durationStr = String(duration).trim();
+      
+      // 如果是纯数字，直接判断
+      if (/^\d+$/.test(durationStr)) {
+        const minutes = parseInt(durationStr, 10);
+        if (minutes === 0) {
+          this.$message.error("时长不能为0");
+          return false;
+        }
+        return true;
+      }
+      
+      // 解析时间格式 (hh:mm:ss 或 mm:ss)
+      const parts = durationStr.split(":");
+      
+      if (parts.length === 2) {
+        // mm:ss 格式
+        const minutes = parseInt(parts[0], 10) || 0;
+        const seconds = parseInt(parts[1], 10) || 0;
+        if (minutes === 0 && seconds === 0) {
+          this.$message.error("时长不能为00:00:00");
+          return false;
+        }
+        return true;
+      }
+      
+      if (parts.length === 3) {
+        // hh:mm:ss 格式
+        const hours = parseInt(parts[0], 10) || 0;
+        const minutes = parseInt(parts[1], 10) || 0;
+        const seconds = parseInt(parts[2], 10) || 0;
+        if (hours === 0 && minutes === 0 && seconds === 0) {
+          this.$message.error("时长不能为00:00:00");
+          return false;
+        }
+        return true;
+      }
+      
+      // 格式不正确，也视为无效
+      this.$message.error("时长格式不正确");
+      return false;
+    },
+    // 处理时长输入失焦事件
+    handleDurationBlur() {
+      // 失焦时进行校验
+      this.validateDuration();
     },
   },
 };
