@@ -203,7 +203,7 @@
                 :key="'hr-param2-' + activeSport"
                 class="pill-input"
                 @input="handleThresholdInput('param2', $event)"
-                @blur="getThresholdPreviewList"
+                @blur="getThresholdPreviewList('param2')"
               />
               <span class="suffix unit-red">bpm</span>
               <span class="label right-gap"
@@ -214,7 +214,7 @@
                 :key="'hr-param1-' + activeSport"
                 class="pill-input"
                 @input="handleThresholdInput('param1', $event)"
-                @blur="getThresholdPreviewList"
+                @blur="getThresholdPreviewList('param1')"
               />
               <span class="suffix unit-red">bpm</span>
             </div>
@@ -235,7 +235,7 @@
                 v-model="thresholdData.thresholdTimeValue"
                 :key="'swim-' + activeSport"
                 timerType="mm:ss"
-                @handleBlur="getThresholdPreviewList"
+                @handleBlur="getThresholdPreviewList('thresholdTimeValue')"
               />
               <span class="suffix unit-red">min/100m</span>
             </div>
@@ -249,7 +249,7 @@
                 :key="'bike-' + activeSport"
                 class="pill-input"
                 @input="handleThresholdInput('threshold', $event)"
-                @blur="getThresholdPreviewList"
+                @blur="getThresholdPreviewList('threshold')"
               />
               <span class="suffix unit-red">w</span>
             </div>
@@ -270,7 +270,7 @@
                 v-model="thresholdData.thresholdTimeValue"
                 :key="'run-' + activeSport"
                 timerType="mm:ss"
-                @handleBlur="getThresholdPreviewList"
+                @handleBlur="getThresholdPreviewList('thresholdTimeValue')"
               />
               <span class="suffix unit-red">min/km</span>
             </div>
@@ -922,7 +922,18 @@ export default {
       });
     },
     // 获取阈值预览列表
-    getThresholdPreviewList() {
+    getThresholdPreviewList(type) {
+      let value = 0;
+      if (type === 'thresholdTimeValue') {
+        value = Number(mmssToSeconds(this.thresholdData.thresholdTimeValue));
+      } else if (type === 'threshold') {
+        value = Number(this.thresholdData.threshold);
+      } else if (type === 'param1') {
+        value = Number(this.thresholdData.param1);
+      } else if (type === 'param2') {
+        value = Number(this.thresholdData.param2);
+      }
+      if (value === 0) return this.$message.error("输入值不能为0，请重新输入");
       let threshold = "";
       if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
         threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue);
@@ -979,6 +990,19 @@ export default {
           this.createPreferenceData();
         }
         return;
+      }
+      let value = 0;
+      let value2 = 0;
+      if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
+        value = Number(mmssToSeconds(this.thresholdData.thresholdTimeValue));
+        if (value === 0) return this.$message.error("输入值不能为0，请重新输入");
+      } else if (Number(this.activeSport) === 2) {
+        value = Number(this.thresholdData.threshold);
+        if (value === 0) return this.$message.error("输入值不能为0，请重新输入");
+      } else if (Number(this.activeSport) === 1) {
+        value = Number(this.thresholdData.param1);
+        value2 = Number(this.thresholdData.param2);
+        if (value === 0 || value2 === 0) return this.$message.error("输入值不能为0，请重新输入");
       }
       this.$confirm(
         "阈值更新将会影响运动员的相关设置及训练计划, 是否继续?",
