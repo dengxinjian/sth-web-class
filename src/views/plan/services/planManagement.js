@@ -39,6 +39,13 @@ export const planApi = {
     });
   },
 
+  // 获取团队计划
+  getTeamPlans(shareDataType) {
+    return getData({
+      url: `/training/api/teamShare/summary?shareDataType=${shareDataType}`,
+    });
+  },
+
   // 添加计划
   addPlan(data) {
     return submitData({

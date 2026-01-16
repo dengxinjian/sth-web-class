@@ -5,6 +5,7 @@
         <PlanList
           :class-list="classList"
           :active-class-type.sync="activeClassType"
+          :team-list="teamList"
           @class-type-change="handleClassTypeChange"
           @search="handlePlanSearch"
           :show-add-class-btn="true"
@@ -162,6 +163,7 @@ export default {
       addPlanGroupId: null,
       ownerTeams: [],
       defaultTeam: null,
+      teamList: [],
 
       // 计划列表数据
       planSearchInput: "",
@@ -208,7 +210,7 @@ export default {
           }
           this.getPlanList();
           // this.getPlanLimitCount();
-          this.getTeamList();
+          // this.getTeamList();
           this.getDefaultTeam(); // 个人初始团队id
         }
       },
@@ -216,24 +218,78 @@ export default {
     },
   },
   mounted() {
-    // 判断路由是否有值
+    if (localStorage.getItem("loginType") !== "1") {
+      // this.getDefaultTeam();
+      this.getDefaultTeam();
+    }
   },
   methods: {
-    getTeamList() {
+    async getTeamList() {
+      const _this = this;
       getData({
         url: "/consumer/api/team/coach/all-teams",
       }).then((res) => {
-        this.ownerTeams = res.result;
+        if (res.success) {
+          _this.ownerTeams = res.result;
+          const list = [..._this.teamList, ...res.result]
+            .reduce((acc, team) => {
+              if (team && team.id && !acc.find((t) => t.id === team.id)) {
+                acc.push(team);
+              }
+              return acc;
+            }, [])
+          console.log(list, "*======list====过滤团队数组");
+          _this.teamList = list.map((item) => {
+            return {
+              id: item.id,
+              label: item.teamName,
+              description: item.description || "",
+              isGroup: true,
+              groupName: item.teamName,
+              membersCount: item.members?.length || 0,
+              triUserId: item.triUserId,
+            };
+          });
+          console.log(_this.teamList, "*======teamList====重组团队数据");
+        }
       });
     },
-    getDefaultTeam() {
+    async getDefaultTeam() {
       const _this = this;
-      getData({
+      const res = await getData({
         url: "/gateway/team/my-team",
-      }).then((res) => {
-        // console.log('=======个人初始团队',res.result);
-        _this.defaultTeam = res.result || null;
       });
+      if (res.success) {
+        _this.teamList = [..._this.teamList,res.result] || [];
+        // _this.defaultTeam = res.result || null;
+        // // 将默认团队转换为树节点格式
+        // if (res.result && res.result.id) {
+        //   const defaultTeamNode = {
+        //     id: res.result.id,
+        //     label: res.result.teamName || res.result.name || '',
+        //     description: res.result.description || "",
+        //     isGroup: true,
+        //     groupName: res.result.teamName || res.result.name || '',
+        //     membersCount: res.result.members?.length || 0,
+        //     triUserId: res.result.triUserId,
+        //     // 不设置 children 属性，让懒加载处理
+        //   };
+        //   // 检查是否已存在，避免重复
+        //   const existingIndex = _this.teamList.findIndex(t => t.id === res.result.id);
+        //   if (existingIndex >= 0) {
+        //     _this.teamList[existingIndex] = defaultTeamNode;
+        //   } else {
+        //     _this.teamList = [defaultTeamNode];
+        //   }
+        // }
+        _this.getTeamList();
+      }
+      // getData({
+      //   url: "/gateway/team/my-team",
+      // }).then((res) => {
+      //   // console.log('=======个人初始团队',res.result);
+      //   _this.defaultTeam = res.result || null;
+      // });
     },
     async getPlanLimitCount() {
       const res = await planApi.getPlanLimitCount();
@@ -389,12 +445,21 @@ export default {
     handleClassTypeChange(type) {
       this.planSearchInput = "";
       this.activeClassType = type;
-      this.restPageInfo();
-      this.getPlanList();
+      if (type === "team") {
+        this.getTeamPlanList();
+      } else {
+        this.restPageInfo();
+        this.getPlanList();
+      }
     },
     handlePlanSearch(keyword) {
       this.planSearchInput = keyword;
       this.getPlanList();
+    },
+    // 获取团队计划
+    async getTeamPlanList() {
+      const res = await planApi.getTeamPlans(2);
+      console.log(res, "*======res");
     },
     /**
      * 获取课程列表
@@ -570,7 +635,12 @@ export default {
               _this.copyOfficialPlanInfo = {
                 ..._this.currentPlanDetail,
                 planGroupId: null,
-                teamId: localStorage.getItem("loginType") === '2' ? _this.ownerTeams.length === 0 ? _this.defaultTeam.id : null : null,
+                teamId:
+                  localStorage.getItem("loginType") === "2"
+                    ? _this.ownerTeams.length === 0
+                      ? _this.defaultTeam.id
+                      : null
+                    : null,
                 planSourceTeamId: _this.currentPlanDetail.teamId || null,
                 ownerName: localStorage.getItem("name").split("#")[0],
                 ownerId: localStorage.getItem("triUserId"),
@@ -627,11 +697,15 @@ export default {
     handleDeletePlan() {
       const _this = this;
       if (_this.currentPlanDetail.id) {
-        this.$confirm(`确认删除计划【${_this.currentPlanDetail?.planTitle}】？`, "提示", {
-          confirmButtonText: "删除",
-          cancelButtonText: "取消",
-          type: "warning",
-        }).then(() => {
+        this.$confirm(
+          `确认删除计划【${_this.currentPlanDetail?.planTitle}】？`,
+          "提示",
+          {
+            confirmButtonText: "删除",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+        ).then(() => {
           // 调用删除分组API
           planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
             if (res.success) {
