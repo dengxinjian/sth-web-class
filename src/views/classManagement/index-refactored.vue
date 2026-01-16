@@ -1048,7 +1048,13 @@ export default {
       const _this = this;
       const res = await teamApi.getAllTeams();
       if (res.success) {
-        this.teamList = [..._this.teamList,...res.result].map((item) => ({
+        const list = [..._this.teamList,...res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, [])
+        this.teamList = list.map((item) => ({
           id: item.id,
           name: item.teamName,
           teamOwnerId: item.teamOwnerId,
