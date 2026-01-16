@@ -247,6 +247,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+:deep(.el-collapse-item__header) {
+  background: #C3C9D726;
+}
 .class-container {
   height: 100%;
   display: flex;
