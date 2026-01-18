@@ -5,7 +5,6 @@
         <PlanList
           :class-list="classList"
           :active-class-type.sync="activeClassType"
-          :team-list="teamList"
           @class-type-change="handleClassTypeChange"
           @search="handlePlanSearch"
           :show-add-class-btn="true"
@@ -261,27 +260,6 @@ export default {
       });
       if (res.success) {
         _this.teamList = [..._this.teamList,res.result] || [];
-        // _this.defaultTeam = res.result || null;
-        // // 将默认团队转换为树节点格式
-        // if (res.result && res.result.id) {
-        //   const defaultTeamNode = {
-        //     id: res.result.id,
-        //     label: res.result.teamName || res.result.name || '',
-        //     description: res.result.description || "",
-        //     isGroup: true,
-        //     groupName: res.result.teamName || res.result.name || '',
-        //     membersCount: res.result.members?.length || 0,
-        //     triUserId: res.result.triUserId,
-        //     // 不设置 children 属性，让懒加载处理
-        //   };
-        //   // 检查是否已存在，避免重复
-        //   const existingIndex = _this.teamList.findIndex(t => t.id === res.result.id);
-        //   if (existingIndex >= 0) {
-        //     _this.teamList[existingIndex] = defaultTeamNode;
-        //   } else {
-        //     _this.teamList = [defaultTeamNode];
-        //   }
-        // }
         _this.getTeamList();
       }
       // getData({
@@ -446,7 +424,7 @@ export default {
       this.planSearchInput = "";
       this.activeClassType = type;
       if (type === "team") {
-        this.getTeamPlanList();
+        // this.getTeamPlanList();
       } else {
         this.restPageInfo();
         this.getPlanList();
@@ -457,10 +435,10 @@ export default {
       this.getPlanList();
     },
     // 获取团队计划
-    async getTeamPlanList() {
-      const res = await planApi.getTeamPlans(2);
-      console.log(res, "*======res");
-    },
+    // async getTeamPlanList() {
+    //   const res = await planApi.getTeamPlans(2);
+    //   console.log(res, "*======res");
+    // },
     /**
      * 获取课程列表
      */
