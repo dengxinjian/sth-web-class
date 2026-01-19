@@ -282,23 +282,25 @@ export default {
     },
     // 新增课程
     submitNewClass(flag) {
+      const links = this.form.links.filter(item => item.url !== "");
       this.$emit("save", {
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
         labels: this.form.tags,
         classesDate: this.classesDate + " 00:00:00",
         sportType: "OTHER",
-        classesJson: JSON.stringify({...this.form}),
+        classesJson: JSON.stringify({...this.form, links: links.length === 0 ? null : links}),
         triUserId: this.triUserId,
       });
       if (flag) this.onCancel();
     },
     // 更新课程
     submitUpdateClass(flag) {
+      const links = this.form.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.form.id,
-        classesJson: JSON.stringify({ ...this.form }),
+        classesJson: JSON.stringify({ ...this.form, links: links.length === 0 ? null : links }),
       }).then((res) => {
         if (res.success) {
           this.$emit("save",{
@@ -308,7 +310,7 @@ export default {
             labels: this.form.tags,
             classesDate: this.classesDate + " 00:00:00",
             sportType: "OTHER",
-            classesJson: JSON.stringify({...this.form}),
+            classesJson: JSON.stringify({...this.form, links: links.length === 0 ? null : links}),
           }, flag);
           this.$message.success("课表保存成功");
         }

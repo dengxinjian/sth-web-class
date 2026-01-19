@@ -319,6 +319,7 @@ export default {
     },
     // 新增课程
     submitNewClass(flag) {
+      const links = this.form.links.filter(item => item.url !== "");
       const saveData = {
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
@@ -326,6 +327,7 @@ export default {
         sportType: "REMARK",
         classesJson: JSON.stringify({
           ...this.form,
+          links: links.length === 0 ? null : links,
         }),
       };
 
@@ -333,6 +335,7 @@ export default {
     },
     // 更新课程
     submitUpdateClass(flag) {
+      const links = this.form.links.filter(item => item.url !== "");
       const saveData = {
         id: this.form.id,
         classesTitle: this.form.title,
@@ -341,6 +344,7 @@ export default {
         sportType: "REMARK",
         classesJson: JSON.stringify({
           ...this.form,
+          links: links.length === 0 ? null : links,
         }),
       };
 

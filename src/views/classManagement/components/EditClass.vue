@@ -587,10 +587,10 @@ export default {
     handleRemoveLink(index) {
       this.classData.classesJson?.links?.splice(index, 1);
     },
-    handleCopyUrl(url) {
-      navigator.clipboard.writeText(url);
-      this.$message.success("复制成功");
-    },
+    // handleCopyUrl(url) {
+    //   navigator.clipboard.writeText(url);
+    //   this.$message.success("复制成功");
+    // },
     isRestType(sportType) {
       return ["REST", "REMARK"].includes(sportType);
     },
@@ -625,9 +625,13 @@ export default {
       if (!this.classData.classesJson) {
         this.$set(this.classData, "classesJson", {});
       }
+      const links = this.classData.classesJson?.links.filter(item => item.url !== "");
       this.$set(this.classData.classesJson, "title", this.form.classTitle);
       const data = JSON.parse(JSON.stringify(this.classData));
-      data.classesJson = JSON.stringify(data.classesJson);
+      data.classesJson = JSON.stringify({
+        ...data.classesJson,
+        links: links.length === 0 ? null : links,
+      });
       this.$emit("save", data, flag);
     },
     handleSave(saveData, flag) {

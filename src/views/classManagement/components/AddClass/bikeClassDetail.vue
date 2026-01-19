@@ -970,6 +970,7 @@ export default {
     },
     // 新增课程
     submitNewClass(flag) {
+      const links = this.classInfo.links.filter(item => item.url !== "");
       const saveData = {
         classesTitle: this.classInfo.title,
         classesGroupId: this.classInfo.groupId,
@@ -979,6 +980,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
       };
 
@@ -986,6 +988,7 @@ export default {
     },
     // 更新课程
     submitUpdateClass(flag) {
+      const links = this.classInfo.links.filter(item => item.url !== "");
       const saveData = {
         id: this.classInfo.id,
         classesTitle: this.classInfo.title,
@@ -996,6 +999,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
       };
 
@@ -1029,6 +1033,7 @@ export default {
         this.$message.error(validation.message);
         return;
       }
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/analysis/classCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1038,6 +1043,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
       }).then((res) => {
         if (res.success) {
@@ -1054,11 +1060,12 @@ export default {
     async onSave(closeAfter) {
       await this.$refs.titleRef.validate();
       const validation = checkFormBike(this.classInfo);
-      console.log("====this.classInfo",this.classInfo);
+      console.log("====this.classInfo====提交",this.classInfo);
       if (!validation.isValid) {
         this.$message.error(validation.message);
         return;
       }
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/analysis/classCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1068,6 +1075,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
       }).then((res) => {
         if (res.success) {

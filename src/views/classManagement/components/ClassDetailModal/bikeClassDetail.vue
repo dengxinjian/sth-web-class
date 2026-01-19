@@ -1158,6 +1158,7 @@ export default {
     },
     // 更新课程
     submitUpdateClass(flag) {
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.classInfo.id,
@@ -1165,6 +1166,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
       }).then((res) => {
         if (res.success) {
@@ -1183,6 +1185,7 @@ export default {
                 ...this.classInfo,
                 timeline: this.timeline,
                 maxIntensity: this.maxIntensity,
+                links: links.length === 0 ? null : links,
               }),
             },
             flag
@@ -1223,6 +1226,7 @@ export default {
         this.$message.error(validation.message);
         return;
       }
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1233,6 +1237,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
         classesDate: !this.data.id
           ? this.classesDate + " 00:00:00"
@@ -1258,6 +1263,7 @@ export default {
         this.$message.error(validation.message);
         return;
       }
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1268,6 +1274,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
         classesDate: !this.data.id
           ? this.classesDate + " 00:00:00"

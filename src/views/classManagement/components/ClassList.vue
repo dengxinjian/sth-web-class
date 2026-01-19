@@ -248,7 +248,7 @@ export default {
 
 <style lang="scss" scoped>
 :deep(.el-collapse-item__header) {
-  background: #c3c9d726;
+  background: #C3C9D726;
 }
 .class-container {
   height: 100%;
