@@ -1576,12 +1576,16 @@ export default {
             ? this.actualData.distance * 1000
             : this.actualData.distance;
       }
+      const links = this.classData.classesJson?.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.isActivity
           ? this.classData.classScheduleId
           : this.classData.id,
-        classesJson: JSON.stringify(this.classData.classesJson),
+        classesJson: JSON.stringify({
+          ...this.classData.classesJson,
+          links: links.length === 0 ? null : links,
+        }),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
         duration: hhmmssToSeconds(this.actualData.duration) || null,
@@ -1608,10 +1612,14 @@ export default {
         this.$message.error("运动数据未修改，无需保存");
         return;
       }
+      const links = this.classData.classesJson?.links.filter(item => item.url !== "");
       submitData({
         url: "/training/api/activity/updateActivityDetail",
         activityId: this.classData.activityId,
-        classesJson: JSON.stringify(this.classData.classesJson),
+        classesJson: JSON.stringify({
+          ...this.classData.classesJson,
+          links: links.length === 0 ? null : links,
+        }),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
         duration: hhmmssToSeconds(this.actualData.duration) || null,
@@ -1662,7 +1670,11 @@ export default {
           if (!this.classData.classesJson) {
             this.$set(this.classData, "classesJson", {});
           }
-          this.$set(this.classData.classesJson, "title", this.form.title);
+          const links = this.classData.classesJson?.links.filter(item => item.url !== "");
+          this.$set({
+            ...this.classData.classesJson,
+            links: links.length === 0 ? null : links,
+          }, "title", this.form.title);
         } catch (error) {
           // 验证失败，不继续保存
           return;

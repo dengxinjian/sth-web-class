@@ -1249,6 +1249,7 @@ export default {
     },
     // 更新课表
     submitUpdateClass(flag) {
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.classInfo.id,
@@ -1256,6 +1257,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
       }).then((res) => {
         if (res.success) {
@@ -1274,6 +1276,7 @@ export default {
                 ...this.classInfo,
                 timeline: this.timeline,
                 maxIntensity: this.maxIntensity,
+                links: links.length === 0 ? null : links,
               }),
             },
             flag
@@ -1312,6 +1315,7 @@ export default {
         this.$message.error(validation.message);
         return;
       }
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1325,6 +1329,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
         triUserId: this.triUserId,
       }).then((res) => {
@@ -1352,6 +1357,7 @@ export default {
         return;
       }
       console.log(JSON.stringify(this.classInfo));
+      const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1365,6 +1371,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
+          links: links.length === 0 ? null : links,
         }),
         triUserId: this.triUserId,
       }).then((res) => {
