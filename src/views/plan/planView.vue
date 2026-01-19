@@ -86,6 +86,8 @@
       @cancel="handleApplyCoachCancel"
       @viewApplyHistory="handleViewApplyHistory"
     />
+    <!-- 计划分享 -->
+    <SharePlan v-model="showSharePlan" :planInfo="currentPlanDetail" />
     <!-- 应用历史 -->
     <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
   </div>
@@ -103,6 +105,7 @@ import SummaryPreview from "./components/SummaryPreview/index.vue";
 import Copy from "./components/Copy/index.vue";
 import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue";
 import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue";
+import SharePlan from "./components/SharePlan/index.vue";
 
 // 服务和工具导入
 import { planApi, groupApi } from "./services/planManagement";
@@ -121,6 +124,7 @@ export default {
     Copy,
     ApplyCoach,
     ApplyHistory,
+    SharePlan,
   },
   props: {
     isPlan: {
@@ -154,6 +158,7 @@ export default {
       showApplyCoach: false,
       showApplyAthlete: false,
       showApplyHistory: false,
+      showSharePlan: false,
       currentPlanId: "",
       currentPlanGroupId: "",
       planTitle: "",
@@ -230,13 +235,15 @@ export default {
       }).then((res) => {
         if (res.success) {
           _this.ownerTeams = res.result;
-          const list = [..._this.teamList, ...res.result]
-            .reduce((acc, team) => {
+          const list = [..._this.teamList, ...res.result].reduce(
+            (acc, team) => {
               if (team && team.id && !acc.find((t) => t.id === team.id)) {
                 acc.push(team);
               }
               return acc;
-            }, [])
+            },
+            []
+          );
           console.log(list, "*======list====过滤团队数组");
           _this.teamList = list.map((item) => {
             return {
@@ -259,7 +266,7 @@ export default {
         url: "/gateway/team/my-team",
       });
       if (res.success) {
-        _this.teamList = [..._this.teamList,res.result] || [];
+        _this.teamList = [..._this.teamList, res.result] || [];
         _this.getTeamList();
       }
       // getData({
@@ -595,43 +602,37 @@ export default {
     async handleOptionsClick(item, index) {
       const _this = this;
       const optMap = {
-        0: () => {
+        // 概要预览
+        1: () => {
           _this.showSummaryPreview = true;
         },
-        1: async () => {
-          if (_this.activeClassType === "official") {
-            // const result = await _this.getPlanLimitCount();
-            // if (result.currentCount >= result.limitValue) {
-            //   _this.$message.error(
-            //     "您当前的计划数量已达上限，无法添加更多计划"
-            //   );
-            //   return;
-            // }
-            // console.log('=======官方计划详情',_this.currentPlanDetail);
-            // console.log('=======个人初始团队',_this.defaultTeam);
-            _this.$nextTick(() => {
-              _this.copyOfficialPlanInfo = {
-                ..._this.currentPlanDetail,
-                planGroupId: null,
-                teamId:
-                  localStorage.getItem("loginType") === "2"
-                    ? _this.ownerTeams.length === 0
-                      ? _this.defaultTeam.id
-                      : null
-                    : null,
-                planSourceTeamId: _this.currentPlanDetail.teamId || null,
-                ownerName: localStorage.getItem("name").split("#")[0],
-                ownerId: localStorage.getItem("triUserId"),
-                loginType: parseInt(localStorage.getItem("loginType")),
-              };
-              _this.$emit("choose-plan", true);
-              _this.handleAddPlan();
-            });
-          } else {
-            _this.handleEditPlan();
-          }
-        },
+        // 添加
         2: async () => {
+          _this.$nextTick(() => {
+            _this.copyOfficialPlanInfo = {
+              ..._this.currentPlanDetail,
+              planGroupId: null,
+              teamId:
+                localStorage.getItem("loginType") === "2"
+                  ? _this.ownerTeams.length === 0
+                    ? _this.defaultTeam.id
+                    : null
+                  : null,
+              planSourceTeamId: _this.currentPlanDetail.teamId || null,
+              ownerName: localStorage.getItem("name").split("#")[0],
+              ownerId: localStorage.getItem("triUserId"),
+              loginType: parseInt(localStorage.getItem("loginType")),
+            };
+            _this.$emit("choose-plan", true);
+            _this.handleAddPlan();
+          });
+        },
+        // 编辑
+        3: async () => {
+          _this.handleEditPlan();
+        },
+        // 复制
+        4: async () => {
           // const result = await _this.getPlanLimitCount();
           // if (result.currentCount >= result.limitValue) {
           //   _this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
@@ -641,15 +642,22 @@ export default {
             _this.showCopy = true;
           });
         },
-        3: () => {
+        // 应用
+        5: () => {
           _this.showApplyCoach = true;
         },
-        4: () => {
+        // 应用历史
+        6: () => {
           _this.showApplyHistory = true;
         },
-        5: () => {
+        // 删除
+        7: () => {
           // _this.handleDeleteGroup();
           _this.handleDeletePlan();
+        },
+        // 分享到团队
+        8: () => {
+          _this.showSharePlan = true;
         },
       };
       optMap[index]();

@@ -2,7 +2,7 @@
   <div class="planned-schedule-container">
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
-        <div style="width: 32px; height: 32px;"></div>
+        <div style="width: 32px; height: 32px"></div>
         <div class="planned-schedule-header-title-left-title">
           {{ planTitle || "计划日程" }}
         </div>
@@ -17,11 +17,15 @@
           <div class="add-class-btn-popover-more-list">
             <div v-for="(el, idx) in optionsArray" :key="idx">
               <div
-                :class="idx === 5 ? 'add-class-btn-popover-more-list-item-del' : 'add-class-btn-popover-more-list-item'"
+                :class="
+                  el.value === 7
+                    ? 'add-class-btn-popover-more-list-item-del'
+                    : 'add-class-btn-popover-more-list-item'
+                "
                 :key="idx"
-                @click="$emit('options-click', el, idx)"
+                @click="$emit('options-click', el, el.value)"
               >
-                {{ el }}
+                {{ el.label }}
               </div>
             </div>
           </div>
@@ -41,13 +45,18 @@
         </el-popover>
       </div>
       <div class="planned-schedule-header-title-right">
-        <div class="planned-schedule-header-title-right-total-label">总时长/总距离/总STH</div>
+        <div class="planned-schedule-header-title-right-total-label">
+          总时长/总距离/总STH
+        </div>
         <div class="planned-schedule-header-title-right-total-value">
           <span>{{
             secondsToHHMMSS(getTotalDuration()) === "00:00:00"
               ? "--:--:--"
               : secondsToHHMMSS(getTotalDuration())
-          }}</span>/<span class="planned-schedule-header-title-right-total-value">{{ getTotalDistance() || "--" }}km</span>/<span class="planned-schedule-header-title-right-total-value">{{
+          }}</span
+          >/<span class="planned-schedule-header-title-right-total-value"
+            >{{ getTotalDistance() || "--" }}km</span
+          >/<span class="planned-schedule-header-title-right-total-value">{{
             getTotalSth() > 100000
               ? (getTotalSth() / 10000).toFixed(2) + "万"
               : getTotalSth() || "--"
@@ -129,8 +138,26 @@ export default {
   computed: {
     optionsArray() {
       return this.activeClassType === "official"
-        ? ["概要", "添加"]
-        : ["概要", "编辑", "复制", "应用", "历史", "删除"];
+        ? [
+          { label: "概要", value: 1 },
+          { label: "添加", value: 2 },
+        ]
+        : localStorage.getItem("loginType") === "2" ? [
+          { label: "概要", value: 1 },
+          { label: "编辑", value: 3 },
+          { label: "复制", value: 4 },
+          { label: "应用", value: 5 },
+          { label: "分享到团队", value: 8 },
+          { label: "历史", value: 6 },
+          { label: "删除", value: 7 },
+        ] : [
+          { label: "概要", value: 1 },
+          { label: "编辑", value: 3 },
+          { label: "复制", value: 4 },
+          { label: "应用", value: 5 },
+          { label: "历史", value: 6 },
+          { label: "删除", value: 7 },
+        ];
     },
   },
   methods: {
@@ -317,7 +344,7 @@ export default {
       background: rgba(64, 158, 255, 0.18);
     }
   }
-  .add-class-btn-popover-more-list-item-del{
+  .add-class-btn-popover-more-list-item-del {
     width: 100%;
     height: 36px;
     line-height: 36px;
@@ -491,13 +518,13 @@ export default {
       padding: 0 20px;
       box-sizing: border-box;
       gap: 5px;
-      .planned-schedule-header-title-right-total-label{
+      .planned-schedule-header-title-right-total-label {
         font-size: 12px;
         color: #666666;
       }
-      .planned-schedule-header-title-right-total-value{
+      .planned-schedule-header-title-right-total-value {
         font-size: 14px;
-        color:#101010;
+        color: #101010;
       }
       .planned-schedule-header-title-right-total {
         margin-bottom: 2px;
