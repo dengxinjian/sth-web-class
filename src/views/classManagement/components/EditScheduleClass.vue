@@ -961,13 +961,7 @@ export default {
           } else {
             this.classData.classesJson = {
               ...this.classData.classesJson,
-              links: this.classData.classesJson?.links || [
-                {
-                  title: "",
-                  type: "1",
-                  url: "",
-                },
-              ],
+              links: this.classData.classesJson?.links || [],
             };
             console.log(this.classData, "classData====获取2");
             this.actualData = {
@@ -1034,10 +1028,10 @@ export default {
     },
   },
   methods: {
-    handleCopyUrl(url) {
-      navigator.clipboard.writeText(url);
-      this.$message.success("复制成功");
-    },
+    // handleCopyUrl(url) {
+    //   navigator.clipboard.writeText(url);
+    //   this.$message.success("复制成功");
+    // },
     handleAddLink() {
       this.classData.classesJson?.links?.push({
         title: "",
@@ -1137,13 +1131,7 @@ export default {
             ...res.result,
             classesJson: {
               ...classData,
-              links: classData?.links || [
-                {
-                  title: "",
-                  type: "1",
-                  url: "",
-                },
-              ],
+              links: classData?.links || [],
             },
           };
           console.log("====当前课表数据====this.classData", this.classData);
@@ -1584,7 +1572,7 @@ export default {
           : this.classData.id,
         classesJson: JSON.stringify({
           ...this.classData.classesJson,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
@@ -1618,7 +1606,7 @@ export default {
         activityId: this.classData.activityId,
         classesJson: JSON.stringify({
           ...this.classData.classesJson,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
@@ -1673,7 +1661,7 @@ export default {
           const links = this.classData.classesJson?.links.filter(item => item.url !== "");
           this.$set({
             ...this.classData.classesJson,
-            links: links.length === 0 ? null : links,
+            links: links,
           }, "title", this.form.title);
         } catch (error) {
           // 验证失败，不继续保存

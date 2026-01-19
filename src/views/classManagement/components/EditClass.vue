@@ -537,23 +537,11 @@ export default {
         if (classData.classesJson) {
           classData.classesJson = {
             ...parseClassesJson(classData.classesJson),
-            links: parseClassesJson(classData.classesJson)?.links || [
-              {
-                title: "",
-                type: "1",
-                url: "",
-              },
-            ],
+            links: parseClassesJson(classData.classesJson)?.links || [],
           };
         } else {
           classData.classesJson = {
-            links: [
-              {
-                title: "",
-                type: "1",
-                url: "",
-              },
-            ],
+            links: [],
           };
         }
         this.classData = classData;
@@ -630,7 +618,7 @@ export default {
       const data = JSON.parse(JSON.stringify(this.classData));
       data.classesJson = JSON.stringify({
         ...data.classesJson,
-        links: links.length === 0 ? null : links,
+        links: links,
       });
       this.$emit("save", data, flag);
     },
