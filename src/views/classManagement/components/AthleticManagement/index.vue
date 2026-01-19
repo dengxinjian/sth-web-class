@@ -11,7 +11,7 @@
           ></el-button>
         </el-input>
       </div>
-      <div class="athletic-btn">
+      <div class="athletic-btn" v-if="defaultTeamId === teamId">
         <el-button type="primary" size="mini" @click="handleInviteAthletic"
           >邀请运动员</el-button
         >
@@ -394,6 +394,10 @@ export default {
       default: "",
     },
     activeName: {
+      type: String,
+      default: "",
+    },
+    defaultTeamId: {
       type: String,
       default: "",
     },

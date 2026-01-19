@@ -17,6 +17,7 @@
               :teamId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
               :activeName="activeName"
+              :defaultTeamId="defaultTeamId"
               @athletic-click="handleAthleticChange"
             />
           </div>
@@ -580,6 +581,8 @@ export default {
       inputActivityDate: "",
 
       isPlan: false,
+
+      defaultTeamId: null,
     };
   },
   watch: {
@@ -1031,6 +1034,7 @@ export default {
         url: "/gateway/team/my-team",
       });
       if (res.success) {
+        _this.defaultTeamId = res.result.id;
         _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
