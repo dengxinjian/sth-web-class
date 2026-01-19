@@ -919,6 +919,7 @@ export default {
       if (val) {
         this.getTagList();
         if (this.data.id && this.originalType === "my") {
+          console.log(this.data, "this.data====打开弹框=====");
           // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
           if (this.data.classesJson) {
             const classesJson =
@@ -935,6 +936,7 @@ export default {
             this.classInfo.groupId =
               this.data.classesGroupId || this.data.groupId;
           } else {
+            console.log(this.data, "this.data====打开弹框2=====");
             // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
             this.getClassInfo(this.data.id);
           }
@@ -942,6 +944,7 @@ export default {
           this.resetForm();
         } else {
           console.log(this.data, "this.data");
+          console.log(this.data, "this.data====打开弹框3=====");
           const classesJson =
             typeof this.data.classesJson === "string"
               ? JSON.parse(this.data.classesJson)
@@ -1227,8 +1230,12 @@ export default {
               console.log(section, "section");
 
               if (section.range === "target") {
+                // const timer =
+                //   distanceIncrement *
+                //   mmssToSeconds(section.targetSpeed) *
+                //   Number(stage.times || 1);
                 const timer =
-                  distanceIncrement *
+                  section.targetDistance *
                   mmssToSeconds(section.targetSpeed) *
                   Number(stage.times || 1);
                 this.classInfo.duration += timer;
@@ -1236,8 +1243,10 @@ export default {
                 const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
                 const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
                 const timer3 = (timer1 + timer2) / 2;
+                // this.classInfo.duration +=
+                //   distanceIncrement * timer3 * Number(stage.times || 1);
                 this.classInfo.duration +=
-                  distanceIncrement * timer3 * Number(stage.times || 1);
+                  section.targetDistance * timer3 * Number(stage.times || 1);
               }
             }
           }
@@ -1664,7 +1673,7 @@ export default {
             title: section.title,
           };
         });
-        duration += totalTime * stage.times;
+        duration += (totalTime * (stage.times - 1));
         distance += totalDistance * stage.times;
         return {
           duration: totalTime * stage.times,
