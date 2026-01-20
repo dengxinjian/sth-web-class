@@ -29,7 +29,7 @@
         class="month-data-item"
       >
         <div class="month-data-text">
-          <div style="display: flex; align-items: center;width: 90px;">
+          <div style="display: flex; align-items: center; width: 90px">
             <img
               :src="item.icon"
               alt=""
@@ -45,7 +45,7 @@
               }}</span
             >
           </div>
-          <div style="width: 90px;text-align: right;">
+          <div style="width: 90px; text-align: right">
             <span style="padding-left: 5px"
               >{{ item.planValue || 0 }}
               {{
@@ -191,6 +191,32 @@ export default {
                   planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
                 };
               }
+              if (item.key === "totalCalories") {
+                return {
+                  ...item,
+                  actualValue:
+                    parseInt(item.actualValue) > 10000
+                      ? unitConversion(
+                          actualValue,
+                          statisticKeyToTitle[item.key]?.unit || 'kcal'
+                        )
+                      : item.actualValue,
+                  actualValueUnit:
+                    parseInt(item.actualValue) > 10000 ? "万" : "",
+                  title: statisticKeyToTitle[item.key]?.title,
+                  color: statisticKeyToTitle[item.key]?.color,
+                  icon: statisticKeyToTitle[item.key]?.icon,
+                  unit: statisticKeyToTitle[item.key]?.unit,
+                  planValue:
+                    parseInt(item.planValue) > 10000
+                      ? unitConversion(
+                          planValue,
+                          statisticKeyToTitle[item.key]?.unit || 'kcal'
+                        )
+                      : item.planValue,
+                  planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
+                };
+              }
               return {
                 ...item,
                 actualValue: unitConversion(
@@ -204,7 +230,10 @@ export default {
                 planValue,
               };
             });
-            console.log(this.statisticData, "this.statisticData====获取-getMonthStatisticData");
+            console.log(
+              this.statisticData,
+              "this.statisticData====获取-getMonthStatisticData"
+            );
             this.sthData = res.result.avgSthRespDto;
           }
         })
@@ -258,6 +287,32 @@ export default {
                         )
                       : item.planValue,
                   planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
+                };
+              }
+              if (item.key === "totalCalories") {
+                return {
+                  ...item,
+                  actualValue:
+                    parseInt(item.actualValue) > 10000
+                      ? unitConversion(
+                          actualValue,
+                          statisticKeyToTitle[item.key]?.unit || 'kcal'
+                        )
+                      : item.actualValue,
+                  actualValueUnit:
+                    parseInt(item.actualValue) > 10000 ? "万" : "",
+                  title: statisticKeyToTitle[item.key]?.title,
+                  color: statisticKeyToTitle[item.key]?.color,
+                  icon: statisticKeyToTitle[item.key]?.icon,
+                  unit: statisticKeyToTitle[item.key]?.unit,
+                  planValue:
+                    parseInt(item.planValue) > 10000
+                      ? unitConversion(
+                          planValue,
+                          statisticKeyToTitle[item.key]?.unit || 'kcal'
+                        )
+                      : item.planValue,
+                  planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
                 };
               }
               return {
@@ -357,7 +412,7 @@ export default {
   flex-direction: column;
 }
 
-.month-statistic-date-picker{
+.month-statistic-date-picker {
   display: flex;
   align-items: center;
   justify-content: center;

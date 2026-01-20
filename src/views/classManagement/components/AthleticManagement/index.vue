@@ -806,7 +806,7 @@ export default {
           })
           .catch((error) => {
             console.error("解绑失败:", error);
-            this.$message.error("解绑失败");
+            // this.$message.error("解绑失败");
           });
       });
     },
@@ -836,7 +836,7 @@ export default {
           })
           .catch((error) => {
             console.error("解绑失败:", error);
-            this.$message.error("解绑失败");
+            // this.$message.error("解绑失败");
           });
       });
     },
