@@ -614,12 +614,12 @@ export const checkForm = (classInfo) => {
       if (classInfo.mode === 3) {
         if (
           classInfo.stages[i].sections[j].range === "range" &&
-          (!classInfo.stages[i].sections[j].targetSpeedRange[0] ||
-            !classInfo.stages[i].sections[j].targetSpeedRange[1])
+          (classInfo.stages[i].sections[j].targetSpeedRange[0] === "00:00" ||
+            classInfo.stages[i].sections[j].targetSpeedRange[1] === "00:00")
         ) {
           return {
             isValid: false,
-            message: `阶段${i + 1}的段落${j + 1}的配速范围不能为空或者为0`,
+            message: `阶段${i + 1}的段落${j + 1}的配速范围不能为空或者为00:00`,
           };
         }
         if (
