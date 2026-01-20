@@ -218,7 +218,17 @@
               />
               <span class="suffix unit-red">bpm</span>
             </div>
-            <div class="reset-btn" @click="resetThresholdData">重置</div>
+            <div
+              class="reset-btn"
+              :class="{ disabled: !isThresholdDataChanged }"
+              :style="{
+                cursor: isThresholdDataChanged ? 'pointer' : 'not-allowed',
+                opacity: isThresholdDataChanged ? 1 : 0.5,
+              }"
+              @click="isThresholdDataChanged && resetThresholdData()"
+            >
+              重置
+            </div>
           </div>
           <div v-else-if="activeSport === 4" class="row">
             <div style="display: flex; align-items: center">
@@ -239,7 +249,17 @@
               />
               <span class="suffix unit-red">min/100m</span>
             </div>
-            <div class="reset-btn" @click="resetThresholdData">重置</div>
+            <div
+              class="reset-btn"
+              :class="{ disabled: !isThresholdDataChanged }"
+              :style="{
+                cursor: isThresholdDataChanged ? 'pointer' : 'not-allowed',
+                opacity: isThresholdDataChanged ? 1 : 0.5,
+              }"
+              @click="isThresholdDataChanged && resetThresholdData()"
+            >
+              重置
+            </div>
           </div>
           <div v-else-if="activeSport === 2" class="row">
             <div style="display: flex; align-items: center">
@@ -253,7 +273,17 @@
               />
               <span class="suffix unit-red">w</span>
             </div>
-            <div class="reset-btn" @click="resetThresholdData">重置</div>
+            <div
+              class="reset-btn"
+              :class="{ disabled: !isThresholdDataChanged }"
+              :style="{
+                cursor: isThresholdDataChanged ? 'pointer' : 'not-allowed',
+                opacity: isThresholdDataChanged ? 1 : 0.5,
+              }"
+              @click="isThresholdDataChanged && resetThresholdData()"
+            >
+              重置
+            </div>
           </div>
           <div v-else-if="activeSport === 3" class="row">
             <div style="display: flex; align-items: center">
@@ -274,7 +304,17 @@
               />
               <span class="suffix unit-red">min/km</span>
             </div>
-            <div class="reset-btn" @click="resetThresholdData">重置</div>
+            <div
+              class="reset-btn"
+              :class="{ disabled: !isThresholdDataChanged }"
+              :style="{
+                cursor: isThresholdDataChanged ? 'pointer' : 'not-allowed',
+                opacity: isThresholdDataChanged ? 1 : 0.5,
+              }"
+              @click="isThresholdDataChanged && resetThresholdData()"
+            >
+              重置
+            </div>
           </div>
           <div class="zoneContainer">
             <div class="zoneTr">
@@ -566,6 +606,39 @@ export default {
           (this.preferenceForm.strengthTimes || 0);
       }
       return totalTimes;
+    },
+    // 判断阈值数据是否有改变
+    isThresholdDataChanged() {
+      const sport = Number(this.activeSport);
+      if (sport === 4) {
+        // 游泳或跑步：比较 thresholdTimeValue
+        return (
+          String(this.thresholdData.thresholdTimeValue || "") !==
+          String(this.originThresholdTimeValue || "")
+        );
+      } else if (sport === 3) {
+        return (
+          String(this.thresholdData.thresholdTimeValue || "") !==
+          String(this.originThresholdTimeValue || "")
+        );
+      } else if (sport === 2) {
+        // 骑行：比较 threshold
+        const currentThreshold = this.thresholdData.threshold;
+        const originThreshold = this.originThreshold;
+        // 统一转换为字符串进行比较，处理数字和字符串的情况
+        const currentStr = currentThreshold != null ? String(currentThreshold) : "";
+        const originStr = originThreshold != null ? String(originThreshold) : "";
+        return currentStr !== originStr;
+      } else if (sport === 1) {
+        // 心率：比较 param1 和 param2
+        return (
+          String(this.thresholdData.param1 || "") !==
+            String(this.originParam1 || "") ||
+          String(this.thresholdData.param2 || "") !==
+            String(this.originParam2 || "")
+        );
+      }
+      return false;
     },
     // 可用于长距离训练的日期（排除休息日）
     availableDaysForLongDistance() {
@@ -874,7 +947,7 @@ export default {
       getData({
         url: "/consumer/wx/getUserProfile",
         triUserId: this.triUserId,
-        clientType: 'web',
+        clientType: "web",
       }).then((res) => {
         if (res.success) {
           this.baseForm = res.result;
@@ -905,7 +978,8 @@ export default {
           this.originParam2 = result.param2;
         }
         if (isFirst && Number(this.activeSport) === 2) {
-          this.originthreshold = result.threshold;
+          // 与 thresholdData.threshold 保持一致的类型（数字或空字符串）
+          this.originThreshold = result.threshold ? +result.threshold : "";
         }
         // 使用 Vue.set 确保响应式更新，或者直接赋值新对象
         this.thresholdData = {
@@ -922,18 +996,23 @@ export default {
       });
     },
     // 获取阈值预览列表
-    getThresholdPreviewList(type) {
-      let value = 0;
-      if (type === 'thresholdTimeValue') {
-        value = Number(mmssToSeconds(this.thresholdData.thresholdTimeValue));
-      } else if (type === 'threshold') {
-        value = Number(this.thresholdData.threshold);
-      } else if (type === 'param1') {
-        value = Number(this.thresholdData.param1);
-      } else if (type === 'param2') {
-        value = Number(this.thresholdData.param2);
+    getThresholdPreviewList(type, isReset = false) {
+      if (!isReset) {
+        let value = 0;
+        if (type === "thresholdTimeValue") {
+          value = Number(mmssToSeconds(this.thresholdData.thresholdTimeValue));
+        } else if (type === "threshold") {
+          value = Number(this.thresholdData.threshold);
+        } else if (type === "param1") {
+          value = Number(this.thresholdData.param1);
+        } else if (type === "param2") {
+          value = Number(this.thresholdData.param2);
+        }
+        if (value === 0) {
+          return this.$message.error("输入值不能为0，请重新输入");
+        }
       }
-      if (value === 0) return this.$message.error("输入值不能为0，请重新输入");
+
       let threshold = "";
       if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
         threshold = mmssToSeconds(this.thresholdData.thresholdTimeValue);
@@ -968,12 +1047,12 @@ export default {
       if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
         this.thresholdData.thresholdTimeValue = this.originThresholdTimeValue;
       } else if (Number(this.activeSport) === 2) {
-        this.thresholdData.threshold = Number(this.originthreshold);
+        this.thresholdData.threshold = Number(this.originThreshold);
       } else if (Number(this.activeSport) === 1) {
         this.thresholdData.param1 = Number(this.originParam1);
         this.thresholdData.param2 = Number(this.originParam2);
       }
-      this.getThresholdPreviewList();
+      this.getThresholdPreviewList(null, true);
     },
     handleClose() {
       this.onCancel();
@@ -995,14 +1074,17 @@ export default {
       let value2 = 0;
       if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
         value = Number(mmssToSeconds(this.thresholdData.thresholdTimeValue));
-        if (value === 0) return this.$message.error("输入值不能为0，请重新输入");
+        if (value === 0)
+          return this.$message.error("输入值不能为0，请重新输入");
       } else if (Number(this.activeSport) === 2) {
         value = Number(this.thresholdData.threshold);
-        if (value === 0) return this.$message.error("输入值不能为0，请重新输入");
+        if (value === 0)
+          return this.$message.error("输入值不能为0，请重新输入");
       } else if (Number(this.activeSport) === 1) {
         value = Number(this.thresholdData.param1);
         value2 = Number(this.thresholdData.param2);
-        if (value === 0 || value2 === 0) return this.$message.error("输入值不能为0，请重新输入");
+        if (value === 0 || value2 === 0)
+          return this.$message.error("输入值不能为0，请重新输入");
       }
       this.$confirm(
         "阈值更新将会影响运动员的相关设置及训练计划, 是否继续?",
@@ -1022,7 +1104,10 @@ export default {
             threshold: "",
             triUserId: this.triUserId,
           };
-          if (Number(this.activeSport) === 4 || Number(this.activeSport) === 3) {
+          if (
+            Number(this.activeSport) === 4 ||
+            Number(this.activeSport) === 3
+          ) {
             params.threshold = mmssToSeconds(
               this.thresholdData.thresholdTimeValue
             );
@@ -1196,7 +1281,7 @@ export default {
         const intValue = parseInt(numericValue, 10);
         if (intValue > 0) {
           this.thresholdData[field] = intValue;
-          if (field === 'param1') {
+          if (field === "param1") {
             this.thresholdData.param2 = Math.ceil(intValue * 0.88);
           }
         } else {

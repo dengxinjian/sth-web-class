@@ -17,6 +17,7 @@
               :teamId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
               :activeName="activeName"
+              :defaultTeamId="defaultTeamId"
               @athletic-click="handleAthleticChange"
             />
           </div>
@@ -580,6 +581,8 @@ export default {
       inputActivityDate: "",
 
       isPlan: false,
+
+      defaultTeamId: null,
     };
   },
   watch: {
@@ -1031,6 +1034,7 @@ export default {
         url: "/gateway/team/my-team",
       });
       if (res.success) {
+        _this.defaultTeamId = res.result.id;
         _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
@@ -1058,12 +1062,12 @@ export default {
           id: item.id,
           name: item.teamName,
           teamOwnerId: item.teamOwnerId,
-          members: res.result.length > 0 ? item.members.map((member) => ({
+          members: res.result.length > 0 ? item.members.filter(el => el.userType === 3).map((member) => ({
             id: member.id,
             name: member.userNickname,
             triUserId: member.triUserId,
             lastMatchType: member.lastMatchType,
-          })) : [],
+          })): [],
         }));
         // 默认选中第一个团队
         if (this.teamList.length > 0) {
@@ -1104,7 +1108,11 @@ export default {
       this.athleticList = this.teamList.find(
         (item) => item.id === this.selectedTeam
       ).members;
-
+      if(this.athleticList.length === 0){
+        this.selectedAthletic = null;
+        this.athleticInfoData = {};
+        return;
+      }
       // 默认选中第一个运动员
       if (this.athleticList.length > 0) {
         this.selectedAthletic = this.athleticList[0].triUserId;
