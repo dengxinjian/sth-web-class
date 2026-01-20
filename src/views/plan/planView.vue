@@ -14,6 +14,7 @@
           @edit-group="handleEditGroup"
           @delete-group="handleDeleteGroup"
           @choose-plan="handlePlanDayDetail"
+          @view-plan="handleViewPlanView"
           :selected-plan-id="currentPlanId"
           :current-plan-group-id="currentPlanGroupId"
         />
@@ -329,6 +330,12 @@ export default {
     async handlePlanDayDetail(id, groupId) {
       this.currentPlanId = id;
       this.currentPlanGroupId = groupId;
+      this.$emit("choose-plan", true);
+      await this.getPlanDetail(id);
+      await this.getPlanDayDetail(id);
+    },
+    async handleViewPlanView(id) {
+      console.log("handleViewPlan===选择分享计划", id);
       this.$emit("choose-plan", true);
       await this.getPlanDetail(id);
       await this.getPlanDayDetail(id);

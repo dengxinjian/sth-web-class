@@ -18,6 +18,7 @@
         class="class-type-item"
         :class="{ 'active-title': activeClassType === 'team' }"
         @click="handleClassTypeChange('team')"
+        v-if="loginType === '2'"
       >
         <div
           class="title"
@@ -137,27 +138,6 @@
                 @click="handleDeleteGroup(node)"
               >
                 删除
-              </div>
-              <div
-                class="btn-list-hover-item"
-                v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-                @click="handleMoveAthletic(node)"
-              >
-                移动
-              </div>
-              <div
-                class="btn-list-hover-item"
-                v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-                @click="handleMoveOutAthletic(node)"
-              >
-                解绑
-              </div>
-              <div
-                class="btn-list-hover-item"
-                v-if="!node.data.isGroup && node.parent.data.id === 'coach'"
-                @click="handleMoveOutCoach(node)"
-              >
-                解绑
               </div>
             </div>
             <div class="btn-list-hover-item" slot="reference">
@@ -333,6 +313,7 @@ export default {
       treeKey: 0, // 用于强制重新渲染 el-tree
       teamList: [],
       loadingTeamTree: false,
+      loginType: localStorage.getItem("loginType") || "1",
     };
   },
   computed: {
@@ -640,12 +621,10 @@ export default {
      * 处理节点点击事件
      */
     handleNodeClick(data, node) {
+      console.log("handleNodeClick===选择分享计划", data, node);
       // 如果点击的是计划节点（不是团队节点），触发选择计划事件
       if (!node.data.isGroup && node.data.id) {
-        // 获取父节点的ID作为groupId
-        const groupId =
-          node.parent && node.parent.data ? node.parent.data.id : null;
-        this.$emit("choose-plan", node.data.id, groupId);
+        this.$emit("view-plan", data.sourcePlanId,data);
       }
     },
   },
