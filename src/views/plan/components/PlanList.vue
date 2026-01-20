@@ -93,7 +93,7 @@
       >
         <span class="athletic-btn-list" slot-scope="{ node }">
           <el-tooltip
-            v-if="node.level === 1"
+            v-if="node.label.length * 14 > 148"
             :content="node.label"
             placement="top"
           >
@@ -484,7 +484,7 @@ export default {
           resolve([]);
         }
       }
-      if (node.level > 0) {
+      if (node.level === 1) {
         getData({
           url: `/training/api/teamShare/byTeam?teamId=${
             node.data.id
@@ -494,17 +494,25 @@ export default {
             console.log("res======res====当前团队计划", res);
             if (res.success && res.result) {
               // 将计划列表转换为树节点格式
-              const planNodes = Array.isArray(res.result)
-                ? res.result.map((plan) => ({
-                  id: plan.id,
-                  label: plan.planTitle || plan.title || "未命名计划",
+              const planNodes = Array.isArray(res.result.groups)
+                ? res.result.groups.map((plan) => ({
+                  id: plan.groupId,
+                  label: plan.groupName || plan.title || "未命名计划",
                   isGroup: false,
                   // 计划节点是叶子节点，不能再展开
-                  leaf: true,
+                  leaf: false,
+                  children: plan.plansList.map(item => ({
+                    id: item.teamId,
+                    label: item.planTitle || item.title || "未命名计划",
+                    isGroup: false,
+                    leaf: true,
+                    ...item,
+                  })),
                   ...plan,
                 }))
                 : [];
               resolve(planNodes);
+              this.loadingTeamTree = false;
             } else {
               this.loadingTeamTree = false;
               resolve([]);
@@ -514,6 +522,10 @@ export default {
             this.loadingTeamTree = false;
             resolve([]);
           });
+      }
+      if (node.level === 2) {
+        resolve(node.data.children);
+        this.loadingTeamTree = false;
       }
     },
     handleClassTypeChange(type) {
