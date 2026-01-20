@@ -2699,9 +2699,11 @@ export default {
     /**
      * 保存运动员信息
      */
-    onSaveAthleticInfo() {
+    onSaveAthleticInfo(payload,type) {
       // 保存逻辑
-      this.showAthleticInfoDialog = false;
+      if (type) {
+        this.showAthleticInfoDialog = false;
+      }
       this.getScheduleData();
       this.getAthleticThreshold(this.selectedAthletic);
     },

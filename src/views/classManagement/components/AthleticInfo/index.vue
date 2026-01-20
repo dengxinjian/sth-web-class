@@ -1124,9 +1124,7 @@ export default {
             .then((res) => {
               if (res.success) {
                 this.$message.success("阈值保存成功");
-                if (type) {
-                  this.$emit("save", res.result);
-                }
+                this.$emit("save", res.result,type);
                 this.getThresholdData();
                 this.loading = false;
               }
