@@ -1673,7 +1673,7 @@ export default {
             title: section.title,
           };
         });
-        duration += (totalTime * (stage.times - 1));
+        duration += totalTime * stage.times;
         distance += totalDistance * stage.times;
         return {
           duration: totalTime * stage.times,
