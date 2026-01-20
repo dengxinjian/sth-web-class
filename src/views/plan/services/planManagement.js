@@ -105,3 +105,25 @@ export const groupApi = {
     });
   },
 };
+
+export const teamApi = {
+  // 获取我的团队
+  getMyTeam() {
+    return getData({
+      url: "/gateway/team/my-team",
+    });
+  },
+  // 获取团队列表
+  getAllTeamList() {
+    return getData({
+      url: "/consumer/api/team/coach/all-teams",
+    });
+  },
+
+  // 获取团队详情
+  getTeamDetail(id) {
+    return getData({
+      url: `/consumer/api/team/info/${id}`,
+    });
+  },
+};

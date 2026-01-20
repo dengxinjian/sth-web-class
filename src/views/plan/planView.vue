@@ -87,7 +87,7 @@
       @viewApplyHistory="handleViewApplyHistory"
     />
     <!-- 计划分享 -->
-    <SharePlan v-model="showSharePlan" :planInfo="currentPlanDetail" />
+    <SharePlan v-model="showSharePlan" :planInfo="currentPlanDetail" @shareSuccess="handleShareSuccess" />
     <!-- 应用历史 -->
     <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
   </div>
@@ -310,6 +310,9 @@ export default {
     handleViewApplyHistory(planId) {
       this.showApplyHistory = true;
       this.currentPlanId = planId;
+    },
+    handleShareSuccess(payload) {
+      this.showSharePlan = false;
     },
     /**
      * 处理概要预览取消事件

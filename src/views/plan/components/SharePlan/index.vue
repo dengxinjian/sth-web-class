@@ -13,34 +13,55 @@
       ref="formRef"
       :model="form"
       :rules="rules"
-      label-width="90px"
+      label-width="130px"
       size="small"
     >
-      <el-form-item label="计划名称" prop="planTitle">
-        <el-input
+      <el-form-item label="团队选择" prop="teamId">
+        <!-- <el-input
           v-model="form.planTitle"
           maxlength="20"
           show-word-limit
           placeholder="请输入计划名称"
           clearable
-        />
-      </el-form-item>
-
-      <el-form-item label="分组名" prop="planGroupId">
+        /> -->
         <el-select
-          v-model="form.planGroupId"
-          placeholder="请选择分组"
+          v-model="form.teamId"
+          placeholder="请选择团队"
           filterable
           clearable
+          multiple
+          collapse-tags
           style="width: 100%"
+          @change="handleTeamChange"
         >
           <el-option
-            v-for="g in groupOptions"
-            :key="g.id"
-            :label="g.planClassesGroup"
-            :value="g.id"
-          />
+            v-for="item in teams"
+            :key="item.id"
+            :label="item.teamName"
+            :value="item.id"
+          ></el-option>
         </el-select>
+      </el-form-item>
+
+      <el-form-item
+        :label="`${item.teamName}`"
+        v-for="item in selectedTeams"
+        :key="item.shareToId"
+      >
+        <el-radio-group v-model="item.shareToAuth">
+          <el-radio
+            :label="col.value"
+            v-for="col in radioOptions"
+            :key="col.id"
+            >{{ col.label }}</el-radio
+          >
+        </el-radio-group>
+        <img
+          src="~@/assets/plan/close.png"
+          alt=""
+          style="width: 24px; height: 24px; margin-left: 20px; cursor: pointer"
+          @click="handleClose(item)"
+        />
       </el-form-item>
     </el-form>
 
@@ -53,6 +74,7 @@
 
 <script>
 import { getData, submitData } from "@/api/common.js";
+import { teamApi } from "../../services/planManagement";
 
 export default {
   name: "SummaryPreview",
@@ -68,19 +90,18 @@ export default {
     return {
       innerVisible: this.visible || this.value || false,
       form: {
-        planTitle: this.defaultTitle,
-        planGroupId: this.defaultGroupId,
+        teamId: [],
       },
       rules: {
-        planTitle: [
-          { required: true, message: "请输入计划名称", trigger: "blur" },
-          { min: 1, max: 50, message: "长度在1到20个字符", trigger: "blur" },
-        ],
-        planGroupId: [
-          { required: true, message: "请选择分组", trigger: "change" },
-        ],
+        teamId: [{ required: true, message: "请选择分组", trigger: "change" }],
       },
       groups: [],
+      teams: [],
+      selectedTeams: [],
+      radioOptions: [
+        { label: "查看", value: 1 },
+        { label: "编辑", value: 2 },
+      ],
     };
   },
   computed: {
@@ -101,7 +122,7 @@ export default {
       if (val) {
         // reset form when opening
         this.resetForm();
-        this.getGroupList();
+        this.getTeamList();
       } else {
         // clear validation when closing
         this.$nextTick(
@@ -114,12 +135,45 @@ export default {
     },
   },
   methods: {
-    getGroupList() {
-      getData({
-        url: "/training/api/planClassesGroup/option",
-      }).then((res) => {
-        this.groups = res.result;
-      });
+    async getTeamList() {
+      const myTeam = await teamApi.getMyTeam();
+      const allTeamList = await teamApi.getAllTeamList();
+      this.teams = [myTeam.result, ...allTeamList.result].reduce(
+        (acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        },
+        []
+      );
+      console.log(this.teams, "this.teams");
+    },
+    handleTeamChange(val) {
+      const newList = this.teams
+        .filter((item) => val.includes(item.id))
+        .map((item) => ({
+          shareToId: item.id,
+          teamName: item.teamName,
+          shareToAuth: item.shareToAuth || 1,
+        }));
+      this.selectedTeams = [...this.selectedTeams, ...newList].reduce(
+        (acc, item) => {
+          if (!acc.find((el) => el.shareToId === item.shareToId)) {
+            acc.push(item);
+          }
+          return acc;
+        },
+        []
+      );
+    },
+    handleClose(val) {
+      this.selectedTeams = this.selectedTeams.filter(
+        (item) => item.shareToId !== val.shareToId
+      );
+      this.form.teamId = this.form.teamId.filter(
+        (item) => item !== val.shareToId
+      );
     },
     onCancel() {
       this.innerVisible = false;
@@ -128,59 +182,37 @@ export default {
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
-        // this.$emit("save", { ...this.form });
-        // this.innerVisible = false;
-        console.log(this.planClasses, "this.planClasses");
-        console.log(this.form, "this.form");
-        console.log(this.planInfo, "this.planInfo");
-        console.log("this.planClasses.flat()", this.planClasses.flat());
-        const details = this.planClasses.flat().map((item) => {
-          if (item.competitionDtoList.length > 0 || item.details.length > 0) {
-            return {
-              day: item.day,
-              details: item.details.map(el => {
-                return {
-                  classesId: el.classesId,
-                  classesJson: JSON.stringify(el.classesJson),
-                  sportType: el.sportType,
-                }
-              }),
-              competitionDtoList: item.competitionDtoList,
-            };
-          } else {
-            return null;
-          }
-        }).filter(item => item !== null);
-        console.log(details, "details");
+        const triUserId = localStorage.getItem("userId");
+        const shareTos = this.selectedTeams.map(item => ({
+          shareToId: item.shareToId,
+          shareToAuth: item.shareToAuth,
+        }));
         const params = {
-          ...this.form,
-          teamId: this.planInfo.teamId,
-          email: this.planInfo.email,
-          weChat: this.planInfo.weChat,
-          description: this.planInfo.description,
-          level: this.planInfo.level,
-          dayDetails: details,
-          sourcePlanId: this.planInfo.id,
-          loginType: localStorage.getItem("loginType"),
+          requestUserId: triUserId,
+          shareDataId: this.planInfo.id,
+          shareDataType: 2,
+          shareTos: shareTos,
+          shareToType: 2,
         };
-        console.log(params, "params");
         submitData({
-          url: "/training/api/planClasses/copyPlanClasses",
+          url: "/training/api/share/create",
           requestData: params,
         }).then((res) => {
           if (res.success) {
-            this.$message.success("复制成功");
+            this.$message.success("分享成功");
             this.innerVisible = false;
-            this.$emit("save", res.result);
+            this.$emit("shareSuccess", res.result);
+          } else {
+            this.$message.error(res.message);
           }
         });
       });
     },
     resetForm() {
       this.form = {
-        planTitle: this.defaultTitle,
-        planGroupId: this.defaultGroupId,
+        teamId: [],
       };
+      this.selectedTeams = [];
       this.$nextTick(() => {
         if (this.$refs.formRef) {
           this.$refs.formRef.clearValidate();
@@ -207,5 +239,12 @@ export default {
 }
 .statistics-divider-wrapper ::v-deep(.el-divider__text) {
   font-size: 12px;
+}
+
+::v-deep(.el-form-item__content) {
+  margin-left: 0;
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
 }
 </style>
