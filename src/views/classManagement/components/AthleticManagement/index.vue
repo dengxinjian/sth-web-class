@@ -557,10 +557,10 @@ export default {
                 // 创建新的coach团队
                 const coachTeam = {
                   id: "coach",
-                  label: "我的执教",
+                  label: "教练组",
                   description: "执教团队",
                   isGroup: true,
-                  groupName: "我的执教",
+                  groupName: "教练组",
                   membersCount: coachMembers?.length || 0,
                   triUserId: null,
                   children: coachMembers,
