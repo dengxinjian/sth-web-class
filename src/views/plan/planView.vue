@@ -187,7 +187,7 @@ export default {
             const { id, planGroupId, type } = this.$route.query;
             if (id) {
               this.currentPlanId = parseInt(id);
-              this.currentPlanGroupId = parseInt(planGroupId);
+              // this.currentPlanGroupId = parseInt(planGroupId);
               this.getPlanDetail(id);
               this.getPlanDayDetail(id);
             }
@@ -296,7 +296,8 @@ export default {
       const res = await planApi.getPlanDetail(id);
       this.currentPlanDetail = res.result;
       this.currentPlanId = res.result.id;
-      this.currentPlanGroupId = res.result.planGroupId;
+      // 是否展开
+      // this.currentPlanGroupId = res.result.planGroupId;
     },
     /**
      * 处理计划日常详情数据，重组为按天分组的格式，并按每7天一组组成二维数组

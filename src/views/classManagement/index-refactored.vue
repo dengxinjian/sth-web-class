@@ -330,7 +330,7 @@
       :visible="showViewClassCard"
       :class-item="classModalData"
       :active-class-type="activeClassType"
-      @close="showViewClassCard = false"
+      @close="handleCloseResetViewClassCard"
       @move="handleMoveClass"
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
@@ -623,6 +623,10 @@ export default {
     this.$root.$off("identity-changed", this.handleIdentityChanged);
   },
   methods: {
+    handleCloseResetViewClassCard() {
+      this.showViewClassCard = false;
+      this.getClassList();
+    },
     getDeviceBrandIcon,
     getDeviceName(deviceType) {
       return DEVICE_TYPE_DICT[deviceType] || "未知设备";

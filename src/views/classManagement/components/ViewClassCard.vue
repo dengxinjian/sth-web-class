@@ -267,7 +267,7 @@
     <EditClass
       :visible="showEditClass"
       :class-item="classItem"
-      @close="showEditClass = false"
+      @close="handleCloseResetClass"
       @save="handleEditSave"
       @delete="$emit('delete', classItem)"
     />
@@ -394,6 +394,10 @@ export default {
       if (flag) this.showEditClass = false;
       this.$emit("save", saveData, flag);
     },
+    handleCloseResetClass() {
+      this.showEditClass = false
+      this.$emit("close");
+    },
   },
 };
 </script>
@@ -496,7 +500,7 @@ export default {
       font-family: PingFang SC;
       font-weight: 400;
       font-style: Regular;
-      font-size: 14px;
+      font-size: 12px;
       color: #101010;
     }
   }
