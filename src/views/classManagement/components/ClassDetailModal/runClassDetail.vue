@@ -192,7 +192,7 @@
                     />
                   </el-col>
                   <el-col :span="2">
-                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;" v-if="classInfo.links.length > 1">
+                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
                       <i
                       class="el-icon-remove-outline"
                       @click="handleRemoveLink(index)"
@@ -1176,7 +1176,7 @@ export default {
           this.$nextTick(async () => {
             this.localClassesDate = res.result.classesDate;
             await this.getAthleticThreshold(res.result.classesDate);
-            this.classInfo = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || [{ title: "", type: "1", url: "" }]};
+            this.classInfo = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || []};
             this.timeline = JSON.parse(res.result.classesJson).timeline;
             this.classInfo.id = res.result.id;
             this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
@@ -1257,7 +1257,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
       }).then((res) => {
         if (res.success) {
@@ -1276,7 +1276,7 @@ export default {
                 ...this.classInfo,
                 timeline: this.timeline,
                 maxIntensity: this.maxIntensity,
-                links: links.length === 0 ? null : links,
+                links: links,
               }),
             },
             flag
@@ -1329,7 +1329,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
         triUserId: this.triUserId,
       }).then((res) => {
@@ -1371,7 +1371,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
         triUserId: this.triUserId,
       }).then((res) => {

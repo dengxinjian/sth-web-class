@@ -130,7 +130,6 @@
                   </el-col>
                   <el-col :span="1">
                     <div
-                      v-if="form.links.length > 1"
                       style="
                         height: 100%;
                         display: flex;
@@ -356,9 +355,7 @@ export default {
         if (res.success) {
           this.form = {
             ...JSON.parse(res.result.classesJson),
-            links: JSON.parse(res.result.classesJson)?.links || [
-              { title: "", type: "1", url: "" },
-            ],
+            links: JSON.parse(res.result.classesJson)?.links || [],
           };
           this.form.id = res.result.id;
           this.form.distance = this.normalizeDistanceValue(
@@ -378,7 +375,7 @@ export default {
         labels: this.form.tags,
         classesDate: this.classesDate + " 00:00:00",
         sportType: "SWIM",
-        classesJson: JSON.stringify({ ...this.form, links: links.length === 0 ? null : links }),
+        classesJson: JSON.stringify({ ...this.form, links: links }),
         triUserId: this.triUserId,
       });
       if (flag) this.onCancel();
@@ -389,7 +386,7 @@ export default {
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.form.id,
-        classesJson: JSON.stringify({ ...this.form, links: links.length === 0 ? null : links }),
+        classesJson: JSON.stringify({ ...this.form, links: links }),
       }).then((res) => {
         if (res.success) {
           this.$emit(
@@ -401,7 +398,7 @@ export default {
               labels: this.form.tags,
               classesDate: this.classesDate + " 00:00:00",
               sportType: "SWIM",
-              classesJson: JSON.stringify({ ...this.form, links: links.length === 0 ? null : links }),
+              classesJson: JSON.stringify({ ...this.form, links: links }),
             },
             flag
           );

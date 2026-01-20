@@ -211,7 +211,6 @@
                   </el-col>
                   <el-col :span="2">
                     <div
-                      v-if="classInfo.links.length > 1"
                       style="
                         height: 100%;
                         display: flex;
