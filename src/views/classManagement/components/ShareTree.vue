@@ -176,15 +176,15 @@ export default {
         }
       }
       if (node.level === 1) {
-        // 查询该分享团队下的所有分组 shareDataType: 1 团队课程  2 分享计划
+        // 查询该分享团队下的所有分组 shareDataType:1 团队课程  2 分享计划
         getData({
-          url: `/training/api/shareTeamGroup/list?teamId=${node.data.id}&shareDataType=2`,
+          url: `/training/api/shareTeamGroup/list?teamId=${node.data.id}&shareDataType=1`,
         }).then((res) => {
           if (res.success && res.result) {
             const groupList = res.result.map((item) => {
               return {
                 id: item.id,
-                label: item.groupName || item.title || "未命名计划",
+                label: item.groupName || "未命名分组",
                 isGroup: true,
                 leaf: false,
                 ...item,
@@ -204,17 +204,16 @@ export default {
           url: `/training/api/teamShare/pageByGroupId`,
           groupId: node.data.id,
           teamId: node.data.teamId,
-          shareDataType: 2,
+          shareDataType: 1,
           current: 1,
           size: 20,
         })
           .then((res) => {
             if (res.success && res.result) {
               // 将计划列表转换为树节点格式
-              const planNodes = res.result.records.map((plan) => ({
-                ...plan,
-                id: plan.id,
-                label: plan.planTitle || plan.title || "未命名计划",
+              const planNodes = res.result.records.map((el) => ({
+                ...el,
+                label: el.classesTitle || "未命名课程",
                 isGroup: false,
                 // 计划节点是叶子节点，不能再展开
                 leaf: true,

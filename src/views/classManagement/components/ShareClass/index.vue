@@ -7,7 +7,7 @@
     class="add-class-title-modal"
     :close-on-click-modal="false"
   >
-    <span slot="title">计划分享</span>
+    <span slot="title">分享团队</span>
 
     <el-form
       ref="formRef"
@@ -74,7 +74,7 @@
 
 <script>
 import { getData, submitData } from "@/api/common.js";
-import { teamApi } from "../../services/planManagement";
+import { teamApi } from "../../services/classManagement";
 
 export default {
   name: "SummaryPreview",
@@ -85,6 +85,7 @@ export default {
     defaultGroupId: { type: [String, Number], default: undefined },
     planInfo: { type: Object, default: () => ({}) },
     planClasses: { type: Array, default: () => [] },
+    classId: { type: [String, Number], default: undefined },
   },
   data() {
     return {
@@ -137,7 +138,7 @@ export default {
   methods: {
     async getTeamList() {
       const myTeam = await teamApi.getMyTeam();
-      const allTeamList = await teamApi.getAllTeamList();
+      const allTeamList = await teamApi.getAllTeams();
       this.teams = [myTeam.result, ...allTeamList.result].reduce(
         (acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
@@ -189,10 +190,10 @@ export default {
         }));
         const params = {
           requestUserId: triUserId,
-          shareDataId: this.planInfo.id,
-          shareDataType: 2,
+          shareDataId: this.classId,
+          shareDataType: 1, // 1 团队课程  2 分享计划
           shareTos: shareTos,
-          shareToType: 2,
+          shareToType: 2, //  1 个人  2 团队
         };
         submitData({
           url: "/training/api/share/create",

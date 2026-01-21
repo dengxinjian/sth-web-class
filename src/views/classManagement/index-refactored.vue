@@ -334,6 +334,12 @@
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
       @save="handleUpdateClass"
+      @share="handleShareClass"
+    />
+    <ShareClassModal
+      v-model="showShareClassModal"
+      :class-id="shareClassId"
+      @save="onSaveShareClass"
     />
     <AddClassModal
       v-model="showAddClassModal"
@@ -425,6 +431,7 @@ import SportDetailModal from "./components/SportDetailModal";
 import ClassDetailModal from "./components/ClassDetailModal";
 import CopyClassFromOfficial from "./components/CopyClassFromOfficial";
 import ViewClassCard from "./components/ViewClassCard";
+import ShareClassModal from "./components/ShareClass/index.vue";
 import EditScheduleClass from "./components/EditScheduleClass";
 import HealthView from "./components/HealthView.vue";
 import AddEvent from "./components/addEvent.vue";
@@ -484,6 +491,7 @@ export default {
     PlanView,
     EventInfo,
     WeekRangePicker,
+    ShareClassModal,
   },
   mixins: [dragMixin],
   data() {
@@ -580,6 +588,8 @@ export default {
       inputActivityDate: "",
 
       isPlan: false,
+      showShareClassModal: false,
+      shareClassId: "",
     };
   },
   watch: {
@@ -1746,6 +1756,15 @@ export default {
     },
 
     /**
+     * 分享课程
+     */
+    handleShareClass(classId) {
+      console.log(classId, "classId===分享课程id");  
+      this.shareClassId = classId;
+      this.showShareClassModal = true;
+    },
+
+    /**
      * 删除课程
      */
     async handleDeleteClass(classItem) {
@@ -2661,6 +2680,10 @@ export default {
         if (flag) this.showAddClassModal = false;
         this.handlePasteClass(this.addScheduleDate, saveData);
       }
+    },
+    onSaveShareClass(classId) {
+      this.showShareClassModal = false;
+      // this.getClassList();
     },
 
     /**

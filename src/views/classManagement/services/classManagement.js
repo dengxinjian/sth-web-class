@@ -9,6 +9,12 @@ import request from "@/utils/request";
  * 团队相关API
  */
 export const teamApi = {
+  // 获取我的团队
+  getMyTeam() {
+    return getData({
+      url: "/gateway/team/my-team",
+    });
+  },
   // 获取所有团队
   getAllTeams() {
     return getData({ url: "/consumer/api/team/coach/all-teams" });

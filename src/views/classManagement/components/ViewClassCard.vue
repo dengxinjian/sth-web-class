@@ -57,6 +57,17 @@
                 移动
               </div>
             </span>
+            <span v-if="showShareBtn">
+              <div
+                class="btn-list-hover-item"
+                @click.stop="
+                  $emit('share', classItem.id);
+                  handleClose();
+                "
+              >
+                分享课程
+              </div>
+            </span>
             <span v-if="showDeleteBtn">
               <div class="btn-list-hover-item" @click.stop="handleDelete()" style="color: #F92B30;">删除</div>
             </span>
@@ -346,6 +357,9 @@ export default {
     },
     copyBtnText() {
       return this.activeClassType === "official" ? "添加" : "复制";
+    },
+    showShareBtn() {
+      return true;
     },
   },
   watch: {
