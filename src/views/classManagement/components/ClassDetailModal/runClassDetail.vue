@@ -913,7 +913,7 @@ export default {
   data() {
     return {
       innerVisible: this.visible || this.value || false,
-      localClassesDate: this.classesDate, // Local copy to avoid mutating prop
+      localClassesDate: this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00", // Local copy to avoid mutating prop
       timeline: [],
       maxIntensity: 1,
       existingTags: ["标签1", "标签2", "标签3"], // 现有的标签
@@ -1194,8 +1194,8 @@ export default {
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
         classesDate: !this.data.id
-          ? this.localClassesDate + " 00:00:00"
-          : this.localClassesDate,
+          ? this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00"
+          : this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00",
         sportType: "RUN",
         classesJson: JSON.stringify({
           ...this.classInfo,
@@ -1269,8 +1269,8 @@ export default {
               classesGroupId: this.classInfo.groupId,
               labels: this.classInfo.tags,
               classesDate: !this.data.id
-                ? this.classesDate + " 00:00:00"
-                : this.classesDate,
+                ? this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00"
+                : this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
               sportType: "RUN",
               classesJson: JSON.stringify({
                 ...this.classInfo,
@@ -1323,8 +1323,8 @@ export default {
         labels: this.classInfo.tags,
         sportType: "RUN",
         classesDate: !this.data.id
-          ? this.localClassesDate + " 00:00:00"
-          : this.localClassesDate,
+          ? this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00"
+          : this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00",
         classesJson: JSON.stringify({
           ...this.classInfo,
           timeline: this.timeline,
@@ -1364,8 +1364,8 @@ export default {
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
         classesDate: !this.data.id
-          ? this.localClassesDate + " 00:00:00"
-          : this.localClassesDate,
+          ? this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00"
+          : this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00",
         sportType: "RUN",
         classesJson: JSON.stringify({
           ...this.classInfo,

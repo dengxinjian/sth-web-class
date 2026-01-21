@@ -287,7 +287,7 @@ export default {
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
         labels: this.form.tags,
-        classesDate: this.classesDate + " 00:00:00",
+        classesDate: this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
         sportType: "OTHER",
         classesJson: JSON.stringify({...this.form, links: links}),
         triUserId: this.triUserId,
@@ -308,7 +308,7 @@ export default {
             classesTitle: this.form.title,
             classesGroupId: this.form.groupId,
             labels: this.form.tags,
-            classesDate: this.classesDate + " 00:00:00",
+            classesDate: this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
             sportType: "OTHER",
             classesJson: JSON.stringify({...this.form, links: links}),
           }, flag);

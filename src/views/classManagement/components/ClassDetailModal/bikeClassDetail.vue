@@ -1140,8 +1140,8 @@ export default {
           classesGroupId: this.classInfo.groupId,
           labels: this.classInfo.tags,
           classesDate: !this.data.id
-            ? this.classesDate + " 00:00:00"
-            : this.classesDate,
+            ? this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00"
+            : this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
           sportType: "CYCLE",
           classesJson: JSON.stringify({
             ...this.classInfo,
@@ -1176,8 +1176,8 @@ export default {
               classesGroupId: this.classInfo.groupId,
               labels: this.classInfo.tags,
               classesDate: !this.data.id
-                ? this.classesDate + " 00:00:00"
-                : this.classesDate,
+                ? this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00"
+                : this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
               sportType: "CYCLE",
               classesJson: JSON.stringify({
                 ...this.classInfo,
@@ -1238,8 +1238,8 @@ export default {
           links: links,
         }),
         classesDate: !this.data.id
-          ? this.classesDate + " 00:00:00"
-          : this.classesDate,
+          ? this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00"
+          : this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
@@ -1275,8 +1275,8 @@ export default {
           links: links,
         }),
         classesDate: !this.data.id
-          ? this.classesDate + " 00:00:00"
-          : this.classesDate,
+          ? this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00"
+          : this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
