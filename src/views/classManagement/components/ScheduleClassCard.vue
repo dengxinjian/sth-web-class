@@ -440,17 +440,17 @@ export default {
     .body-title {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
       padding: 5px 3px;
 
       .sport-type-icon {
         display: flex;
-        align-content: center;
+        align-items: center;
 
         .sport-type-name {
-          width: 15px;
-          height: 15px;
+          width: 16px;
+          height: 16px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -482,15 +482,18 @@ export default {
 
     .title {
       font-size: 15px;
+      line-height: 20px;
       font-weight: 400;
       flex: 1;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       margin-left: 6px;
       font-family: PingFang SC;
       font-style: Regular;
       color: #101010;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
     }
 
     .keyword {
