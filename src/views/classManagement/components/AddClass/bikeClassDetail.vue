@@ -408,6 +408,7 @@
                     v-model="part.stageMode"
                     placeholder="请选择"
                     size="small"
+                    @change="handleStageModeChange(index, idx)"
                     :disabled="originalType === 'official'"
                   >
                     <el-option label="热身" value="warmup" />
@@ -920,6 +921,29 @@ export default {
     }
   },
   methods: {
+    handleStageModeChange(index, idx) {
+      if (this.classInfo.stages[index].sections[idx].stageMode === "warmup") {
+        this.classInfo.stages[index].sections[idx].thresholdFtpRange = [55, 65]
+        this.classInfo.stages[index].sections[idx].thresholdFtp = 60
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 60
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [55, 65]
+      } else if (this.classInfo.stages[index].sections[idx].stageMode === "bike") {
+        this.classInfo.stages[index].sections[idx].thresholdFtpRange = [70, 80]
+        this.classInfo.stages[index].sections[idx].thresholdFtp = 75
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 75
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [70, 80]
+      } else if (this.classInfo.stages[index].sections[idx].stageMode === "recover") {
+        this.classInfo.stages[index].sections[idx].thresholdFtpRange = [45, 55]
+        this.classInfo.stages[index].sections[idx].thresholdFtp = 50
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 50
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [45, 55]
+      } else if (this.classInfo.stages[index].sections[idx].stageMode === "cooling") {
+        this.classInfo.stages[index].sections[idx].thresholdFtpRange = [50, 60]
+        this.classInfo.stages[index].sections[idx].thresholdFtp = 55
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 55
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [50, 60]
+      }
+    },
     handleTimesChange(stageIndex) {
       const stage = this.classInfo.stages[stageIndex];
       console.log(stage, "stage", stageIndex);
@@ -1121,19 +1145,54 @@ export default {
     },
     // 创建深拷贝的section模板
     createSectionTemplate(title, stageMode) {
-      return {
-        ...this.sectionTemplate,
-        title,
-        stageMode,
-        tags: [...this.sectionTemplate.tags], // 深拷贝数组
-        thresholdFtpRange: [...this.sectionTemplate.thresholdFtpRange], // 深拷贝数组
-        thresholdHeartRateRange: [
-          ...this.sectionTemplate.thresholdHeartRateRange,
-        ], // 深拷贝数组
-        targetFtpRange: [...this.sectionTemplate.targetFtpRange], // 深拷贝数组
-        targetHeartRateRange: [...this.sectionTemplate.targetHeartRateRange], // 深拷贝数组
-        cadence: [...this.sectionTemplate.cadence], // 深拷贝数组
-      };
+      if (stageMode === "warmup") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdFtpRange: [55, 65],
+          thresholdFtp: 60,
+          thresholdHeartRate: 60,
+          thresholdHeartRateRange: [55, 65],
+        }
+      }
+      if (stageMode === "bike") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdFtpRange: [70, 80],
+          thresholdFtp: 75,
+          thresholdHeartRate: 75,
+          thresholdHeartRateRange: [70, 80],
+        }
+      }
+      if (stageMode === "recover") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdFtpRange: [45, 55],
+          thresholdFtp: 50,
+          thresholdHeartRate: 50,
+          thresholdHeartRateRange: [45, 55],
+        }
+      }
+      if (stageMode === "cooling") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdFtpRange: [50, 60],
+          targetFtpRange: 55,
+          thresholdHeartRate: 55,
+          thresholdHeartRateRange: [50, 60],
+        }
+      }
     },
     handleAddLink() {
       this.classInfo.links.push({ title: "", type: '1', url: "" });
