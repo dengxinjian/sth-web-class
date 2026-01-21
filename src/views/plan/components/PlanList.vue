@@ -433,115 +433,85 @@ export default {
       this.loadingTeamTree = true;
       // 如果是团队节点（isGroup: true），加载该团队的计划列表
       if (node.level === 0) {
-      //   const resDefault = await getData({ url: "/gateway/team/my-team" });
-      //   const resTeam = await getData({
-      //     url: "/consumer/api/team/coach/all-teams",
-      //   });
-      //   if (resDefault.success && resTeam.success) {
-      //     const list = [resDefault.result, ...resTeam.result].reduce(
-      //       (acc, team) => {
-      //         if (team && team.id && !acc.find((t) => t.id === team.id)) {
-      //           acc.push(team);
-      //         }
-      //         return acc;
-      //       },
-      //       []
-      //     )
-      //     const teamList = list.map((item) => {
-      //       return {
-      //         id: item.id,
-      //         label: item.teamName,
-      //         description: item.description || "",
-      //         isGroup: true,
-      //         groupName: item.teamName,
-      //         membersCount: item.members?.length || 0,
-      //         triUserId: item.triUserId,
-      //       };
-      //     });
-      //     this.teamList = teamList;
-      //     resolve(teamList);
-      //     this.loadingTeamTree = false;
-      //   } else {
-      //     resolve([]);
-      //   }
-        getData({
-          url: `/training/api/teamShare/summary?shareDataType=2`,
-        })
-          .then((res) => {
-            console.log("res======res====当前所有分享团队==**", res);
-            if (res.success && res.result) {
-              const teamList = res.result.map(item => {
-                return {
-                  id: item.id,
-                  label: item.teamName,
-                  isGroup: true,
-                  leaf: false,
-                  ...item,
-                };
-              });
-              resolve(teamList);
-              this.loadingTeamTree = false;
-            } else {
-              resolve([]);
-            }
+        const resDefault = await getData({ url: "/gateway/team/my-team" });
+        const resTeam = await getData({
+          url: "/consumer/api/team/coach/all-teams",
+        });
+        if (resDefault.success && resTeam.success) {
+          const list = [resDefault.result, ...resTeam.result].reduce(
+            (acc, team) => {
+              if (team && team.id && !acc.find((t) => t.id === team.id)) {
+                acc.push(team);
+              }
+              return acc;
+            },
+            []
+          );
+          const teamList = list.map((item) => {
+            return {
+              id: item.id,
+              label: item.teamName,
+              description: item.description || "",
+              isGroup: true,
+              groupName: item.teamName,
+              membersCount: item.members?.length || 0,
+              triUserId: item.triUserId,
+            };
           });
+          this.teamList = teamList;
+          resolve(teamList);
+          this.loadingTeamTree = false;
+        } else {
+          resolve([]);
+        }
       }
       if (node.level === 1) {
         // 查询该分享团队下的所有分组
         getData({
-          url: `/training/api/shareTeamGroup/list?teamId=${
-            node.data.id
-          }&shareDataType=2`,
-        })
-          .then((res) => {
-            console.log("res======res====当前团队计划", res);
-            if (res.success && res.result) {
-              const groupList = res.result.map(item => {
-                console.log("item======item====当前团队分组", item);
-                return {
-                  id: item.id,
-                  label: item.groupName || item.title || "未命名计划",
-                  isGroup: true,
-                  leaf: false,
-                  ...item,
-                };
-              });
-              resolve(groupList);
-              this.loadingTeamTree = false;
-            } else {
-              this.loadingTeamTree = false;
-              resolve([]);
-            }
-          });
+          url: `/training/api/shareTeamGroup/list?teamId=${node.data.id}&shareDataType=2`,
+        }).then((res) => {
+          console.log("res======res====当前团队计划", res);
+          if (res.success && res.result) {
+            const groupList = res.result.map((item) => {
+              console.log("item======item====当前团队分组", item);
+              return {
+                id: item.id,
+                label: item.groupName || item.title || "未命名计划",
+                isGroup: true,
+                leaf: false,
+                ...item,
+              };
+            });
+            resolve(groupList);
+            this.loadingTeamTree = false;
+          } else {
+            this.loadingTeamTree = false;
+            resolve([]);
+          }
+        });
       }
       if (node.level === 2) {
         // 根据分享分组获取分组下的所有分享计划
         getData({
-          url: `/training/api/teamShare/byTeam?teamId=${
-            node.data.id
-          }&shareDataType=${2}`,
+          url: `/training/api/teamShare/pageByGroupId`,
+          groupId: node.data.id,
+          teamId: node.data.teamId,
+          shareDataType: 2,
+          current: 1,
+          size: 20,
         })
           .then((res) => {
             console.log("res======res====当前团队计划", res);
             if (res.success && res.result) {
               // 将计划列表转换为树节点格式
-              const planNodes = Array.isArray(res.result.groups)
-                ? res.result.groups.map((plan) => ({
-                  id: plan.groupId,
-                  label: plan.groupName || plan.title || "未命名计划",
-                  isGroup: false,
-                  // 计划节点是叶子节点，不能再展开
-                  leaf: false,
-                  children: plan.plansList.map(item => ({
-                    id: item.teamId,
-                    label: item.planTitle || item.title || "未命名计划",
-                    isGroup: false,
-                    leaf: true,
-                    ...item,
-                  })),
-                  ...plan,
-                }))
-                : [];
+              const planNodes = res.result.records.map((plan) => ({
+                id: plan.id,
+                label: plan.planTitle || plan.title || "未命名计划",
+                isGroup: false,
+                // 计划节点是叶子节点，不能再展开
+                leaf: true,
+                ...plan,
+              }));
               resolve(planNodes);
               this.loadingTeamTree = false;
             } else {
@@ -671,10 +641,10 @@ export default {
      * 处理节点点击事件
      */
     handleNodeClick(data, node) {
-      console.log("handleNodeClick===选择分享计划", data, node);
+      // console.log("handleNodeClick===选择分享计划", data, node);
       // 如果点击的是计划节点（不是团队节点），触发选择计划事件
       if (!node.data.isGroup && node.data.id) {
-        this.$emit("view-plan", data.sourcePlanId,data);
+        this.$emit("view-plan", data.sourcePlanId, data);
       }
     },
   },

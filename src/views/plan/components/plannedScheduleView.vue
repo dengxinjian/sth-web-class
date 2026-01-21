@@ -131,33 +131,64 @@ export default {
       type: String,
       default: "official",
     },
+    shareAuth: {
+      type: Number,
+      default: 1,
+    },
   },
   data() {
     return {};
   },
   computed: {
     optionsArray() {
-      return this.activeClassType === "official"
-        ? [
+      if (this.activeClassType === "official") {
+        return [
           { label: "概要", value: 1 },
           { label: "添加", value: 2 },
-        ]
-        : localStorage.getItem("loginType") === "2" ? [
+        ];
+      }
+      if (this.activeClassType === "my") {
+        if (localStorage.getItem("loginType") === "2") {
+          return [
+            { label: "概要", value: 1 },
+            { label: "编辑", value: 3 },
+            { label: "复制", value: 4 },
+            { label: "应用", value: 5 },
+            { label: "分享到团队", value: 8 },
+            { label: "历史", value: 6 },
+            { label: "删除", value: 7 },
+          ];
+        } else {
+          return [
+            { label: "概要", value: 1 },
+            { label: "编辑", value: 3 },
+            { label: "复制", value: 4 },
+            { label: "应用", value: 5 },
+            { label: "历史", value: 6 },
+            { label: "删除", value: 7 },
+          ];
+        }
+      }
+      if (this.activeClassType === "team") {
+        if (this.shareAuth === 2) {
+          return [
+            { label: "概要", value: 1 },
+            { label: "编辑", value: 3 },
+            { label: "复制", value: 4 },
+            { label: "应用", value: 5 },
+            { label: "历史", value: 6 },
+            { label: "删除", value: 7 },
+          ];
+        }
+        return [
           { label: "概要", value: 1 },
-          { label: "编辑", value: 3 },
-          { label: "复制", value: 4 },
-          { label: "应用", value: 5 },
-          { label: "分享到团队", value: 8 },
-          { label: "历史", value: 6 },
-          { label: "删除", value: 7 },
-        ] : [
-          { label: "概要", value: 1 },
-          { label: "编辑", value: 3 },
           { label: "复制", value: 4 },
           { label: "应用", value: 5 },
           { label: "历史", value: 6 },
           { label: "删除", value: 7 },
         ];
+      }
+      return [];
     },
   },
   methods: {

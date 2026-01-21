@@ -24,6 +24,7 @@
         :planList="planList"
         :planTitle="planTitle"
         :showMore="showMore"
+        :shareAuth="shareAuth"
         :activeClassType="activeClassType"
         @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass"
@@ -88,7 +89,11 @@
       @viewApplyHistory="handleViewApplyHistory"
     />
     <!-- 计划分享 -->
-    <SharePlan v-model="showSharePlan" :planInfo="currentPlanDetail" @shareSuccess="handleShareSuccess" />
+    <SharePlan
+      v-model="showSharePlan"
+      :planInfo="currentPlanDetail"
+      @shareSuccess="handleShareSuccess"
+    />
     <!-- 应用历史 -->
     <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
   </div>
@@ -169,6 +174,7 @@ export default {
       ownerTeams: [],
       defaultTeam: null,
       teamList: [],
+      shareAuth: 1,
 
       // 计划列表数据
       planSearchInput: "",
@@ -245,7 +251,7 @@ export default {
             },
             []
           );
-          console.log(list, "*======list====过滤团队数组");
+          // console.log(list, "*======list====过滤团队数组");
           _this.teamList = list.map((item) => {
             return {
               id: item.id,
@@ -257,7 +263,7 @@ export default {
               triUserId: item.triUserId,
             };
           });
-          console.log(_this.teamList, "*======teamList====重组团队数据");
+          // console.log(_this.teamList, "*======teamList====重组团队数据");
         }
       });
     },
@@ -334,8 +340,9 @@ export default {
       await this.getPlanDetail(id);
       await this.getPlanDayDetail(id);
     },
-    async handleViewPlanView(id) {
-      console.log("handleViewPlan===选择分享计划", id);
+    async handleViewPlanView(id, data) {
+      // console.log("handleViewPlan===选择分享计划", id,data);
+      this.shareAuth = data.shareAuth;
       this.$emit("choose-plan", true);
       await this.getPlanDetail(id);
       await this.getPlanDayDetail(id);
