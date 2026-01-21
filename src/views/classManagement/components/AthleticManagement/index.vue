@@ -449,17 +449,31 @@ export default {
       if (!this.searchInput) {
         return this.athleticData;
       }
-      return this.athleticData.filter((group) => {
-        return (
-          group.label.toLowerCase().includes(this.searchInput.toLowerCase()) ||
-          (group.children &&
-            group.children.some((member) =>
-              member.label
-                .toLowerCase()
-                .includes(this.searchInput.toLowerCase())
-            ))
-        );
-      });
+      return this.athleticData
+        .map((group) => {
+          // 检查分组名称是否匹配
+          const groupMatches = this.matchText(group.label, this.searchInput);
+          // 检查子成员是否匹配，并过滤出匹配的成员
+          const matchedChildren =
+            group.children && group.children.length > 0
+              ? group.children.filter((member) =>
+                this.matchText(member.label, this.searchInput)
+              )
+              : [];
+          // 如果分组名称匹配，保留整个分组（包括所有子成员）
+          if (groupMatches) {
+            return group;
+          }
+          // 如果只有子成员匹配，只保留匹配的子成员
+          if (matchedChildren.length > 0) {
+            return {
+              ...group,
+              children: matchedChildren,
+            };
+          }
+          return null;
+        })
+        .filter((group) => group !== null);
     },
     // 可用的目标分组（排除当前分组）
     availableGroups() {
@@ -486,6 +500,38 @@ export default {
     isCurrentUser(triUserId) {
       const currentTriUserId = localStorage.getItem("triUserId");
       return currentTriUserId && triUserId && currentTriUserId === triUserId;
+    },
+
+    // 中英文匹配函数
+    matchText(target, searchInput) {
+      if (!searchInput) return true;
+      if (!target) return false;
+
+      // 提取中文字符和英文字符
+      const chineseChars = searchInput.match(/[\u4e00-\u9fa5]/g) || [];
+      const englishChars = searchInput.match(/[a-zA-Z]/gi) || [];
+
+      let matched = true;
+
+      // 中文字符匹配：目标文本必须包含所有输入的中文字符
+      if (chineseChars.length > 0) {
+        const targetChinese = target.match(/[\u4e00-\u9fa5]/g) || [];
+        matched =
+          matched &&
+          chineseChars.every((char) => targetChinese.includes(char));
+      }
+
+      // 英文字符匹配：按字母匹配（忽略大小写）
+      if (englishChars.length > 0) {
+        const targetLower = target.toLowerCase();
+        const searchLower = searchInput.toLowerCase();
+        // 提取英文部分进行匹配
+        const targetEnglish = target.match(/[a-zA-Z]/gi)?.join("").toLowerCase() || "";
+        const searchEnglish = englishChars.join("").toLowerCase();
+        matched = matched && targetEnglish.includes(searchEnglish);
+      }
+
+      return matched;
     },
 
     handleNodeClick(node) {
