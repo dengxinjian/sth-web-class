@@ -853,9 +853,9 @@
 
     <span slot="footer" class="dialog-footer">
       <!-- <el-button @click="onDelete" :disabled="!classInfo.id">删除</el-button> -->
-      <el-button @click="onCancel">取消</el-button>
-      <el-button type="warning" @click="onSave(false)">保存</el-button>
-      <el-button type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button @click="onCancel" :disabled="saving">取消</el-button>
+      <el-button type="warning" @click="onSave(false)" :disabled="saving">保存</el-button>
+      <el-button type="danger" @click="onSave(true)" :disabled="saving">保存并关闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -918,6 +918,7 @@ export default {
       maxIntensity: 1,
       existingTags: ["标签1", "标签2", "标签3"], // 现有的标签
       newTag: "", // 新标签输入
+      saving: false, // 保存中标志，防止重复保存
       classInfo: {
         id: "",
         sportType: "RUN",
@@ -991,6 +992,9 @@ export default {
           this.resetForm();
           this.getAthleticThreshold(this.localClassesDate);
         }
+      } else {
+        // 弹窗关闭时重置 saving 标志
+        this.saving = false;
       }
     },
     data(val) {
@@ -1204,7 +1208,19 @@ export default {
         }),
         triUserId: this.triUserId,
       });
-      if (flag) this.onCancel();
+      // 延迟重置 saving 标志，确保父组件已经处理完保存事件
+      // 如果是保存并关闭，等待弹窗关闭后再重置
+      if (flag) {
+        this.onCancel();
+        this.$nextTick(() => {
+          this.saving = false;
+        });
+      } else {
+        // 仅保存时，延迟重置以确保父组件有时间处理
+        setTimeout(() => {
+          this.saving = false;
+        }, 500);
+      }
       // scheduleApi
       //   .createSchedule({
       //     classesTitle: this.classInfo.title,
@@ -1282,9 +1298,16 @@ export default {
             flag
           );
           this.$message.success("课表保存成功");
+          // 重置 saving 标志
+          this.saving = false;
         }
         console.log(flag, "flag");
-        if (flag) this.onCancel();
+        if (flag) {
+          this.onCancel();
+        }
+      }).catch((error) => {
+        console.error("更新课程失败:", error);
+        this.saving = false; // 保存失败时重置标志
       });
     },
     // 删除课程
@@ -1350,12 +1373,20 @@ export default {
       this.$emit("cancel");
     },
     async onSave(closeAfter) {
+      // 防止重复保存
+      if (this.saving) {
+        return;
+      }
+
       await this.$refs.titleRef.validate();
       const validation = checkForm(this.classInfo);
       if (!validation.isValid) {
         this.$message.error(validation.message);
         return;
       }
+
+      this.saving = true; // 设置保存中标志
+
       console.log(JSON.stringify(this.classInfo));
       const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
@@ -1388,6 +1419,9 @@ export default {
             this.submitNewClass(closeAfter);
           }
         }
+      }).catch((error) => {
+        console.error("保存失败:", error);
+        this.saving = false; // 保存失败时重置标志
       });
     },
     onDelete() {

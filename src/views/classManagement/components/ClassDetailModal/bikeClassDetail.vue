@@ -772,9 +772,9 @@
 
     <span slot="footer" class="dialog-footer">
       <!-- <el-button @click="onDelete" :disabled="!classInfo.id">删除</el-button> -->
-      <el-button @click="onCancel">取消</el-button>
-      <el-button type="warning" @click="onSave(false)">保存</el-button>
-      <el-button type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button @click="onCancel" :disabled="saving">取消</el-button>
+      <el-button type="warning" @click="onSave(false)" :disabled="saving">保存</el-button>
+      <el-button type="danger" @click="onSave(true)" :disabled="saving">保存并关闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -832,6 +832,7 @@ export default {
       maxIntensity: 1,
       existingTags: [], // 现有的标签
       newTag: "", // 新标签输入
+      saving: false, // 保存中标志，防止重复保存
       classInfo: {
         id: "",
         sportType: "CYCLE",
@@ -905,6 +906,9 @@ export default {
           this.resetForm();
           this.getAthleticThreshold(this.classesDate);
         }
+      } else {
+        // 弹窗关闭时重置 saving 标志
+        this.saving = false;
       }
     },
     data(val) {
@@ -1152,7 +1156,19 @@ export default {
         },
         flag
       );
-      if (flag) this.onCancel();
+      // 延迟重置 saving 标志，确保父组件已经处理完保存事件
+      // 如果是保存并关闭，等待弹窗关闭后再重置
+      if (flag) {
+        this.onCancel();
+        this.$nextTick(() => {
+          this.saving = false;
+        });
+      } else {
+        // 仅保存时，延迟重置以确保父组件有时间处理
+        setTimeout(() => {
+          this.saving = false;
+        }, 500);
+      }
     },
     // 更新课程
     submitUpdateClass(flag) {
@@ -1189,8 +1205,15 @@ export default {
             flag
           );
           this.$message.success("课表保存成功");
+          // 重置 saving 标志
+          this.saving = false;
         }
-        if (flag) this.onCancel();
+        if (flag) {
+          this.onCancel();
+        }
+      }).catch((error) => {
+        console.error("更新课程失败:", error);
+        this.saving = false; // 保存失败时重置标志
       });
     },
     handleRemoveLink(index) {
@@ -1254,6 +1277,11 @@ export default {
       this.$emit("cancel");
     },
     async onSave(closeAfter) {
+      // 防止重复保存
+      if (this.saving) {
+        return;
+      }
+
       // 获取 titleRef 的验证结果
       await this.$refs.titleRef.validate();
       const validation = checkFormBike(this.classInfo);
@@ -1261,6 +1289,9 @@ export default {
         this.$message.error(validation.message);
         return;
       }
+
+      this.saving = true; // 设置保存中标志
+
       const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
         url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
@@ -1287,6 +1318,13 @@ export default {
             this.submitNewClass(closeAfter);
           }
         }
+      }).catch((error) => {
+        console.error("保存失败:", error);
+        this.saving = false; // 保存失败时重置标志
+      }).finally(() => {
+        // 注意：submitNewClass 和 submitUpdateClass 是异步的，所以不能在这里直接重置
+        // 需要在它们完成后重置，或者通过延迟来重置
+        // 但是为了确保在保存完成后重置，我们在 submitNewClass 和 submitUpdateClass 中处理
       });
     },
     onDelete() {
