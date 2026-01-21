@@ -51,7 +51,7 @@
             <div class="btn-list-hover">
               <div
                 class="btn-list-hover-item"
-                v-if="activity.classesJson"
+                v-if="activity.classesJson?.activityId"
                 @click="$emit('unbind', activity.classScheduleId)"
               >
                 解除匹配

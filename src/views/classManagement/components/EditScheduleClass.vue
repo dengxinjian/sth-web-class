@@ -10,7 +10,7 @@
       top="5vh"
     >
       <!-- <span slot="title" class="dialog-title">课表简介</span> -->
-      <div class="header-title" style="margin-top: 16px">
+      <div class="header-title" style="margin-bottom: 16px;">
         <!-- <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input
@@ -1159,8 +1159,9 @@ export default {
       return ["REMARK", "OTHER", "REST"].includes(sportType);
     },
     deleteClass(classData) {
+      console.log(classData, "classData====删除课表");
       this.$confirm(
-        `确认删除课表【${classData?.classesJson?.title}】？`,
+        `确认删除课表【${getSportTypeName(classData.sportType)}_手动录入数据】？`,
         "提示",
         {
           confirmButtonText: "删除",
