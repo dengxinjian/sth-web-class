@@ -453,6 +453,7 @@
                     v-model="part.stageMode"
                     placeholder="请选择"
                     size="small"
+                    @change="handleStageModeChange(index, idx)"
                   >
                     <el-option label="热身" value="warmup" />
                     <el-option label="跑步" value="bike" />
@@ -954,7 +955,7 @@ export default {
         targetSpeedRange: ["03:30", "05:00"],
         targetHeartRate: 150,
         targetHeartRateRange: [110, 150],
-        cadence: [160, 200],
+        cadence: [170, 180],
         lap: false,
         targetSeconds: 20 * 60, // 计算出来的秒数
       },
@@ -1424,21 +1425,79 @@ export default {
       this.classInfo.stages.splice(index, 1);
       this.calculateTimeline();
     },
+    handleStageModeChange(index, idx) {
+      if (this.classInfo.stages[index].sections[idx].stageMode === "warmup") {
+        this.classInfo.stages[index].sections[idx].thresholdSpeedRange = [55, 65]
+        this.classInfo.stages[index].sections[idx].thresholdSpeed = 60
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 60
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [55, 65]
+      } else if (this.classInfo.stages[index].sections[idx].stageMode === "bike") {
+        this.classInfo.stages[index].sections[idx].thresholdSpeedRange = [70, 80]
+        this.classInfo.stages[index].sections[idx].thresholdSpeed = 75
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 75
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [70, 80]
+      } else if (this.classInfo.stages[index].sections[idx].stageMode === "recover") {
+        this.classInfo.stages[index].sections[idx].thresholdSpeedRange = [45, 55]
+        this.classInfo.stages[index].sections[idx].thresholdSpeed = 50
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 50
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [45, 55]
+      } else if (this.classInfo.stages[index].sections[idx].stageMode === "cooling") {
+        this.classInfo.stages[index].sections[idx].thresholdSpeedRange = [50, 60]
+        this.classInfo.stages[index].sections[idx].thresholdSpeed = 55
+        this.classInfo.stages[index].sections[idx].thresholdHeartRate = 55
+        this.classInfo.stages[index].sections[idx].thresholdHeartRateRange = [50, 60]
+      }
+    },
     // 创建深拷贝的section模板
     createSectionTemplate(title, stageMode) {
-      return {
-        ...this.sectionTemplate,
-        title,
-        stageMode,
-        tags: [...this.sectionTemplate.tags], // 深拷贝数组
-        thresholdSpeedRange: [...this.sectionTemplate.thresholdSpeedRange], // 深拷贝数组
-        thresholdHeartRateRange: [
-          ...this.sectionTemplate.thresholdHeartRateRange,
-        ], // 深拷贝数组
-        targetSpeedRange: [...this.sectionTemplate.targetSpeedRange], // 深拷贝数组
-        targetHeartRateRange: [...this.sectionTemplate.targetHeartRateRange], // 深拷贝数组
-        cadence: [...this.sectionTemplate.cadence], // 深拷贝数组
-      };
+      if (stageMode === "warmup") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdSpeedRange: [55, 65],
+          thresholdSpeed: 60,
+          thresholdHeartRate: 60,
+          thresholdHeartRateRange: [55, 65],
+        }
+      }
+      if (stageMode === "bike") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdSpeedRange: [70, 80],
+          thresholdSpeed: 75,
+          thresholdHeartRate: 75,
+          thresholdHeartRateRange: [70, 80],
+        }
+      }
+      if (stageMode === "recover") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdSpeedRange: [45, 55],
+          thresholdSpeed: 50,
+          thresholdHeartRate: 50,
+          thresholdHeartRateRange: [45, 55],
+        }
+      }
+      if (stageMode === "cooling") {
+        return {
+          ...this.sectionTemplate,
+          title,
+          stageMode,
+          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          thresholdSpeedRange: [50, 60],
+          thresholdSpeed: 55,
+          thresholdHeartRate: 55,
+          thresholdHeartRateRange: [50, 60],
+        }
+      }
     },
     // 添加段落
     handleAddStage(type) {
