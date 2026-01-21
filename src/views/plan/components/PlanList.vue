@@ -112,35 +112,43 @@
             popper-class="athletic-btn-popover"
             placement="right"
             trigger="hover"
+            v-if="node.level > 1"
           >
             <div class="btn-list-hover">
               <div
                 class="btn-list-hover-item"
-                v-if="node.data.isGroup"
-                @click="handleAddGroup"
+                v-if="node.level === 2"
+                @click="handleAddShareGroup(node)"
               >
                 新增
               </div>
               <div
                 class="btn-list-hover-item"
                 v-if="
-                  node.data.isGroup && node.data.id && node.data.id !== 'coach'
+                  node.level === 2 && node.data.id !== 0
                 "
-                @click="handleEditGroup(node)"
+                @click="handleEditShareGroup(node)"
               >
                 编辑
               </div>
               <div
                 class="btn-list-hover-item"
                 v-if="
-                  node.data.isGroup && node.data.id && node.data.id !== 'coach'
+                  node.level === 2 && node.data.id !== 0
                 "
-                @click="handleDeleteGroup(node)"
+                @click="handleDeleteShareGroup(node)"
               >
                 删除
               </div>
+              <div
+                class="btn-list-hover-item"
+                v-if="node.level === 3"
+                @click="handleMoveShareGroup(node)"
+              >
+                移动
+              </div>
             </div>
-            <div class="btn-list-hover-item" slot="reference">
+            <div class="btn-list-hover-item" slot="reference" v-if="node.level">
               <i class="el-icon-more"></i>
             </div>
           </el-popover>
@@ -429,7 +437,6 @@ export default {
   },
   methods: {
     async loadNodeTeamPlanList(node, resolve) {
-      console.log("*======node====当前分组节点", node);
       this.loadingTeamTree = true;
       // 如果是团队节点（isGroup: true），加载该团队的计划列表
       if (node.level === 0) {
@@ -470,10 +477,8 @@ export default {
         getData({
           url: `/training/api/shareTeamGroup/list?teamId=${node.data.id}&shareDataType=2`,
         }).then((res) => {
-          console.log("res======res====当前团队计划", res);
           if (res.success && res.result) {
             const groupList = res.result.map((item) => {
-              console.log("item======item====当前团队分组", item);
               return {
                 id: item.id,
                 label: item.groupName || item.title || "未命名计划",
@@ -501,7 +506,6 @@ export default {
           size: 20,
         })
           .then((res) => {
-            console.log("res======res====当前团队计划", res);
             if (res.success && res.result) {
               // 将计划列表转换为树节点格式
               const planNodes = res.result.records.map((plan) => ({
@@ -588,6 +592,18 @@ export default {
         });
       }
     },
+    handleAddShareGroup(node) {
+      this.$emit("add-share-group", node);
+    },
+    handleEditShareGroup(node) {
+      this.$emit("edit-share-group", node);
+    },
+    handleDeleteShareGroup(node) {
+      this.$emit("delete-share-group", node);
+    },
+    handleMoveShareGroup(node) {
+      this.$emit("move-share-group", node);
+    },
     /**
      * 处理添加分组
      */
@@ -617,35 +633,28 @@ export default {
       }
     },
     /**
-     * 处理移动运动员
-     */
-    handleMoveAthletic(node) {
-      // TODO: 实现移动运动员逻辑
-      console.log("handleMoveAthletic", node);
-    },
-    /**
-     * 处理解绑运动员
-     */
-    handleMoveOutAthletic(node) {
-      // TODO: 实现解绑运动员逻辑
-      console.log("handleMoveOutAthletic", node);
-    },
-    /**
-     * 处理解绑教练
-     */
-    handleMoveOutCoach(node) {
-      // TODO: 实现解绑教练逻辑
-      console.log("handleMoveOutCoach", node);
-    },
-    /**
      * 处理节点点击事件
      */
     handleNodeClick(data, node) {
-      // console.log("handleNodeClick===选择分享计划", data, node);
       // 如果点击的是计划节点（不是团队节点），触发选择计划事件
       if (!node.data.isGroup && node.data.id) {
         this.$emit("view-plan", data.sourcePlanId, data);
       }
+    },
+    /**
+     * 刷新团队树数据
+     */
+    refreshTeamTree() {
+      // 清空团队列表数据
+      this.teamList = [];
+      // 强制重新渲染 el-tree（通过改变 key 值）
+      this.treeKey = Date.now();
+      // 重置 el-tree 的当前选中节点
+      this.$nextTick(() => {
+        if (this.$refs.teamTree) {
+          this.$refs.teamTree.setCurrentKey(null);
+        }
+      });
     },
   },
 };
@@ -887,13 +896,16 @@ export default {
 }
 
 // 树形组件样式优化
-.el-tree {
+::v-deep(.el-tree) {
   .el-tree-node__content {
     height: 32px;
     line-height: 32px;
     &:hover {
       background-color: #f5f7fa;
     }
+  }
+  .el-tree-node.is-current > .el-tree-node__content {
+    background-color: #C3C9D726 !important;
   }
 }
 .athletic-tree {
