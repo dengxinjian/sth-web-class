@@ -310,13 +310,21 @@ export default {
     handleViewClass(sourceClassId, data) {
       this.$emit("view-class", sourceClassId, data);
     },
+    /**
+     * 刷新团队树数据
+     */
+    refreshTeamTree() {
+      if (this.$refs.shareTreeRef && this.$refs.shareTreeRef.refreshTeamTree) {
+        this.$refs.shareTreeRef.refreshTeamTree();
+      }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 :deep(.el-collapse-item__header) {
-  background: #C3C9D726;
+  background: #c3c9d726;
 }
 .class-container {
   height: 100%;

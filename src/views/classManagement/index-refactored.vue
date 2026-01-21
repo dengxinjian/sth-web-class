@@ -24,6 +24,7 @@
           <!-- 课程管理 -->
           <div v-show="activeName === 'class'" class="class-container-wrapper">
             <ClassList
+              ref="planListRef"
               :class-list="classList"
               :active-class-type.sync="activeClassType"
               @class-type-change="handleClassTypeChange"
@@ -39,6 +40,10 @@
               @copy-class="handleCopyClassFromOfficial"
               @collapse-change="classSlideChange"
               @view-class="handleViewClass"
+              @add-share-group="handleAddShareGroup"
+              @edit-share-group="handleEditShareGroup"
+              @delete-share-group="handleDeleteShareGroup"
+              @move-share-group="handleMoveShareGroup"
             />
           </div>
         </div>
@@ -409,6 +414,18 @@
       :activityDate="inputActivityDate"
       @submit="handleInputActivitySave"
     />
+    <!-- 添加分享分组 -->
+    <AddShareGroup
+      v-model="addShareGroupVisible"
+      :data="currentShareGroup"
+      @save="handleAddShareGroupSave"
+    />
+    <!-- 移动分享分组 -->
+    <MoveShareGroup
+      v-model="moveShareGroupVisible"
+      :data="currentMoveShareGroup"
+      @save="handleMoveShareGroupSave"
+    />
   </div>
 </template>
 
@@ -439,6 +456,8 @@ import InputActivity from "./components/InputActivity.vue";
 import PlanView from "../plan/planView.vue";
 import EventInfo from "./components/EventInfo.vue";
 import WeekRangePicker from "@/components/WeekRangePicker/index.vue";
+import AddShareGroup from "./components/AddShareGroup/index.vue";
+import MoveShareGroup from "./components/MoveShareGroup/index.vue";
 
 // 服务和工具导入
 import {
@@ -492,6 +511,8 @@ export default {
     EventInfo,
     WeekRangePicker,
     ShareClassModal,
+    AddShareGroup,
+    MoveShareGroup,
   },
   mixins: [dragMixin],
   data() {
@@ -590,6 +611,10 @@ export default {
       isPlan: false,
       showShareClassModal: false,
       shareClassId: "",
+      addShareGroupVisible: false,
+      currentShareGroup: {},
+      moveShareGroupVisible: false,
+      currentMoveShareGroup: {},
     };
   },
   watch: {
@@ -1058,28 +1083,33 @@ export default {
       const _this = this;
       const res = await teamApi.getAllTeams();
       if (res.success) {
-        const list = [..._this.teamList,...res.result].reduce((acc, team) => {
+        const list = [..._this.teamList, ...res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
           }
           return acc;
-        }, [])
+        }, []);
         this.teamList = list.map((item) => ({
           id: item.id,
           name: item.teamName,
           teamOwnerId: item.teamOwnerId,
-          members: res.result.length > 0 ? item.members.map((member) => ({
-            id: member.id,
-            name: member.userNickname,
-            triUserId: member.triUserId,
-            lastMatchType: member.lastMatchType,
-          })) : [],
+          members:
+            res.result.length > 0
+              ? item.members.map((member) => ({
+                  id: member.id,
+                  name: member.userNickname,
+                  triUserId: member.triUserId,
+                  lastMatchType: member.lastMatchType,
+                }))
+              : [],
         }));
         // 默认选中第一个团队
         if (this.teamList.length > 0) {
           const triUserId = localStorage.getItem("triUserId");
           // this.selectedTeam = this.teamList[0].id;
-          this.selectedTeam = this.teamList.find(item => item.teamOwnerId === triUserId)?.id;
+          this.selectedTeam = this.teamList.find(
+            (item) => item.teamOwnerId === triUserId
+          )?.id;
           this.getAthleticList();
           this.getScheduleData();
         }
@@ -1759,7 +1789,7 @@ export default {
      * 分享课程
      */
     handleShareClass(classId) {
-      console.log(classId, "classId===分享课程id");  
+      console.log(classId, "classId===分享课程id");
       this.shareClassId = classId;
       this.showShareClassModal = true;
     },
@@ -2686,6 +2716,70 @@ export default {
       // this.getClassList();
     },
 
+    // 添加分享分组
+    handleAddShareGroup(node) {
+      this.currentShareGroup = {
+        id: "",
+        groupName: "",
+        teamId: node.data.teamId,
+      };
+      this.addShareGroupVisible = true;
+    },
+    // 编辑分享分组
+    handleEditShareGroup(node) {
+      this.currentShareGroup = { ...node.data };
+      this.addShareGroupVisible = true;
+    },
+    // 删除分享分组
+    handleDeleteShareGroup(node) {
+      this.$confirm(`确认删除分组【${node?.data?.groupName}】？`, "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        // 调用删除分组API
+        groupApi
+          .deleteShareGroup({
+            requestUserId: localStorage.getItem("triUserId"),
+            id: node.data.id,
+            shareDataType: 1, // 1 团队课程  2 分享计划
+            teamId: node.data.teamId,
+          })
+          .then((res) => {
+            if (res.success) {
+              this.$message.success("删除成功");
+              // 刷新团队树数据
+              this.refreshTeamTree();
+            }
+          });
+      });
+    },
+    // 移动分享分组
+    handleMoveShareGroup(node) {
+      this.currentMoveShareGroup = { ...node.data };
+      this.moveShareGroupVisible = true;
+    },
+    // 保存分享分组
+    handleAddShareGroupSave(payload) {
+      this.addShareGroupVisible = false;
+      this.currentShareGroup = { id: "", groupName: "", teamId: null };
+      // 刷新团队树数据
+      this.refreshTeamTree();
+    },
+    handleMoveShareGroupSave(payload) {
+      this.moveShareGroupVisible = false;
+      this.currentMoveShareGroup = { id: "", teamId: null };
+      // 刷新团队树数据
+      this.refreshTeamTree();
+    },
+    // 刷新团队树数据
+    refreshTeamTree() {
+      // 只在团队计划类型时刷新
+      if (this.activeClassType === 'team' && this.$refs.planListRef && this.$refs.planListRef.refreshTeamTree) {
+        this.$refs.planListRef.refreshTeamTree();
+      }
+    },
+
     /**
      * 保存分组
      */
@@ -2845,7 +2939,7 @@ export default {
     /**
      * 保存课程详情
      */
-    handleClassDetailSave(data,flag) {
+    handleClassDetailSave(data, flag) {
       console.log(flag, "flag");
       if (flag) {
         this.showClassDetailModal = false;
