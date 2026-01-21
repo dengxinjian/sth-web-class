@@ -66,7 +66,7 @@ export const statisticKeyToTitle = {
 // 单位转换
 export const unitConversion = (value, unit) => {
   if (unit === "kcal") {
-    return (value / 10000).toFixed(2);
+    return (value / 10000).toFixed(2) + '万';
   } else if (unit === "km") {
     return (value / 1000).toFixed(2);
   } else {
