@@ -44,7 +44,7 @@
           </div>
         </div>
 
-        <div>
+        <div class="main-content-area">
           <div class="schedule-top">
             <div
               style="
@@ -148,7 +148,7 @@
             </div>
           </div>
 
-          <div style="display: flex; width: 100%">
+          <div class="schedule-content-area">
             <!-- 日程表 -->
             <ScheduleCalendar
               :current-week="currentWeek"
@@ -181,15 +181,16 @@
               @input-activity="handleInputActivity"
               @click-event-activity="handleEditActivity"
             />
-
-            <!-- 右侧统计面板 -->
-            <StatisticsPanel
-              :sth-data="sthData"
-              :statistic-data="statisticData"
-              :device-list="deviceList"
-              @device-change="handleDeviceChange"
-            />
           </div>
+
+          <!-- 右侧统计面板 -->
+          <StatisticsPanel
+            class="fixed-statistics-panel"
+            :sth-data="sthData"
+            :statistic-data="statisticData"
+            :device-list="deviceList"
+            @device-change="handleDeviceChange"
+          />
         </div>
       </div>
       <div
@@ -2865,33 +2866,30 @@ export default {
   display: flex;
   height: 100%;
   max-height: calc(100vh - 60px);
-  overflow-y: hidden;
-  overflow-x: auto;
-
-  /* 自定义滚动条样式 */
-  &::-webkit-scrollbar {
-    height: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 2.5px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 2.5px;
-
-    &:hover {
-      background: #a8a8a8;
-    }
-  }
+  overflow: hidden;
+  position: relative;
 }
 
+// 固定在左侧的菜单
+:deep(.left-menu) {
+  position: fixed;
+  left: 0;
+  top: 50px;
+  bottom: 0;
+  z-index: 100;
+  width: 60px;
+  height: calc(100vh - 60px);
+}
+
+// 固定在左侧的内容区（type-change）
 .type-change {
-  flex: 0 0 260px;
-  height: 100vh;
-  max-height: calc(100vh - 60px);
+  position: fixed;
+  left: 60px; // LeftMenu 宽度
+  top: 50px;
+  bottom: 0;
+  z-index: 99;
+  width: 260px;
+  height: calc(100vh - 60px);
   background-color: #fff;
   overflow-y: auto;
   overflow-x: hidden;
@@ -2925,6 +2923,72 @@ export default {
   border-right: 1px solid #e5e5e5;
   background-color: #fff;
 }
+
+// 主内容区域，为固定面板留出空间
+.main-content-area {
+  margin-left: 320px; // LeftMenu (60px) + type-change (260px)
+  margin-right: 235px; // StatisticsPanel (235px)
+  width: calc(100% - 555px); // 减去左右固定面板的宽度
+  min-width: 0;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// 固定在顶部的工具栏
+.schedule-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+  width: 100%;
+  background-color: #fff;
+}
+
+// 日程表内容区域，可滚动
+.schedule-content-area {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 0; // 配合 flex: 1 使用，确保正确计算高度
+
+  /* 自定义水平滚动条样式 */
+  &::-webkit-scrollbar {
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2.5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2.5px;
+
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+
+  // 确保 ScheduleCalendar 可以决定最小宽度
+  :deep(.schedule) {
+    min-width: min-content;
+  }
+}
+
+// 固定在右侧的统计面板
+.fixed-statistics-panel {
+  position: fixed;
+  right: 0;
+  top: 50px;
+  bottom: 0;
+  z-index: 100;
+  width: 235px;
+  height: calc(100vh - 60px);
+}
 </style>
 
 <style lang="scss">
@@ -2949,12 +3013,9 @@ export default {
 .schedule-top {
   // padding: 10px;
   height: 58px;
-  background-color: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0;
-  max-width: 1640px;
   flex-wrap: wrap;
   gap: 10px;
   box-shadow: 0px 1px 0px 0px #00000026;
