@@ -770,14 +770,15 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <img
+        <!-- <img
           src="@/assets/addClass/dele.png"
           alt=""
           class="delete-icon"
           @click="deleteClass(classData)"
           v-if="!classData.classScheduleId"
         />
-        <div v-else></div>
+        <div v-else></div> -->
+        <div></div>
         <div>
           <el-button @click="handleClose">取消</el-button>
           <el-button type="primary" @click="handleSave(false)">保存</el-button>
