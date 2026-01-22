@@ -148,7 +148,7 @@
             </div>
           </div>
 
-          <div style="display: flex; width: 100%">
+          <div style="display: flex;flex:1; width: 100%">
             <!-- 日程表 -->
             <ScheduleCalendar
               :current-week="currentWeek"
