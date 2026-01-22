@@ -1215,15 +1215,17 @@ export default {
       if (flag) {
         this.onCancel();
         this.$nextTick(() => {
-          this.saving = false;
-          this.savingOnly = false;
+          setTimeout(() => {
+            this.saving = false;
+            this.savingOnly = false;
+          }, 1500);
         });
       } else {
         // 仅保存时，延迟重置以确保父组件有时间处理
         setTimeout(() => {
           this.saving = false;
           this.savingOnly = false;
-        }, 500);
+        }, 1500);
       }
       // scheduleApi
       //   .createSchedule({
@@ -1302,14 +1304,23 @@ export default {
             flag
           );
           this.$message.success("课表保存成功");
-          // 重置 saving 标志
-          this.saving = false;
-          this.savingOnly = false;
+          // 延迟重置 saving 标志
+          if (flag) {
+            this.onCancel();
+            this.$nextTick(() => {
+              setTimeout(() => {
+                this.saving = false;
+                this.savingOnly = false;
+              }, 1500);
+            });
+          } else {
+            setTimeout(() => {
+              this.saving = false;
+              this.savingOnly = false;
+            }, 1500);
+          }
         }
         console.log(flag, "flag");
-        if (flag) {
-          this.onCancel();
-        }
       }).catch((error) => {
         console.error("更新课程失败:", error);
         this.saving = false; // 保存失败时重置标志
