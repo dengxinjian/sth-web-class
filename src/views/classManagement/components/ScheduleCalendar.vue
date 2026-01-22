@@ -584,11 +584,26 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 120px;
+    min-width: 120px; /* 13寸默认 */
     max-width: 194px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
+
+    /* 14寸电脑 */
+    @media (min-width: 1366px) {
+      min-width: 130px;
+    }
+
+    /* 15寸电脑 */
+    @media (min-width: 1440px) {
+      min-width: 140px;
+    }
+
+    /* 16寸电脑 */
+    @media (min-width: 1920px) {
+      min-width: 194px;
+    }
 
     .schedule-table-cell-title {
       line-height: 40px;
