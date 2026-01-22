@@ -1056,28 +1056,35 @@ export default {
       const _this = this;
       const res = await teamApi.getAllTeams();
       if (res.success) {
-        const list = [..._this.teamList,...res.result].reduce((acc, team) => {
+        const list = [..._this.teamList, ...res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
             acc.push(team);
           }
           return acc;
-        }, [])
+        }, []);
         this.teamList = list.map((item) => ({
           id: item.id,
           name: item.teamName,
           teamOwnerId: item.teamOwnerId,
-          members: res.result.length > 0 ? item.members.filter(el => el.userType === 3).map((member) => ({
-            id: member.id,
-            name: member.userNickname,
-            triUserId: member.triUserId,
-            lastMatchType: member.lastMatchType,
-          })): [],
+          members:
+            res.result.length > 0
+              ? item.members
+                  .filter((el) => el.userType === 3)
+                  .map((member) => ({
+                    id: member.id,
+                    name: member.userNickname,
+                    triUserId: member.triUserId,
+                    lastMatchType: member.lastMatchType,
+                  }))
+              : [],
         }));
         // 默认选中第一个团队
         if (this.teamList.length > 0) {
           const triUserId = localStorage.getItem("triUserId");
           // this.selectedTeam = this.teamList[0].id;
-          this.selectedTeam = this.teamList.find(item => item.teamOwnerId === triUserId)?.id;
+          this.selectedTeam = this.teamList.find(
+            (item) => item.teamOwnerId === triUserId
+          )?.id;
           this.getAthleticList();
           this.getScheduleData();
         }
@@ -1112,7 +1119,7 @@ export default {
       this.athleticList = this.teamList.find(
         (item) => item.id === this.selectedTeam
       ).members;
-      if(this.athleticList.length === 0){
+      if (this.athleticList.length === 0) {
         this.selectedAthletic = null;
         this.athleticInfoData = {};
         return;
@@ -1542,17 +1549,77 @@ export default {
       });
 
       if (res.success) {
-        this.statisticData = res.result.statisticsVoList.map((item) => ({
-          ...item,
-          actualValue: unitConversion(
-            item.actualValue,
-            statisticKeyToTitle[item.key]?.unit
-          ),
-          title: statisticKeyToTitle[item.key]?.title,
-          color: statisticKeyToTitle[item.key]?.color,
-          icon: statisticKeyToTitle[item.key]?.icon,
-          unit: statisticKeyToTitle[item.key]?.unit,
-        }));
+        this.statisticData = res.result.statisticsVoList.map((item) => {
+          if (item.key === "totalSTH") {
+            const actualValue =
+              item.key === "totalSTH"
+                ? Math.round(item.actualValue / 100) / 100
+                : item.actualValue;
+            const planValue =
+              item.key === "totalSTH"
+                ? Math.round(item.planValue / 100) / 100
+                : item.planValue;
+            return {
+              ...item,
+              actualValue:
+                parseInt(item.actualValue) > 10000
+                  ? unitConversion(
+                      actualValue,
+                      statisticKeyToTitle[item.key]?.unit
+                    )
+                  : item.actualValue,
+              actualValueUnit: parseInt(item.actualValue) > 10000 ? "万" : "",
+              title: statisticKeyToTitle[item.key]?.title,
+              color: statisticKeyToTitle[item.key]?.color,
+              icon: statisticKeyToTitle[item.key]?.icon,
+              unit: statisticKeyToTitle[item.key]?.unit,
+              planValue:
+                parseInt(item.planValue) > 10000
+                  ? unitConversion(
+                      planValue,
+                      statisticKeyToTitle[item.key]?.unit
+                    )
+                  : item.planValue,
+              planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
+            };
+          }
+          if (item.key === "totalCalories") {
+            return {
+              ...item,
+              actualValue:
+                parseInt(item.actualValue) > 10000
+                  ? unitConversion(
+                      item.actualValue,
+                      statisticKeyToTitle[item.key]?.unit || "kcal"
+                    )
+                  : item.actualValue,
+              actualValueUnit: parseInt(item.actualValue) > 10000 ? "万" : "",
+              title: statisticKeyToTitle[item.key]?.title,
+              color: statisticKeyToTitle[item.key]?.color,
+              icon: statisticKeyToTitle[item.key]?.icon,
+              unit: statisticKeyToTitle[item.key]?.unit,
+              planValue:
+                parseInt(item.planValue) > 10000
+                  ? unitConversion(
+                      item.planValue,
+                      statisticKeyToTitle[item.key]?.unit || "kcal"
+                    )
+                  : item.planValue,
+              planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
+            };
+          }
+          return {
+            ...item,
+            actualValue: unitConversion(
+              item.actualValue,
+              statisticKeyToTitle[item.key]?.unit
+            ),
+            title: statisticKeyToTitle[item.key]?.title,
+            color: statisticKeyToTitle[item.key]?.color,
+            icon: statisticKeyToTitle[item.key]?.icon,
+            unit: statisticKeyToTitle[item.key]?.unit,
+          };
+        });
         this.sthData = res.result.avgSthRespDto;
       }
     },
@@ -2703,7 +2770,7 @@ export default {
     /**
      * 保存运动员信息
      */
-    onSaveAthleticInfo(payload,type) {
+    onSaveAthleticInfo(payload, type) {
       // 保存逻辑
       if (type) {
         this.showAthleticInfoDialog = false;
@@ -2836,7 +2903,7 @@ export default {
     /**
      * 保存课程详情
      */
-    handleClassDetailSave(data,flag) {
+    handleClassDetailSave(data, flag) {
       console.log(flag, "flag");
       if (flag) {
         this.showClassDetailModal = false;

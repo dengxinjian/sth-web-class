@@ -72,8 +72,12 @@
               />
               <div style="text-align: left">{{ item.title }}</div>
             </div>
-            <div style="text-align: center;">{{ item.actualValue }} {{ item.unit }}</div>
-            <div style="width: 60px;text-align: right;">{{ item.planValue }} {{ item.unit }}</div>
+            <div style="text-align: center;">{{ item.actualValue }} {{
+                item.key === "totalSTH" ? item.actualValueUnit : item.unit
+              }}</div>
+            <div style="width: 60px;text-align: right;">{{ item.planValue }} {{
+                item.key === "totalSTH" ? item.planValueUnit : item.unit
+              }}</div>
             <!-- <img
               v-if="item.icon"
               style="width: 20px; margin-right: 10px"
