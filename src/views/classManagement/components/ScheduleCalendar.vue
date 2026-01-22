@@ -575,6 +575,7 @@ export default {
 }
 
 .schedule-table-body {
+  width: calc(100vw - 560px);
   flex: 1;
   display: flex;
   flex-direction: row;
