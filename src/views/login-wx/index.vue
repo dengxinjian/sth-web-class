@@ -272,6 +272,9 @@
         </div>
       </div>
     </div>
+    <!-- <div class="maintenance-container">
+      <div>系统维护中，请稍后访问</div>
+    </div> -->
   </div>
 </template>
 
@@ -1309,5 +1312,18 @@ footer {
       opacity: 0.8;
     }
   }
+}
+.maintenance-container{
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  background: rgba(255, 255, 255, 0.95);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 </style>
