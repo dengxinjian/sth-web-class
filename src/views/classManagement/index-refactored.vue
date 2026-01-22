@@ -148,7 +148,7 @@
             </div>
           </div>
 
-          <div style="display: flex;flex:1; width: 100%">
+          <div style="display: flex; flex: 1; width: 100%">
             <!-- 日程表 -->
             <ScheduleCalendar
               :current-week="currentWeek"
@@ -354,7 +354,7 @@
       :triUserId="selectedAthletic"
       @close="
         showEditScheduleClass = false;
-        isActivity ? (activityDetailData = {}) : (classDetailData = {})
+        isActivity ? (activityDetailData = {}) : (classDetailData = {});
       "
       @save="handleClassDetailSave"
       @delete="
@@ -2154,6 +2154,7 @@ export default {
         })
         .then((res) => {
           if (res.success) {
+            // this.handleBindMessage(res.data.result);
             this.$message.success("课表移动成功");
           }
         })
@@ -2240,6 +2241,67 @@ export default {
           this.$message.error("该运动类型与课程类型不匹配");
           this.getScheduleData();
         }
+      }
+    },
+    /**
+     * 课程绑定提示信息
+     */
+    handleBindMessage(result) {
+      const messages = [];
+
+      // 判断课表更新状态
+      if (result && result.classScheduleUpdateOk) {
+        messages.push("课表更新成功");
+        // this.$message.success("课表更新成功");
+      } else {
+        messages.push("课表更新失败");
+        // this.$message.error("课表更新失败");
+      }
+      // 判断设备同步状态（遍历所有需要同步的设备）
+      if (
+        result &&
+        result.syncDevice &&
+        result.deviceSyncList &&
+        result.deviceSyncList.length > 0
+      ) {
+        // 遍历所有需要同步的设备
+        result.deviceSyncList?.forEach((item) => {
+          if (item.needSyncDevice) {
+            const deviceName = item.deviceType == "1" ? "高驰" : "佳明国际";
+            if (item.deviceSyncOk) {
+              messages.push(`同步${deviceName}成功`);
+              // this.$message.success(`同步${deviceName}成功`);
+            } else {
+              messages.push(`同步${deviceName}失败`);
+              // this.$message.error(`同步${deviceName}失败`);
+            }
+          }
+        });
+      }
+      // 显示结果（如果有消息）
+      if (messages.length > 0) {
+        const message = messages.join("\n");
+        // 使用 TDesign Toast 组件显示多行提示
+        this.$message.success(message);
+        // Toast({
+        //   context: this,
+        //   selector: "#t-toast",
+        //   message: message,
+        //   theme: "none",
+        //   duration: Math.max(2000, messages.length * 1000),
+        // });
+        // this.setData({ classEditVisible: false, classEditId: "" });
+      } else {
+        // 没有明确的状态信息，显示默认成功提示
+        // Toast({
+        //   context: this,
+        //   selector: "#t-toast",
+        //   message: "操作成功",
+        //   theme: "success",
+          // duration: 2000,
+        // });
+        this.$message.success("操作成功");
+        // this.setData({ classEditVisible: false, classEditId: "" });
       }
     },
 
@@ -2828,6 +2890,7 @@ export default {
                 .then((res) => {
                   if (res.success) {
                     this.$message.success("匹配成功");
+                    // this.handleBindMessage(res.data.result);
                   } else {
                     this.$message.error(res.message);
                   }
@@ -2873,6 +2936,7 @@ export default {
         .then((res) => {
           if (res.success) {
             this.$message.success("匹配成功");
+            // this.handleBindMessage(res.data.result);
           } else {
             this.$message.error(res.message);
           }

@@ -1211,6 +1211,7 @@ export default {
             flag
           );
           this.$message.success("课表保存成功");
+          // this.handleBindMessage(res.data.result);
           // 延迟重置 saving 标志
           if (flag) {
             this.onCancel();
@@ -1251,6 +1252,7 @@ export default {
               this.resetForm();
               this.$emit("save", true);
               this.$message.success("课程删除成功");
+              // this.handleBindMessage(res.data.result);
               this.onCancel();
             }
           });
