@@ -354,7 +354,7 @@
       :triUserId="selectedAthletic"
       @close="
         showEditScheduleClass = false;
-        isActivity ? (activityDetailData = {}) : (classDetailData = {});
+        isActivity ? (activityDetailData = {}) : (classDetailData = {})
       "
       @save="handleClassDetailSave"
       @delete="
@@ -1562,25 +1562,25 @@ export default {
             return {
               ...item,
               actualValue:
-                parseInt(item.actualValue) > 10000
+                parseInt(item.actualValue) > 100000
                   ? unitConversion(
                       actualValue,
                       statisticKeyToTitle[item.key]?.unit
                     )
                   : item.actualValue,
-              actualValueUnit: parseInt(item.actualValue) > 10000 ? "万" : "",
+              actualValueUnit: parseInt(item.actualValue) > 100000 ? "万" : "",
               title: statisticKeyToTitle[item.key]?.title,
               color: statisticKeyToTitle[item.key]?.color,
               icon: statisticKeyToTitle[item.key]?.icon,
               unit: statisticKeyToTitle[item.key]?.unit,
               planValue:
-                parseInt(item.planValue) > 10000
+                parseInt(item.planValue) > 100000
                   ? unitConversion(
                       planValue,
                       statisticKeyToTitle[item.key]?.unit
                     )
                   : item.planValue,
-              planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
+              planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
             };
           }
           if (item.key === "totalCalories") {

@@ -34,7 +34,7 @@
           :rules="rules"
           label-width="70px"
         >
-          <el-form-item label="标题：" prop="title">
+          <el-form-item label="标题：" prop="title" style="margin-top: 16px;">
             <el-input
               type="text"
               placeholder="标题"
@@ -43,11 +43,11 @@
                 !classData.classesJson?.title && !!classData.activityName
               "
               :maxlength="50"
-              style="width: 100%"
+              style="width: 100%;"
             />
           </el-form-item>
         </el-form>
-        <span v-else
+        <span style="font-weight: 600;" v-else
           >{{ getSportTypeName(classData.sportType) }}_手动录入数据</span
         >
       </div>
@@ -775,7 +775,9 @@
           alt=""
           class="delete-icon"
           @click="deleteClass(classData)"
+          v-if="!classData.classScheduleId"
         />
+        <div v-else></div>
         <div>
           <el-button @click="handleClose">取消</el-button>
           <el-button type="primary" @click="handleSave(false)">保存</el-button>
@@ -959,10 +961,10 @@ export default {
           if (this.classData.activityId) {
             this.getSportDetail();
           } else {
-            this.classData.classesJson = {
+            this.classData.classesJson = this.classData.classesJson ? {
               ...this.classData.classesJson,
               links: this.classData.classesJson?.links || [],
-            };
+            } : this.classData.classesJson;
             console.log(this.classData, "classData====获取2");
             this.actualData = {
               duration: this.classData.duration || "00:00:00",
@@ -1160,8 +1162,9 @@ export default {
     },
     deleteClass(classData) {
       console.log(classData, "classData====删除课表");
+      const title = classData.classesJson?.title || classData.activityName ? classData.classesJson?.title || classData.activityName : `${getSportTypeName(classData.sportType)}_手动录入数据}`;
       this.$confirm(
-        `确认删除课表【${getSportTypeName(classData.sportType)}_手动录入数据】？`,
+        `确认删除【${title}】？`,
         "提示",
         {
           confirmButtonText: "删除",

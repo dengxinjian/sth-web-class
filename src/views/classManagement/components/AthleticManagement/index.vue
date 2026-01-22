@@ -206,7 +206,7 @@
     <el-dialog
       :title="groupDialogTitle"
       :visible.sync="showGroupDialog"
-      width="400px"
+      width="490px"
       @close="resetGroupForm"
     >
       <el-form
@@ -219,6 +219,9 @@
           <el-input
             v-model="groupForm.name"
             placeholder="请输入分组名称"
+            maxlength="20"
+            show-word-limit
+            clearable
           ></el-input>
         </el-form-item>
         <!-- <el-form-item label="分组描述" prop="description">
