@@ -774,7 +774,7 @@
       <!-- <el-button @click="onDelete" :disabled="!classInfo.id">删除</el-button> -->
       <el-button @click="onCancel" :disabled="saving">取消</el-button>
       <el-button type="warning" @click="onSave(false)" :disabled="saving">保存</el-button>
-      <el-button type="danger" @click="onSave(true)" :disabled="saving">保存并关闭</el-button>
+      <el-button type="danger" @click="onSave(true)" :disabled="saving || savingOnly">保存并关闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -833,6 +833,7 @@ export default {
       existingTags: [], // 现有的标签
       newTag: "", // 新标签输入
       saving: false, // 保存中标志，防止重复保存
+      savingOnly: false, // 仅保存中标志，用于禁用"保存并关闭"按钮
       classInfo: {
         id: "",
         sportType: "CYCLE",
@@ -909,6 +910,7 @@ export default {
       } else {
         // 弹窗关闭时重置 saving 标志
         this.saving = false;
+        this.savingOnly = false;
       }
     },
     data(val) {
@@ -1162,11 +1164,13 @@ export default {
         this.onCancel();
         this.$nextTick(() => {
           this.saving = false;
+          this.savingOnly = false;
         });
       } else {
         // 仅保存时，延迟重置以确保父组件有时间处理
         setTimeout(() => {
           this.saving = false;
+          this.savingOnly = false;
         }, 500);
       }
     },
@@ -1207,6 +1211,7 @@ export default {
           this.$message.success("课表保存成功");
           // 重置 saving 标志
           this.saving = false;
+          this.savingOnly = false;
         }
         if (flag) {
           this.onCancel();
@@ -1214,6 +1219,7 @@ export default {
       }).catch((error) => {
         console.error("更新课程失败:", error);
         this.saving = false; // 保存失败时重置标志
+        this.savingOnly = false;
       });
     },
     handleRemoveLink(index) {
@@ -1291,6 +1297,10 @@ export default {
       }
 
       this.saving = true; // 设置保存中标志
+      // 如果是仅保存（不关闭），设置 savingOnly 标志以禁用"保存并关闭"按钮
+      if (!closeAfter) {
+        this.savingOnly = true;
+      }
 
       const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
@@ -1321,6 +1331,7 @@ export default {
       }).catch((error) => {
         console.error("保存失败:", error);
         this.saving = false; // 保存失败时重置标志
+        this.savingOnly = false;
       }).finally(() => {
         // 注意：submitNewClass 和 submitUpdateClass 是异步的，所以不能在这里直接重置
         // 需要在它们完成后重置，或者通过延迟来重置
