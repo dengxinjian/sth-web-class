@@ -854,7 +854,7 @@
     <span slot="footer" class="dialog-footer">
       <!-- <el-button @click="onDelete" :disabled="!classInfo.id">删除</el-button> -->
       <el-button @click="onCancel" :disabled="saving">取消</el-button>
-      <el-button type="warning" @click="onSave(false)" :disabled="saving">保存</el-button>
+      <el-button type="warning" @click="onSave(false)" :loading="saving">保存</el-button>
       <el-button type="danger" @click="onSave(true)" :disabled="saving || savingOnly">保存并关闭</el-button>
     </span>
   </el-dialog>
