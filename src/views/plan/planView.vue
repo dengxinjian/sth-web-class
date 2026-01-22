@@ -702,10 +702,10 @@ export default {
     flex: 0 0 260px;
     height: 100vh;
     max-height: calc(100vh - 60px);
-    background-color: #f8f8f8;
+    background-color: #fff;
     overflow-y: auto;
     overflow-x: hidden;
-    border-left: 1px solid #e5e5e5;
+    // border-left: 1px solid #e5e5e5;
     border-right: 1px solid #e5e5e5;
   }
 }

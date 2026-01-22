@@ -6,13 +6,25 @@
         :class="{ active: activeClassType === 'my' }"
         @click="handleClassTypeChange('my')"
       >
-        <img src="~@/assets/plan/plan-title.png" alt="" />
+        <!-- <img src="~@/assets/plan/plan-title.png" alt="" /> -->
+        <div
+          class="title"
+          :class="{ 'active-title': activeClassType === 'my' }"
+        >
+          我的计划
+        </div>
       </li>
       <li
         :class="{ active: activeClassType === 'official' }"
         @click="handleClassTypeChange('official')"
       >
-        <img src="~@/assets/plan/plan-demo.png" alt="" />
+        <!-- <img src="~@/assets/plan/plan-demo.png" alt="" /> -->
+        <div
+          class="title"
+          :class="{ 'active-title': activeClassType === 'official' }"
+        >
+          计划示例
+        </div>
       </li>
     </ul>
 
@@ -324,6 +336,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+:deep(.el-collapse-item__header) {
+  background: #C3C9D726;
+}
 .plan-container {
   height: 100%;
   display: flex;
@@ -346,18 +361,33 @@ export default {
         width: 64px;
         margin-bottom: 4px;
       }
+
+      .title {
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 15px;
+        color: #939393;
+      }
+      .active-title {
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 15px;
+        color: #101010;
+      }
     }
 
     li.active::after {
       content: "";
       position: absolute;
-      bottom: 0;
-      left: 50%;
-      margin-left: -10px;
-      width: 20px;
+      bottom: -10px;
+      left: 26%;
+      // margin-left: -10px;
+      width: 60px;
       height: 4px;
       border-radius: 2px;
-      background-color: #cc2323;
+      background-color: #f92b30;
     }
   }
 
