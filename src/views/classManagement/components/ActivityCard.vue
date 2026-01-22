@@ -27,7 +27,7 @@
               alt=""
             />
           </div>
-          <div
+          <!-- <div
             class="title"
             v-if="
               (activity.classesJson && activity.classesJson.title) ||
@@ -39,7 +39,11 @@
                 ? activity.classesJson.title
                 : activity.activityName
             }}
-          </div>
+          </div> -->
+          <div v-if="
+              (activity.classesJson && activity.classesJson.title) ||
+              activity.activityName
+            "></div>
           <div class="title" v-else>
             {{ getSportTypeName(activity.sportType) }}_手动录入
           </div>
@@ -86,6 +90,19 @@
             />
           </el-popover>
         </div>
+        <div
+          class="title"
+          v-if="
+            (activity.classesJson && activity.classesJson.title) ||
+            activity.activityName
+          "
+        >
+          {{
+            activity.classesJson
+              ? activity.classesJson.title
+              : activity.activityName
+          }}
+        </div>
 
         <div
           class="sport-record-data"
@@ -106,8 +123,8 @@
               <span v-else>km</span>
             </div>
           </div>
-          <div style="display: flex; gap: 4px;margin-top: 4px;">
-            <div class="keyword" style="margin-top: 0px;">
+          <div style="display: flex; gap: 4px; margin-top: 4px">
+            <div class="keyword" style="margin-top: 0px">
               {{ restoreVerification("sthValue") ? "" : "*" }}
               {{ activity.sthValue ? activity.sthValue : "--" }}
             </div>
@@ -192,7 +209,7 @@
             <!-- 训练强度可视化 -->
             <div
               v-if="activity.classesJson.timeline"
-              style="height: 16px; display: flex; gap: 1px ;margin-top: 10px;"
+              style="height: 16px; display: flex; gap: 1px; margin-top: 10px"
             >
               <div
                 v-for="(stage, index) in activity.classesJson.timeline"
@@ -521,12 +538,14 @@ export default {
       font-weight: 400;
       flex: 1;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-left: 6px;
+      // margin-left: 6px;
       font-family: PingFang SC;
       font-style: Regular;
       color: #101010;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
     }
 
     .keyword {
