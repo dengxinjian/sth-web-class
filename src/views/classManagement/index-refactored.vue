@@ -3057,7 +3057,7 @@ export default {
     border: 1px solid #dcdfe6;
     border-radius: 4px;
     background-color: #fff;
-    min-width: 120px;
+    width: 200px;
     font-family: PingFang SC;
     font-size: 14px;
     color: #101010;
