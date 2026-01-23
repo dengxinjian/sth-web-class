@@ -1,6 +1,9 @@
 <template>
   <div id="app">
     <router-view v-if="isRouterAlive" />
+    <div class="maintenance-container">
+      <div>系统维护中，请稍后访问</div>
+    </div>
   </div>
 </template>
 
@@ -71,5 +74,18 @@ export default {
     padding: 0px;
     height: 32px;
   }
+}
+.maintenance-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  background: rgba(255, 255, 255, 0.95);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
 }
 </style>
