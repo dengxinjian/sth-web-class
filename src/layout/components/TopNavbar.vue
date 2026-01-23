@@ -10,11 +10,7 @@
     <!-- 面包屑导航 -->
     <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" /> -->
     <div style="flex: 1; display: flex; align-items: center">
-      <img
-        src="../../assets//addClass/Frame.png"
-        alt=""
-        style="width: 20px; height: 20px; margin-right: 10px"
-      />
+      <img src="../../assets//addClass/Frame.png" alt="" style="width: 20px; height: 20px; margin-right: 10px" />
       <div class="notice-text">
         2025.9.26前绑定‘佳明国际’及‘高驰’账号的用户需要在小程序左滑解绑设备后重新绑定，方能收到课表通知。
       </div>
@@ -43,26 +39,16 @@
         <div class="user-info">
           <img :src="userAvatar" alt="" />
           <span>{{ name }}</span>
-          <i
-            class="el-icon-caret-bottom"
-            style="margin-left: 10px; font-size: 12px"
-          ></i>
+          <i class="el-icon-caret-bottom" style="margin-left: 10px; font-size: 12px"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item @click.native="changeIdentify">
-            <el-button
-              type="primary"
-              size="small"
-              style="width: 100%; margin-bottom: 10px; border: none"
-              :style="{
-                background:
-                  loginType === '1'
-                    ? 'linear-gradient(90.94deg, #2A2A2A 10%, #B81300 50%, #2A2A2A 90%)'
-                    : 'linear-gradient(90.94deg, #2A2A2A 10%, #008867 50%, #2A2A2A 90%)',
-              }"
-              class="change-identify-button"
-              >{{ `切换成${loginType == "1" ? "教练" : "运动员"}` }}</el-button
-            >
+            <el-button type="primary" size="small" style="width: 100%; margin-bottom: 10px; border: none" :style="{
+              background:
+                loginType === '1'
+                  ? 'linear-gradient(90.94deg, #2A2A2A 10%, #B81300 50%, #2A2A2A 90%)'
+                  : 'linear-gradient(90.94deg, #2A2A2A 10%, #008867 50%, #2A2A2A 90%)',
+            }" class="change-identify-button">{{ `切换成${loginType == "1" ? "教练" : "运动员"}` }}</el-button>
           </el-dropdown-item>
 
           <el-dropdown-item @click.native="logout">
@@ -77,45 +63,24 @@
       <div class="mask-container">
         <div class="container-top-box">
           <div class="container-top-box-title">订阅</div>
-          <img
-            src="~@/assets/plan/close.png"
-            alt=""
-            class="close-icon"
-            @click="vipDialogVisible = false"
-          />
+          <img src="~@/assets/plan/close.png" alt="" class="close-icon" @click="vipDialogVisible = false" />
         </div>
         <div class="container-content">
           <div class="container-content-title-box">
             <div class="container-content-title">
-              <img
-                src="~@/assets/vip/per_title.png"
-                alt=""
-                class="container-content-title-img"
-              />
-              <img
-                src="~@/assets/vip/jiao.png"
-                alt=""
-                class="container-content-title-bg"
-              />
+              <img src="~@/assets/vip/per_title.png" alt="" class="container-content-title-img" />
+              <img src="~@/assets/vip/jiao.png" alt="" class="container-content-title-bg" />
             </div>
           </div>
           <div class="content-box">
             <div class="content-box-title">权益说明</div>
             <div class="content-box-list">
-              <div
-                class="list-item"
-                v-for="item in vipInfoList"
-                :key="item.label"
-              >
+              <div class="list-item" v-for="item in vipInfoList" :key="item.label">
                 <img :src="item.img" alt="" />
                 <div class="list-item-content">
                   <!-- <div class="list-item-title">{{ item.title }}</div> -->
                   <div class="list-item-sub-title">{{ item.subTitle }}</div>
-                  <div
-                    class="list-item-content-item"
-                    v-for="child in item.children"
-                    :key="child.idx"
-                  >
+                  <div class="list-item-content-item" v-for="child in item.children" :key="child.idx">
                     <div class="list-item-content-icon-box">
                       <span class="list-item-content-icon"></span>
                     </div>
@@ -343,7 +308,7 @@ export default {
         if (this.$router) {
           const pushResult = this.$router.push("/timeTable/class");
           if (pushResult && typeof pushResult.catch === "function") {
-            pushResult.catch(() => {});
+            pushResult.catch(() => { });
           }
         }
         this.reload();
@@ -372,7 +337,7 @@ export default {
       submitData({
         url: "/consumer/api/vipSubscribe/subscribe",
         requestData: {
-          identityType: "R",
+          identityType: "C",
           subscribeType: 1,
         },
       }).then((res) => {
@@ -389,17 +354,17 @@ export default {
       submitData({
         url: "/consumer/api/vipSubscribe/cancelSubscribe",
         requestData: {
-          identityType: "R",
+          identityType: "C",
           subscribeType: 1,
         },
-      }).then((res) => {});
+      }).then((res) => { });
     },
     async getSubscribeInfo() {
       const _this = this;
       getData({
         url: "/consumer/api/vipSubscribe/getSubscribeRecords",
         triUserId: this.triUserId,
-        identityType: "R",
+        identityType: "C",
       }).then((res) => {
         if (res.success) {
           if (res.result.length === 0) {
@@ -427,14 +392,14 @@ export default {
         }
       )
         .then(() => {
-          if (_this.loginType === "1") {
-            _this.getSubscribeInfo();
-            // _this.handleCancelSubscribeVip()
-          } else {
-            _this.resetPageData();
-          }
+          // if (_this.loginType === "1") {
+          _this.getSubscribeInfo();
+          // _this.handleCancelSubscribeVip()
+          // } else {
+          // _this.resetPageData();
+          // }
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     // 处理 storage 事件（跨标签页）
     handleStorageChange(e) {
@@ -513,16 +478,19 @@ export default {
       color: #fff;
     }
   }
+
   .user-info {
     display: flex;
     align-items: center;
     cursor: pointer;
+
     img {
       width: 30px;
       height: 30px;
       border-radius: 50%;
       margin-right: 10px;
     }
+
     span {
       font-family: PingFang SC;
       font-weight: 400;
@@ -533,6 +501,7 @@ export default {
       vertical-align: middle;
     }
   }
+
   .notice-text {
     font-family: PingFang SC;
     font-weight: 400;
@@ -572,6 +541,7 @@ export default {
         padding: 2px;
         z-index: 10;
       }
+
       .elite-title {
         font-size: 12px;
         transform: scale(0.8);
@@ -626,6 +596,7 @@ export default {
     }
   }
 }
+
 .vip-dialog-mask {
   position: fixed;
   top: 0;
@@ -634,6 +605,7 @@ export default {
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+
   .mask-container {
     width: 880px;
     min-height: 500px;
@@ -648,22 +620,26 @@ export default {
     background-repeat: no-repeat;
     background-position: top center;
     background-size: 100% auto;
+
     .container-top-box {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 20px;
+
       .container-top-box-title {
         font-size: 16px;
         font-weight: bold;
         color: #101010;
       }
+
       .close-icon {
         width: 24px;
         height: 24px;
         cursor: pointer;
       }
     }
+
     .container-content {
       width: 100%;
       height: 520px;
@@ -675,6 +651,7 @@ export default {
       padding: 16px;
       box-sizing: border-box;
       position: relative;
+
       .container-content-title-box {
         width: 750px;
         display: flex;
@@ -683,6 +660,7 @@ export default {
         position: absolute;
         left: 50px;
         top: -38px;
+
         .container-content-title {
           width: 120px;
           height: 40px;
@@ -693,10 +671,12 @@ export default {
           border-top-left-radius: 10px;
           border-top-right-radius: 10px;
           position: relative;
+
           .container-content-title-img {
             width: 57px;
             height: 16px;
           }
+
           .container-content-title-bg {
             width: 144px;
             height: 12px;
@@ -706,6 +686,7 @@ export default {
           }
         }
       }
+
       .content-box {
         width: 100%;
         height: 100%;
@@ -715,12 +696,14 @@ export default {
         padding: 20px 40px 40px 16px;
         box-sizing: border-box;
         position: relative;
+
         .content-box-title {
           text-align: center;
           color: #101010;
           font-size: 14px;
           font-weight: 600;
         }
+
         .content-box-list {
           display: flex;
           flex-wrap: wrap;
@@ -730,6 +713,7 @@ export default {
           column-gap: 16px;
           row-gap: 10px;
           margin-top: 16px;
+
           .list-item {
             // width: 33.33%;
             display: flex;
@@ -740,16 +724,19 @@ export default {
             width: calc((100% - 32px) / 3);
             box-sizing: border-box;
             margin-bottom: 16px;
+
             img {
               width: 30px;
               height: 30px;
               margin-right: 13px;
               flex-shrink: 0;
             }
+
             .list-item-title {
               font-size: 13px;
               color: #101010;
             }
+
             .list-item-content {
               .list-item-sub-title {
                 height: 30px;
@@ -757,10 +744,12 @@ export default {
                 font-size: 15px;
                 font-weight: 600;
               }
+
               .list-item-content-item {
                 display: flex;
                 align-items: flex-start;
                 margin-top: 8px;
+
                 .list-item-content-icon-box {
                   height: 16px;
                   width: 6px !important;
@@ -769,12 +758,14 @@ export default {
                   justify-content: center;
                   margin-right: 6px;
                 }
+
                 .list-item-content-icon {
                   width: 4px;
                   height: 4px;
                   border-radius: 4px;
                   background: #999;
                 }
+
                 .list-item-content-text {
                   flex: 1;
                   font-size: 12px;
@@ -786,16 +777,15 @@ export default {
             }
           }
         }
+
         .content-box-btn {
           width: 352px;
           height: 32px;
           border-radius: 6px;
-          background: linear-gradient(
-            90.94deg,
-            #2a2a2a 10%,
-            #b81300 50%,
-            #2a2a2a 90%
-          );
+          background: linear-gradient(90.94deg,
+              #2a2a2a 10%,
+              #b81300 50%,
+              #2a2a2a 90%);
           text-align: center;
           line-height: 32px;
           font-size: 14px;
