@@ -7,22 +7,42 @@
       <div
         class="content-container"
         style="display: flex; width: 100%"
-        v-if="activeName === 'athletic' || activeName === 'class'"
-      >
+        v-if="activeName === 'athletic' || activeName === 'class'">
         <!-- 中间内容区 -->
         <div class="type-change">
           <!-- 运动员管理 -->
           <div v-show="activeName === 'athletic'">
+            <div v-if="loginType === '2'"
+              class="team-select-container">
+              <el-dropdown trigger="click" placement="bottom-start"
+                @command="handleTeamChange"
+                class="team-dropdown">
+                <span class="el-dropdown-link team-name-title">
+                  {{ getTeamName(selectedTeam) }}
+                  <i class="el-icon-caret-bottom"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown"
+                  class="team-dropdown-menu">
+                  <el-dropdown-item
+                    v-for="t in teamList"
+                    :key="t.id"
+                    :command="t.id"
+                    :class="{ 'active': selectedTeam === t.id }">
+                    {{ t.name }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
             <AthleticManagement
               :teamId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
               :activeName="activeName"
-              @athletic-click="handleAthleticChange"
-            />
+              @athletic-click="handleAthleticChange" />
           </div>
 
           <!-- 课程管理 -->
-          <div v-show="activeName === 'class'" class="class-container-wrapper">
+          <div v-show="activeName === 'class'"
+            class="class-container-wrapper">
             <ClassList
               :class-list="classList"
               :active-class-type.sync="activeClassType"
@@ -38,8 +58,7 @@
               @delete-class="handleDeleteClass"
               @copy-class="handleCopyClassFromOfficial"
               @collapse-change="classSlideChange"
-              @view-class="handleViewClass"
-            />
+              @view-class="handleViewClass" />
           </div>
         </div>
 
@@ -52,43 +71,55 @@
                 gap: 10px;
                 flex: 1;
                 justify-content: space-between;
-              "
-            >
+              ">
               <WeekRangePicker @week-change="onWeekChange" />
-              <div style="display: flex; align-items: center; gap: 10px">
+              <div
+                style="display: flex; align-items: center; gap: 10px">
+
                 <div v-if="loginType === '2'">
-                  <span>团队：</span>
-                  <el-select
-                    :value="selectedTeam"
-                    size="mini"
-                    placeholder="选择团队"
-                    @change="handleTeamChange"
-                    style="width: 160px"
-                  >
-                    <el-option
-                      v-for="t in teamList"
-                      :key="t.id"
-                      :label="t.name"
-                      :value="t.id"
-                    />
-                  </el-select>
-                </div>
-                <div v-if="loginType === '2'">
-                  <span>运动员：</span>
-                  <el-select
-                    :value="selectedAthletic"
-                    size="mini"
-                    placeholder="选择人员"
-                    @change="handleAthleticChange"
-                    style="width: 100px"
-                  >
-                    <el-option
-                      v-for="t in athleticList"
-                      :key="t.triUserId"
-                      :label="t.name"
-                      :value="t.triUserId"
-                    />
-                  </el-select>
+                  <!-- <span>运动员：</span> -->
+                  <el-dropdown
+                    trigger="click"
+                    placement="bottom-start"
+                    @command="handleAthleticChange"
+                    class="athletic-dropdown">
+                    <span class="el-dropdown-link athletic-select-title">
+                      <img
+                        v-if="getSelectedAthleticAvatar"
+                        :src="getSelectedAthleticAvatar"
+                        class="athletic-avatar"
+                        alt="" />
+                      <span class="athletic-name-text">
+                        {{ getSelectedAthleticName || "选择人员" }}
+                      </span>
+                      <i class="el-icon-caret-bottom"></i>
+                    </span>
+                    <el-dropdown-menu
+                      slot="dropdown"
+                      class="athletic-dropdown-menu">
+                      <el-dropdown-item
+                        v-for="item in athleticDropdownItems"
+                        :key="item.key"
+                        :command="item.type === 'member' ? item.value : null"
+                        :disabled="item.type === 'group'"
+                        :class="{
+                          'group-header': item.type === 'group',
+                          active: item.type === 'member' && selectedAthletic === item.value,
+                        }">
+                        <div
+                          v-if="item.type === 'member'"
+                          class="athletic-menu-item">
+                          <img
+                            v-if="item.raw && item.raw.userAvatar"
+                            :src="item.raw.userAvatar"
+                            class="athletic-menu-avatar"
+                            alt="" />
+                          <span>{{ item.label }}</span>
+                        </div>
+                        <span v-else>{{ item.label }}</span>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
                 </div>
               </div>
             </div>
@@ -104,15 +135,14 @@
               <img
                 src="@/assets/addClass/userInfo.png"
                 alt=""
-                @click="showAthleticInfoDialog = true"
-              />
+                @click="showAthleticInfoDialog = true" />
               <img
                 src="@/assets/addClass/Statistics.png"
                 alt=""
-                @click="showMonthStatisticDialog = true"
-              />
+                @click="showMonthStatisticDialog = true" />
               <div class="schedule-table-header-cell-data">
-                <el-popover placement="bottom-end" width="180" trigger="hover">
+                <el-popover placement="bottom-end" width="180"
+                  trigger="hover">
                   <div
                     v-for="item in deviceList"
                     :key="item.id"
@@ -121,29 +151,27 @@
                       flex-direction: row;
                       gap: 10px;
                       margin: 10px 0;
-                    "
-                  >
+                    ">
                     <img
                       :src="getDeviceBrandIcon(item.deviceType)"
                       alt=""
-                      class="device-brand-icon"
-                    />
+                      class="device-brand-icon" />
                     <el-switch
                       v-model="item.enabled"
                       :inactive-text="getDeviceName(item.deviceType)"
-                      @change="handleDeviceChange(item)"
-                    ></el-switch>
+                      @change="handleDeviceChange(item)"></el-switch>
                   </div>
-                  <span slot="reference" class="device-filter-reference">
-                    <img src="@/assets/addClass/Synchronization.png" alt="" />
+                  <span slot="reference"
+                    class="device-filter-reference">
+                    <img src="@/assets/addClass/Synchronization.png"
+                      alt="" />
                   </span>
                 </el-popover>
               </div>
               <img
                 src="@/assets/addClass/Refresh.png"
                 alt=""
-                @click="handleRefresh"
-              />
+                @click="handleRefresh" />
             </div>
           </div>
 
@@ -178,24 +206,21 @@
               @event-detail="handleEventDetail"
               @edit-event="handleEditEvent"
               @input-activity="handleInputActivity"
-              @click-event-activity="handleEditActivity"
-            />
+              @click-event-activity="handleEditActivity" />
 
             <!-- 右侧统计面板 -->
             <StatisticsPanel
               :sth-data="sthData"
               :statistic-data="statisticData"
               :device-list="deviceList"
-              @device-change="handleDeviceChange"
-            />
+              @device-change="handleDeviceChange" />
           </div>
         </div>
       </div>
       <div
         class="content-container"
         style="display: flex; width: 100%"
-        v-if="activeName === 'plan'"
-      >
+        v-if="activeName === 'plan'">
         <PlanView :isPlan="isPlan" @choose-plan="handleChoosePlan" />
         <!-- 日程表 -->
         <ScheduleCalendar
@@ -228,16 +253,14 @@
           @event-detail="handleEventDetail"
           @edit-event="handleEditEvent"
           @input-activity="handleInputActivity"
-          @click-event-activity="handleEditActivity"
-        />
+          @click-event-activity="handleEditActivity" />
         <!-- 右侧统计面板 -->
         <StatisticsPanel
           v-if="!isPlan"
           :sth-data="sthData"
           :statistic-data="statisticData"
           :device-list="deviceList"
-          @device-change="handleDeviceChange"
-        />
+          @device-change="handleDeviceChange" />
       </div>
     </div>
 
@@ -245,15 +268,13 @@
     <AthleticInfoDialog
       v-model="showAthleticInfoDialog"
       :data="athleticInfoData"
-      @save="onSaveAthleticInfo"
-    />
+      @save="onSaveAthleticInfo" />
 
     <MonthStatisticDialog
       v-model="showMonthStatisticDialog"
       :triUserId="selectedAthletic"
       :currentMonth="currentMonth"
-      @cancel="onCancelMonthStatistic"
-    />
+      @cancel="onCancelMonthStatistic" />
 
     <SportTypeModal
       v-model="showSportTypeModal"
@@ -261,16 +282,14 @@
       :isSchedule="isSchedule"
       @select="onSelectSportType"
       @addEvent="handleAddEvent"
-      @cancel="handleCancelSportType"
-    />
+      @cancel="handleCancelSportType" />
 
     <SportDetailModal
       v-model="showSportDetailModal"
       :type="sportDetailData.sportType"
       :data="sportDetailData"
       :selectedAthletic="selectedAthletic"
-      @cancel="onCancelSportDetail"
-    />
+      @cancel="onCancelSportDetail" />
     <AddClassTitle
       v-model="showAddClassTitle"
       :groups="[
@@ -278,22 +297,19 @@
         { id: 2, name: '团队课程' },
       ]"
       :default-group-id="addGroupId"
-      @save="onSaveClassTitle"
-    />
+      @save="onSaveClassTitle" />
 
     <AddGroup
       v-model="showAddGroup"
       :data="currentGroup"
-      @save="onSaveAddGroup"
-    />
+      @save="onSaveAddGroup" />
 
     <MoveGroup
       v-model="showMoveGroup"
       :id="moveGroupId"
       :class-id="moveClassId"
       :type="moveType"
-      @save="onSaveMoveGroup"
-    />
+      @save="onSaveMoveGroup" />
 
     <BindModal
       v-model="showBindModal"
@@ -301,8 +317,7 @@
       :course-data="bindCourseData"
       :type="bindType"
       @bind="onBind"
-      @cancel="onCancelBind"
-    />
+      @cancel="onCancelBind" />
 
     <ClassDetailModal
       v-model="showClassDetailModal"
@@ -313,8 +328,7 @@
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
       @save="handleSaveClassDetail"
-      @cancel="handleResetClassDetail"
-    />
+      @cancel="handleResetClassDetail" />
 
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
@@ -322,8 +336,7 @@
       :group-id="copyClassFromOfficialGroupId"
       :data="copyClassFromOfficialData"
       :active-class-type="activeClassType"
-      @save="onSaveCopyClassFromOfficial"
-    />
+      @save="onSaveCopyClassFromOfficial" />
 
     <ViewClassCard
       :visible="showViewClassCard"
@@ -333,8 +346,7 @@
       @move="handleMoveClass"
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
-      @save="handleUpdateClass"
-    />
+      @save="handleUpdateClass" />
     <AddClassModal
       v-model="showAddClassModal"
       :sportType="classModalData.sportType"
@@ -342,8 +354,7 @@
       :originalType="activeClassType"
       :data="classModalData"
       @save="onSaveAddClass"
-      @cancel="showAddClassModal = false"
-    />
+      @cancel="showAddClassModal = false" />
 
     <EditScheduleClass
       :visible="showEditScheduleClass"
@@ -352,15 +363,14 @@
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
       @close="
-        showEditScheduleClass = false;
-        isActivity ? (activityDetailData = {}) : (classDetailData = {});
-      "
+        showEditScheduleClass = false
+      isActivity ? (activityDetailData = {}) : (classDetailData = {})
+        "
       @save="handleClassDetailSave"
       @delete="
-        handleDeleteClassSchedule;
-        isActivity ? (activityDetailData = {}) : (classDetailData = {});
-      "
-    />
+        handleDeleteClassSchedule
+      isActivity ? (activityDetailData = {}) : (classDetailData = {})
+        " />
 
     <!-- 健康数据查看弹窗 -->
     <el-dialog
@@ -368,8 +378,7 @@
       :visible.sync="showHealthViewDialog"
       width="90%"
       :close-on-click-modal="false"
-      custom-class="health-view-dialog"
-    >
+      custom-class="health-view-dialog">
       <HealthView
         v-if="showHealthViewDialog"
         :health-data="healthViewData"
@@ -377,8 +386,7 @@
         :device-list="deviceList"
         :device-type="healthViewDeviceType"
         :triUserId="selectedAthletic"
-        @close="showHealthViewDialog = false"
-      />
+        @close="showHealthViewDialog = false" />
     </el-dialog>
 
     <!-- 添加/编辑赛事弹窗 -->
@@ -387,51 +395,48 @@
       :event-data="currentEventData"
       :is-edit-mode="isEditMode"
       @confirm="handleEventConfirm"
-      @cancel="handleEventCancel"
-    />
+      @cancel="handleEventCancel" />
     <EventInfo
       :visible.sync="showEventInfo"
       :event-data="currentEventData"
       @delete="handleEventDetail"
       @close="
-        showEventInfo = false;
-        getScheduleData();
-      "
-    />
+        showEventInfo = false
+      getScheduleData()
+        " />
     <InputActivity
       :visible.sync="showInputActivity"
       :activityDate="inputActivityDate"
-      @submit="handleInputActivitySave"
-    />
+      @submit="handleInputActivitySave" />
   </div>
 </template>
 
 <script>
 // 组件导入
-import LeftMenu from "./components/LeftMenu.vue";
-import ClassList from "./components/ClassList.vue";
-import ScheduleCalendar from "./components/ScheduleCalendar.vue";
-import StatisticsPanel from "./components/StatisticsPanel.vue";
-import AthleticManagement from "./components/AthleticManagement";
-import AthleticInfoDialog from "./components/AthleticInfo";
-import MonthStatisticDialog from "./components/MonthStatistic";
-import AddClassModal from "./components/AddClass/index.vue";
-import SportTypeModal from "./components/SportTypeModal";
-import AddClassTitle from "./components/AddClassTitle";
-import AddGroup from "./components/AddGroup";
-import MoveGroup from "./components/MoveGroup";
-import BindModal from "./components/BindModal";
-import SportDetailModal from "./components/SportDetailModal";
-import ClassDetailModal from "./components/ClassDetailModal";
-import CopyClassFromOfficial from "./components/CopyClassFromOfficial";
-import ViewClassCard from "./components/ViewClassCard";
-import EditScheduleClass from "./components/EditScheduleClass";
-import HealthView from "./components/HealthView.vue";
-import AddEvent from "./components/addEvent.vue";
-import InputActivity from "./components/InputActivity.vue";
-import PlanView from "../plan/planView.vue";
-import EventInfo from "./components/EventInfo.vue";
-import WeekRangePicker from "@/components/WeekRangePicker/index.vue";
+import LeftMenu from "./components/LeftMenu.vue"
+import ClassList from "./components/ClassList.vue"
+import ScheduleCalendar from "./components/ScheduleCalendar.vue"
+import StatisticsPanel from "./components/StatisticsPanel.vue"
+import AthleticManagement from "./components/AthleticManagement"
+import AthleticInfoDialog from "./components/AthleticInfo"
+import MonthStatisticDialog from "./components/MonthStatistic"
+import AddClassModal from "./components/AddClass/index.vue"
+import SportTypeModal from "./components/SportTypeModal"
+import AddClassTitle from "./components/AddClassTitle"
+import AddGroup from "./components/AddGroup"
+import MoveGroup from "./components/MoveGroup"
+import BindModal from "./components/BindModal"
+import SportDetailModal from "./components/SportDetailModal"
+import ClassDetailModal from "./components/ClassDetailModal"
+import CopyClassFromOfficial from "./components/CopyClassFromOfficial"
+import ViewClassCard from "./components/ViewClassCard"
+import EditScheduleClass from "./components/EditScheduleClass"
+import HealthView from "./components/HealthView.vue"
+import AddEvent from "./components/addEvent.vue"
+import InputActivity from "./components/InputActivity.vue"
+import PlanView from "../plan/planView.vue"
+import EventInfo from "./components/EventInfo.vue"
+import WeekRangePicker from "@/components/WeekRangePicker/index.vue"
 
 // 服务和工具导入
 import {
@@ -442,8 +447,8 @@ import {
   athleteApi,
   groupApi,
   competitionApi,
-} from "./services/classManagement";
-import { ACTIVITY_TYPE_DICT, DEVICE_TYPE_DICT } from "./constants";
+} from "./services/classManagement"
+import { ACTIVITY_TYPE_DICT, DEVICE_TYPE_DICT } from "./constants"
 import {
   parseClassesJson,
   isSportTypeMatch,
@@ -451,12 +456,12 @@ import {
   getCompletionStatus,
   getSportTypeName,
   getDeviceBrandIcon,
-} from "./utils/helpers";
-import { getLunarDate, secondsToHHMMSS } from "@/utils/index";
-import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle";
-import { CalculateRun, CalculateBike } from "./uilt";
-import dragMixin from "./mixins/dragMixin";
-import { getData } from "@/api/common";
+} from "./utils/helpers"
+import { getLunarDate, secondsToHHMMSS } from "@/utils/index"
+import { statisticKeyToTitle, unitConversion } from "./statisticKeyToTitle"
+import { CalculateRun, CalculateBike } from "./uilt"
+import dragMixin from "./mixins/dragMixin"
+import { getData } from "@/api/common"
 export default {
   name: "ClassManagement",
   components: {
@@ -498,6 +503,12 @@ export default {
       athleticList: [],
       selectedTeam: null,
       selectedAthletic: null,
+      athleticCascaderProps: {
+        emitPath: false,
+        value: "value",
+        label: "label",
+        children: "children",
+      },
       athleticInfoData: {},
       athleticThreshold: {
         run: 0,
@@ -580,99 +591,159 @@ export default {
       inputActivityDate: "",
 
       isPlan: false,
-    };
+    }
+  },
+  computed: {
+    athleticGroupOptions() {
+      const list = Array.isArray(this.athleticList) ? this.athleticList : []
+      const groups = new Map()
+
+      list.forEach((m) => {
+        const groupName = (m && m.groupName) || "未分类"
+        if (!groups.has(groupName)) groups.set(groupName, [])
+        groups.get(groupName).push(m)
+      })
+
+      const toLabel = (m) => (m && (m.userNickname || m.name)) || ""
+
+      return Array.from(groups.entries()).map(([groupName, members]) => ({
+        value: groupName,
+        label: groupName,
+        children: members
+          .filter((m) => m && m.triUserId)
+          .map((m) => ({
+            value: m.triUserId,
+            label: toLabel(m),
+            raw: m,
+          })),
+      }))
+    },
+    athleticDropdownItems() {
+      const items = []
+      this.athleticGroupOptions.forEach((group) => {
+        items.push({
+          type: "group",
+          key: `group-${group.value}`,
+          label: group.label,
+        })
+        group.children.forEach((member) => {
+          items.push({
+            type: "member",
+            key: `member-${member.value}`,
+            value: member.value,
+            label: member.label,
+            raw: member.raw,
+          })
+        })
+      })
+      return items
+    },
+    getSelectedAthleticName() {
+      if (!this.selectedAthletic) return ""
+      const athletic = this.athleticList.find(
+        (item) => item.triUserId === this.selectedAthletic
+      )
+      return athletic ? (athletic.userNickname || athletic.name) : ""
+    },
+    getSelectedAthleticAvatar() {
+      if (!this.selectedAthletic) return null
+      const athletic = this.athleticList.find(
+        (item) => item.triUserId === this.selectedAthletic
+      )
+      return athletic && athletic.userAvatar ? athletic.userAvatar : null
+    },
   },
   watch: {
     // 监听路由变化，同步菜单状态
     $route: {
       handler(to, from) {
         // this.initMenuFromRoute();
-        console.log(to, "to");
-        console.log(from, "from");
+        console.log(to, "to")
+        console.log(from, "from")
       },
       immediate: false,
     },
   },
   mounted() {
     // 根据路由初始化菜单状态
-    this.activeName = localStorage.getItem("activeName") || "class";
-    console.log(this.activeName, "this.activeName");
+    this.activeName = localStorage.getItem("activeName") || "class"
+    console.log(this.activeName, "this.activeName")
     // this.initMenuFromRoute();
     if (localStorage.getItem("loginType") !== "1") {
-      this.getDefaultTeam();
+      this.getDefaultTeam()
       // this.getTeamAndAthleticData();
     } else {
-      this.selectedAthletic = localStorage.getItem("triUserId");
-      this.getScheduleData();
-      this.getAthleticThreshold(this.selectedAthletic);
-      this.getAuthorizedDeviceList();
+      this.selectedAthletic = localStorage.getItem("triUserId")
+      this.getScheduleData()
+      this.getAthleticThreshold(this.selectedAthletic)
+      this.getAuthorizedDeviceList()
     }
-    this.getClassList();
-    console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
+    this.getClassList()
+    console.log(this.$store.state.fromPath, "this.$store.state.fromPath")
     if (this.$store.state.fromPath === "/plan/add") {
-      this.isPlan = true;
+      this.isPlan = true
     }
     // 监听身份切换事件
-    this.$root.$on("identity-changed", this.handleIdentityChanged);
+    this.$root.$on("identity-changed", this.handleIdentityChanged)
   },
   beforeDestroy() {
     // 移除事件监听
-    this.$root.$off("identity-changed", this.handleIdentityChanged);
+    this.$root.$off("identity-changed", this.handleIdentityChanged)
   },
   methods: {
     getDeviceBrandIcon,
     getDeviceName(deviceType) {
-      return DEVICE_TYPE_DICT[deviceType] || "未知设备";
+      return DEVICE_TYPE_DICT[deviceType] || "未知设备"
     },
     /**
      * 处理身份切换事件
      */
     handleIdentityChanged(loginType) {
-      console.log("监听到身份切换事件");
+      console.log("监听到身份切换事件")
       // 在这里添加你需要处理的逻辑
       // 例如：重新加载数据、重置状态等
-      this.activeName = "class";
-      localStorage.setItem("activeName", "class");
-      console.log(this.activeName, "this.activeName");
+      this.activeName = "class"
+      localStorage.setItem("activeName", "class")
+      console.log(this.activeName, "this.activeName")
       // this.initMenuFromRoute();
       if (localStorage.getItem("loginType") !== "1") {
-        this.getDefaultTeam();
+        this.getDefaultTeam()
         // this.getTeamAndAthleticData();
       } else {
-        this.selectedAthletic = localStorage.getItem("triUserId");
-        this.getScheduleData();
-        this.getAthleticThreshold(this.selectedAthletic);
-        this.getAuthorizedDeviceList();
+        this.selectedAthletic = localStorage.getItem("triUserId")
+        this.getScheduleData()
+        this.getAthleticThreshold(this.selectedAthletic)
+        this.getAuthorizedDeviceList()
       }
-      this.getClassList();
-      console.log(this.$store.state.fromPath, "this.$store.state.fromPath");
+      this.getClassList()
+      console.log(this.$store.state.fromPath, "this.$store.state.fromPath")
       if (this.$store.state.fromPath === "/plan/add") {
-        this.isPlan = true;
+        this.isPlan = true
       }
     },
     handleChoosePlan(isPlan) {
-      console.log("handleChoosePlan");
-      this.isPlan = isPlan;
+      console.log("handleChoosePlan")
+      this.isPlan = isPlan
     },
     handleResetClassDetail() {
-      this.scheduleType = "add";
-      this.showClassDetailModal = false;
+      this.scheduleType = "add"
+      this.showClassDetailModal = false
       // 等待弹窗完全关闭后再重置数据，确保子组件能正确响应
       this.$nextTick(() => {
         // 彻底清空对象的所有属性
-        const keys = Object.keys(this.classDetailData);
+        const keys = Object.keys(this.classDetailData)
         keys.forEach((key) => {
-          this.$delete(this.classDetailData, key);
-        });
+          this.$delete(this.classDetailData, key)
+        })
         // 确保设置为全新的空对象
-        this.$set(this, "classDetailData", {});
-        this.getScheduleData();
-      });
+        this.$set(this, "classDetailData", {})
+        this.getScheduleData()
+      })
     },
     handleSaveClassDetail(data) {
       if (!data.classesTitle || data.classesTitle === "") {
-        this.$message.error("课表标题不能为空");
-        return;
+        this.$message.error("课表标题不能为空")
+        return
       }
       if (this.scheduleType === "add" && !data.id) {
         scheduleApi
@@ -686,47 +757,47 @@ export default {
             triUserId: this.selectedAthletic,
           })
           .then((res) => {
-            console.log("******创建课表", res);
+            console.log("******创建课表", res)
             if (res.success) {
-              this.classDetailData = res.result;
-              this.scheduleType = "edit";
-              this.getScheduleData();
-              this.$message.success("课表保存成功");
+              this.classDetailData = res.result
+              this.scheduleType = "edit"
+              this.getScheduleData()
+              this.$message.success("课表保存成功")
             }
-          });
-        return;
+          })
+        return
       }
-      this.getScheduleData();
+      this.getScheduleData()
     },
     async handleCutClass(classesDate, classItem) {
-      console.log(classesDate, "classesDate");
-      console.log(classItem, "classItem");
-      await this.handlePasteClass(classesDate, classItem);
-      this.handleDeleteClassSchedule(classItem, true);
+      console.log(classesDate, "classesDate")
+      console.log(classItem, "classItem")
+      await this.handlePasteClass(classesDate, classItem)
+      this.handleDeleteClassSchedule(classItem, true)
     },
     /**
      * 粘贴赛事
      */
     async handlePasteEvent(date, eventItem) {
-      console.log(date, eventItem, "handlePasteEvent date, eventItem");
+      console.log(date, eventItem, "handlePasteEvent date, eventItem")
       if (!eventItem) {
-        this.$message.error("赛事数据无效");
-        return;
+        this.$message.error("赛事数据无效")
+        return
       }
       // 参照 addEvent.vue 的参数构建方式
       // 处理 priority：转换为数字格式
-      let priority = eventItem.priority;
+      let priority = eventItem.priority
       if (typeof priority === "string") {
         priority =
-          priority === "PRIMARY" ? 1 : priority === "SECONDARY" ? 2 : 3;
+          priority === "PRIMARY" ? 1 : priority === "SECONDARY" ? 2 : 3
       } else if (typeof priority !== "number") {
-        priority = 1; // 默认值
+        priority = 1 // 默认值
       }
 
       // 处理 competitionDistanceValue：确保是正确的数值
-      let competitionDistanceValue = eventItem.competitionDistanceValue;
+      let competitionDistanceValue = eventItem.competitionDistanceValue
       if (typeof competitionDistanceValue === "string") {
-        competitionDistanceValue = parseFloat(competitionDistanceValue) || "";
+        competitionDistanceValue = parseFloat(competitionDistanceValue) || ""
       }
       // 如果单位是 km，需要转换为米（但这里应该保持原值，因为 API 可能已经处理）
       // 根据 addEvent.vue，如果单位是 km，customDistance * 1000，但这里 eventItem 应该已经是正确的值
@@ -741,105 +812,105 @@ export default {
         competitionDistanceUnit: eventItem.competitionDistanceUnit || "km",
         priority: priority,
         competitionTime: date, // 使用 competitionTime 设置新日期
-      };
+      }
 
       try {
         await competitionApi.createCompetition(
           submitData,
           this.selectedAthletic
-        );
-        this.$message.success("赛事粘贴成功");
-        this.getScheduleData();
+        )
+        this.$message.success("赛事粘贴成功")
+        this.getScheduleData()
       } catch (err) {
-        const message = err?.message || err || "赛事粘贴失败";
-        this.$message.error(message);
+        const message = err?.message || err || "赛事粘贴失败"
+        this.$message.error(message)
       }
     },
     /**
      * 剪切赛事（粘贴后删除原位置）
      */
     async handleCutEvent(date, eventItem, cutEventInfo) {
-      console.log(date, eventItem, cutEventInfo, "handleCutEvent");
+      console.log(date, eventItem, cutEventInfo, "handleCutEvent")
       // 先粘贴
-      await this.handlePasteEvent(date, eventItem);
+      await this.handlePasteEvent(date, eventItem)
       // 然后删除原位置的赛事
       if (cutEventInfo && cutEventInfo.eventItem && cutEventInfo.eventItem.id) {
         try {
-          await competitionApi.deleteCompetition(cutEventInfo.eventItem.id);
-          this.$message.success("赛事剪切成功");
-          this.getScheduleData();
+          await competitionApi.deleteCompetition(cutEventInfo.eventItem.id)
+          this.$message.success("赛事剪切成功")
+          this.getScheduleData()
         } catch (err) {
-          const message = err?.message || err || "删除原赛事失败";
-          this.$message.error(message);
+          const message = err?.message || err || "删除原赛事失败"
+          this.$message.error(message)
         }
       }
     },
     handleInputActivitySave(data) {
-      console.log(data, "data");
-      data.triUserId = this.selectedAthletic;
+      console.log(data, "data")
+      data.triUserId = this.selectedAthletic
       scheduleApi.createActivity(data).then((res) => {
         if (res.success) {
-          this.$message.success("运动录入成功");
-          this.showInputActivity = false;
-          this.getScheduleData();
+          this.$message.success("运动录入成功")
+          this.showInputActivity = false
+          this.getScheduleData()
         }
-      });
+      })
     },
     /**
      * 添加赛事
      */
     handleAddEvent(eventData = {}) {
-      this.currentEventData = eventData; // 如果有数据则是编辑模式，否则是添加模式
-      this.showAddEvent = true;
-      this.isEditMode = false;
+      this.currentEventData = eventData // 如果有数据则是编辑模式，否则是添加模式
+      this.showAddEvent = true
+      this.isEditMode = false
     },
     handleInputActivity(date) {
       if (!this.selectedAthletic) {
         return this.$message.error(
           "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
-        );
+        )
       }
-      console.log(date, "date");
-      this.inputActivityDate = date;
-      this.showInputActivity = true;
+      console.log(date, "date")
+      this.inputActivityDate = date
+      this.showInputActivity = true
     },
     /**
      * 赛事确认
      */
     handleEventConfirm(data) {
-      console.log("赛事数据:", data);
+      console.log("赛事数据:", data)
       if (!this.isEditMode) {
-        data.competitionTime = this.addScheduleDate;
+        data.competitionTime = this.addScheduleDate
 
         competitionApi
           .createCompetition(data, this.selectedAthletic)
           .then(() => {
-            this.$message.success("赛事保存成功");
-            this.showAddEvent = false;
-            this.getScheduleData();
+            this.$message.success("赛事保存成功")
+            this.showAddEvent = false
+            this.getScheduleData()
           })
           .catch((err) => {
-            const message = err?.message || err || "赛事保存失败";
-            this.$message.error(message);
-          });
+            const message = err?.message || err || "赛事保存失败"
+            this.$message.error(message)
+          })
       } else {
-        console.log(data, "data");
-        console.log(this.selectedAthletic, "this.selectedAthletic");
+        console.log(data, "data")
+        console.log(this.selectedAthletic, "this.selectedAthletic")
         competitionApi
           .updateCompetition(data, this.selectedAthletic)
           .then((res) => {
             if (res.success) {
-              this.$message.success("赛事保存成功");
-              this.showAddEvent = false;
-              this.getScheduleData();
+              this.$message.success("赛事保存成功")
+              this.showAddEvent = false
+              this.getScheduleData()
             }
-          });
+          })
       }
       // 这里可以添加保存成功后的处理逻辑，比如刷新列表等
       // 如果需要刷新日程数据，可以调用 this.getScheduleData();
     },
     handleEventDetail(eventItem) {
-      console.log(eventItem, "eventItem");
+      console.log(eventItem, "eventItem")
       this.$confirm("确认删除该赛事？", "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
@@ -847,93 +918,93 @@ export default {
       }).then(() => {
         competitionApi.deleteCompetition(eventItem.id).then((res) => {
           if (res.success) {
-            this.$message.success("赛事删除成功");
-            this.showEventInfo = false;
-            this.getScheduleData();
+            this.$message.success("赛事删除成功")
+            this.showEventInfo = false
+            this.getScheduleData()
           }
-        });
-      });
+        })
+      })
     },
     handleEditEvent(eventItem, type) {
-      console.log(eventItem, "eventItem");
+      console.log(eventItem, "eventItem")
 
       // 获取今天的日期（只比较日期部分，不考虑时间）
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
 
       // 解析 eventItem.competitionDate（可能是 "YYYY-MM-DD" 格式或 Date 对象）
-      let eventDate;
+      let eventDate
       if (typeof eventItem.competitionDate === "string") {
-        console.log(eventItem.competitionDate, "eventItem.competitionDate");
-        eventDate = new Date(eventItem.competitionDate);
+        console.log(eventItem.competitionDate, "eventItem.competitionDate")
+        eventDate = new Date(eventItem.competitionDate)
       } else if (eventItem.competitionDate instanceof Date) {
-        eventDate = new Date(eventItem.competitionDate);
+        eventDate = new Date(eventItem.competitionDate)
       } else {
-        this.$message.error("赛事日期格式无效");
-        return;
+        this.$message.error("赛事日期格式无效")
+        return
       }
 
-      eventDate.setHours(0, 0, 0, 0);
+      eventDate.setHours(0, 0, 0, 0)
 
       // 计算天数差
-      const diffTime = eventDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffTime = eventDate.getTime() - today.getTime()
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
       // 校验日期必须大于今天
       if (diffDays >= 0) {
         if (type === "click" && diffDays === 0) {
-          this.currentEventData = eventItem;
-          this.showEventInfo = true;
-          return;
+          this.currentEventData = eventItem
+          this.showEventInfo = true
+          return
         }
-        this.currentEventData = eventItem;
-        this.showAddEvent = true;
-        this.isEditMode = true;
+        this.currentEventData = eventItem
+        this.showAddEvent = true
+        this.isEditMode = true
       } else {
-        this.currentEventData = eventItem;
-        this.showEventInfo = true;
+        this.currentEventData = eventItem
+        this.showEventInfo = true
       }
     },
     /**
      * 赛事取消
      */
     handleEventCancel() {
-      this.currentEventData = {};
-      this.showAddEvent = false;
+      this.currentEventData = {}
+      this.showAddEvent = false
     },
     handleAddSchedule(date) {
       if (!this.selectedAthletic) {
         return this.$message.error(
           "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
-        );
+        )
       }
-      this.classModalDataType = "addSchedule";
-      this.addScheduleDate = date;
-      this.showSportTypeModal = true;
-      this.classModalData = { title: "" };
-      this.isClass = false;
-      this.isSchedule = true;
-      console.log(date, "date");
+      this.classModalDataType = "addSchedule"
+      this.addScheduleDate = date
+      this.showSportTypeModal = true
+      this.classModalData = { title: "" }
+      this.isClass = false
+      this.isSchedule = true
+      console.log(date, "date")
     },
     async handlePasteClass(date, classItem) {
-      console.log(date, classItem, "date, classItem");
-      await this.getAthleticThreshold(this.selectedAthletic, date);
-      const newData = JSON.parse(JSON.stringify(classItem));
-      newData.classesJson = parseClassesJson(newData.classesJson);
-      newData.classesDate = date + " 00:00:00";
+      console.log(date, classItem, "date, classItem")
+      await this.getAthleticThreshold(this.selectedAthletic, date)
+      const newData = JSON.parse(JSON.stringify(classItem))
+      newData.classesJson = parseClassesJson(newData.classesJson)
+      newData.classesDate = date + " 00:00:00"
       // 根据运动类型计算阈值
       if (newData.sportType === "RUN") {
         newData.classesJson = new CalculateRun(
           this.athleticThreshold,
           newData.classesJson
-        ).updateClassInfoCalculatedValues();
+        ).updateClassInfoCalculatedValues()
       } else if (newData.sportType === "CYCLE") {
         newData.classesJson = new CalculateBike(
           this.athleticThreshold,
           newData.classesJson
-        ).updateClassInfoCalculatedValues();
+        ).updateClassInfoCalculatedValues()
       }
-      console.log(newData, "newData");
+      console.log(newData, "newData")
       // 计算时间距离STH
       if (["RUN", "CYCLE"].includes(newData.sportType)) {
         const res = await scheduleApi.calculateTimeDistanceSth({
@@ -941,7 +1012,7 @@ export default {
           classesJson: JSON.stringify(newData.classesJson),
           triUserId: this.selectedAthletic,
           classesDate: date + " 00:00:00",
-        });
+        })
 
         if (newData.sportType === "RUN") {
           newData.classesJson = {
@@ -949,45 +1020,45 @@ export default {
             duration: secondsToHHMMSS((res.result && res.result.time) || 0),
             distance: ((res.result && res.result.distance) || 0) + "km",
             sth: (res.result && res.result.sth) || null,
-          };
+          }
         } else if (newData.sportType === "CYCLE") {
           newData.classesJson = {
             ...newData.classesJson,
             duration: newData.classesJson.duration,
             distance: newData.classesJson.distance,
             sth: (res.result && res.result.sth) || null,
-          };
+          }
         }
       }
-      newData.classesJson = JSON.stringify(newData.classesJson);
+      newData.classesJson = JSON.stringify(newData.classesJson)
       const res = await scheduleApi.createSchedule({
         ...newData,
         triUserId: this.selectedAthletic,
-      });
+      })
       if (res.success) {
-        this.classModalData = res.result;
-        this.getScheduleData();
-        this.getClassList();
+        this.classModalData = res.result
+        this.getScheduleData()
+        this.getClassList()
       }
     },
     handleEditClassSchedule(classItem) {
-      console.log(classItem, "classItem");
-      this.showEditScheduleClass = true;
-      this.classDetailData = classItem;
-      this.isActivity = false;
+      console.log(classItem, "classItem")
+      this.showEditScheduleClass = true
+      this.classDetailData = classItem
+      this.isActivity = false
     },
     handleEditActivity(activity) {
-      console.log(activity, "activity");
-      this.showEditScheduleClass = true;
-      this.activityDetailData = activity;
-      this.isActivity = true;
+      console.log(activity, "activity")
+      this.showEditScheduleClass = true
+      this.activityDetailData = activity
+      this.isActivity = true
     },
     /**
      * 获取团队名称
      */
     getTeamName(teamId) {
-      const team = this.teamList.find((item) => item.id === teamId);
-      return team ? team.name : "";
+      const team = this.teamList.find((item) => item.id === teamId)
+      return team ? team.name : ""
     },
 
     /**
@@ -1005,39 +1076,39 @@ export default {
      * 类型切换（运动员/课程）
      */
     handleTypeChange(type) {
-      this.activeName = type;
-      this.getClassList();
-      this.isPlan = false;
+      this.activeName = type
+      this.getClassList()
+      this.isPlan = false
     },
 
     /**
      * 课程类型切换（我的/官方）
      */
     handleClassTypeChange(type) {
-      this.activeClassType = type;
-      this.getClassList();
+      this.activeClassType = type
+      this.getClassList()
     },
 
     /**
      * 课程搜索
      */
     handleClassSearch(keyword) {
-      this.classSearchInput = keyword;
-      this.getClassList();
+      this.classSearchInput = keyword
+      this.getClassList()
     },
     async getDefaultTeam() {
-      const _this = this;
+      const _this = this
       const res = await getData({
         url: "/gateway/team/my-team",
-      });
+      })
       if (res.success) {
         _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
-            acc.push(team);
+            acc.push(team)
           }
-          return acc;
-        }, []);
-        _this.getTeamAndAthleticData();
+          return acc
+        }, [])
+        _this.getTeamAndAthleticData()
       }
     },
 
@@ -1045,33 +1116,46 @@ export default {
      * 获取团队和运动员数据
      */
     async getTeamAndAthleticData() {
-      const _this = this;
-      const res = await teamApi.getAllTeams();
+      const _this = this
+      const res = await teamApi.getAllTeams()
       if (res.success) {
-        const list = [..._this.teamList,...res.result].reduce((acc, team) => {
+        const list = [..._this.teamList, ...res.result].reduce((acc, team) => {
           if (team && team.id && !acc.find((t) => t.id === team.id)) {
-            acc.push(team);
+            acc.push(team)
           }
-          return acc;
+          return acc
         }, [])
         this.teamList = list.map((item) => ({
           id: item.id,
           name: item.teamName,
           teamOwnerId: item.teamOwnerId,
-          members: res.result.length > 0 ? item.members.map((member) => ({
-            id: member.id,
-            name: member.userNickname,
-            triUserId: member.triUserId,
-            lastMatchType: member.lastMatchType,
-          })) : [],
-        }));
+          members:
+            item.members && item.members.length > 0
+              ? item.members.map((member) => ({
+                id: member.id,
+                triUserId: member.triUserId,
+                // 顯示用（兼容舊欄位）
+                userNickname: member.userNickname,
+                name: member.userNickname,
+                // 分組資訊（用於級聯）
+                groupId: member.groupId,
+                groupName: member.groupName || "未分类",
+                userType: member.userType,
+                lastMatchType: member.lastMatchType,
+                // 頭像資訊
+                userAvatar: member.userAvatar,
+              }))
+              : [],
+        }))
         // 默认选中第一个团队
         if (this.teamList.length > 0) {
-          const triUserId = localStorage.getItem("triUserId");
+          const triUserId = localStorage.getItem("triUserId")
           // this.selectedTeam = this.teamList[0].id;
-          this.selectedTeam = this.teamList.find(item => item.teamOwnerId === triUserId)?.id;
-          this.getAthleticList();
-          this.getScheduleData();
+          this.selectedTeam = this.teamList.find(
+            (item) => item.teamOwnerId === triUserId
+          )?.id
+          this.getAthleticList()
+          this.getScheduleData()
         }
       }
     },
@@ -1080,21 +1164,21 @@ export default {
      * 团队切换
      */
     handleTeamChange(teamId) {
-      this.selectedTeam = teamId;
-      this.getAthleticList();
+      this.selectedTeam = teamId
+      this.getAthleticList()
     },
 
     /**
      * 运动员切换
      */
     handleAthleticChange(athleticId) {
-      this.selectedAthletic = athleticId;
+      this.selectedAthletic = athleticId
       this.athleticInfoData = this.athleticList.find(
         (item) => item.triUserId === athleticId
-      );
-      this.getScheduleData();
-      this.getAthleticThreshold(athleticId);
-      this.getAuthorizedDeviceList();
+      )
+      this.getScheduleData()
+      this.getAthleticThreshold(athleticId)
+      this.getAuthorizedDeviceList()
     },
 
     /**
@@ -1103,16 +1187,21 @@ export default {
     getAthleticList() {
       this.athleticList = this.teamList.find(
         (item) => item.id === this.selectedTeam
-      ).members;
+      ).members
 
       // 默认选中第一个运动员
-      if (this.athleticList.length > 0) {
-        this.selectedAthletic = this.athleticList[0].triUserId;
-        this.athleticInfoData = this.athleticList[0];
-        this.getClassList();
-        this.getAthleticThreshold(this.selectedAthletic);
-        this.getAuthorizedDeviceList();
-        this.getScheduleData();
+      const firstTriUserId =
+        this.athleticGroupOptions?.[0]?.children?.[0]?.value ||
+        (this.athleticList.length > 0 ? this.athleticList[0].triUserId : null)
+      if (firstTriUserId) {
+        this.selectedAthletic = firstTriUserId
+        this.athleticInfoData =
+          this.athleticList.find((i) => i.triUserId === firstTriUserId) ||
+          this.athleticList[0]
+        this.getClassList()
+        this.getAthleticThreshold(this.selectedAthletic)
+        this.getAuthorizedDeviceList()
+        this.getScheduleData()
       }
     },
 
@@ -1123,10 +1212,10 @@ export default {
       const apiMethod =
         this.activeClassType === "official"
           ? classApi.getOfficialClasses
-          : classApi.getClassesByUserId;
+          : classApi.getClassesByUserId
 
-      console.log(apiMethod, "this.classSearchInput");
-      const res = await apiMethod(this.classSearchInput);
+      console.log(apiMethod, "this.classSearchInput")
+      const res = await apiMethod(this.classSearchInput)
       if (res.success) {
         this.classList = res.result.map((item) => ({
           timespan: new Date().getTime(),
@@ -1136,12 +1225,12 @@ export default {
             ...part,
             classesJson: parseClassesJson(part.classesJson),
           })),
-        }));
+        }))
         this.$nextTick(() => {
-          this.classSlideChange();
-        });
+          this.classSlideChange()
+        })
       } else {
-        this.classList = [];
+        this.classList = []
       }
     },
 
@@ -1149,22 +1238,22 @@ export default {
      * 获取日程数据
      */
     async getScheduleData() {
-      if (!this.selectedAthletic) return;
-      this.loading = true;
+      if (!this.selectedAthletic) return
+      this.loading = true
 
       const res = await scheduleApi.getCalendarOverview({
         begin: this.currentWeek[0].commonDate + " 00:00:00",
         end: this.currentWeek[6].commonDate + " 23:59:59",
         triUserId: this.selectedAthletic,
-      });
+      })
       if (res.success && res.result) {
-        this.getStatisticData();
+        this.getStatisticData()
         // 创建新数组确保 Vue 响应式更新
         const newCurrentWeek = this.currentWeek.map((item) => {
-          let activityList = [];
-          let classSchedule = [];
-          let healthInfos = [];
-          let competitionList = [];
+          let activityList = []
+          let classSchedule = []
+          let healthInfos = []
+          let competitionList = []
           let deviceActivityBindView = {
             cycle: [],
             run: [],
@@ -1172,7 +1261,7 @@ export default {
             otherT1: [],
             otherT2: [],
             strength: [],
-          };
+          }
 
           res.result.forEach((part) => {
             if (item.commonDate === part.dataDate) {
@@ -1194,7 +1283,7 @@ export default {
                 }))
                 .filter(
                   (i) => !i.bindingManualActivityId && !i.bindCompetitionId
-                );
+                )
 
               // 处理虚拟运动记录
               part.manualDeviceActivityVoList.forEach((i) => {
@@ -1206,12 +1295,12 @@ export default {
                       : null,
                     distance: Math.round(i.distance / 10) / 100,
                     preciseDistance: i.distance,
-                  });
-                  console.log(activityList, "activityList");
+                  })
+                  console.log(activityList, "activityList")
                 } else {
                   activityList.forEach((item, index) => {
                     if (item.manualActivityId === i.manualActivityId) {
-                      console.log(i);
+                      console.log(i)
                       activityList[index] = {
                         ...i,
                         activityName: item.activityName,
@@ -1225,13 +1314,13 @@ export default {
                           item.oldActivityDistance
                         ),
                         oldActivitySthValue: item.oldActivitySthValue,
-                      };
-                      console.log(activityList[index], "activityList[index]");
+                      }
+                      console.log(activityList[index], "activityList[index]")
                     }
-                  });
+                  })
                 }
-              });
-              console.log(activityList, "activityList");
+              })
+              console.log(activityList, "activityList")
               // 处理课表
               classSchedule = (part.classScheduleVoList || [])
                 .map((i) => ({
@@ -1240,14 +1329,14 @@ export default {
                 }))
                 .filter(
                   (i) => !i.bindingActivityId && !i.bindingManualActivityId
-                );
+                )
 
               // 处理健康数据
-              console.log(part.healthInfos, "part.healthInfos");
+              console.log(part.healthInfos, "part.healthInfos")
               healthInfos =
                 part.healthInfos && part.healthInfos.length > 0
                   ? [part.healthInfos[0]]
-                  : [];
+                  : []
 
               part.competitionList.forEach((i) => {
                 i.deviceActivityBindView.cycle.forEach((item) => {
@@ -1265,7 +1354,7 @@ export default {
                       oldActivityDistance: Math.round(item.distance),
                       preciseDistance: Math.round(item.distance),
                       oldActivitySthValue: item.sthValue,
-                    });
+                    })
                   } else {
                     deviceActivityBindView.cycle.push({
                       ...item,
@@ -1284,9 +1373,9 @@ export default {
                       oldActivitySthValue: item.deviceActivity
                         ? item.deviceActivity.sthValue
                         : 0,
-                    });
+                    })
                   }
-                });
+                })
                 i.deviceActivityBindView.run.forEach((item) => {
                   if (!item.manualActivityId) {
                     deviceActivityBindView.run.push({
@@ -1302,7 +1391,7 @@ export default {
                       oldActivityDistance: Math.round(item.distance),
                       preciseDistance: Math.round(item.distance),
                       oldActivitySthValue: item.sthValue,
-                    });
+                    })
                   } else {
                     deviceActivityBindView.run.push({
                       ...item,
@@ -1321,13 +1410,13 @@ export default {
                       oldActivitySthValue: item.deviceActivity
                         ? item.deviceActivity.sthValue
                         : 0,
-                    });
+                    })
                   }
                   console.log(
                     deviceActivityBindView.run,
                     "============deviceActivityBindView.run"
-                  );
-                });
+                  )
+                })
                 i.deviceActivityBindView.swim.forEach((item) => {
                   if (!item.manualActivityId) {
                     deviceActivityBindView.swim.push({
@@ -1343,7 +1432,7 @@ export default {
                       oldActivityDistance: Math.round(item.distance),
                       preciseDistance: Math.round(item.distance),
                       oldActivitySthValue: item.sthValue,
-                    });
+                    })
                   } else {
                     deviceActivityBindView.swim.push({
                       ...item,
@@ -1362,10 +1451,10 @@ export default {
                       oldActivitySthValue: item.deviceActivity
                         ? item.deviceActivity.sthValue
                         : 0,
-                    });
-                    console.log(item, "item==============");
+                    })
+                    console.log(item, "item==============")
                   }
-                });
+                })
                 i.deviceActivityBindView.otherT1.forEach((item) => {
                   if (!item.manualActivityId) {
                     deviceActivityBindView.otherT1.push({
@@ -1381,7 +1470,7 @@ export default {
                       oldActivityDistance: Math.round(item.distance),
                       preciseDistance: Math.round(item.distance),
                       oldActivitySthValue: item.sthValue,
-                    });
+                    })
                   } else {
                     deviceActivityBindView.otherT1.push({
                       ...item,
@@ -1400,9 +1489,9 @@ export default {
                       oldActivitySthValue: item.deviceActivity
                         ? item.deviceActivity.sthValue
                         : 0,
-                    });
+                    })
                   }
-                });
+                })
                 i.deviceActivityBindView.otherT2.forEach((item) => {
                   if (!item.manualActivityId) {
                     deviceActivityBindView.otherT2.push({
@@ -1418,7 +1507,7 @@ export default {
                       oldActivityDistance: Math.round(item.distance),
                       preciseDistance: Math.round(item.distance),
                       oldActivitySthValue: item.sthValue,
-                    });
+                    })
                   } else {
                     deviceActivityBindView.otherT2.push({
                       ...item,
@@ -1437,9 +1526,9 @@ export default {
                       oldActivitySthValue: item.deviceActivity
                         ? item.deviceActivity.sthValue
                         : 0,
-                    });
+                    })
                   }
-                });
+                })
                 i.deviceActivityBindView.strength.forEach((item) => {
                   if (!item.manualActivityId) {
                     deviceActivityBindView.strength.push({
@@ -1455,7 +1544,7 @@ export default {
                       oldActivityDistance: Math.round(item.distance),
                       preciseDistance: Math.round(item.distance),
                       oldActivitySthValue: item.sthValue,
-                    });
+                    })
                   } else {
                     deviceActivityBindView.strength.push({
                       ...item,
@@ -1474,10 +1563,10 @@ export default {
                       oldActivitySthValue: item.deviceActivity
                         ? item.deviceActivity.sthValue
                         : 0,
-                    });
+                    })
                   }
-                });
-                i.deviceActivityBindView = deviceActivityBindView;
+                })
+                i.deviceActivityBindView = deviceActivityBindView
                 deviceActivityBindView = {
                   cycle: [],
                   run: [],
@@ -1485,12 +1574,12 @@ export default {
                   otherT1: [],
                   otherT2: [],
                   strength: [],
-                };
-              });
-              competitionList = part.competitionList;
-              console.log(competitionList, "============competitionList");
+                }
+              })
+              competitionList = part.competitionList
+              console.log(competitionList, "============competitionList")
             }
-          });
+          })
 
           return {
             ...item,
@@ -1499,35 +1588,35 @@ export default {
             healthInfos,
             competitionList,
             timesp: new Date().getTime(),
-          };
-        });
+          }
+        })
         // 直接赋值新数组，确保 Vue 响应式更新
         // 对于根级别的 data 属性，直接赋值即可触发响应式更新
-        this.currentWeek = [...newCurrentWeek];
-        console.log(this.currentWeek, "this.currentWeek");
+        this.currentWeek = [...newCurrentWeek]
+        console.log(this.currentWeek, "this.currentWeek")
       }
       this.$nextTick(() => {
         // 确保视图更新 - 使用 $forceUpdate 强制重新渲染
-        this.$forceUpdate();
+        this.$forceUpdate()
         // 初始化拖拽
-        this.initAllDrag();
+        this.initAllDrag()
         setTimeout(() => {
-          this.loading = false;
-        }, 1000);
-      });
+          this.loading = false
+        }, 1000)
+      })
     },
 
     /**
      * 获取统计数据
      */
     async getStatisticData() {
-      if (!this.selectedAthletic) return;
+      if (!this.selectedAthletic) return
 
       const res = await statisticsApi.getWeekStatistics({
         begin: this.currentWeek[0].commonDate,
         end: this.currentWeek[6].commonDate,
         triUserId: this.selectedAthletic,
-      });
+      })
 
       if (res.success) {
         this.statisticData = res.result.statisticsVoList.map((item) => ({
@@ -1540,8 +1629,8 @@ export default {
           color: statisticKeyToTitle[item.key]?.color,
           icon: statisticKeyToTitle[item.key]?.icon,
           unit: statisticKeyToTitle[item.key]?.unit,
-        }));
-        this.sthData = res.result.avgSthRespDto;
+        }))
+        this.sthData = res.result.avgSthRespDto
       }
     },
 
@@ -1549,50 +1638,50 @@ export default {
      * 获取运动员阈值
      */
     async getAthleticThreshold(id, date) {
-      const res = await athleteApi.getUserProfile(id, date);
-      window.localStorage.setItem("avatarUrl", res.result.avatarUrl);
+      const res = await athleteApi.getUserProfile(id, date)
+      window.localStorage.setItem("avatarUrl", res.result.avatarUrl)
       res.result.thresholdRecordList.forEach((item) => {
         switch (item.thresholdType) {
           case 1:
-            this.athleticThreshold.heartRate = item.threshold;
-            break;
+            this.athleticThreshold.heartRate = item.threshold
+            break
           case 2:
-            this.athleticThreshold.cycle = item.threshold;
-            break;
+            this.athleticThreshold.cycle = item.threshold
+            break
           case 3:
-            this.athleticThreshold.run = item.threshold;
-            break;
+            this.athleticThreshold.run = item.threshold
+            break
           case 4:
-            this.athleticThreshold.swim = item.threshold;
-            break;
+            this.athleticThreshold.swim = item.threshold
+            break
         }
-      });
+      })
     },
 
     /**
      * 获取授权设备列表
      */
     async getAuthorizedDeviceList() {
-      const res = await athleteApi.getAuthorizedDevices(this.selectedAthletic);
+      const res = await athleteApi.getAuthorizedDevices(this.selectedAthletic)
       this.deviceList = (res.result || []).map((device) => ({
         ...device,
         enabled: device.syncFlag === 1,
         deviceType: device.deviceType || 0,
-      }));
+      }))
     },
 
     /**
      * 设备状态变更
      */
     async handleDeviceChange(item) {
-      const syncFlag = item.enabled ? 1 : 0;
+      const syncFlag = item.enabled ? 1 : 0
       const res = await athleteApi.updateAuthorizedDevice({
         deviceId: item.id,
         syncFlag,
-      });
+      })
       if (res.success) {
-        this.$message.success("操作成功");
-        this.getAuthorizedDeviceList();
+        this.$message.success("操作成功")
+        this.getAuthorizedDeviceList()
       }
     },
 
@@ -1602,13 +1691,13 @@ export default {
     handleDeviceClick(classItem, device) {
       const date = this.currentWeek.find((w) =>
         w.classSchedule.some((c) => c.id === classItem.id)
-      )?.commonDate;
+      )?.commonDate
 
       if (date && date < new Date().toISOString().split("T")[0]) {
-        this.$message.error("该课表已过期");
-        return;
+        this.$message.error("该课表已过期")
+        return
       }
-      console.log(device, "device");
+      console.log(device, "device")
 
       // if (device.syncStatus === 1) {
       //   this.$message.info("该设备已同步成功");
@@ -1623,16 +1712,16 @@ export default {
         const res = await scheduleApi.retrySync({
           classScheduleId: classItem.id,
           deviceType: device.deviceType,
-        });
+        })
         if (res.success) {
           // this.$message.success(res.result);
-          this.$message.success("同步成功");
-          this.getScheduleData();
+          this.$message.success("同步成功")
+          this.getScheduleData()
         } else {
           // this.$message.error(res.message);
-          this.$message.error("同步失败");
+          this.$message.error("同步失败")
         }
-      });
+      })
     },
 
     /**
@@ -1640,33 +1729,33 @@ export default {
      */
     onWeekChange(payload) {
       this.currentWeek = payload.currentWeek.list.map((item) => {
-        const date = getLunarDate(item);
+        const date = getLunarDate(item)
         return {
           commonDate: item,
           lunarDate: date.fullName,
           date: item,
           activityList: [],
           classSchedule: [],
-        };
-      });
+        }
+      })
 
       // 计算当前月份
       if (this.currentWeek.length > 0) {
-        const firstDay = this.currentWeek[0].commonDate;
-        const date = new Date(firstDay);
+        const firstDay = this.currentWeek[0].commonDate
+        const date = new Date(firstDay)
         this.currentMonth = `${date.getFullYear()}-${String(
           date.getMonth() + 1
-        ).padStart(2, "0")}`;
+        ).padStart(2, "0")}`
       }
 
-      this.getScheduleData();
+      this.getScheduleData()
     },
 
     /**
      * 刷新数据
      */
     handleRefresh() {
-      this.getScheduleData();
+      this.getScheduleData()
     },
 
     /**
@@ -1682,18 +1771,18 @@ export default {
       //   return;
       // }
       // if (!this.selectedAthletic) return this.$message.error("您未加入团队，不可给团队人员添加课程，请加入团队后操作！");
-      this.classModalDataType = "add";
-      this.isClass = true;
-      this.addGroupId = groupId;
-      this.showAddClassTitle = true;
+      this.classModalDataType = "add"
+      this.isClass = true
+      this.addGroupId = groupId
+      this.showAddClassTitle = true
     },
 
     /**
      * 新增分组
      */
     handleAddGroup() {
-      this.currentGroup = { id: "", classesGroupName: "" };
-      this.showAddGroup = true;
+      this.currentGroup = { id: "", classesGroupName: "" }
+      this.showAddGroup = true
     },
 
     /**
@@ -1703,8 +1792,8 @@ export default {
       this.currentGroup = {
         id: group.groupId,
         classesGroupName: group.groupName,
-      };
-      this.showAddGroup = true;
+      }
+      this.showAddGroup = true
     },
 
     /**
@@ -1719,30 +1808,30 @@ export default {
         // 调用删除分组API
         groupApi.deleteGroup(item.groupId).then((res) => {
           if (res.success) {
-            this.$message.success("删除成功");
-            this.getClassList();
+            this.$message.success("删除成功")
+            this.getClassList()
           }
-        });
-      });
+        })
+      })
     },
 
     /**
      * 移动分组
      */
     handleMoveGroup(groupId) {
-      this.moveGroupId = groupId;
-      this.moveType = "group";
-      this.showMoveGroup = true;
+      this.moveGroupId = groupId
+      this.moveType = "group"
+      this.showMoveGroup = true
     },
 
     /**
      * 移动课程
      */
     handleMoveClass(classId, groupId) {
-      this.moveClassId = classId;
-      this.moveGroupId = groupId;
-      this.moveType = "class";
-      this.showMoveGroup = true;
+      this.moveClassId = classId
+      this.moveGroupId = groupId
+      this.moveType = "class"
+      this.showMoveGroup = true
     },
 
     /**
@@ -1754,40 +1843,40 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await classApi.deleteClass(classItem?.id);
+        const res = await classApi.deleteClass(classItem?.id)
         if (res.success) {
-          this.$message.success("删除成功");
-          this.getClassList();
+          this.$message.success("删除成功")
+          this.getClassList()
         }
-      });
+      })
     },
     async handleUpdateClass(classData, flag) {
       classApi.updateClass(classData).then((res) => {
         if (res.success) {
-          this.$message.success("更新成功");
-          if (flag) this.showViewClassCard = false;
-          this.getClassList();
+          this.$message.success("更新成功")
+          if (flag) this.showViewClassCard = false
+          this.getClassList()
         }
-      });
+      })
     },
 
     /**
      * 查看课程
      */
     handleViewClass(classId) {
-      this.showViewClassCard = true;
-      this.classModalData = this.findClassById(classId);
+      this.showViewClassCard = true
+      this.classModalData = this.findClassById(classId)
     },
 
     /**
      * 课程详情
      */
     handleClassDetail(classId, sportType) {
-      this.classModalData = this.findClassById(classId);
+      this.classModalData = this.findClassById(classId)
       // console.log(this.classDetailData, "classDetailData");
       // this.showClassDetailModal = true;
-      this.classModalDataType = "edit";
-      console.log(sportType, "sportType");
+      this.classModalDataType = "edit"
+      console.log(sportType, "sportType")
       // this.showAddClassModal = true;
     },
 
@@ -1806,12 +1895,12 @@ export default {
       // this.classDetailData = foundClass;
       // this.classSportType = sportType;
       // this.showClassDetailModal = true;
-      console.log(classItem, "classItem");
-      this.classSportType = sportType;
-      this.classDetailData = classItem;
+      console.log(classItem, "classItem")
+      this.classSportType = sportType
+      this.classDetailData = classItem
       this.$nextTick(() => {
-        this.showClassDetailModal = true;
-      });
+        this.showClassDetailModal = true
+      })
     },
 
     /**
@@ -1831,20 +1920,20 @@ export default {
           const res = await scheduleApi.deleteSchedule({
             id: classItem?.id,
             triUserId: this.selectedAthletic,
-          });
+          })
           if (res.success) {
-            this.$message.success("删除成功");
-            this.getScheduleData();
+            this.$message.success("删除成功")
+            this.getScheduleData()
           }
-        });
+        })
       } else {
         const res = await scheduleApi.deleteSchedule({
           id: classItem?.id,
           triUserId: this.selectedAthletic,
-        });
+        })
         if (res.success) {
-          this.$message.success("课表剪切成功");
-          this.getScheduleData();
+          this.$message.success("课表剪切成功")
+          this.getScheduleData()
         }
       }
     },
@@ -1858,23 +1947,23 @@ export default {
       //   id: classScheduleId,
       //   sportType,
       // };
-      console.log(this.sportDetailData, "this.sportDetailData");
-      this.activityDetailData = activity;
+      console.log(this.sportDetailData, "this.sportDetailData")
+      this.activityDetailData = activity
       // this.showSportDetailModal = true;
-      this.showEditScheduleClass = true;
-      this.isActivity = true;
+      this.showEditScheduleClass = true
+      this.isActivity = true
     },
 
     /**
      * 查看健康数据
      */
     handleViewHealthData(healthData) {
-      console.log("healthData:", healthData);
-      this.healthViewData = healthData;
+      console.log("healthData:", healthData)
+      this.healthViewData = healthData
       this.healthViewDate =
-        healthData.date || new Date().toISOString().split("T")[0];
-      this.healthViewDeviceType = healthData.deviceType || null;
-      this.showHealthViewDialog = true;
+        healthData.date || new Date().toISOString().split("T")[0]
+      this.healthViewDeviceType = healthData.deviceType || null
+      this.showHealthViewDialog = true
     },
 
     /**
@@ -1886,16 +1975,16 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await scheduleApi.unbindActivity(classScheduleId);
+        const res = await scheduleApi.unbindActivity(classScheduleId)
         if (res.success) {
-          this.$message.success("解除匹配成功");
-          this.getScheduleData();
+          this.$message.success("解除匹配成功")
+          this.getScheduleData()
         }
-      });
+      })
     },
 
     getSportTypeName(sportType) {
-      return getSportTypeName(sportType);
+      return getSportTypeName(sportType)
     },
 
     /**
@@ -1913,17 +2002,17 @@ export default {
           type: "warning",
         }
       ).then(async () => {
-        const type = activity.activityId ? 1 : 2;
+        const type = activity.activityId ? 1 : 2
         const activityId = activity.activityId
           ? activity.activityId
-          : activity.manualActivityId;
-        console.log(activity, activityId, type, "activityId, type");
-        const res = await scheduleApi.deleteActivity(activityId, type);
+          : activity.manualActivityId
+        console.log(activity, activityId, type, "activityId, type")
+        const res = await scheduleApi.deleteActivity(activityId, type)
         if (res.success) {
-          this.$message.success("删除成功");
-          this.getScheduleData();
+          this.$message.success("删除成功")
+          this.getScheduleData()
         }
-      });
+      })
     },
 
     /**
@@ -1938,25 +2027,25 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
-      this.copyClassFromOfficialClassId = classData.id;
-      this.copyClassFromOfficialGroupId = groupId;
-      this.copyClassFromOfficialData = classData;
-      this.showCopyClassFromOfficial = true;
+      this.copyClassFromOfficialClassId = classData.id
+      this.copyClassFromOfficialGroupId = groupId
+      this.copyClassFromOfficialData = classData
+      this.showCopyClassFromOfficial = true
     },
 
     /**
      * 通过ID查找课程
      */
     findClassById(id) {
-      let findClass = {};
+      let findClass = {}
       this.classList.forEach((item) => {
         item.classesList.forEach((part) => {
           if (part.id === +id) {
-            findClass = part;
+            findClass = part
           }
-        });
-      });
-      return findClass;
+        })
+      })
+      return findClass
     },
 
     /**
@@ -1966,64 +2055,64 @@ export default {
       if (!this.selectedAthletic) {
         return this.$message.error(
           "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
-        );
+        )
       }
-      const classItem = this.findClassById(e.item.dataset.id);
+      const classItem = this.findClassById(e.item.dataset.id)
       const params = {
         classesId: classItem.id,
         classesJson: JSON.stringify(classItem.classesJson),
         classesDate: e.to.dataset.date,
         sportType: classItem.sportType,
-      };
+      }
       // // 移除克隆的DOM元素，避免显示课程模板
       // if (e.item && e.item.parentNode) {
       //   e.item.parentNode.removeChild(e.item);
       // }
       this.$nextTick(() => {
-        this.AddScheduleClass(params, "", e.newIndex);
-      });
+        this.AddScheduleClass(params, "", e.newIndex)
+      })
     },
 
     /**
      * 日历拖拽添加
      */
     handleScheduleDragAdd(e) {
-      console.log(e, "======================");
-      const classId = e.item.firstChild.dataset.id;
-      const date = e.to.dataset.date;
-      console.log(classId, date, "classId, date");
+      console.log(e, "======================")
+      const classId = e.item.firstChild.dataset.id
+      const date = e.to.dataset.date
+      console.log(classId, date, "classId, date")
 
-      let newClassSchedule = {};
-      const sortVoList = [];
+      let newClassSchedule = {}
+      const sortVoList = []
 
       // 课程模板拖拽的单独处理
       if (e.item.dataset.type === "classTemplate") {
-        this.handleClassDragToSchedule(e);
-        return;
+        this.handleClassDragToSchedule(e)
+        return
       }
 
       // 计算在“仅课程卡片”中的实际索引，忽略健康数据、赛事、运动记录等非课程元素
-      let targetClassIndex = 0;
-      const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0;
-      const currentWeekData = [];
-      let topIndex = 0;
+      let targetClassIndex = 0
+      const newIndex = typeof e.newIndex === "number" ? e.newIndex : 0
+      const currentWeekData = []
+      let topIndex = 0
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(e.to.dataset.date)) {
-          currentWeekData.push(...item.healthInfos);
-          currentWeekData.push(...item.competitionList);
-          topIndex = item.healthInfos.length + item.competitionList.length;
-          currentWeekData.push(...item.classSchedule);
-          currentWeekData.push(...item.activityList);
+          currentWeekData.push(...item.healthInfos)
+          currentWeekData.push(...item.competitionList)
+          topIndex = item.healthInfos.length + item.competitionList.length
+          currentWeekData.push(...item.classSchedule)
+          currentWeekData.push(...item.activityList)
         }
-      });
+      })
 
       if (topIndex === 0) {
-        targetClassIndex = newIndex;
+        targetClassIndex = newIndex
       } else {
         if (newIndex > topIndex) {
-          targetClassIndex = newIndex - topIndex;
+          targetClassIndex = newIndex - topIndex
         } else {
-          targetClassIndex = 0;
+          targetClassIndex = 0
         }
       }
 
@@ -2036,36 +2125,36 @@ export default {
       // 删除原数据
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(e.item.firstChild.dataset.date)) {
-          console.log(item.classSchedule, "item.classSchedule===============");
+          console.log(item.classSchedule, "item.classSchedule===============")
           item.classSchedule.forEach((itemClass, oldIndex) => {
-            console.log(itemClass.id, classId, "itemClass.id, classId");
+            console.log(itemClass.id, classId, "itemClass.id, classId")
             if (itemClass.id === +classId) {
-              newClassSchedule = itemClass;
-              item.classSchedule.splice(oldIndex, 1);
+              newClassSchedule = itemClass
+              item.classSchedule.splice(oldIndex, 1)
             }
-          });
+          })
         }
-      });
+      })
 
       // 插入新数据
-      let currentData = [];
+      let currentData = []
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(date)) {
-          console.log(item.classSchedule, "item.classSchedule");
-          currentData = JSON.parse(JSON.stringify(item.classSchedule));
+          console.log(item.classSchedule, "item.classSchedule")
+          currentData = JSON.parse(JSON.stringify(item.classSchedule))
           // 使用只包含课程的索引插入，避免健康数据和赛事影响排序
-          currentData.splice(targetClassIndex, 0, newClassSchedule);
+          currentData.splice(targetClassIndex, 0, newClassSchedule)
         }
-      });
-      console.log(currentData, "currentData===============");
+      })
+      console.log(currentData, "currentData===============")
 
       // 生成排序数据
       currentData.forEach((item, index) => {
         sortVoList.push({
           id: item.id,
           sort: index,
-        });
-      });
+        })
+      })
       scheduleApi
         .bindActivity({
           classScheduleId: classId,
@@ -2075,54 +2164,54 @@ export default {
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("课表移动成功");
+            this.$message.success("课表移动成功")
           }
         })
         .finally(() => {
-          this.getScheduleData();
-        });
+          this.getScheduleData()
+        })
     },
 
     /**
      * 运动和课表匹配
      */
     handleMatchClass(data) {
-      const { classId, activityId, manualActivityId, type } = data;
-      let currentClass = {};
-      let currentActivity = {};
-      let activityDate = "";
-      console.log(data, "data");
+      const { classId, activityId, manualActivityId, type } = data
+      let currentClass = {}
+      let currentActivity = {}
+      let activityDate = ""
+      console.log(data, "data")
 
       this.currentWeek.forEach((item) => {
         item.activityList.forEach((activity) => {
           if (activity.activityId === activityId) {
-            currentActivity = activity;
-            activityDate = item.commonDate;
+            currentActivity = activity
+            activityDate = item.commonDate
           } else if (activity.manualActivityId === manualActivityId) {
-            currentActivity = activity;
-            activityDate = item.commonDate;
+            currentActivity = activity
+            activityDate = item.commonDate
           }
-        });
+        })
         item.classSchedule.forEach((classItem) => {
           if (classItem.id === +classId) {
-            currentClass = classItem;
+            currentClass = classItem
           }
-        });
-      });
-      console.log(currentActivity, "currentActivity");
-      console.log(currentClass, "currentClass");
+        })
+      })
+      console.log(currentActivity, "currentActivity")
+      console.log(currentClass, "currentClass")
 
       // 检查运动是否已经匹配过课表
       if (currentActivity.classScheduleId) {
-        this.getScheduleData();
-        this.$message.warning("该运动已经匹配过课表");
-        return;
+        this.getScheduleData()
+        this.$message.warning("该运动已经匹配过课表")
+        return
       }
 
       // 判断是否从课程模板中拖拽
       if (type === "classTemplate") {
-        currentClass = this.findClassById(classId);
-        console.log(currentClass, "currentClass===================");
+        currentClass = this.findClassById(classId)
+        console.log(currentClass, "currentClass===================")
         if (
           currentClass.sportType ===
           ACTIVITY_TYPE_DICT[currentActivity.sportType]
@@ -2134,15 +2223,15 @@ export default {
               dataDate: activityDate,
             },
             "classTemplate"
-          );
+          )
         } else {
           console.log(
             currentClass.sportType,
             currentActivity.sportType,
             "currentClass.sportType, currentActivity.sportType"
-          );
-          this.$message.error("该运动类型与课程类型不匹配");
-          this.getScheduleData();
+          )
+          this.$message.error("该运动类型与课程类型不匹配")
+          this.getScheduleData()
         }
       } else {
         if (
@@ -2151,15 +2240,15 @@ export default {
           this.handleBind(currentClass, {
             ...currentActivity,
             dataDate: activityDate,
-          });
+          })
         } else {
           console.log(
             currentClass.sportType,
             currentActivity.sportType,
             "currentClass.sportType, currentActivity.sportType"
-          );
-          this.$message.error("该运动类型与课程类型不匹配");
-          this.getScheduleData();
+          )
+          this.$message.error("该运动类型与课程类型不匹配")
+          this.getScheduleData()
         }
       }
     },
@@ -2181,35 +2270,35 @@ export default {
         manualActivityId,
         activityDate,
         "eventId, eventDate, activityId, manualActivityId, activityDate"
-      );
+      )
       if (!eventId) {
-        this.$message.error("赛事信息无效");
-        return;
+        this.$message.error("赛事信息无效")
+        return
       }
       if (!this.currentWeek || !Array.isArray(this.currentWeek)) {
-        this.$message.error("周数据未初始化");
-        this.getScheduleData();
-        return;
+        this.$message.error("周数据未初始化")
+        this.getScheduleData()
+        return
       }
       const eventData = this.currentWeek.find(
         (item) => item.commonDate === eventDate
-      );
-      console.log(eventData, "eventData");
+      )
+      console.log(eventData, "eventData")
       if (!eventData) {
-        this.$message.error("未找到对应的日期数据");
-        this.getScheduleData();
-        return;
+        this.$message.error("未找到对应的日期数据")
+        this.getScheduleData()
+        return
       }
       if (eventDate && activityDate && eventDate !== activityDate) {
         // this.$message.warning("只能匹配同一天的赛事");
-        this.getScheduleData();
-        return;
+        this.getScheduleData()
+        return
       }
-      const bindingActivityId = manualActivityId || activityId;
+      const bindingActivityId = manualActivityId || activityId
       if (!bindingActivityId) {
-        this.$message.error("运动数据无效");
-        this.getScheduleData();
-        return;
+        this.$message.error("运动数据无效")
+        this.getScheduleData()
+        return
       }
 
       // 找到对应的赛事数据
@@ -2218,34 +2307,34 @@ export default {
         !eventData.competitionList ||
         !Array.isArray(eventData.competitionList)
       ) {
-        this.$message.error("赛事列表数据无效");
-        this.getScheduleData();
-        return;
+        this.$message.error("赛事列表数据无效")
+        this.getScheduleData()
+        return
       }
 
-      console.log("eventId:", eventId, "type:", typeof eventId);
-      console.log("competitionList:", eventData.competitionList);
+      console.log("eventId:", eventId, "type:", typeof eventId)
+      console.log("competitionList:", eventData.competitionList)
       console.log(
         "competitionList ids:",
         eventData.competitionList.map((item) => ({
           id: item.id,
           type: typeof item.id,
         }))
-      );
+      )
 
       // 使用类型转换，支持字符串和数字类型匹配
       const competition = eventData.competitionList.find(
         (item) => String(item.id) === String(eventId)
-      );
-      console.log(competition, "competition");
+      )
+      console.log(competition, "competition")
       if (!competition) {
         this.$message.error(
           `未找到对应的赛事数据，eventId: ${eventId}，可用ID: ${eventData.competitionList
             .map((item) => item.id)
             .join(", ")}`
-        );
-        this.getScheduleData();
-        return;
+        )
+        this.getScheduleData()
+        return
       }
 
       // 找到对应的运动数据
@@ -2253,16 +2342,16 @@ export default {
         (item) =>
           (activityId && item.activityId === activityId) ||
           (manualActivityId && item.manualActivityId === manualActivityId)
-      );
-      console.log(activity, "activity");
+      )
+      console.log(activity, "activity")
       if (!activity) {
-        this.$message.error("未找到对应的运动数据");
-        this.getScheduleData();
-        return;
+        this.$message.error("未找到对应的运动数据")
+        this.getScheduleData()
+        return
       }
 
       // 获取比赛类型（可能是 displayValue 数字、value 字符串或 label 中文）
-      const rawCompetitionType = competition.competitionType;
+      const rawCompetitionType = competition.competitionType
 
       // 比赛类型映射表（参照 addEvent.vue 和 API 返回的数据结构）
       // displayValue: 数字, value: 英文值, label: 中文
@@ -2285,38 +2374,38 @@ export default {
         骑行: { value: "CYCLE", label: "骑行" },
         游泳: { value: "SWIM", label: "游泳" },
         其他: { value: "OTHER", label: "其他" },
-      };
+      }
 
       // 规范化比赛类型，统一转换为 value
       const normalizeCompetitionType = (type) => {
-        if (type === null || type === undefined) return null;
+        if (type === null || type === undefined) return null
         // 先尝试直接匹配
         if (COMPETITION_TYPE_MAP[type]) {
-          return COMPETITION_TYPE_MAP[type].value;
+          return COMPETITION_TYPE_MAP[type].value
         }
         // 尝试转换为字符串匹配
-        const typeStr = String(type);
+        const typeStr = String(type)
         if (COMPETITION_TYPE_MAP[typeStr]) {
-          return COMPETITION_TYPE_MAP[typeStr].value;
+          return COMPETITION_TYPE_MAP[typeStr].value
         }
         // 尝试转换为数字匹配（处理 displayValue）
-        const typeNum = Number(type);
+        const typeNum = Number(type)
         if (!isNaN(typeNum) && COMPETITION_TYPE_MAP[typeNum]) {
-          return COMPETITION_TYPE_MAP[typeNum].value;
+          return COMPETITION_TYPE_MAP[typeNum].value
         }
-        return null;
-      };
+        return null
+      }
 
       const normalizedCompetitionType =
-        normalizeCompetitionType(rawCompetitionType);
+        normalizeCompetitionType(rawCompetitionType)
       if (!normalizedCompetitionType) {
-        this.$message.warning(`未知的比赛类型: ${rawCompetitionType}`);
-        this.getScheduleData();
-        return;
+        this.$message.warning(`未知的比赛类型: ${rawCompetitionType}`)
+        this.getScheduleData()
+        return
       }
 
       // 获取运动类型（可能是数字 1,2,3 或字符串 CYCLE, RUN, SWIM）
-      let activitySportType = activity.sportType;
+      let activitySportType = activity.sportType
 
       // 将数字类型转换为字符串类型
       const ACTIVITY_TYPE_DICT = {
@@ -2325,10 +2414,10 @@ export default {
         3: "SWIM",
         4: "STRENGTH",
         5: "OTHER",
-      };
+      }
       if (typeof activitySportType === "number") {
         activitySportType =
-          ACTIVITY_TYPE_DICT[activitySportType] || activitySportType;
+          ACTIVITY_TYPE_DICT[activitySportType] || activitySportType
       }
 
       // 比赛类型到运动类型的映射（根据 value 匹配）
@@ -2338,30 +2427,30 @@ export default {
         CYCLE: ["CYCLE"], // 骑行只能匹配骑行
         SWIM: ["SWIM"], // 游泳只能匹配游泳
         OTHER: ["SWIM", "CYCLE", "RUN", "OTHER", "STRENGTH"], // 其他类型可以关联游泳、骑行、跑步、其他、力量
-      };
+      }
 
       // 检查比赛类型和运动类型是否允许关联
       const allowedSportTypes =
-        competitionTypeToSportTypes[normalizedCompetitionType];
+        competitionTypeToSportTypes[normalizedCompetitionType]
       if (!allowedSportTypes || allowedSportTypes.length === 0) {
         const competitionInfo = Object.values(COMPETITION_TYPE_MAP).find(
           (item) => item.value === normalizedCompetitionType
-        );
+        )
         const competitionTypeName =
-          competitionInfo?.label || normalizedCompetitionType;
+          competitionInfo?.label || normalizedCompetitionType
         this.$message.warning(
           `比赛类型为${competitionTypeName}时，暂不支持关联运动数据`
-        );
-        this.getScheduleData();
-        return;
+        )
+        this.getScheduleData()
+        return
       }
 
       if (!allowedSportTypes.includes(activitySportType)) {
         const competitionInfo = Object.values(COMPETITION_TYPE_MAP).find(
           (item) => item.value === normalizedCompetitionType
-        );
+        )
         const competitionTypeName =
-          competitionInfo?.label || normalizedCompetitionType;
+          competitionInfo?.label || normalizedCompetitionType
 
         // 运动类型中文名称映射
         const sportTypeNameMap = {
@@ -2370,26 +2459,26 @@ export default {
           RUN: "跑步",
           STRENGTH: "力量",
           OTHER: "其他",
-        };
+        }
 
         // 根据比赛类型生成允许的运动类型提示信息
-        let allowedTypesText = "";
+        let allowedTypesText = ""
         if (normalizedCompetitionType === "TRIATHLON") {
           // 铁三：当前规则允许关联「骑行、游泳、跑步、其他」
-          allowedTypesText = "游泳、骑行、跑步、其他";
+          allowedTypesText = "游泳、骑行、跑步、其他"
         } else {
           // 获取允许的运动类型的中文名称
           const allowedNames = allowedSportTypes
             .map((type) => sportTypeNameMap[type] || type)
-            .join("、");
-          allowedTypesText = allowedNames;
+            .join("、")
+          allowedTypesText = allowedNames
         }
 
         this.$message.warning(
           `比赛类型为${competitionTypeName}时，只能关联${allowedTypesText}的运动数据`
-        );
-        this.getScheduleData();
-        return;
+        )
+        this.getScheduleData()
+        return
       }
 
       // 关联成功，继续后续处理
@@ -2402,14 +2491,14 @@ export default {
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("关联成功");
+            this.$message.success("关联成功")
           }
-          this.getScheduleData();
+          this.getScheduleData()
         })
         .catch((err) => {
-          console.error("关联失败:", err);
-          this.getScheduleData();
-        });
+          console.error("关联失败:", err)
+          this.getScheduleData()
+        })
       // const type = manualActivityId ? 2 : 1;
     },
 
@@ -2426,7 +2515,7 @@ export default {
         dataDate: activityItem.dataDate,
         distance: activityItem.distance,
         sportType: activityItem.sportType,
-      };
+      }
       // 模拟课程数据 - 这里可以从课程列表中选择
       const courseData = {
         name: (classItem.classesJson && classItem.classesJson.title) || null,
@@ -2440,36 +2529,36 @@ export default {
         distanceUnit:
           (classItem.classesJson && classItem.classesJson.distanceUnit) || null,
         sportType: classItem.sportType,
-      };
-      console.log(exerciseData, "exerciseData");
-      this.bindCourseData = courseData;
-      this.bindExerciseData = [exerciseData];
-      this.bindType = type;
-      this.showBindModal = true;
+      }
+      console.log(exerciseData, "exerciseData")
+      this.bindCourseData = courseData
+      this.bindExerciseData = [exerciseData]
+      this.bindType = type
+      this.showBindModal = true
     },
 
     /**
      * 添加课表到日历
      */
     async AddScheduleClass(data, type = "", index = 0) {
-      if (!this.selectedAthletic) return;
-      console.log(this.athleticThreshold, "old athleticThreshold");
-      const originalClassesJson = parseClassesJson(data.classesJson);
-      await this.getAthleticThreshold(this.selectedAthletic, data.classesDate);
-      console.log(this.athleticThreshold, "new athleticThreshold");
+      if (!this.selectedAthletic) return
+      console.log(this.athleticThreshold, "old athleticThreshold")
+      const originalClassesJson = parseClassesJson(data.classesJson)
+      await this.getAthleticThreshold(this.selectedAthletic, data.classesDate)
+      console.log(this.athleticThreshold, "new athleticThreshold")
 
       // 根据运动类型计算阈值
-      let calculatedClassesJson = originalClassesJson;
+      let calculatedClassesJson = originalClassesJson
       if (data.sportType === "RUN") {
         calculatedClassesJson = new CalculateRun(
           this.athleticThreshold,
           originalClassesJson
-        ).updateClassInfoCalculatedValues();
+        ).updateClassInfoCalculatedValues()
       } else if (data.sportType === "CYCLE") {
         calculatedClassesJson = new CalculateBike(
           this.athleticThreshold,
           originalClassesJson
-        ).updateClassInfoCalculatedValues();
+        ).updateClassInfoCalculatedValues()
       }
 
       // 计算时间距离STH
@@ -2478,7 +2567,7 @@ export default {
           ...data,
           classesJson: JSON.stringify(calculatedClassesJson),
           triUserId: this.selectedAthletic,
-        });
+        })
 
         if (data.sportType === "RUN") {
           calculatedClassesJson = {
@@ -2486,62 +2575,62 @@ export default {
             duration: secondsToHHMMSS((res.result && res.result.time) || 0),
             distance: ((res.result && res.result.distance) || 0) + "km",
             sth: (res.result && res.result.sth) || null,
-          };
+          }
         } else if (data.sportType === "CYCLE") {
           calculatedClassesJson = {
             ...calculatedClassesJson,
             duration: calculatedClassesJson.duration,
             distance: calculatedClassesJson.distance,
             sth: (res.result && res.result.sth) || null,
-          };
+          }
         }
       }
 
       // 将计算后的classesJson字符串化
-      const finalClassesJsonString = JSON.stringify(calculatedClassesJson);
+      const finalClassesJsonString = JSON.stringify(calculatedClassesJson)
 
       // 创建更新后的data对象
       const updatedData = {
         ...data,
         classesJson: finalClassesJsonString,
-      };
+      }
 
       if (type === "classTemplate") {
-        return updatedData;
+        return updatedData
       }
 
       // 生成排序数据
-      const sortVoList = [];
-      let classSchedule = [];
-      let sort = null;
+      const sortVoList = []
+      let classSchedule = []
+      let sort = null
 
       this.currentWeek.forEach((item) => {
         if (item.commonDate === updatedData.classesDate) {
-          classSchedule = JSON.parse(JSON.stringify(item.classSchedule));
-          classSchedule.splice(index, 0, updatedData);
+          classSchedule = JSON.parse(JSON.stringify(item.classSchedule))
+          classSchedule.splice(index, 0, updatedData)
         }
-      });
+      })
 
       classSchedule.forEach((item, index) => {
         if (item.id) {
           sortVoList.push({
             id: item.id,
             sort: index,
-          });
+          })
         } else {
-          sort = index;
+          sort = index
         }
-      });
+      })
 
       const res = await scheduleApi.createSchedule({
         ...updatedData,
         triUserId: this.selectedAthletic,
         sortVoList,
         sort,
-      });
+      })
 
       if (res.success) {
-        this.getScheduleData();
+        this.getScheduleData()
         // this.getClassList();
       }
     },
@@ -2554,7 +2643,7 @@ export default {
     },
 
     handleClassDragEndFromClassList(e) {
-      console.log(e, "handleClassDragEndFromClassList===================");
+      console.log(e, "handleClassDragEndFromClassList===================")
       if (
         e.originalEvent.srcElement.offsetParent &&
         e.originalEvent.srcElement.offsetParent.dataset &&
@@ -2568,9 +2657,9 @@ export default {
           manualActivityId:
             e.originalEvent.srcElement.offsetParent.dataset.manualactivityid,
           type: e.item.dataset.type,
-        });
+        })
       } else if (e.to.dataset.date) {
-        this.handleScheduleDragAdd(e);
+        this.handleScheduleDragAdd(e)
       }
     },
 
@@ -2578,9 +2667,9 @@ export default {
      * 保存课程标题
      */
     onSaveClassTitle(payload) {
-      this.classModalData = { ...payload };
-      this.showAddClassTitle = false;
-      this.showSportTypeModal = true;
+      this.classModalData = { ...payload }
+      this.showAddClassTitle = false
+      this.showSportTypeModal = true
     },
 
     /**
@@ -2588,7 +2677,7 @@ export default {
      */
     onSelectSportType(item) {
       if (this.classModalDataType !== "addSchedule") {
-        this.classModalDataType = "add";
+        this.classModalDataType = "add"
       }
       var Map = {
         swim: "SWIM",
@@ -2598,58 +2687,58 @@ export default {
         rest: "REST",
         ride: "CYCLE",
         run: "RUN",
-      };
+      }
 
       if (this.classModalDataType === "addSchedule") {
         // 新增模式，确保数据为空
-        this.scheduleType = "add";
-        this.classDetailData = {};
-        this.classSportType = Map[item.key];
+        this.scheduleType = "add"
+        this.classDetailData = {}
+        this.classSportType = Map[item.key]
         this.$nextTick(() => {
-          this.showClassDetailModal = true;
-        });
-        console.log(this.addScheduleDate, "this.addScheduleDate");
-        return;
+          this.showClassDetailModal = true
+        })
+        console.log(this.addScheduleDate, "this.addScheduleDate")
+        return
       }
-      console.log(item, "item");
+      console.log(item, "item")
 
-      this.classModalData.sportType = Map[item.key];
-      this.showAddClassModal = true;
-      this.showSportTypeModal = false;
+      this.classModalData.sportType = Map[item.key]
+      this.showAddClassModal = true
+      this.showSportTypeModal = false
     },
 
     handleCancelSportType() {
-      this.showSportTypeModal = false;
-      this.isSchedule = false;
+      this.showSportTypeModal = false
+      this.isSchedule = false
     },
 
     /**
      * 保存各类型课程
      */
     onSaveAddClass(saveData, flag) {
-      console.log(saveData, "saveData");
+      console.log(saveData, "saveData")
       if (this.classModalDataType === "add") {
         classApi.createClass(saveData).then((res) => {
           if (res.success) {
-            this.$message.success("课程保存成功");
-            this.classModalData = res.result;
-            this.classModalDataType = "edit";
-            if (flag) this.showAddClassModal = false;
-            this.getClassList();
+            this.$message.success("课程保存成功")
+            this.classModalData = res.result
+            this.classModalDataType = "edit"
+            if (flag) this.showAddClassModal = false
+            this.getClassList()
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
+        })
       } else if (this.classModalDataType === "edit") {
         classApi.updateClass(saveData).then((res) => {
           if (res.success) {
-            this.$message.success("课程保存成功");
-            if (flag) this.showAddClassModal = false;
-            this.getClassList();
+            this.$message.success("课程保存成功")
+            if (flag) this.showAddClassModal = false
+            this.getClassList()
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
+        })
       } else if (this.classModalDataType === "addSchedule") {
         console.log(
           saveData,
@@ -2657,9 +2746,9 @@ export default {
           this.classModalData,
           this.addScheduleDate,
           "saveData, flag, classModalData, addScheduleDate"
-        );
-        if (flag) this.showAddClassModal = false;
-        this.handlePasteClass(this.addScheduleDate, saveData);
+        )
+        if (flag) this.showAddClassModal = false
+        this.handlePasteClass(this.addScheduleDate, saveData)
       }
     },
 
@@ -2667,25 +2756,25 @@ export default {
      * 保存分组
      */
     onSaveAddGroup() {
-      this.showAddGroup = false;
-      this.getClassList();
+      this.showAddGroup = false
+      this.getClassList()
     },
 
     /**
      * 保存移动分组
      */
     onSaveMoveGroup() {
-      this.showMoveGroup = false;
-      this.getClassList();
-      this.getScheduleData();
+      this.showMoveGroup = false
+      this.getClassList()
+      this.getScheduleData()
     },
 
     /**
      * 保存复制课程
      */
     onSaveCopyClassFromOfficial() {
-      this.showCopyClassFromOfficial = false;
-      this.getClassList();
+      this.showCopyClassFromOfficial = false
+      this.getClassList()
     },
 
     /**
@@ -2693,38 +2782,38 @@ export default {
      */
     onSaveAthleticInfo() {
       // 保存逻辑
-      this.showAthleticInfoDialog = false;
-      this.getScheduleData();
-      this.getAthleticThreshold(this.selectedAthletic);
+      this.showAthleticInfoDialog = false
+      this.getScheduleData()
+      this.getAthleticThreshold(this.selectedAthletic)
     },
 
     /**
      * 取消月度统计
      */
     onCancelMonthStatistic() {
-      this.showMonthStatisticDialog = false;
+      this.showMonthStatisticDialog = false
     },
 
     /**
      * 取消运动详情
      */
     onCancelSportDetail() {
-      this.showSportDetailModal = false;
+      this.showSportDetailModal = false
     },
 
     /**
      * 绑定确认
      */
     async onBind(data) {
-      console.log("匹配数据：", data);
+      console.log("匹配数据：", data)
       if (data.type === "classTemplate") {
         const params = {
           classesId: data.courseData.id,
           classesJson: JSON.stringify(data.courseData.classesJson),
           classesDate: data.exerciseData[0].dataDate,
           sportType: data.courseData.sportType,
-        };
-        const josnData = await this.AddScheduleClass(params, data.type);
+        }
+        const josnData = await this.AddScheduleClass(params, data.type)
         scheduleApi
           .createSchedule({
             ...josnData,
@@ -2732,10 +2821,10 @@ export default {
           })
           .then((res) => {
             if (res.success) {
-              const type = data.exerciseData[0].activityId ? 1 : 2;
+              const type = data.exerciseData[0].activityId ? 1 : 2
               const bindingActivityId = data.exerciseData[0].activityId
                 ? data.exerciseData[0].activityId
-                : data.exerciseData[0].manualActivityId;
+                : data.exerciseData[0].manualActivityId
               scheduleApi
                 .bindActivity({
                   classScheduleId: res.result.id,
@@ -2746,40 +2835,40 @@ export default {
                 })
                 .then((res) => {
                   if (res.success) {
-                    this.$message.success("匹配成功");
+                    this.$message.success("匹配成功")
                   } else {
-                    this.$message.error(res.message);
+                    this.$message.error(res.message)
                   }
                   // 关闭对话框并刷新数据
-                  this.showBindModal = false;
+                  this.showBindModal = false
                   this.$nextTick(() => {
-                    this.getScheduleData();
-                  });
+                    this.getScheduleData()
+                  })
                 })
                 .catch((error) => {
-                  console.error("绑定失败:", error);
-                  this.$message.error("绑定失败");
-                  this.showBindModal = false;
+                  console.error("绑定失败:", error)
+                  this.$message.error("绑定失败")
+                  this.showBindModal = false
                   this.$nextTick(() => {
-                    this.getScheduleData();
-                  });
-                });
+                    this.getScheduleData()
+                  })
+                })
             } else {
-              this.$message.error(res.message);
-              this.showBindModal = false;
+              this.$message.error(res.message)
+              this.showBindModal = false
             }
           })
           .catch((error) => {
-            console.error("创建课表失败:", error);
-            this.$message.error("创建课表失败");
-            this.showBindModal = false;
-          });
-        return;
+            console.error("创建课表失败:", error)
+            this.$message.error("创建课表失败")
+            this.showBindModal = false
+          })
+        return
       }
-      const type = data.exerciseData[0].manualActivityId ? 2 : 1;
+      const type = data.exerciseData[0].manualActivityId ? 2 : 1
       const bindingActivityId = data.exerciseData[0].manualActivityId
         ? data.exerciseData[0].manualActivityId
-        : data.exerciseData[0].activityId;
+        : data.exerciseData[0].activityId
       // 这里可以调用匹配API
       scheduleApi
         .bindActivity({
@@ -2791,54 +2880,54 @@ export default {
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("匹配成功");
+            this.$message.success("匹配成功")
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
           // 关闭对话框并刷新数据
-          this.showBindModal = false;
+          this.showBindModal = false
           this.$nextTick(() => {
-            this.getScheduleData();
-          });
+            this.getScheduleData()
+          })
         })
         .catch((error) => {
-          console.error("绑定失败:", error);
-          this.$message.error("绑定失败");
-          this.showBindModal = false;
+          console.error("绑定失败:", error)
+          this.$message.error("绑定失败")
+          this.showBindModal = false
           this.$nextTick(() => {
-            this.getScheduleData();
-          });
-        });
+            this.getScheduleData()
+          })
+        })
     },
 
     /**
      * 取消绑定
      */
     onCancelBind() {
-      this.showBindModal = false;
-      this.getScheduleData();
+      this.showBindModal = false
+      this.getScheduleData()
     },
 
     /**
      * 保存课程详情
      */
-    handleClassDetailSave(data,flag) {
-      console.log(flag, "flag");
+    handleClassDetailSave(data, flag) {
+      console.log(flag, "flag")
       if (flag) {
-        this.showClassDetailModal = false;
-        this.showEditScheduleClass = false;
-        this.classSportType = "";
+        this.showClassDetailModal = false
+        this.showEditScheduleClass = false
+        this.classSportType = ""
         if (this.isActivity) {
-          this.activityDetailData = {};
+          this.activityDetailData = {}
         } else {
-          this.classDetailData = {};
+          this.classDetailData = {}
         }
       }
-      this.getScheduleData();
-      this.getClassList();
+      this.getScheduleData()
+      this.getClassList()
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -2911,12 +3000,131 @@ export default {
   border-right: 1px solid #e5e5e5;
   background-color: #fff;
 }
+
+.team-select-container {
+  padding: 16px 10px 0;
+  margin-bottom: 5px;
+
+  .team-dropdown {
+    cursor: pointer;
+    width: 100%;
+
+    .team-name-title {
+      display: flex;
+      align-items: center;
+      color: #101010;
+      font-family: PingFang SC;
+      font-weight: 600;
+      font-style: Semibold;
+      font-size: 15px;
+
+      i {
+        margin-left: 8px;
+        font-size: 12px;
+        color: #999;
+      }
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
 </style>
 
 <style lang="scss">
 .device-brand-icon {
   width: 22px;
   margin-right: 10px;
+}
+
+.team-dropdown-menu {
+  .el-dropdown-menu__item.active {
+    color: #CC2323;
+    font-weight: bold;
+  }
+}
+
+.athletic-dropdown {
+  cursor: pointer;
+  display: inline-block;
+
+  .athletic-select-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background-color: #fff;
+    min-width: 120px;
+    font-family: PingFang SC;
+    font-size: 14px;
+    color: #101010;
+    transition: all 0.3s;
+
+    &:hover {
+      border-color: #c0c4cc;
+    }
+
+    .athletic-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .athletic-name-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    i {
+      margin-left: auto;
+      font-size: 12px;
+      color: #999;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.athletic-dropdown-menu {
+  .group-header {
+    font-weight: 600;
+    color: #101010;
+    background-color: #f5f7fa;
+    cursor: default;
+    padding: 8px 20px;
+    font-size: 13px;
+
+    &:hover {
+      background-color: #f5f7fa;
+      color: #101010;
+    }
+  }
+
+  .athletic-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .athletic-menu-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+  }
+
+  .el-dropdown-menu__item.active {
+    color: #CC2323;
+    font-weight: bold;
+    background-color: #fef0f0;
+  }
 }
 
 .health-view-dialog {
@@ -2932,6 +3140,7 @@ export default {
     padding: 0;
   }
 }
+
 .schedule-top {
   // padding: 10px;
   height: 58px;
@@ -2945,6 +3154,7 @@ export default {
   gap: 10px;
   box-shadow: 0px 1px 0px 0px #00000026;
   border-bottom: 1px solid #e5e5e5;
+
   .schedule-search {
     width: 230px;
     display: flex;
@@ -2953,6 +3163,7 @@ export default {
     flex-wrap: wrap;
     justify-content: flex-end;
     padding-right: 20px;
+
     img {
       width: 24px;
       height: 24px;

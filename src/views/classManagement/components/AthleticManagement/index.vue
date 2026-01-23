@@ -1,7 +1,7 @@
 <template>
   <div class="athletic-management">
     <div style="padding: 10px">
-      <div class="athletic-title">{{ teamName }}</div>
+      <!-- <div class="athletic-title">{{ teamName }}</div> -->
       <div class="athletic-operation">
         <el-input size="mini" v-model="searchInput" @input="handleSearch">
           <el-button
