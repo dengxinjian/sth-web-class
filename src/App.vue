@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <router-view v-if="isRouterAlive" />
-    <div class="maintenance-container">
+    <!-- <div class="maintenance-container">
       <div>系统维护中，请稍后访问</div>
-    </div>
+    </div> -->
   </div>
 </template>
 
