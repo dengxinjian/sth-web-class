@@ -47,10 +47,10 @@
               background:
                 loginType === '1'
                   ? 'linear-gradient(90.94deg, #2A2A2A 10%, #B81300 50%, #2A2A2A 90%)'
-                  : 'linear-gradient(90.94deg, #2A2A2A 10%, #008867 50%, #2A2A2A 90%)',
+                  : '',
             }" class="change-identify-button">{{ `切换成${loginType == "1" ? "教练" : "运动员"}` }}</el-button>
           </el-dropdown-item>
-
+          <!-- linear-gradient(90.94deg, #2A2A2A 10%, #008867 50%, #2A2A2A 90%) -->
           <el-dropdown-item @click.native="logout">
             <el-button type="info" size="small" style="width: 100%">{{
               $t("navbar.logOut")

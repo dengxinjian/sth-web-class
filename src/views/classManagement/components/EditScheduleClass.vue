@@ -813,6 +813,7 @@ import { scheduleApi } from "../services/classManagement.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
 import { getClassImageIcon, getSportTypeName } from "../utils/helpers";
 import { hhmmssToSeconds } from "@/utils/index";
+
 export default {
   name: "EditClass",
   components: {
@@ -1578,6 +1579,7 @@ export default {
         classesJson: JSON.stringify({
           ...this.classData.classesJson,
           links: links,
+          title: this.form.title
         }),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
@@ -1645,6 +1647,7 @@ export default {
         sthValue: this.actualData.sthValue || 0,
         calories: this.actualData.calories || 0,
         distanceUnit: this.actualData.distanceUnit,
+        title: this.form.title,
       }).then((res) => {
         if (res.success) {
           this.$message.success("运动记录保存成功");
@@ -1667,6 +1670,7 @@ export default {
           this.$set({
             ...this.classData.classesJson,
             links: links,
+            title: this.form.title,
           }, "title", this.form.title);
         } catch (error) {
           // 验证失败，不继续保存
