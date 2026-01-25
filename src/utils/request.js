@@ -1,6 +1,7 @@
 import axios from "axios";
 import { MessageBox, Message } from "element-ui";
 import store from "@/store";
+import router from "@/router";
 import { getToken } from "@/utils/auth";
 const isPoint401 = false;
 
@@ -105,7 +106,7 @@ service.interceptors.response.use(
       //     });
       // }
       store.dispatch("user/resetToken").then(() => {
-        location.reload();
+        router.push("/login");
       });
     } else {
       Message({
