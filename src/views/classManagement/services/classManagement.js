@@ -2,8 +2,8 @@
  * 课程管理API服务
  */
 
-import { getData, submitData } from "@/api/common.js";
-import request from "@/utils/request";
+import { getData, submitData } from "@/api/common.js"
+import request from "@/utils/request"
 
 /**
  * 团队相关API
@@ -11,9 +11,9 @@ import request from "@/utils/request";
 export const teamApi = {
   // 获取所有团队
   getAllTeams() {
-    return getData({ url: "/consumer/api/team/coach/all-teams" });
+    return getData({ url: "/consumer/api/team/coach/all-teams" })
   },
-};
+}
 
 /**
  * 课程相关API
@@ -24,7 +24,7 @@ export const classApi = {
     return getData({
       url: "/training/api/classes/getClassesByUserIdGroupedWithName",
       classesTitle,
-    });
+    })
   },
 
   // 获取官方课程列表
@@ -32,34 +32,34 @@ export const classApi = {
     return getData({
       url: "/training/api/classes/getOfficialGroupedWithName",
       classesTitle,
-    });
+    })
   },
 
   // 删除课程
   deleteClass(id) {
     return submitData({
       url: `/training/api/classes/deleteClasses?id=${id}`,
-    });
+    })
   },
   createClass(data) {
     return submitData({
       url: "/training/api/classes/create",
       requestData: data,
-    });
+    })
   },
   updateClass(data) {
     return submitData({
       url: "/training/api/classes/update",
       requestData: data,
-    });
+    })
   },
   // 获取当前人 课程配置数
   getCurrentUserClassConfigCount() {
     return getData({
       url: "/training/api/classes/getUserClassesCount",
-    });
+    })
   },
-};
+}
 
 /**
  * 课表相关API
@@ -72,7 +72,7 @@ export const scheduleApi = {
       begin,
       end,
       triUserId,
-    });
+    })
   },
 
   // 获取健康数据
@@ -82,7 +82,7 @@ export const scheduleApi = {
       deviceType,
       date,
       triUserId,
-    });
+    })
   },
 
   // 创建课表
@@ -90,7 +90,18 @@ export const scheduleApi = {
     return submitData({
       url: "/gateway/training/classSchedule/create",
       requestData: data,
-    });
+    })
+  },
+
+  // 删除该日期所有课表
+  deleteAllSchedules(params) {
+    return request({
+      url: `/gateway/training/classSchedule/deleteClassScheduleOfDay?day=${params.day}&triUserId=${params.triUserId}`,
+      method: "post",
+      headers: {
+        requestUserInfoId: params.triUserId,
+      },
+    })
   },
 
   // 删除课表
@@ -104,7 +115,7 @@ export const scheduleApi = {
       headers: {
         requestUserInfoId: params.triUserId,
       },
-    });
+    })
   },
 
   // 运动详细
@@ -113,7 +124,7 @@ export const scheduleApi = {
       url: "/gateway/training/activity/getActivityDetail",
       activityId,
       triUserId
-    });
+    })
   },
 
   // 课表绑定运动
@@ -121,7 +132,7 @@ export const scheduleApi = {
     return submitData({
       url: "/gateway/training/classSchedule/classBindingActivity",
       requestData: data,
-    });
+    })
   },
 
   // 课表解绑运动
@@ -129,14 +140,14 @@ export const scheduleApi = {
     return submitData({
       url: "/training/api/classSchedule/classUnbindActivity",
       requestData: { classScheduleId },
-    });
+    })
   },
 
   // 删除运动
   deleteActivity(activityId, type) {
     return submitData({
       url: `/training/api/activity/deleteActivity?activityId=${activityId}&type=${type}`,
-    });
+    })
   },
 
   // 计算时间距离和STH
@@ -144,7 +155,7 @@ export const scheduleApi = {
     return submitData({
       url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
       requestData: data,
-    });
+    })
   },
 
   // 重试课表同步
@@ -156,7 +167,7 @@ export const scheduleApi = {
       //   classScheduleId,
       //   deviceType,
       // },
-    });
+    })
   },
 
   // 录入运动
@@ -164,9 +175,9 @@ export const scheduleApi = {
     return submitData({
       url: "/training/api/manualDeviceActivity/create",
       requestData: data,
-    });
+    })
   },
-};
+}
 
 /**
  * 统计相关API
@@ -179,9 +190,9 @@ export const statisticsApi = {
       begin,
       end,
       triUserId,
-    });
+    })
   },
-};
+}
 
 /**
  * 运动员相关API
@@ -194,7 +205,7 @@ export const athleteApi = {
       triUserId,
       date,
       clientType,
-    });
+    })
   },
 
   // 获取授权设备列表
@@ -202,23 +213,23 @@ export const athleteApi = {
     return getData({
       url: "/device/api/device/authorizedDevice",
       triUserId,
-    });
+    })
   },
 
   // 更新授权设备
   updateAuthorizedDevice({ deviceId, syncFlag }) {
     return submitData({
       url: `/device/api/device/updateAuthorizedDevice?deviceId=${deviceId}&syncFlag=${syncFlag}`,
-    });
+    })
   },
   // 获取所有设备列表
   getDeviceList(triUserId) {
     return getData({
       url: "/device/api/device/authorizedAllDevice",
       triUserId,
-    });
+    })
   },
-};
+}
 
 /**
  * 分组相关API
@@ -229,7 +240,7 @@ export const groupApi = {
     return submitData({
       url: "/training/api/classesGroup/create",
       requestData: data,
-    });
+    })
   },
 
   // 更新分组
@@ -237,16 +248,16 @@ export const groupApi = {
     return submitData({
       url: "/training/api/classesGroup/update",
       requestData: data,
-    });
+    })
   },
 
   // 删除分组
   deleteGroup(id) {
     return submitData({
       url: `/training/api/classesGroup/deleteClassesGroup?id=${id}`,
-    });
+    })
   },
-};
+}
 
 /**
  * 赛事相关API
@@ -256,21 +267,21 @@ export const competitionApi = {
   getDropdownOptions() {
     return getData({
       url: "/consumer/api/competition/dropdown-options",
-    });
+    })
   },
   // 行政区域
   getAdministrativeDivision(parentId = "") {
     return getData({
       url: "/training/api/resource/administrative-division",
       parentId,
-    });
+    })
   },
   // 查询赛事详情
   getCompetitionDetail(id) {
     return request({
       url: `/gateway/competition/${id}`,
       method: "get",
-    });
+    })
   },
   // 创建赛事
   createCompetition(data, triUserId) {
@@ -281,7 +292,7 @@ export const competitionApi = {
       headers: {
         requestUserInfoId: triUserId,
       },
-    });
+    })
   },
 
   // 更新赛事
@@ -298,14 +309,14 @@ export const competitionApi = {
       },
       method: "put",
       data,
-    });
+    })
   },
   // 删除赛事
   deleteCompetition(id) {
     return submitData({
       url: `/gateway/competition/${id}`,
       method: "delete",
-    });
+    })
   },
 
   // 赛事绑定运动
@@ -313,14 +324,14 @@ export const competitionApi = {
     return submitData({
       url: "/gateway/activity/web/activityBindCompetition",
       requestData: data,
-    });
+    })
   },
   // 赛事解绑运动
   unbindActivity(data) {
     return submitData({
       url: "/gateway/activity/web/activityUnBindCompetition",
       requestData: data,
-    });
+    })
   },
   // 保存/更新比赛成绩
   saveCompetitionResult(data) {
@@ -328,7 +339,7 @@ export const competitionApi = {
       url: "/consumer/api/competition/season-results",
       method: "put",
       data,
-    });
+    })
   },
   // 赛事运动位置移动
   moveActivityPosition(data) {
@@ -336,6 +347,6 @@ export const competitionApi = {
       url: "/training/api/activity/web/changeTransitionNode",
       method: "post",
       data,
-    });
+    })
   },
-};
+}

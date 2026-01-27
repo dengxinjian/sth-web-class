@@ -83,7 +83,8 @@
                     placement="bottom-start"
                     @command="handleAthleticChange"
                     class="athletic-dropdown">
-                    <span class="el-dropdown-link athletic-select-title">
+                    <span
+                      class="el-dropdown-link athletic-select-title">
                       <img
                         v-if="getSelectedAthleticAvatar"
                         :src="getSelectedAthleticAvatar"
@@ -205,6 +206,7 @@
               @add-schedule="handleAddSchedule"
               @event-detail="handleEventDetail"
               @edit-event="handleEditEvent"
+              @delete-all-schedules="handleDeleteAllSchedules"
               @input-activity="handleInputActivity"
               @click-event-activity="handleEditActivity" />
 
@@ -253,7 +255,8 @@
           @event-detail="handleEventDetail"
           @edit-event="handleEditEvent"
           @input-activity="handleInputActivity"
-          @click-event-activity="handleEditActivity" />
+          @click-event-activity="handleEditActivity"
+          @delete-all-schedules="handleDeleteAllSchedules" />
         <!-- 右侧统计面板 -->
         <StatisticsPanel
           v-if="!isPlan"
@@ -694,6 +697,25 @@ export default {
     getDeviceBrandIcon,
     getDeviceName(deviceType) {
       return DEVICE_TYPE_DICT[deviceType] || "未知设备"
+    },
+    /**
+     * 删除该日期所有课表
+     */
+    handleDeleteAllSchedules(date) {
+      console.log("handleDeleteAllSchedules-1", date)
+      scheduleApi.deleteAllSchedules({
+        day: date,
+        triUserId: this.selectedAthletic,
+      }).then((res) => {
+        if (res.success) {
+          this.$message.success("课表删除成功")
+          this.getScheduleData()
+        }
+      })
+        .catch((err) => {
+          console.log(err, "err")
+          this.$message.error("课表删除失败")
+        })
     },
     /**
      * 处理身份切换事件

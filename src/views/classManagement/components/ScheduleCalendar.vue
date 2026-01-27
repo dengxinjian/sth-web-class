@@ -86,7 +86,9 @@
             }`"
             class="schedule-table-cell"
           >
-            <div :class=" item.commonDate === today ? 'schedule-table-cell-title-cur' : 'schedule-table-cell-title'">
+            <div
+              :class="item.commonDate === today ? 'schedule-table-cell-title-cur' : 'schedule-table-cell-title'"
+              @contextmenu.stop.prevent="showDateTitleContextMenu($event, item.commonDate)">
               <div>{{ new Date(item?.commonDate).getDate() }}</div>
               <div>
                 （{{ convertToLunar(item?.commonDate).dateStr }}）
@@ -205,6 +207,23 @@
                 </div>
               </div>
             </transition>
+            <!-- 日期标题右键菜单 -->
+            <transition name="context-menu-fade">
+              <div
+                v-if="dateTitleContextMenuVisible"
+                class="context-menu date-title-context-menu"
+                :style="{
+                  left: dateTitleContextMenuX + 'px',
+                  top: dateTitleContextMenuY + 'px',
+                }"
+                @click.stop>
+                <div
+                  class="context-menu-item"
+                  @click="handleDeleteAllSchedules">
+                  <span>删除课表</span>
+                </div>
+              </div>
+            </transition>
           </div>
         </div>
       </div>
@@ -270,17 +289,26 @@ export default {
       hasCutEvent: false, // 是否已剪切过赛事
       cutEvent: null, // 保存剪切的赛事信息（用于删除原位置）
       today: new Date().toISOString().split('T')[0], // 当前日期
+      dateTitleContextMenuVisible: false, // 日期标题右键菜单显示状态
+      dateTitleContextMenuX: 0, // 日期标题右键菜单位置X
+      dateTitleContextMenuY: 0, // 日期标题右键菜单位置Y
+      dateTitleContextMenuDate: null, // 日期标题右键菜单的日期
     };
   },
   mounted() {
     document.addEventListener("click", this.hideContextMenu);
+    document.addEventListener("click", this.hideDateTitleContextMenu);
   },
   beforeDestroy() {
     document.removeEventListener("click", this.hideContextMenu);
+    document.removeEventListener("click", this.hideDateTitleContextMenu);
   },
   methods: {
     isToday,
     convertToLunar,
+    handleClickDate(date) {
+      this.$emit("click-date", date);
+    },
     handleClickEventActivity(activity) {
       console.log("handleClickEventActivity-activity-1", activity);
       this.$emit("click-event-activity", activity);
@@ -500,6 +528,96 @@ export default {
     },
     handleInputActivity(date) {
       this.$emit("input-activity", date);
+    },
+    // 显示日期标题右键菜单
+    showDateTitleContextMenu(event, date) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      this.dateTitleContextMenuVisible = true;
+      this.dateTitleContextMenuDate = date;
+
+      // 直接使用鼠标位置（相对于视口，因为菜单使用 fixed 定位）
+      let x = event.clientX;
+      let y = event.clientY;
+
+      // 使用 nextTick 确保菜单已渲染，然后调整位置避免超出视口
+      this.$nextTick(() => {
+        const menuElement = document.querySelector(".date-title-context-menu");
+        if (!menuElement) {
+          this.dateTitleContextMenuX = x;
+          this.dateTitleContextMenuY = y;
+          return;
+        }
+
+        const menuRect = menuElement.getBoundingClientRect();
+        const menuWidth = menuRect.width;
+        const menuHeight = menuRect.height;
+
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // 调整位置，确保菜单不超出视口
+        if (x + menuWidth > viewportWidth) {
+          x = viewportWidth - menuWidth - 10;
+        }
+
+        if (x < 10) {
+          x = 10;
+        }
+
+        if (y + menuHeight > viewportHeight) {
+          y = viewportHeight - menuHeight - 10;
+        }
+
+        if (y < 10) {
+          y = 10;
+        }
+
+        this.dateTitleContextMenuX = x;
+        this.dateTitleContextMenuY = y;
+      });
+    },
+    // 隐藏日期标题右键菜单
+    hideDateTitleContextMenu() {
+      this.dateTitleContextMenuVisible = false;
+      this.dateTitleContextMenuDate = null;
+    },
+    // 删除该日期所有课表
+    handleDeleteAllSchedules() {
+      if (!this.dateTitleContextMenuDate) return;
+
+      // 先保存日期值，避免在 hideDateTitleContextMenu 中被清空
+      const targetDate = this.dateTitleContextMenuDate;
+
+      const dateItem = this.currentWeek.find(
+        (item) => item.commonDate === targetDate
+      );
+
+      if (!dateItem || !dateItem.classSchedule || dateItem.classSchedule.length === 0) {
+        this.$message.info("该日期没有课表");
+        this.hideDateTitleContextMenu();
+        return;
+      }
+
+      const scheduleCount = dateItem.classSchedule.length;
+      this.$confirm(
+        `确认删除该日期下的所有课表（共${scheduleCount}个）？`,
+        "提示",
+        {
+          confirmButtonText: "删除",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
+        .then(() => {
+          // 使用保存的日期值触发事件
+          this.$emit("delete-all-schedules", targetDate);
+          this.hideDateTitleContextMenu();
+        })
+        .catch(() => {
+          this.hideDateTitleContextMenu();
+        });
     },
   },
 };
@@ -793,6 +911,10 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  &.date-title-context-menu {
+    position: fixed;
+  }
 
   .context-menu-item {
     width: 60px;
