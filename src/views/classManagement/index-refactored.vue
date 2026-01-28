@@ -44,6 +44,7 @@
           <div v-show="activeName === 'class'"
             class="class-container-wrapper">
             <ClassList
+              ref="planListRef"
               :class-list="classList"
               :active-class-type.sync="activeClassType"
               @class-type-change="handleClassTypeChange"
@@ -58,7 +59,11 @@
               @delete-class="handleDeleteClass"
               @copy-class="handleCopyClassFromOfficial"
               @collapse-change="classSlideChange"
-              @view-class="handleViewClass" />
+              @view-class="handleViewClass"
+              @add-share-group="handleAddShareGroup"
+              @edit-share-group="handleEditShareGroup"
+              @delete-share-group="handleDeleteShareGroup"
+              @move-share-group="handleMoveShareGroup" />
           </div>
         </div>
 
@@ -349,7 +354,12 @@
       @move="handleMoveClass"
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
-      @save="handleUpdateClass" />
+      @save="handleUpdateClass"
+      @share="handleShareClass" />
+    <ShareClassModal
+      v-model="showShareClassModal"
+      :class-id="shareClassId"
+      @save="onSaveShareClass" />
     <AddClassModal
       v-model="showAddClassModal"
       :sportType="classModalData.sportType"
@@ -411,6 +421,16 @@
       :visible.sync="showInputActivity"
       :activityDate="inputActivityDate"
       @submit="handleInputActivitySave" />
+    <!-- 添加分享分组 -->
+    <AddShareGroup
+      v-model="addShareGroupVisible"
+      :data="currentShareGroup"
+      @save="handleAddShareGroupSave" />
+    <!-- 移动分享分组 -->
+    <MoveShareGroup
+      v-model="moveShareGroupVisible"
+      :data="currentMoveShareGroup"
+      @save="handleMoveShareGroupSave" />
   </div>
 </template>
 
@@ -433,6 +453,7 @@ import SportDetailModal from "./components/SportDetailModal"
 import ClassDetailModal from "./components/ClassDetailModal"
 import CopyClassFromOfficial from "./components/CopyClassFromOfficial"
 import ViewClassCard from "./components/ViewClassCard"
+import ShareClassModal from "./components/ShareClass/index.vue"
 import EditScheduleClass from "./components/EditScheduleClass"
 import HealthView from "./components/HealthView.vue"
 import AddEvent from "./components/addEvent.vue"
@@ -440,6 +461,8 @@ import InputActivity from "./components/InputActivity.vue"
 import PlanView from "../plan/planView.vue"
 import EventInfo from "./components/EventInfo.vue"
 import WeekRangePicker from "@/components/WeekRangePicker/index.vue"
+import AddShareGroup from "./components/AddShareGroup/index.vue"
+import MoveShareGroup from "./components/MoveShareGroup/index.vue"
 
 // 服务和工具导入
 import {
@@ -492,6 +515,9 @@ export default {
     PlanView,
     EventInfo,
     WeekRangePicker,
+    ShareClassModal,
+    AddShareGroup,
+    MoveShareGroup,
   },
   mixins: [dragMixin],
   data() {
@@ -594,6 +620,12 @@ export default {
       inputActivityDate: "",
 
       isPlan: false,
+      showShareClassModal: false,
+      shareClassId: "",
+      addShareGroupVisible: false,
+      currentShareGroup: {},
+      moveShareGroupVisible: false,
+      currentMoveShareGroup: {},
     }
   },
   computed: {
@@ -1857,6 +1889,15 @@ export default {
     },
 
     /**
+     * 分享课程
+     */
+    handleShareClass(classId) {
+      console.log(classId, "classId===分享课程id")
+      this.shareClassId = classId
+      this.showShareClassModal = true
+    },
+
+    /**
      * 删除课程
      */
     async handleDeleteClass(classItem) {
@@ -2773,7 +2814,74 @@ export default {
         this.handlePasteClass(this.addScheduleDate, saveData)
       }
     },
+    onSaveShareClass(classId) {
+      this.showShareClassModal = false
+      // this.getClassList();
+    },
 
+    // 添加分享分组
+    handleAddShareGroup(node) {
+      this.currentShareGroup = {
+        id: "",
+        groupName: "",
+        teamId: node.data.teamId,
+      }
+      this.addShareGroupVisible = true
+    },
+    // 编辑分享分组
+    handleEditShareGroup(node) {
+      this.currentShareGroup = { ...node.data }
+      this.addShareGroupVisible = true
+    },
+    // 删除分享分组
+    handleDeleteShareGroup(node) {
+      this.$confirm(`确认删除分组【${node?.data?.groupName}】？`, "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        // 调用删除分组API
+        groupApi
+          .deleteShareGroup({
+            requestUserId: localStorage.getItem("triUserId"),
+            id: node.data.id,
+            shareDataType: 1, // 1 团队课程  2 分享计划
+            teamId: node.data.teamId,
+          })
+          .then((res) => {
+            if (res.success) {
+              this.$message.success("删除成功")
+              // 刷新团队树数据
+              this.refreshTeamTree()
+            }
+          })
+      })
+    },
+    // 移动分享分组
+    handleMoveShareGroup(node) {
+      this.currentMoveShareGroup = { ...node.data }
+      this.moveShareGroupVisible = true
+    },
+    // 保存分享分组
+    handleAddShareGroupSave(payload) {
+      this.addShareGroupVisible = false
+      this.currentShareGroup = { id: "", groupName: "", teamId: null }
+      // 刷新团队树数据
+      this.refreshTeamTree()
+    },
+    handleMoveShareGroupSave(payload) {
+      this.moveShareGroupVisible = false
+      this.currentMoveShareGroup = { id: "", teamId: null }
+      // 刷新团队树数据
+      this.refreshTeamTree()
+    },
+    // 刷新团队树数据
+    refreshTeamTree() {
+      // 只在团队计划类型时刷新
+      if (this.activeClassType === 'team' && this.$refs.planListRef && this.$refs.planListRef.refreshTeamTree) {
+        this.$refs.planListRef.refreshTeamTree()
+      }
+    },
     /**
      * 保存分组
      */
@@ -2949,6 +3057,7 @@ export default {
       this.getClassList()
     },
   },
+
 }
 </script>
 

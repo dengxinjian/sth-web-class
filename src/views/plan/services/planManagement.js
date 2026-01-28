@@ -104,6 +104,13 @@ export const groupApi = {
       url: `/training/api/planClassesGroup/deletePlanClassesGroup?id=${id}`,
     });
   },
+  // 删除分享分组
+  deleteShareGroup(params) {
+    return submitData({
+      url: `/training/api/shareTeamGroup/delete`,
+      requestData: params,
+    });
+  },
 };
 
 export const teamApi = {

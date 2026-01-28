@@ -1,12 +1,49 @@
 <template>
   <div class="class-container">
     <!-- 课程类型切换 -->
-    <ul class="class-type-list">
+    <div class="plan-type-list">
+      <div
+        class="class-type-item"
+        :class="{ 'active-title': activeClassType === 'my' }"
+        @click="handleClassTypeChange('my')"
+      >
+        <div
+          class="title"
+          :class="{ 'active-title': activeClassType === 'my' }"
+        >
+          我的课程
+        </div>
+      </div>
+      <div
+        class="class-type-item"
+        :class="{ 'active-title': activeClassType === 'team' }"
+        @click="handleClassTypeChange('team')"
+      >
+        <div
+          class="title"
+          :class="{ 'active-title': activeClassType === 'team' }"
+        >
+          团队课程
+        </div>
+      </div>
+      <div
+        class="class-type-item"
+        :class="{ 'active-title': activeClassType === 'official' }"
+        @click="handleClassTypeChange('official')"
+      >
+        <div
+          class="title"
+          :class="{ 'active-title': activeClassType === 'official' }"
+        >
+          课程示例
+        </div>
+      </div>
+    </div>
+    <!-- <ul class="class-type-list">
       <li
         :class="{ active: activeClassType === 'my' }"
         @click="handleClassTypeChange('my')"
       >
-        <!-- <img src="~@/assets/addClass/title-mine.png" alt="" /> -->
         <div
           class="title"
           :class="{ 'active-title': activeClassType === 'my' }"
@@ -18,7 +55,6 @@
         :class="{ active: activeClassType === 'official' }"
         @click="handleClassTypeChange('official')"
       >
-        <!-- <img src="~@/assets/addClass/title-official.png" alt="" /> -->
         <div
           class="title"
           :class="{ 'active-title': activeClassType === 'official' }"
@@ -26,7 +62,7 @@
           课程示例
         </div>
       </li>
-    </ul>
+    </ul> -->
 
     <!-- 操作栏 -->
     <div class="class-operation">
@@ -61,7 +97,7 @@
     </div>
 
     <!-- 课程列表 -->
-    <div class="schedule-class-container">
+    <div class="schedule-class-container" v-if="activeClassType !== 'team'">
       <el-collapse
         accordion
         v-model="activeCollapseItem"
@@ -162,6 +198,19 @@
         </el-collapse-item>
       </el-collapse>
     </div>
+
+    <!-- 团队课程操作栏 -->
+    <div class="team-operation" v-if="activeClassType === 'team'">
+      <ShareTree
+        ref="shareTreeRef"
+        :search-input="searchInput"
+        @add-share-group="handleAddShareGroup"
+        @edit-share-group="handleEditShareGroup"
+        @delete-share-group="handleDeleteShareGroup"
+        @move-share-group="handleMoveShareGroup"
+        @view-class="handleViewClass"
+      />
+    </div>
   </div>
 </template>
 
@@ -169,12 +218,14 @@
 import ClassCard from "./ClassCard.vue";
 import draggable from "vuedraggable";
 import { debounce } from "../uilt";
+import ShareTree from "./ShareTree.vue";
 
 export default {
   name: "ClassList",
   components: {
     ClassCard,
     draggable,
+    ShareTree,
   },
   props: {
     classList: {
@@ -242,18 +293,79 @@ export default {
       console.log(e, "handleClassDragEnd===================");
       this.$emit("class-drag-end", e);
     },
+
+    // 分享课程相关
+    handleAddShareGroup(node) {
+      this.$emit("add-share-group", node);
+    },
+    handleEditShareGroup(node) {
+      this.$emit("edit-share-group", node);
+    },
+    handleDeleteShareGroup(node) {
+      this.$emit("delete-share-group", node);
+    },
+    handleMoveShareGroup(node) {
+      this.$emit("move-share-group", node);
+    },
+    handleViewClass(sourceClassId, data) {
+      this.$emit("view-class", sourceClassId, data);
+    },
+    /**
+     * 刷新团队树数据
+     */
+    refreshTeamTree() {
+      if (this.$refs.shareTreeRef && this.$refs.shareTreeRef.refreshTeamTree) {
+        this.$refs.shareTreeRef.refreshTeamTree();
+      }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 :deep(.el-collapse-item__header) {
-  background: #C3C9D726;
+  background: #c3c9d726;
 }
 .class-container {
   height: 100%;
   display: flex;
   flex-direction: column;
+
+  .plan-type-list {
+    height: 46px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+    border-bottom: 1px solid #01010126;
+    box-sizing: border-box;
+    .class-type-item {
+      height: 46px;
+      line-height: 46px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      .title {
+        height: 46px;
+        line-height: 46px;
+        font-family: PingFang SC;
+        font-weight: 400;
+        font-style: Regular;
+        font-size: 15px;
+        color: #939393;
+        border-bottom: 4px solid transparent;
+      }
+      .active-title {
+        font-family: PingFang SC;
+        font-weight: 500;
+        font-style: Medium;
+        font-size: 15px;
+        color: #101010;
+        border-bottom: 4px solid #f92b30;
+      }
+    }
+  }
 
   .class-type-list {
     list-style: none;
@@ -306,8 +418,7 @@ export default {
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    margin-bottom: 20px;
-    padding: 0 10px;
+    padding: 12px 10px;
   }
 
   .schedule-class-container {

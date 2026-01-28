@@ -80,72 +80,15 @@
     </div>
 
     <div class="team-operation" v-if="activeClassType === 'team'">
-      <el-tree
-        ref="teamTree"
-        :key="treeKey"
-        :data="filteredTeamList"
-        node-key="id"
-        :props="props"
-        :highlight-current="true"
-        :load="loadNodeTeamPlanList"
-        :lazy="true"
-        @node-click="handleNodeClick"
-        v-loading="loadingTeamTree"
-      >
-        <span class="athletic-btn-list" slot-scope="{ node }">
-          <el-tooltip
-            v-if="node.label.length * 14 > 148"
-            :content="node.label"
-            placement="top"
-          >
-            <span class="tree-label-text"
-              >{{ node.label }}
-              <span v-if="node.isGroup">({{ node.membersCount }})</span></span
-            >
-          </el-tooltip>
-          <span v-else class="tree-label-text"
-            >{{ node.label }}
-            <span v-if="node.isGroup">({{ node.membersCount }})</span></span
-          >
-
-          <el-popover
-            popper-class="athletic-btn-popover"
-            placement="right"
-            trigger="hover"
-          >
-            <div class="btn-list-hover">
-              <div
-                class="btn-list-hover-item"
-                v-if="node.data.isGroup"
-                @click="handleAddGroup"
-              >
-                新增
-              </div>
-              <div
-                class="btn-list-hover-item"
-                v-if="
-                  node.data.isGroup && node.data.id && node.data.id !== 'coach'
-                "
-                @click="handleEditGroup(node)"
-              >
-                编辑
-              </div>
-              <div
-                class="btn-list-hover-item"
-                v-if="
-                  node.data.isGroup && node.data.id && node.data.id !== 'coach'
-                "
-                @click="handleDeleteGroup(node)"
-              >
-                删除
-              </div>
-            </div>
-            <div class="btn-list-hover-item" slot="reference">
-              <i class="el-icon-more"></i>
-            </div>
-          </el-popover>
-        </span>
-      </el-tree>
+      <ShareTree
+        ref="shareTreeRef"
+        :search-input="searchInput"
+        @add-share-group="handleAddShareGroup"
+        @edit-share-group="handleEditShareGroup"
+        @delete-share-group="handleDeleteShareGroup"
+        @move-share-group="handleMoveShareGroup"
+        @view-plan="handleViewPlan"
+      />
     </div>
 
     <!-- 课程列表 -->
@@ -272,11 +215,12 @@
 <script>
 import { debounce } from "../../classManagement/uilt";
 import HoverPlanDetail from "./HoverPlanDetail/index.vue";
-import { getData } from "@/api/common";
+import ShareTree from "./ShareTree.vue";
 export default {
   name: "PlanList",
   components: {
     HoverPlanDetail,
+    ShareTree,
   },
   props: {
     classList: {
@@ -305,56 +249,8 @@ export default {
       searchInput: "",
       activeCollapse: null,
       loading: false,
-      props: {
-        label: "label",
-        children: "zones",
-        isLeaf: "leaf",
-      },
-      treeKey: 0, // 用于强制重新渲染 el-tree
-      teamList: [],
-      loadingTeamTree: false,
       loginType: localStorage.getItem("loginType") || "1",
     };
-  },
-  computed: {
-    // 过滤后的团队列表数据（用于搜索和懒加载）
-    filteredTeamList() {
-      // 确保 teamList 是数组
-      if (!Array.isArray(this.teamList) || this.teamList.length === 0) {
-        return [];
-      }
-
-      let list = this.teamList;
-
-      // 如果有搜索输入，进行过滤
-      if (this.searchInput) {
-        list = this.teamList.filter((group) => {
-          // 确保 group 有 label 属性
-          if (!group || !group.label) {
-            return false;
-          }
-          return group.label
-            .toLowerCase()
-            .includes(this.searchInput.toLowerCase());
-        });
-      }
-
-      // 在懒加载模式下，根节点不应该有 children 属性
-      // 同时需要明确设置 leaf: false，让 el-tree 知道这些节点可以展开
-      const newList = list
-        .filter((item) => item && item.id && item.label) // 确保数据格式正确
-        .map((item) => {
-          const { children, ...rest } = item;
-          return {
-            ...rest,
-            // 不设置 children 属性，让 el-tree 通过懒加载来加载子节点
-            // 明确设置 leaf: false，表示这些节点可以展开（不是叶子节点）
-            leaf: false,
-          };
-        });
-
-      return newList;
-    },
   },
   watch: {
     currentPlanGroupId: {
@@ -401,19 +297,6 @@ export default {
       },
       immediate: true,
     },
-    // 监听 teamList 变化，确保数据更新时 el-tree 能够正确显示
-    teamList: {
-      handler(newList) {
-        if (Array.isArray(newList) && newList.length > 0) {
-          // 当 teamList 有数据时，确保 el-tree 能够正确渲染
-          this.$nextTick(() => {
-            // 可以在这里添加额外的逻辑，比如展开第一个节点等
-          });
-        }
-      },
-      immediate: true,
-      deep: true,
-    },
   },
   mounted() {
     // 组件挂载后，延迟检查以确保数据已加载
@@ -428,107 +311,6 @@ export default {
     }, 500);
   },
   methods: {
-    async loadNodeTeamPlanList(node, resolve) {
-      console.log("*======node====当前分组节点", node);
-      this.loadingTeamTree = true;
-      // 如果是团队节点（isGroup: true），加载该团队的计划列表
-      if (node.level === 0) {
-        const resDefault = await getData({ url: "/gateway/team/my-team" });
-        const resTeam = await getData({
-          url: "/consumer/api/team/coach/all-teams",
-        });
-        if (resDefault.success && resTeam.success) {
-          const list = [resDefault.result, ...resTeam.result].reduce(
-            (acc, team) => {
-              if (team && team.id && !acc.find((t) => t.id === team.id)) {
-                acc.push(team);
-              }
-              return acc;
-            },
-            []
-          );
-          const teamList = list.map((item) => {
-            return {
-              id: item.id,
-              label: item.teamName,
-              description: item.description || "",
-              isGroup: true,
-              groupName: item.teamName,
-              membersCount: item.members?.length || 0,
-              triUserId: item.triUserId,
-            };
-          });
-          this.teamList = teamList;
-          resolve(teamList);
-          this.loadingTeamTree = false;
-        } else {
-          resolve([]);
-        }
-      }
-      if (node.level === 1) {
-        // 查询该分享团队下的所有分组
-        getData({
-          url: `/training/api/shareTeamGroup/list?teamId=${node.data.id}&shareDataType=2`,
-        }).then((res) => {
-          console.log("res======res====当前团队计划", res);
-          if (res.success && res.result) {
-            const groupList = res.result.map((item) => {
-              console.log("item======item====当前团队分组", item);
-              return {
-                id: item.id,
-                label: item.groupName || item.title || "未命名计划",
-                isGroup: true,
-                leaf: false,
-                ...item,
-              };
-            });
-            resolve(groupList);
-            this.loadingTeamTree = false;
-          } else {
-            this.loadingTeamTree = false;
-            resolve([]);
-          }
-        });
-      }
-      if (node.level === 2) {
-        // 根据分享分组获取分组下的所有分享计划
-        getData({
-          url: `/training/api/teamShare/pageByGroupId`,
-          groupId: node.data.id,
-          teamId: node.data.teamId,
-          shareDataType: 2,
-          current: 1,
-          size: 20,
-        })
-          .then((res) => {
-            console.log("res======res====当前团队计划", res);
-            if (res.success && res.result) {
-              // 将计划列表转换为树节点格式
-              const planNodes = res.result.records.map((plan) => ({
-                id: plan.id,
-                label: plan.planTitle || plan.title || "未命名计划",
-                isGroup: false,
-                // 计划节点是叶子节点，不能再展开
-                leaf: true,
-                ...plan,
-              }));
-              resolve(planNodes);
-              this.loadingTeamTree = false;
-            } else {
-              this.loadingTeamTree = false;
-              resolve([]);
-            }
-          })
-          .catch(() => {
-            this.loadingTeamTree = false;
-            resolve([]);
-          });
-      }
-      if (node.level === 2) {
-        resolve(node.data.children);
-        this.loadingTeamTree = false;
-      }
-    },
     handleClassTypeChange(type) {
       // 清空搜索输入
       this.searchInput = "";
@@ -538,12 +320,10 @@ export default {
       // 切换到 team 类型时，触发重新加载团队列表并强制重新渲染 el-tree
       if (type === "team") {
         this.$emit("reload-team-list");
-        // 强制重新渲染 el-tree（通过改变 key 值）
+        // 重置 el-tree 的当前选中节点
         this.$nextTick(() => {
-          this.treeKey = Date.now();
-          // 重置 el-tree 的当前选中节点
-          if (this.$refs.teamTree) {
-            this.$refs.teamTree.setCurrentKey(null);
+          if (this.$refs.shareTreeRef) {
+            this.$refs.shareTreeRef.resetCurrentKey();
           }
         });
       }
@@ -588,6 +368,21 @@ export default {
         });
       }
     },
+    handleAddShareGroup(node) {
+      this.$emit("add-share-group", node);
+    },
+    handleEditShareGroup(node) {
+      this.$emit("edit-share-group", node);
+    },
+    handleDeleteShareGroup(node) {
+      this.$emit("delete-share-group", node);
+    },
+    handleMoveShareGroup(node) {
+      this.$emit("move-share-group", node);
+    },
+    handleViewPlan(sourcePlanId, data) {
+      this.$emit("view-plan", sourcePlanId, data);
+    },
     /**
      * 处理添加分组
      */
@@ -617,34 +412,11 @@ export default {
       }
     },
     /**
-     * 处理移动运动员
+     * 刷新团队树数据
      */
-    handleMoveAthletic(node) {
-      // TODO: 实现移动运动员逻辑
-      console.log("handleMoveAthletic", node);
-    },
-    /**
-     * 处理解绑运动员
-     */
-    handleMoveOutAthletic(node) {
-      // TODO: 实现解绑运动员逻辑
-      console.log("handleMoveOutAthletic", node);
-    },
-    /**
-     * 处理解绑教练
-     */
-    handleMoveOutCoach(node) {
-      // TODO: 实现解绑教练逻辑
-      console.log("handleMoveOutCoach", node);
-    },
-    /**
-     * 处理节点点击事件
-     */
-    handleNodeClick(data, node) {
-      // console.log("handleNodeClick===选择分享计划", data, node);
-      // 如果点击的是计划节点（不是团队节点），触发选择计划事件
-      if (!node.data.isGroup && node.data.id) {
-        this.$emit("view-plan", data.sourcePlanId, data);
+    refreshTeamTree() {
+      if (this.$refs.shareTreeRef && this.$refs.shareTreeRef.refreshTeamTree) {
+        this.$refs.shareTreeRef.refreshTeamTree();
       }
     },
   },
@@ -703,28 +475,8 @@ export default {
 
   .team-operation {
     flex: 1;
-    padding: 12px 10px;
-    overflow-y: auto;
-    background-color: #fff;
-
-    /* 自定义滚动条样式 */
-    &::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 2.5px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 2.5px;
-
-      &:hover {
-        background: #a8a8a8;
-      }
-    }
+    display: flex;
+    flex-direction: column;
   }
 
   .schedule-plan-container {
@@ -835,69 +587,12 @@ export default {
   }
 }
 
-// 树形样式
-.athletic-btn-list {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  padding-right: 8px;
-}
-.btn-list-hover-item {
-  width: 60px;
-  height: 32px;
-  border-radius: 5px;
-  font-family: PingFang SC;
-  font-weight: 400;
-  font-style: Regular;
-  font-size: 14px;
-  text-align: center;
-  line-height: 32px;
-  color: #101010;
-  cursor: pointer;
-  &:hover {
-    background-color: #c3c9d740;
-    font-family: PingFang SC;
-    font-weight: 500;
-    font-style: Medium;
-    font-size: 14px;
-  }
-}
-.athletic-btn {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-}
-.athletic-operation {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
 // 弹框样式优化
 .dialog-footer {
   text-align: right;
   .el-button {
     margin-left: 10px;
   }
-}
-
-// 树形组件样式优化
-.el-tree {
-  .el-tree-node__content {
-    height: 32px;
-    line-height: 32px;
-    &:hover {
-      background-color: #f5f7fa;
-    }
-  }
-}
-.athletic-tree {
-  border-bottom: 8px solid #f0f0f0;
 }
 
 // 搜索框样式
@@ -1078,21 +773,5 @@ export default {
       border-color: #555;
     }
   }
-}
-.tree-label-text {
-  display: inline-block;
-  max-width: 158px !important;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  vertical-align: middle;
-}
-.tree-label-text-athletic {
-  display: inline-block;
-  max-width: 148px !important;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  vertical-align: middle;
 }
 </style>

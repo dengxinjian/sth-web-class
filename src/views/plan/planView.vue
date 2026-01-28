@@ -3,6 +3,7 @@
     <div class="plan-container">
       <div class="type-change">
         <PlanList
+          ref="planListRef"
           :class-list="classList"
           :active-class-type.sync="activeClassType"
           @class-type-change="handleClassTypeChange"
@@ -15,6 +16,10 @@
           @delete-group="handleDeleteGroup"
           @choose-plan="handlePlanDayDetail"
           @view-plan="handleViewPlanView"
+          @add-share-group="handleAddShareGroup"
+          @edit-share-group="handleEditShareGroup"
+          @delete-share-group="handleDeleteShareGroup"
+          @move-share-group="handleMoveShareGroup"
           :selected-plan-id="currentPlanId"
           :current-plan-group-id="currentPlanGroupId"
         />
@@ -63,6 +68,18 @@
       :data="currentGroup"
       @save="handleAddGroupSave"
     />
+    <!-- 添加分享分组 -->
+    <AddShareGroup
+      v-model="addShareGroupVisible"
+      :data="currentShareGroup"
+      @save="handleAddShareGroupSave"
+    />
+    <!-- 移动分享分组 -->
+    <MoveShareGroup
+      v-model="moveShareGroupVisible"
+      :data="currentMoveShareGroup"
+      @save="handleMoveShareGroupSave"
+    />
     <!-- 概要 -->
     <SummaryPreview
       v-model="showSummaryPreview"
@@ -107,6 +124,8 @@ import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOf
 import PlannedScheduleView from "./components/plannedScheduleView.vue";
 import AddPlan from "./components/AddPlan";
 import AddGroup from "./components/AddGroup";
+import AddShareGroup from "./components/AddShareGroup";
+import MoveShareGroup from "./components/MoveShareGroup";
 import SummaryPreview from "./components/SummaryPreview/index.vue";
 import Copy from "./components/Copy/index.vue";
 import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue";
@@ -126,6 +145,8 @@ export default {
     PlannedScheduleView,
     AddPlan,
     AddGroup,
+    AddShareGroup,
+    MoveShareGroup,
     SummaryPreview,
     Copy,
     ApplyCoach,
@@ -156,10 +177,14 @@ export default {
       copyClassFromOfficialData: {},
       showCopyClassFromOfficial: false,
       currentGroup: { id: "", groupName: "" },
+      currentShareGroup: { id: "", groupName: "", teamId: null },
+      currentMoveShareGroup: { id: "", teamId: null },
       // 对话框状态
       addPlanVisible: false,
       addGroupVisible: false,
+      addShareGroupVisible: false,
       showSummaryPreview: false,
+      moveShareGroupVisible: false,
       showCopy: false,
       showApplyCoach: false,
       showApplyAthlete: false,
@@ -612,6 +637,69 @@ export default {
           }
         });
       });
+    },
+    // 添加分享分组
+    handleAddShareGroup(node) {
+      this.currentShareGroup = {
+        id: "",
+        groupName: "",
+        teamId: node.data.teamId,
+      };
+      this.addShareGroupVisible = true;
+    },
+    // 编辑分享分组
+    handleEditShareGroup(node) {
+      this.currentShareGroup = { ...node.data };
+      this.addShareGroupVisible = true;
+    },
+    // 删除分享分组
+    handleDeleteShareGroup(node) {
+      this.$confirm(`确认删除分组【${node?.data?.groupName}】？`, "提示", {
+        confirmButtonText: "删除",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        // 调用删除分组API
+        groupApi
+          .deleteShareGroup({
+            requestUserId: localStorage.getItem("triUserId"),
+            id: node.data.id,
+            shareDataType: 2,
+            teamId: node.data.teamId,
+          })
+          .then((res) => {
+            if (res.success) {
+              this.$message.success("删除成功");
+              // 刷新团队树数据
+              this.refreshTeamTree();
+            }
+          });
+      });
+    },
+    // 移动分享分组
+    handleMoveShareGroup(node) {
+      this.currentMoveShareGroup = { ...node.data };
+      this.moveShareGroupVisible = true;
+    },
+    // 保存分享分组
+    handleAddShareGroupSave(payload) {
+      this.addShareGroupVisible = false;
+      this.currentShareGroup = { id: "", groupName: "", teamId: null };
+      // 刷新团队树数据
+      this.refreshTeamTree();
+    },
+    handleMoveShareGroupSave(payload) {
+      this.moveShareGroupVisible = false;
+      this.currentMoveShareGroup = { id: "", teamId: null };
+      // 刷新团队树数据
+      this.refreshTeamTree();
+    },
+    // 刷新团队树数据
+    refreshTeamTree() {
+      // 只在团队计划类型时刷新
+      if (this.activeClassType === 'team' && this.$refs.planListRef && this.$refs.planListRef.refreshTeamTree) {
+        this.$refs.planListRef.refreshTeamTree();
+      }
     },
     /**
      * 处理选项的点击事件

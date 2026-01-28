@@ -9,6 +9,12 @@ import request from "@/utils/request"
  * 团队相关API
  */
 export const teamApi = {
+  // 获取我的团队
+  getMyTeam() {
+    return getData({
+      url: "/gateway/team/my-team",
+    });
+  },
   // 获取所有团队
   getAllTeams() {
     return getData({ url: "/consumer/api/team/coach/all-teams" })
@@ -257,7 +263,15 @@ export const groupApi = {
       url: `/training/api/classesGroup/deleteClassesGroup?id=${id}`,
     })
   },
-}
+
+  // 删除分享分组
+  deleteShareGroup(params) {
+    return submitData({
+      url: `/training/api/shareTeamGroup/delete`,
+      requestData: params,
+    });
+  },
+};
 
 /**
  * 赛事相关API
