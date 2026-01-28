@@ -102,6 +102,85 @@
             :picker-options="pickerOptions">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="计划应用范围" v-if="form.athleteType === 1">
+          <div class="apply-range-cell">
+            <el-select
+              v-model="form.applyRange"
+              placeholder="请选择"
+              size="small"
+              style="width: 120px; flex-shrink: 0"
+              @change="onFormApplyRangeChange">
+              <el-option label="全部应用" :value="0"></el-option>
+              <el-option label="部分应用" :value="1"></el-option>
+            </el-select>
+            <el-popover
+              v-model="form.dayPickerVisibleForm"
+              placement="bottom-start"
+              trigger="click"
+              popper-class="day-range-popper"
+              :disabled="form.applyRange !== 1">
+              <div class="day-range-popover">
+                <div class="day-range-title">选择天数</div>
+                <div class="day-range-row">
+                  <span class="day-range-label">开始天数</span>
+                  <el-select
+                    v-model="form.applyStartDay"
+                    placeholder="开始"
+                    size="small"
+                    style="width: 140px"
+                    @change="onFormStartDayChange">
+                    <el-option
+                      v-for="d in planDayOptions"
+                      :key="`form-start-${d}`"
+                      :label="`第${d}天`"
+                      :value="d" />
+                  </el-select>
+                </div>
+                <div class="day-range-row">
+                  <span class="day-range-label">结束天数</span>
+                  <el-select
+                    v-model="form.applyEndDay"
+                    placeholder="结束"
+                    size="small"
+                    style="width: 140px">
+                    <el-option
+                      v-for="d in planDayOptions"
+                      :key="`form-end-${d}`"
+                      :label="`第${d}天`"
+                      :value="d"
+                      :disabled="form.applyStartDay && d <= form.applyStartDay" />
+                  </el-select>
+                </div>
+              </div>
+              <div
+                slot="reference"
+                class="day-range-input"
+                :class="{ disabled: form.applyRange !== 1 }">
+                <span class="day-range-input-text">
+                  {{
+                    form.applyRange === 1 &&
+                    form.applyStartDay &&
+                    form.applyEndDay
+                      ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
+                      : "选择天数"
+                  }}
+                </span>
+                <i class="el-icon-date"></i>
+              </div>
+            </el-popover>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="是否同步设备" v-if="form.athleteType === 1">
+          <el-select
+            v-model="form.syncFlag"
+            placeholder="请选择"
+            size="small"
+            style="width: 120px">
+            <el-option label="不同步" :value="0"></el-option>
+            <el-option label="同步" :value="1"></el-option>
+          </el-select>
+        </el-form-item>
         <div style="padding: 0 0 0 14px; box-sizing: border-box;"
           v-if="form.athleteType === 2">
           <el-row
@@ -270,6 +349,86 @@
             :picker-options="pickerOptions">
           </el-date-picker>
         </el-form-item>
+
+        <el-form-item label="计划应用范围">
+          <div class="apply-range-cell">
+            <el-select
+              v-model="form.applyRange"
+              placeholder="请选择"
+              size="small"
+              style="width: 120px; flex-shrink: 0"
+              @change="onFormApplyRangeChange">
+              <el-option label="全部应用" :value="0"></el-option>
+              <el-option label="部分应用" :value="1"></el-option>
+            </el-select>
+            <el-popover
+              v-model="form.dayPickerVisibleForm"
+              placement="bottom-start"
+              trigger="click"
+              popper-class="day-range-popper"
+              :disabled="form.applyRange !== 1">
+              <div class="day-range-popover">
+                <div class="day-range-title">选择天数</div>
+                <div class="day-range-row">
+                  <span class="day-range-label">开始天数</span>
+                  <el-select
+                    v-model="form.applyStartDay"
+                    placeholder="开始"
+                    size="small"
+                    style="width: 140px"
+                    @change="onFormStartDayChange">
+                    <el-option
+                      v-for="d in planDayOptions"
+                      :key="`form-start-${d}`"
+                      :label="`第${d}天`"
+                      :value="d" />
+                  </el-select>
+                </div>
+                <div class="day-range-row">
+                  <span class="day-range-label">结束天数</span>
+                  <el-select
+                    v-model="form.applyEndDay"
+                    placeholder="结束"
+                    size="small"
+                    style="width: 140px">
+                    <el-option
+                      v-for="d in planDayOptions"
+                      :key="`form-end-${d}`"
+                      :label="`第${d}天`"
+                      :value="d"
+                      :disabled="form.applyStartDay && d <= form.applyStartDay" />
+                  </el-select>
+                </div>
+              </div>
+              <div
+                slot="reference"
+                class="day-range-input"
+                :class="{ disabled: form.applyRange !== 1 }">
+                <span class="day-range-input-text">
+                  {{
+                    form.applyRange === 1 &&
+                    form.applyStartDay &&
+                    form.applyEndDay
+                      ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
+                      : "选择天数"
+                  }}
+                </span>
+                <i class="el-icon-date"></i>
+              </div>
+            </el-popover>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="是否同步设备">
+          <el-select
+            v-model="form.syncFlag"
+            placeholder="请选择"
+            size="small"
+            style="width: 120px">
+            <el-option label="不同步" :value="0"></el-option>
+            <el-option label="同步" :value="1"></el-option>
+          </el-select>
+        </el-form-item>
       </template>
     </el-form>
 
@@ -304,6 +463,12 @@ export default {
         applyMode: 1,
         applyDate: moment().format("YYYY-MM-DD"),
         applyDimension: "1",
+        // 批量设置时的计划应用范围 & 同步设备
+        applyRange: 0,
+        applyStartDay: 1,
+        applyEndDay: null,
+        syncFlag: 0,
+        dayPickerVisibleForm: false,
       },
       rules: {
         title: [
@@ -556,6 +721,25 @@ export default {
         item.applyEndDay = nextDay
       }
     },
+    onFormApplyRangeChange() {
+      if (this.form.applyRange !== 1) {
+        this.form.applyStartDay = 1
+        this.form.applyEndDay =
+          this.planDayOptions[this.planDayOptions.length - 1] || 28
+        this.form.dayPickerVisibleForm = false
+      }
+    },
+    onFormStartDayChange() {
+      if (!this.form.applyStartDay) return
+      const maxDay = this.planDayOptions[this.planDayOptions.length - 1] || 28
+      if (
+        this.form.applyEndDay &&
+        this.form.applyEndDay <= this.form.applyStartDay
+      ) {
+        const nextDay = Math.min(this.form.applyStartDay + 1, maxDay)
+        this.form.applyEndDay = nextDay
+      }
+    },
     getClubList() {
       getData({
         url: "/consumer/api/club/coach/getAllTeamsAndClubs",
@@ -689,6 +873,14 @@ export default {
         teamId: undefined,
         athleteIds: [],
         athleteType: 1,
+        applyMode: 1,
+        applyDate: moment().format("YYYY-MM-DD"),
+        applyDimension: "1",
+        applyRange: 0,
+        applyStartDay: 1,
+        applyEndDay: null,
+        syncFlag: 0,
+        dayPickerVisibleForm: false,
       }
       this.members = []
       this.resetForm()
@@ -761,24 +953,33 @@ export default {
         // 根据登录类型构建 targets 数组
         let targets = []
         if (_this.loginType === "2") {
-          targets =
-            _this.form.athleteType === 1
-              ? choosedAthletes.map((item) => ({
-                triUserId: item,
-                applyDate: _this.form.applyDate,
-                applyMode: _this.form.applyMode,
-              }))
-              : _this.members.map((item) => ({
-                triUserId: item.triUserId,
-                applyDate: item.applyDate,
-                applyMode: item.applyMode,
-                applyRange: item.applyRange,
-                applyDays:
-                  item.applyRange === 1
-                    ? [item.applyStartDay, item.applyEndDay]
-                    : [],
-                syncFlag: item.syncFlag,
-              }))
+          if (_this.form.athleteType === 1) {
+            targets = choosedAthletes.map((item) => ({
+              triUserId: item,
+              applyDate: _this.form.applyDate,
+              applyMode: _this.form.applyMode,
+              applyRange: _this.form.applyRange,
+              applyDays:
+                _this.form.applyRange === 1 &&
+                _this.form.applyStartDay &&
+                _this.form.applyEndDay
+                  ? [_this.form.applyStartDay, _this.form.applyEndDay]
+                  : [],
+              syncFlag: _this.form.syncFlag,
+            }))
+          } else {
+            targets = _this.members.map((item) => ({
+              triUserId: item.triUserId,
+              applyDate: item.applyDate,
+              applyMode: item.applyMode,
+              applyRange: item.applyRange,
+              applyDays:
+                item.applyRange === 1
+                  ? [item.applyStartDay, item.applyEndDay]
+                  : [],
+              syncFlag: item.syncFlag,
+            }))
+          }
           const findEmptyDateOrApplyMode = targets.filter(
             (item) => !item.applyDate || !item.applyMode
           )
@@ -904,9 +1105,14 @@ export default {
         teamId: undefined,
         athleteIds: [],
         athleteType: 1,
-        applyDimension: "1",
         applyMode: 1,
         applyDate: moment().format("YYYY-MM-DD"),
+        applyDimension: "1",
+        applyRange: 0,
+        applyStartDay: 1,
+        applyEndDay: null,
+        syncFlag: 0,
+        dayPickerVisibleForm: false,
       }
       this.members = []
       this.teamGroupList = [] // 清空团队分组列表
