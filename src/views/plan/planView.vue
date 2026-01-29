@@ -20,6 +20,7 @@
           @edit-share-group="handleEditShareGroup"
           @delete-share-group="handleDeleteShareGroup"
           @move-share-group="handleMoveShareGroup"
+          @move-plan="handleMovePlan"
           :selected-plan-id="currentPlanId"
           :current-plan-group-id="currentPlanGroupId"
         />
@@ -113,6 +114,12 @@
     />
     <!-- 应用历史 -->
     <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
+    <!-- 移动计划到分组 -->
+    <MovePlan
+      v-model="showMovePlan"
+      :planInfo="currentPlanDetail"
+      @save="handleMovePlanSave"
+    />
   </div>
 </template>
 
@@ -126,6 +133,7 @@ import AddPlan from "./components/AddPlan";
 import AddGroup from "./components/AddGroup";
 import AddShareGroup from "./components/AddShareGroup";
 import MoveShareGroup from "./components/MoveShareGroup";
+import MovePlan from "./components/MovePlan/index.vue";
 import SummaryPreview from "./components/SummaryPreview/index.vue";
 import Copy from "./components/Copy/index.vue";
 import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue";
@@ -147,6 +155,7 @@ export default {
     AddGroup,
     AddShareGroup,
     MoveShareGroup,
+    MovePlan,
     SummaryPreview,
     Copy,
     ApplyCoach,
@@ -190,6 +199,7 @@ export default {
       showApplyAthlete: false,
       showApplyHistory: false,
       showSharePlan: false,
+      showMovePlan: false,
       currentPlanId: "",
       currentPlanGroupId: "",
       planTitle: "",
@@ -693,6 +703,23 @@ export default {
       this.currentMoveShareGroup = { id: "", teamId: null };
       // 刷新团队树数据
       this.refreshTeamTree();
+    },
+    /**
+     * 移动计划
+     */
+    handleMovePlan(planDetail) {
+      this.currentPlanDetail = planDetail;
+      this.showMovePlan = true;
+    },
+    // 移动计划成功
+    handleMovePlanSave(payload) {
+      this.showMovePlan = false;
+      console.log(payload, "*======payload");
+      if (payload && payload.planGroupId) {
+        this.currentPlanGroupId = payload.planGroupId;
+      }
+      // 重新获取计划列表
+      this.getPlanList();
     },
     // 刷新团队树数据
     refreshTeamTree() {

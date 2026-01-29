@@ -202,7 +202,7 @@
                     }}</span>
                   </div>
                 </span>
-                <HoverPlanDetail :planInfo="classItem"></HoverPlanDetail>
+                <HoverPlanDetail :planInfo="classItem" @move="handleMovePlan"></HoverPlanDetail>
               </el-popover>
             </div>
           </div>
@@ -418,6 +418,9 @@ export default {
       if (this.$refs.shareTreeRef && this.$refs.shareTreeRef.refreshTeamTree) {
         this.$refs.shareTreeRef.refreshTeamTree();
       }
+    },
+    handleMovePlan(planDetail) {
+      this.$emit("move-plan", planDetail);
     },
   },
 };

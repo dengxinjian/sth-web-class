@@ -24,20 +24,25 @@
                 <el-dropdown-menu slot="dropdown"
                   class="team-dropdown-menu">
                   <el-dropdown-item
-                    v-for="t in teamList"
-                    :key="t.id"
-                    :command="t.id"
-                    :class="{ 'active': selectedTeam === t.id }">
-                    {{ t.name }}
+                    v-for="t in teamOrClubList"
+                    :key="t.type + '_' + t.id"
+                    :command="{ id: t.id, type: t.type }"
+                    :class="{ 'active': selectedTeam === t.id && selectedOrgType === t.type }">
+                    {{ t.displayName }}
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
             <AthleticManagement
+              v-if="selectedTeam && selectedOrgType === 'team'"
               :teamId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
               :activeName="activeName"
               @athletic-click="handleAthleticChange" />
+            <cludList v-else :clubId="selectedTeam"
+              :teamName="getTeamName(selectedTeam)"
+              :activeName="activeName"
+              @member-click="handleAthleticChange"></cludList>
           </div>
 
           <!-- 课程管理 -->
@@ -431,6 +436,7 @@
       v-model="moveShareGroupVisible"
       :data="currentMoveShareGroup"
       @save="handleMoveShareGroupSave" />
+
   </div>
 </template>
 
@@ -463,6 +469,7 @@ import EventInfo from "./components/EventInfo.vue"
 import WeekRangePicker from "@/components/WeekRangePicker/index.vue"
 import AddShareGroup from "./components/AddShareGroup/index.vue"
 import MoveShareGroup from "./components/MoveShareGroup/index.vue"
+import cludList from "./components/cludList/index.vue"
 
 // 服务和工具导入
 import {
@@ -518,6 +525,7 @@ export default {
     ShareClassModal,
     AddShareGroup,
     MoveShareGroup,
+    cludList
   },
   mixins: [dragMixin],
   data() {
@@ -527,8 +535,10 @@ export default {
       activeClassType: "my",
       loginType: localStorage.getItem("loginType") || "2",
 
-      // 团队和运动员数据
+      // 团队和运动员数据（下拉：团队 + 俱乐部）
+      teamOrClubList: [],
       teamList: [],
+      selectedOrgType: "team", // 'team' | 'club'
       athleticList: [],
       selectedTeam: null,
       selectedAthletic: null,
@@ -705,8 +715,7 @@ export default {
     console.log(this.activeName, "this.activeName")
     // this.initMenuFromRoute();
     if (localStorage.getItem("loginType") !== "1") {
-      this.getDefaultTeam()
-      // this.getTeamAndAthleticData();
+      this.getAllTeamsAndClubs()
     } else {
       this.selectedAthletic = localStorage.getItem("triUserId")
       this.getScheduleData()
@@ -761,8 +770,7 @@ export default {
       console.log(this.activeName, "this.activeName")
       // this.initMenuFromRoute();
       if (localStorage.getItem("loginType") !== "1") {
-        this.getDefaultTeam()
-        // this.getTeamAndAthleticData();
+        this.getAllTeamsAndClubs()
       } else {
         this.selectedAthletic = localStorage.getItem("triUserId")
         this.getScheduleData()
@@ -1108,11 +1116,13 @@ export default {
       this.isActivity = true
     },
     /**
-     * 获取团队名称
+     * 获取团队/俱乐部名称（下拉展示：团队：xxx / 俱乐部：xxx）
      */
     getTeamName(teamId) {
-      const team = this.teamList.find((item) => item.id === teamId)
-      return team ? team.name : ""
+      const item = this.teamOrClubList.find(
+        (t) => t.id === teamId && t.type === this.selectedOrgType
+      )
+      return item ? item.displayName : ""
     },
 
     /**
@@ -1150,75 +1160,79 @@ export default {
       this.classSearchInput = keyword
       this.getClassList()
     },
-    async getDefaultTeam() {
-      const _this = this
-      const res = await getData({
-        url: "/gateway/team/my-team",
-      })
-      if (res.success) {
-        _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
-          if (team && team.id && !acc.find((t) => t.id === team.id)) {
-            acc.push(team)
-          }
-          return acc
-        }, [])
-        _this.getTeamAndAthleticData()
-      }
-    },
-
     /**
-     * 获取团队和运动员数据
+     * 获取团队和俱乐部列表（/api/club/coach/getAllTeamsAndClubs），下拉显示团队 + 俱乐部
      */
-    async getTeamAndAthleticData() {
+    async getAllTeamsAndClubs() {
       const _this = this
-      const res = await teamApi.getAllTeams()
-      if (res.success) {
-        const list = [..._this.teamList, ...res.result].reduce((acc, team) => {
-          if (team && team.id && !acc.find((t) => t.id === team.id)) {
-            acc.push(team)
-          }
-          return acc
-        }, [])
-        this.teamList = list.map((item) => ({
-          id: item.id,
-          name: item.teamName,
-          teamOwnerId: item.teamOwnerId,
-          members:
-            item.members && item.members.length > 0
-              ? item.members.map((member) => ({
-                id: member.id,
-                triUserId: member.triUserId,
-                // 顯示用（兼容舊欄位）
-                userNickname: member.userNickname,
-                name: member.userNickname,
-                // 分組資訊（用於級聯）
-                groupId: member.groupId,
-                groupName: member.groupName || "未分类",
-                userType: member.userType,
-                lastMatchType: member.lastMatchType,
-                // 頭像資訊
-                userAvatar: member.userAvatar,
-              }))
-              : [],
-        }))
-        // 默认选中第一个团队
-        if (this.teamList.length > 0) {
-          const triUserId = localStorage.getItem("triUserId")
-          // this.selectedTeam = this.teamList[0].id;
-          this.selectedTeam = this.teamList.find(
-            (item) => item.teamOwnerId === triUserId
-          )?.id
-          this.getAthleticList()
-          this.getScheduleData()
+      const res = await teamApi.getAllTeamsAndClubs()
+      if (!res || !res.success) {
+        this.teamOrClubList = []
+        this.teamList = []
+        return
+      }
+      const data = res.result || res
+      const teams = (data.allCoachTeamList || []).map((item) => ({
+        id: item.id,
+        name: item.teamName,
+        teamOwnerId: item.teamOwnerId,
+        members:
+          item.members && item.members.length > 0
+            ? item.members.map((member) => ({
+              id: member.id,
+              triUserId: member.triUserId,
+              userNickname: member.userNickname,
+              name: member.userNickname,
+              groupId: member.groupId,
+              groupName: member.groupName || "未分类",
+              userType: member.userType,
+              lastMatchType: member.lastMatchType,
+              userAvatar: member.userAvatar,
+            }))
+            : [],
+      }))
+      const clubs = (data.allCoachClubList || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        type: "club",
+        displayName: "俱乐部：" + (item.name || ""),
+      }))
+      const teamItems = teams.map((t) => ({
+        id: t.id,
+        name: t.name,
+        type: "team",
+        displayName: "团队：" + (t.name || ""),
+      }))
+      _this.teamList = teams
+      _this.teamOrClubList = [...teamItems, ...clubs]
+      // 默认选中：优先当前用户的团队，否则第一个团队，否则第一个俱乐部
+      if (_this.teamOrClubList.length > 0) {
+        const triUserId = localStorage.getItem("triUserId")
+        const ownerTeam = _this.teamList.find(
+          (item) => item.teamOwnerId === triUserId
+        )
+        if (ownerTeam) {
+          _this.selectedTeam = ownerTeam.id
+          _this.selectedOrgType = "team"
+        } else {
+          _this.selectedTeam = _this.teamOrClubList[0].id
+          _this.selectedOrgType = _this.teamOrClubList[0].type
         }
+        _this.getAthleticList()
+        _this.getScheduleData()
       }
     },
 
     /**
-     * 团队切换
+     * 团队/俱乐部切换
      */
-    handleTeamChange(teamId) {
-      this.selectedTeam = teamId
+    handleTeamChange(payload) {
+      const id = payload && typeof payload === "object" ? payload.id : payload
+      const type =
+        payload && typeof payload === "object" ? payload.type : "team"
+      this.selectedTeam = id
+      this.selectedOrgType = type
+      console.log(this.selectedTeam, this.selectedOrgType, "this.selectedTeam, this.selectedOrgType")
       this.getAthleticList()
     },
 
@@ -1236,14 +1250,72 @@ export default {
     },
 
     /**
-     * 获取运动员列表
+     * 获取运动员列表（团队用 teamList.members，俱乐部用 /consumer/api/club/member/list）
      */
     getAthleticList() {
-      this.athleticList = this.teamList.find(
-        (item) => item.id === this.selectedTeam
-      ).members
+      if (!this.selectedTeam) {
+        this.athleticList = []
+        this.selectedAthletic = null
+        return
+      }
+      if (this.selectedOrgType === "team") {
+        const team = this.teamList.find((item) => item.id === this.selectedTeam)
+        this.athleticList = team && team.members ? team.members : []
+      } else {
+        // 俱乐部：参考 ApplyCoach 的 getClubMemberList
+        this.fetchClubMemberList(this.selectedTeam)
+        return
+      }
+      this.applyFirstAthleticAndSchedule()
+    },
 
-      // 默认选中第一个运动员
+    /**
+     * 俱乐部成员列表（与 ApplyCoach getClubMemberList 一致）
+     */
+    fetchClubMemberList(clubId) {
+      if (!clubId) {
+        this.athleticList = []
+        this.applyFirstAthleticAndSchedule()
+        return
+      }
+      getData({
+        url: `/consumer/api/club/query/groups-with-members/${clubId}`,
+        clubId,
+      })
+        .then((res) => {
+          const list =
+            res && res.success && Array.isArray(res.result) ? res.result : []
+          // 接口返回的是「分组 + 该分组下成员」的結構，需要扁平化成運動員列表
+          const athletes = []
+          list.forEach((group) => {
+            if (!group || !Array.isArray(group.members)) return
+            const groupName = group.groupName || "未分类"
+            const groupId = group.groupId
+            group.members.forEach((m) => {
+              if (!m || !m.triUserId || !m.userNickname) return
+              athletes.push({
+                triUserId: m.triUserId,
+                userNickname: m.userNickname,
+                name: m.userNickname,
+                userAvatar: m.userAvatar,
+                groupId,
+                groupName,
+              })
+            })
+          })
+          this.athleticList = athletes
+          this.applyFirstAthleticAndSchedule()
+        })
+        .catch(() => {
+          this.athleticList = []
+          this.applyFirstAthleticAndSchedule()
+        })
+    },
+
+    /**
+     * 默认选中第一个运动员并拉取课表等
+     */
+    applyFirstAthleticAndSchedule() {
       const firstTriUserId =
         this.athleticGroupOptions?.[0]?.children?.[0]?.value ||
         (this.athleticList.length > 0 ? this.athleticList[0].triUserId : null)
@@ -3223,6 +3295,8 @@ export default {
 }
 
 .athletic-dropdown-menu {
+  min-width: 200px;
+
   .group-header {
     font-weight: 600;
     color: #101010;

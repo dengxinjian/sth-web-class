@@ -941,6 +941,15 @@ export default {
           _this.loading = false
         })
     },
+    // 根据开始/结束天数构造 applyDays：从 start 到 end 的所有天数
+    buildApplyDays(start, end) {
+      if (!start || !end || end <= start) return []
+      const days = []
+      for (let d = start; d <= end; d += 1) {
+        days.push(d)
+      }
+      return days
+    },
     onConfirm() {
       const _this = this
       this.$refs.formRef.validate((valid) => {
@@ -963,7 +972,10 @@ export default {
                 _this.form.applyRange === 1 &&
                 _this.form.applyStartDay &&
                 _this.form.applyEndDay
-                  ? [_this.form.applyStartDay, _this.form.applyEndDay]
+                  ? _this.buildApplyDays(
+                    _this.form.applyStartDay,
+                    _this.form.applyEndDay
+                  )
                   : [],
               syncFlag: _this.form.syncFlag,
             }))
@@ -975,7 +987,7 @@ export default {
               applyRange: item.applyRange,
               applyDays:
                 item.applyRange === 1
-                  ? [item.applyStartDay, item.applyEndDay]
+                  ? _this.buildApplyDays(item.applyStartDay, item.applyEndDay)
                   : [],
               syncFlag: item.syncFlag,
             }))
@@ -992,11 +1004,7 @@ export default {
           const invalidApplyDays = targets.filter(
             (t) =>
               t.applyRange === 1 &&
-              (!t.applyDays ||
-                t.applyDays.length !== 2 ||
-                !t.applyDays[0] ||
-                !t.applyDays[1] ||
-                t.applyDays[0] >= t.applyDays[1])
+              (!Array.isArray(t.applyDays) || t.applyDays.length === 0)
           )
           if (invalidApplyDays.length > 0) {
             _this.$message.error("部分应用时，开始天数必须小于结束天数")

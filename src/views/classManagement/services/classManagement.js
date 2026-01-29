@@ -19,6 +19,10 @@ export const teamApi = {
   getAllTeams() {
     return getData({ url: "/consumer/api/team/coach/all-teams" })
   },
+  // 获取教练下所有团队和俱乐部（用于下拉：团队 + 俱乐部）
+  getAllTeamsAndClubs() {
+    return getData({ url: "/consumer/api/club/coach/getAllTeamsAndClubs" })
+  },
 }
 
 /**
