@@ -1934,6 +1934,12 @@ export default {
       // this.showAddClassModal = true;
     },
 
+    handleShareClassDetail(item) {
+      const findClass = this.shareGroupList.find(el => el.id === item.classesGroupId)?.classesList.find(el => el.id === item.id)
+      this.classModalData = findClass
+      this.classModalDataType = "edit"
+    },
+
     /**
      * 课表详情
      */

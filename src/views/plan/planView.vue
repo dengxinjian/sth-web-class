@@ -653,18 +653,18 @@ export default {
       this.currentShareGroup = {
         id: "",
         groupName: "",
-        teamId: node.data.teamId,
+        teamId: node.teamId,
       };
       this.addShareGroupVisible = true;
     },
     // 编辑分享分组
     handleEditShareGroup(node) {
-      this.currentShareGroup = { ...node.data };
+      this.currentShareGroup = { ...node };
       this.addShareGroupVisible = true;
     },
     // 删除分享分组
     handleDeleteShareGroup(node) {
-      this.$confirm(`确认删除分组【${node?.data?.groupName}】？`, "提示", {
+      this.$confirm(`确认删除分组【${node?.groupName}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
@@ -673,9 +673,9 @@ export default {
         groupApi
           .deleteShareGroup({
             requestUserId: localStorage.getItem("triUserId"),
-            id: node.data.id,
+            id: node.id,
             shareDataType: 2,
-            teamId: node.data.teamId,
+            teamId: node.teamId,
           })
           .then((res) => {
             if (res.success) {
@@ -688,7 +688,8 @@ export default {
     },
     // 移动分享分组
     handleMoveShareGroup(node) {
-      this.currentMoveShareGroup = { ...node.data };
+      console.log(node, "node--移动分享分组");
+      this.currentMoveShareGroup = { ...node };
       this.moveShareGroupVisible = true;
     },
     // 保存分享分组
