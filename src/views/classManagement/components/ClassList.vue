@@ -201,7 +201,7 @@
 
     <!-- 团队课程操作栏 -->
     <div class="team-operation" v-if="activeClassType === 'team'">
-      <ShareTree
+      <!-- <ShareTree
         ref="shareTreeRef"
         :search-input="searchInput"
         @add-share-group="handleAddShareGroup"
@@ -209,7 +209,14 @@
         @delete-share-group="handleDeleteShareGroup"
         @move-share-group="handleMoveShareGroup"
         @view-class="handleViewClass"
-      />
+      /> -->
+      <div class="team-operation-container" v-for="item in teamTreeList" :key="item.id">
+        <div class="team-operation-item">
+          <div class="team-operation-item-title">
+            <span class="team-operation-item-title-text">{{ item.name }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -229,6 +236,10 @@ export default {
   },
   props: {
     classList: {
+      type: Array,
+      default: () => [],
+    },
+    teamTreeList: {
       type: Array,
       default: () => [],
     },
