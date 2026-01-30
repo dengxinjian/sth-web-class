@@ -33,15 +33,36 @@
 
           <!-- 课程管理 -->
           <div v-show="activeName === 'class'" class="class-container-wrapper">
-            <ClassList ref="planListRef" :class-list="classList" :team-tree-list="teamTreeList"
-              :active-class-type.sync="activeClassType" @class-type-change="handleClassTypeChange"
-              @search="handleClassSearch" @add-class="handleAddClass" @add-group="handleAddGroup"
-              @edit-group="handleEditGroup" @delete-group="handleDeleteGroup" @move-group="handleMoveGroup"
-              @class-detail="handleClassDetail" @move-class="handleMoveClass" @delete-class="handleDeleteClass"
-              @copy-class="handleCopyClassFromOfficial" @collapse-change="classSlideChange"
-              @view-class="handleViewClass" @add-share-group="handleAddShareGroup"
-              @edit-share-group="handleEditShareGroup" @delete-share-group="handleDeleteShareGroup"
-              @move-share-group="handleMoveShareGroup" />
+            <ClassList ref="planListRef"
+              :class-list="classList"
+              :team-tree-list="teamTreeList"
+              :active-class-type.sync="activeClassType"
+              @class-type-change="handleClassTypeChange"
+              @search="handleClassSearch"
+              @add-class="handleAddClass"
+              @add-group="handleAddGroup"
+              @edit-group="handleEditGroup"
+              @delete-group="handleDeleteGroup"
+              @move-group="handleMoveGroup"
+              @class-detail="handleClassDetail"
+              @share-class-detail="handleShareClassDetail"
+              @move-class="handleMoveClass"
+              @move-share-class="handleMoveShareClass"
+              @delete-class="handleDeleteClass"
+              @delete-share-class="handleDeleteShareClass"
+              @copy-class="handleCopyClassFromOfficial"
+              @collapse-change="classSlideChange"
+              @view-class="handleViewClass"
+              @view-share-class="handleViewShareClase"
+              @add-share-group="handleAddShareGroup"
+              @edit-share-group="handleEditShareGroup"
+              @delete-share-group="handleDeleteShareGroup"
+              @move-share-group="handleMoveShareGroup"
+              @share-team-click="handleShareTeamClick"
+              @share-team-group-click="handleShareTeamGroupClick"
+              :share-group-list="shareGroupList"
+              :current-share-team-id="currentShareTeamId"
+            />
           </div>
         </div>
 
@@ -432,6 +453,9 @@ export default {
       currentShareGroup: {},
       moveShareGroupVisible: false,
       currentMoveShareGroup: {},
+
+      currentShareTeamId: "",
+      shareGroupList: []
     }
   },
   computed: {
@@ -534,6 +558,55 @@ export default {
     getDeviceBrandIcon,
     getDeviceName(deviceType) {
       return DEVICE_TYPE_DICT[deviceType] || "未知设备"
+    },
+    // 选择分享团队
+    handleShareTeamClick(teamId) {
+      console.log(teamId, "teamId--选择分享团队");
+      this.currentShareTeamId = teamId;
+      getData({
+        url: `/training/api/shareTeamGroup/list?teamId=${teamId}&shareDataType=1`,
+      }).then((res) => {
+        if (res.success && res.result) {
+          console.log(res.result, "res.result--分享团队下的分享组");
+          this.shareGroupList = res.result;
+        }
+      });
+    },
+    handleShareTeamGroupClick(id) {
+      console.log(id, "id---分享分组id")
+      const findGroup = this.shareGroupList.find(el => el.id === id)
+      this.getShareGroupClass(findGroup)
+    },
+    handleShareTeamClassClick(id) {
+      console.log(id, "id")
+    },
+    getShareGroupClass(node) {
+      const _this = this;
+      getData({
+        url: `/training/api/teamShare/pageByGroupId`,
+        groupId: node.id,
+        teamId: node.teamId,
+        shareDataType: 1,
+        current: 1,
+        size: 20,
+      })
+        .then((res) => {
+          if (res.success && res.result) {
+            console.log('====分享课程', res)
+            _this.shareGroupList = _this.shareGroupList.map(el => {
+              if (el.id === node.id) {
+                return {
+                  ...el,
+                  classesList: res.result.records.map(item => ({
+                    ...item,
+                    classesJson: parseClassesJson(item.classesJson),
+                  }))
+                }
+              }
+              return el
+            })
+          }
+        })
     },
     /**
      * 删除该日期所有课表
@@ -1787,6 +1860,16 @@ export default {
     },
 
     /**
+     * 移动分享课程
+     */
+    handleMoveShareClass(classId, groupId) {
+      this.moveClassId = classId
+      this.moveGroupId = groupId
+      this.moveType = "class"
+      this.showMoveGroup = true
+    },
+
+    /**
      * 分享课程
      */
     handleShareClass(classId) {
@@ -1811,6 +1894,10 @@ export default {
         }
       })
     },
+    // 删除分享课程 -- 缺少接口
+    async handleDeleteShareClass(classItem){
+
+    },
     async handleUpdateClass(classData, flag) {
       classApi.updateClass(classData).then((res) => {
         if (res.success) {
@@ -1827,6 +1914,12 @@ export default {
     handleViewClass(classId) {
       this.showViewClassCard = true
       this.classModalData = this.findClassById(classId)
+    },
+
+    handleViewShareClase(item) {
+      this.showViewClassCard = true;
+      const findClass = this.shareGroupList.find(el => el.id === item.classesGroupId)?.classesList.find(el => el.id === item.id)
+      this.classModalData = findClass
     },
 
     /**
@@ -2719,21 +2812,22 @@ export default {
 
     // 添加分享分组
     handleAddShareGroup(node) {
+      console.log(node, "node--添加分享分组---分享组节点信息")
       this.currentShareGroup = {
         id: "",
         groupName: "",
-        teamId: node.data.teamId,
+        teamId: node.teamId,
       }
       this.addShareGroupVisible = true
     },
     // 编辑分享分组
     handleEditShareGroup(node) {
-      this.currentShareGroup = { ...node.data }
+      this.currentShareGroup = { ...node }
       this.addShareGroupVisible = true
     },
     // 删除分享分组
     handleDeleteShareGroup(node) {
-      this.$confirm(`确认删除分组【${node?.data?.groupName}】？`, "提示", {
+      this.$confirm(`确认删除分组【${node?.groupName}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
@@ -2742,15 +2836,16 @@ export default {
         groupApi
           .deleteShareGroup({
             requestUserId: localStorage.getItem("triUserId"),
-            id: node.data.id,
+            id: node.id,
             shareDataType: 1, // 1 团队课程  2 分享计划
-            teamId: node.data.teamId,
+            teamId: node.teamId,
           })
           .then((res) => {
             if (res.success) {
               this.$message.success("删除成功")
-              // 刷新团队树数据
+              // 刷新团队树与当前团队的分享分组列表
               this.refreshTeamTree()
+              this.refreshShareGroupList()
             }
           })
       })
@@ -2760,18 +2855,20 @@ export default {
       this.currentMoveShareGroup = { ...node.data }
       this.moveShareGroupVisible = true
     },
-    // 保存分享分组
+    // 保存分享分组（添加/编辑成功后）
     handleAddShareGroupSave(payload) {
       this.addShareGroupVisible = false
       this.currentShareGroup = { id: "", groupName: "", teamId: null }
-      // 刷新团队树数据
+      // 刷新团队树与当前团队的分享分组列表
       this.refreshTeamTree()
+      this.refreshShareGroupList()
     },
     handleMoveShareGroupSave(payload) {
       this.moveShareGroupVisible = false
       this.currentMoveShareGroup = { id: "", teamId: null }
-      // 刷新团队树数据
+      // 刷新团队树与当前团队的分享分组列表
       this.refreshTeamTree()
+      this.refreshShareGroupList()
     },
     // 刷新团队树数据
     refreshTeamTree() {
@@ -2779,6 +2876,17 @@ export default {
       if (this.activeClassType === 'team' && this.$refs.planListRef && this.$refs.planListRef.refreshTeamTree) {
         this.$refs.planListRef.refreshTeamTree()
       }
+    },
+    // 刷新当前团队的分享分组列表（用于添加/编辑/删除分组后更新右侧列表）
+    refreshShareGroupList() {
+      if (!this.currentShareTeamId) return
+      getData({
+        url: `/training/api/shareTeamGroup/list?teamId=${this.currentShareTeamId}&shareDataType=1`,
+      }).then((res) => {
+        if (res.success && res.result) {
+          this.shareGroupList = res.result
+        }
+      })
     },
     /**
      * 保存分组
