@@ -95,10 +95,10 @@
                 popper-class="hover-plan-detail-popover">
                 <!-- <span slot="reference" @click.stop>{{ classItem.planTitle }}</span> -->
                 <span slot="reference">
-                  <div style="width: 100%; cursor: pointer">
-                    {{ classItem.planTitle }}
-                  </div>
-                  <div style="
+                      <div style="width: 100%; cursor: pointer">
+                        {{ classItem.planTitle }}
+                      </div>
+                      <div style="
                       width: 100%;
                       cursor: pointer;
                       display: flex;
@@ -106,14 +106,17 @@
                       align-items: center;
                       gap: 5px;
                     ">
-                    <el-rate v-model="classItem.level" :allow-half="true" disabled
-                      :colors="['#F92B30', '#F92B30', '#F92B30']" text-color="#999999"
-                      disabled-void-color="#E1E4EC"></el-rate>
-                    <span style="font-size: 10px; color: #979fb0">{{
-                      classItem.level ? "" : "未评分"
-                    }}</span>
-                  </div>
-                </span>
+                        <el-rate v-model="classItem.level" :allow-half="true" disabled
+                          :colors="['#F92B30', '#F92B30', '#F92B30']" text-color="#999999"
+                          disabled-void-color="#E1E4EC"></el-rate>
+                        <span style="font-size: 10px; color: #979fb0">{{
+                          classItem.level ? "" : "未评分"
+                        }}</span>
+                        <span style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px;">{{
+                          classItem.isShare ? "已分享" : ""
+                        }}</span>
+                      </div>
+                    </span>
                 <HoverPlanDetail :planInfo="classItem" @move="handleMovePlan"></HoverPlanDetail>
               </el-popover>
             </div>
@@ -151,8 +154,7 @@
                     <span class="group-name-text">{{ item.groupName }}</span>
                     <span class="group-name-count">({{ item.groupCount }})</span>
                   </div>
-                  <el-popover popper-class="athletic-btn-popover"
-                    placement="right" width="80" trigger="hover">
+                  <el-popover popper-class="athletic-btn-popover" placement="right" width="80" trigger="hover">
                     <div class="group-operations">
                       <span>
                         <el-button type="text" @click="handleAddShareGroup(item)">
@@ -393,12 +395,16 @@ export default {
     },
     handleShareGroupCollapseChange(activeNames) {
       console.log(activeNames, "id--团队计划分组折叠变化");
+      // 折叠关闭时 activeNames 可能为空，find 会返回 undefined
+      if (activeNames == null || activeNames === "") return;
       const findGroup = this.currentShareGroupList.find(el => el.id === activeNames);
       console.log(findGroup, "findGroup--团队计划分组折叠变化");
-      this.getShareGroupPlanList(findGroup)
+      if (!findGroup) return;
+      this.getShareGroupPlanList(findGroup);
     },
     // 点击团队计划
     getShareGroupPlanList(node) {
+      if (!node || node.id == null) return;
       const _this = this;
       // 根据分享分组获取分组下的所有分享计划
       getData({
@@ -426,7 +432,7 @@ export default {
         })
     },
     handleSharePlanClick(node) {
-      console.log('====点击了分享计划',node)
+      console.log('====点击了分享计划', node)
       this.$emit("view-plan", node.sourcePlanId, node);
     },
     handleSearch() {
@@ -479,7 +485,7 @@ export default {
       this.$emit("delete-share-group", node);
     },
     handleMoveShareGroup(node) {
-      this.$emit("move-share-group", {...node, teamId: this.currentShareTeamId});
+      this.$emit("move-share-group", { ...node, teamId: this.currentShareTeamId });
     },
     handleViewPlan(sourcePlanId, data) {
       this.$emit("view-plan", sourcePlanId, data);

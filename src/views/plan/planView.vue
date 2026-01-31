@@ -792,6 +792,10 @@ export default {
         8: () => {
           _this.showSharePlan = true;
         },
+        // 权限调整
+        9: () => {
+          _this.showPermission = true;
+        },
       };
       optMap[index]();
     },
