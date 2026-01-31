@@ -436,6 +436,15 @@ export default {
     },
     handleSharePlanClick(node) {
       console.log('====点击了分享计划', node)
+      // 保持当前分组展开：找到该计划所在分组并设为激活，避免 accordion 折叠
+      const group = this.currentShareGroupList.find(
+        (g) => g.classesList && g.classesList.some((c) => c.sourcePlanId === node.sourcePlanId || c.id === node.id)
+      );
+      if (group && group.id != null) {
+        this.$nextTick(() => {
+          this.activeCollapse = group.id;
+        });
+      }
       this.$emit("view-plan", node.sourcePlanId, node);
     },
     handleSearch() {
