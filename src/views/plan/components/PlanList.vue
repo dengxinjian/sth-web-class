@@ -335,6 +335,9 @@ export default {
       this.$emit("update:activeClassType", type);
       // 触发 class-type-change 事件，让父组件处理类型切换
       this.$emit("class-type-change", type);
+      this.currentShareTeamId = '';
+      this.currentShareGroupList = [];
+      this.currentSharePlanList = [];
       // 切换到 team 类型时，触发重新加载团队列表并强制重新渲染 el-tree
       if (type === "team") {
         this.getTeamPlanList();

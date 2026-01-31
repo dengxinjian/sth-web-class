@@ -14,8 +14,8 @@
           trigger="hover"
           popper-class="add-class-btn-popover-planned-schedule"
         >
-          <div class="add-class-btn-popover-more-list">
-            <div v-for="(el, idx) in optionsArray" :key="idx">
+          <div class="add-class-btn-popover-more-list" :key="'options-' + shareAuth">
+            <div v-for="(el, idx) in optionsArray" :key="'opt-' + shareAuth + '-' + idx">
               <div
                 :class="
                   el.value === 7
