@@ -4,25 +4,20 @@
       <!-- 左侧菜单 -->
       <LeftMenu v-model="activeName" @change="handleTypeChange" />
 
-      <div class="content-container"
-        style="display: flex; width: 100%"
+      <div class="content-container" style="display: flex; width: 100%"
         v-if="activeName === 'athletic' || activeName === 'class'">
         <!-- 中间内容区 -->
         <div class="type-change">
           <!-- 运动员管理 -->
           <div v-show="activeName === 'athletic'">
-            <div v-if="loginType === '2'"
-              class="team-select-container">
-              <el-dropdown trigger="click" placement="bottom-start"
-                @command="handleTeamChange" class="team-dropdown">
+            <div v-if="loginType === '2'" class="team-select-container">
+              <el-dropdown trigger="click" placement="bottom-start" @command="handleTeamChange" class="team-dropdown">
                 <span class="el-dropdown-link team-name-title">
                   {{ getTeamName(selectedTeam) }}
                   <i class="el-icon-caret-bottom"></i>
                 </span>
-                <el-dropdown-menu slot="dropdown"
-                  class="team-dropdown-menu">
-                  <el-dropdown-item v-for="t in teamOrClubList"
-                    :key="t.type + '_' + t.id"
+                <el-dropdown-menu slot="dropdown" class="team-dropdown-menu">
+                  <el-dropdown-item v-for="t in teamOrClubList" :key="t.type + '_' + t.id"
                     :command="{ id: t.id, type: t.type }"
                     :class="{ 'active': selectedTeam === t.id && selectedOrgType === t.type }">
                     {{ t.displayName }}
@@ -30,48 +25,25 @@
                 </el-dropdown-menu>
               </el-dropdown>
             </div>
-            <AthleticManagement
-              v-if="selectedTeam && selectedOrgType === 'team'"
-              :teamId="selectedTeam"
-              :teamName="getTeamName(selectedTeam)"
-              :activeName="activeName"
-              @athletic-click="handleAthleticChange" />
-            <cludList v-else :clubId="selectedTeam"
-              :teamName="getTeamName(selectedTeam)"
-              :activeName="activeName"
+            <AthleticManagement v-if="selectedTeam && selectedOrgType === 'team'" :teamId="selectedTeam"
+              :teamName="getTeamName(selectedTeam)" :activeName="activeName" @athletic-click="handleAthleticChange" />
+            <cludList v-else :clubId="selectedTeam" :teamName="getTeamName(selectedTeam)" :activeName="activeName"
               @member-click="handleAthleticChange"></cludList>
           </div>
 
           <!-- 课程管理 -->
-          <div v-show="activeName === 'class'"
-            class="class-container-wrapper">
-            <ClassList ref="planListRef"
-              :class-list="classList"
-              :team-tree-list="teamTreeList"
-              :active-class-type.sync="activeClassType"
-              @class-type-change="handleClassTypeChange"
-              @search="handleClassSearch"
-              @add-class="handleAddClass"
-              @add-group="handleAddGroup"
-              @edit-group="handleEditGroup"
-              @delete-group="handleDeleteGroup"
-              @move-group="handleMoveGroup"
-              @class-detail="handleClassDetail"
-              @share-class-detail="handleShareClassDetail"
-              @move-class="handleMoveClass"
-              @move-share-class="handleMoveShareClass"
-              @delete-class="handleDeleteClass"
-              @delete-share-class="handleDeleteShareClass"
-              @copy-class="handleCopyClassFromOfficial"
-              @collapse-change="classSlideChange"
-              @view-class="handleViewClass"
-              @view-share-class="handleViewShareClase"
-              @add-share-group="handleAddShareGroup"
-              @edit-share-group="handleEditShareGroup"
-              @delete-share-group="handleDeleteShareGroup"
-              @share-team-click="handleShareTeamClick"
-              @share-team-group-click="handleShareTeamGroupClick"
-              :share-group-list="shareGroupList"
+          <div v-show="activeName === 'class'" class="class-container-wrapper">
+            <ClassList ref="planListRef" :class-list="classList" :team-tree-list="teamTreeList"
+              :active-class-type.sync="activeClassType" @class-type-change="handleClassTypeChange"
+              @search="handleClassSearch" @add-class="handleAddClass" @add-group="handleAddGroup"
+              @edit-group="handleEditGroup" @delete-group="handleDeleteGroup" @move-group="handleMoveGroup"
+              @class-detail="handleClassDetail" @share-class-detail="handleShareClassDetail"
+              @move-class="handleMoveClass" @move-share-class="handleMoveShareClass" @delete-class="handleDeleteClass"
+              @delete-share-class="handleDeleteShareClass" @copy-class="handleCopyClassFromOfficial"
+              @collapse-change="classSlideChange" @view-class="handleViewClass" @view-share-class="handleViewShareClase"
+              @add-share-group="handleAddShareGroup" @edit-share-group="handleEditShareGroup"
+              @delete-share-group="handleDeleteShareGroup" @share-team-click="handleShareTeamClick"
+              @share-team-group-click="handleShareTeamGroupClick" :share-group-list="shareGroupList"
               :current-share-team-id="currentShareTeamId" />
           </div>
         </div>
@@ -86,40 +58,28 @@
                 justify-content: space-between;
               ">
               <WeekRangePicker @week-change="onWeekChange" />
-              <div
-                style="display: flex; align-items: center; gap: 10px">
+              <div style="display: flex; align-items: center; gap: 10px">
 
                 <div v-if="loginType === '2'">
                   <!-- <span>运动员：</span> -->
-                  <el-dropdown trigger="click"
-                    placement="bottom-start"
-                    @command="handleAthleticChange"
+                  <el-dropdown trigger="click" placement="bottom-start" @command="handleAthleticChange"
                     class="athletic-dropdown">
-                    <span
-                      class="el-dropdown-link athletic-select-title">
-                      <img v-if="getSelectedAthleticAvatar"
-                        :src="getSelectedAthleticAvatar"
-                        class="athletic-avatar"
+                    <span class="el-dropdown-link athletic-select-title">
+                      <img v-if="getSelectedAthleticAvatar" :src="getSelectedAthleticAvatar" class="athletic-avatar"
                         alt="" />
                       <span class="athletic-name-text">
                         {{ getSelectedAthleticName || "选择人员" }}
                       </span>
                       <i class="el-icon-caret-bottom"></i>
                     </span>
-                    <el-dropdown-menu slot="dropdown"
-                      class="athletic-dropdown-menu">
-                      <el-dropdown-item
-                        v-for="item in athleticDropdownItems"
-                        :key="item.key"
-                        :command="item.type === 'member' ? item.value : null"
-                        :disabled="item.type === 'group'" :class="{
+                    <el-dropdown-menu slot="dropdown" class="athletic-dropdown-menu">
+                      <el-dropdown-item v-for="item in athleticDropdownItems" :key="item.key"
+                        :command="item.type === 'member' ? item.value : null" :disabled="item.type === 'group'" :class="{
                           'group-header': item.type === 'group',
                           active: item.type === 'member' && selectedAthletic === item.value,
                         }">
-                        <div v-if="item.type === 'member'"
-                          class="athletic-menu-item">
-                          <img v-if="item.raw && item.raw.userAvatar"
-                            :src="item.raw.userAvatar"
+                        <div v-if="item.type === 'member'" class="athletic-menu-item">
+                          <img v-if="item.raw && item.raw.userAvatar" :src="item.raw.userAvatar"
                             class="athletic-menu-avatar" alt="" />
                           <span>{{ item.label }}</span>
                         </div>
@@ -139,185 +99,114 @@
               >
                 信息查看
               </el-button> -->
-              <img src="@/assets/addClass/userInfo.png" alt=""
-                @click="showAthleticInfoDialog = true" />
-              <img src="@/assets/addClass/Statistics.png" alt=""
-                @click="showMonthStatisticDialog = true" />
+              <img src="@/assets/addClass/userInfo.png" alt="" @click="showAthleticInfoDialog = true" />
+              <img src="@/assets/addClass/Statistics.png" alt="" @click="showMonthStatisticDialog = true" />
               <div class="schedule-table-header-cell-data">
-                <el-popover placement="bottom-end" width="180"
-                  trigger="hover">
-                  <div v-for="item in deviceList" :key="item.id"
-                    style="
+                <el-popover placement="bottom-end" width="180" trigger="hover">
+                  <div v-for="item in deviceList" :key="item.id" style="
                       display: flex;
                       flex-direction: row;
                       gap: 10px;
                       margin: 10px 0;
                     ">
-                    <img :src="getDeviceBrandIcon(item.deviceType)"
-                      alt="" class="device-brand-icon" />
-                    <el-switch v-model="item.enabled"
-                      :inactive-text="getDeviceName(item.deviceType)"
+                    <img :src="getDeviceBrandIcon(item.deviceType)" alt="" class="device-brand-icon" />
+                    <el-switch v-model="item.enabled" :inactive-text="getDeviceName(item.deviceType)"
                       @change="handleDeviceChange(item)"></el-switch>
                   </div>
-                  <span slot="reference"
-                    class="device-filter-reference">
-                    <img src="@/assets/addClass/Synchronization.png"
-                      alt="" />
+                  <span slot="reference" class="device-filter-reference">
+                    <img src="@/assets/addClass/Synchronization.png" alt="" />
                   </span>
                 </el-popover>
               </div>
-              <img src="@/assets/addClass/Refresh.png" alt=""
-                @click="handleRefresh" />
+              <img src="@/assets/addClass/Refresh.png" alt="" @click="handleRefresh" />
             </div>
           </div>
 
           <div style="display: flex;flex:1; width: 100%">
             <!-- 日程表 -->
-            <ScheduleCalendar :current-week="currentWeek"
-              :team-list="teamList" :athletic-list="athleticList"
-              :selected-team="selectedTeam"
-              :selected-athletic="selectedAthletic"
-              @week-change="onWeekChange"
-              @team-change="handleTeamChange"
-              @athletic-change="handleAthleticChange"
-              @show-info="showAthleticInfoDialog = true"
-              @show-statistic="showMonthStatisticDialog = true"
-              @refresh="handleRefresh"
-              @class-detail="handleClassScheduleDetail"
-              @activity-detail="handleSportDetail"
-              @delete-schedule="handleDeleteClassSchedule"
-              @unbind="handleUnbind"
-              @delete-activity="handleDeleteActivity"
-              @device-click="handleDeviceClick"
-              @edit-schedule="handleEditClassSchedule"
-              @edit-activity="handleEditActivity"
-              @paste-class="handlePasteClass"
-              @cut-class="handleCutClass"
-              @paste-event="handlePasteEvent"
-              @cut-event="handleCutEvent"
-              @view-health-data="handleViewHealthData"
-              @add-schedule="handleAddSchedule"
-              @event-detail="handleEventDetail"
-              @edit-event="handleEditEvent"
-              @delete-all-schedules="handleDeleteAllSchedules"
-              @input-activity="handleInputActivity"
+            <ScheduleCalendar :current-week="currentWeek" :team-list="teamList" :athletic-list="athleticList"
+              :selected-team="selectedTeam" :selected-athletic="selectedAthletic" @week-change="onWeekChange"
+              @team-change="handleTeamChange" @athletic-change="handleAthleticChange"
+              @show-info="showAthleticInfoDialog = true" @show-statistic="showMonthStatisticDialog = true"
+              @refresh="handleRefresh" @class-detail="handleClassScheduleDetail" @activity-detail="handleSportDetail"
+              @delete-schedule="handleDeleteClassSchedule" @unbind="handleUnbind"
+              @delete-activity="handleDeleteActivity" @device-click="handleDeviceClick"
+              @edit-schedule="handleEditClassSchedule" @edit-activity="handleEditActivity"
+              @paste-class="handlePasteClass" @cut-class="handleCutClass" @paste-event="handlePasteEvent"
+              @cut-event="handleCutEvent" @view-health-data="handleViewHealthData" @add-schedule="handleAddSchedule"
+              @event-detail="handleEventDetail" @edit-event="handleEditEvent"
+              @delete-all-schedules="handleDeleteAllSchedules" @input-activity="handleInputActivity"
               @click-event-activity="handleEditActivity" />
 
             <!-- 右侧统计面板 -->
-            <StatisticsPanel :sth-data="sthData"
-              :statistic-data="statisticData"
-              :device-list="deviceList"
+            <StatisticsPanel :sth-data="sthData" :statistic-data="statisticData" :device-list="deviceList"
               @device-change="handleDeviceChange" />
           </div>
         </div>
       </div>
-      <div class="content-container"
-        style="display: flex; width: 100%"
-        v-if="activeName === 'plan'">
+      <div class="content-container" style="display: flex; width: 100%" v-if="activeName === 'plan'">
         <PlanView :isPlan="isPlan" @choose-plan="handleChoosePlan" />
         <!-- 日程表 -->
-        <ScheduleCalendar v-if="!isPlan" :current-week="currentWeek"
-          :team-list="teamList" :athletic-list="athleticList"
-          :selected-team="selectedTeam"
-          :selected-athletic="selectedAthletic"
-          @week-change="onWeekChange"
-          @team-change="handleTeamChange"
-          @athletic-change="handleAthleticChange"
-          @show-info="showAthleticInfoDialog = true"
-          @show-statistic="showMonthStatisticDialog = true"
-          @refresh="handleRefresh"
-          @class-detail="handleClassScheduleDetail"
-          @activity-detail="handleSportDetail"
-          @delete-schedule="handleDeleteClassSchedule"
-          @unbind="handleUnbind"
-          @delete-activity="handleDeleteActivity"
-          @device-click="handleDeviceClick"
-          @edit-schedule="handleEditClassSchedule"
-          @edit-activity="handleEditActivity"
-          @paste-class="handlePasteClass" @cut-class="handleCutClass"
-          @paste-event="handlePasteEvent"
-          @cut-event="handleCutEvent"
-          @view-health-data="handleViewHealthData"
-          @add-schedule="handleAddSchedule"
-          @event-detail="handleEventDetail"
-          @edit-event="handleEditEvent"
-          @input-activity="handleInputActivity"
-          @click-event-activity="handleEditActivity"
-          @delete-all-schedules="handleDeleteAllSchedules" />
+        <ScheduleCalendar v-if="!isPlan" :current-week="currentWeek" :team-list="teamList" :athletic-list="athleticList"
+          :selected-team="selectedTeam" :selected-athletic="selectedAthletic" @week-change="onWeekChange"
+          @team-change="handleTeamChange" @athletic-change="handleAthleticChange"
+          @show-info="showAthleticInfoDialog = true" @show-statistic="showMonthStatisticDialog = true"
+          @refresh="handleRefresh" @class-detail="handleClassScheduleDetail" @activity-detail="handleSportDetail"
+          @delete-schedule="handleDeleteClassSchedule" @unbind="handleUnbind" @delete-activity="handleDeleteActivity"
+          @device-click="handleDeviceClick" @edit-schedule="handleEditClassSchedule" @edit-activity="handleEditActivity"
+          @paste-class="handlePasteClass" @cut-class="handleCutClass" @paste-event="handlePasteEvent"
+          @cut-event="handleCutEvent" @view-health-data="handleViewHealthData" @add-schedule="handleAddSchedule"
+          @event-detail="handleEventDetail" @edit-event="handleEditEvent" @input-activity="handleInputActivity"
+          @click-event-activity="handleEditActivity" @delete-all-schedules="handleDeleteAllSchedules" />
         <!-- 右侧统计面板 -->
-        <StatisticsPanel v-if="!isPlan" :sth-data="sthData"
-          :statistic-data="statisticData" :device-list="deviceList"
+        <StatisticsPanel v-if="!isPlan" :sth-data="sthData" :statistic-data="statisticData" :device-list="deviceList"
           @device-change="handleDeviceChange" />
       </div>
     </div>
 
     <!-- 对话框组件 -->
-    <AthleticInfoDialog v-model="showAthleticInfoDialog"
-      :data="athleticInfoData" @save="onSaveAthleticInfo" />
+    <AthleticInfoDialog v-model="showAthleticInfoDialog" :data="athleticInfoData" @save="onSaveAthleticInfo" />
 
-    <MonthStatisticDialog v-model="showMonthStatisticDialog"
-      :triUserId="selectedAthletic" :currentMonth="currentMonth"
+    <MonthStatisticDialog v-model="showMonthStatisticDialog" :triUserId="selectedAthletic" :currentMonth="currentMonth"
       @cancel="onCancelMonthStatistic" />
 
-    <SportTypeModal v-model="showSportTypeModal" :isClass="isClass"
-      :isSchedule="isSchedule" @select="onSelectSportType"
+    <SportTypeModal v-model="showSportTypeModal" :isClass="isClass" :isSchedule="isSchedule" @select="onSelectSportType"
       @addEvent="handleAddEvent" @cancel="handleCancelSportType" />
 
-    <SportDetailModal v-model="showSportDetailModal"
-      :type="sportDetailData.sportType" :data="sportDetailData"
-      :selectedAthletic="selectedAthletic"
-      @cancel="onCancelSportDetail" />
+    <SportDetailModal v-model="showSportDetailModal" :type="sportDetailData.sportType" :data="sportDetailData"
+      :selectedAthletic="selectedAthletic" @cancel="onCancelSportDetail" />
     <AddClassTitle v-model="showAddClassTitle" :groups="[
       { id: 1, name: '我的课程' },
       { id: 2, name: '团队课程' },
     ]" :default-group-id="addGroupId" @save="onSaveClassTitle" />
 
-    <AddGroup v-model="showAddGroup" :data="currentGroup"
-      @save="onSaveAddGroup" />
+    <AddGroup v-model="showAddGroup" :data="currentGroup" @save="onSaveAddGroup" />
 
-    <MoveGroup v-model="showMoveGroup" :id="moveGroupId"
-      :class-id="moveClassId" :type="moveType"
+    <MoveGroup v-model="showMoveGroup" :id="moveGroupId" :class-id="moveClassId" :type="moveType"
       @save="onSaveMoveGroup" />
 
-    <BindModal v-model="showBindModal"
-      :exercise-data="bindExerciseData" :course-data="bindCourseData"
-      :type="bindType"
+    <BindModal v-model="showBindModal" :exercise-data="bindExerciseData" :course-data="bindCourseData" :type="bindType"
       @bind="onBind" @cancel="onCancelBind" />
 
-    <ClassDetailModal v-model="showClassDetailModal"
-      :type="classSportType" :scheduleType="scheduleType"
-      :data="classDetailData" :classesDate="addScheduleDate"
-      :athleticThreshold="athleticThreshold"
-      :triUserId="selectedAthletic" @save="handleSaveClassDetail"
-      @cancel="handleResetClassDetail" />
+    <ClassDetailModal v-model="showClassDetailModal" :type="classSportType" :scheduleType="scheduleType"
+      :data="classDetailData" :classesDate="addScheduleDate" :athleticThreshold="athleticThreshold"
+      :triUserId="selectedAthletic" @save="handleSaveClassDetail" @cancel="handleResetClassDetail" />
 
-    <CopyClassFromOfficial v-model="showCopyClassFromOfficial"
-      :class-id="copyClassFromOfficialClassId"
-      :group-id="copyClassFromOfficialGroupId"
-      :data="copyClassFromOfficialData"
-      :active-class-type="activeClassType"
+    <CopyClassFromOfficial v-model="showCopyClassFromOfficial" :class-id="copyClassFromOfficialClassId"
+      :group-id="copyClassFromOfficialGroupId" :data="copyClassFromOfficialData" :active-class-type="activeClassType"
       @save="onSaveCopyClassFromOfficial" />
 
-    <ViewClassCard :visible="showViewClassCard"
-      :class-item="classModalData"
-      :active-class-type="activeClassType"
-      @close="showViewClassCard = false" @move="handleMoveClass"
-      @move-share-group="handleMoveShareGroup"
-      @delete="handleDeleteClass"
-      @copy="handleCopyClassFromOfficial" @save="handleUpdateClass"
-      @share="handleShareClass" />
-    <ShareClassModal v-model="showShareClassModal"
-      :class-id="shareClassId" @save="onSaveShareClass" />
-    <AddClassModal v-model="showAddClassModal"
-      :sportType="classModalData.sportType" :type="classModalDataType"
-      :originalType="activeClassType" :data="classModalData"
-      @save="onSaveAddClass"
+    <ViewClassCard :visible="showViewClassCard" :class-item="classModalData" :active-class-type="activeClassType"
+      @close="showViewClassCard = false" @move="handleMoveClass" @move-share-group="handleMoveShareGroup"
+      @share-auth-edit="handleShareAuthEdit" @delete="handleDeleteClass" @copy="handleCopyClassFromOfficial"
+      @save="handleUpdateClass" @share="handleShareClass" />
+    <ShareClassModal v-model="showShareClassModal" :class-id="shareClassId" @save="onSaveShareClass" />
+    <AddClassModal v-model="showAddClassModal" :sportType="classModalData.sportType" :type="classModalDataType"
+      :originalType="activeClassType" :data="classModalData" @save="onSaveAddClass"
       @cancel="showAddClassModal = false" />
 
-    <EditScheduleClass :visible="showEditScheduleClass"
-      :class-item="isActivity ? activityDetailData : classDetailData"
-      :is-activity="isActivity" :athleticThreshold="athleticThreshold"
-      :triUserId="selectedAthletic" @close="
+    <EditScheduleClass :visible="showEditScheduleClass" :class-item="isActivity ? activityDetailData : classDetailData"
+      :is-activity="isActivity" :athleticThreshold="athleticThreshold" :triUserId="selectedAthletic" @close="
         showEditScheduleClass = false
       isActivity ? (activityDetailData = {}) : (classDetailData = {})
         " @save="handleClassDetailSave" @delete="
@@ -326,37 +215,30 @@
           " />
 
     <!-- 健康数据查看弹窗 -->
-    <el-dialog title="" :visible.sync="showHealthViewDialog"
-      width="90%" :close-on-click-modal="false"
+    <el-dialog title="" :visible.sync="showHealthViewDialog" width="90%" :close-on-click-modal="false"
       custom-class="health-view-dialog">
-      <HealthView v-if="showHealthViewDialog"
-        :health-data="healthViewData" :date="healthViewDate"
-        :device-list="deviceList" :device-type="healthViewDeviceType"
-        :triUserId="selectedAthletic"
+      <HealthView v-if="showHealthViewDialog" :health-data="healthViewData" :date="healthViewDate"
+        :device-list="deviceList" :device-type="healthViewDeviceType" :triUserId="selectedAthletic"
         @close="showHealthViewDialog = false" />
     </el-dialog>
 
     <!-- 添加/编辑赛事弹窗 -->
-    <AddEvent :visible.sync="showAddEvent"
-      :event-data="currentEventData" :is-edit-mode="isEditMode"
+    <AddEvent :visible.sync="showAddEvent" :event-data="currentEventData" :is-edit-mode="isEditMode"
       @confirm="handleEventConfirm" @cancel="handleEventCancel" />
-    <EventInfo :visible.sync="showEventInfo"
-      :event-data="currentEventData" @delete="handleEventDetail"
-      @close="
-        showEventInfo = false
-      getScheduleData()
-        " />
-    <InputActivity :visible.sync="showInputActivity"
-      :activityDate="inputActivityDate"
+    <EventInfo :visible.sync="showEventInfo" :event-data="currentEventData" @delete="handleEventDetail" @close="
+      showEventInfo = false
+    getScheduleData()
+      " />
+    <InputActivity :visible.sync="showInputActivity" :activityDate="inputActivityDate"
       @submit="handleInputActivitySave" />
     <!-- 添加分享分组 -->
-    <AddShareGroup v-model="addShareGroupVisible"
-      :data="currentShareGroup" @save="handleAddShareGroupSave" />
+    <AddShareGroup v-model="addShareGroupVisible" :data="currentShareGroup" @save="handleAddShareGroupSave" />
     <!-- 移动分享分组 -->
-    <MoveShareGroup
-      :visible.sync="moveShareGroupVisible"
-      :data="currentMoveShareGroup"
+    <MoveShareGroup :visible.sync="moveShareGroupVisible" :data="currentMoveShareGroup"
       @save="handleMoveShareGroupSave" />
+    <!-- 权限调整 -->
+    <ShareAuthEdit v-model="shareAuthEditVisible" :shareAuth="currentShareAuthEdit.shareAuth"
+      :planInfo="currentShareAuthEdit" @success="handleShareAuthEditSave" />
 
   </div>
 </template>
@@ -391,6 +273,7 @@ import WeekRangePicker from "@/components/WeekRangePicker/index.vue"
 import AddShareGroup from "./components/AddShareGroup/index.vue"
 import MoveShareGroup from "./components/MoveShareGroup/index.vue"
 import cludList from "./components/cludList/index.vue"
+import ShareAuthEdit from "./components/ShareClassPersion/index.vue"
 
 // 服务和工具导入
 import {
@@ -446,7 +329,8 @@ export default {
     ShareClassModal,
     AddShareGroup,
     MoveShareGroup,
-    cludList
+    cludList,
+    ShareAuthEdit
   },
   mixins: [dragMixin],
   data() {
@@ -562,7 +446,9 @@ export default {
       currentMoveShareGroup: {},
 
       currentShareTeamId: "",
-      shareGroupList: []
+      shareGroupList: [],
+      shareAuthEditVisible: false,
+      currentShareAuthEdit: {},
     }
   },
   computed: {
@@ -1135,6 +1021,9 @@ export default {
       this.getClassList()
       if (type === "team") {
         this.getAllTeamsTreeList()
+        // 刷新团队树与当前团队的分享分组列表
+        this.refreshTeamTree()
+        this.refreshShareGroupList()
       }
     },
 
@@ -3060,6 +2949,18 @@ export default {
             }
           })
       })
+    },
+    // 权限调整
+    handleShareAuthEdit(node) {
+      this.currentShareAuthEdit = { ...node }
+      this.shareAuthEditVisible = true
+    },
+    handleShareAuthEditSave(payload) {
+      this.shareAuthEditVisible = false
+      this.currentShareAuthEdit = { id: "", teamId: null }
+      // 刷新团队树与当前团队的分享分组列表
+      this.refreshTeamTree()
+      this.refreshShareGroupList()
     },
     // 移动分享分组
     handleMoveShareGroup(node) {

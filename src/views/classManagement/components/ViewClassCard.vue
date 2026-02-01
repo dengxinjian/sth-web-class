@@ -65,10 +65,7 @@
               </div>
             </span>
             <span>
-              <div class="btn-list-hover-item" @click.stop="
-                showEditClass = true
-              handleClose()
-                ">
+              <div class="btn-list-hover-item" @click.stop="handleShareAuthEdit">
                 权限调整
               </div>
             </span>
@@ -302,6 +299,10 @@ export default {
   },
 
   methods: {
+    truncateByLines,
+    getSportIcon(sportType) {
+      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
+    },
     handleClose() {
       // this.innerVisible = false;
       this.$emit("close")
@@ -310,9 +311,9 @@ export default {
       this.$emit("move-share-group", this.classItem)
       this.handleClose()
     },
-    truncateByLines,
-    getSportIcon(sportType) {
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
+    handleShareAuthEdit() {
+      this.$emit("share-auth-edit", this.classItem)
+      this.handleClose()
     },
     getDeviceIcon(deviceType) {
       return DEVICE_TYPE_ICON_DICT[deviceType] || ""
