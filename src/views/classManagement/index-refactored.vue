@@ -69,7 +69,6 @@
               @add-share-group="handleAddShareGroup"
               @edit-share-group="handleEditShareGroup"
               @delete-share-group="handleDeleteShareGroup"
-              @move-share-group="handleMoveShareGroup"
               @share-team-click="handleShareTeamClick"
               @share-team-group-click="handleShareTeamGroupClick"
               :share-group-list="shareGroupList"
@@ -303,6 +302,7 @@
       :class-item="classModalData"
       :active-class-type="activeClassType"
       @close="showViewClassCard = false" @move="handleMoveClass"
+      @move-share-group="handleMoveShareGroup"
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial" @save="handleUpdateClass"
       @share="handleShareClass" />
@@ -353,7 +353,8 @@
     <AddShareGroup v-model="addShareGroupVisible"
       :data="currentShareGroup" @save="handleAddShareGroupSave" />
     <!-- 移动分享分组 -->
-    <MoveShareGroup v-model="moveShareGroupVisible"
+    <MoveShareGroup
+      :visible.sync="moveShareGroupVisible"
       :data="currentMoveShareGroup"
       @save="handleMoveShareGroupSave" />
 
@@ -2105,6 +2106,7 @@ export default {
     },
 
     handleViewShareClase(item) {
+      console.log(item, "item====查看分享课程")
       this.showViewClassCard = true
       const findClass = this.shareGroupList.find(el => el.id === item.classesGroupId)?.classesList.find(el => el.id === item.id)
       this.classModalData = findClass
@@ -3061,7 +3063,7 @@ export default {
     },
     // 移动分享分组
     handleMoveShareGroup(node) {
-      this.currentMoveShareGroup = { ...node.data }
+      this.currentMoveShareGroup = { ...node }
       this.moveShareGroupVisible = true
     },
     // 保存分享分组（添加/编辑成功后）

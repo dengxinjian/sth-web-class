@@ -1,122 +1,99 @@
 <template>
   <div>
-    <el-dialog
-      :visible.sync="innerVisible"
-      width="20%"
-      :before-close="handleClose"
-      append-to-body
-      :show-close="false"
-      :modal="false"
-      top="20vh"
-      :custom-class="dialogCustomClass"
-      :style="{ '--dialog-margin-left': dialogMarginLeft }">
-      <div
-        slot="title"
-        style="display: flex; justify-content: end; align-items: center">
-        <el-popover
-          popper-class="athletic-btn-popover"
-          placement="right"
-          trigger="hover"
-          :tabindex="999"
+    <el-dialog :visible.sync="innerVisible" width="20%" :before-close="handleClose" append-to-body :show-close="false"
+      :modal="false" top="20vh" :custom-class="dialogCustomClass" :style="{ '--dialog-margin-left': dialogMarginLeft }">
+      <div slot="title" style="display: flex; justify-content: end; align-items: center">
+        <el-popover popper-class="athletic-btn-popover" placement="right" trigger="hover" :tabindex="999"
           v-if="type === 'edit' && showDeleteBtn">
           <div class="btn-list-hover">
             <span v-if="showDeleteBtn">
-              <div
-                class="btn-list-hover-item"
-                @click.stop="
-                  showEditClass = true
-                handleClose()
-                  ">
+              <div class="btn-list-hover-item" @click.stop="
+                showEditClass = true
+              handleClose()
+                ">
                 编辑
               </div>
             </span>
 
             <span v-if="showCopyBtn">
-              <div
-                class="btn-list-hover-item"
-                @click.stop="
-                  $emit('copy', classItem)
-                handleClose()
-                  ">
+              <div class="btn-list-hover-item" @click.stop="
+                $emit('copy', classItem)
+              handleClose()
+                ">
                 {{ copyBtnText }}
               </div>
             </span>
             <span v-if="showMoveBtn">
-              <div
-                class="btn-list-hover-item"
-                @click.stop="
-                  $emit('move', classItem.id)
-                handleClose()
-                  ">
+              <div class="btn-list-hover-item" @click.stop="
+                $emit('move', classItem.id)
+              handleClose()
+                ">
                 移动
               </div>
             </span>
             <span v-if="showShareBtn">
-              <div
-                class="btn-list-hover-item"
-                @click.stop="
-                  $emit('share', classItem.id)
-                handleClose()
-                  ">
+              <div class="btn-list-hover-item" @click.stop="
+                $emit('share', classItem.id)
+              handleClose()
+                ">
                 分享课程
               </div>
             </span>
             <span v-if="showDeleteBtn">
-              <div class="btn-list-hover-item"
-                @click.stop="handleDelete()" style="color: #F92B30;">
+              <div class="btn-list-hover-item" @click.stop="handleDelete()" style="color: #F92B30;">
                 删除</div>
             </span>
           </div>
           <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
-          <img
-            src="@/assets/addClass/Component 117.png"
-            alt=""
-            @click.stop
-            slot="reference"
+          <img src="@/assets/addClass/Component 117.png" alt="" @click.stop slot="reference"
             style="width: 16px; height: 16px" />
         </el-popover>
-        <el-popover
-          v-if="activeClassType === 'team'"
-          popper-class="athletic-btn-popover"
-          placement="right"
-          trigger="hover"
-          :tabindex="999">
-          <div class="btn-list-hover-item"
-            @click.stop="handleMoveAndClose">
-            移动
+        <el-popover v-if="activeClassType === 'team'" popper-class="athletic-btn-popover" placement="right"
+          trigger="hover" :tabindex="999">
+          <div class="btn-list-hover">
+            <span v-if="classItem.shareAuth === 2">
+              <div class="btn-list-hover-item" @click.stop="
+                showEditClass = true
+              handleClose()
+                ">
+                编辑
+              </div>
+            </span>
+            <span>
+              <div class="btn-list-hover-item" @click.stop="handleMoveShareClass">
+                移动
+              </div>
+            </span>
+            <span>
+              <div class="btn-list-hover-item" @click.stop="
+                showEditClass = true
+              handleClose()
+                ">
+                权限调整
+              </div>
+            </span>
           </div>
-          <img
-            slot="reference"
-            src="@/assets/addClass/Component 117.png"
-            alt=""
-            @click.stop
+          <img slot="reference" src="@/assets/addClass/Component 117.png" alt="" @click.stop
             style="width: 16px; height: 16px" />
         </el-popover>
         <span v-if="activeClassType === 'official'">
-          <el-button
-            type="text"
-            @click.stop="
-              $emit('copy', classItem)
-            handleClose()
-              ">
+          <el-button type="text" @click.stop="
+            $emit('copy', classItem)
+          handleClose()
+            ">
             {{ copyBtnText }}
           </el-button>
         </span>
       </div>
       <div>
         <div class="class-schedule-card-container">
-          <div
-            class="classScheduleCard"
-            :style="cardStyle"
+          <div class="classScheduleCard" :style="cardStyle"
             @click.stop="$emit('click', classItem.id, classItem.sportType)">
             <div class="card-body" style="background-color: white">
               <!-- 标题栏 -->
               <div class="body-title">
                 <div class="sport-type-icon">
-                  <img
-                    class="image-icon"
-                    :src="getSportIcon(classItem.sportType)"
-                    alt="" />
+                  <img class="image-icon" :src="getSportIcon(classItem.sportType)" alt="" />
                   <!-- 课程标题 -->
                   <div class="title">
                     {{
@@ -126,8 +103,7 @@
                 </div>
               </div>
 
-              <div
-                style="
+              <div style="
                   display: flex;
                   align-items: center;
                   justify-content: space-between;
@@ -152,11 +128,10 @@
                         classItem.sportType
                       )
                     }}
-                    <span
-                      v-if="
-                        classItem.classesJson?.distanceUnit &&
-                        classItem.classesJson.distanceUnit !== 'km'
-                      ">
+                    <span v-if="
+                      classItem.classesJson?.distanceUnit &&
+                      classItem.classesJson.distanceUnit !== 'km'
+                    ">
                       {{ classItem.classesJson.distanceUnit }}
                     </span>
                     <span v-else>km</span>
@@ -174,76 +149,52 @@
                     }}
                   </div>
                   <div>
-                    <img class="sth" src="~@/assets/addClass/sth.png"
-                      alt="" />
+                    <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
                   </div>
                 </div>
               </div>
-              <div
-                class="section-title"
-                v-if="classItem.classesJson && classItem.classesJson.summary">
+              <div class="section-title" v-if="classItem.classesJson && classItem.classesJson.summary">
                 概要
               </div>
 
               <!-- 概要 -->
-              <pre
-                v-if="classItem.classesJson && classItem.classesJson.summary"
-                class="stage-details">
+              <pre v-if="classItem.classesJson && classItem.classesJson.summary" class="stage-details">
               {{ classItem.classesJson.summary }}
               </pre>
               <!-- 训练强度可视化 -->
 
-              <div
-                v-if="classItem.classesJson && classItem.classesJson.timeline"
+              <div v-if="classItem.classesJson && classItem.classesJson.timeline"
                 style="height: 16px; display: flex; gap: 1px">
-                <div
-                  v-for="(stage, index) in classItem.classesJson.timeline"
-                  :key="index"
-                  class="time-stage"
+                <div v-for="(stage, index) in classItem.classesJson.timeline" :key="index" class="time-stage"
                   :style="{ flex: stage.duration }">
                   <div style="display: flex; gap: 1px; height: 16px">
-                    <div
-                      v-for="n in +stage.times"
-                      :key="n"
-                      :style="{ flex: 1 }">
-                      <ExerciseProcessChart
-                        :exerciseList="stage.stageTimeline"
-                        :maxIntensity="classItem.classesJson?.maxIntensity"
-                        :height="16" />
+                    <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
+                      <ExerciseProcessChart :exerciseList="stage.stageTimeline"
+                        :maxIntensity="classItem.classesJson?.maxIntensity" :height="16" />
                     </div>
                   </div>
                 </div>
               </div>
-              <div
-                class="section-title"
-                style="margin-bottom: 10px"
-                v-if="
-                  classItem.classesJson &&
-                  classItem.classesJson.timeline &&
-                  classItem.classesJson.timeline.length > 0
-                ">
+              <div class="section-title" style="margin-bottom: 10px" v-if="
+                classItem.classesJson &&
+                classItem.classesJson.timeline &&
+                classItem.classesJson.timeline.length > 0
+              ">
                 阶段明细
               </div>
               <!-- 骑行详情 -->
-              <template
-                v-if="
-                  classItem.classesJson &&
-                  (classItem.sportType === 'CYCLE' || classItem.sportType === 1)
-                ">
-                <CycleStageDetails
-                  :class-data="classItem.classesJson"
-                  :max-stages="99"
-                  type="class" />
+              <template v-if="
+                classItem.classesJson &&
+                (classItem.sportType === 'CYCLE' || classItem.sportType === 1)
+              ">
+                <CycleStageDetails :class-data="classItem.classesJson" :max-stages="99" type="class" />
               </template>
               <!-- 跑步详情 -->
               <template v-else-if="
                 classItem.classesJson &&
                 (classItem.sportType === 'RUN' || classItem.sportType === 2)
               ">
-                <RunStageDetails
-                  :class-data="classItem.classesJson"
-                  :max-stages="99"
-                  type="class" />
+                <RunStageDetails :class-data="classItem.classesJson" :max-stages="99" type="class" />
               </template>
 
               <!-- 训练建议 -->
@@ -255,15 +206,14 @@
               <pre v-if="
                 classItem.classesJson && classItem.classesJson.trainingAdvice
               " class="stage-details">
-              {{ classItem.classesJson.trainingAdvice }}
-              </pre>
+  {{ classItem.classesJson.trainingAdvice }}
+</pre>
             </div>
           </div>
         </div>
       </div>
     </el-dialog>
-    <EditClass :visible="showEditClass" :class-item="classItem"
-      @close="handleCloseResetClass" @save="handleEditSave"
+    <EditClass :visible="showEditClass" :class-item="classItem" @close="handleCloseResetClass" @save="handleEditSave"
       @delete="$emit('delete', classItem)" />
   </div>
 </template>
@@ -356,8 +306,8 @@ export default {
       // this.innerVisible = false;
       this.$emit("close")
     },
-    handleMoveAndClose() {
-      this.$emit("move", this.classItem.id)
+    handleMoveShareClass() {
+      this.$emit("move-share-group", this.classItem)
       this.handleClose()
     },
     truncateByLines,
