@@ -221,8 +221,7 @@ export const athleteApi = {
   // 获取授权设备列表
   getAuthorizedDevices(triUserId) {
     return getData({
-      url: "/device/api/device/authorizedDevice",
-      triUserId,
+      url: `/device/api/device/authorizedDevice?triUserId=${triUserId}`,
     })
   },
 
