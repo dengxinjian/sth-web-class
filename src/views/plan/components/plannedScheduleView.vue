@@ -1,5 +1,5 @@
 <template>
-  <div class="planned-schedule-container">
+  <div class="planned-schedule-container" v-loading="planListLoading">
     <div class="planned-schedule-header">
       <div class="planned-schedule-header-title-left">
         <div style="width: 32px; height: 32px"></div>
@@ -137,7 +137,9 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      planListLoading: false,
+    };
   },
   computed: {
     optionsArray() {
@@ -189,6 +191,32 @@ export default {
         ];
       }
       return [];
+    },
+  },
+  watch: {
+    planList: {
+      handler(newVal, oldVal) {
+        // 当 planList 切换或变化时显示 loading
+        // 检查数组是否真的发生了变化（比较长度或内容）
+        const hasChanged =
+          !oldVal ||
+          !newVal ||
+          oldVal.length !== newVal.length ||
+          JSON.stringify(oldVal) !== JSON.stringify(newVal);
+
+        if (hasChanged) {
+          this.planListLoading = true;
+          // 等待 DOM 更新完成后隐藏 loading
+          this.$nextTick(() => {
+            // 使用 setTimeout 确保渲染完成
+            setTimeout(() => {
+              this.planListLoading = false;
+            }, 150);
+          });
+        }
+      },
+      immediate: false,
+      deep: false, // 使用 shallow watch，通过 JSON.stringify 来比较
     },
   },
   methods: {

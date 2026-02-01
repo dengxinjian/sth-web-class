@@ -10,7 +10,7 @@
       top="5vh"
     >
       <!-- <span slot="title" class="dialog-title">课表简介</span> -->
-      <div class="header-title" style="margin-top: 16px">
+      <div class="header-title" style="margin-bottom: 16px;">
         <!-- <div v-if="classData.classesJson?.title || classData.activityName">
             <span>标题：</span>
             <el-input
@@ -34,7 +34,7 @@
           :rules="rules"
           label-width="70px"
         >
-          <el-form-item label="标题：" prop="title">
+          <el-form-item label="标题：" prop="title" style="margin-top: 16px;">
             <el-input
               type="text"
               placeholder="标题"
@@ -43,11 +43,11 @@
                 !classData.classesJson?.title && !!classData.activityName
               "
               :maxlength="50"
-              style="width: 100%"
+              style="width: 100%;"
             />
           </el-form-item>
         </el-form>
-        <span v-else
+        <span style="font-weight: 600;" v-else
           >{{ getSportTypeName(classData.sportType) }}_手动录入数据</span
         >
       </div>
@@ -770,12 +770,15 @@
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <img
+        <!-- <img
           src="@/assets/addClass/dele.png"
           alt=""
           class="delete-icon"
           @click="deleteClass(classData)"
+          v-if="!classData.classScheduleId"
         />
+        <div v-else></div> -->
+        <div></div>
         <div>
           <el-button @click="handleClose">取消</el-button>
           <el-button type="primary" @click="handleSave(false)">保存</el-button>
@@ -810,6 +813,7 @@ import { scheduleApi } from "../services/classManagement.js";
 import TimeInput from "@/views/classManagement/components/timeInpt";
 import { getClassImageIcon, getSportTypeName } from "../utils/helpers";
 import { hhmmssToSeconds } from "@/utils/index";
+
 export default {
   name: "EditClass",
   components: {
@@ -959,16 +963,10 @@ export default {
           if (this.classData.activityId) {
             this.getSportDetail();
           } else {
-            this.classData.classesJson = {
+            this.classData.classesJson = this.classData.classesJson ? {
               ...this.classData.classesJson,
-              links: this.classData.classesJson?.links || [
-                {
-                  title: "",
-                  type: "1",
-                  url: "",
-                },
-              ],
-            };
+              links: this.classData.classesJson?.links || [],
+            } : this.classData.classesJson;
             console.log(this.classData, "classData====获取2");
             this.actualData = {
               duration: this.classData.duration || "00:00:00",
@@ -1034,10 +1032,10 @@ export default {
     },
   },
   methods: {
-    handleCopyUrl(url) {
-      navigator.clipboard.writeText(url);
-      this.$message.success("复制成功");
-    },
+    // handleCopyUrl(url) {
+    //   navigator.clipboard.writeText(url);
+    //   this.$message.success("复制成功");
+    // },
     handleAddLink() {
       this.classData.classesJson?.links?.push({
         title: "",
@@ -1137,13 +1135,7 @@ export default {
             ...res.result,
             classesJson: {
               ...classData,
-              links: classData?.links || [
-                {
-                  title: "",
-                  type: "1",
-                  url: "",
-                },
-              ],
+              links: classData?.links || [],
             },
           };
           console.log("====当前课表数据====this.classData", this.classData);
@@ -1171,8 +1163,10 @@ export default {
       return ["REMARK", "OTHER", "REST"].includes(sportType);
     },
     deleteClass(classData) {
+      console.log(classData, "classData====删除课表");
+      const title = classData.classesJson?.title || classData.activityName ? classData.classesJson?.title || classData.activityName : `${getSportTypeName(classData.sportType)}_手动录入数据}`;
       this.$confirm(
-        `确认删除课表【${classData?.classesJson?.title}】？`,
+        `确认删除【${title}】？`,
         "提示",
         {
           confirmButtonText: "删除",
@@ -1584,7 +1578,8 @@ export default {
           : this.classData.id,
         classesJson: JSON.stringify({
           ...this.classData.classesJson,
-          links: links.length === 0 ? null : links,
+          links: links,
+          title: this.form.title
         }),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
@@ -1618,7 +1613,7 @@ export default {
         activityId: this.classData.activityId,
         classesJson: JSON.stringify({
           ...this.classData.classesJson,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
         activityDuration:
           hhmmssToSeconds(this.actualData.activityDuration) || null,
@@ -1652,6 +1647,7 @@ export default {
         sthValue: this.actualData.sthValue || 0,
         calories: this.actualData.calories || 0,
         distanceUnit: this.actualData.distanceUnit,
+        title: this.form.title,
       }).then((res) => {
         if (res.success) {
           this.$message.success("运动记录保存成功");
@@ -1673,7 +1669,8 @@ export default {
           const links = this.classData.classesJson?.links.filter(item => item.url !== "");
           this.$set({
             ...this.classData.classesJson,
-            links: links.length === 0 ? null : links,
+            links: links,
+            title: this.form.title,
           }, "title", this.form.title);
         } catch (error) {
           // 验证失败，不继续保存

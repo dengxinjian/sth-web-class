@@ -192,7 +192,7 @@
                     />
                   </el-col>
                   <el-col :span="2">
-                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;" v-if="classInfo.links.length > 1">
+                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
                       <i
                       class="el-icon-remove-outline"
                       @click="handleRemoveLink(index)"
@@ -854,9 +854,9 @@
 
     <span slot="footer" class="dialog-footer">
       <!-- <el-button @click="onDelete" :disabled="!classInfo.id">删除</el-button> -->
-      <el-button @click="onCancel">取消</el-button>
-      <el-button type="warning" @click="onSave(false)">保存</el-button>
-      <el-button type="danger" @click="onSave(true)">保存并关闭</el-button>
+      <el-button @click="onCancel" :disabled="saving">取消</el-button>
+      <el-button type="warning" @click="onSave(false)" :loading="saving">保存</el-button>
+      <el-button type="danger" @click="onSave(true)" :disabled="saving || savingOnly">保存并关闭</el-button>
     </span>
   </el-dialog>
 </template>
@@ -914,11 +914,13 @@ export default {
   data() {
     return {
       innerVisible: this.visible || this.value || false,
-      localClassesDate: this.classesDate, // Local copy to avoid mutating prop
+      localClassesDate: this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00", // Local copy to avoid mutating prop
       timeline: [],
       maxIntensity: 1,
       existingTags: ["标签1", "标签2", "标签3"], // 现有的标签
       newTag: "", // 新标签输入
+      saving: false, // 保存中标志，防止重复保存
+      savingOnly: false, // 仅保存中标志，用于禁用"保存并关闭"按钮
       classInfo: {
         id: "",
         sportType: "RUN",
@@ -992,6 +994,10 @@ export default {
           this.resetForm();
           this.getAthleticThreshold(this.localClassesDate);
         }
+      } else {
+        // 弹窗关闭时重置 saving 标志
+        this.saving = false;
+        this.savingOnly = false;
       }
     },
     data(val) {
@@ -1177,7 +1183,7 @@ export default {
           this.$nextTick(async () => {
             this.localClassesDate = res.result.classesDate;
             await this.getAthleticThreshold(res.result.classesDate);
-            this.classInfo = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || [{ title: "", type: "1", url: "" }]};
+            this.classInfo = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || []};
             this.timeline = JSON.parse(res.result.classesJson).timeline;
             this.classInfo.id = res.result.id;
             this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
@@ -1195,8 +1201,8 @@ export default {
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
         classesDate: !this.data.id
-          ? this.localClassesDate + " 00:00:00"
-          : this.localClassesDate,
+          ? this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00"
+          : this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00",
         sportType: "RUN",
         classesJson: JSON.stringify({
           ...this.classInfo,
@@ -1205,7 +1211,23 @@ export default {
         }),
         triUserId: this.triUserId,
       });
-      if (flag) this.onCancel();
+      // 延迟重置 saving 标志，确保父组件已经处理完保存事件
+      // 如果是保存并关闭，等待弹窗关闭后再重置
+      if (flag) {
+        this.onCancel();
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.saving = false;
+            this.savingOnly = false;
+          }, 1500);
+        });
+      } else {
+        // 仅保存时，延迟重置以确保父组件有时间处理
+        setTimeout(() => {
+          this.saving = false;
+          this.savingOnly = false;
+        }, 1500);
+      }
       // scheduleApi
       //   .createSchedule({
       //     classesTitle: this.classInfo.title,
@@ -1258,7 +1280,7 @@ export default {
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
       }).then((res) => {
         if (res.success) {
@@ -1270,22 +1292,40 @@ export default {
               classesGroupId: this.classInfo.groupId,
               labels: this.classInfo.tags,
               classesDate: !this.data.id
-                ? this.classesDate + " 00:00:00"
-                : this.classesDate,
+                ? this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00"
+                : this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
               sportType: "RUN",
               classesJson: JSON.stringify({
                 ...this.classInfo,
                 timeline: this.timeline,
                 maxIntensity: this.maxIntensity,
-                links: links.length === 0 ? null : links,
+                links: links,
               }),
             },
             flag
           );
           this.$message.success("课表保存成功");
+          // 延迟重置 saving 标志
+          if (flag) {
+            this.onCancel();
+            this.$nextTick(() => {
+              setTimeout(() => {
+                this.saving = false;
+                this.savingOnly = false;
+              }, 1500);
+            });
+          } else {
+            setTimeout(() => {
+              this.saving = false;
+              this.savingOnly = false;
+            }, 1500);
+          }
         }
         console.log(flag, "flag");
-        if (flag) this.onCancel();
+      }).catch((error) => {
+        console.error("更新课程失败:", error);
+        this.saving = false; // 保存失败时重置标志
+        this.savingOnly = false;
       });
     },
     // 删除课程
@@ -1324,13 +1364,13 @@ export default {
         labels: this.classInfo.tags,
         sportType: "RUN",
         classesDate: !this.data.id
-          ? this.localClassesDate + " 00:00:00"
-          : this.localClassesDate,
+          ? this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00"
+          : this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00",
         classesJson: JSON.stringify({
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
         triUserId: this.triUserId,
       }).then((res) => {
@@ -1351,12 +1391,24 @@ export default {
       this.$emit("cancel");
     },
     async onSave(closeAfter) {
+      // 防止重复保存
+      if (this.saving) {
+        return;
+      }
+
       await this.$refs.titleRef.validate();
       const validation = checkForm(this.classInfo);
       if (!validation.isValid) {
         this.$message.error(validation.message);
         return;
       }
+
+      this.saving = true; // 设置保存中标志
+      // 如果是仅保存（不关闭），设置 savingOnly 标志以禁用"保存并关闭"按钮
+      if (!closeAfter) {
+        this.savingOnly = true;
+      }
+
       console.log(JSON.stringify(this.classInfo));
       const links = this.classInfo.links.filter(item => item.url !== "");
       submitData({
@@ -1365,14 +1417,14 @@ export default {
         classesGroupId: this.classInfo.groupId,
         labels: this.classInfo.tags,
         classesDate: !this.data.id
-          ? this.localClassesDate + " 00:00:00"
-          : this.localClassesDate,
+          ? this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00"
+          : this.localClassesDate.indexOf('00:00:00') > -1 ? this.localClassesDate : this.localClassesDate + " 00:00:00",
         sportType: "RUN",
         classesJson: JSON.stringify({
           ...this.classInfo,
           timeline: this.timeline,
           maxIntensity: this.maxIntensity,
-          links: links.length === 0 ? null : links,
+          links: links,
         }),
         triUserId: this.triUserId,
       }).then((res) => {
@@ -1389,6 +1441,10 @@ export default {
             this.submitNewClass(closeAfter);
           }
         }
+      }).catch((error) => {
+        console.error("保存失败:", error);
+        this.saving = false; // 保存失败时重置标志
+        this.savingOnly = false;
       });
     },
     onDelete() {

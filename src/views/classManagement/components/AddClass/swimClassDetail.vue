@@ -137,7 +137,6 @@
                   </el-col>
                   <el-col :span="1">
                     <div
-                      v-if="form.links.length > 1"
                       style="
                         height: 100%;
                         display: flex;
@@ -493,9 +492,9 @@ export default {
     async onSave(closeAfter) {
       await this.$refs.titleRef.validate();
       // 校验时长不能为0
-      if (!this.validateDuration()) {
-        return;
-      }
+      // if (!this.validateDuration()) {
+      //   return;
+      // }
       const payload = { ...this.form };
       if (this.form.id) {
         this.submitUpdateClass(closeAfter);
@@ -588,7 +587,7 @@ export default {
     // 处理时长输入失焦事件
     handleDurationBlur() {
       // 失焦时进行校验
-      this.validateDuration();
+      // this.validateDuration();
     },
   },
 };

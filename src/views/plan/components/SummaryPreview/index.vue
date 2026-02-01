@@ -223,28 +223,44 @@
               <el-col :span="24" class="summary-preview-table-content">
                 <el-row>
                   <el-col :span="8">游泳</el-col>
-                  <el-col :span="8">{{ getweekSwimmingDuration() }}</el-col>
+                  <el-col :span="8">{{ secondsToHHMMSS(getweekSwimmingDuration()) === '00:00:00' ? 'N/A' : secondsToHHMMSS(getweekSwimmingDuration()) }}{{
+                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
                   <el-col :span="8">{{ getweekSwimmingDistance() }}</el-col>
                 </el-row>
               </el-col>
               <el-col :span="24" class="summary-preview-table-content">
                 <el-row>
                   <el-col :span="8">骑行</el-col>
-                  <el-col :span="8">{{ getweekCycleDuration() }}</el-col>
+                  <el-col :span="8">{{ secondsToHHMMSS(getweekCycleDuration()) === '00:00:00' ? 'N/A' : secondsToHHMMSS(getweekCycleDuration()) }}{{
+                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
                   <el-col :span="8">{{ getweekCycleDistance() }}</el-col>
                 </el-row>
               </el-col>
               <el-col :span="24" class="summary-preview-table-content">
                 <el-row>
                   <el-col :span="8">跑步</el-col>
-                  <el-col :span="8">{{ getweekRunDuration() }}</el-col>
+                  <el-col :span="8">{{ secondsToHHMMSS(getweekRunDuration()) === '00:00:00' ? 'N/A' : secondsToHHMMSS(getweekRunDuration()) }}{{
+                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
                   <el-col :span="8">{{ getweekRunDistance() }}</el-col>
                 </el-row>
               </el-col>
               <el-col :span="24" class="summary-preview-table-content">
                 <el-row>
                   <el-col :span="8">力量</el-col>
-                  <el-col :span="8">{{ getweekPowerDuration() }}</el-col>
+                  <el-col :span="8">{{ secondsToHHMMSS(getweekPowerDuration()) === '00:00:00' ? 'N/A' : secondsToHHMMSS(getweekPowerDuration()) }}{{
+                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
                   <el-col :span="8">{{
                     getweekPowerAndOtherDistance("STRENGTH")
                   }}</el-col>

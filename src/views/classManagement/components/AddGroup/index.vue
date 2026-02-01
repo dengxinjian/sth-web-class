@@ -18,9 +18,7 @@
     >
       <el-form-item label="分组名称" prop="classesGroupName">
         <el-input
-          type="textarea"
           v-model="form.classesGroupName"
-          :rows="3"
           maxlength="50"
           show-word-limit
           placeholder="请输入分组名称"
@@ -142,6 +140,17 @@ export default {
 .dialog-footer{
   display: flex;
   justify-content: flex-end;
+}
+/* 字数统计样式 */
+.add-group-modal ::v-deep(.el-input__inner) {
+  padding-right: 78px;
+  box-sizing: border-box;
+}
+.add-group-modal ::v-deep(.el-input__count) {
+  background-color: #fff;
+  height: 80%;
+  line-height: 32px;
+  padding-right: 8px;
 }
 </style>
 

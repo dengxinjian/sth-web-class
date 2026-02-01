@@ -693,6 +693,7 @@ export default {
 }
 
 .schedule-table-body {
+  width: calc(100vw - 560px);
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -702,11 +703,42 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 194px;
+    min-width: 138px; /* 13寸默认 */
     max-width: 194px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
+    box-sizing: border-box;
+
+    /* 14寸电脑 */
+    @media (min-width: 1366px) {
+      min-width: 130px;
+    }
+
+    /* 15寸电脑 */
+    @media (min-width: 1440px) {
+      min-width: 138px;
+    }
+
+    /* 16寸电脑 */
+    @media (min-width: 1600px) {
+      min-width: 149px;
+    }
+
+    /* 17寸电脑 */
+    @media (min-width: 1700px) {
+      min-width: 159px;
+    }
+
+    /* 18寸电脑 */
+    @media (min-width: 1800px) {
+      min-width: 170px;
+    }
+
+    /* 19寸电脑 */
+    @media (min-width: 1920px) {
+      min-width: 194px;
+    }
 
     .schedule-table-cell-title {
       line-height: 40px;
@@ -900,7 +932,7 @@ export default {
 }
 
 .context-menu {
-  position: absolute;
+  position: fixed;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 4px;

@@ -372,6 +372,11 @@ export default {
               this.$message.success("登录成功");
               this.$store.commit("user/SET_TOKEN", res.result.jwt);
               this.$store.commit("user/SET_NAME", res.result.nicknameTag);
+              const { userInfo } = res.result;
+              const loginType = userInfo?.webIdentityType && userInfo?.webIdentityType === "C" ? "2" : "1";
+              localStorage.setItem("loginType", loginType);
+              localStorage.setItem("webIdentityType", userInfo?.webIdentityType);
+
               localStorage.setItem("triUserId", res.result.triUserId);
               localStorage.setItem("name", res.result.nicknameTag);
               // console.log("res.result.jwt", res.result.jwt);
@@ -462,7 +467,6 @@ export default {
         return;
       }
       this.$message.success("登录成功");
-
       // 保存用户信息到 Vuex
       this.$store.commit("user/SET_TOKEN", result.jwt);
       this.$store.commit("user/SET_NAME", result.nicknameTag);

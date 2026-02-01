@@ -34,11 +34,11 @@
     <div class="schedule-table-cell-data">
       <div class="week-data-sth">
         <div>
-          <div style="color: #3e5cec">{{ sthData.avgLong || 0 }}</div>
-          <span style="line-height: 26px">长期STH</span>
+          <div style="color: #3e5cec;font-size: 16px;">{{ sthData.avgLong || 0 }}</div>
+          <span style="line-height: 28px;font-size: 12px;">长期STH</span>
         </div>
         <div>
-          <div style="background-color: #f92b30">
+          <div style="background-color: #f92b30;font-size: 20px;margin-top: 2px;">
             {{ sthData.avgShort || 0 }}
           </div>
           <span>短期STH</span>
@@ -51,7 +51,7 @@
                 : 0
             }}
           </div>
-          <span style="line-height: 26px"> 平衡</span>
+          <span style="line-height: 28px;font-size: 12px;"> 平衡</span>
         </div>
       </div>
 
@@ -72,8 +72,12 @@
               />
               <div style="text-align: left">{{ item.title }}</div>
             </div>
-            <div style="text-align: center;">{{ item.actualValue }} {{ item.unit }}</div>
-            <div style="width: 60px;text-align: right;">{{ item.actualValue }} {{ item.unit }}</div>
+            <div style="text-align: center;">{{ item.actualValue }} {{
+                item.key === "totalSTH" ? item.actualValueUnit : item.unit
+              }}</div>
+            <div style="width: 60px;text-align: right;">{{ item.planValue }} {{
+                item.key === "totalSTH" ? item.planValueUnit : item.unit
+              }}</div>
             <!-- <img
               v-if="item.icon"
               style="width: 20px; margin-right: 10px"
@@ -229,8 +233,8 @@ export default {
 
     div:nth-child(1) {
       background-color: #ffffff;
-      font-size: 14px;
-      line-height: 26px;
+      font-size: 16px;
+      line-height: 30px;
     }
     div {
       height: 26px;

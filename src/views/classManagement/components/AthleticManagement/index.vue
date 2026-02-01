@@ -11,7 +11,7 @@
           ></el-button>
         </el-input>
       </div>
-      <div class="athletic-btn">
+      <div class="athletic-btn" v-if="defaultTeamId === teamId">
         <el-button type="primary" size="mini" @click="handleInviteAthletic"
           >邀请运动员</el-button
         >
@@ -206,7 +206,7 @@
     <el-dialog
       :title="groupDialogTitle"
       :visible.sync="showGroupDialog"
-      width="400px"
+      width="490px"
       @close="resetGroupForm"
     >
       <el-form
@@ -219,6 +219,9 @@
           <el-input
             v-model="groupForm.name"
             placeholder="请输入分组名称"
+            maxlength="20"
+            show-word-limit
+            clearable
           ></el-input>
         </el-form-item>
         <!-- <el-form-item label="分组描述" prop="description">
@@ -397,6 +400,10 @@ export default {
       type: String,
       default: "",
     },
+    defaultTeamId: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
@@ -445,17 +452,31 @@ export default {
       if (!this.searchInput) {
         return this.athleticData;
       }
-      return this.athleticData.filter((group) => {
-        return (
-          group.label.toLowerCase().includes(this.searchInput.toLowerCase()) ||
-          (group.children &&
-            group.children.some((member) =>
-              member.label
-                .toLowerCase()
-                .includes(this.searchInput.toLowerCase())
-            ))
-        );
-      });
+      return this.athleticData
+        .map((group) => {
+          // 检查分组名称是否匹配
+          const groupMatches = this.matchText(group.label, this.searchInput);
+          // 检查子成员是否匹配，并过滤出匹配的成员
+          const matchedChildren =
+            group.children && group.children.length > 0
+              ? group.children.filter((member) =>
+                this.matchText(member.label, this.searchInput)
+              )
+              : [];
+          // 如果分组名称匹配，保留整个分组（包括所有子成员）
+          if (groupMatches) {
+            return group;
+          }
+          // 如果只有子成员匹配，只保留匹配的子成员
+          if (matchedChildren.length > 0) {
+            return {
+              ...group,
+              children: matchedChildren,
+            };
+          }
+          return null;
+        })
+        .filter((group) => group !== null);
     },
     // 可用的目标分组（排除当前分组）
     availableGroups() {
@@ -482,6 +503,38 @@ export default {
     isCurrentUser(triUserId) {
       const currentTriUserId = localStorage.getItem("triUserId");
       return currentTriUserId && triUserId && currentTriUserId === triUserId;
+    },
+
+    // 中英文匹配函数
+    matchText(target, searchInput) {
+      if (!searchInput) return true;
+      if (!target) return false;
+
+      // 提取中文字符和英文字符
+      const chineseChars = searchInput.match(/[\u4e00-\u9fa5]/g) || [];
+      const englishChars = searchInput.match(/[a-zA-Z]/gi) || [];
+
+      let matched = true;
+
+      // 中文字符匹配：目标文本必须包含所有输入的中文字符
+      if (chineseChars.length > 0) {
+        const targetChinese = target.match(/[\u4e00-\u9fa5]/g) || [];
+        matched =
+          matched &&
+          chineseChars.every((char) => targetChinese.includes(char));
+      }
+
+      // 英文字符匹配：按字母匹配（忽略大小写）
+      if (englishChars.length > 0) {
+        const targetLower = target.toLowerCase();
+        const searchLower = searchInput.toLowerCase();
+        // 提取英文部分进行匹配
+        const targetEnglish = target.match(/[a-zA-Z]/gi)?.join("").toLowerCase() || "";
+        const searchEnglish = englishChars.join("").toLowerCase();
+        matched = matched && targetEnglish.includes(searchEnglish);
+      }
+
+      return matched;
     },
 
     handleNodeClick(node) {
@@ -553,10 +606,10 @@ export default {
                 // 创建新的coach团队
                 const coachTeam = {
                   id: "coach",
-                  label: "我的执教",
+                  label: "教练组",
                   description: "执教团队",
                   isGroup: true,
-                  groupName: "我的执教",
+                  groupName: "教练组",
                   membersCount: coachMembers?.length || 0,
                   triUserId: null,
                   children: coachMembers,
@@ -802,7 +855,7 @@ export default {
           })
           .catch((error) => {
             console.error("解绑失败:", error);
-            this.$message.error("解绑失败");
+            // this.$message.error("解绑失败");
           });
       });
     },
@@ -832,7 +885,7 @@ export default {
           })
           .catch((error) => {
             console.error("解绑失败:", error);
-            this.$message.error("解绑失败");
+            // this.$message.error("解绑失败");
           });
       });
     },

@@ -75,7 +75,7 @@
                     />
                   </el-col>
                   <el-col :span="1">
-                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;" v-if="form.links.length > 1">
+                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
                       <i
                       class="el-icon-remove-outline"
                       @click="handleRemoveLink(index)"
@@ -227,7 +227,7 @@ export default {
         id,
       }).then((res) => {
         if (res.success) {
-          this.form = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || [{ title: "", type: "1", url: "" }]}
+          this.form = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || []}
           this.form.id = res.result.id;
         }
       });
@@ -239,9 +239,9 @@ export default {
         classesTitle: this.form.title,
         classesGroupId: this.form.groupId,
         labels: this.form.tags,
-        classesDate: this.classesDate + " 00:00:00",
+        classesDate: this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
         sportType: "REST",
-        classesJson: JSON.stringify({ ...this.form, links: links.length === 0 ? null : links }),
+        classesJson: JSON.stringify({ ...this.form, links: links }),
         triUserId: this.triUserId,
       });
       console.log(
@@ -249,7 +249,7 @@ export default {
           classesTitle: this.form.title,
           classesGroupId: this.form.groupId,
           labels: this.form.tags,
-          classesDate: this.classesDate + " 00:00:00",
+          classesDate: this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
           sportType: "REST",
           classesJson: JSON.stringify({ ...this.form }),
           triUserId: this.triUserId,
@@ -264,7 +264,7 @@ export default {
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.form.id,
-        classesJson: JSON.stringify({ ...this.form, links: links.length === 0 ? null : links }),
+        classesJson: JSON.stringify({ ...this.form, links: links }),
       }).then((res) => {
         if (res.success) {
           this.$emit(
@@ -274,9 +274,9 @@ export default {
               classesTitle: this.form.title,
               classesGroupId: this.form.groupId,
               labels: this.form.tags,
-              classesDate: this.classesDate + " 00:00:00",
+              classesDate: this.classesDate.indexOf('00:00:00') > -1 ? this.classesDate : this.classesDate + " 00:00:00",
               sportType: "REST",
-              classesJson: JSON.stringify({ ...this.form, links: links.length === 0 ? null : links }),
+              classesJson: JSON.stringify({ ...this.form, links: links }),
             },
             flag
           );

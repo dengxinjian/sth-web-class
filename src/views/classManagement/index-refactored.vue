@@ -38,6 +38,7 @@
               :teamId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
               :activeName="activeName"
+              :defaultTeamId="defaultTeamId"
               @athletic-click="handleAthleticChange" />
             <cludList v-else :clubId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
@@ -186,7 +187,7 @@
             </div>
           </div>
 
-          <div style="display: flex; width: 100%">
+          <div style="display: flex;flex:1; width: 100%">
             <!-- 日程表 -->
             <ScheduleCalendar
               :current-week="currentWeek"
@@ -355,7 +356,7 @@
       :visible="showViewClassCard"
       :class-item="classModalData"
       :active-class-type="activeClassType"
-      @close="showViewClassCard = false"
+      @close="handleCloseResetViewClassCard"
       @move="handleMoveClass"
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
@@ -381,9 +382,9 @@
       :athleticThreshold="athleticThreshold"
       :triUserId="selectedAthletic"
       @close="
-        showEditScheduleClass = false
-      isActivity ? (activityDetailData = {}) : (classDetailData = {})
-        "
+        showEditScheduleClass = false;
+        isActivity ? (activityDetailData = {}) : (classDetailData = {})
+      "
       @save="handleClassDetailSave"
       @delete="
         handleDeleteClassSchedule
@@ -630,6 +631,8 @@ export default {
       inputActivityDate: "",
 
       isPlan: false,
+
+      defaultTeamId: null,
       showShareClassModal: false,
       shareClassId: "",
       addShareGroupVisible: false,
@@ -735,6 +738,10 @@ export default {
     this.$root.$off("identity-changed", this.handleIdentityChanged)
   },
   methods: {
+    handleCloseResetViewClassCard() {
+      this.showViewClassCard = false;
+      this.getClassList();
+    },
     getDeviceBrandIcon,
     getDeviceName(deviceType) {
       return DEVICE_TYPE_DICT[deviceType] || "未知设备"
@@ -1157,11 +1164,28 @@ export default {
      * 课程搜索
      */
     handleClassSearch(keyword) {
-      this.classSearchInput = keyword
-      this.getClassList()
+      this.classSearchInput = keyword;
+      this.getClassList();
     },
+    async getDefaultTeam() {
+      const _this = this;
+      const res = await getData({
+        url: "/gateway/team/my-team",
+      });
+      if (res.success) {
+        _this.defaultTeamId = res.result.id;
+        _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
+          if (team && team.id && !acc.find((t) => t.id === team.id)) {
+            acc.push(team);
+          }
+          return acc;
+        }, []);
+        _this.getTeamAndAthleticData();
+      }
+    },
+
     /**
-     * 获取团队和俱乐部列表（/api/club/coach/getAllTeamsAndClubs），下拉显示团队 + 俱乐部
+     * 获取团队和运动员数据
      */
     async getAllTeamsAndClubs() {
       const _this = this
@@ -1745,18 +1769,78 @@ export default {
       })
 
       if (res.success) {
-        this.statisticData = res.result.statisticsVoList.map((item) => ({
-          ...item,
-          actualValue: unitConversion(
-            item.actualValue,
-            statisticKeyToTitle[item.key]?.unit
-          ),
-          title: statisticKeyToTitle[item.key]?.title,
-          color: statisticKeyToTitle[item.key]?.color,
-          icon: statisticKeyToTitle[item.key]?.icon,
-          unit: statisticKeyToTitle[item.key]?.unit,
-        }))
-        this.sthData = res.result.avgSthRespDto
+        this.statisticData = res.result.statisticsVoList.map((item) => {
+          if (item.key === "totalSTH") {
+            const actualValue =
+              item.key === "totalSTH"
+                ? Math.round(item.actualValue / 100) / 100
+                : item.actualValue;
+            const planValue =
+              item.key === "totalSTH"
+                ? Math.round(item.planValue / 100) / 100
+                : item.planValue;
+            return {
+              ...item,
+              actualValue:
+                parseInt(item.actualValue) > 100000
+                  ? unitConversion(
+                      actualValue,
+                      statisticKeyToTitle[item.key]?.unit
+                    )
+                  : item.actualValue,
+              actualValueUnit: parseInt(item.actualValue) > 100000 ? "万" : "",
+              title: statisticKeyToTitle[item.key]?.title,
+              color: statisticKeyToTitle[item.key]?.color,
+              icon: statisticKeyToTitle[item.key]?.icon,
+              unit: statisticKeyToTitle[item.key]?.unit,
+              planValue:
+                parseInt(item.planValue) > 100000
+                  ? unitConversion(
+                      planValue,
+                      statisticKeyToTitle[item.key]?.unit
+                    )
+                  : item.planValue,
+              planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
+            };
+          }
+          if (item.key === "totalCalories") {
+            return {
+              ...item,
+              actualValue:
+                parseInt(item.actualValue) > 10000
+                  ? unitConversion(
+                      item.actualValue,
+                      statisticKeyToTitle[item.key]?.unit || "kcal"
+                    )
+                  : item.actualValue,
+              actualValueUnit: parseInt(item.actualValue) > 10000 ? "万" : "",
+              title: statisticKeyToTitle[item.key]?.title,
+              color: statisticKeyToTitle[item.key]?.color,
+              icon: statisticKeyToTitle[item.key]?.icon,
+              unit: statisticKeyToTitle[item.key]?.unit,
+              planValue:
+                parseInt(item.planValue) > 10000
+                  ? unitConversion(
+                      item.planValue,
+                      statisticKeyToTitle[item.key]?.unit || "kcal"
+                    )
+                  : item.planValue,
+              planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
+            };
+          }
+          return {
+            ...item,
+            actualValue: unitConversion(
+              item.actualValue,
+              statisticKeyToTitle[item.key]?.unit
+            ),
+            title: statisticKeyToTitle[item.key]?.title,
+            color: statisticKeyToTitle[item.key]?.color,
+            icon: statisticKeyToTitle[item.key]?.icon,
+            unit: statisticKeyToTitle[item.key]?.unit,
+          };
+        });
+        this.sthData = res.result.avgSthRespDto;
       }
     },
 
@@ -2982,11 +3066,13 @@ export default {
     /**
      * 保存运动员信息
      */
-    onSaveAthleticInfo() {
+    onSaveAthleticInfo(payload, type) {
       // 保存逻辑
-      this.showAthleticInfoDialog = false
-      this.getScheduleData()
-      this.getAthleticThreshold(this.selectedAthletic)
+      if (type) {
+        this.showAthleticInfoDialog = false;
+      }
+      this.getScheduleData();
+      this.getAthleticThreshold(this.selectedAthletic);
     },
 
     /**
@@ -3114,7 +3200,7 @@ export default {
      * 保存课程详情
      */
     handleClassDetailSave(data, flag) {
-      console.log(flag, "flag")
+      console.log(flag, "flag");
       if (flag) {
         this.showClassDetailModal = false
         this.showEditScheduleClass = false

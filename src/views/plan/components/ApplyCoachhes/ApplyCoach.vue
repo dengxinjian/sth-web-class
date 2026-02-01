@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :visible.sync="innerVisible"
-    :width="loginType === '2' ? '880px' : '420px'"
+    :width="loginType === '2' ? '880px' : '480px'"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -12,7 +12,7 @@
       ref="formRef"
       :model="form"
       :rules="rules"
-      :label-width="loginType === '2' ? '145px' : '90px'"
+      :label-width="loginType === '2' ? '145px' : '120px'"
       size="small">
       <template v-if="loginType === '2'">
         <el-form-item label="应用维度" prop="applyDimension">
@@ -462,7 +462,7 @@ export default {
         athleteType: 1,
         applyMode: 1,
         applyDate: moment().format("YYYY-MM-DD"),
-        applyDimension: "1",
+        applyDimension: localStorage.getItem("loginType") === "1" ? "0" : "1",
         // 批量设置时的计划应用范围 & 同步设备
         applyRange: 0,
         applyStartDay: 1,
@@ -1078,7 +1078,7 @@ export default {
         planClassesId: _this.planInfo.id,
         teamId: _this.form.teamId,
         targets,
-        applyDimension: _this.form.applyDimension,
+        applyDimension: _this.loginType === "1" ? "0" : _this.form.applyDimension,
       }
       submitData({
         url: "/gateway/training/planClasses/applyPlanClasses",
@@ -1109,13 +1109,14 @@ export default {
         })
     },
     resetForm() {
+      const loginType = localStorage.getItem("loginType")
       this.form = {
         teamId: undefined,
         athleteIds: [],
         athleteType: 1,
         applyMode: 1,
         applyDate: moment().format("YYYY-MM-DD"),
-        applyDimension: "1",
+        applyDimension: loginType === "1" ? "0" : "1",
         applyRange: 0,
         applyStartDay: 1,
         applyEndDay: null,

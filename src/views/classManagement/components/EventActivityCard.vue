@@ -17,7 +17,28 @@
               alt=""
             />
           </div>
-          <div
+          <!-- <div
+            class="title"
+            v-if="
+              (activity.classesJson && activity.classesJson.title) ||
+              activity.activityName
+            "
+          >
+            {{
+              activity.classesJson
+                ? activity.classesJson.title
+                : activity.activityName
+            }}
+          </div> -->
+          <div v-if="
+              (activity.classesJson && activity.classesJson.title) ||
+              activity.activityName
+            "></div>
+          <div class="title" v-else>
+            {{ getSportTypeName(activity.sportType) }}_手动录入
+          </div>
+        </div>
+        <div
             class="title"
             v-if="
               (activity.classesJson && activity.classesJson.title) ||
@@ -30,10 +51,6 @@
                 : activity.activityName
             }}
           </div>
-          <div class="title" v-else>
-            {{ getSportTypeName(activity.sportType) }}_手动录入
-          </div>
-        </div>
 
         <div class="sport-record-data">
           <div class="keyword">
@@ -330,12 +347,14 @@ export default {
       font-weight: 400;
       flex: 1;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-left: 6px;
+      // margin-left: 6px;
       font-family: PingFang SC;
       font-style: Regular;
       color: #101010;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
     }
 
     .keyword {

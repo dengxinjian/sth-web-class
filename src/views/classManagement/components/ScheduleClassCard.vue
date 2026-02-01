@@ -42,8 +42,6 @@
                 </div>
               </template>
             </div>
-            <!-- 课程标题 -->
-            <div class="title">{{ (classItem.classesJson && classItem.classesJson.title) || "--" }}</div>
             <el-popover
               popper-class="athletic-btn-popover"
               placement="right"
@@ -72,7 +70,7 @@
 
                 <div
                   class="btn-list-hover-item"
-                  style="color: #F92B30;"
+                  style="color: #f92b30"
                   @click.stop="$emit('delete', classItem)"
                 >
                   删除
@@ -89,6 +87,11 @@
             </el-popover>
           </div>
 
+          <!-- 课程标题 -->
+          <div class="title">
+            {{ (classItem.classesJson && classItem.classesJson.title) || "--" }}
+          </div>
+
           <!-- 运动类型 -->
           <div class="keyword">
             {{ classItem.sportType === "CYCLE" ? "BIKE" : classItem.sportType }}
@@ -96,7 +99,11 @@
 
           <!-- 时长 -->
           <div class="keyword">
-            {{ formatDuration(classItem.classesJson && classItem.classesJson.duration) }}
+            {{
+              formatDuration(
+                classItem.classesJson && classItem.classesJson.duration
+              )
+            }}
           </div>
 
           <!-- 距离 -->
@@ -124,12 +131,14 @@
 
           <!-- STH -->
           <div
-            style="display: flex; gap: 4px;margin-top: 4px;"
+            style="display: flex; gap: 4px; margin-top: 4px"
             v-if="!isRestType(classItem.sportType)"
           >
-          <div class="keyword" style="margin-top: 0px;">
+            <div class="keyword" style="margin-top: 0px">
               {{
-                !classItem.classesJson || !classItem.classesJson.sth ? "--" : classItem.classesJson.sth
+                !classItem.classesJson || !classItem.classesJson.sth
+                  ? "--"
+                  : classItem.classesJson.sth
               }}
             </div>
             <div>
@@ -140,7 +149,7 @@
             v-if="
               classItem.classesJson &&
               (classItem.classesJson.summary ||
-              classItem.classesJson.trainingAdvice)
+                classItem.classesJson.trainingAdvice)
             "
           >
             <!-- 概要 -->
@@ -155,7 +164,9 @@
           </template>
 
           <!-- 骑行详情 -->
-          <template v-else-if="classItem.sportType === 'CYCLE' && classItem.classesJson">
+          <template
+            v-else-if="classItem.sportType === 'CYCLE' && classItem.classesJson"
+          >
             <CycleStageDetails
               :class-data="classItem.classesJson"
               :max-stages="2"
@@ -163,7 +174,9 @@
           </template>
 
           <!-- 跑步详情 -->
-          <template v-else-if="classItem.sportType === 'RUN' && classItem.classesJson">
+          <template
+            v-else-if="classItem.sportType === 'RUN' && classItem.classesJson"
+          >
             <RunStageDetails
               :class-data="classItem.classesJson"
               :max-stages="2"
@@ -218,7 +231,13 @@
         </div>
         <div class="context-menu-item" @click="handleCut">剪切</div>
         <div class="context-menu-item" @click="handleCopy">复制</div>
-        <div class="context-menu-item" @click="handleDelete" style="color: #F92B30;">删除</div>
+        <div
+          class="context-menu-item"
+          @click="handleDelete"
+          style="color: #f92b30"
+        >
+          删除
+        </div>
       </div>
     </transition>
   </div>
@@ -440,17 +459,17 @@ export default {
     .body-title {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
       padding: 5px 3px;
 
       .sport-type-icon {
         display: flex;
-        align-content: center;
+        align-items: center;
 
         .sport-type-name {
-          width: 15px;
-          height: 15px;
+          width: 16px;
+          height: 16px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -482,15 +501,18 @@ export default {
 
     .title {
       font-size: 15px;
+      line-height: 20px;
       font-weight: 400;
       flex: 1;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-left: 6px;
+      // margin-left: 6px;
       font-family: PingFang SC;
       font-style: Regular;
       color: #101010;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
     }
 
     .keyword {

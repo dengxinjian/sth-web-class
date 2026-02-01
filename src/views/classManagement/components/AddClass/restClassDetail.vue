@@ -98,7 +98,6 @@
                   </el-col>
                   <el-col :span="1">
                     <div
-                      v-if="form.links.length > 1"
                       style="
                         height: 100%;
                         display: flex;
