@@ -9,28 +9,24 @@
       :modal="false"
       top="20vh"
       :custom-class="dialogCustomClass"
-      :style="{ '--dialog-margin-left': dialogMarginLeft }"
-    >
+      :style="{ '--dialog-margin-left': dialogMarginLeft }">
       <div
         slot="title"
-        style="display: flex; justify-content: end; align-items: center"
-      >
+        style="display: flex; justify-content: end; align-items: center">
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
           trigger="hover"
           :tabindex="999"
-          v-if="type === 'edit' && showDeleteBtn"
-        >
+          v-if="type === 'edit' && showDeleteBtn">
           <div class="btn-list-hover">
             <span v-if="showDeleteBtn">
               <div
                 class="btn-list-hover-item"
                 @click.stop="
-                  showEditClass = true;
-                  handleClose();
-                "
-              >
+                  showEditClass = true
+                handleClose()
+                  ">
                 编辑
               </div>
             </span>
@@ -39,10 +35,9 @@
               <div
                 class="btn-list-hover-item"
                 @click.stop="
-                  $emit('copy', classItem);
-                  handleClose();
-                "
-              >
+                  $emit('copy', classItem)
+                handleClose()
+                  ">
                 {{ copyBtnText }}
               </div>
             </span>
@@ -50,10 +45,9 @@
               <div
                 class="btn-list-hover-item"
                 @click.stop="
-                  $emit('move', classItem.id);
-                  handleClose();
-                "
-              >
+                  $emit('move', classItem.id)
+                handleClose()
+                  ">
                 移动
               </div>
             </span>
@@ -61,15 +55,16 @@
               <div
                 class="btn-list-hover-item"
                 @click.stop="
-                  $emit('share', classItem.id);
-                  handleClose();
-                "
-              >
+                  $emit('share', classItem.id)
+                handleClose()
+                  ">
                 分享课程
               </div>
             </span>
             <span v-if="showDeleteBtn">
-              <div class="btn-list-hover-item" @click.stop="handleDelete()" style="color: #F92B30;">删除</div>
+              <div class="btn-list-hover-item"
+                @click.stop="handleDelete()" style="color: #F92B30;">
+                删除</div>
             </span>
           </div>
           <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
@@ -78,17 +73,33 @@
             alt=""
             @click.stop
             slot="reference"
-            style="width: 16px; height: 16px"
-          />
+            style="width: 16px; height: 16px" />
         </el-popover>
-        <span v-if="!showDeleteBtn">
+        {{ activeClassType }}
+        <el-popover
+          v-if="activeClassType === 'team'"
+          popper-class="athletic-btn-popover"
+          placement="right"
+          trigger="hover"
+          :tabindex="999">
+          <div class="btn-list-hover-item"
+            @click.stop="handleMoveAndClose">
+            移动
+          </div>
+          <img
+            slot="reference"
+            src="@/assets/addClass/Component 117.png"
+            alt=""
+            @click.stop
+            style="width: 16px; height: 16px" />
+        </el-popover>
+        <span v-if="activeClassType === 'official'">
           <el-button
             type="text"
             @click.stop="
-              $emit('copy', classItem);
-              handleClose();
-            "
-          >
+              $emit('copy', classItem)
+            handleClose()
+              ">
             {{ copyBtnText }}
           </el-button>
         </span>
@@ -98,8 +109,7 @@
           <div
             class="classScheduleCard"
             :style="cardStyle"
-            @click.stop="$emit('click', classItem.id, classItem.sportType)"
-          >
+            @click.stop="$emit('click', classItem.id, classItem.sportType)">
             <div class="card-body" style="background-color: white">
               <!-- 标题栏 -->
               <div class="body-title">
@@ -107,8 +117,7 @@
                   <img
                     class="image-icon"
                     :src="getSportIcon(classItem.sportType)"
-                    alt=""
-                  />
+                    alt="" />
                   <!-- 课程标题 -->
                   <div class="title">
                     {{
@@ -125,8 +134,7 @@
                   justify-content: space-between;
                   margin-bottom: 20px;
                   margin-top: 10px;
-                "
-              >
+                ">
                 <!-- 时长 -->
                 <div class="keyword">
                   {{
@@ -149,8 +157,7 @@
                       v-if="
                         classItem.classesJson?.distanceUnit &&
                         classItem.classesJson.distanceUnit !== 'km'
-                      "
-                    >
+                      ">
                       {{ classItem.classesJson.distanceUnit }}
                     </span>
                     <span v-else>km</span>
@@ -168,48 +175,42 @@
                     }}
                   </div>
                   <div>
-                    <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+                    <img class="sth" src="~@/assets/addClass/sth.png"
+                      alt="" />
                   </div>
                 </div>
               </div>
               <div
                 class="section-title"
-                v-if="classItem.classesJson && classItem.classesJson.summary"
-              >
+                v-if="classItem.classesJson && classItem.classesJson.summary">
                 概要
               </div>
 
               <!-- 概要 -->
               <pre
                 v-if="classItem.classesJson && classItem.classesJson.summary"
-                class="stage-details"
-              >
-          {{ classItem.classesJson.summary }}
-        </pre
-              >
+                class="stage-details">
+              {{ classItem.classesJson.summary }}
+              </pre>
               <!-- 训练强度可视化 -->
 
               <div
                 v-if="classItem.classesJson && classItem.classesJson.timeline"
-                style="height: 16px; display: flex; gap: 1px"
-              >
+                style="height: 16px; display: flex; gap: 1px">
                 <div
                   v-for="(stage, index) in classItem.classesJson.timeline"
                   :key="index"
                   class="time-stage"
-                  :style="{ flex: stage.duration }"
-                >
+                  :style="{ flex: stage.duration }">
                   <div style="display: flex; gap: 1px; height: 16px">
                     <div
                       v-for="n in +stage.times"
                       :key="n"
-                      :style="{ flex: 1 }"
-                    >
+                      :style="{ flex: 1 }">
                       <ExerciseProcessChart
                         :exerciseList="stage.stageTimeline"
                         :maxIntensity="classItem.classesJson?.maxIntensity"
-                        :height="16"
-                      />
+                        :height="16" />
                     </div>
                   </div>
                 </div>
@@ -221,8 +222,7 @@
                   classItem.classesJson &&
                   classItem.classesJson.timeline &&
                   classItem.classesJson.timeline.length > 0
-                "
-              >
+                ">
                 阶段明细
               </div>
               <!-- 骑行详情 -->
@@ -230,67 +230,51 @@
                 v-if="
                   classItem.classesJson &&
                   (classItem.sportType === 'CYCLE' || classItem.sportType === 1)
-                "
-              >
+                ">
                 <CycleStageDetails
                   :class-data="classItem.classesJson"
                   :max-stages="99"
-                  type="class"
-                />
+                  type="class" />
               </template>
               <!-- 跑步详情 -->
-              <template
-                v-else-if="
-                  classItem.classesJson &&
-                  (classItem.sportType === 'RUN' || classItem.sportType === 2)
-                "
-              >
+              <template v-else-if="
+                classItem.classesJson &&
+                (classItem.sportType === 'RUN' || classItem.sportType === 2)
+              ">
                 <RunStageDetails
                   :class-data="classItem.classesJson"
                   :max-stages="99"
-                  type="class"
-                />
+                  type="class" />
               </template>
 
               <!-- 训练建议 -->
-              <div
-                class="section-title"
-                v-if="
-                  classItem.classesJson && classItem.classesJson.trainingAdvice
-                "
-              >
+              <div class="section-title" v-if="
+                classItem.classesJson && classItem.classesJson.trainingAdvice
+              ">
                 训练建议
               </div>
-              <pre
-                v-if="
-                  classItem.classesJson && classItem.classesJson.trainingAdvice
-                "
-                class="stage-details"
-              >
-          {{ classItem.classesJson.trainingAdvice }}
-        </pre
-              >
+              <pre v-if="
+                classItem.classesJson && classItem.classesJson.trainingAdvice
+              " class="stage-details">
+              {{ classItem.classesJson.trainingAdvice }}
+              </pre>
             </div>
           </div>
         </div>
       </div>
     </el-dialog>
-    <EditClass
-      :visible="showEditClass"
-      :class-item="classItem"
-      @close="handleCloseResetClass"
-      @save="handleEditSave"
-      @delete="$emit('delete', classItem)"
-    />
+    <EditClass :visible="showEditClass" :class-item="classItem"
+      @close="handleCloseResetClass" @save="handleEditSave"
+      @delete="$emit('delete', classItem)" />
   </div>
 </template>
 <script>
-import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import CycleStageDetails from "./CycleStageDetails.vue";
-import RunStageDetails from "./RunStageDetails.vue";
-import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from "../constants";
-import { truncateByLines, isExpired } from "../utils/helpers";
-import EditClass from "./EditClass.vue";
+import ExerciseProcessChart from "@/components/ExerciseProcessChart"
+import CycleStageDetails from "./CycleStageDetails.vue"
+import RunStageDetails from "./RunStageDetails.vue"
+import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from "../constants"
+import { truncateByLines, isExpired } from "../utils/helpers"
+import EditClass from "./EditClass.vue"
 export default {
   name: "SthWebClassViewClassCard",
   components: {
@@ -316,7 +300,7 @@ export default {
       type: String,
       default: "edit",
       validator(value) {
-        return ["view", "edit"].includes(value);
+        return ["view", "edit"].includes(value)
       },
     },
     dialogMarginLeft: {
@@ -328,11 +312,11 @@ export default {
     return {
       innerVisible: false,
       showEditClass: false,
-    };
+    }
   },
   computed: {
     dialogCustomClass() {
-      return "view-class-card-dialog";
+      return "view-class-card-dialog"
     },
     cardStyle() {
       // 过期且有时长的课程显示为红色
@@ -342,78 +326,82 @@ export default {
         this.classItem.classesJson.duration &&
         this.classItem.classesJson.duration !== "00:00:00"
       ) {
-        return { backgroundColor: "rgba(204, 35, 35, 1)" };
+        return { backgroundColor: "rgba(204, 35, 35, 1)" }
       }
-      return { backgroundColor: "#fff" };
+      return { backgroundColor: "#fff" }
     },
     showMoveBtn() {
-      return this.activeClassType === "my";
+      return this.activeClassType === "my"
     },
     showDeleteBtn() {
-      return this.activeClassType === "my";
+      return this.activeClassType === "my"
     },
     showCopyBtn() {
-      return true;
+      return true
     },
     copyBtnText() {
-      return this.activeClassType === "official" ? "添加" : "复制";
+      return this.activeClassType === "official" ? "添加" : "复制"
     },
     showShareBtn() {
-      return true;
+      return true
     },
   },
   watch: {
     visible(val) {
-      this.innerVisible = val;
+      this.innerVisible = val
     },
   },
 
   methods: {
     handleClose() {
       // this.innerVisible = false;
-      this.$emit("close");
+      this.$emit("close")
+    },
+    handleMoveAndClose() {
+      this.$emit("move", this.classItem.id)
+      this.handleClose()
     },
     truncateByLines,
     getSportIcon(sportType) {
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
     },
     getDeviceIcon(deviceType) {
-      return DEVICE_TYPE_ICON_DICT[deviceType] || "";
+      return DEVICE_TYPE_ICON_DICT[deviceType] || ""
     },
     isRestType(sportType) {
-      return ["REST", "REMARK", "OTHER"].includes(sportType);
+      return ["REST", "REMARK", "OTHER"].includes(sportType)
     },
     formatDuration(duration) {
-      return duration === "00:00:00" || !duration ? "--:--:--" : duration;
+      return duration === "00:00:00" || !duration ? "--:--:--" : duration
     },
     formatDistance(distance, sportType) {
-      let result = "";
+      let result = ""
       if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "");
+        result = distance.replace("km", "")
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance;
+        result = distance
       }
       if (!result || result === "0") {
-        result = "--";
+        result = "--"
       }
-      return result;
+      return result
     },
     handleDelete() {
-      this.handleClose();
-      this.$emit("delete", this.classItem);
+      this.handleClose()
+      this.$emit("delete", this.classItem)
     },
     handleEditSave(saveData, flag) {
-      console.log(saveData, flag, "saveData, flag");
-      if (flag) this.showEditClass = false;
-      this.$emit("save", saveData, flag);
+      console.log(saveData, flag, "saveData, flag")
+      if (flag) this.showEditClass = false
+      this.$emit("save", saveData, flag)
     },
     handleCloseResetClass() {
       this.showEditClass = false
-      this.$emit("close");
+      this.$emit("close")
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 ::v-deep(.el-dialog__body) {
@@ -427,6 +415,7 @@ export default {
   overflow: hidden;
   border-radius: 6px;
   background-color: #ffffff;
+
   .card-body {
     width: 100%;
     padding-left: 2px;
@@ -462,9 +451,11 @@ export default {
         .sport-type-color1 {
           background-color: #7fb135;
         }
+
         .sport-type-color2 {
           background-color: #c72a29;
         }
+
         .sport-type-color0 {
           background-color: #aaaaaa;
         }
@@ -494,6 +485,7 @@ export default {
       font-size: 14px;
       color: #101010;
     }
+
     .section-title {
       font-size: 14px;
       margin-top: 10px;
@@ -524,6 +516,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+
   .btn-list-hover-item {
     width: 60px;
     height: 32px;
@@ -536,6 +529,7 @@ export default {
     line-height: 32px;
     color: #101010;
     cursor: pointer;
+
     &:hover {
       background-color: #c3c9d740;
       font-family: PingFang SC;
