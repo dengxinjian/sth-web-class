@@ -75,7 +75,6 @@
             slot="reference"
             style="width: 16px; height: 16px" />
         </el-popover>
-        {{ activeClassType }}
         <el-popover
           v-if="activeClassType === 'team'"
           popper-class="athletic-btn-popover"
