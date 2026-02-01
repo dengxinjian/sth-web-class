@@ -14,8 +14,8 @@
           trigger="hover"
           popper-class="add-class-btn-popover-planned-schedule"
         >
-          <div class="add-class-btn-popover-more-list">
-            <div v-for="(el, idx) in optionsArray" :key="idx">
+          <div class="add-class-btn-popover-more-list" :key="'options-' + shareAuth">
+            <div v-for="(el, idx) in optionsArray" :key="'opt-' + shareAuth + '-' + idx">
               <div
                 :class="
                   el.value === 7
@@ -176,18 +176,16 @@ export default {
           return [
             { label: "概要", value: 1 },
             { label: "编辑", value: 3 },
-            { label: "复制", value: 4 },
             { label: "应用", value: 5 },
             { label: "历史", value: 6 },
-            { label: "删除", value: 7 },
+            { label: "权限调整", value: 9 },
           ];
         }
         return [
           { label: "概要", value: 1 },
-          { label: "复制", value: 4 },
           { label: "应用", value: 5 },
           { label: "历史", value: 6 },
-          { label: "删除", value: 7 },
+          { label: "权限调整", value: 9 },
         ];
       }
       return [];

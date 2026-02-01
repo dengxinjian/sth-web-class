@@ -1,31 +1,19 @@
 <template>
   <div class="hover-plan-detail">
     <!-- <h2>概要</h2> -->
-    <div
-      slot="title"
-      style="display: flex; justify-content: end; align-items: center">
-      <el-popover
-        popper-class="athletic-btn-popover"
-        placement="right"
-        trigger="hover"
-        :tabindex="999">
+    <div slot="title" style="display: flex; justify-content: end; align-items: center">
+      <el-popover popper-class="athletic-btn-popover" placement="right" trigger="hover" :tabindex="999">
         <div class="btn-list-hover">
           <span>
-            <div
-              class="btn-list-hover-item"
-              @click.stop="
-                $emit('move', planDetail)
-                ">
+            <div class="btn-list-hover-item" @click.stop="
+              $emit('move', planDetail)
+              ">
               移动
             </div>
           </span>
         </div>
         <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
-        <img
-          src="@/assets/addClass/Component 117.png"
-          alt=""
-          @click.stop
-          slot="reference"
+        <img src="@/assets/addClass/Component 117.png" alt="" @click.stop slot="reference"
           style="width: 16px; height: 16px" />
       </el-popover>
     </div>
@@ -47,27 +35,19 @@
         }}
       </div>
     </div>
-    <div class="detail-row-box" v-for="item in renderColumns"
-      :key="item.prop">
+    <div class="detail-row-box" v-for="item in renderColumns" :key="item.prop">
       <div class="detail-row-title">{{ item.label }}</div>
       <div class="detail-row-content">{{ planDetail[item.prop] }}
       </div>
     </div>
     <div class="detail-row-box">
       <div class="detail-row-title">计划难度</div>
-      <div class="detail-row-content"
-        style="display: flex; align-items: center; gap: 5px;">
-        <el-rate
-          v-model="planDetail.level"
-          :allow-half="true"
-          disabled
-          :colors="['#F92B30', '#F92B30', '#F92B30']"
-          text-color="#999999"
-          disabled-void-color="#E1E4EC"></el-rate>
-        <span
-          style="font-size: 10px; color: #979fb0;margin-bottom: 1px;">{{
-            planDetail.level ? "" : "未评分"
-          }}</span>
+      <div class="detail-row-content" style="display: flex; align-items: center; gap: 5px;">
+        <el-rate v-model="planDetail.level" :allow-half="true" disabled :colors="['#F92B30', '#F92B30', '#F92B30']"
+          text-color="#999999" disabled-void-color="#E1E4EC"></el-rate>
+        <span style="font-size: 10px; color: #979fb0;margin-bottom: 1px;">{{
+          planDetail.level ? "" : "未评分"
+        }}</span>
       </div>
     </div>
     <div class="detail-row-box">
@@ -93,12 +73,11 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekSwimmingDuration())
               }}{{
-                secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                  ? ""
-                  : " /周"
-              }}</el-col>
-              <el-col
-                :span="9">{{ getweekSwimmingDistance() || "N/A" }}
+                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
+              <el-col :span="9">{{ getweekSwimmingDistance() || "N/A" }}
               </el-col>
             </el-row>
           </el-col>
@@ -110,10 +89,10 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekCycleDuration())
               }}{{
-                secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                  ? ""
-                  : " /周"
-              }}</el-col>
+                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
               <el-col :span="9">{{ getweekCycleDistance() || "N/A" }}
               </el-col>
             </el-row>
@@ -126,12 +105,11 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekRunDuration())
               }}{{
-                secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                  ? ""
-                  : " /周"
-              }}</el-col>
-              <el-col
-                :span="9">{{ getweekRunDistance() || "N/A" }}</el-col>
+                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
+              <el-col :span="9">{{ getweekRunDistance() || "N/A" }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -142,10 +120,10 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekPowerDuration())
               }}{{
-                secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                  ? ""
-                  : " /周"
-              }}</el-col>
+                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
               <el-col :span="9">{{
                 getweekPowerAndOtherDistance("STRENGTH") || "N/A"
               }}</el-col>
@@ -159,10 +137,10 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekOtherDuration())
               }}{{
-                secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
-                  ? ""
-                  : " /周"
-              }}</el-col>
+                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                    ? ""
+                    : " /周"
+                }}</el-col>
               <el-col :span="9">{{
                 getweekPowerAndOtherDistance("OTHER") || "N/A"
               }}</el-col>
@@ -181,8 +159,7 @@
                     ? ""
                     : " /周"
                 }}</el-col>
-              <el-col
-                :span="9">{{ getweekDistance() || "N/A" }}</el-col>
+              <el-col :span="9">{{ getweekDistance() || "N/A" }}</el-col>
             </el-row>
           </el-col>
         </el-row>
@@ -404,8 +381,13 @@ export default {
           typeof newVal === "object" &&
           Object.keys(newVal).length > 0
         ) {
-          this.getPlanDetail(newVal.id)
-          this.getPlanDayDetail(newVal.id)
+          if (newVal.planType && newVal.planType === 'share') {
+            this.getPlanDetail(newVal.sourcePlanId)
+            this.getPlanDayDetail(newVal.sourcePlanId)
+          } else {
+            this.getPlanDetail(newVal.id)
+            this.getPlanDayDetail(newVal.id)
+          }
         }
       },
       immediate: true,

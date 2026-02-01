@@ -2,40 +2,21 @@
   <div class="plan-container">
     <!-- 课程类型切换 -->
     <div class="plan-type-list">
-      <div
-        class="class-type-item"
-        :class="{ 'active-title': activeClassType === 'my' }"
-        @click="handleClassTypeChange('my')"
-      >
-        <div
-          class="title"
-          :class="{ 'active-title': activeClassType === 'my' }"
-        >
+      <div class="class-type-item" :class="{ 'active-title': activeClassType === 'my' }"
+        @click="handleClassTypeChange('my')">
+        <div class="title" :class="{ 'active-title': activeClassType === 'my' }">
           我的计划
         </div>
       </div>
-      <div
-        class="class-type-item"
-        :class="{ 'active-title': activeClassType === 'team' }"
-        @click="handleClassTypeChange('team')"
-        v-if="loginType === '2'"
-      >
-        <div
-          class="title"
-          :class="{ 'active-title': activeClassType === 'team' }"
-        >
+      <div class="class-type-item" :class="{ 'active-title': activeClassType === 'team' }"
+        @click="handleClassTypeChange('team')" v-if="loginType === '2'">
+        <div class="title" :class="{ 'active-title': activeClassType === 'team' }">
           团队计划
         </div>
       </div>
-      <div
-        class="class-type-item"
-        :class="{ 'active-title': activeClassType === 'official' }"
-        @click="handleClassTypeChange('official')"
-      >
-        <div
-          class="title"
-          :class="{ 'active-title': activeClassType === 'official' }"
-        >
+      <div class="class-type-item" :class="{ 'active-title': activeClassType === 'official' }"
+        @click="handleClassTypeChange('official')">
+        <div class="title" :class="{ 'active-title': activeClassType === 'official' }">
           计划示例
         </div>
       </div>
@@ -43,17 +24,10 @@
 
     <!-- 操作栏 -->
     <div class="class-operation">
-      <el-popover
-        v-if="activeClassType === 'my' && showAddClassBtn"
-        placement="bottom"
-        width="160"
-        trigger="click"
-        popper-class="add-class-btn-popover"
-      >
+      <el-popover v-if="activeClassType === 'my' && showAddClassBtn" placement="bottom" width="160" trigger="click"
+        popper-class="add-class-btn-popover">
         <el-button type="primary" size="mini" slot="reference">新增</el-button>
-        <div
-          style="display: flex; flex-direction: column; gap: 6px; width: 100px"
-        >
+        <div style="display: flex; flex-direction: column; gap: 6px; width: 100px">
           <span>
             <div class="add-class-btn" @click="$emit('add-plan')">新增计划</div>
           </span>
@@ -65,73 +39,31 @@
         </div>
       </el-popover>
 
-      <el-input
-        size="mini"
-        v-model="searchInput"
-        @input="handleSearch"
-        clearable
-      >
-        <el-button
-          slot="append"
-          icon="el-icon-search"
-          @click="handleSearch"
-        ></el-button>
+      <el-input size="mini" v-model="searchInput" @input="handleSearch" clearable>
+        <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
       </el-input>
-    </div>
-
-    <div class="team-operation" v-if="activeClassType === 'team'">
-      <ShareTree
-        ref="shareTreeRef"
-        :search-input="searchInput"
-        @add-share-group="handleAddShareGroup"
-        @edit-share-group="handleEditShareGroup"
-        @delete-share-group="handleDeleteShareGroup"
-        @move-share-group="handleMoveShareGroup"
-        @view-plan="handleViewPlan"
-      />
     </div>
 
     <!-- 课程列表 -->
     <div class="schedule-plan-container" v-if="activeClassType !== 'team'">
-      <el-collapse
-        v-model="activeCollapse"
-        accordion
-        @change="$emit('collapse-change')"
-        v-loading="loading"
-      >
-        <el-collapse-item
-          v-for="item in classList"
-          :key="item.groupId"
-          :name="item.groupId"
-        >
+      <el-collapse v-model="activeCollapse" accordion @change="$emit('collapse-change')" v-loading="loading">
+        <el-collapse-item v-for="item in classList" :key="item.groupId" :name="item.groupId">
           <template slot="title">
             <div class="schedule-class-title">
               <div class="group-name">
                 <span class="group-name-text">{{ item.groupName }}</span>
                 <span class="group-name-count">({{ item.classesCount }})</span>
               </div>
-              <el-popover
-                v-if="activeClassType === 'my' && showAddClassBtn"
-                popper-class="athletic-btn-popover"
-                placement="right"
-                width="80"
-                trigger="hover"
-              >
+              <el-popover v-if="activeClassType === 'my' && showAddClassBtn" popper-class="athletic-btn-popover"
+                placement="right" width="80" trigger="hover">
                 <div class="group-operations">
                   <span>
-                    <el-button
-                      type="text"
-                      @click="$emit('add-plan', item.groupId)"
-                    >
+                    <el-button type="text" @click="$emit('add-plan', item.groupId)">
                       新增计划
                     </el-button>
                   </span>
                   <span>
-                    <el-button
-                      type="text"
-                      :disabled="!item.groupId"
-                      @click="$emit('edit-group', item)"
-                    >
+                    <el-button type="text" :disabled="!item.groupId" @click="$emit('edit-group', item)">
                       编辑分组
                     </el-button>
                   </span>
@@ -145,11 +77,7 @@
                     </el-button>
                   </span> -->
                   <span>
-                    <el-button
-                      type="text"
-                      :disabled="!item.groupId"
-                      @click="$emit('delete-group', item)"
-                    >
+                    <el-button type="text" :disabled="!item.groupId" @click="$emit('delete-group', item)">
                       删除分组
                     </el-button>
                   </span>
@@ -160,48 +88,35 @@
           </template>
 
           <div class="plan-js-class-drag-container" :key="item.timespan">
-            <div
-              class="plan-item"
-              :class="{ active: selectedPlanId === classItem.id }"
-              v-for="classItem in item.classesList"
-              :key="classItem.id"
-              @click.stop="$emit('choose-plan', classItem.id, item.groupId)"
-            >
-              <el-popover
-                placement="right"
-                width="320px"
-                trigger="hover"
-                :disabled="!classItem.planTitle"
-                popper-class="hover-plan-detail-popover"
-              >
+            <div class="plan-item" :class="{ active: selectedPlanId === classItem.id }"
+              v-for="classItem in item.classesList" :key="classItem.id"
+              @click.stop="$emit('choose-plan', classItem.id, item.groupId)">
+              <el-popover placement="right" width="320px" trigger="hover" :disabled="!classItem.planTitle"
+                popper-class="hover-plan-detail-popover">
                 <!-- <span slot="reference" @click.stop>{{ classItem.planTitle }}</span> -->
                 <span slot="reference">
-                  <div style="width: 100%; cursor: pointer">
-                    {{ classItem.planTitle }}
-                  </div>
-                  <div
-                    style="
+                      <div style="width: 100%; cursor: pointer">
+                        {{ classItem.planTitle }}
+                      </div>
+                      <div style="
                       width: 100%;
                       cursor: pointer;
                       display: flex;
                       flex-direction: row;
                       align-items: center;
                       gap: 5px;
-                    "
-                  >
-                    <el-rate
-                      v-model="classItem.level"
-                      :allow-half="true"
-                      disabled
-                      :colors="['#F92B30', '#F92B30', '#F92B30']"
-                      text-color="#999999"
-                      disabled-void-color="#E1E4EC"
-                    ></el-rate>
-                    <span style="font-size: 10px; color: #979fb0">{{
-                      classItem.level ? "" : "未评分"
-                    }}</span>
-                  </div>
-                </span>
+                    ">
+                        <el-rate v-model="classItem.level" :allow-half="true" disabled
+                          :colors="['#F92B30', '#F92B30', '#F92B30']" text-color="#999999"
+                          disabled-void-color="#E1E4EC"></el-rate>
+                        <span style="font-size: 10px; color: #979fb0">{{
+                          classItem.level ? "" : "未评分"
+                        }}</span>
+                        <span style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px;">{{
+                          classItem.isShare ? "已分享" : ""
+                        }}</span>
+                      </div>
+                    </span>
                 <HoverPlanDetail :planInfo="classItem" @move="handleMovePlan"></HoverPlanDetail>
               </el-popover>
             </div>
@@ -209,18 +124,117 @@
         </el-collapse-item>
       </el-collapse>
     </div>
+
+    <!-- 团队计划 -->
+    <!-- <div class="team-operation" v-if="activeClassType === 'team'">
+      <ShareTree
+        ref="shareTreeRef"
+        :search-input="searchInput"
+        @add-share-group="handleAddShareGroup"
+        @edit-share-group="handleEditShareGroup"
+        @delete-share-group="handleDeleteShareGroup"
+        @move-share-group="handleMoveShareGroup"
+        @view-plan="handleViewPlan"
+      />
+    </div> -->
+    <!-- 团队计划 -->
+    <div class="team-operation" v-if="activeClassType === 'team'">
+      <div class="team-operation-container" v-for="shareItem in teamPlanList" :key="shareItem.id">
+        <div class="team-operation-item" :class="{ 'is-active': currentShareTeamId === shareItem.id }"
+          @click="handleShareTeamClick(shareItem.id)">
+          <span class="team-operation-item-title-text">{{ shareItem.name }}</span>
+          <i class="el-icon-arrow-right team-operation-arrow"></i>
+        </div>
+        <div class="team-operation-content" v-show="currentShareTeamId === shareItem.id">
+          <el-collapse v-model="activeCollapse" accordion @change="handleShareGroupCollapseChange" v-loading="loading">
+            <el-collapse-item v-for="item in currentShareGroupList" :key="item.id" :name="item.id">
+              <template slot="title">
+                <div class="schedule-class-title">
+                  <div class="group-name">
+                    <span class="group-name-text">{{ item.groupName }}</span>
+                    <span class="group-name-count">({{ item.groupCount }})</span>
+                  </div>
+                  <el-popover popper-class="athletic-btn-popover" placement="right" width="80" trigger="hover">
+                    <div class="group-operations">
+                      <span>
+                        <el-button type="text" @click="handleAddShareGroup(item)">
+                          新增分组
+                        </el-button>
+                      </span>
+                      <span>
+                        <el-button type="text" :disabled="!item.id" @click="handleEditShareGroup(item)">
+                          编辑分组
+                        </el-button>
+                      </span>
+                      <!-- <span>
+                    <el-button
+                      type="text"
+                      :disabled="!item.groupId"
+                      @click="$emit('move-group', item.groupId)"
+                    >
+                      移动分组
+                    </el-button>
+                  </span> -->
+                      <span>
+                        <el-button type="text" :disabled="!item.id" @click="handleDeleteShareGroup(item)">
+                          删除分组
+                        </el-button>
+                      </span>
+                    </div>
+                    <i class="el-icon-more" slot="reference" @click.stop></i>
+                  </el-popover>
+                </div>
+              </template>
+
+              <div class="plan-js-class-drag-container" :key="item.timespan">
+                <div class="plan-item" :class="{ active: selectedPlanId === classItem.sourcePlanId }"
+                  v-for="classItem in item.classesList" :key="classItem.id"
+                  @click.stop="handleSharePlanClick(classItem)">
+                  <el-popover placement="right" width="320px" trigger="hover" :disabled="!classItem.planTitle"
+                    popper-class="hover-plan-detail-popover">
+                    <!-- <span slot="reference" @click.stop>{{ classItem.planTitle }}</span> -->
+                    <span slot="reference">
+                      <div style="width: 100%; cursor: pointer">
+                        {{ classItem.planTitle }}
+                      </div>
+                      <div style="
+                      width: 100%;
+                      cursor: pointer;
+                      display: flex;
+                      flex-direction: row;
+                      align-items: center;
+                      gap: 5px;
+                    ">
+                        <el-rate v-model="classItem.level" :allow-half="true" disabled
+                          :colors="['#F92B30', '#F92B30', '#F92B30']" text-color="#999999"
+                          disabled-void-color="#E1E4EC"></el-rate>
+                        <span style="font-size: 10px; color: #979fb0">{{
+                          classItem.level ? "" : "未评分"
+                        }}</span>
+                      </div>
+                    </span>
+                    <HoverPlanDetail :planInfo="classItem" @move="handleMoveShareGroup"></HoverPlanDetail>
+                  </el-popover>
+                </div>
+              </div>
+            </el-collapse-item>
+          </el-collapse>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { debounce } from "../../classManagement/uilt";
 import HoverPlanDetail from "./HoverPlanDetail/index.vue";
-import ShareTree from "./ShareTree.vue";
+// import ShareTree from "./ShareTree.vue";
+import { getData } from "@/api/common.js";
 export default {
   name: "PlanList",
   components: {
     HoverPlanDetail,
-    ShareTree,
+    // ShareTree,
   },
   props: {
     classList: {
@@ -250,6 +264,10 @@ export default {
       activeCollapse: null,
       loading: false,
       loginType: localStorage.getItem("loginType") || "1",
+      teamPlanList: [],
+      currentShareTeamId: '',
+      currentShareGroupList: [],
+      currentSharePlanList: [],
     };
   },
   watch: {
@@ -317,16 +335,117 @@ export default {
       this.$emit("update:activeClassType", type);
       // 触发 class-type-change 事件，让父组件处理类型切换
       this.$emit("class-type-change", type);
+      this.currentShareTeamId = '';
+      this.currentShareGroupList = [];
+      this.currentSharePlanList = [];
       // 切换到 team 类型时，触发重新加载团队列表并强制重新渲染 el-tree
       if (type === "team") {
-        this.$emit("reload-team-list");
-        // 重置 el-tree 的当前选中节点
-        this.$nextTick(() => {
-          if (this.$refs.shareTreeRef) {
-            this.$refs.shareTreeRef.resetCurrentKey();
+        this.getTeamPlanList();
+        // this.$emit("reload-team-list");
+        // // 重置 el-tree 的当前选中节点
+        // this.$nextTick(() => {
+        //   if (this.$refs.shareTreeRef) {
+        //     this.$refs.shareTreeRef.resetCurrentKey();
+        //   }
+        // });
+      }
+    },
+    async getTeamPlanList() {
+      const _this = this;
+      const resDefault = await getData({ url: "/gateway/team/my-team" });
+      const resTeam = await getData({
+        url: "/consumer/api/team/coach/all-teams",
+      });
+      if (resDefault.success && resTeam.success) {
+        const list = [resDefault.result, ...resTeam.result].reduce(
+          (acc, team) => {
+            if (team && team.id && !acc.find((t) => t.id === team.id)) {
+              acc.push(team);
+            }
+            return acc;
+          },
+          []
+        );
+        const teamTreeList = list.map((item) => ({
+          id: item.id,
+          name: item.teamName,
+          teamOwnerId: item.teamOwnerId,
+          members: item.members,
+        }))
+        console.log(teamTreeList, "list--团队计划列表");
+        _this.teamPlanList = teamTreeList;
+        _this.loading = false;
+      }
+    },
+    // 点击团队分组
+    handleShareTeamClick(id) {
+      this.currentShareTeamId = id;
+      if (id) {
+        this.getTeamPlanGroupList(id);
+      }
+    },
+    async getTeamPlanGroupList(id) {
+      const _this = this;
+      getData({
+        url: `/training/api/shareTeamGroup/list?teamId=${id}&shareDataType=2`,
+      }).then((res) => {
+        if (res.success && res.result) {
+          console.log(res.result, "res.result--团队计划分组列表");
+          _this.currentShareGroupList = res.result;
+          _this.loading = false;
+        }
+      });
+    },
+    handleShareGroupCollapseChange(activeNames) {
+      console.log(activeNames, "id--团队计划分组折叠变化");
+      // 折叠关闭时 activeNames 可能为空，find 会返回 undefined
+      if (activeNames == null || activeNames === "") return;
+      const findGroup = this.currentShareGroupList.find(el => el.id === activeNames);
+      console.log(findGroup, "findGroup--团队计划分组折叠变化");
+      if (!findGroup) return;
+      this.getShareGroupPlanList(findGroup);
+    },
+    // 点击团队计划
+    getShareGroupPlanList(node) {
+      if (!node || node.id == null) return;
+      const _this = this;
+      // 根据分享分组获取分组下的所有分享计划
+      getData({
+        url: `/training/api/teamShare/pageByGroupId`,
+        groupId: node.id,
+        teamId: node.teamId,
+        shareDataType: 2,
+        current: 1,
+        size: 20,
+      })
+        .then((res) => {
+          if (res.success && res.result) {
+            console.log(res.result, "res.result--分组下团队计划列表");
+            _this.currentShareGroupList = _this.currentShareGroupList.map(el => {
+              if (el.id === node.id) {
+                el.classesList = res.result.records.map(el => ({
+                  ...el,
+                  planType: 'share',
+                }));
+              }
+              return el;
+            });
+            _this.loading = false;
           }
+        })
+    },
+    handleSharePlanClick(node) {
+      console.log('====点击了分享计划', node)
+      // 保持当前分组展开：找到该计划所在分组并设为激活，避免 accordion 折叠
+      const group = this.currentShareGroupList.find(
+        (g) => g.classesList && g.classesList.some((c) => c.sourcePlanId === node.sourcePlanId || c.id === node.id)
+      );
+      if (group && group.id != null) {
+        this.$nextTick(() => {
+          this.activeCollapse = group.id;
         });
       }
+      this.$emit("view-plan", node.sourcePlanId, node);
     },
     handleSearch() {
       if (this.emitSearch) {
@@ -378,7 +497,7 @@ export default {
       this.$emit("delete-share-group", node);
     },
     handleMoveShareGroup(node) {
-      this.$emit("move-share-group", node);
+      this.$emit("move-share-group", { ...node, teamId: this.currentShareTeamId });
     },
     handleViewPlan(sourcePlanId, data) {
       this.$emit("view-plan", sourcePlanId, data);
@@ -412,11 +531,12 @@ export default {
       }
     },
     /**
-     * 刷新团队树数据
+     * 刷新团队树数据/分享分组列表
      */
     refreshTeamTree() {
-      if (this.$refs.shareTreeRef && this.$refs.shareTreeRef.refreshTeamTree) {
-        this.$refs.shareTreeRef.refreshTeamTree();
+      // 刷新当前团队的分享分组列表
+      if (this.currentShareTeamId) {
+        this.getTeamPlanGroupList(this.currentShareTeamId);
       }
     },
     handleMovePlan(planDetail) {
@@ -432,7 +552,7 @@ export default {
   display: flex;
   flex-direction: column;
   background: #fff;
-  border-left: 1px solid #e5e5e5;
+
   .plan-type-list {
     height: 46px;
     display: flex;
@@ -442,12 +562,14 @@ export default {
     gap: 16px;
     border-bottom: 1px solid #01010126;
     box-sizing: border-box;
+
     .class-type-item {
       height: 46px;
       line-height: 46px;
       text-align: center;
       cursor: pointer;
       position: relative;
+
       .title {
         height: 46px;
         line-height: 46px;
@@ -458,6 +580,7 @@ export default {
         color: #939393;
         border-bottom: 4px solid transparent;
       }
+
       .active-title {
         font-family: PingFang SC;
         font-weight: 500;
@@ -475,12 +598,6 @@ export default {
     align-items: center;
     gap: 10px;
     padding: 12px 10px;
-  }
-
-  .team-operation {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
   }
 
   .schedule-plan-container {
@@ -537,6 +654,7 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+
 .plan-item {
   display: flex;
   flex-direction: row;
@@ -546,36 +664,45 @@ export default {
   border-bottom: 1px solid#c3c9d72e;
   // background-color: #f9f9f9;
 }
+
 .plan-item:first-child {
   border-top: 1px solid #c3c9d72e;
 }
+
 .plan-item:last-child {
   border-bottom: none;
 }
+
 .plan-item:hover {
   background-color: #f1f1f1;
   cursor: pointer;
 }
+
 .plan-item:active {
   background-color: #c3c9d72e;
   cursor: pointer;
 }
+
 .plan-item.active {
   // color: #cc2323;
   // background-color: rgba(204, 35, 35, 0.15);
   background: #c3c9d72e;
 }
+
 .plan-item.active:first-child {
   border-bottom: 1px solid#01010126;
   border-top: 1px solid #c3c9d72e;
 }
+
 .plan-item.active:last-child {
   border-bottom: 1px solid #c3c9d72e;
   border-bottom: none;
 }
+
 .plan-item ::v-deep(.el-rate__icon) {
   font-size: 16px;
 }
+
 .add-class-btn {
   width: 84px;
   height: 32px;
@@ -584,6 +711,7 @@ export default {
   border-radius: 5px;
   font-size: 14px;
   color: #101010;
+
   &:hover {
     cursor: pointer;
     background-color: #c3c9d740;
@@ -594,6 +722,7 @@ export default {
 // 弹框样式优化
 .dialog-footer {
   text-align: right;
+
   .el-button {
     margin-left: 10px;
   }
@@ -643,6 +772,7 @@ export default {
       justify-content: center;
       align-items: center;
       gap: 8px;
+
       .athlete-figure {
         width: 40px;
         height: 40px;
@@ -772,9 +902,63 @@ export default {
     font-weight: 500;
     font-style: Medium;
     line-height: 8px;
+
     &:hover {
       background: #555;
       border-color: #555;
+    }
+  }
+}
+
+.team-operation-container {
+  .team-operation-item {
+    height: 44px;
+    font-size: 14px;
+    color: #101010;
+    line-height: 44px;
+    text-align: center;
+    cursor: pointer;
+    border-bottom: 1px solid #e6ebf5;
+    background-color: #f6f7f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    box-sizing: border-box;
+
+    .team-operation-arrow {
+      transition: transform 0.2s ease;
+    }
+
+    &.is-active .team-operation-arrow {
+      transform: rotate(90deg);
+    }
+  }
+
+  .team-operation-content {
+    padding: 0 1px;
+    box-sizing: border-box;
+
+    .schedule-class-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 198px;
+      padding: 0 10px;
+
+      .group-name {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 5px;
+        width: 80%;
+
+        .group-name-text {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
     }
   }
 }

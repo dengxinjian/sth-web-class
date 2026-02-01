@@ -2,124 +2,55 @@
   <div class="container" :style="{ width: isPlan ? '100%' : '' }">
     <div class="plan-container">
       <div class="type-change">
-        <PlanList
-          ref="planListRef"
-          :class-list="classList"
-          :active-class-type.sync="activeClassType"
-          @class-type-change="handleClassTypeChange"
-          @search="handlePlanSearch"
-          :show-add-class-btn="true"
-          @view-class="handleViewClass"
-          @add-plan="handleAddPlan"
-          @add-group="handleAddGroup"
-          @edit-group="handleEditGroup"
-          @delete-group="handleDeleteGroup"
-          @choose-plan="handlePlanDayDetail"
-          @view-plan="handleViewPlanView"
-          @add-share-group="handleAddShareGroup"
-          @edit-share-group="handleEditShareGroup"
-          @delete-share-group="handleDeleteShareGroup"
-          @move-share-group="handleMoveShareGroup"
-          @move-plan="handleMovePlan"
-          :selected-plan-id="currentPlanId"
-          :current-plan-group-id="currentPlanGroupId"
-        />
+        <PlanList ref="planListRef" :class-list="classList" :active-class-type.sync="activeClassType"
+          @class-type-change="handleClassTypeChange" @search="handlePlanSearch" :show-add-class-btn="true"
+          @view-class="handleViewClass" @add-plan="handleAddPlan" @add-group="handleAddGroup"
+          @edit-group="handleEditGroup" @delete-group="handleDeleteGroup" @choose-plan="handlePlanDayDetail"
+          @view-plan="handleViewPlanView" @add-share-group="handleAddShareGroup"
+          @edit-share-group="handleEditShareGroup" @delete-share-group="handleDeleteShareGroup"
+          @move-share-group="handleMoveShareGroup" @move-plan="handleMovePlan" :selected-plan-id="currentPlanId"
+          :current-plan-group-id="currentPlanGroupId" />
       </div>
-      <PlannedScheduleView
-        v-if="isPlan"
-        :planList="planList"
-        :planTitle="planTitle"
-        :showMore="showMore"
-        :shareAuth="shareAuth"
-        :activeClassType="activeClassType"
-        @options-click="handleOptionsClick"
-        @view-class="handleViewPlanClass"
-      />
+      <PlannedScheduleView v-if="isPlan" :planList="planList" :planTitle="planTitle" :showMore="showMore"
+        :shareAuth="shareAuth" :activeClassType="activeClassType" @options-click="handleOptionsClick"
+        @view-class="handleViewPlanClass" />
     </div>
     <!-- 查看计划详情 -->
-    <ViewPlanDetail
-      :visible="showViewPlanDetail"
-      :class-item="classModalData"
-      :click-position="clickPosition"
-      @close="showViewPlanDetail = false"
-    />
+    <ViewPlanDetail :visible="showViewPlanDetail" :class-item="classModalData" :click-position="clickPosition"
+      @close="showViewPlanDetail = false" />
     <!-- 复制课程 -->
-    <CopyClassFromOfficial
-      v-model="showCopyClassFromOfficial"
-      :class-id="copyClassFromOfficialClassId"
-      :group-id="copyClassFromOfficialGroupId"
-      :data="copyClassFromOfficialData"
-      :active-class-type="activeClassType"
-      @save="onSaveCopyClassFromOfficial"
-    />
+    <CopyClassFromOfficial v-model="showCopyClassFromOfficial" :class-id="copyClassFromOfficialClassId"
+      :group-id="copyClassFromOfficialGroupId" :data="copyClassFromOfficialData" :active-class-type="activeClassType"
+      @save="onSaveCopyClassFromOfficial" />
 
     <!-- 添加计划 -->
-    <AddPlan
-      v-model="addPlanVisible"
-      :current-group-id="addPlanGroupId"
-      :activeClassType="activeClassType"
-      :copyOfficialPlanInfo="copyOfficialPlanInfo"
-      :planList="planList"
-      @addPlanSuccess="handleAddPlanSuccess"
-      @cancel="handleAddPlanCancel"
-    />
+    <AddPlan v-model="addPlanVisible" :current-group-id="addPlanGroupId" :activeClassType="activeClassType"
+      :copyOfficialPlanInfo="copyOfficialPlanInfo" :planList="planList" @addPlanSuccess="handleAddPlanSuccess"
+      @cancel="handleAddPlanCancel" />
     <!-- 添加分组 -->
-    <AddGroup
-      v-model="addGroupVisible"
-      :data="currentGroup"
-      @save="handleAddGroupSave"
-    />
+    <AddGroup v-model="addGroupVisible" :data="currentGroup" @save="handleAddGroupSave" />
     <!-- 添加分享分组 -->
-    <AddShareGroup
-      v-model="addShareGroupVisible"
-      :data="currentShareGroup"
-      @save="handleAddShareGroupSave"
-    />
+    <AddShareGroup v-model="addShareGroupVisible" :data="currentShareGroup" @save="handleAddShareGroupSave" />
     <!-- 移动分享分组 -->
-    <MoveShareGroup
-      v-model="moveShareGroupVisible"
-      :data="currentMoveShareGroup"
-      @save="handleMoveShareGroupSave"
-    />
+    <MoveShareGroup v-model="moveShareGroupVisible" :data="currentMoveShareGroup" @save="handleMoveShareGroupSave" />
     <!-- 概要 -->
-    <SummaryPreview
-      v-model="showSummaryPreview"
-      :active-class-type="activeClassType"
-      :planInfo="currentPlanDetail"
-      :planClasses="planList"
-      @cancel="handleSummaryPreviewCancel"
-    />
+    <SummaryPreview v-model="showSummaryPreview" :active-class-type="activeClassType" :planInfo="currentPlanDetail"
+      :planClasses="planList" @cancel="handleSummaryPreviewCancel" />
     <!-- 复制 -->
-    <Copy
-      :defaultTitle="`${currentPlanDetail.planTitle}_复制`"
-      :defaultGroupId="currentPlanDetail.planGroupId"
-      v-model="showCopy"
-      :planInfo="currentPlanDetail"
-      :planClasses="planList"
-      @save="onSaveCopy"
-    />
+    <Copy :defaultTitle="`${currentPlanDetail.planTitle}_复制`" :defaultGroupId="currentPlanDetail.planGroupId"
+      v-model="showCopy" :planInfo="currentPlanDetail" :planClasses="planList" @save="onSaveCopy" />
     <!-- 应用计划 -->
-    <ApplyCoach
-      v-model="showApplyCoach"
-      :planInfo="currentPlanDetail"
-      :planClasses="planList"
-      @cancel="handleApplyCoachCancel"
-      @viewApplyHistory="handleViewApplyHistory"
-    />
+    <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail" :planClasses="planList"
+      @cancel="handleApplyCoachCancel" @viewApplyHistory="handleViewApplyHistory" />
     <!-- 计划分享 -->
-    <SharePlan
-      v-model="showSharePlan"
-      :planInfo="currentPlanDetail"
-      @shareSuccess="handleShareSuccess"
-    />
+    <SharePlan v-model="showSharePlan" :planInfo="currentPlanDetail" @shareSuccess="handleShareSuccess" />
     <!-- 应用历史 -->
     <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
     <!-- 移动计划到分组 -->
-    <MovePlan
-      v-model="showMovePlan"
-      :planInfo="currentPlanDetail"
-      @save="handleMovePlanSave"
-    />
+    <MovePlan v-model="showMovePlan" :planInfo="currentPlanDetail" @save="handleMovePlanSave" />
+    <!-- 权限调整 -->
+    <PermissionAdjust v-model="showSharePlanPersion" :shareAuth="shareAuth" :planInfo="currentPlanDetail"
+      @close="handleSharePlanPersionClose" />
   </div>
 </template>
 
@@ -139,7 +70,7 @@ import Copy from "./components/Copy/index.vue";
 import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue";
 import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue";
 import SharePlan from "./components/SharePlan/index.vue";
-
+import PermissionAdjust from "./components/SharePlanPersion/index.vue";
 // 服务和工具导入
 import { planApi, groupApi } from "./services/planManagement";
 import { getData } from "@/api/common";
@@ -161,6 +92,7 @@ export default {
     ApplyCoach,
     ApplyHistory,
     SharePlan,
+    PermissionAdjust,
   },
   props: {
     isPlan: {
@@ -200,6 +132,7 @@ export default {
       showApplyHistory: false,
       showSharePlan: false,
       showMovePlan: false,
+      showSharePlanPersion: false,
       currentPlanId: "",
       currentPlanGroupId: "",
       planTitle: "",
@@ -654,18 +587,18 @@ export default {
       this.currentShareGroup = {
         id: "",
         groupName: "",
-        teamId: node.data.teamId,
+        teamId: node.teamId,
       };
       this.addShareGroupVisible = true;
     },
     // 编辑分享分组
     handleEditShareGroup(node) {
-      this.currentShareGroup = { ...node.data };
+      this.currentShareGroup = { ...node };
       this.addShareGroupVisible = true;
     },
     // 删除分享分组
     handleDeleteShareGroup(node) {
-      this.$confirm(`确认删除分组【${node?.data?.groupName}】？`, "提示", {
+      this.$confirm(`确认删除分组【${node?.groupName}】？`, "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
@@ -674,9 +607,9 @@ export default {
         groupApi
           .deleteShareGroup({
             requestUserId: localStorage.getItem("triUserId"),
-            id: node.data.id,
+            id: node.id,
             shareDataType: 2,
-            teamId: node.data.teamId,
+            teamId: node.teamId,
           })
           .then((res) => {
             if (res.success) {
@@ -689,7 +622,8 @@ export default {
     },
     // 移动分享分组
     handleMoveShareGroup(node) {
-      this.currentMoveShareGroup = { ...node.data };
+      console.log(node, "node--移动分享分组");
+      this.currentMoveShareGroup = { ...node };
       this.moveShareGroupVisible = true;
     },
     // 保存分享分组
@@ -728,6 +662,15 @@ export default {
       if (this.activeClassType === 'team' && this.$refs.planListRef && this.$refs.planListRef.refreshTeamTree) {
         this.$refs.planListRef.refreshTeamTree();
       }
+    },
+    handleSharePlanPersionClose(payload) {
+      this.showSharePlanPersion = false;
+      if (!payload.revoke) {
+        this.shareAuth = payload.shareToAuth;
+      }
+      // 关闭权限调整后刷新团队数据渲染
+      this.refreshTeamTree();
+      this.getPlanList();
     },
     /**
      * 处理选项的点击事件
@@ -791,6 +734,10 @@ export default {
         // 分享到团队
         8: () => {
           _this.showSharePlan = true;
+        },
+        // 权限调整
+        9: () => {
+          _this.showSharePlanPersion = true;
         },
       };
       optMap[index]();
@@ -890,6 +837,7 @@ export default {
       background: #a8a8a8;
     }
   }
+
   .type-change {
     flex: 0 0 260px;
     height: 100vh;

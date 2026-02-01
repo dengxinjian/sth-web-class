@@ -19,7 +19,7 @@
       <el-row>
         <el-col :span="24">
           <el-form-item label="计划名称" prop="planTitle">
-            <span v-if="activeClassType === 'official'">{{
+            <span v-if="activeClassType === 'official' || activeClassType === 'team'">{{
               form.planTitle
             }}</span>
             <el-input
@@ -42,7 +42,7 @@
               filterable
               clearable
               style="width: 100%"
-              v-if="activeClassType !== 'official'"
+              v-if="activeClassType !== 'official' && activeClassType !== 'team'"
             >
               <el-option
                 v-for="g in groupOptions"
@@ -69,7 +69,7 @@
               clearable
               style="width: 100%"
               @change="handleTeamChange"
-              v-if="activeClassType !== 'official'"
+              v-if="activeClassType !== 'official' && activeClassType !== 'team'"
             >
               <el-option
                 v-for="g in teamOptions"
@@ -84,7 +84,7 @@
 
         <el-col :span="12">
           <el-form-item label="计划源">
-            <span v-if="activeClassType === 'official'">{{
+            <span v-if="activeClassType === 'official' || activeClassType === 'team'">{{
               form.planSource
             }}</span>
             <el-input
@@ -99,7 +99,7 @@
 
         <el-col :span="12">
           <el-form-item label="拥有者">
-            <span v-if="activeClassType === 'official'">{{
+            <span v-if="activeClassType === 'official' || activeClassType === 'team'">{{
               planInfo.possessNickname
             }}</span>
             <el-input
@@ -113,7 +113,7 @@
 
         <el-col :span="12">
           <el-form-item label="邮箱" prop="email">
-            <span v-if="activeClassType === 'official'">{{ form.email }}</span>
+            <span v-if="activeClassType === 'official' || activeClassType === 'team'">{{ form.email }}</span>
             <el-input
               v-else
               :readonly="activeClassType === 'official'"
@@ -126,7 +126,7 @@
 
         <el-col :span="12">
           <el-form-item label="微信号" prop="weChat">
-            <span v-if="activeClassType === 'official'">{{ form.weChat }}</span>
+            <span v-if="activeClassType === 'official' || activeClassType === 'team'">{{ form.weChat }}</span>
             <el-input
               v-else
               :readonly="activeClassType === 'official'"
@@ -138,7 +138,7 @@
 
         <el-col :span="24">
           <el-form-item label="描述" prop="description">
-            <span v-if="activeClassType === 'official'">{{
+            <span v-if="activeClassType === 'official' || activeClassType === 'team'">{{
               form.description
             }}</span>
             <el-input
@@ -153,7 +153,7 @@
             />
           </el-form-item>
         </el-col>
-        <el-col :span="24" v-if="activeClassType === 'official'">
+        <el-col :span="24" v-if="activeClassType === 'official' || activeClassType === 'team'">
           <el-form-item
             label="计划难度"
             prop="level"
@@ -432,15 +432,15 @@
     </el-form>
 
     <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel" v-if="activeClassType === 'official'"
+      <el-button @click="onCancel" v-if="activeClassType === 'official' || activeClassType === 'team'"
         >关闭</el-button
       >
-      <el-button @click="onCancel" v-if="activeClassType !== 'official'"
+      <el-button @click="onCancel" v-if="activeClassType !== 'official' && activeClassType !== 'team'"
         >取消</el-button
       >
       <el-button
         type="primary"
-        v-if="activeClassType !== 'official'"
+        v-if="activeClassType !== 'official' && activeClassType !== 'team'"
         @click="onConfirm"
         >确定</el-button
       >

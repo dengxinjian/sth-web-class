@@ -2,39 +2,21 @@
   <div class="class-container">
     <!-- 课程类型切换 -->
     <div class="plan-type-list">
-      <div
-        class="class-type-item"
-        :class="{ 'active-title': activeClassType === 'my' }"
-        @click="handleClassTypeChange('my')"
-      >
-        <div
-          class="title"
-          :class="{ 'active-title': activeClassType === 'my' }"
-        >
+      <div class="class-type-item" :class="{ 'active-title': activeClassType === 'my' }"
+        @click="handleClassTypeChange('my')">
+        <div class="title" :class="{ 'active-title': activeClassType === 'my' }">
           我的课程
         </div>
       </div>
-      <div
-        class="class-type-item"
-        :class="{ 'active-title': activeClassType === 'team' }"
-        @click="handleClassTypeChange('team')"
-      >
-        <div
-          class="title"
-          :class="{ 'active-title': activeClassType === 'team' }"
-        >
+      <div class="class-type-item" :class="{ 'active-title': activeClassType === 'team' }"
+        @click="handleClassTypeChange('team')">
+        <div class="title" :class="{ 'active-title': activeClassType === 'team' }">
           团队课程
         </div>
       </div>
-      <div
-        class="class-type-item"
-        :class="{ 'active-title': activeClassType === 'official' }"
-        @click="handleClassTypeChange('official')"
-      >
-        <div
-          class="title"
-          :class="{ 'active-title': activeClassType === 'official' }"
-        >
+      <div class="class-type-item" :class="{ 'active-title': activeClassType === 'official' }"
+        @click="handleClassTypeChange('official')">
+        <div class="title" :class="{ 'active-title': activeClassType === 'official' }">
           课程示例
         </div>
       </div>
@@ -66,13 +48,8 @@
 
     <!-- 操作栏 -->
     <div class="class-operation">
-      <el-popover
-        v-if="activeClassType === 'my' && showAddClassBtn"
-        placement="bottom"
-        width="100"
-        trigger="click"
-        popper-class="add-class-btn-popover"
-      >
+      <el-popover v-if="activeClassType === 'my' && showAddClassBtn" placement="bottom" width="100" trigger="click"
+        popper-class="add-class-btn-popover">
         <el-button type="primary" size="mini" slot="reference">新增</el-button>
         <div style="display: flex; flex-direction: column; gap: 5px">
           <div class="add-class-btn" @click="$emit('add-class')">新增课程</div>
@@ -80,13 +57,7 @@
         </div>
       </el-popover>
 
-      <el-input
-        size="mini"
-        v-model="searchInput"
-        clearable
-        prefix-icon="el-icon-search"
-        @input="handleSearch"
-      >
+      <el-input size="mini" v-model="searchInput" clearable prefix-icon="el-icon-search" @input="handleSearch">
         <!-- <el-button
           slot="append"
           icon="el-icon-search"
@@ -98,45 +69,24 @@
 
     <!-- 课程列表 -->
     <div class="schedule-class-container" v-if="activeClassType !== 'team'">
-      <el-collapse
-        accordion
-        v-model="activeCollapseItem"
-        @change="$emit('collapse-change')"
-        v-loading="loading"
-      >
-        <el-collapse-item
-          v-for="item in classList"
-          :key="item.groupId"
-          :name="item.groupId"
-        >
+      <el-collapse accordion v-model="activeCollapseItem" @change="$emit('collapse-change')" v-loading="loading">
+        <el-collapse-item v-for="item in classList" :key="item.groupId" :name="item.groupId">
           <template slot="title">
             <div class="schedule-class-title">
               <div class="group-name">
                 <span class="group-name-text">{{ item.groupName }}</span>
                 <span class="group-name-count">({{ item.classesCount }})</span>
               </div>
-              <el-popover
-                v-if="activeClassType === 'my' && showAddClassBtn"
-                popper-class="athletic-btn-popover"
-                placement="right"
-                width="80"
-                trigger="hover"
-              >
+              <el-popover v-if="activeClassType === 'my' && showAddClassBtn" popper-class="athletic-btn-popover"
+                placement="right" width="80" trigger="hover">
                 <div class="group-operations">
                   <span>
-                    <el-button
-                      type="text"
-                      @click="$emit('add-class', item.groupId)"
-                    >
+                    <el-button type="text" @click="$emit('add-class', item.groupId)">
                       新增课程
                     </el-button>
                   </span>
                   <span>
-                    <el-button
-                      type="text"
-                      :disabled="!item.groupId"
-                      @click="$emit('edit-group', item)"
-                    >
+                    <el-button type="text" :disabled="!item.groupId" @click="$emit('edit-group', item)">
                       编辑分组
                     </el-button>
                   </span>
@@ -150,11 +100,7 @@
                     </el-button>
                   </span> -->
                   <span>
-                    <el-button
-                      type="text"
-                      :disabled="!item.groupId"
-                      @click="$emit('delete-group', item)"
-                    >
+                    <el-button type="text" :disabled="!item.groupId" @click="$emit('delete-group', item)">
                       删除分组
                     </el-button>
                   </span>
@@ -164,36 +110,16 @@
             </div>
           </template>
 
-          <draggable
-            class="js-class-drag-container"
-            :list="item.classesList"
-            :group="{ name: groupName, put: false, pull: 'clone' }"
-            :animation="0"
-            :sort="false"
-            :force-fallback="true"
-            :fallback-on-body="true"
-            :fallback-tolerance="5"
-            :scroll="true"
-            :scroll-sensitivity="40"
-            :scroll-speed="10"
-            ghost-class="is-plan-drag-ghost"
-            :key="item.timespan"
-            @end="handleClassDragEnd"
-          >
-            <ClassCard
-              v-for="classItem in item.classesList"
-              :key="classItem.id"
-              :class-data="classItem"
-              :active-class-type="activeClassType"
-              :group-id="item.groupId"
+          <draggable class="js-class-drag-container" :list="item.classesList"
+            :group="{ name: groupName, put: false, pull: 'clone' }" :animation="0" :sort="false" :force-fallback="true"
+            :fallback-on-body="true" :fallback-tolerance="5" :scroll="true" :scroll-sensitivity="40" :scroll-speed="10"
+            ghost-class="is-plan-drag-ghost" :key="item.timespan" @end="handleClassDragEnd">
+            <ClassCard v-for="classItem in item.classesList" :key="classItem.id" :class-data="classItem"
+              :active-class-type="activeClassType" :group-id="item.groupId"
               @click="$emit('class-detail', classItem.id, classItem.sportType)"
-              @move="$emit('move-class', classItem.id, item.groupId)"
-              @delete="$emit('delete-class', classItem)"
-              @copy="
+              @move="$emit('move-class', classItem.id, item.groupId)" @delete="$emit('delete-class', classItem)" @copy="
                 $emit('copy-class', classItem, item.groupId, classItem.title)
-              "
-              @view="$emit('view-class', classItem.id)"
-            />
+                " @view="$emit('view-class', classItem.id)" />
           </draggable>
         </el-collapse-item>
       </el-collapse>
@@ -201,15 +127,71 @@
 
     <!-- 团队课程操作栏 -->
     <div class="team-operation" v-if="activeClassType === 'team'">
-      <ShareTree
-        ref="shareTreeRef"
-        :search-input="searchInput"
-        @add-share-group="handleAddShareGroup"
-        @edit-share-group="handleEditShareGroup"
-        @delete-share-group="handleDeleteShareGroup"
-        @move-share-group="handleMoveShareGroup"
-        @view-class="handleViewClass"
-      />
+      <div class="team-operation-container" v-for="shareItem in teamTreeList" :key="shareItem.id">
+        <div class="team-operation-item" :class="{ 'is-active': currentShareTeamId === shareItem.id }"
+          @click="$emit('share-team-click', shareItem.id)">
+          <span class="team-operation-item-title-text">{{ shareItem.name }}</span>
+          <i class="el-icon-arrow-right team-operation-arrow"></i>
+        </div>
+        <div class="team-operation-content" v-show="currentShareTeamId === shareItem.id">
+          <el-collapse accordion v-model="activeCollapseItem" @change="handleShareTeamGroupClick" v-loading="loading">
+            <el-collapse-item v-for="item in currentShareGroupList" :key="item.groupId" :name="item.id">
+              <template slot="title">
+                <div class="schedule-class-title">
+                  <div class="group-name">
+                    <span class="group-name-text">{{ item.groupName }}</span>
+                    <span class="group-name-count">({{ item.groupCount }})</span>
+                  </div>
+                  <el-popover popper-class="athletic-btn-popover"
+                    placement="right" width="80" trigger="hover">
+                    <div class="group-operations">
+                      <span>
+                        <el-button type="text" @click="$emit('add-share-group', item)">
+                          新增分组
+                        </el-button>
+                      </span>
+                      <span>
+                        <el-button type="text" @click="$emit('edit-share-group', item)">
+                          编辑分组
+                        </el-button>
+                      </span>
+                      <!-- <span>
+                    <el-button
+                      type="text"
+                      :disabled="!item.groupId"
+                      @click="$emit('move-group', item.groupId)"
+                    >
+                      移动分组
+                    </el-button>
+                  </span> -->
+                      <span>
+                        <el-button type="text" @click="$emit('delete-share-group', item)">
+                          删除分组
+                        </el-button>
+                      </span>
+                    </div>
+                    <i class="el-icon-more" slot="reference" @click.stop></i>
+                  </el-popover>
+                </div>
+              </template>
+
+              <draggable class="js-class-drag-container" :list="item.classesList"
+                :group="{ name: groupName, put: false, pull: 'clone' }" :animation="0" :sort="false"
+                :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="5" :scroll="true"
+                :scroll-sensitivity="40" :scroll-speed="10" ghost-class="is-plan-drag-ghost" :key="item.timespan"
+                @end="handleClassDragEnd">
+                <ClassCard v-for="classItem in item.classesList" :key="classItem.id" :class-data="classItem"
+                  :active-class-type="activeClassType" :group-id="item.groupId"
+                  @click="$emit('share-class-detail', classItem.id, classItem.sportType)"
+                  @move="$emit('move-share-class', classItem.id, item.groupId)"
+                  @delete="$emit('delete-share-class', classItem)"
+                  @copy="$emit('copy-share-class', classItem, item.groupId, classItem.title)"
+                  @view="$emit('view-share-class', classItem)" />
+              </draggable>
+            </el-collapse-item>
+          </el-collapse>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -218,17 +200,29 @@
 import ClassCard from "./ClassCard.vue";
 import draggable from "vuedraggable";
 import { debounce } from "../uilt";
-import ShareTree from "./ShareTree.vue";
+import { getData } from "@/api/common.js";
+import { parseClassesJson } from '../utils/helpers';
 
 export default {
   name: "ClassList",
   components: {
     ClassCard,
     draggable,
-    ShareTree,
   },
   props: {
     classList: {
+      type: Array,
+      default: () => [],
+    },
+    shareGroupList: {
+      type: Array,
+      default: () => [],
+    },
+    currentShareTeamId: {
+      type: String,
+      default: "",
+    },
+    teamTreeList: {
       type: Array,
       default: () => [],
     },
@@ -251,6 +245,9 @@ export default {
       emitSearch: null,
       loading: false,
       activeCollapseItem: "",
+      activeTeamItemId: "",
+      currentTeamClassList: [],
+      currentShareGroupList: [],
     };
   },
   watch: {
@@ -271,6 +268,21 @@ export default {
       },
       deep: true,
     },
+    shareGroupList: {
+      handler(newVal, oldVal) {
+        console.log(this.shareGroupList, "shareGroupList--分享组");
+        if (newVal) {
+          this.currentShareGroupList = newVal;
+        }
+      },
+      deep: true,
+    },
+    currentShareTeamId: {
+      handler() {
+        console.log(this.currentShareTeamId, "currentShareTeamId--分享团队");
+      },
+      immediate: false,
+    },
   },
   created() {
     this.emitSearch = debounce(() => {
@@ -278,6 +290,10 @@ export default {
     }, 500);
   },
   methods: {
+    handleShareTeamGroupClick(activeNames) {
+      console.log('选中的分组', activeNames)
+      this.$emit('share-team-group-click', activeNames)
+    },
     handleClassTypeChange(type) {
       this.$emit("update:activeClassType", type);
       this.$emit("class-type-change", type);
@@ -326,6 +342,7 @@ export default {
 :deep(.el-collapse-item__header) {
   background: #c3c9d726;
 }
+
 .class-container {
   height: 100%;
   display: flex;
@@ -340,12 +357,14 @@ export default {
     gap: 16px;
     border-bottom: 1px solid #01010126;
     box-sizing: border-box;
+
     .class-type-item {
       height: 46px;
       line-height: 46px;
       text-align: center;
       cursor: pointer;
       position: relative;
+
       .title {
         height: 46px;
         line-height: 46px;
@@ -356,6 +375,7 @@ export default {
         color: #939393;
         border-bottom: 4px solid transparent;
       }
+
       .active-title {
         font-family: PingFang SC;
         font-weight: 500;
@@ -384,6 +404,7 @@ export default {
         width: 64px;
         margin-bottom: 4px;
       }
+
       .title {
         font-family: PingFang SC;
         font-weight: 400;
@@ -391,6 +412,7 @@ export default {
         font-size: 15px;
         color: #939393;
       }
+
       .active-title {
         font-family: PingFang SC;
         font-weight: 500;
@@ -475,6 +497,7 @@ export default {
   flex-direction: column;
   align-items: center;
 }
+
 .add-class-btn {
   width: 88px;
   height: 32px;
@@ -487,12 +510,65 @@ export default {
   line-height: 32px;
   color: #101010;
   cursor: pointer;
+
   &:hover {
     background-color: #c3c9d740;
     font-family: PingFang SC;
     font-weight: 500;
     font-style: Medium;
     font-size: 14px;
+  }
+}
+
+.team-operation-container {
+  .team-operation-item {
+    height: 44px;
+    font-size: 14px;
+    color: #101010;
+    line-height: 44px;
+    text-align: center;
+    cursor: pointer;
+    border-bottom: 1px solid #e6ebf5;
+    background-color: #f6f7f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    box-sizing: border-box;
+
+    .team-operation-arrow {
+      transition: transform 0.2s ease;
+    }
+
+    &.is-active .team-operation-arrow {
+      transform: rotate(90deg);
+    }
+  }
+
+  .team-operation-content {
+    padding: 0 1px;
+    box-sizing: border-box;
+    .schedule-class-title{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 198px;
+      padding: 0 10px;
+
+      .group-name {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 5px;
+        width: 80%;
+
+        .group-name-text {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
   }
 }
 </style>
