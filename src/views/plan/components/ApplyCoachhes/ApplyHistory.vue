@@ -238,8 +238,8 @@ export default {
         this.resetForm()
         this.getApplyHistory()
       } else {
-        // 弹窗关闭时清除定时器
-        this.clearTimer()
+        // 弹窗关闭时重置页面数据
+        this.resetPageData()
         // clear validation when closing
         this.$nextTick(
           () =>
@@ -382,6 +382,20 @@ export default {
           this.$refs.formRef.clearValidate()
         }
       })
+    },
+    /** 关闭弹窗时重置页面数据 */
+    resetPageData() {
+      this.clearTimer()
+      this.activeTab = "apply"
+      this.tableData = []
+      this.total = 0
+      this.pagination = { page: 1, limit: 10 }
+      this.shareTableData = []
+      this.shareTotal = 0
+      this.sharePagination = { page: 1, limit: 10 }
+      this.permissionDialogVisible = false
+      this.permissionForm = { revoke: false, shareToAuth: 1 }
+      this.currentShareRow = null
     },
     handleSizeChange(val) {
       // 每页条数改变

@@ -151,7 +151,7 @@
                         </el-button>
                       </span>
                       <span>
-                        <el-button type="text" @click="$emit('edit-share-group', item)">
+                        <el-button type="text" :disabled="!item.id" @click="$emit('edit-share-group', item)">
                           编辑分组
                         </el-button>
                       </span>
@@ -165,7 +165,7 @@
                     </el-button>
                   </span> -->
                       <span>
-                        <el-button type="text" @click="$emit('delete-share-group', item)">
+                        <el-button type="text" :disabled="!item.id" @click="$emit('delete-share-group', item)">
                           删除分组
                         </el-button>
                       </span>

@@ -65,6 +65,7 @@ export default {
         ],
       },
       groupList: [],
+      shareRecordList: [],
     };
   },
   watch: {
@@ -80,6 +81,7 @@ export default {
       if (val) {
         this.resetForm();
         this.getGroupList(this.data?.teamId);
+        this.getCurrentShareRecord()
       } else {
         this.$nextTick(
           () =>
@@ -111,9 +113,34 @@ export default {
         url: `/training/api/shareTeamGroup/list?teamId=${teamId}&shareDataType=2`,
       }).then((res) => {
         if (res.success && res.result) {
+          console.log('====计划分组下的数据====',res.result)
           this.groupList = res.result;
         }
       });
+    },
+    getCurrentShareRecord() {
+      const requestUserId = localStorage.getItem("triUserId")
+      if (!requestUserId) {
+        return
+      }
+      submitData({
+        url: "/gateway/training/share/queryShareRecords",
+        requestData: {
+          requestUserId,
+          shareDataId: this.data?.id,
+          shareDataType: 2, // 1=团队课程 2=计划
+          pageNum: 1,
+          pageSize: 10,
+        },
+      })
+        .then((res) => {
+          console.log(res, "res====获取分享历史");
+          this.shareRecordList = res.result.records || []
+        })
+        .catch((err) => {
+          console.error("获取分享历史失败:", err)
+          this.shareRecordList = []
+        })
     },
     onCancel() {
       this.innerVisible = false;
@@ -123,10 +150,15 @@ export default {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return;
         // 由父组件决定具体新增/编辑接口，此处只派发规范化数据
+        const record = this.shareRecordList[0]
+        if (!record || (record.id == null && record.shareRecordId == null)) {
+          this.$message.error("没有找到分享记录，无法移动");
+          return;
+        }
         submitData({
           url: "/training/api/teamShare/move",
           requestData: {
-            id: this.data?.id,
+            id: record?.id,
             targetGroupId: this.form.targetGroupId,
             requestUserId: localStorage.getItem("triUserId") || "",
           },
