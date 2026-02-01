@@ -199,7 +199,7 @@
     <ViewClassCard :visible="showViewClassCard" :class-item="classModalData" :active-class-type="activeClassType"
       @close="showViewClassCard = false" @move="handleMoveClass" @move-share-group="handleMoveShareGroup"
       @share-auth-edit="handleShareAuthEdit" @delete="handleDeleteClass" @copy="handleCopyClassFromOfficial"
-      @save="handleUpdateClass" @share="handleShareClass" />
+      @save="handleUpdateClass" @share="handleShareClass" @share-history="handleShareClassHistroy" />
     <ShareClassModal v-model="showShareClassModal" :class-id="shareClassId" @save="onSaveShareClass" />
     <AddClassModal v-model="showAddClassModal" :sportType="classModalData.sportType" :type="classModalDataType"
       :originalType="activeClassType" :data="classModalData" @save="onSaveAddClass"
@@ -240,6 +240,11 @@
     <ShareAuthEdit v-model="shareAuthEditVisible" :shareAuth="currentShareAuthEdit.shareAuth"
       :planInfo="currentShareAuthEdit" @success="handleShareAuthEditSave" />
 
+    <shareHistory
+      :visible.sync="showShareHistory"
+      :planInfo="shareHistoryData"
+      @close="showShareHistory = false"
+    />
   </div>
 </template>
 
@@ -274,6 +279,7 @@ import AddShareGroup from "./components/AddShareGroup/index.vue"
 import MoveShareGroup from "./components/MoveShareGroup/index.vue"
 import cludList from "./components/cludList/index.vue"
 import ShareAuthEdit from "./components/ShareClassPersion/index.vue"
+import shareHistory from "./components/ShareHistory/index.vue"
 
 // 服务和工具导入
 import {
@@ -330,7 +336,8 @@ export default {
     AddShareGroup,
     MoveShareGroup,
     cludList,
-    ShareAuthEdit
+    ShareAuthEdit,
+    shareHistory
   },
   mixins: [dragMixin],
   data() {
@@ -449,6 +456,7 @@ export default {
       shareGroupList: [],
       shareAuthEditVisible: false,
       currentShareAuthEdit: {},
+      shareHistoryData: {}
     }
   },
   computed: {
@@ -1986,6 +1994,12 @@ export default {
       })
     },
 
+    // 分享历史
+    async handleShareClassHistroy(classData) {
+      this.shareHistoryData = classData
+      this.showShareHistory = true
+    },
+
     /**
      * 查看课程
      */
@@ -1995,7 +2009,6 @@ export default {
     },
 
     handleViewShareClase(item) {
-      console.log(item, "item====查看分享课程")
       this.showViewClassCard = true
       const findClass = this.shareGroupList.find(el => el.id === item.classesGroupId)?.classesList.find(el => el.id === item.id)
       this.classModalData = findClass
@@ -2009,7 +2022,6 @@ export default {
       // console.log(this.classDetailData, "classDetailData");
       // this.showClassDetailModal = true;
       this.classModalDataType = "edit"
-      console.log(sportType, "sportType")
       // this.showAddClassModal = true;
     },
 
@@ -2034,7 +2046,7 @@ export default {
       // this.classDetailData = foundClass;
       // this.classSportType = sportType;
       // this.showClassDetailModal = true;
-      console.log(classItem, "classItem")
+      // console.log(classItem, "classItem")
       this.classSportType = sportType
       this.classDetailData = classItem
       this.$nextTick(() => {

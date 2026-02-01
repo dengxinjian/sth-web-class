@@ -39,6 +39,14 @@
                 分享课程
               </div>
             </span>
+            <span v-if="classItem.isShare">
+              <div class="btn-list-hover-item" @click.stop="
+                $emit('share-history', classItem)
+              handleClose()
+                ">
+                分享历史
+              </div>
+            </span>
             <span v-if="showDeleteBtn">
               <div class="btn-list-hover-item" @click.stop="handleDelete()" style="color: #F92B30;">
                 删除</div>
