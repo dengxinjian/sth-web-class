@@ -23,6 +23,10 @@ export const teamApi = {
   getAllTeamsAndClubs() {
     return getData({ url: "/consumer/api/club/coach/getAllTeamsAndClubs" })
   },
+  // 我加入的团队
+  getMyJoinedTeams(triUserId) {
+    return getData({ url: "/consumer/api/team/query/athlete-team?triUserId=" + triUserId })
+  },
 }
 
 /**

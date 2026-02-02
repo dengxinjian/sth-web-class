@@ -12,19 +12,18 @@
           placement="bottom"
           width="110"
           trigger="hover"
-          popper-class="add-class-btn-popover-planned-schedule"
-        >
-          <div class="add-class-btn-popover-more-list" :key="'options-' + shareAuth">
-            <div v-for="(el, idx) in optionsArray" :key="'opt-' + shareAuth + '-' + idx">
+          popper-class="add-class-btn-popover-planned-schedule">
+          <div class="add-class-btn-popover-more-list"
+            :key="'options-' + shareAuth">
+            <div v-for="(el, idx) in optionsArray"
+              :key="'opt-' + shareAuth + '-' + idx">
               <div
-                :class="
-                  el.value === 7
+                :class="el.value === 7
                     ? 'add-class-btn-popover-more-list-item-del'
                     : 'add-class-btn-popover-more-list-item'
-                "
+                  "
                 :key="idx"
-                @click="$emit('options-click', el, el.value)"
-              >
+                @click="$emit('options-click', el, el.value)">
                 {{ el.label }}
               </div>
             </div>
@@ -36,12 +35,10 @@
             @click.stop
           ></i> -->
           <!-- <el-button type="text" slot="reference">操作</el-button> -->
-          <span class="more-icon-span" slot="reference"
-            ><img
+          <span class="more-icon-span" slot="reference"><img
               src="@/assets/plan/more.png"
               alt="更多"
-              style="width: 16px; height: 16px"
-          /></span>
+              style="width: 16px; height: 16px" /></span>
         </el-popover>
       </div>
       <div class="planned-schedule-header-title-right">
@@ -53,14 +50,13 @@
             secondsToHHMMSS(getTotalDuration()) === "00:00:00"
               ? "--:--:--"
               : secondsToHHMMSS(getTotalDuration())
-          }}</span
-          >/<span class="planned-schedule-header-title-right-total-value"
-            >{{ getTotalDistance() || "--" }}km</span
-          >/<span class="planned-schedule-header-title-right-total-value">{{
-            getTotalSth() > 100000
-              ? (getTotalSth() / 10000).toFixed(2) + "万"
-              : getTotalSth() || "--"
-          }}</span>
+          }}</span>/<span
+            class="planned-schedule-header-title-right-total-value">{{ getTotalDistance() || "--" }}km</span>/<span
+            class="planned-schedule-header-title-right-total-value">{{
+              getTotalSth() > 100000
+                ? (getTotalSth() / 10000).toFixed(2) + "万"
+                : getTotalSth() || "--"
+            }}</span>
         </div>
         <!-- 总运动时长距离sth总值 -->
         <!-- <div class="planned-schedule-header-title-right-total">
@@ -98,8 +94,7 @@
           @plan-item-move="$emit('plan-item-move', $event)"
           @plan-item-reorder="$emit('plan-item-reorder', $event)"
           @plan-library-drop="$emit('plan-library-drop', $event)"
-          @view-class="handleViewClass"
-        />
+          @view-class="handleViewClass" />
       </div>
       <!-- <div class="planned-schedule-container-statistics"></div> -->
     </div>
@@ -107,8 +102,8 @@
 </template>
 
 <script>
-import ScheduleBoxesView from "./ScheduleBoxesView.vue";
-import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils";
+import ScheduleBoxesView from "./ScheduleBoxesView.vue"
+import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils"
 export default {
   name: "PlannedScheduleView",
   components: {
@@ -135,11 +130,16 @@ export default {
       type: Number,
       default: 1,
     },
+    shareUserId: {
+      type: String,
+      default: "",
+    },
   },
   data() {
     return {
       planListLoading: false,
-    };
+      triUserId: localStorage.getItem("triUserId"),
+    }
   },
   computed: {
     optionsArray() {
@@ -147,7 +147,7 @@ export default {
         return [
           { label: "概要", value: 1 },
           { label: "添加", value: 2 },
-        ];
+        ]
       }
       if (this.activeClassType === "my") {
         if (localStorage.getItem("loginType") === "2") {
@@ -159,7 +159,7 @@ export default {
             { label: "分享到团队", value: 8 },
             { label: "历史", value: 6 },
             { label: "删除", value: 7 },
-          ];
+          ]
         } else {
           return [
             { label: "概要", value: 1 },
@@ -168,27 +168,42 @@ export default {
             { label: "应用", value: 5 },
             { label: "历史", value: 6 },
             { label: "删除", value: 7 },
-          ];
+          ]
         }
       }
       if (this.activeClassType === "team") {
-        if (this.shareAuth === 2) {
+        if (this.shareAuth === 2 && this.shareUserId === this.triUserId) {
           return [
             { label: "概要", value: 1 },
             { label: "编辑", value: 3 },
             { label: "应用", value: 5 },
             { label: "历史", value: 6 },
             { label: "权限调整", value: 9 },
-          ];
+          ]
+        }
+        if (this.shareAuth === 2) {
+          return [
+            { label: "概要", value: 1 },
+            { label: "编辑", value: 3 },
+            { label: "应用", value: 5 },
+            { label: "历史", value: 6 },
+          ]
+        }
+        if (this.shareAuth === 1 && this.shareUserId === this.triUserId) {
+          return [
+            { label: "概要", value: 1 },
+            { label: "应用", value: 5 },
+            { label: "历史", value: 6 },
+            { label: "权限调整", value: 9 },
+          ]
         }
         return [
           { label: "概要", value: 1 },
           { label: "应用", value: 5 },
           { label: "历史", value: 6 },
-          { label: "权限调整", value: 9 },
-        ];
+        ]
       }
-      return [];
+      return []
     },
   },
   watch: {
@@ -200,17 +215,17 @@ export default {
           !oldVal ||
           !newVal ||
           oldVal.length !== newVal.length ||
-          JSON.stringify(oldVal) !== JSON.stringify(newVal);
+          JSON.stringify(oldVal) !== JSON.stringify(newVal)
 
         if (hasChanged) {
-          this.planListLoading = true;
+          this.planListLoading = true
           // 等待 DOM 更新完成后隐藏 loading
           this.$nextTick(() => {
             // 使用 setTimeout 确保渲染完成
             setTimeout(() => {
-              this.planListLoading = false;
-            }, 150);
-          });
+              this.planListLoading = false
+            }, 150)
+          })
         }
       },
       immediate: false,
@@ -228,37 +243,37 @@ export default {
               weekTotal +
               item.details.reduce((classTotal, classItem) => {
                 if (!classItem) {
-                  return classTotal;
+                  return classTotal
                 }
-                let classesJson = classItem.classesJson;
+                let classesJson = classItem.classesJson
                 if (typeof classesJson === "string") {
                   try {
-                    classesJson = JSON.parse(classesJson);
+                    classesJson = JSON.parse(classesJson)
                   } catch (error) {
-                    console.error("解析 classesJson 失败:", error);
-                    return classTotal;
+                    console.error("解析 classesJson 失败:", error)
+                    return classTotal
                   }
                 }
                 if (!classesJson.sth) {
-                  return classTotal;
+                  return classTotal
                 }
-                return classTotal + Number(classesJson.sth);
+                return classTotal + Number(classesJson.sth)
               }, 0)
-            );
+            )
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     roundDistance(value, decimals = 2) {
       if (value === null || typeof value === "undefined") {
-        return value;
+        return value
       }
-      const numericValue = Number(value);
+      const numericValue = Number(value)
       if (!Number.isFinite(numericValue)) {
-        return value;
+        return value
       }
-      const factor = Math.pow(10, decimals);
-      return Math.round((numericValue + Number.EPSILON) * factor) / factor;
+      const factor = Math.pow(10, decimals)
+      return Math.round((numericValue + Number.EPSILON) * factor) / factor
     },
     getTotalDistance() {
       const totalDistance = this.planList.reduce((total, week) => {
@@ -269,15 +284,15 @@ export default {
               weekTotal +
               item.details.reduce((classTotal, classItem) => {
                 if (!classItem) {
-                  return classTotal;
+                  return classTotal
                 }
-                let classesJson = classItem.classesJson;
+                let classesJson = classItem.classesJson
                 if (typeof classesJson === "string") {
                   try {
-                    classesJson = JSON.parse(classesJson);
+                    classesJson = JSON.parse(classesJson)
                   } catch (error) {
-                    console.error("解析 classesJson 失败:", error);
-                    return classTotal;
+                    console.error("解析 classesJson 失败:", error)
+                    return classTotal
                   }
                 }
                 if (
@@ -285,13 +300,13 @@ export default {
                   classesJson.distance === "--km" ||
                   classesJson.distance === "--"
                 ) {
-                  return classTotal;
+                  return classTotal
                 }
                 if (
                   classesJson.sportType === "SWIM" &&
                   classesJson.distanceUnit === "m"
                 ) {
-                  return classTotal + Number(classesJson.distance) / 1000;
+                  return classTotal + Number(classesJson.distance) / 1000
                 }
                 if (
                   typeof classesJson.distance === "string" &&
@@ -299,16 +314,16 @@ export default {
                 ) {
                   return (
                     classTotal + Number(classesJson.distance.replace("km", ""))
-                  );
+                  )
                 }
-                return classTotal + Number(classesJson.distance);
+                return classTotal + Number(classesJson.distance)
               }, 0)
-            );
+            )
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
       // 如果是整数，不保留小数；如果有小数，保留两位小数
-      return this.roundDistance(totalDistance);
+      return this.roundDistance(totalDistance)
     },
     getTotalDuration() {
       return this.planList.reduce((total, week) => {
@@ -320,15 +335,15 @@ export default {
               item.details.reduce((classTotal, classItem) => {
                 // console.log(classItem, "classItem");
                 if (!classItem) {
-                  return classTotal;
+                  return classTotal
                 }
-                let classesJson = classItem.classesJson;
+                let classesJson = classItem.classesJson
                 if (typeof classesJson === "string") {
                   try {
-                    classesJson = JSON.parse(classesJson);
+                    classesJson = JSON.parse(classesJson)
                   } catch (error) {
-                    console.error("解析 classesJson 失败:", error);
-                    return classTotal;
+                    console.error("解析 classesJson 失败:", error)
+                    return classTotal
                   }
                 }
                 if (
@@ -336,34 +351,34 @@ export default {
                   classesJson.duration === "00:00:00" ||
                   classesJson.duration === "--:--:--"
                 ) {
-                  return classTotal;
+                  return classTotal
                 }
-                return classTotal + hhmmssToSeconds(classesJson.duration);
+                return classTotal + hhmmssToSeconds(classesJson.duration)
               }, 0)
-            );
+            )
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     handleDeleteClass(classItem, classIndex, weekNumber, globalDay) {
-      this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
+      this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay)
     },
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
-      this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
+      this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay)
     },
     handlePasteClass(globalDay, weekNumber, classItem) {
-      this.$emit("paste-class", globalDay, weekNumber, classItem);
+      this.$emit("paste-class", globalDay, weekNumber, classItem)
     },
     handleAddWeek() {
-      this.$emit("add-week");
+      this.$emit("add-week")
     },
     handleViewClass(classItem, clickPosition) {
       // console.log("handleViewClass-classItem", classItem);
       // console.log("handleViewClass-clickPosition", clickPosition);
-      this.$emit("view-class", classItem, clickPosition);
+      this.$emit("view-class", classItem, clickPosition)
     },
   },
-};
+}
 </script>
 
 <style scoped lang="scss">
@@ -373,11 +388,13 @@ export default {
   background-color: #fff;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
+
 .add-class-btn-popover-more-list {
   width: 140px;
   background-color: #fff;
   padding: 0 0 0 8px;
   box-sizing: border-box;
+
   .add-class-btn-popover-more-list-item {
     width: 100%;
     height: 36px;
@@ -386,6 +403,7 @@ export default {
     background-color: #fff;
     font-size: 14px;
     color: #101010;
+
     &:hover {
       cursor: pointer;
       font-weight: 600;
@@ -401,6 +419,7 @@ export default {
       background: rgba(64, 158, 255, 0.18);
     }
   }
+
   .add-class-btn-popover-more-list-item-del {
     width: 100%;
     height: 36px;
@@ -409,6 +428,7 @@ export default {
     background-color: #fff;
     font-size: 14px;
     color: #f92b30;
+
     &:hover {
       cursor: pointer;
       font-weight: 600;
@@ -424,6 +444,7 @@ export default {
       background: rgba(64, 158, 255, 0.18);
     }
   }
+
   // .add-class-btn-popover-more-list-item:last-child {
   //   width: 100%;
   //   height: 36px;
@@ -456,6 +477,7 @@ export default {
   background-color: #fff;
   padding: 0 0 0 8px;
   box-sizing: border-box;
+
   & .add-class-btn-popover-more-list-item {
     width: 100%;
     height: 36px;
@@ -481,6 +503,7 @@ export default {
     }
   }
 }
+
 .planned-schedule-container {
   flex: 1;
   display: flex;
@@ -575,20 +598,24 @@ export default {
       padding: 0 20px;
       box-sizing: border-box;
       gap: 5px;
+
       .planned-schedule-header-title-right-total-label {
         font-size: 12px;
         color: #666666;
       }
+
       .planned-schedule-header-title-right-total-value {
         font-size: 14px;
         color: #101010;
       }
+
       .planned-schedule-header-title-right-total {
         margin-bottom: 2px;
         width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
+
         .label {
           font-weight: 600;
           color: #303133;
@@ -657,6 +684,7 @@ export default {
     }
   }
 }
+
 .more-icon-span {
   cursor: pointer;
   display: inline-block;

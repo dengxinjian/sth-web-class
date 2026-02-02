@@ -200,7 +200,7 @@
       @close="showViewClassCard = false" @move="handleMoveClass" @move-share-group="handleMoveShareGroup"
       @share-auth-edit="handleShareAuthEdit" @delete="handleDeleteClass" @copy="handleCopyClassFromOfficial"
       @save="handleUpdateClass" @share="handleShareClass" @share-history="handleShareClassHistroy" />
-    <ShareClassModal v-model="showShareClassModal" :class-id="shareClassId" @save="onSaveShareClass" />
+    <ShareClassModal v-model="showShareClassModal" :class-id="shareClassId" @shareSuccess="onSaveShareClass" />
     <AddClassModal v-model="showAddClassModal" :sportType="classModalData.sportType" :type="classModalDataType"
       :originalType="activeClassType" :data="classModalData" @save="onSaveAddClass"
       @cancel="showAddClassModal = false" />
@@ -452,8 +452,8 @@ export default {
       shareGroupList: [],
       shareAuthEditVisible: false,
       currentShareAuthEdit: {},
+      shareHistoryData: {},
       showShareHistory: false,
-      shareHistoryData: {}
     }
   },
   computed: {
@@ -2931,7 +2931,7 @@ export default {
     },
     onSaveShareClass(classId) {
       this.showShareClassModal = false
-      // this.getClassList();
+      this.getClassList();
     },
 
     // 添加分享分组

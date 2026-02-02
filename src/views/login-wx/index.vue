@@ -20,7 +20,7 @@
         <div class="text-content">
           <h1>强者之心</h1>
           <!-- <p style="margin-bottom: 300px;">让科学普及训练</p> -->
-          <p style="margin-bottom: 300px;font-size: 32px;font-weight: 400;">2025.H2 强者觉醒 敬请期待！</p>
+          <!-- <p style="margin-bottom: 300px;font-size: 32px;font-weight: 400;">2025.H2 强者觉醒 敬请期待！</p> -->
           <!-- <p>敬请期待！</p> -->
           <div class="contact-info">
             <h5 style="font-size: 32px;font-weight: 400;">联系我们</h5>
