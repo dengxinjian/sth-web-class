@@ -240,11 +240,7 @@
     <ShareAuthEdit v-model="shareAuthEditVisible" :shareAuth="currentShareAuthEdit.shareAuth"
       :planInfo="currentShareAuthEdit" @success="handleShareAuthEditSave" />
 
-    <shareHistory
-      :visible.sync="showShareHistory"
-      :planInfo="shareHistoryData"
-      @close="showShareHistory = false"
-    />
+    <shareHistory :visible.sync="showShareHistory" :planInfo="shareHistoryData" @close="showShareHistory = false" />
   </div>
 </template>
 
@@ -456,6 +452,7 @@ export default {
       shareGroupList: [],
       shareAuthEditVisible: false,
       currentShareAuthEdit: {},
+      showShareHistory: false,
       shareHistoryData: {}
     }
   },
@@ -1028,10 +1025,25 @@ export default {
       this.activeClassType = type
       this.getClassList()
       if (type === "team") {
-        this.getAllTeamsTreeList()
-        // 刷新团队树与当前团队的分享分组列表
+        const loginType = localStorage.getItem("loginType")
+        console.log(loginType, "=======******loginType")
+        if (loginType === "2") {
+          this.getAllTeamsTreeList()
+        } else {
+          console.log("运动员登陆时")
+          this.getMyTeamsTreeList()
+        }
         this.refreshTeamTree()
         this.refreshShareGroupList()
+      }
+    },
+
+    async getMyTeamsTreeList() {
+      const res = await getData({ url: "/consumer/api/team/query/athlete-team" })
+      if (res.success && res.result) {
+        this.teamTreeList = [res.result]
+      } else {
+        this.teamTreeList = []
       }
     },
 
