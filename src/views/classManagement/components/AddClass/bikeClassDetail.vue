@@ -1188,7 +1188,7 @@ export default {
           stageMode,
           tags: [...this.sectionTemplate.tags], // 深拷贝数组
           thresholdFtpRange: [50, 60],
-          targetFtpRange: 55,
+          thresholdFtp: 55,
           thresholdHeartRate: 55,
           thresholdHeartRateRange: [50, 60],
         }
