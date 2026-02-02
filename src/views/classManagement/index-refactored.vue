@@ -684,8 +684,14 @@ export default {
     getDeviceName(deviceType) {
       return DEVICE_TYPE_DICT[deviceType] || "未知设备"
     },
-    // 选择分享团队
+    // 选择分享团队（再次点击同一项时折叠收起）
     handleShareTeamClick(teamId) {
+      const isSameTeam = String(this.currentShareTeamId) === String(teamId)
+      if (isSameTeam) {
+        this.currentShareTeamId = ''
+        this.shareGroupList = []
+        return
+      }
       console.log(teamId, "teamId--选择分享团队")
       this.currentShareTeamId = teamId
       getData({
