@@ -12,6 +12,7 @@
           :current-plan-group-id="currentPlanGroupId" />
       </div>
       <PlannedScheduleView v-if="isPlan" :planList="planList" :planTitle="planTitle" :showMore="showMore"
+        :shareUserId="shareUserId"
         :shareAuth="shareAuth" :activeClassType="activeClassType" @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass" />
     </div>
@@ -151,6 +152,7 @@ export default {
       copyOfficialPlanInfo: null,
       limitValue: 0, // 计划限制数量
       currentCount: 0, // 当前计划数量
+      shareUserId: "",
     };
   },
   watch: {
@@ -311,6 +313,7 @@ export default {
     async handleViewPlanView(id, data) {
       // console.log("handleViewPlan===选择分享计划", id,data);
       this.shareAuth = data.shareAuth;
+      this.shareUserId = data.shareUserId;
       this.$emit("choose-plan", true);
       await this.getPlanDetail(id);
       await this.getPlanDayDetail(id);
