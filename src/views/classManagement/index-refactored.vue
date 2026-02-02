@@ -1039,7 +1039,7 @@ export default {
     },
 
     async getMyTeamsTreeList() {
-      const res = await getData({ url: "/consumer/api/team/query/athlete-team" })
+      const res = await getData({ url: "/consumer/api/team/query/athlete-team?triUserId=" + localStorage.getItem("triUserId") })
       if (res.success && res.result) {
         this.teamTreeList = [res.result]
       } else {
