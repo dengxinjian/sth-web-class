@@ -35,6 +35,7 @@
               :teamId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
               :activeName="activeName"
+              :defaultTeamId="defaultTeamId"
               @athletic-click="handleAthleticChange" />
             <cludList v-else :clubId="selectedTeam"
               :teamName="getTeamName(selectedTeam)"
@@ -636,7 +637,7 @@ export default {
       const athletic = this.athleticList.find(
         (item) => item.triUserId === this.selectedAthletic
       )
-      return athletic && athletic.userAvatar ? athletic.userAvatar : null
+      return athletic && athletic.userAvatar ? athletic.userAvatar : require('@/assets/logo-sth.png')
     },
   },
   watch: {
@@ -657,6 +658,7 @@ export default {
     // this.initMenuFromRoute();
     if (localStorage.getItem("loginType") !== "1") {
       this.getAllTeamsAndClubs()
+      this.getDefaultTeam()
     } else {
       this.selectedAthletic = localStorage.getItem("triUserId")
       this.getScheduleData()
@@ -1216,14 +1218,8 @@ export default {
       })
       if (res.success) {
         _this.defaultTeamId = res.result.id
-        _this.teamList = [..._this.teamList, res.result].reduce((acc, team) => {
-          if (team && team.id && !acc.find((t) => t.id === team.id)) {
-            acc.push(team)
-          }
-          return acc
-        }, [])
-        _this.getTeamAndAthleticData()
       }
+      console.log(_this.defaultTeamId, "defaultTeamId")
     },
 
     /**

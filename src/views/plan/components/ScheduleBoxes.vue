@@ -313,7 +313,6 @@
           class="context-menu-item"
           @click="handlePaste(contextMenuWeekIndex)"
         >
-          <i class="el-icon-document-copy"></i>
           <span>粘贴</span>
         </div>
       </div>
@@ -1576,32 +1575,36 @@ export default {
 }
 
 .context-menu {
-  position: fixed;
+  position: absolute;
   background: white;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   z-index: 99999;
   padding: 4px 0;
-  min-width: 120px;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   .context-menu-item {
-    padding: 8px 16px;
+    width: 60px;
+    height: 32px;
+    border-radius: 5px;
+    font-family: PingFang SC;
+    font-weight: 400;
+    font-style: Regular;
     font-size: 14px;
-    color: #cc2323;
+    text-align: center;
+    line-height: 32px;
+    color: #101010;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-
-    i {
-      font-size: 16px;
-    }
-
     &:hover {
-      background-color: #f5f7fa;
-      color: #cc2323;
+      background-color: #c3c9d740;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 14px;
     }
   }
 }

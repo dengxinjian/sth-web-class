@@ -1,124 +1,142 @@
 <template>
   <div>
-  <el-dialog
-    :visible.sync="innerVisible"
-    :width="getDialogWidth()"
-    append-to-body
-    :before-close="onCancel"
-    class="add-class-title-modal"
-    :close-on-click-modal="false">
-    <span slot="title">历史</span>
+    <el-dialog
+      :visible.sync="innerVisible"
+      :width="getDialogWidth()"
+      append-to-body
+      :before-close="onCancel"
+      class="add-class-title-modal"
+      :close-on-click-modal="false">
+      <span slot="title">历史</span>
 
-    <!-- 使用 el-tabs 切换：应用历史 / 分享历史 -->
-    <el-tabs v-model="activeTab" type="card" @tab-click="handleTabChange">
-      <el-tab-pane label="应用历史" name="apply" />
-      <el-tab-pane label="分享历史" name="share" />
-    </el-tabs>
+      <!-- 使用 el-tabs 切换：应用历史 / 分享历史 -->
+      <el-tabs v-model="activeTab" type="card"
+        @tab-click="handleTabChange">
+        <el-tab-pane label="应用历史" name="apply" />
+        <el-tab-pane label="分享历史" name="share" />
+      </el-tabs>
 
-    <!-- 应用历史 -->
-    <el-table v-if="activeTab === 'apply' && loginType === '2'" :data="tableData" border
-      style="width: 100%; margin-top: 10px">
-      <!-- 应用维度：1=团队，2=俱乐部 -->
-      <el-table-column prop="applyDimension" label="应用维度" width="120"
-        align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.applyDimension === '1' ? '团队' : '俱乐部' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="teamName" label="名称" width="180"
-        align="center" />
-      <el-table-column prop="applyNickname" label="昵称" width="180"
-        align="center" />
-      <el-table-column prop="applyTimeRange" label="应用时间" width="260"
-        align="center" />
-      <el-table-column prop="applyStatusDesc" label="应用状态" width="120"
-        align="center">
-        <template slot-scope="scope">
-          <span :class="getStatusClass(scope.row.applyStatus)">
-            {{ scope.row.applyStatusDesc }}
-          </span>
-        </template>
-      </el-table-column>
-      <!-- 操作 -->
-      <el-table-column label="操作" width="120" align="center">
-        <template slot-scope="scope">
-          <!-- 同步 取消 -->
-          <el-button type="text" size="small"
-            @click="syncApply(scope.row)"
-            v-if="scope.row.applyStatus === 1">同步</el-button>
-          <el-button
-            type="text"
-            size="small"
-            class="history-cancel-btn"
-            @click="cancelApply(scope.row)"
-            v-if="scope.row.applyStatus === 0 || scope.row.applyStatus === 1">取消</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-table v-else-if="activeTab === 'apply'" :data="tableData" style="width: 100%; margin-top: 10px">
-      <el-table-column prop="applyNickname" label="昵称"
-        align="center" />
-      <el-table-column prop="applyTimeRange" label="应用时间"
-        align="center" />
-      <el-table-column prop="applyStatusDesc" label="应用状态" width="120"
-        align="center">
-        <template slot-scope="scope">
-          <span :class="getStatusClass(scope.row.applyStatus)">
-            {{ scope.row.applyStatusDesc }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="120" align="center">
-        <template slot-scope="scope">
-          <!-- 同步 取消 -->
-          <el-button type="text" size="small"
-            @click="syncApply(scope.row)"
-            v-if="scope.row.applyStatus === 1">同步</el-button>
-          <el-button
-            type="text"
-            size="small"
-            class="history-cancel-btn"
-            @click="cancelApply(scope.row)"
-            v-if="scope.row.applyStatus === 0 || scope.row.applyStatus === 1">取消</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+      <!-- 应用历史 -->
+      <div v-if="activeTab === 'apply'"
+        style="margin-top: 10px; margin-bottom: 8px;">
+        <el-button
+          type="primary"
+          size="small"
+          :disabled="!syncSelection.length"
+          @click="batchSyncApply">批量同步</el-button>
+      </div>
+      <el-table
+        v-if="activeTab === 'apply' && loginType === '2'"
+        ref="applyTableA"
+        :data="tableData"
+        border
+        style="width: 100%; margin-top: 0"
+        @selection-change="handleApplySelectionChange">
+        <el-table-column type="selection" width="55" align="center"
+          :selectable="(row) => row.applyStatus === 1" />
+        <!-- 应用维度：1=团队，2=俱乐部 -->
+        <el-table-column prop="applyDimension" label="应用维度"
+          width="120"
+          align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.applyDimension === '1' ? '团队' : '俱乐部' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="teamName" label="名称" width="180"
+          align="center" />
+        <el-table-column prop="applyNickname" label="昵称" width="180"
+          align="center" />
+        <el-table-column prop="applyTimeRange" label="应用时间"
+          width="260"
+          align="center" />
+        <el-table-column prop="applyStatusDesc" label="应用状态"
+          width="120"
+          align="center">
+          <template slot-scope="scope">
+            <span :class="getStatusClass(scope.row.applyStatus)">
+              {{ scope.row.applyStatusDesc }}
+            </span>
+          </template>
+        </el-table-column>
+        <!-- 操作 -->
+        <el-table-column label="操作" width="120" align="center">
+          <template slot-scope="scope">
+            <!-- 同步 取消 -->
+            <el-button type="text" size="small"
+              @click="syncApply(scope.row)"
+              v-if="scope.row.applyStatus === 1">同步</el-button>
+            <el-button
+              type="text"
+              size="small"
+              class="history-cancel-btn"
+              @click="cancelApply(scope.row)"
+              v-if="scope.row.applyStatus === 0 || scope.row.applyStatus === 1">取消</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-else-if="activeTab === 'apply'" ref="applyTableB"
+        :data="tableData" style="width: 100%; margin-top: 0"
+        @selection-change="handleApplySelectionChange">
+        <el-table-column type="selection" width="55" align="center"
+          :selectable="(row) => row.applyStatus === 1" />
+        <el-table-column prop="applyNickname" label="昵称"
+          align="center" />
+        <el-table-column prop="applyTimeRange" label="应用时间"
+          align="center" />
+        <el-table-column prop="applyStatusDesc" label="应用状态"
+          width="120"
+          align="center">
+          <template slot-scope="scope">
+            <span :class="getStatusClass(scope.row.applyStatus)">
+              {{ scope.row.applyStatusDesc }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="120" align="center">
+          <template slot-scope="scope">
+            <!-- 同步 取消 -->
+            <el-button type="text" size="small"
+              @click="syncApply(scope.row)"
+              v-if="scope.row.applyStatus === 1">同步</el-button>
+            <el-button
+              type="text"
+              size="small"
+              class="history-cancel-btn"
+              @click="cancelApply(scope.row)"
+              v-if="scope.row.applyStatus === 0 || scope.row.applyStatus === 1">取消</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <!-- 分享历史 -->
-    <el-table
-      v-if="activeTab === 'share'"
-      :data="shareTableData"
-      border
-      style="width: 100%; margin-top: 10px"
-    >
-      <el-table-column
-        prop="shareToName"
-        label="分享团队名称"
-        align="center"
-      />
-      <el-table-column
-        prop="shareTime"
-        label="分享时间"
-        width="180"
-        align="center"
-      />
-      <el-table-column
-        prop="permissionDesc"
-        label="权限"
-        width="120"
-        align="center"
-      />
-      <el-table-column label="操作" width="120" align="center">
-        <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="small"
-            @click="handleAdjustPermission(scope.row)"
-          >权限调整</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!-- <el-pagination
+      <!-- 分享历史（无多选，仅展示 + 权限调整） -->
+      <el-table
+        v-if="activeTab === 'share'"
+        key="share-history-table"
+        :data="shareTableData"
+        border
+        style="width: 100%; margin-top: 10px"
+      >
+        <el-table-column prop="shareTeamName" label="分享团队名称"
+          align="center" min-width="140" />
+        <el-table-column prop="shareTime" label="分享时间" width="180"
+          align="center" />
+        <el-table-column prop="permissionDesc" label="权限" width="120"
+          align="center">
+          <template slot-scope="scope">
+            <span
+              style="color: #e5423c;">{{ scope.row.permissionDesc }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              size="small"
+              @click="handleAdjustPermission(scope.row)">权限调整</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="pagination.page"
@@ -128,60 +146,59 @@
       :total="total"
       style="margin-top: 20px; text-align: right"
     /> -->
-    <!-- 应用历史分页 -->
-    <el-pagination v-if="activeTab === 'apply' && (loginType === '2' || total > 10)"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="pagination.page" :page-sizes="[10, 20, 50, 100]"
-      :page-size="pagination.limit"
-      layout="total, sizes, prev, pager, next, jumper" :total="total"
-      style="margin-top: 20px; text-align: right;margin-bottom: 20px;" />
+      <!-- 应用历史分页 -->
+      <el-pagination
+        v-if="activeTab === 'apply' && (loginType === '2' && total > 10)"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagination.page"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="pagination.limit"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        style="margin-top: 20px; text-align: right;margin-bottom: 20px;" />
 
-    <!-- 分享历史分页 -->
-    <el-pagination
-      v-if="activeTab === 'share' && shareTotal > sharePagination.limit"
-      @size-change="handleShareSizeChange"
-      @current-change="handleShareCurrentChange"
-      :current-page="sharePagination.page"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="sharePagination.limit"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="shareTotal"
-      style="margin-top: 20px; text-align: right;margin-bottom: 20px;"
-    />
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel">关闭</el-button>
-    </span>
-  </el-dialog>
+      <!-- 分享历史分页 -->
+      <el-pagination
+        v-if="activeTab === 'share' && shareTotal > sharePagination.limit"
+        @size-change="handleShareSizeChange"
+        @current-change="handleShareCurrentChange"
+        :current-page="sharePagination.page"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="sharePagination.limit"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="shareTotal"
+        style="margin-top: 20px; text-align: right;margin-bottom: 20px;" />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="onCancel">关闭</el-button>
+      </span>
+    </el-dialog>
 
-  <!-- 权限调整弹框 -->
-  <el-dialog
-    title="权限调整"
-    :visible.sync="permissionDialogVisible"
-    width="420px"
-    append-to-body
-    class="permission-adjust-modal"
-    @close="closePermissionDialog"
-  >
-    <el-form ref="permissionFormRef" :model="permissionForm" label-width="80px">
-      <el-form-item label="撤回:" required>
-        <el-radio-group v-model="permissionForm.revoke">
-          <el-radio :label="true">是</el-radio>
-          <el-radio :label="false">否</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="权限:" required>
-        <el-radio-group v-model="permissionForm.shareToAuth">
-          <el-radio :label="1">查看</el-radio>
-          <el-radio :label="2">编辑</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    </el-form>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="closePermissionDialog">取消</el-button>
-      <el-button type="primary" @click="confirmPermissionAdjust">确定</el-button>
-    </span>
-  </el-dialog>
+    <!-- 权限调整弹框 -->
+    <el-dialog title="权限调整" :visible.sync="permissionDialogVisible"
+      width="420px" append-to-body class="permission-adjust-modal"
+      @close="closePermissionDialog">
+      <el-form ref="permissionFormRef" :model="permissionForm"
+        label-width="80px">
+        <el-form-item label="撤回:" required>
+          <el-radio-group v-model="permissionForm.revoke">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="权限:" required>
+          <el-radio-group v-model="permissionForm.shareToAuth">
+            <el-radio :label="1">查看</el-radio>
+            <el-radio :label="2">编辑</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closePermissionDialog">取消</el-button>
+        <el-button type="primary"
+          @click="confirmPermissionAdjust">确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -221,6 +238,8 @@ export default {
       currentShareRow: null,
       loginType: localStorage.getItem("loginType") || "1",
       timer: null,
+      // 应用历史多选，仅 applyStatus === 1 可勾选
+      syncSelection: [],
     }
   },
   watch: {
@@ -281,6 +300,9 @@ export default {
       if (name === "apply") {
         this.getApplyHistory()
       } else if (name === "share") {
+        this.syncSelection = []
+        if (this.$refs.applyTableA) this.$refs.applyTableA.clearSelection()
+        if (this.$refs.applyTableB) this.$refs.applyTableB.clearSelection()
         this.getShareHistory()
       }
     },
@@ -376,6 +398,7 @@ export default {
         limit: 10,
       }
       this.tableData = []
+      this.syncSelection = []
       this.total = 0
       this.$nextTick(() => {
         if (this.$refs.formRef) {
@@ -390,6 +413,7 @@ export default {
       this.tableData = []
       this.total = 0
       this.pagination = { page: 1, limit: 10 }
+      this.syncSelection = []
       this.shareTableData = []
       this.shareTotal = 0
       this.sharePagination = { page: 1, limit: 10 }
@@ -407,6 +431,46 @@ export default {
       // 当前页改变
       this.pagination.page = val
       this.getApplyHistory()
+    },
+    handleApplySelectionChange(selection) {
+      this.syncSelection = selection
+    },
+    // 批量同步选中的记录（仅 applyStatus === 1 的会被勾选）
+    async batchSyncApply() {
+      if (!this.syncSelection || this.syncSelection.length === 0) {
+        this.$message.warning("请先勾选要同步的记录")
+        return
+      }
+      try {
+        await this.$confirm(
+          `确认对选中的 ${this.syncSelection.length} 条记录批量同步到设备？`,
+          "提示",
+          {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          }
+        )
+      } catch (e) {
+        return
+      }
+      try {
+        const res = await submitData({
+          url: "/gateway/training/planClasses/resyncClassSchedulesByHistoryIds",
+          historyIds: this.syncSelection.map(row => row.id),
+        })
+        if (res && res.success) {
+          this.getApplyHistory()
+          this.syncSelection = []
+          if (this.$refs.applyTableA) this.$refs.applyTableA.clearSelection()
+          if (this.$refs.applyTableB) this.$refs.applyTableB.clearSelection()
+          this.$message.success(res?.result || "同步成功")
+        } else {
+          this.$message.error(res?.message || "同步失败，请稍后重试")
+        }
+      } catch (err) {
+        // this.$message.error(err?.result || "同步失败，请稍后重试")
+      }
     },
     // 同步：根据历史记录ID重新同步课表到设备
     async syncApply(row) {
@@ -435,14 +499,13 @@ export default {
           historyId: row.id,
         })
         if (res && res.success) {
-          this.$message.success("已发起重新同步，请稍后在设备上查看")
+          this.$message.success(res?.result || "已发起重新同步，请稍后在设备上查看")
           this.getApplyHistory()
         } else {
           this.$message.error(res?.message || "同步失败，请稍后重试")
         }
       } catch (err) {
         console.error("同步失败:", err)
-        this.$message.error("同步失败，请稍后重试")
       }
     },
     // 取消：根据历史记录ID取消应用计划
@@ -468,14 +531,14 @@ export default {
           historyId: row.id,
         })
         if (res && res.success) {
-          this.$message.success("取消成功")
+          this.$message.success(res?.result || "取消成功")
           this.getApplyHistory()
         } else {
           this.$message.error(res?.message || "取消失败，请稍后重试")
         }
       } catch (err) {
         console.error("取消失败:", err)
-        this.$message.error("取消失败，请稍后重试")
+        // this.$message.error("取消失败，请稍后重试")
       }
     },
     // 分享历史：查询 /gateway/training/planClasses 分享记录（示例：/api/share/query）
