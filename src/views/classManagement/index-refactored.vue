@@ -2125,6 +2125,8 @@ export default {
       console.log(flag, "flag")
       if (this.activeClassType === "team") {
         classData.id = this.classModalData.sourceClassId
+        delete classData.classesGroupId
+        delete classData.classesGroupName
       }
       classApi.updateClass(classData).then((res) => {
         if (res.success) {

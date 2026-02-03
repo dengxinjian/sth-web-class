@@ -159,8 +159,8 @@
                 <span class="day-range-input-text">
                   {{
                     form.applyRange === 1 &&
-                    form.applyStartDay &&
-                    form.applyEndDay
+                      form.applyStartDay &&
+                      form.applyEndDay
                       ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
                       : "选择天数"
                   }}
@@ -407,8 +407,8 @@
                 <span class="day-range-input-text">
                   {{
                     form.applyRange === 1 &&
-                    form.applyStartDay &&
-                    form.applyEndDay
+                      form.applyStartDay &&
+                      form.applyEndDay
                       ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
                       : "选择天数"
                   }}
@@ -970,8 +970,8 @@ export default {
               applyRange: _this.form.applyRange,
               applyDays:
                 _this.form.applyRange === 1 &&
-                _this.form.applyStartDay &&
-                _this.form.applyEndDay
+                  _this.form.applyStartDay &&
+                  _this.form.applyEndDay
                   ? _this.buildApplyDays(
                     _this.form.applyStartDay,
                     _this.form.applyEndDay
@@ -1017,6 +1017,12 @@ export default {
               triUserId: _this.triUserId,
               applyDate: _this.form.applyDate,
               applyMode: _this.form.applyMode,
+              applyRange: _this.form.applyRange,
+              applyDays:
+                _this.form.applyRange === 1
+                  ? _this.buildApplyDays(_this.form.applyStartDay, _this.form.applyEndDay)
+                  : [],
+              syncFlag: _this.form.syncFlag,
             },
           ]
         }

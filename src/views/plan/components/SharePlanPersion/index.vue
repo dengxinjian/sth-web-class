@@ -14,7 +14,7 @@
           <el-radio :label="false">否</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="权限:" required>
+      <el-form-item label="权限:" required v-if="!form.revoke">
         <el-radio-group v-model="form.shareToAuth">
           <el-radio :label="1">查看</el-radio>
           <el-radio :label="2">编辑</el-radio>

@@ -2,8 +2,8 @@
  * 辅助工具函数
  */
 
-import { SPORT_TYPE_ICONS, COMPLETION_COLORS, SPORT_TYPE_NAMES } from "../constants";
-import { getLunar } from "chinese-lunar-calendar";
+import { SPORT_TYPE_ICONS, COMPLETION_COLORS, SPORT_TYPE_NAMES } from "../constants"
+import { getLunar } from "chinese-lunar-calendar"
 
 /**
  * 获取运动类型图标
@@ -11,7 +11,7 @@ import { getLunar } from "chinese-lunar-calendar";
  * @returns {String} 图标路径
  */
 export function getSportImageIcon(sportType) {
-  return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+  return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
 }
 
 /**
@@ -26,9 +26,9 @@ export function getClassImageIcon(sportType) {
     3: "SWIM",
     4: "STRENGTH",
     5: "OTHER",
-  };
-  const type = typeof sportType === "number" ? typeMap[sportType] : sportType;
-  return SPORT_TYPE_ICONS[type] || SPORT_TYPE_ICONS.OTHER;
+  }
+  const type = typeof sportType === "number" ? typeMap[sportType] : sportType
+  return SPORT_TYPE_ICONS[type] || SPORT_TYPE_ICONS.OTHER
 }
 
 /**
@@ -43,9 +43,9 @@ export function getSportTypeName(sportType) {
     3: "SWIM",
     4: "STRENGTH",
     5: "OTHER",
-  };
-  const type = typeof sportType === "number" ? typeMap[sportType] : sportType;
-  return SPORT_TYPE_NAMES[type] || SPORT_TYPE_NAMES.OTHER;
+  }
+  const type = typeof sportType === "number" ? typeMap[sportType] : sportType
+  return SPORT_TYPE_NAMES[type] || SPORT_TYPE_NAMES.OTHER
 }
 
 /**
@@ -73,9 +73,9 @@ export function getClassIconArrowColor(sportType) {
     SWIM: "#35A9E0",
     STRENGTH: "#B4B4B5",
     OTHER: "#B4B4B5",
-  };
+  }
 
-  return colorMap[sportType] || "#B4B4B5";
+  return colorMap[sportType] || "#B4B4B5"
 }
 
 /**
@@ -84,17 +84,17 @@ export function getClassIconArrowColor(sportType) {
  * @returns {Array} [backgroundColor, textColor]
  */
 export function getSportBackgroundColor(percent) {
-  if (!percent) return ["#C3C9D7", "#333"];
+  if (!percent) return ["#C3C9D7", "#333"]
 
   if (percent > 80 && percent <= 120) {
-    return ["#00B06D", "#fff"]; // 绿色 - 完成良好
+    return ["#00B06D", "#fff"] // 绿色 - 完成良好
   } else if (
     (percent > 120 && percent <= 145) ||
     (percent <= 80 && percent > 60)
   ) {
-    return ["#F66700", "#333"]; // 浅橙色 - 完成不足
+    return ["#FFD860", "#fff"] // 黄色 - 偏离计划
   } else if ((percent > 0 && percent <= 60) || percent > 145) {
-    return ["#FFD860", "#fff"]; // 黄色 - 偏离计划
+    return ["#F66700", "#333"] // 浅橙色 - 完成不足
   }
 }
 
@@ -104,14 +104,14 @@ export function getSportBackgroundColor(percent) {
  * @returns {String} 完成度标识
  */
 export function getCompletionStatus(percent) {
-  if (!percent) return "";
+  if (!percent) return ""
 
   if (percent >= 80 && percent <= 120) {
-    return COMPLETION_COLORS.GREEN;
+    return COMPLETION_COLORS.GREEN
   } else if (percent < 60) {
-    return COMPLETION_COLORS.SHALLOW_ORANGE;
+    return COMPLETION_COLORS.SHALLOW_ORANGE
   } else {
-    return COMPLETION_COLORS.DEEP_ORANGE;
+    return COMPLETION_COLORS.DEEP_ORANGE
   }
 }
 
@@ -128,8 +128,8 @@ export function isToday(date) {
       month: "2-digit",
       day: "2-digit",
     })
-    .replace(/\//g, "-");
-  return date === today;
+    .replace(/\//g, "-")
+  return date === today
 }
 
 /**
@@ -139,10 +139,10 @@ export function isToday(date) {
  * @returns {String} 截断后的文本
  */
 export function truncateByLines(text, maxLines = 3) {
-  if (!text) return "";
-  const lines = text.split("\n");
-  if (lines.length <= maxLines) return text;
-  return lines.slice(0, maxLines).join("\n") + "...";
+  if (!text) return ""
+  const lines = text.split("\n")
+  if (lines.length <= maxLines) return text
+  return lines.slice(0, maxLines).join("\n") + "..."
 }
 
 /**
@@ -151,11 +151,11 @@ export function truncateByLines(text, maxLines = 3) {
  * @returns {String}
  */
 export function formatDate(date) {
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  const d = new Date(date)
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
 }
 
 /**
@@ -171,8 +171,8 @@ export function getDeviceBrandIcon(deviceType) {
     4: require("@/assets/addClass/device-zepp.png"),
     5: require("@/assets/addClass/device-suunto.png"),
     6: require("@/assets/addClass/device-suunto.png"),
-  };
-  return iconMap[deviceType] || "";
+  }
+  return iconMap[deviceType] || ""
 }
 
 /**
@@ -181,8 +181,8 @@ export function getDeviceBrandIcon(deviceType) {
  * @returns {Boolean}
  */
 export function isExpired(date) {
-  const today = new Date().toISOString().split("T")[0];
-  return date < today;
+  const today = new Date().toISOString().split("T")[0]
+  return date < today
 }
 
 /**
@@ -192,10 +192,10 @@ export function isExpired(date) {
  */
 export function parseClassesJson(jsonString) {
   try {
-    return typeof jsonString === "string" ? JSON.parse(jsonString) : jsonString;
+    return typeof jsonString === "string" ? JSON.parse(jsonString) : jsonString
   } catch (e) {
-    console.error("解析课程JSON失败:", e);
-    return {};
+    console.error("解析课程JSON失败:", e)
+    return {}
   }
 }
 
@@ -212,8 +212,8 @@ export function isSportTypeMatch(classType, activityType) {
     3: "SWIM",
     4: "STRENGTH",
     5: "OTHER",
-  };
-  return classType === activityTypeMap[activityType];
+  }
+  return classType === activityTypeMap[activityType]
 }
 
 /**
@@ -225,7 +225,7 @@ export function generateSortData(items) {
   return items.map((item, index) => ({
     id: item.id,
     sort: index,
-  }));
+  }))
 }
 
 /**
@@ -238,6 +238,6 @@ export function convertToLunar(date) {
     new Date(date).getFullYear(),
     new Date(date).getMonth() + 1,
     new Date(date).getDate()
-  );
-  return lunarDate;
+  )
+  return lunarDate
 }
