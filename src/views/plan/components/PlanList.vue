@@ -95,10 +95,10 @@
                 popper-class="hover-plan-detail-popover">
                 <!-- <span slot="reference" @click.stop>{{ classItem.planTitle }}</span> -->
                 <span slot="reference">
-                      <div style="width: 100%; cursor: pointer">
-                        {{ classItem.planTitle }}
-                      </div>
-                      <div style="
+                  <div style="width: 100%; cursor: pointer">
+                    {{ classItem.planTitle }}
+                  </div>
+                  <div style="
                       width: 100%;
                       cursor: pointer;
                       display: flex;
@@ -106,17 +106,18 @@
                       align-items: center;
                       gap: 5px;
                     ">
-                        <el-rate v-model="classItem.level" :allow-half="true" disabled
-                          :colors="['#F92B30', '#F92B30', '#F92B30']" text-color="#999999"
-                          disabled-void-color="#E1E4EC"></el-rate>
-                        <span style="font-size: 10px; color: #979fb0">{{
-                          classItem.level ? "" : "未评分"
-                        }}</span>
-                        <span style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px;">{{
-                          classItem.isShare ? "已分享" : ""
-                        }}</span>
-                      </div>
-                    </span>
+                    <el-rate v-model="classItem.level" :allow-half="true" disabled
+                      :colors="['#F92B30', '#F92B30', '#F92B30']" text-color="#999999"
+                      disabled-void-color="#E1E4EC"></el-rate>
+                    <span style="font-size: 10px; color: #979fb0">{{
+                      classItem.level ? "" : "未评分"
+                    }}</span>
+                    <span
+                      style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px;">{{
+                        classItem.isShare ? "已分享" : ""
+                      }}</span>
+                  </div>
+                </span>
                 <HoverPlanDetail :planInfo="classItem" @move="handleMovePlan"></HoverPlanDetail>
               </el-popover>
             </div>
@@ -379,6 +380,12 @@ export default {
     },
     // 点击团队分组
     handleShareTeamClick(id) {
+      const isSameTeam = String(this.currentShareTeamId) === String(id)
+      if (isSameTeam) {
+        this.currentShareTeamId = '';
+        this.currentShareGroupList = [];
+        return;
+      }
       this.currentShareTeamId = id;
       if (id) {
         this.getTeamPlanGroupList(id);
