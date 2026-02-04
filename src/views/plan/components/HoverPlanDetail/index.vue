@@ -1102,31 +1102,49 @@ export default {
     // 计算周力量时长总和
     getweekPowerDuration() {
       const week = this.planClasses.flat()
-      if (!week || !Array.isArray(week)) {
+      if (!week || !Array.isArray(week) || week.length === 0) {
         return 0
       }
+
+      // 解析 classesJson（可能是字符串）
+      const parseClassesJson = (classesJson) => {
+        if (typeof classesJson === "string") {
+          try {
+            return JSON.parse(classesJson)
+          } catch (error) {
+            console.error("解析 classesJson 失败:", error)
+            return null
+          }
+        }
+        return classesJson
+      }
+
+      const isValidDuration = (duration) => {
+        return duration && duration !== "00:00:00" && duration !== "--:--:--"
+      }
+
+      const calculateClassDuration = (classItem) => {
+        if (!classItem || classItem.sportType !== "STRENGTH") {
+          return 0
+        }
+        const classesJson = parseClassesJson(classItem.classesJson)
+        if (!classesJson || !isValidDuration(classesJson.duration)) {
+          return 0
+        }
+        return hhmmssToSeconds(classesJson.duration)
+      }
+
       const durationTotal = week.reduce((acc, item) => {
-        if (!item || !item.details || !Array.isArray(item.details)) {
+        if (!item?.details || !Array.isArray(item.details)) {
           return acc
         }
-        return (
-          acc +
-          item.details.reduce((classAcc, classItem) => {
-            if (!classItem) {
-              return classAcc
-            }
-            if (
-              !classItem.classesJson.duration ||
-              classItem.classesJson.duration === "00:00:00" ||
-              classItem.classesJson.duration === "--:--:--" ||
-              classItem.sportType !== "STRENGTH"
-            ) {
-              return classAcc
-            }
-            return classAcc + hhmmssToSeconds(classItem.classesJson.duration)
-          }, 0)
+        const itemDuration = item.details.reduce(
+          (classAcc, classItem) => classAcc + calculateClassDuration(classItem),
+          0
         )
+        return acc + itemDuration
       }, 0)
+
       return durationTotal / this.weekNumber || 0
     },
     // 计算周其他时长总和
