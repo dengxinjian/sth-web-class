@@ -118,7 +118,7 @@
                         <div v-if="item.type === 'member'"
                           class="athletic-menu-item">
                           <img v-if="item.raw && item.raw.userAvatar"
-                            :src="item.raw.userAvatar"
+                            :src="!item.raw.userAvatar || item.raw.userAvatar.includes('wxfile') ? require('@/assets/logo-sth.png') : item.raw.userAvatar"
                             class="athletic-menu-avatar" alt="" />
                           <span>{{ item.label }}</span>
                         </div>
@@ -637,6 +637,11 @@ export default {
       const athletic = this.athleticList.find(
         (item) => item.triUserId === this.selectedAthletic
       )
+      console.log('=====获取运动员头像', athletic.userAvatar,athletic && athletic.userAvatar && athletic.userAvatar.includes('wxfile'))
+      if (athletic && athletic.userAvatar && athletic.userAvatar.includes('wxfile')) {
+        console.log('=====获取运动员头像', athletic.userAvatar)
+        return require('@/assets/logo-sth.png')
+      }
       return athletic && athletic.userAvatar ? athletic.userAvatar : require('@/assets/logo-sth.png')
     },
   },

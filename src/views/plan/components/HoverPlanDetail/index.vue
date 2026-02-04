@@ -17,6 +17,10 @@
           style="width: 16px; height: 16px" />
       </el-popover>
     </div>
+    <div class="detail-row-box" v-if="planDetail.isShare">
+      <div class="detail-row-title">分享人</div>
+      <div class="detail-row-content">{{ planDetail.possessNickname }}</div>
+    </div>
     <div class="detail-row-box">
       <div class="detail-row-title">计划名称</div>
       <div class="detail-row-content">{{ planDetail.planTitle }}</div>

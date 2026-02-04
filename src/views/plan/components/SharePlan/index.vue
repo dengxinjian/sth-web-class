@@ -16,7 +16,7 @@
       label-width="130px"
       size="small"
     >
-      <el-form-item label="团队选择" prop="teamId">
+      <el-form-item label="团队选择" prop="teamId" class="share-team-select">
         <!-- <el-input
           v-model="form.planTitle"
           maxlength="20"
@@ -30,7 +30,6 @@
           filterable
           clearable
           multiple
-          collapse-tags
           style="width: 100%"
           @change="handleTeamChange"
         >
@@ -44,6 +43,7 @@
       </el-form-item>
 
       <el-form-item
+        class="share-team-item"
         :label="`${item.teamName}`"
         v-for="item in selectedTeams"
         :key="item.shareToId"
@@ -150,22 +150,23 @@ export default {
       console.log(this.teams, "this.teams");
     },
     handleTeamChange(val) {
-      const newList = this.teams
-        .filter((item) => val.includes(item.id))
+      // 依當前選中的 teamId 同步下方列表：保留權限設定，只顯示 val 中的團隊
+      const idSet = new Set(val || []);
+      this.selectedTeams = this.selectedTeams
+        .filter((item) => idSet.has(item.shareToId))
+        .map((item) => ({
+          ...item,
+          shareToAuth: item.shareToAuth ?? 1,
+        }));
+      const existingIds = new Set(this.selectedTeams.map((t) => t.shareToId));
+      const toAdd = this.teams
+        .filter((t) => idSet.has(t.id) && !existingIds.has(t.id))
         .map((item) => ({
           shareToId: item.id,
           teamName: item.teamName,
           shareToAuth: item.shareToAuth || 1,
         }));
-      this.selectedTeams = [...this.selectedTeams, ...newList].reduce(
-        (acc, item) => {
-          if (!acc.find((el) => el.shareToId === item.shareToId)) {
-            acc.push(item);
-          }
-          return acc;
-        },
-        []
-      );
+      this.selectedTeams = [...this.selectedTeams, ...toAdd];
     },
     handleClose(val) {
       this.selectedTeams = this.selectedTeams.filter(
@@ -246,5 +247,24 @@ export default {
   display: flex;
   align-items: center;
   margin-top: 4px;
+}
+
+/* 分享團隊名稱不換行，過長以省略號顯示 */
+.add-class-title-modal .share-team-item ::v-deep(.el-form-item__label) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 團隊選擇下拉框內標籤不換行 */
+.add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag) {
+  max-width: 100%;
+}
+.add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag .el-select__tags-text) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
 }
 </style>

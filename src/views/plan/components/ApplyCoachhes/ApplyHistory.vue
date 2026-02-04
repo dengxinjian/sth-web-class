@@ -39,7 +39,7 @@
           width="120"
           align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.applyDimension === '1' ? '团队' : '俱乐部' }}</span>
+            <span>{{ scope.row.applyDimension === 1 ? '团队' : '俱乐部' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="teamName" label="名称" width="180"
@@ -124,7 +124,7 @@
           align="center">
           <template slot-scope="scope">
             <span
-              style="color: #e5423c;">{{ scope.row.permissionDesc }}</span>
+              :style="{ color: scope.row.shareToAuth === 0 ? '' : '#e5423c' }">{{ scope.row.permissionDesc }} </span>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="120" align="center">
@@ -132,6 +132,7 @@
             <el-button
               type="text"
               size="small"
+              v-if="scope.row.shareUserId === triUserId && scope.row.shareToAuth !== 0"
               @click="handleAdjustPermission(scope.row)">权限调整</el-button>
           </template>
         </el-table-column>
@@ -186,7 +187,7 @@
             <el-radio :label="false">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="权限:" required>
+        <el-form-item label="权限:" required v-if="!permissionForm.revoke">
           <el-radio-group v-model="permissionForm.shareToAuth">
             <el-radio :label="1">查看</el-radio>
             <el-radio :label="2">编辑</el-radio>
@@ -240,6 +241,7 @@ export default {
       timer: null,
       // 应用历史多选，仅 applyStatus === 1 可勾选
       syncSelection: [],
+      triUserId: localStorage.getItem("triUserId"),
     }
   },
   watch: {

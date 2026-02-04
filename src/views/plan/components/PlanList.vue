@@ -112,7 +112,7 @@
                     <span style="font-size: 10px; color: #979fb0">{{
                       classItem.level ? "" : "未评分"
                     }}</span>
-                    <span
+                    <span v-if="classItem.isShare"
                       style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px;">{{
                         classItem.isShare ? "已分享" : ""
                       }}</span>
