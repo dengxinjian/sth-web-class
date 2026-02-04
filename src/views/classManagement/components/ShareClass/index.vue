@@ -33,12 +33,13 @@
           <el-option
             v-for="item in teams"
             :key="item.id"
-            :label="item.teamName"
+            :label="item.name"
             :value="item.id"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item
+        class="share-team-item"
         :label="`${item.teamName}`"
         v-for="item in selectedTeams"
         :key="item.shareToId">
@@ -65,7 +66,7 @@
 
 <script>
 import { getData, submitData } from "@/api/common.js"
-import { teamApi } from "../../services/classManagement"
+import { teamApi } from "../../../plan/services/planManagement"
 
 export default {
   name: "SummaryPreview",
@@ -130,26 +131,23 @@ export default {
   methods: {
     async getTeamList() {
       if (localStorage.getItem("loginType") === "2") {
-        const myTeam = await teamApi.getMyTeam()
-        const allTeamList = await teamApi.getAllTeams()
-        this.teams = [myTeam.result, ...allTeamList.result].reduce(
-          (acc, team) => {
-            if (team && team.id && !acc.find((t) => t.id === team.id)) {
-              acc.push(team)
-            }
-            return acc
-          },
-          []
-        )
+        const res = await teamApi.getCoachTeams({
+          triUserId: localStorage.getItem("triUserId"),
+          filterType: 1,
+          filterDataId: this.classId,
+          filterDataType: 1,
+        })
+        this.teams = res.result
       } else {
-        const myJoinedTeams = await teamApi.getMyJoinedTeams(this.triUserId)
-        this.teams = [{
-          ...myJoinedTeams.result,
-          teamName: myJoinedTeams.result.name,
-
-        }]
-        console.log(this.teams, "this.teams")
+        const res = await teamApi.getAthleteTeams({
+          triUserId: localStorage.getItem("triUserId"),
+          filterType: 1,
+          filterDataId: this.classId,
+          filterDataType: 1,
+        })
+        this.teams = res.result
       }
+      console.log(this.teams, "this.teams")
     },
     handleTeamChange(val) {
       // 與選中項聯動：下方列表 = 當前選中的團隊，取消勾選時同步移除
@@ -161,7 +159,7 @@ export default {
         .filter((item) => idList.includes(item.id))
         .map((item) => ({
           shareToId: item.id,
-          teamName: item.teamName,
+          teamName: item.name,
           shareToAuth: existingMap.has(item.id) ? existingMap.get(item.id) : 1,
         }))
     },
@@ -220,7 +218,6 @@ export default {
   },
 }
 </script>
-
 <style scoped>
 .add-class-title-modal ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
@@ -243,10 +240,32 @@ export default {
   font-size: 12px;
 }
 
-::v-deep(.el-form-item__content) {
+/* 僅針對下方團隊列使用 flex，避免影響上方多選刪除時的排版 */
+.add-class-title-modal .share-team-item ::v-deep(.el-form-item__content) {
   margin-left: 0;
   display: flex;
   align-items: center;
   margin-top: 4px;
 }
+
+/* 分享團隊名稱不換行，過長以省略號顯示 */
+.add-class-title-modal .share-team-item ::v-deep(.el-form-item__label) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 團隊選擇下拉框內標籤不換行 */
+.add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag) {
+  max-width: 100%;
+}
+
+.add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag .el-select__tags-text) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
+}
+
 </style>

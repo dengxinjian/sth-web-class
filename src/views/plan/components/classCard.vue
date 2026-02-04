@@ -77,25 +77,20 @@
             {{ formatDuration(classItem.classesJson.duration) }}
           </div>
 
-          <!-- 距离 -->
-          <div style="display: flex"
-            v-if="!isRestType(classItem.sportType)">
-            <div class="keyword">
-              {{
-                formatDistance(
-                  classItem.classesJson.distance,
-                  classItem.sportType,
-                  classItem.classesJson.distanceUnit
-                )
-              }}
-              <span
-                v-if="classItem.classesJson.distanceUnit && classItem.classesJson.distanceUnit !== 'km'">
-                {{ classItem.classesJson.distanceUnit }}
-              </span>
-              <span v-else>km</span>
-            </div>
-            <div>&nbsp;&nbsp;</div>
-          </div>
+           <!-- 距离 -->
+        <span class="keyword">
+          {{
+            formatDistance(
+              classItem.classesJson.distance,
+              classItem.sportType,
+              classItem.classesJson.distanceUnit
+            )
+          }}
+          <span v-if="classItem.sportType === 'SWIM'">
+            {{ classItem.classesJson.distanceUnit }}
+          </span>
+          <span v-else>km</span>
+        </span>
 
           <!-- STH -->
           <div
@@ -268,21 +263,25 @@ export default {
       return duration === "00:00:00" ? "--:--:--" : duration
     },
     formatDistance(distance, sportType, distanceUnit) {
-      console.log(distance, sportType, "distance, sportType")
-      let result = ""
+      let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "")
+        result = distance.replace("km", "");
       }
-      if (distance && Number(distance) > 0) {
-        result = distance
+      if (distance && typeof distance === "number" && distance > 0) {
+        result = distance;
       }
       if (!result || result === "0") {
-        result = "--"
+        result = "--";
       }
-      if (distanceUnit && distanceUnit !== "km" && sportType !== "SWIM" && result !== "--") {
-        result = (Number(result) / 1000).toFixed(2)
+      if (
+        distanceUnit &&
+        distanceUnit !== "km" &&
+        sportType !== "SWIM" &&
+        result !== "--"
+      ) {
+        result = (Number(result) / 1000).toFixed(2);
       }
-      return result
+      return result;
     },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单

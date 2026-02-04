@@ -5,8 +5,7 @@
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
-    :close-on-click-modal="false"
-  >
+    :close-on-click-modal="false">
     <span slot="title">计划分享</span>
 
     <el-form
@@ -14,9 +13,9 @@
       :model="form"
       :rules="rules"
       label-width="130px"
-      size="small"
-    >
-      <el-form-item label="团队选择" prop="teamId" class="share-team-select">
+      size="small">
+      <el-form-item label="团队选择" prop="teamId"
+        class="share-team-select">
         <!-- <el-input
           v-model="form.planTitle"
           maxlength="20"
@@ -31,14 +30,12 @@
           clearable
           multiple
           style="width: 100%"
-          @change="handleTeamChange"
-        >
+          @change="handleTeamChange">
           <el-option
             v-for="item in teams"
             :key="item.id"
-            :label="item.teamName"
-            :value="item.id"
-          ></el-option>
+            :label="item.name"
+            :value="item.id"></el-option>
         </el-select>
       </el-form-item>
 
@@ -46,22 +43,18 @@
         class="share-team-item"
         :label="`${item.teamName}`"
         v-for="item in selectedTeams"
-        :key="item.shareToId"
-      >
+        :key="item.shareToId">
         <el-radio-group v-model="item.shareToAuth">
           <el-radio
             :label="col.value"
             v-for="col in radioOptions"
-            :key="col.id"
-            >{{ col.label }}</el-radio
-          >
+            :key="col.id">{{ col.label }}</el-radio>
         </el-radio-group>
         <img
           src="~@/assets/plan/close.png"
           alt=""
           style="width: 24px; height: 24px; margin-left: 20px; cursor: pointer"
-          @click="handleClose(item)"
-        />
+          @click="handleClose(item)" />
       </el-form-item>
     </el-form>
 
@@ -73,8 +66,8 @@
 </template>
 
 <script>
-import { getData, submitData } from "@/api/common.js";
-import { teamApi } from "../../services/planManagement";
+import { getData, submitData } from "@/api/common.js"
+import { teamApi } from "../../services/planManagement"
 
 export default {
   name: "SummaryPreview",
@@ -102,27 +95,27 @@ export default {
         { label: "查看", value: 1 },
         { label: "编辑", value: 2 },
       ],
-    };
+    }
   },
   computed: {
     groupOptions() {
-      return Array.isArray(this.groups) ? this.groups : [];
+      return Array.isArray(this.groups) ? this.groups : []
     },
   },
   watch: {
     visible(val) {
-      this.innerVisible = val;
+      this.innerVisible = val
     },
     value(val) {
-      if (typeof val !== "undefined") this.innerVisible = val;
+      if (typeof val !== "undefined") this.innerVisible = val
     },
     innerVisible(val) {
-      this.$emit("update:visible", val);
-      this.$emit("input", val);
+      this.$emit("update:visible", val)
+      this.$emit("input", val)
       if (val) {
         // reset form when opening
-        this.resetForm();
-        this.getTeamList();
+        this.resetForm()
+        this.getTeamList()
       } else {
         // clear validation when closing
         this.$nextTick(
@@ -130,119 +123,143 @@ export default {
             this.$refs.formRef &&
             this.$refs.formRef.clearValidate &&
             this.$refs.formRef.clearValidate()
-        );
+        )
       }
     },
   },
   methods: {
     async getTeamList() {
-      const myTeam = await teamApi.getMyTeam();
-      const allTeamList = await teamApi.getAllTeamList();
-      this.teams = [myTeam.result, ...allTeamList.result].reduce(
-        (acc, team) => {
-          if (team && team.id && !acc.find((t) => t.id === team.id)) {
-            acc.push(team);
-          }
-          return acc;
-        },
-        []
-      );
-      console.log(this.teams, "this.teams");
+      // this.teams = await teamApi.getAllTeamList()
+      // const myTeam = await teamApi.getMyTeam()
+      // const allTeamList = await teamApi.getAllTeamList()
+      // this.teams = [myTeam.result, ...allTeamList.result].reduce(
+      //   (acc, team) => {
+      //     if (team && team.id && !acc.find((t) => t.id === team.id)) {
+      //       acc.push(team)
+      //     }
+      //     return acc
+      //   },
+      //   []
+      // )
+      if (localStorage.getItem("loginType") === "2") {
+        const res = await teamApi.getCoachTeams({
+          triUserId: localStorage.getItem("triUserId"),
+          filterType: 1,
+          filterDataId: this.planInfo.id,
+          filterDataType: 2,
+        })
+        this.teams = res.result
+        console.log(res, "res")
+      } else {
+        const res = await teamApi.getAthleteTeams({
+          triUserId: localStorage.getItem("triUserId"),
+          filterType: 1,
+          filterDataId: this.planInfo.id,
+          filterDataType: 2,
+        })
+        this.teams = res.result
+      }
+      console.log(this.teams, "this.teams")
     },
     handleTeamChange(val) {
       // 依當前選中的 teamId 同步下方列表：保留權限設定，只顯示 val 中的團隊
-      const idSet = new Set(val || []);
+      const idSet = new Set(val || [])
       this.selectedTeams = this.selectedTeams
         .filter((item) => idSet.has(item.shareToId))
         .map((item) => ({
           ...item,
           shareToAuth: item.shareToAuth ?? 1,
-        }));
-      const existingIds = new Set(this.selectedTeams.map((t) => t.shareToId));
+        }))
+      const existingIds = new Set(this.selectedTeams.map((t) => t.shareToId))
       const toAdd = this.teams
         .filter((t) => idSet.has(t.id) && !existingIds.has(t.id))
         .map((item) => ({
           shareToId: item.id,
-          teamName: item.teamName,
+          teamName: item.name,
           shareToAuth: item.shareToAuth || 1,
-        }));
-      this.selectedTeams = [...this.selectedTeams, ...toAdd];
+        }))
+      this.selectedTeams = [...this.selectedTeams, ...toAdd]
     },
     handleClose(val) {
       this.selectedTeams = this.selectedTeams.filter(
         (item) => item.shareToId !== val.shareToId
-      );
+      )
       this.form.teamId = this.form.teamId.filter(
         (item) => item !== val.shareToId
-      );
+      )
     },
     onCancel() {
-      this.innerVisible = false;
-      this.$emit("cancel");
+      this.innerVisible = false
+      this.$emit("cancel")
     },
     onConfirm() {
       this.$refs.formRef.validate((valid) => {
-        if (!valid) return;
-        const triUserId = localStorage.getItem("triUserId");
+        if (!valid) return
+        const triUserId = localStorage.getItem("triUserId")
         const shareTos = this.selectedTeams.map(item => ({
           shareToId: item.shareToId,
           shareToAuth: item.shareToAuth,
-        }));
+        }))
         const params = {
           requestUserId: triUserId,
           shareDataId: this.planInfo.id,
           shareDataType: 2,
           shareTos: shareTos,
           shareToType: 2,
-        };
+        }
         submitData({
           url: "/training/api/share/create",
           requestData: params,
         }).then((res) => {
           if (res.success) {
-            this.$message.success("分享成功");
-            this.innerVisible = false;
-            this.$emit("shareSuccess", res.result);
+            this.$message.success("分享成功")
+            this.innerVisible = false
+            this.$emit("shareSuccess", res.result)
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
-      });
+        })
+      })
     },
     resetForm() {
       this.form = {
         teamId: [],
-      };
-      this.selectedTeams = [];
+      }
+      this.selectedTeams = []
       this.$nextTick(() => {
         if (this.$refs.formRef) {
-          this.$refs.formRef.clearValidate();
+          this.$refs.formRef.clearValidate()
         }
-      });
+      })
     },
   },
-};
+}
 </script>
 
 <style scoped>
 .add-class-title-modal ::v-deep(.el-dialog__header) {
   padding: 16px 24px;
 }
+
 .add-class-title-modal ::v-deep(.el-dialog__body) {
   padding: 10px 24px 0 24px;
 }
+
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
 }
+
 .statistics-divider-wrapper {
   margin: 8px 0;
 }
+
 .statistics-divider-wrapper ::v-deep(.el-divider__text) {
   font-size: 12px;
 }
 
-::v-deep(.el-form-item__content) {
+/* 僅針對下方團隊列使用 flex，避免影響上方多選刪除時的排版 */
+.add-class-title-modal .share-team-item ::v-deep(.el-form-item__content) {
   margin-left: 0;
   display: flex;
   align-items: center;
@@ -260,11 +277,16 @@ export default {
 .add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag) {
   max-width: 100%;
 }
+
 .add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag .el-select__tags-text) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   display: inline-block;
   max-width: 100%;
+}
+
+::v-deep(.el-select .el-tag__close.el-icon-close) {
+  top: -5px;
 }
 </style>

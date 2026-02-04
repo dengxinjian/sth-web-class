@@ -3,22 +3,20 @@
     <div
       v-if="innerVisible"
       class="view-plan-detail-overlay"
-      @click.self="handleClose"
-    >
+      @click.self="handleClose">
       <div
         ref="popupContainer"
         class="view-plan-detail-popup"
         :style="popupStyle"
-        @click.stop
-      >
+        @click.stop>
         <!-- 标题栏（关闭按钮） -->
         <div class="popup-header">
-          <div style="display: flex; justify-content: end; align-items: center">
+          <div
+            style="display: flex; justify-content: end; align-items: center">
             <i
               class="el-icon-close"
               style="cursor: pointer; font-size: 18px"
-              @click="handleClose"
-            ></i>
+              @click="handleClose"></i>
           </div>
         </div>
         <!-- 内容区域 -->
@@ -27,8 +25,7 @@
             <div
               class="classScheduleCard"
               :style="cardStyle"
-              @click.stop="$emit('click', classItem.id, classItem.sportType)"
-            >
+              @click.stop="$emit('click', classItem.id, classItem.sportType)">
               <div class="card-body" style="background-color: white">
                 <!-- 标题栏 -->
                 <div class="body-title">
@@ -36,8 +33,7 @@
                     <img
                       class="image-icon"
                       :src="getSportIcon(classItem.sportType)"
-                      alt=""
-                    />
+                      alt="" />
                     <!-- 课程标题 -->
                     <div class="title">
                       {{
@@ -56,8 +52,7 @@
                     justify-content: space-between;
                     margin-bottom: 20px;
                     margin-top: 10px;
-                  "
-                >
+                  ">
                   <!-- 时长 -->
                   <div class="keyword">
                     {{
@@ -68,26 +63,19 @@
                   </div>
 
                   <!-- 距离 -->
-                  <div style="display: flex">
-                    <div class="keyword">
-                      {{
-                        formatDistance(
-                          classItem.classesJson?.distance,
-                          classItem.sportType
-                        )
-                      }}
-                      <span
-                        v-if="
-                          classItem.classesJson &&
-                          classItem.sportType === 'SWIM'
-                        "
-                      >
-                        {{ classItem.classesJson.distanceUnit }}
-                      </span>
-                      <span v-else>km</span>
-                    </div>
-                    <div>&nbsp;&nbsp;</div>
-                  </div>
+                  <span class="keyword">
+                    {{
+                      formatDistance(
+                        classItem.classesJson.distance,
+                        classItem.sportType,
+                        classItem.classesJson.distanceUnit
+                      )
+                    }}
+                    <span v-if="classItem.sportType === 'SWIM'">
+                      {{ classItem.classesJson.distanceUnit }}
+                    </span>
+                    <span v-else>km</span>
+                  </span>
 
                   <!-- STH -->
                   <div style="display: flex; gap: 4px">
@@ -102,49 +90,42 @@
                       <img
                         class="sth"
                         src="~@/assets/addClass/sth.png"
-                        alt=""
-                      />
+                        alt="" />
                     </div>
                   </div>
                 </div>
                 <div
                   class="section-title"
-                  v-if="classItem.classesJson && classItem.classesJson.summary"
-                >
+                  v-if="classItem.classesJson && classItem.classesJson.summary">
                   概要
                 </div>
 
                 <!-- 概要 -->
                 <pre
                   v-if="classItem.classesJson && classItem.classesJson.summary"
-                  class="stage-details"
-                >
-          {{ classItem.classesJson.summary }}
-        </pre
-                >
+                  class="stage-details">
+                {{ classItem.classesJson.summary }}
+                </pre>
                 <!-- 训练强度可视化 -->
 
                 <div
                   v-if="classItem.classesJson && classItem.classesJson.timeline"
-                  style="height: 16px; display: flex; gap: 1px"
-                >
+                  style="height: 16px; display: flex; gap: 1px">
                   <div
                     v-for="(stage, index) in classItem.classesJson.timeline"
                     :key="index"
                     class="time-stage"
-                    :style="{ flex: stage.duration }"
-                  >
-                    <div style="display: flex; gap: 1px; height: 16px">
+                    :style="{ flex: stage.duration }">
+                    <div
+                      style="display: flex; gap: 1px; height: 16px">
                       <div
                         v-for="n in +stage.times"
                         :key="n"
-                        :style="{ flex: 1 }"
-                      >
+                        :style="{ flex: 1 }">
                         <ExerciseProcessChart
                           :exerciseList="stage.stageTimeline"
                           :maxIntensity="classItem.classesJson.maxIntensity"
-                          :height="16"
-                        />
+                          :height="16" />
                       </div>
                     </div>
                   </div>
@@ -156,8 +137,7 @@
                     classItem.classesJson &&
                     classItem.classesJson.timeline &&
                     classItem.classesJson.timeline.length > 0
-                  "
-                >
+                  ">
                   阶段明细
                 </div>
                 <!-- 骑行详情 -->
@@ -166,48 +146,36 @@
                     classItem.classesJson &&
                     (classItem.sportType === 'CYCLE' ||
                       classItem.sportType === 1)
-                  "
-                >
+                  ">
                   <CycleStageDetails
                     :class-data="classItem.classesJson"
                     :max-stages="99"
-                    type="class"
-                  />
+                    type="class" />
                 </template>
                 <!-- 跑步详情 -->
-                <template
-                  v-else-if="
-                    classItem.classesJson &&
-                    (classItem.sportType === 'RUN' || classItem.sportType === 2)
-                  "
-                >
+                <template v-else-if="
+                  classItem.classesJson &&
+                  (classItem.sportType === 'RUN' || classItem.sportType === 2)
+                ">
                   <RunStageDetails
                     :class-data="classItem.classesJson"
                     :max-stages="99"
-                    type="class"
-                  />
+                    type="class" />
                 </template>
 
                 <!-- 训练建议 -->
-                <div
-                  class="section-title"
-                  v-if="
-                    classItem.classesJson &&
-                    classItem.classesJson.trainingAdvice
-                  "
-                >
+                <div class="section-title" v-if="
+                  classItem.classesJson &&
+                  classItem.classesJson.trainingAdvice
+                ">
                   训练建议
                 </div>
-                <pre
-                  v-if="
-                    classItem.classesJson &&
-                    classItem.classesJson.trainingAdvice
-                  "
-                  class="stage-details"
-                >
-          {{ classItem.classesJson.trainingAdvice }}
-        </pre
-                >
+                <pre v-if="
+                  classItem.classesJson &&
+                  classItem.classesJson.trainingAdvice
+                " class="stage-details">
+                {{ classItem.classesJson.trainingAdvice }}
+                </pre>
               </div>
             </div>
           </div>
@@ -217,10 +185,10 @@
   </transition>
 </template>
 <script>
-import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import CycleStageDetails from "../../../classManagement/components/CycleStageDetails.vue";
-import RunStageDetails from "../../../classManagement/components/RunStageDetails.vue";
-import { SPORT_TYPE_ICONS } from "../../../classManagement/constants";
+import ExerciseProcessChart from "@/components/ExerciseProcessChart"
+import CycleStageDetails from "../../../classManagement/components/CycleStageDetails.vue"
+import RunStageDetails from "../../../classManagement/components/RunStageDetails.vue"
+import { SPORT_TYPE_ICONS } from "../../../classManagement/constants"
 
 export default {
   name: "ViewPlanDetail",
@@ -248,25 +216,25 @@ export default {
     return {
       innerVisible: this.visible || false,
       popupStyle: {},
-    };
+    }
   },
   computed: {
     cardStyle() {
-      return { backgroundColor: "#fff" };
+      return { backgroundColor: "#fff" }
     },
   },
   watch: {
     visible: {
       immediate: true,
       handler(val) {
-        this.innerVisible = val;
+        this.innerVisible = val
         if (val && this.clickPosition) {
           // 使用双重 nextTick 确保 DOM 已完全渲染
           this.$nextTick(() => {
             this.$nextTick(() => {
-              this.setPopupPosition();
-            });
-          });
+              this.setPopupPosition()
+            })
+          })
         }
       },
     },
@@ -277,80 +245,88 @@ export default {
           // 使用双重 nextTick 确保 DOM 已完全渲染
           this.$nextTick(() => {
             this.$nextTick(() => {
-              this.setPopupPosition();
-            });
-          });
+              this.setPopupPosition()
+            })
+          })
         }
       },
     },
   },
   methods: {
     handleClose() {
-      this.$emit("close");
+      this.$emit("close")
     },
     getSportIcon(sportType) {
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
     },
     formatDuration(duration) {
-      return duration === "00:00:00" || !duration ? "--:--:--" : duration;
+      return duration === "00:00:00" || !duration ? "--:--:--" : duration
     },
-    formatDistance(distance, sportType) {
+    formatDistance(distance, sportType, distanceUnit) {
       let result = "";
       if (distance && typeof distance === "string" && distance.includes("km")) {
         result = distance.replace("km", "");
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+        result = distance;
       }
       if (!result || result === "0") {
         result = "--";
+      }
+      if (
+        distanceUnit &&
+        distanceUnit !== "km" &&
+        sportType !== "SWIM" &&
+        result !== "--"
+      ) {
+        result = (Number(result) / 1000).toFixed(2);
       }
       return result;
     },
     setPopupPosition() {
       if (!this.clickPosition || !this.$refs.popupContainer) {
-        return;
+        return
       }
 
-      const popupEl = this.$refs.popupContainer;
+      const popupEl = this.$refs.popupContainer
       if (!popupEl) {
-        return;
+        return
       }
 
       // 获取弹窗尺寸
-      const popupRect = popupEl.getBoundingClientRect();
-      const popupWidth = popupRect.width || 400; // 默认宽度
-      const popupHeight = popupRect.height || 300; // 默认高度
+      const popupRect = popupEl.getBoundingClientRect()
+      const popupWidth = popupRect.width || 400 // 默认宽度
+      const popupHeight = popupRect.height || 300 // 默认高度
 
       // 计算位置：点击位置右侧10px
       // 兼容 clientX/clientY 和 x/y 两种格式
-      const clickX = this.clickPosition.clientX || this.clickPosition.x || 0;
-      const clickY = this.clickPosition.clientY || this.clickPosition.y || 0;
-      let left = clickX + 10;
-      let top = clickY;
+      const clickX = this.clickPosition.clientX || this.clickPosition.x || 0
+      const clickY = this.clickPosition.clientY || this.clickPosition.y || 0
+      let left = clickX + 10
+      let top = clickY
 
       // 边界检查：确保弹窗不超出视口
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
 
       // 如果右侧超出，调整到左侧
       if (left + popupWidth > viewportWidth) {
-        left = clickX - popupWidth - 10;
+        left = clickX - popupWidth - 10
       }
 
       // 如果左侧超出，调整到右侧
       if (left < 0) {
-        left = 10;
+        left = 10
       }
 
       // 如果底部超出，向上调整
       if (top + popupHeight > viewportHeight) {
-        top = viewportHeight - popupHeight - 10;
+        top = viewportHeight - popupHeight - 10
       }
 
       // 如果顶部超出，向下调整
       if (top < 0) {
-        top = 10;
+        top = 10
       }
 
       // 应用位置
@@ -359,10 +335,10 @@ export default {
         left: `${left}px`,
         top: `${top}px`,
         zIndex: 2001,
-      };
+      }
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .view-plan-detail-overlay {
@@ -428,6 +404,7 @@ export default {
   background-color: #ffffff;
   padding: 0 10px 10px 10px;
   box-sizing: border-box;
+
   .card-body {
     width: 100%;
     padding-left: 2px;
@@ -463,9 +440,11 @@ export default {
         .sport-type-color1 {
           background-color: #7fb135;
         }
+
         .sport-type-color2 {
           background-color: #c72a29;
         }
+
         .sport-type-color0 {
           background-color: #aaaaaa;
         }
@@ -486,6 +465,7 @@ export default {
       font-size: 14px;
       font-weight: bold;
     }
+
     .section-title {
       font-size: 14px;
       font-weight: bold;

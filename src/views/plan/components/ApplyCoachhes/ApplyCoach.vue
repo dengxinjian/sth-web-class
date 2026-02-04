@@ -65,7 +65,6 @@
             :props="memberProps"
             clearable
             style="width: 100%"
-            collapse-tags
             @change="handleCascaderChange"></el-cascader>
         </el-form-item>
 

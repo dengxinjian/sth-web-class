@@ -133,4 +133,66 @@ export const teamApi = {
       url: `/consumer/api/team/info/${id}`,
     });
   },
+  // 获取主教练或助教的团队列表(仅团队不含俱乐部)
+  // GET /gateway/team/query/coach-teams
+  // query:
+  // - triUserId: 运动员用户ID
+  // - filterType: 过滤数据Type（1-分享）
+  // - filterDataId: 过滤数据ID
+  // - filterDataType: 过滤数据type
+  getCoachTeams(params = {}) {
+    const { triUserId, filterType, filterDataId, filterDataType } = params || {};
+    const query = []
+      .concat(
+        triUserId ? [`triUserId=${encodeURIComponent(triUserId)}`] : []
+      )
+      .concat(
+        typeof filterType !== "undefined"
+          ? [`filterType=${encodeURIComponent(filterType)}`]
+          : []
+      )
+      .concat(
+        typeof filterDataId !== "undefined"
+          ? [`filterDataId=${encodeURIComponent(filterDataId)}`]
+          : []
+      )
+      .concat(
+        typeof filterDataType !== "undefined"
+          ? [`filterDataType=${encodeURIComponent(filterDataType)}`]
+          : []
+      )
+      .join("&");
+
+    return getData({
+      url: `/gateway/team/query/coach-teams${query ? `?${query}` : ""}`,
+    });
+  },
+  // /gateway/team/query/athlete-team 查询运动员加入的团队
+  getAthleteTeams(params = {}) {
+    const { triUserId, filterType, filterDataId, filterDataType } = params || {};
+    const query = []
+      .concat(
+        triUserId ? [`triUserId=${encodeURIComponent(triUserId)}`] : []
+      )
+      .concat(
+        typeof filterType !== "undefined"
+          ? [`filterType=${encodeURIComponent(filterType)}`]
+          : []
+      )
+      .concat(
+        typeof filterDataId !== "undefined"
+          ? [`filterDataId=${encodeURIComponent(filterDataId)}`]
+          : []
+      )
+      .concat(
+        typeof filterDataType !== "undefined"
+          ? [`filterDataType=${encodeURIComponent(filterDataType)}`]
+          : []
+      )
+      .join("&");
+
+    return getData({
+      url: `/gateway/team/query/athlete-team${query ? `?${query}` : ""}`,
+    });
+  },
 };
