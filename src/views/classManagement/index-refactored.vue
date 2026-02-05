@@ -118,7 +118,7 @@
                         <div v-if="item.type === 'member'"
                           class="athletic-menu-item">
                           <img v-if="item.raw && item.raw.userAvatar"
-                            :src="!item.raw.userAvatar || item.raw.userAvatar.includes('wxfile') ? require('@/assets/logo-sth.png') : item.raw.userAvatar"
+                            :src="!item.raw.userAvatar || item.raw.userAvatar.includes('wxfile') ? 'https://web-home.tos-cn-beijing.volces.com/avatar.png' : item.raw.userAvatar"
                             class="athletic-menu-avatar" alt="" />
                           <span>{{ item.label }}</span>
                         </div>
@@ -583,6 +583,7 @@ export default {
   computed: {
     athleticGroupOptions() {
       const list = Array.isArray(this.athleticList) ? this.athleticList : []
+      console.log(list, "list")
       const groups = new Map()
 
       list.forEach((m) => {
@@ -637,12 +638,11 @@ export default {
       const athletic = this.athleticList.find(
         (item) => item.triUserId === this.selectedAthletic
       )
-      console.log('=====获取运动员头像', athletic.userAvatar,athletic && athletic.userAvatar && athletic.userAvatar.includes('wxfile'))
       if (athletic && athletic.userAvatar && athletic.userAvatar.includes('wxfile')) {
         console.log('=====获取运动员头像', athletic.userAvatar)
-        return require('@/assets/logo-sth.png')
+        return 'https://web-home.tos-cn-beijing.volces.com/avatar.png'
       }
-      return athletic && athletic.userAvatar ? athletic.userAvatar : require('@/assets/logo-sth.png')
+      return athletic && athletic.userAvatar ? athletic.userAvatar : 'https://web-home.tos-cn-beijing.volces.com/avatar.png'
     },
   },
   watch: {
@@ -715,9 +715,6 @@ export default {
       if (!id && id !== 0) return
       const findGroup = this.shareGroupList.find(el => el.id === id)
       this.getShareGroupClass(findGroup)
-    },
-    handleShareTeamClassClick(id) {
-      console.log(id, "id")
     },
     getShareGroupClass(node) {
       const _this = this
@@ -1258,6 +1255,7 @@ export default {
             }))
             : [],
       }))
+      console.log(teams, "teams")
       const clubs = (data.allCoachClubList || []).map((item) => ({
         id: item.id,
         name: item.name,
@@ -1320,6 +1318,7 @@ export default {
      * 获取运动员列表（团队用 teamList.members，俱乐部用 /consumer/api/club/member/list）
      */
     getAthleticList() {
+      console.log(this.selectedTeam, "this.selectedTeam")
       if (!this.selectedTeam) {
         this.athleticList = []
         this.selectedAthletic = null
@@ -1327,7 +1326,9 @@ export default {
       }
       if (this.selectedOrgType === "team") {
         const team = this.teamList.find((item) => item.id === this.selectedTeam)
+        console.log(team, "team")
         this.athleticList = team && team.members ? team.members : []
+        console.log(this.athleticList, "this.athleticList")
       } else {
         // 俱乐部：参考 ApplyCoach 的 getClubMemberList
         this.fetchClubMemberList(this.selectedTeam)

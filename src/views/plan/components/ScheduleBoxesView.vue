@@ -459,48 +459,83 @@ export default {
       }, 0);
     },
     // 计算周运动距离总和
-    getweekDistance(weekIndex) {
-      const week = this.planList[weekIndex];
+   // 计算周运动距离总和
+   getweekDistance(weekIndex) {
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return Number(classAcc)
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return Number(classAcc)
               }
             }
 
             if (!classesJson.distance) {
-              return classAcc;
+              return Number(classAcc)
             }
             if (
               classesJson.sportType === "SWIM" &&
               classesJson.distanceUnit === "m"
             ) {
-              return classAcc + Number(classesJson.distance) / 1000;
+              return Number(classAcc) + Number(classesJson.distance) / 1000
             }
-            return classAcc + Number(classesJson.distance);
+            if (
+              !classesJson.distance ||
+              classesJson.distance === "--km" ||
+              classesJson.distance === "--"
+            ) {
+              return Number(classAcc)
+            }
+            if (
+              typeof classesJson.distance === "string" &&
+              classesJson.distance.includes("km")
+            ) {
+              if (
+                classesJson.distanceUnit &&
+                classesJson.distanceUnit !== "km" &&
+                classItem.sportType !== "SWIM" &&
+                classesJson.distance !== "--"
+              ) {
+                const result = (Number(classesJson.distance.replace("km", "")) / 1000 || 0).toFixed(2)
+                // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+                return Number(classAcc) + Number(result)
+              }
+            }
+            if (
+              classesJson.distanceUnit &&
+              classesJson.distanceUnit !== "km" &&
+              classItem.sportType !== "SWIM" &&
+              classesJson.distance !== "--"
+            ) {
+              const result = (Number(classesJson.distance) / 1000 || 0).toFixed(2)
+              console.log(result, "result")
+              console.log(Number(classAcc) + Number(result), "Number(classAcc) + Number(result)")
+              // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+              return Number(classAcc) + Number(result)
+            }
+            return Number(classAcc) + Number(classesJson.distance)
           }, 0)
-        );
-      }, 0);
-      return this.roundDistance(totalDistance);
+        )
+      }, 0)
+      return this.roundDistance(totalDistance)
     },
     // 计算周运动游泳时长总和
     getweekSwimmingDuration(weekIndex) {

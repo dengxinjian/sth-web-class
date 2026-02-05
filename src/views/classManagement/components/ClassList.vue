@@ -143,7 +143,7 @@
                     <span class="group-name-count">({{ item.groupCount }})</span>
                   </div>
                   <el-popover popper-class="athletic-btn-popover"
-                    placement="right" width="80" trigger="hover">
+                    placement="right" width="80" trigger="hover" v-if="activeClassType === 'team' && showAddClassBtn">
                     <div class="group-operations">
                       <span>
                         <el-button type="text" @click="$emit('add-share-group', item)">
@@ -182,10 +182,6 @@
                 @end="handleClassDragEnd">
                 <ClassCard v-for="classItem in item.classesList" :key="classItem.id" :class-data="classItem"
                   :active-class-type="activeClassType" :group-id="item.groupId"
-                  @click="$emit('share-class-detail', classItem.id, classItem.sportType)"
-                  @move="$emit('move-share-class', classItem.id, item.groupId)"
-                  @delete="$emit('delete-share-class', classItem)"
-                  @copy="$emit('copy-share-class', classItem, item.groupId, classItem.title)"
                   @view="$emit('view-share-class', classItem)" />
               </draggable>
             </el-collapse-item>

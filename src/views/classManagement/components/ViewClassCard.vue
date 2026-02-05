@@ -35,7 +35,7 @@
                 移动
               </div>
             </span>
-            <span v-if="showShareBtn">
+            <span v-if="showShareBtn && isClassShare">
               <div class="btn-list-hover-item" @click.stop="
                 $emit('share', classItem.id)
               handleClose()
@@ -43,7 +43,7 @@
                 分享课程
               </div>
             </span>
-            <span v-if="classItem.isShare">
+            <span v-if="isClassShare">
               <div class="btn-list-hover-item" @click.stop="
                 $emit('share-history', classItem)
               handleClose()
@@ -62,11 +62,11 @@
             @click.stop slot="reference"
             style="width: 16px; height: 16px" />
         </el-popover>
-        <el-popover v-if="activeClassType === 'team'"
+        <el-popover v-if="activeClassType === 'team' && isClassShare"
           popper-class="athletic-btn-popover" placement="right"
           trigger="hover" :tabindex="999">
           <div class="btn-list-hover">
-            <span v-if="classItem.shareAuth === 2">
+            <span v-if="classItem.shareAuth === 2 && isClassShare">
               <div class="btn-list-hover-item" @click.stop="
                 showEditClass = true
               handleClose()
@@ -76,13 +76,13 @@
             </span>
             <span>
               <div class="btn-list-hover-item"
-                @click.stop="handleMoveShareClass">
+                @click.stop="handleMoveShareClass" v-if="isClassShare">
                 移动
               </div>
             </span>
             <span>
               <div class="btn-list-hover-item"
-                @click.stop="handleShareAuthEdit" v-if="triUserId === classItem.shareUserId">
+                @click.stop="handleShareAuthEdit" v-if="triUserId === classItem.shareUserId && isClassShare">
                 权限调整
               </div>
             </span>
@@ -286,6 +286,10 @@ export default {
     dialogMarginLeft: {
       type: String,
       default: "320px",
+    },
+    isClassShare: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {

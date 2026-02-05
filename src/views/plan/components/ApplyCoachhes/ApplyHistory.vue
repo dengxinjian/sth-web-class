@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       :visible.sync="innerVisible"
-      :width="getDialogWidth()"
+      width="900px"
       append-to-body
       :before-close="onCancel"
       class="add-class-title-modal"
@@ -132,7 +132,7 @@
             <el-button
               type="text"
               size="small"
-              v-if="scope.row.shareUserId === triUserId && scope.row.shareToAuth !== 0"
+              :disabled="scope.row.shareToAuth === 0 || scope.row.shareUserId !== triUserId"
               @click="handleAdjustPermission(scope.row)">权限调整</el-button>
           </template>
         </el-table-column>
@@ -313,14 +313,6 @@ export default {
       if (this.timer) {
         clearTimeout(this.timer)
         this.timer = null
-      }
-    },
-    getDialogWidth() {
-      const loginType = localStorage.getItem("loginType")
-      if (loginType === "2") {
-        return "900px"
-      } else {
-        return "580px"
       }
     },
     getApplyHistory() {

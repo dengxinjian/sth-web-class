@@ -887,6 +887,7 @@ export default {
     },
     // 判断是否在结束日期之后
     diffAffterDate(dates, classes) {
+      console.log(dates, "dates")
       // 边界检查
       if (!dates || dates.length === 0 || !classes || classes.length === 0) {
         return false
@@ -909,7 +910,6 @@ export default {
           isAfter: isAfter,
         }
       })
-
       // 判断是否所有日期都在结束日期之后
       const isAfter = dateResults.every((item) => item.isAfter === false)
 
@@ -1031,6 +1031,7 @@ export default {
           .flat()
           .filter((item) => item.details.length > 0)
         const diffAffterDate = _this.diffAffterDate(findEndDate, planList)
+        console.log(diffAffterDate, "diffAffterDate")
         if (!diffAffterDate.isAfter) {
           _this.applyPlanClasses(targets)
           return

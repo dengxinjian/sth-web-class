@@ -1,8 +1,10 @@
 <template>
   <div class="hover-plan-detail">
     <!-- <h2>概要</h2> -->
-    <div slot="title" style="display: flex; justify-content: end; align-items: center">
-      <el-popover popper-class="athletic-btn-popover" placement="right" trigger="hover" :tabindex="999">
+    <div slot="title"
+      style="display: flex; justify-content: end; align-items: center">
+      <el-popover popper-class="athletic-btn-popover" v-if="activeClassType !== 'team'"
+        placement="right" trigger="hover" :tabindex="999">
         <div class="btn-list-hover">
           <span>
             <div class="btn-list-hover-item" @click.stop="
@@ -12,18 +14,19 @@
             </div>
           </span>
         </div>
-        <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
-        <img src="@/assets/addClass/Component 117.png" alt="" @click.stop slot="reference"
+        <img src="@/assets/addClass/Component 117.png" alt=""
+          @click.stop slot="reference"
           style="width: 16px; height: 16px" />
       </el-popover>
-    </div>
-    <div class="detail-row-box" v-if="planDetail.isShare">
-      <div class="detail-row-title">分享人</div>
-      <div class="detail-row-content">{{ planDetail.possessNickname }}</div>
     </div>
     <div class="detail-row-box">
       <div class="detail-row-title">计划名称</div>
       <div class="detail-row-content">{{ planDetail.planTitle }}</div>
+    </div>
+    <div class="detail-row-box" v-if="planDetail.isShare">
+      <div class="detail-row-title">分享人</div>
+      <div class="detail-row-content">{{ planDetail.possessNickname }}
+      </div>
     </div>
     <div class="detail-row-box" v-if="planDetail?.teamName">
       <div class="detail-row-title">团队</div>
@@ -39,19 +42,24 @@
         }}
       </div>
     </div>
-    <div class="detail-row-box" v-for="item in renderColumns" :key="item.prop">
+    <div class="detail-row-box" v-for="item in renderColumns"
+      :key="item.prop">
       <div class="detail-row-title">{{ item.label }}</div>
       <div class="detail-row-content">{{ planDetail[item.prop] }}
       </div>
     </div>
     <div class="detail-row-box">
       <div class="detail-row-title">计划难度</div>
-      <div class="detail-row-content" style="display: flex; align-items: center; gap: 5px;">
-        <el-rate v-model="planDetail.level" :allow-half="true" disabled :colors="['#F92B30', '#F92B30', '#F92B30']"
-          text-color="#999999" disabled-void-color="#E1E4EC"></el-rate>
-        <span style="font-size: 10px; color: #979fb0;margin-bottom: 1px;">{{
-          planDetail.level ? "" : "未评分"
-        }}</span>
+      <div class="detail-row-content"
+        style="display: flex; align-items: center; gap: 5px;">
+        <el-rate v-model="planDetail.level" :allow-half="true"
+          disabled :colors="['#F92B30', '#F92B30', '#F92B30']"
+          text-color="#999999"
+          disabled-void-color="#E1E4EC"></el-rate>
+        <span
+          style="font-size: 10px; color: #979fb0;margin-bottom: 1px;">{{
+            planDetail.level ? "" : "未评分"
+          }}</span>
       </div>
     </div>
     <div class="detail-row-box">
@@ -77,11 +85,12 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekSwimmingDuration())
               }}{{
-                  secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col>
-              <el-col :span="9">{{ getweekSwimmingDistance() || "N/A" }}
+                secondsToHHMMSS(getweekSwimmingDuration()) === "00:00:00"
+                  ? ""
+                  : " /周"
+              }}</el-col>
+              <el-col
+                :span="9">{{ getweekSwimmingDistance() || "N/A" }}
               </el-col>
             </el-row>
           </el-col>
@@ -93,10 +102,10 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekCycleDuration())
               }}{{
-                  secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col>
+                secondsToHHMMSS(getweekCycleDuration()) === "00:00:00"
+                  ? ""
+                  : " /周"
+              }}</el-col>
               <el-col :span="9">{{ getweekCycleDistance() || "N/A" }}
               </el-col>
             </el-row>
@@ -109,11 +118,12 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekRunDuration())
               }}{{
-                  secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col>
-              <el-col :span="9">{{ getweekRunDistance() || "N/A" }}</el-col>
+                secondsToHHMMSS(getweekRunDuration()) === "00:00:00"
+                  ? ""
+                  : " /周"
+              }}</el-col>
+              <el-col
+                :span="9">{{ getweekRunDistance() || "N/A" }}</el-col>
             </el-row>
           </el-col>
           <el-col :span="24">
@@ -124,10 +134,10 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekPowerDuration())
               }}{{
-                  secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col>
+                secondsToHHMMSS(getweekPowerDuration()) === "00:00:00"
+                  ? ""
+                  : " /周"
+              }}</el-col>
               <el-col :span="9">{{
                 getweekPowerAndOtherDistance("STRENGTH") || "N/A"
               }}</el-col>
@@ -141,10 +151,10 @@
                   ? "N/A"
                   : secondsToHHMMSS(getweekOtherDuration())
               }}{{
-                  secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
-                    ? ""
-                    : " /周"
-                }}</el-col>
+                secondsToHHMMSS(getweekOtherDuration()) === "00:00:00"
+                  ? ""
+                  : " /周"
+              }}</el-col>
               <el-col :span="9">{{
                 getweekPowerAndOtherDistance("OTHER") || "N/A"
               }}</el-col>
@@ -163,7 +173,8 @@
                     ? ""
                     : " /周"
                 }}</el-col>
-              <el-col :span="9">{{ getweekDistance() || "N/A" }}</el-col>
+              <el-col
+                :span="9">{{ getweekDistance() || "N/A" }}</el-col>
             </el-row>
           </el-col>
         </el-row>
@@ -333,6 +344,10 @@ export default {
     planInfo: {
       type: Object,
       default: () => ({}),
+    },
+    activeClassType: {
+      type: String,
+      default: "my",
     },
   },
   data() {
@@ -748,6 +763,33 @@ export default {
               classesJson.distanceUnit === "m"
             ) {
               return classAcc + Number(classesJson.distance) / 1000
+            }
+            if (
+              typeof classesJson.distance === "string" &&
+              classesJson.distance.includes("km")
+            ) {
+              if (
+                classesJson.distanceUnit &&
+                classesJson.distanceUnit !== "km" &&
+                classItem.sportType !== "SWIM" &&
+                classesJson.distance !== "--"
+              ) {
+                const result = (Number(classesJson.distance.replace("km", "")) / 1000 || 0).toFixed(2)
+                // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+                return Number(classAcc) + Number(result)
+              }
+            }
+            if (
+              classesJson.distanceUnit &&
+              classesJson.distanceUnit !== "km" &&
+              classItem.sportType !== "SWIM" &&
+              classesJson.distance !== "--"
+            ) {
+              const result = (Number(classesJson.distance) / 1000 || 0).toFixed(2)
+              console.log(result, "result")
+              console.log(Number(classAcc) + Number(result), "Number(classAcc) + Number(result)")
+              // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+              return Number(classAcc) + Number(result)
             }
             // console.log("classesJson.distance-总距离", classesJson.distance, index);
             const total1 = classAcc + Number(classesJson.distance)
@@ -1240,6 +1282,33 @@ export default {
               classesJson.distance === "--"
             ) {
               return classAcc
+            }
+            if (
+              typeof classesJson.distance === "string" &&
+              classesJson.distance.includes("km")
+            ) {
+              if (
+                classesJson.distanceUnit &&
+                classesJson.distanceUnit !== "km" &&
+                classItem.sportType !== "SWIM" &&
+                classesJson.distance !== "--"
+              ) {
+                const result = (Number(classesJson.distance.replace("km", "")) / 1000 || 0).toFixed(2)
+                // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+                return Number(classAcc) + Number(result)
+              }
+            }
+            if (
+              classesJson.distanceUnit &&
+              classesJson.distanceUnit !== "km" &&
+              classItem.sportType !== "SWIM" &&
+              classesJson.distance !== "--"
+            ) {
+              const result = (Number(classesJson.distance) / 1000 || 0).toFixed(2)
+              console.log(result, "result")
+              console.log(Number(classAcc) + Number(result), "Number(classAcc) + Number(result)")
+              // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+              return Number(classAcc) + Number(result)
             }
             const total1 = classAcc + Number(classesJson.distance)
             return total1

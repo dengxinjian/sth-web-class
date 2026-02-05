@@ -2,7 +2,7 @@
   <div>
   <el-dialog
     :visible.sync="innerVisible"
-    :width="getDialogWidth()"
+    width="780px"
     append-to-body
     :before-close="onCancel"
     class="add-class-title-modal"
@@ -37,6 +37,7 @@
           <el-button
             type="text"
             size="small"
+            :disabled="scope.row.shareToAuth === 0 || scope.row.shareUserId !== triUserId"
             @click="handleAdjustPermission(scope.row)"
           >权限调整</el-button>
         </template>
@@ -76,7 +77,7 @@
           <el-radio :label="false">否</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="权限:" required>
+      <el-form-item label="权限:" required v-if="!permissionForm.revoke">
         <el-radio-group v-model="permissionForm.shareToAuth">
           <el-radio :label="1">查看</el-radio>
           <el-radio :label="2">编辑</el-radio>
@@ -127,6 +128,7 @@ export default {
       currentShareRow: null,
       loginType: localStorage.getItem("loginType") || "1",
       timer: null,
+      triUserId: localStorage.getItem("triUserId"),
     }
   },
   watch: {
@@ -197,14 +199,14 @@ export default {
         this.timer = null
       }
     },
-    getDialogWidth() {
-      const loginType = localStorage.getItem("loginType")
-      if (loginType === "2") {
-        return "900px"
-      } else {
-        return "580px"
-      }
-    },
+    // getDialogWidth() {
+    //   const loginType = localStorage.getItem("loginType")
+    //   if (loginType === "2") {
+    //     return "900px"
+    //   } else {
+    //     return "580px"
+    //   }
+    // },
     getApplyHistory() {
       const params = {
         url: "/gateway/training/planClasses/listApplyHistoryByPlanId",

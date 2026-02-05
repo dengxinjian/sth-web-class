@@ -3,15 +3,21 @@
     <div class="plan-container">
       <div class="type-change">
         <ClassList
+          ref="planListRef"
+          :team-tree-list="teamTreeList"
           :class-list="classList"
           :active-class-type.sync="activeClassType"
           @class-type-change="handleClassTypeChange"
           @search="handleClassSearch"
           :show-add-class-btn="false"
           @view-class="handleViewClass"
+          @view-share-class="handleViewShareClase"
           @collapse-change="planSlideChange"
-          group-name="planDrag"
-        />
+          @share-team-click="handleShareTeamClick"
+          @share-team-group-click="handleShareTeamGroupClick"
+          :share-group-list="shareGroupList"
+          :current-share-team-id="currentShareTeamId"
+          group-name="planDrag" />
       </div>
       <PlannedSchedule
         :planList="planData.dayDetails || []"
@@ -27,8 +33,7 @@
         @plan-item-move="handlePlanItemMove"
         @plan-library-drop="handlePlanLibraryDrop"
         @save="handleSave"
-        @save-and-exit="handleSaveAndExit"
-      />
+        @save-and-exit="handleSaveAndExit" />
     </div>
     <ViewClassCard
       class="view-class-card"
@@ -40,22 +45,20 @@
       @delete="handleDeleteClass"
       @copy="handleCopyClassFromOfficial"
       @save="handleUpdateClass"
+      :is-class-share="false"
       type="edit"
-      dialog-margin-left="260px"
-    />
+      dialog-margin-left="260px" />
     <CopyClassFromOfficial
       v-model="showCopyClassFromOfficial"
       :class-id="copyClassFromOfficialClassId"
       :group-id="copyClassFromOfficialGroupId"
       :data="copyClassFromOfficialData"
       :active-class-type="activeClassType"
-      @save="onSaveCopyClassFromOfficial"
-    />
+      @save="onSaveCopyClassFromOfficial" />
     <SportTypeModal
       v-model="showSportTypeModal"
       @select="onSelectSportType"
-      @addEvent="handleAddEvent"
-    />
+      @addEvent="handleAddEvent" />
     <AddClassModal
       v-model="showAddClassModal"
       :sportType="selectedSportType"
@@ -64,10 +67,9 @@
       originalType="my"
       @save="handleSaveAddClass"
       @cancel="
-        showAddClassModal = false;
-        isClassError = false;
-      "
-    />
+        showAddClassModal = false
+      isClassError = false
+        " />
     <EditClassModal
       :visible="showEditPlanClassModal"
       :class-item="editPlanClassData"
@@ -80,44 +82,41 @@
           editPlanClassWeekNumber,
           editPlanClassGlobalDay
         )
-      "
-      @save="handleEditPlanClassSave"
-    />
+        "
+      @save="handleEditPlanClassSave" />
     <AddEvent
       :visible="showAddEvent"
       :event-data="currentEventData"
       :is-edit-mode="isEditMode"
       @confirm="handleEventConfirm"
-      @cancel="handleEventCancel"
-    />
+      @cancel="handleEventCancel" />
     <CreatePlanCourseDialog
       v-model="showCreatePlanCourseDialog"
-      @save="handleCreatePlanCourse"
-    />
+      @save="handleCreatePlanCourse" />
     <MoveGroup
       v-model="showMoveGroup"
       :id="moveGroupId"
       :class-id="moveClassId"
       :type="moveType"
-      @save="onSaveMoveGroup"
-    />
+      @save="onSaveMoveGroup" />
   </div>
 </template>
 
 <script>
-import { classApi } from "../classManagement/services/classManagement";
-import { parseClassesJson } from "../classManagement/utils/helpers";
-import ClassList from "../classManagement/components/ClassList.vue";
-import ViewClassCard from "../classManagement/components/ViewClassCard.vue";
-import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOfficial/index.vue";
-import PlannedSchedule from "./components/plannedSchedule.vue";
-import SportTypeModal from "../classManagement/components/SportTypeModal/index.vue";
-import AddClassModal from "../classManagement/components/AddClass/index.vue";
-import EditClassModal from "../classManagement/components/EditClass.vue";
-import { planApi } from "./services/planManagement";
-import AddEvent from "../classManagement/components/addEvent.vue";
-import CreatePlanCourseDialog from "./components/CreatePlanCourseDialog.vue";
-import MoveGroup from "../classManagement/components/MoveGroup/index.vue";
+import { classApi } from "../classManagement/services/classManagement"
+import { parseClassesJson } from "../classManagement/utils/helpers"
+import ClassList from "../classManagement/components/ClassList.vue"
+import ViewClassCard from "../classManagement/components/ViewClassCard.vue"
+import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOfficial/index.vue"
+import PlannedSchedule from "./components/plannedSchedule.vue"
+import SportTypeModal from "../classManagement/components/SportTypeModal/index.vue"
+import AddClassModal from "../classManagement/components/AddClass/index.vue"
+import EditClassModal from "../classManagement/components/EditClass.vue"
+import { planApi } from "./services/planManagement"
+import AddEvent from "../classManagement/components/addEvent.vue"
+import CreatePlanCourseDialog from "./components/CreatePlanCourseDialog.vue"
+import MoveGroup from "../classManagement/components/MoveGroup/index.vue"
+import { getData } from "@/api/common.js"
 export default {
   name: "PlanView",
   components: {
@@ -176,7 +175,10 @@ export default {
       initialPlanData: null,
       isSaving: false, // 标记是否正在保存，避免重复提示
       isClassError: false,
-    };
+      teamTreeList: [],
+      shareGroupList: [],
+      currentShareTeamId: "",
+    }
   },
   watch: {
     // 暂不去除，后续根据功能是否需要再启用
@@ -193,37 +195,37 @@ export default {
     // },
   },
   mounted() {
-    this.getClassList();
+    this.getClassList()
     // 课程数量限制 -- 后续根据待用功能添加
     // this.getCurrentUserClassConfigCount();
-    console.log(this.$route.query, "this.$route.query");
-    this.planType = this.$route.query.type;
+    console.log(this.$route.query, "this.$route.query")
+    this.planType = this.$route.query.type
     // 获取 store plan.js planData数据
-    const storePlanData = this.$store.state.plan.planData;
+    const storePlanData = this.$store.state.plan.planData
     if (storePlanData) {
-      this.planData = storePlanData;
+      this.planData = storePlanData
     } else {
       // 如果 store 中没有数据，初始化 planData
       this.planData = {
         dayDetails: [],
-      };
+      }
       // 保存初始数据到 store
-      this.$store.dispatch("plan/savePlanData", this.planData);
+      this.$store.dispatch("plan/savePlanData", this.planData)
     }
-    console.log(this.planData, "this.planData");
+    console.log(this.planData, "this.planData")
     // this.$store.dispatch("plan", this.planType);
     // this.$route.query.planId && this.getPlanData();
 
     // 保存初始数据快照，用于检测变更
-    this.initialPlanData = JSON.parse(JSON.stringify(this.planData));
+    this.initialPlanData = JSON.parse(JSON.stringify(this.planData))
 
     // 监听浏览器刷新/关闭事件
-    window.addEventListener("beforeunload", this.handleBeforeUnload);
+    window.addEventListener("beforeunload", this.handleBeforeUnload)
   },
   // 路由离开守卫 - 监听路由跳转
   beforeRouteLeave(to, from, next) {
     // 先检查数据是否有变更
-    this.checkDataChanged();
+    this.checkDataChanged()
 
     if (this.hasUnsavedChanges && !this.isSaving) {
       // 阻止路由跳转，等待用户选择
@@ -232,51 +234,51 @@ export default {
         this.handleLeaveWithSave()
           .then((shouldLeave) => {
             if (shouldLeave) {
-              next();
+              next()
             } else {
-              next(false);
+              next(false)
             }
           })
           .catch((error) => {
-            console.error("离开页面处理失败:", error);
-            next(false);
-          });
-      }, 0);
+            console.error("离开页面处理失败:", error)
+            next(false)
+          })
+      }, 0)
     } else {
-      next();
+      next()
     }
   },
   // 离开页面时,清除定时器，停止自动保存
   beforeDestroy() {
-    this.stopAutoSave();
+    this.stopAutoSave()
     // 移除事件监听
-    window.removeEventListener("beforeunload", this.handleBeforeUnload);
+    window.removeEventListener("beforeunload", this.handleBeforeUnload)
   },
   methods: {
     // 检测数据是否有变更
     checkDataChanged() {
-      const currentData = JSON.stringify(this.planData);
-      const initialData = JSON.stringify(this.initialPlanData);
-      this.hasUnsavedChanges = currentData !== initialData;
-      return this.hasUnsavedChanges;
+      const currentData = JSON.stringify(this.planData)
+      const initialData = JSON.stringify(this.initialPlanData)
+      this.hasUnsavedChanges = currentData !== initialData
+      return this.hasUnsavedChanges
     },
     // 标记数据已修改
     markDataChanged() {
-      this.hasUnsavedChanges = true;
+      this.hasUnsavedChanges = true
     },
     // 标记数据已保存
     markDataSaved() {
-      this.hasUnsavedChanges = false;
-      this.initialPlanData = JSON.parse(JSON.stringify(this.planData));
+      this.hasUnsavedChanges = false
+      this.initialPlanData = JSON.parse(JSON.stringify(this.planData))
     },
     // 处理浏览器刷新/关闭事件
     handleBeforeUnload(event) {
       if (this.hasUnsavedChanges && !this.isSaving) {
         // 标准方式
-        event.preventDefault();
+        event.preventDefault()
         // Chrome 需要设置 returnValue
-        event.returnValue = "您有未保存的数据，确定要离开吗？";
-        return event.returnValue;
+        event.returnValue = "您有未保存的数据，确定要离开吗？"
+        return event.returnValue
       }
     },
     // 处理离开页面时的保存提示
@@ -294,66 +296,66 @@ export default {
           .then(async () => {
             // 用户点击"保存并离开"
             try {
-              this.isSaving = true;
-              await this.handleSaveAndExit();
-              this.isSaving = false;
-              this.markDataSaved();
-              resolve(true);
+              this.isSaving = true
+              await this.handleSaveAndExit()
+              this.isSaving = false
+              this.markDataSaved()
+              resolve(true)
             } catch (error) {
-              console.error("保存失败:", error);
-              this.isSaving = false;
-              this.$message.error("保存失败，请重试");
-              resolve(false);
+              console.error("保存失败:", error)
+              this.isSaving = false
+              this.$message.error("保存失败，请重试")
+              resolve(false)
             }
           })
           .catch((action) => {
             if (action === "cancel") {
               // 用户点击"不保存离开"
-              this.hasUnsavedChanges = false;
-              resolve(true);
+              this.hasUnsavedChanges = false
+              resolve(true)
             } else {
               // 用户关闭对话框（点击 X 或按 ESC），取消离开
-              resolve(false);
+              resolve(false)
             }
-          });
-      });
+          })
+      })
     },
     startAutoSave() {
       // 如果已有定时器在运行，先清除旧的定时器，避免重复启动
       if (this.autoSaveTimer) {
-        this.stopAutoSave();
+        this.stopAutoSave()
       }
       this.autoSaveTimer = setInterval(() => {
         try {
-          this.handleAutoSave();
-          console.log("自动保存数据");
+          this.handleAutoSave()
+          console.log("自动保存数据")
         } catch (error) {
-          console.error("自动保存失败:", error);
+          console.error("自动保存失败:", error)
           // 即使保存失败，定时器仍然继续运行
         }
-      }, 30000);
+      }, 30000)
     },
     stopAutoSave() {
       if (this.autoSaveTimer) {
-        clearInterval(this.autoSaveTimer);
-        this.autoSaveTimer = null;
+        clearInterval(this.autoSaveTimer)
+        this.autoSaveTimer = null
       }
     },
     async handleAutoSave() {
-      const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
-      const planList = [];
+      const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails))
+      const planList = []
       dayDetails.forEach((item) => {
         item.forEach((week) => {
           if (week.details.length > 0 || week.competitionDtoList) {
-            planList.push(week);
+            planList.push(week)
           }
-        });
-      });
+        })
+      })
       planList.forEach((item) => {
         item.details.forEach((day) => {
-          day.classesJson = JSON.stringify(day.classesJson);
-        });
-      });
+          day.classesJson = JSON.stringify(day.classesJson)
+        })
+      })
 
       const res = await planApi.updatePlan({
         planTitle: this.planData.planTitle,
@@ -365,10 +367,10 @@ export default {
         dayDetails: planList,
         level: this.planData.level,
         planClassesId: this.planData.id,
-      });
+      })
       if (res.success) {
         // 自动保存成功后，标记数据已保存
-        this.markDataSaved();
+        this.markDataSaved()
         // this.$message.success("更新成功");
       }
     },
@@ -376,80 +378,80 @@ export default {
      * 保存移动分组
      */
     onSaveMoveGroup() {
-      this.showMoveGroup = false;
-      this.getClassList();
+      this.showMoveGroup = false
+      this.getClassList()
     },
     /**
      * 赛事确认
      */
     handleEventConfirm(data) {
-      console.log("赛事数据:", data);
-      const weekIndex = this.selectedDay.weekNumber - 1;
-      const globalDay = this.selectedDay.globalDay;
+      console.log("赛事数据:", data)
+      const weekIndex = this.selectedDay.weekNumber - 1
+      const globalDay = this.selectedDay.globalDay
 
       // 确保周数据存在
       if (!this.planData.dayDetails[weekIndex]) {
-        this.$set(this.planData.dayDetails, weekIndex, []);
+        this.$set(this.planData.dayDetails, weekIndex, [])
       }
       // 查找该天是否已存在数据
       let dayIndex = this.planData.dayDetails[weekIndex].findIndex(
         (item) => item.day === globalDay
-      );
-      let dayData = this.planData.dayDetails[weekIndex][dayIndex];
+      )
+      let dayData = this.planData.dayDetails[weekIndex][dayIndex]
       if (!dayData) {
         // 如果该天不存在，创建新的数据对象
         dayData = {
           day: globalDay,
           details: [],
           competitionDtoList: [],
-        };
-        this.planData.dayDetails[weekIndex].push(dayData);
-        dayIndex = this.planData.dayDetails[weekIndex].length - 1;
+        }
+        this.planData.dayDetails[weekIndex].push(dayData)
+        dayIndex = this.planData.dayDetails[weekIndex].length - 1
       }
       // 确保 competitionDtoList 数组存在
       if (!dayData.competitionDtoList) {
-        this.$set(dayData, "competitionDtoList", []);
+        this.$set(dayData, "competitionDtoList", [])
       }
       if (this.editEventIndex !== null) {
-        this.$set(dayData.competitionDtoList, this.editEventIndex, data);
+        this.$set(dayData.competitionDtoList, this.editEventIndex, data)
       } else {
-        dayData.competitionDtoList.push(data);
+        dayData.competitionDtoList.push(data)
       }
       // 保证对 dayDetails 的引用是响应式的
       this.$set(this.planData.dayDetails[weekIndex], dayIndex, {
         ...dayData,
         competitionDtoList: [...dayData.competitionDtoList],
-      });
-      console.log(this.planData, "this.planData");
+      })
+      console.log(this.planData, "this.planData")
       // 触发响应式更新
-      this.$forceUpdate();
+      this.$forceUpdate()
       // 标记数据已修改
-      this.markDataChanged();
+      this.markDataChanged()
 
-      this.editEventIndex = null;
-      this.showAddEvent = false;
+      this.editEventIndex = null
+      this.showAddEvent = false
     },
     /**
      * 赛事取消
      */
     handleEventCancel() {
-      this.currentEventData = {};
-      this.editEventIndex = null;
-      this.editEventWeekNumber = null;
-      this.editEventGlobalDay = null;
-      this.showAddEvent = false;
-      this.isEditMode = false;
+      this.currentEventData = {}
+      this.editEventIndex = null
+      this.editEventWeekNumber = null
+      this.editEventGlobalDay = null
+      this.showAddEvent = false
+      this.isEditMode = false
     },
     handleAddEvent() {
-      this.currentEventData = {};
-      this.showAddEvent = true;
+      this.currentEventData = {}
+      this.showAddEvent = true
     },
     planSlideChange() {
       // 拖拽功能已由 vuedraggable 处理，无需手动初始化
     },
     // 保存并关闭
     async handleSaveAndExit() {
-      await this.handleSave(true);
+      await this.handleSave(true)
       this.$router.replace({
         path: "/timeTable/class",
         query: {
@@ -457,41 +459,41 @@ export default {
           planGroupId: this.planData.planGroupId,
           type: "edit",
         },
-      });
+      })
     },
     // 保存
     async handleSave(isExit = false) {
-      console.log("=====添加计划接口提交=====>this.planData",this.planData);
-      this.isSaving = true; // 标记正在保存
-      const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails));
-      const planList = [];
+      console.log("=====添加计划接口提交=====>this.planData", this.planData)
+      this.isSaving = true // 标记正在保存
+      const dayDetails = JSON.parse(JSON.stringify(this.planData.dayDetails))
+      const planList = []
       dayDetails.forEach((item) => {
         item.forEach((week) => {
           if (week.details.length > 0 || week.competitionDtoList) {
-            planList.push(week);
+            planList.push(week)
           }
-        });
-      });
-      console.log(planList, "planList");
+        })
+      })
+      console.log(planList, "planList")
       planList.forEach((item) => {
         item.details.forEach((day) => {
-          day.classesJson = JSON.stringify(day.classesJson);
-        });
-      });
+          day.classesJson = JSON.stringify(day.classesJson)
+        })
+      })
       try {
         if (this.planType === "add") {
           if (this.planData.id) {
-            await this.updatePlan(planList, isExit, "add");
+            await this.updatePlan(planList, isExit, "add")
           } else {
-            await this.addPlan(planList, isExit);
+            await this.addPlan(planList, isExit)
           }
         } else {
-          await this.updatePlan(planList, isExit);
+          await this.updatePlan(planList, isExit)
         }
       } finally {
-        this.isSaving = false;
+        this.isSaving = false
       }
-      console.log(planList, "planList");
+      console.log(planList, "planList")
     },
     async updatePlan(planList, isExit = false, type = "update") {
       const res = await planApi.updatePlan({
@@ -505,14 +507,14 @@ export default {
         level: this.planData.level,
         dayDetails: planList,
         planClassesId: this.planData.id,
-      });
+      })
       if (res.success) {
         // 标记数据已保存
-        this.markDataSaved();
+        this.markDataSaved()
         if (type === "add") {
-          this.$message.success("添加成功");
+          this.$message.success("添加成功")
         } else {
-          this.$message.success(isExit ? "更新成功" : "保存成功");
+          this.$message.success(isExit ? "更新成功" : "保存成功")
         }
 
         if (isExit) {
@@ -523,7 +525,7 @@ export default {
               planGroupId: this.planData.planGroupId,
               type: "edit",
             },
-          });
+          })
         }
       }
     },
@@ -540,15 +542,15 @@ export default {
         description: this.planData.description,
         dayDetails: planList,
         level: this.planData.level,
-      });
+      })
       if (res.success) {
         // 标记数据已保存
-        this.markDataSaved();
-        this.$message.success(isExit ? "添加成功" : "保存成功");
+        this.markDataSaved()
+        this.$message.success(isExit ? "添加成功" : "保存成功")
         this.planData = {
           ...this.planData,
           ...res.result,
-        };
+        }
         if (isExit) {
           this.$router.replace({
             path: "/timeTable/class",
@@ -556,17 +558,140 @@ export default {
               id: res.result.id,
               planGroupId: this.planData.planGroupId,
             },
-          });
+          })
         }
       }
     },
     handleClassTypeChange(type) {
-      this.activeClassType = type;
-      this.getClassList();
+      console.log(type, "=======******type")
+      this.activeClassType = type
+      this.getClassList()
+      if (type === "team") {
+        const loginType = localStorage.getItem("loginType")
+        console.log(loginType, "=======******loginType")
+        if (loginType === "2") {
+          this.getAllTeamsTreeList()
+        } else {
+          console.log("运动员登陆时")
+          this.getMyTeamsTreeList()
+        }
+        this.refreshTeamTree()
+        this.refreshShareGroupList()
+      }
+    },
+    refreshTeamTree() {
+      // 只在团队计划类型时刷新
+      if (this.activeClassType === 'team' && this.$refs.planListRef && this.$refs.planListRef.refreshTeamTree) {
+        this.$refs.planListRef.refreshTeamTree()
+      }
+    },
+    // 刷新当前团队的分享分组列表（用于添加/编辑/删除分组后更新右侧列表）
+    refreshShareGroupList() {
+      if (!this.currentShareTeamId) return
+      getData({
+        url: `/training/api/shareTeamGroup/list?teamId=${this.currentShareTeamId}&shareDataType=1`,
+      }).then((res) => {
+        if (res.success && res.result) {
+          this.shareGroupList = res.result
+        }
+      })
+    },
+    async getMyTeamsTreeList() {
+      const res = await getData({ url: "/consumer/api/team/query/athlete-team?triUserId=" + localStorage.getItem("triUserId") })
+      if (res.success && res.result) {
+        this.teamTreeList = [res.result]
+      } else {
+        this.teamTreeList = []
+      }
+    },
+
+    async getAllTeamsTreeList() {
+      const resDefault = await getData({ url: "/gateway/team/my-team" })
+      const resTeam = await getData({
+        url: "/consumer/api/team/coach/all-teams",
+      })
+      if (resDefault.success && resTeam.success) {
+        const list = [resDefault.result, ...resTeam.result].reduce(
+          (acc, team) => {
+            if (team && team.id && !acc.find((t) => t.id === team.id)) {
+              acc.push(team)
+            }
+            return acc
+          },
+          []
+        )
+        const teamTreeList = list.map((item) => ({
+          id: item.id,
+          name: item.teamName,
+          teamOwnerId: item.teamOwnerId,
+          members: item.members,
+        }))
+        this.teamTreeList = teamTreeList
+        console.log("=======******this.teamTreeList", this.teamTreeList)
+      }
+    },
+
+    // 选择分享团队（再次点击同一项时折叠收起）
+    handleShareTeamClick(teamId) {
+      const isSameTeam = String(this.currentShareTeamId) === String(teamId)
+      if (isSameTeam) {
+        this.currentShareTeamId = ''
+        this.shareGroupList = []
+        return
+      }
+      console.log(teamId, "teamId--选择分享团队")
+      this.currentShareTeamId = teamId
+      getData({
+        url: `/training/api/shareTeamGroup/list?teamId=${teamId}&shareDataType=1`,
+      }).then((res) => {
+        if (res.success && res.result) {
+          console.log(res.result, "res.result--分享团队下的分享组")
+          this.shareGroupList = res.result
+        }
+      })
+    },
+    handleShareTeamGroupClick(id) {
+      console.log(id, "id---分享分组id")
+      if (!id && id !== 0) return
+      const findGroup = this.shareGroupList.find(el => el.id === id)
+      this.getShareGroupClass(findGroup)
+    },
+    handleViewShareClase(item) {
+      this.showViewClassCard = true
+      const findClass = this.shareGroupList.find(el => el.id === item.classesGroupId)?.classesList.find(el => el.id === item.id)
+      this.classModalData = findClass
+    },
+    getShareGroupClass(node) {
+      const _this = this
+      getData({
+        url: `/training/api/teamShare/pageByGroupId`,
+        groupId: node.id,
+        teamId: node.teamId,
+        shareDataType: 1,
+        current: 1,
+        size: 20,
+      })
+        .then((res) => {
+          if (res.success && res.result) {
+            console.log('====分享课程', res)
+            _this.shareGroupList = _this.shareGroupList.map(el => {
+              if (el.id === node.id) {
+                return {
+                  ...el,
+                  classesList: res.result.records.map(item => ({
+                    ...item,
+                    classesJson: parseClassesJson(item.classesJson),
+                  }))
+                }
+              }
+              return el
+            })
+          }
+        })
     },
     handleClassSearch(keyword) {
-      this.classSearchInput = keyword;
-      this.getClassList();
+      this.classSearchInput = keyword
+      this.getClassList()
     },
     /**
      * 获取课程列表
@@ -575,9 +700,9 @@ export default {
       const apiMethod =
         this.activeClassType === "official"
           ? classApi.getOfficialClasses
-          : classApi.getClassesByUserId;
+          : classApi.getClassesByUserId
 
-      const res = await apiMethod(this.classSearchInput);
+      const res = await apiMethod(this.classSearchInput)
       if (res.success) {
         this.classList = res.result.map((item) => ({
           timespan: new Date().getTime(),
@@ -587,22 +712,22 @@ export default {
             ...part,
             classesJson: parseClassesJson(part.classesJson),
           })),
-        }));
+        }))
         // this.$nextTick(() => {
         //   this.classSlideChange();
         // });
       } else {
-        this.classList = [];
+        this.classList = []
       }
     },
     /**
      * 移动课程
      */
     handleMoveClass(classId, groupId) {
-      this.moveClassId = classId;
-      this.moveGroupId = groupId;
-      this.moveType = "class";
-      this.showMoveGroup = true;
+      this.moveClassId = classId
+      this.moveGroupId = groupId
+      this.moveType = "class"
+      this.showMoveGroup = true
       // console.log(
       //   this.moveClassId,
       //   this.moveGroupId,
@@ -620,42 +745,42 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        const res = await classApi.deleteClass(classItem?.id);
+        const res = await classApi.deleteClass(classItem?.id)
         if (res.success) {
-          this.$message.success("删除成功");
-          this.getClassList();
+          this.$message.success("删除成功")
+          this.getClassList()
         }
-      });
+      })
     },
     async handleUpdateClass(classData) {
       classApi.updateClass(classData).then((res) => {
         if (res.success) {
-          this.$message.success("更新成功");
-          this.getClassList();
+          this.$message.success("更新成功")
+          this.getClassList()
         }
-      });
+      })
     },
 
     /**
      * 查看课程
      */
     handleViewClass(classId) {
-      this.showViewClassCard = true;
-      this.classModalData = this.findClassById(classId);
+      this.showViewClassCard = true
+      this.classModalData = this.findClassById(classId)
     },
     /**
      * 通过ID查找课程
      */
     findClassById(id) {
-      let findClass = {};
+      let findClass = {}
       this.classList.forEach((item) => {
         item.classesList.forEach((part) => {
           if (part.id === +id) {
-            findClass = part;
+            findClass = part
           }
-        });
-      });
-      return findClass;
+        })
+      })
+      return findClass
     },
     /**
      * 复制/添加课程
@@ -669,31 +794,31 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
-      this.copyClassFromOfficialClassId = classData.id;
-      this.copyClassFromOfficialGroupId = groupId;
-      this.copyClassFromOfficialData = classData;
-      this.showCopyClassFromOfficial = true;
+      this.copyClassFromOfficialClassId = classData.id
+      this.copyClassFromOfficialGroupId = groupId
+      this.copyClassFromOfficialData = classData
+      this.showCopyClassFromOfficial = true
     },
     /**
      * 保存复制课程
      */
     onSaveCopyClassFromOfficial() {
-      this.showCopyClassFromOfficial = false;
-      this.getClassList();
+      this.showCopyClassFromOfficial = false
+      this.getClassList()
     },
     handlePlanItemMove(payload) {
-      console.log(payload, "payload");
-      console.log(this.planList, "this.planList", this.planData.dayDetails);
+      console.log(payload, "payload")
+      console.log(this.planList, "this.planList", this.planData.dayDetails)
     },
-    handlePlanLibraryDrop(payload) {},
-    relocatePlanClass(payload) {},
+    handlePlanLibraryDrop(payload) { },
+    relocatePlanClass(payload) { },
 
     /**
      * 点击框添加课程
      */
     handleBoxClick(day) {
-      this.selectedDay = day;
-      this.showSportTypeModal = true;
+      this.selectedDay = day
+      this.showSportTypeModal = true
     },
     /**
      * 选择运动类型
@@ -707,17 +832,17 @@ export default {
         rest: "REST",
         ride: "CYCLE",
         run: "RUN",
-      };
-      this.selectedSportType = Map[sportType.key];
-      this.CreatePlanCourseDialogData = {};
-      this.showCreatePlanCourseDialog = true;
+      }
+      this.selectedSportType = Map[sportType.key]
+      this.CreatePlanCourseDialogData = {}
+      this.showCreatePlanCourseDialog = true
       // this.showAddClassModal = true;
     },
     handleCreatePlanCourse(data) {
       // console.log(data, "data");
-      this.CreatePlanCourseDialogData = { ...data };
-      this.classModalDataType = "add";
-      this.showAddClassModal = true;
+      this.CreatePlanCourseDialogData = { ...data }
+      this.classModalDataType = "add"
+      this.showAddClassModal = true
     },
     /**
      * 保存添加计划表课程
@@ -726,21 +851,21 @@ export default {
       // console.log(saveData, flag, "saveData, flag");
       if (!this.selectedDay || !this.selectedDay.globalDay) {
         // console.error("selectedDay 信息不完整");
-        this.showAddClassModal = false;
-        return;
+        this.showAddClassModal = false
+        return
       }
 
-      const weekIndex = this.selectedDay.weekNumber - 1;
-      const globalDay = this.selectedDay.globalDay;
+      const weekIndex = this.selectedDay.weekNumber - 1
+      const globalDay = this.selectedDay.globalDay
       // 确保周数据存在
       if (!this.planData.dayDetails[weekIndex]) {
-        this.$set(this.planData.dayDetails, weekIndex, []);
+        this.$set(this.planData.dayDetails, weekIndex, [])
       }
 
       // 查找该天是否已存在数据
       let dayData = this.planData.dayDetails[weekIndex].find(
         (item) => item.day === globalDay
-      );
+      )
 
       if (!dayData) {
         // 如果该天不存在，创建新的数据对象
@@ -748,13 +873,13 @@ export default {
           day: globalDay,
           details: [],
           competitionDtoList: [],
-        };
-        this.planData.dayDetails[weekIndex].push(dayData);
+        }
+        this.planData.dayDetails[weekIndex].push(dayData)
       }
 
       // 确保 details 数组存在
       if (!dayData.details) {
-        this.$set(dayData, "details", []);
+        this.$set(dayData, "details", [])
       }
 
       // if (this.classModalDataType === "add") {
@@ -762,44 +887,44 @@ export default {
       // } else {
       //   this.$set(dayData.details, dayData.details.length - 1, saveData);
       // }
-      dayData.details.push(saveData);
+      dayData.details.push(saveData)
 
       if (flag) {
-        this.showAddClassModal = false;
-        this.selectedDay = null;
-        this.selectedSportType = null;
+        this.showAddClassModal = false
+        this.selectedDay = null
+        this.selectedSportType = null
       }
       if (this.CreatePlanCourseDialogData.mode === "SAVE") {
         // console.log(saveData, "saveData");
-        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
+        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)))
       } else {
-        this.classModalDataType = "edit";
+        this.classModalDataType = "edit"
       }
       // 触发响应式更新
-      this.$forceUpdate();
+      this.$forceUpdate()
     },
     handleSaveAddClass(saveData, flag) {
       // console.log(saveData, flag, "saveData, flag");
       if (!this.selectedDay || !this.selectedDay.globalDay) {
-        console.error("selectedDay 信息不完整");
-        this.showAddClassModal = false;
-        return;
+        console.error("selectedDay 信息不完整")
+        this.showAddClassModal = false
+        return
       }
       if (saveData.classesTitle.length < 1) {
-        this.$message.error("课程标题不能为空");
-        return;
+        this.$message.error("课程标题不能为空")
+        return
       }
-      const weekIndex = this.selectedDay.weekNumber - 1;
-      const globalDay = this.selectedDay.globalDay;
+      const weekIndex = this.selectedDay.weekNumber - 1
+      const globalDay = this.selectedDay.globalDay
       // 确保周数据存在
       if (!this.planData.dayDetails[weekIndex]) {
-        this.$set(this.planData.dayDetails, weekIndex, []);
+        this.$set(this.planData.dayDetails, weekIndex, [])
       }
 
       // 查找该天是否已存在数据
       let dayData = this.planData.dayDetails[weekIndex].find(
         (item) => item.day === globalDay
-      );
+      )
 
       if (!dayData) {
         // 如果该天不存在，创建新的数据对象
@@ -807,72 +932,72 @@ export default {
           day: globalDay,
           details: [],
           competitionDtoList: [],
-        };
-        this.planData.dayDetails[weekIndex].push(dayData);
+        }
+        this.planData.dayDetails[weekIndex].push(dayData)
       }
 
       // 确保 details 数组存在
       if (!dayData.details) {
-        this.$set(dayData, "details", []);
+        this.$set(dayData, "details", [])
       }
 
       if (this.classModalDataType === "add") {
-        this.$message.success("课程保存成功");
-        dayData.details.push(saveData);
+        this.$message.success("课程保存成功")
+        dayData.details.push(saveData)
       } else {
-        this.$message.success("课程保存成功");
-        this.$set(dayData.details, dayData.details.length - 1, saveData);
+        this.$message.success("课程保存成功")
+        this.$set(dayData.details, dayData.details.length - 1, saveData)
       }
 
       if (flag) {
-        this.showAddClassModal = false;
-        this.selectedDay = null;
-        this.selectedSportType = null;
+        this.showAddClassModal = false
+        this.selectedDay = null
+        this.selectedSportType = null
       }
       if (this.CreatePlanCourseDialogData.mode === "SAVE") {
-        console.log(saveData, "saveData");
-        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)));
+        console.log(saveData, "saveData")
+        this.savePlanCourse(JSON.parse(JSON.stringify(saveData)))
       } else {
-        this.classModalDataType = "edit";
+        this.classModalDataType = "edit"
       }
       // 触发响应式更新
-      this.$forceUpdate();
+      this.$forceUpdate()
       // 标记数据已修改
-      this.markDataChanged();
+      this.markDataChanged()
     },
     // 如果是永久保存 需要走接口
     async savePlanCourse(data) {
-      console.log(data, "data");
+      console.log(data, "data")
       // data.classesJson = JSON.stringify(data.classesJson);
       if (this.classModalDataType === "add") {
-        this.classModalDataType = "edit";
+        this.classModalDataType = "edit"
         classApi
           .createClass(data)
           .then((res) => {
-            console.log(res, "res");
+            console.log(res, "res")
             if (res.success) {
-              this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result };
-              this.isClassError = false;
-              this.getClassList();
+              this.CreatePlanCourseDialogData = { mode: "SAVE", ...res.result }
+              this.isClassError = false
+              this.getClassList()
             } else {
-              this.isClassError = true;
+              this.isClassError = true
             }
           })
           .catch((err) => {
-            console.log(err, "err");
-            this.isClassError = true;
-          });
+            console.log(err, "err")
+            this.isClassError = true
+          })
       } else {
         if (this.isClassError) {
-          return;
+          return
         }
         classApi.updateClass(data).then((res) => {
           if (res.success) {
-            this.getClassList();
+            this.getClassList()
           } else {
-            this.$message.error(res.message);
+            this.$message.error(res.message)
           }
-        });
+        })
       }
     },
     /**
@@ -886,84 +1011,84 @@ export default {
         globalDay,
         isCut,
         "classItem, classIndex, weekNumber, globalDay, isCut"
-      );
+      )
       if (isCut) {
         if (
           weekNumber === undefined ||
           globalDay === undefined ||
           classIndex === undefined
         ) {
-          console.error("删除参数不完整");
-          return;
+          console.error("删除参数不完整")
+          return
         }
 
-        const weekIndex = weekNumber - 1;
+        const weekIndex = weekNumber - 1
 
         // 检查周数据是否存在
         if (!this.planData.dayDetails[weekIndex]) {
-          console.error(`第 ${weekNumber} 周数据不存在`);
-          return;
+          console.error(`第 ${weekNumber} 周数据不存在`)
+          return
         }
 
         // 查找该天的数据对象
         const dayData = this.planData.dayDetails[weekIndex].find(
           (item) => item.day === globalDay
-        );
-        console.log(dayData, "dayData");
+        )
+        console.log(dayData, "dayData")
 
         if (!dayData) {
-          console.error(`第 ${globalDay} 天的数据不存在`);
-          return;
+          console.error(`第 ${globalDay} 天的数据不存在`)
+          return
         }
 
         // 检查 details 数组是否存在
         if (!dayData.details || !Array.isArray(dayData.details)) {
-          console.error(`第 ${globalDay} 天的课程数组不存在`);
-          return;
+          console.error(`第 ${globalDay} 天的课程数组不存在`)
+          return
         }
 
         // 检查索引是否有效
         if (classIndex < 0 || classIndex >= dayData.details.length) {
-          console.error(`课程索引 ${classIndex} 无效`);
-          return;
+          console.error(`课程索引 ${classIndex} 无效`)
+          return
         }
 
         // 删除指定索引的课程
-        dayData.details.splice(classIndex, 1);
+        dayData.details.splice(classIndex, 1)
 
         const dayIndex = this.planData.dayDetails[weekIndex].findIndex(
           (item) => item.day === globalDay
-        );
+        )
 
         const hasEvents =
           Array.isArray(dayData.competitionDtoList) &&
-          dayData.competitionDtoList.length > 0;
+          dayData.competitionDtoList.length > 0
 
         if (dayData.details.length === 0 && !hasEvents) {
           // 当该天没有课程和赛事时才删除整天
           if (dayIndex !== -1) {
-            this.planData.dayDetails[weekIndex].splice(dayIndex, 1);
+            this.planData.dayDetails[weekIndex].splice(dayIndex, 1)
           }
         } else if (dayIndex !== -1) {
           // 否则更新该天的数据以保持响应式
           this.$set(this.planData.dayDetails[weekIndex], dayIndex, {
             ...dayData,
             details: [...dayData.details],
-          });
+          })
         }
 
         // 触发响应式更新
-        this.$forceUpdate();
+        this.$forceUpdate()
         // 标记数据已修改
-        this.markDataChanged();
+        this.markDataChanged()
 
         // 重置编辑相关数据
-        this.editPlanClassData = {};
-        this.editPlanClassIndex = null;
-        this.editPlanClassWeekNumber = null;
-        this.editPlanClassGlobalDay = null;
+        this.editPlanClassData = {}
+        this.editPlanClassIndex = null
+        this.editPlanClassWeekNumber = null
+        this.editPlanClassGlobalDay = null
 
-        this.$message.success("操作成功");
+        this.$message.success("操作成功")
       } else {
         this.$confirm(`确认删除该课程【${classItem?.classesJson?.title}】？`, "提示", {
           confirmButtonText: "删除",
@@ -975,78 +1100,78 @@ export default {
             globalDay === undefined ||
             classIndex === undefined
           ) {
-            console.error("删除参数不完整");
-            return;
+            console.error("删除参数不完整")
+            return
           }
 
-          const weekIndex = weekNumber - 1;
+          const weekIndex = weekNumber - 1
 
           // 检查周数据是否存在
           if (!this.planData.dayDetails[weekIndex]) {
-            console.error(`第 ${weekNumber} 周数据不存在`);
-            return;
+            console.error(`第 ${weekNumber} 周数据不存在`)
+            return
           }
 
           // 查找该天的数据对象
           const dayData = this.planData.dayDetails[weekIndex].find(
             (item) => item.day === globalDay
-          );
-          console.log(dayData, "dayData");
+          )
+          console.log(dayData, "dayData")
 
           if (!dayData) {
-            console.error(`第 ${globalDay} 天的数据不存在`);
-            return;
+            console.error(`第 ${globalDay} 天的数据不存在`)
+            return
           }
 
           // 检查 details 数组是否存在
           if (!dayData.details || !Array.isArray(dayData.details)) {
-            console.error(`第 ${globalDay} 天的课程数组不存在`);
-            return;
+            console.error(`第 ${globalDay} 天的课程数组不存在`)
+            return
           }
 
           // 检查索引是否有效
           if (classIndex < 0 || classIndex >= dayData.details.length) {
-            console.error(`课程索引 ${classIndex} 无效`);
-            return;
+            console.error(`课程索引 ${classIndex} 无效`)
+            return
           }
 
           // 删除指定索引的课程
-          dayData.details.splice(classIndex, 1);
+          dayData.details.splice(classIndex, 1)
 
           const dayIndex = this.planData.dayDetails[weekIndex].findIndex(
             (item) => item.day === globalDay
-          );
+          )
 
           const hasEvents =
             Array.isArray(dayData.competitionDtoList) &&
-            dayData.competitionDtoList.length > 0;
+            dayData.competitionDtoList.length > 0
 
           if (dayData.details.length === 0 && !hasEvents) {
             // 当该天没有课程和赛事时才删除整天
             if (dayIndex !== -1) {
-              this.planData.dayDetails[weekIndex].splice(dayIndex, 1);
+              this.planData.dayDetails[weekIndex].splice(dayIndex, 1)
             }
           } else if (dayIndex !== -1) {
             // 否则更新该天的数据以保持响应式
             this.$set(this.planData.dayDetails[weekIndex], dayIndex, {
               ...dayData,
               details: [...dayData.details],
-            });
+            })
           }
 
           // 触发响应式更新
-          this.$forceUpdate();
+          this.$forceUpdate()
           // 标记数据已修改
-          this.markDataChanged();
+          this.markDataChanged()
 
           // 重置编辑相关数据
-          this.editPlanClassData = {};
-          this.editPlanClassIndex = null;
-          this.editPlanClassWeekNumber = null;
-          this.editPlanClassGlobalDay = null;
+          this.editPlanClassData = {}
+          this.editPlanClassIndex = null
+          this.editPlanClassWeekNumber = null
+          this.editPlanClassGlobalDay = null
 
-          this.$message.success("删除成功");
-        });
+          this.$message.success("删除成功")
+        })
       }
     },
     /**
@@ -1059,13 +1184,13 @@ export default {
         weekNumber,
         globalDay,
         "classItem, classIndex, weekNumber, globalDay"
-      );
-      this.CreatePlanCourseDialogData = {};
-      this.showEditPlanClassModal = true;
-      this.editPlanClassData = JSON.parse(JSON.stringify(classItem));
-      this.editPlanClassIndex = classIndex;
-      this.editPlanClassWeekNumber = weekNumber;
-      this.editPlanClassGlobalDay = globalDay;
+      )
+      this.CreatePlanCourseDialogData = {}
+      this.showEditPlanClassModal = true
+      this.editPlanClassData = JSON.parse(JSON.stringify(classItem))
+      this.editPlanClassIndex = classIndex
+      this.editPlanClassWeekNumber = weekNumber
+      this.editPlanClassGlobalDay = globalDay
     },
     /**
      * 保存编辑的计划表课程
@@ -1080,44 +1205,44 @@ export default {
         this.editPlanClassIndex === undefined ||
         this.editPlanClassIndex === null
       ) {
-        console.error("编辑参数不完整");
-        this.$message.error("编辑失败：参数不完整");
-        return;
+        console.error("编辑参数不完整")
+        this.$message.error("编辑失败：参数不完整")
+        return
       }
 
       if (!classItem) {
-        console.error("课程数据为空");
-        this.$message.error("编辑失败：课程数据为空");
-        return;
+        console.error("课程数据为空")
+        this.$message.error("编辑失败：课程数据为空")
+        return
       }
 
-      const weekIndex = this.editPlanClassWeekNumber - 1;
+      const weekIndex = this.editPlanClassWeekNumber - 1
 
       // 检查周数据是否存在
       if (!this.planData.dayDetails[weekIndex]) {
-        console.error(`第 ${this.editPlanClassWeekNumber} 周数据不存在`);
-        this.$message.error(`第 ${this.editPlanClassWeekNumber} 周数据不存在`);
-        return;
+        console.error(`第 ${this.editPlanClassWeekNumber} 周数据不存在`)
+        this.$message.error(`第 ${this.editPlanClassWeekNumber} 周数据不存在`)
+        return
       }
 
       // 查找该天的数据对象
       const dayData = this.planData.dayDetails[weekIndex].find(
         (item) => item.day === this.editPlanClassGlobalDay
-      );
+      )
 
       if (!dayData) {
-        console.error(`第 ${this.editPlanClassGlobalDay} 天的数据不存在`);
-        this.$message.error(`第 ${this.editPlanClassGlobalDay} 天的数据不存在`);
-        return;
+        console.error(`第 ${this.editPlanClassGlobalDay} 天的数据不存在`)
+        this.$message.error(`第 ${this.editPlanClassGlobalDay} 天的数据不存在`)
+        return
       }
 
       // 检查 details 数组是否存在
       if (!dayData.details || !Array.isArray(dayData.details)) {
-        console.error(`第 ${this.editPlanClassGlobalDay} 天的课程数组不存在`);
+        console.error(`第 ${this.editPlanClassGlobalDay} 天的课程数组不存在`)
         this.$message.error(
           `第 ${this.editPlanClassGlobalDay} 天的课程数组不存在`
-        );
-        return;
+        )
+        return
       }
 
       // 检查索引是否有效
@@ -1125,53 +1250,53 @@ export default {
         this.editPlanClassIndex < 0 ||
         this.editPlanClassIndex >= dayData.details.length
       ) {
-        console.error(`课程索引 ${this.editPlanClassIndex} 无效`);
-        this.$message.error(`课程索引无效`);
-        return;
+        console.error(`课程索引 ${this.editPlanClassIndex} 无效`)
+        this.$message.error(`课程索引无效`)
+        return
       }
 
       // 使用 Vue.set 确保响应式更新
-      this.$set(dayData.details, this.editPlanClassIndex, classItem);
+      this.$set(dayData.details, this.editPlanClassIndex, classItem)
 
       // 触发响应式更新
-      this.$forceUpdate();
+      this.$forceUpdate()
       // 标记数据已修改
-      this.markDataChanged();
+      this.markDataChanged()
 
       // 如果 flag 为 true，关闭编辑对话框
       if (flag) {
-        this.showEditPlanClassModal = false;
+        this.showEditPlanClassModal = false
         // 重置编辑相关数据
-        this.editPlanClassData = {};
-        this.editPlanClassIndex = null;
-        this.editPlanClassWeekNumber = null;
-        this.editPlanClassGlobalDay = null;
+        this.editPlanClassData = {}
+        this.editPlanClassIndex = null
+        this.editPlanClassWeekNumber = null
+        this.editPlanClassGlobalDay = null
       }
 
-      this.$message.success("编辑成功");
+      this.$message.success("编辑成功")
     },
     /**
      * 粘贴计划表课程
      */
     handlePasteClass(globalDay, weekNumber, classItem) {
-      console.log(globalDay, classItem, "globalDay, classItem");
-      this.CreatePlanCourseDialogData = {};
-      this.selectedDay = { globalDay, weekNumber };
-      this.onSaveAddClass(classItem, true);
+      console.log(globalDay, classItem, "globalDay, classItem")
+      this.CreatePlanCourseDialogData = {}
+      this.selectedDay = { globalDay, weekNumber }
+      this.onSaveAddClass(classItem, true)
     },
     handlePasteEvent(globalDay, weekNumber, eventItem) {
-      console.log(globalDay, eventItem, "globalDay, eventItem");
-      this.CreatePlanCourseDialogData = {};
-      this.selectedDay = { globalDay, weekNumber };
-      this.handleEventConfirm(eventItem);
+      console.log(globalDay, eventItem, "globalDay, eventItem")
+      this.CreatePlanCourseDialogData = {}
+      this.selectedDay = { globalDay, weekNumber }
+      this.handleEventConfirm(eventItem)
     },
     /**
      * 添加周
      */
     handleAddWeek() {
-      this.planData.dayDetails.push([]);
+      this.planData.dayDetails.push([])
       // 标记数据已修改
-      this.markDataChanged();
+      this.markDataChanged()
     },
     /**
      * 删除赛事
@@ -1184,37 +1309,37 @@ export default {
         globalDay,
         isCut,
         "eventItem, eventIndex, weekNumber, globalDay, isCut"
-      );
+      )
       if (isCut) {
-        const weekIndex = weekNumber - 1;
+        const weekIndex = weekNumber - 1
         const dayData = this.planData.dayDetails[weekIndex].find(
           (item) => item.day === globalDay
-        );
+        )
         if (dayData) {
-          dayData.competitionDtoList.splice(eventIndex, 1);
+          dayData.competitionDtoList.splice(eventIndex, 1)
         }
-        this.$forceUpdate();
+        this.$forceUpdate()
         // 标记数据已修改
-        this.markDataChanged();
+        this.markDataChanged()
       } else {
         this.$confirm("确认删除该赛事？", "提示", {
           confirmButtonText: "删除",
           cancelButtonText: "取消",
           type: "warning",
         }).then(() => {
-          console.log("删除赛事");
-          const weekIndex = weekNumber - 1;
+          console.log("删除赛事")
+          const weekIndex = weekNumber - 1
           const dayData = this.planData.dayDetails[weekIndex].find(
             (item) => item.day === globalDay
-          );
+          )
           if (dayData) {
-            dayData.competitionDtoList.splice(eventIndex, 1);
+            dayData.competitionDtoList.splice(eventIndex, 1)
           }
-          this.$forceUpdate();
+          this.$forceUpdate()
           // 标记数据已修改
-          this.markDataChanged();
-          this.$message.success("删除成功");
-        });
+          this.markDataChanged()
+          this.$message.success("删除成功")
+        })
       }
     },
     /**
@@ -1227,34 +1352,34 @@ export default {
         weekNumber,
         globalDay,
         "eventItem, eventIndex, weekNumber, globalDay"
-      );
-      this.editEventIndex = eventIndex;
-      this.editEventWeekNumber = weekNumber;
-      this.editEventGlobalDay = globalDay;
-      this.selectedDay = { globalDay, weekNumber };
-      this.isEditMode = true;
-      this.currentEventData = eventItem;
-      this.showAddEvent = true;
+      )
+      this.editEventIndex = eventIndex
+      this.editEventWeekNumber = weekNumber
+      this.editEventGlobalDay = globalDay
+      this.selectedDay = { globalDay, weekNumber }
+      this.isEditMode = true
+      this.currentEventData = eventItem
+      this.showAddEvent = true
     },
   },
-};
+}
 
 function clampIndex(index, length) {
-  const numericIndex = Number(index);
+  const numericIndex = Number(index)
   if (!Number.isFinite(numericIndex)) {
-    return 0;
+    return 0
   }
-  const numericLength = Number(length);
+  const numericLength = Number(length)
   if (!Number.isFinite(numericLength) || numericLength <= 0) {
-    return 0;
+    return 0
   }
   if (numericIndex < 0) {
-    return 0;
+    return 0
   }
   if (numericIndex > numericLength - 1) {
-    return numericLength - 1;
+    return numericLength - 1
   }
-  return Math.floor(numericIndex);
+  return Math.floor(numericIndex)
 }
 </script>
 
@@ -1287,6 +1412,7 @@ function clampIndex(index, length) {
       background: #a8a8a8;
     }
   }
+
   .type-change {
     flex: 0 0 260px;
     height: 100vh;

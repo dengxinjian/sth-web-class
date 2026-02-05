@@ -2,14 +2,12 @@
   <div class="plan-table-scroll-container">
     <div
       class="schedule-boxes-wrapper plan-table-container"
-      :style="{ height: containerHeight, overflowY: 'auto' }"
-    >
+      :style="{ height: containerHeight, overflowY: 'auto' }">
       <div
         v-for="(item, index) in planListWithId"
         :key="item.id || `week-${index}`"
         :data-index="index"
-        style="display: flex"
-      >
+        style="display: flex">
         <div class="schedule-boxes-wrapper-content">
           <!-- <div class="week-header">第 {{ item.weekIndex + 1 }}周</div> -->
           <div class="schedule-boxes-container">
@@ -17,12 +15,14 @@
               v-for="(box, boxIndex) in boxes"
               :key="boxIndex"
               class="schedule-box-item"
-              :class="{ 'last-item': boxIndex === boxes.length - 1 }"
-            >
+              :class="{ 'last-item': boxIndex === boxes.length - 1 }">
               <div class="box-header">
                 <div class="box-day-text">
-                  <span v-if="boxIndex === 0" class="box-day-text-week">周{{ item.weekIndex + 1 }}</span>
-                  <span v-if="boxIndex === 0" class="box-day-text-day">DAY</span>
+                  <span v-if="boxIndex === 0"
+                    class="box-day-text-week">周{{ item.weekIndex + 1
+                    }}</span>
+                  <span v-if="boxIndex === 0"
+                    class="box-day-text-day">DAY</span>
                   <span>{{ item.weekIndex * 7 + boxIndex + 1 }}</span>
                 </div>
               </div>
@@ -38,8 +38,7 @@
                     item.weekIndex,
                     boxIndex
                   )
-                "
-              >
+                  ">
                 <!-- <draggable
                   :key="`draggable-events-${item.weekIndex}-${boxIndex}`"
                   :list="
@@ -78,9 +77,8 @@
                     item.weekData,
                     item.weekIndex * 7 + boxIndex + 1
                   )"
-                  :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${
-                    eventItem.competitionName || eventItem.id || eventIndex
-                  }`"
+                  :key="`${item.weekIndex * 7 + boxIndex + 1}-${eventIndex}-${eventItem.competitionName || eventItem.id || eventIndex
+                    }`"
                   :event-item="eventItem"
                   :date="String(item.weekIndex * 7 + boxIndex + 1)"
                   data-type="planEvent"
@@ -94,7 +92,7 @@
                       item.weekIndex + 1,
                       item.weekIndex * 7 + boxIndex + 1
                     )
-                  "
+                    "
                   @delete="
                     handleDeleteEvent(
                       eventItem,
@@ -102,7 +100,7 @@
                       item.weekIndex + 1,
                       item.weekIndex * 7 + boxIndex + 1
                     )
-                  "
+                    "
                   @copy="handleCopyEvent"
                   @cut="
                     handleCutEvent(
@@ -111,17 +109,15 @@
                       item.weekIndex + 1,
                       item.weekIndex * 7 + boxIndex + 1
                     )
-                  "
-                />
+                    " />
                 <!-- </draggable> -->
                 <draggable
                   :key="`draggable-${item.weekIndex}-${boxIndex}`"
-                  :list="
-                    getDayDetailsArray(
-                      item.weekData,
-                      item.weekIndex * 7 + boxIndex + 1
-                    )
-                  "
+                  :list="getDayDetailsArray(
+                    item.weekData,
+                    item.weekIndex * 7 + boxIndex + 1
+                  )
+                    "
                   :group="{
                     name: 'plan-classes',
                     put: canPutInClassContainer,
@@ -145,19 +141,17 @@
                   :emptyInsertThreshold="10"
                   class="draggable-classes-container"
                   @start="handleDragStart"
-                  @end="handleDragEnd"
-                >
+                  @end="handleDragEnd">
                   <ClassCard
                     v-for="(classItem, classIndex) in getDayDetailsArray(
                       item.weekData,
                       item.weekIndex * 7 + boxIndex + 1
                     )"
-                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${classIndex}-${
-                      classItem.createTime ||
+                    :key="`${item.weekIndex * 7 + boxIndex + 1}-${classIndex}-${classItem.createTime ||
                       classItem.classesTitle ||
                       classItem.id ||
                       classIndex
-                    }`"
+                      }`"
                     :class-item="classItem"
                     :date="String(item.weekIndex * 7 + boxIndex + 1)"
                     :is-dragging="isDragging"
@@ -169,7 +163,7 @@
                         item.weekIndex + 1,
                         item.weekIndex * 7 + boxIndex + 1
                       )
-                    "
+                      "
                     @edit="
                       handleEditClass(
                         classItem,
@@ -177,7 +171,7 @@
                         item.weekIndex + 1,
                         item.weekIndex * 7 + boxIndex + 1
                       )
-                    "
+                      "
                     @copy="handleCopyClass"
                     @cut="
                       handleCutClass(
@@ -186,8 +180,7 @@
                         item.weekIndex + 1,
                         item.weekIndex * 7 + boxIndex + 1
                       )
-                    "
-                  />
+                      " />
                   <div
                     class="box-content"
                     :class="{ 'is-dragging': isDragging }"
@@ -196,8 +189,7 @@
                         item.weekIndex * 7 + boxIndex + 1,
                         item.weekIndex
                       )
-                    "
-                  >
+                      ">
                     <div class="box-plus-circle">
                       <div class="box-plus">+</div>
                     </div>
@@ -217,25 +209,23 @@
             </div>
             <div class="activity">
               <span class="label">时长/距离</span>
-              <span class="value"
-                >{{
-                  secondsToHHMMSS(getweekDuration(item.weekIndex)) ===
+              <span class="value">{{
+                secondsToHHMMSS(getweekDuration(item.weekIndex)) ===
                   "00:00:00"
-                    ? "--:--:--"
-                    : secondsToHHMMSS(getweekDuration(item.weekIndex))
-                }}
-                / {{ getweekDistance(item.weekIndex) || "--" }}km</span
-              >
+                  ? "--:--:--"
+                  : secondsToHHMMSS(getweekDuration(item.weekIndex))
+              }}
+                /
+                {{ getweekDistance(item.weekIndex) || "--" }}km</span>
             </div>
             <div class="activity">
               <span class="label">游泳时长/距离</span>
-              <span class="value"
-                >{{
-                  secondsToHHMMSS(getweekSwimmingDuration(item.weekIndex)) ===
+              <span class="value">{{
+                secondsToHHMMSS(getweekSwimmingDuration(item.weekIndex)) ===
                   "00:00:00"
-                    ? "--:--:--"
-                    : secondsToHHMMSS(getweekSwimmingDuration(item.weekIndex))
-                }}
+                  ? "--:--:--"
+                  : secondsToHHMMSS(getweekSwimmingDuration(item.weekIndex))
+              }}
                 /
                 {{
                   getweekSwimmingDistance(item.weekIndex) > 1000
@@ -243,38 +233,35 @@
                     : getweekSwimmingDistance(item.weekIndex) || "--"
                 }}{{
                   getweekSwimmingDistance(item.weekIndex) > 1000 ? "km" : "m"
-                }}</span
-              >
+                }}</span>
             </div>
             <div class="activity">
               <span class="label">骑行时长/距离</span>
-              <span class="value"
-                >{{
-                  secondsToHHMMSS(getweekCycleDuration(item.weekIndex)) ===
+              <span class="value">{{
+                secondsToHHMMSS(getweekCycleDuration(item.weekIndex)) ===
                   "00:00:00"
-                    ? "--:--:--"
-                    : secondsToHHMMSS(getweekCycleDuration(item.weekIndex))
-                }}
-                / {{ getweekCycleDistance(item.weekIndex) || "--" }}km</span
-              >
+                  ? "--:--:--"
+                  : secondsToHHMMSS(getweekCycleDuration(item.weekIndex))
+              }}
+                /
+                {{ getweekCycleDistance(item.weekIndex) || "--" }}km</span>
             </div>
             <div class="activity">
               <span class="label">跑步时长/距离</span>
-              <span class="value"
-                >{{
-                  secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ===
+              <span class="value">{{
+                secondsToHHMMSS(getweekRunDuration(item.weekIndex)) ===
                   "00:00:00"
-                    ? "--:--:--"
-                    : secondsToHHMMSS(getweekRunDuration(item.weekIndex))
-                }}
-                / {{ getweekRunDistance(item.weekIndex) || "--" }}km</span
-              >
+                  ? "--:--:--"
+                  : secondsToHHMMSS(getweekRunDuration(item.weekIndex))
+              }}
+                /
+                {{ getweekRunDistance(item.weekIndex) || "--" }}km</span>
             </div>
             <div class="activity">
               <span class="label">力量时长</span>
               <span class="value">{{
                 secondsToHHMMSS(getweekPowerDuration(item.weekIndex)) ===
-                "00:00:00"
+                  "00:00:00"
                   ? "--:--:--"
                   : secondsToHHMMSS(getweekPowerDuration(item.weekIndex))
               }}</span>
@@ -283,7 +270,7 @@
               <span class="label">其他时长</span>
               <span class="value">{{
                 secondsToHHMMSS(getweekOtherDuration(item.weekIndex)) ===
-                "00:00:00"
+                  "00:00:00"
                   ? "--:--:--"
                   : secondsToHHMMSS(getweekOtherDuration(item.weekIndex))
               }}</span>
@@ -294,7 +281,7 @@
       <div class="box-content-week" @click="$emit('add-week')">
         <div class="box-plus-circle">
           <!-- <el-tooltip effect="dark" content="添加周" placement="top"> -->
-            <div class="box-plus">+</div>
+          <div class="box-plus">+</div>
           <!-- </el-tooltip> -->
           <div>添加周</div>
         </div>
@@ -306,13 +293,11 @@
         v-if="contextMenuVisible && (hasCopiedClass || hasCopiedEvent)"
         class="context-menu"
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
-        @click.stop
-      >
+        @click.stop>
         <div
           v-if="hasCopiedClass || hasCopiedEvent"
           class="context-menu-item"
-          @click="handlePaste(contextMenuWeekIndex)"
-        >
+          @click="handlePaste(contextMenuWeekIndex)">
           <span>粘贴</span>
         </div>
       </div>
@@ -321,10 +306,10 @@
 </template>
 
 <script>
-import ClassCard from "./classCard.vue";
-import EventCard from "../../classManagement/components/eventCard.vue";
-import draggable from "vuedraggable";
-import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils/index";
+import ClassCard from "./classCard.vue"
+import EventCard from "../../classManagement/components/eventCard.vue"
+import draggable from "vuedraggable"
+import { hhmmssToSeconds, secondsToHHMMSS } from "@/utils/index"
 export default {
   name: "ScheduleBoxes",
   components: {
@@ -381,14 +366,14 @@ export default {
         weekNumber: null,
         globalDay: null,
       },
-    };
+    }
   },
   computed: {
     boxes() {
       return Array.from({ length: this.boxCount }, (_, index) => ({
         number: this.startNumber + index,
         index: index,
-      }));
+      }))
     },
     /**
      * 为 planList 中的每个周数据添加唯一 id
@@ -398,14 +383,14 @@ export default {
       // 处理 planList，确保每个周都有正确的数据结构
       const data = this.planList.map((week, index) => {
         // 如果周是空数组或未定义，初始化为空数组
-        const weekData = Array.isArray(week) ? week : [];
+        const weekData = Array.isArray(week) ? week : []
 
         return {
           id: `week-${index}`,
           weekIndex: index,
           weekData: weekData,
-        };
-      });
+        }
+      })
 
       // 处理 classesJson，确保它是对象格式
       data.forEach((item) => {
@@ -419,117 +404,117 @@ export default {
                   // 如果 classesJson 是字符串，解析为对象
                   if (typeof classItem.classesJson === "string") {
                     try {
-                      classItem.classesJson = JSON.parse(classItem.classesJson);
+                      classItem.classesJson = JSON.parse(classItem.classesJson)
                     } catch (error) {
                       console.error(
                         "planListWithId: JSON parse error",
                         error,
                         classItem.classesJson
-                      );
+                      )
                       // 解析失败时设置为空对象
-                      classItem.classesJson = {};
+                      classItem.classesJson = {}
                     }
                   }
                   // 如果已经是对象，保持不变
                 }
-              });
+              })
             }
             // 如果 day 没有 details，保持原样（会在 getDayDetailsArray 中处理）
-          });
+          })
         }
         // 如果 weekData 是空数组，保持原样（会显示空的 7 天容器）
-      });
-      return data;
+      })
+      return data
     },
   },
   mounted() {
-    document.addEventListener("click", this.hideContextMenu);
-    this.calculateContainerHeight();
-    window.addEventListener("resize", this.calculateContainerHeight);
+    document.addEventListener("click", this.hideContextMenu)
+    this.calculateContainerHeight()
+    window.addEventListener("resize", this.calculateContainerHeight)
   },
   beforeDestroy() {
-    document.removeEventListener("click", this.hideContextMenu);
-    window.removeEventListener("resize", this.calculateContainerHeight);
+    document.removeEventListener("click", this.hideContextMenu)
+    window.removeEventListener("resize", this.calculateContainerHeight)
   },
   methods: {
     secondsToHHMMSS,
     roundDistance(value, decimals = 2) {
       if (value === null || typeof value === "undefined") {
-        return value;
+        return value
       }
-      const numericValue = Number(value);
+      const numericValue = Number(value)
       if (!Number.isFinite(numericValue)) {
-        return value;
+        return value
       }
-      const factor = Math.pow(10, decimals);
-      return Math.round((numericValue + Number.EPSILON) * factor) / factor;
+      const factor = Math.pow(10, decimals)
+      return Math.round((numericValue + Number.EPSILON) * factor) / factor
     },
     //  计算周运动sth总值
     getweekSth(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
 
       return week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
 
             if (!classesJson || typeof classesJson.sth !== "number") {
-              return classAcc;
+              return classAcc
             }
 
-            return classAcc + classesJson.sth;
+            return classAcc + classesJson.sth
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     // 计算周运动时长总和
     getweekDuration(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
 
       return week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
 
@@ -538,96 +523,117 @@ export default {
               classesJson.duration === "00:00:00" ||
               classesJson.duration === "--:--:--"
             ) {
-              return classAcc;
+              return classAcc
             }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
+            return classAcc + hhmmssToSeconds(classesJson.duration)
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     // 计算周运动距离总和
     getweekDistance(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return Number(classAcc)
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return Number(classAcc)
               }
             }
 
             if (!classesJson.distance) {
-              return classAcc;
+              return Number(classAcc)
             }
             if (
               classesJson.sportType === "SWIM" &&
               classesJson.distanceUnit === "m"
             ) {
-              return classAcc + Number(classesJson.distance) / 1000;
+              return Number(classAcc) + Number(classesJson.distance) / 1000
             }
             if (
               !classesJson.distance ||
               classesJson.distance === "--km" ||
               classesJson.distance === "--"
             ) {
-              return classAcc;
+              return Number(classAcc)
             }
             if (
               typeof classesJson.distance === "string" &&
               classesJson.distance.includes("km")
             ) {
-              return classAcc + Number(classesJson.distance.replace("km", ""));
+              if (
+                classesJson.distanceUnit &&
+                classesJson.distanceUnit !== "km" &&
+                classItem.sportType !== "SWIM" &&
+                classesJson.distance !== "--"
+              ) {
+                const result = (Number(classesJson.distance.replace("km", "")) / 1000 || 0).toFixed(2)
+                // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+                return Number(classAcc) + Number(result)
+              }
             }
-            return classAcc + Number(classesJson.distance);
+            if (
+              classesJson.distanceUnit &&
+              classesJson.distanceUnit !== "km" &&
+              classItem.sportType !== "SWIM" &&
+              classesJson.distance !== "--"
+            ) {
+              const result = (Number(classesJson.distance) / 1000 || 0).toFixed(2)
+              console.log(result, "result")
+              console.log(Number(classAcc) + Number(result), "Number(classAcc) + Number(result)")
+              // let result = (Number(classesJson.distance) / 1000).toFixed(2)
+              return Number(classAcc) + Number(result)
+            }
+            return Number(classAcc) + Number(classesJson.distance)
           }, 0)
-        );
-      }, 0);
-      return this.roundDistance(totalDistance);
+        )
+      }, 0)
+      return this.roundDistance(totalDistance)
     },
     // 计算周运动游泳时长总和
     getweekSwimmingDuration(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       return week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
 
@@ -637,83 +643,83 @@ export default {
               classesJson.duration === "--:--:--" ||
               classItem.sportType !== "SWIM"
             ) {
-              return classAcc;
+              return classAcc
             }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
+            return classAcc + hhmmssToSeconds(classesJson.duration)
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     // 计算周游泳距离总和
     getweekSwimmingDistance(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
 
             if (!classesJson.distance || classItem.sportType !== "SWIM") {
-              return classAcc;
+              return classAcc
             }
             if (
               classesJson.sportType === "SWIM" &&
               classesJson.distanceUnit === "km"
             ) {
-              return classAcc + Number(classesJson.distance) * 1000;
+              return classAcc + Number(classesJson.distance) * 1000
             }
-            return classAcc + Number(classesJson.distance);
+            return classAcc + Number(classesJson.distance)
           }, 0)
-        );
-      }, 0);
-      return this.roundDistance(totalDistance);
+        )
+      }, 0)
+      return this.roundDistance(totalDistance)
     },
     // 计算周骑行时长总和
     getweekCycleDuration(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       return week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
 
@@ -723,81 +729,81 @@ export default {
               classesJson.duration === "--:--:--" ||
               classItem.sportType !== "CYCLE"
             ) {
-              return classAcc;
+              return classAcc
             }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
+            return classAcc + hhmmssToSeconds(classesJson.duration)
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     // 计算周骑行距离总和
     getweekCycleDistance(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
             if (!classesJson.distance || classItem.sportType !== "CYCLE") {
-              return classAcc;
+              return classAcc
             }
             if (
               typeof classesJson.distance === "string" &&
               classesJson.distance.includes("km")
             ) {
-              return classAcc + Number(classesJson.distance.replace("km", ""));
+              return classAcc + Number(classesJson.distance.replace("km", ""))
             }
-            return classAcc + Number(classesJson.distance);
+            return classAcc + Number(classesJson.distance)
           }, 0)
-        );
-      }, 0);
-      return this.roundDistance(totalDistance);
+        )
+      }, 0)
+      return this.roundDistance(totalDistance)
     },
     // 计算周跑步时长总和
     getweekRunDuration(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       return week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
 
@@ -807,78 +813,78 @@ export default {
               classesJson.duration === "--:--:--" ||
               classItem.sportType !== "RUN"
             ) {
-              return classAcc;
+              return classAcc
             }
-            return classAcc + hhmmssToSeconds(classesJson.duration);
+            return classAcc + hhmmssToSeconds(classesJson.duration)
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     // 计算周跑步距离总和
     getweekRunDistance(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       const totalDistance = week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
 
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
 
             // 处理 classesJson 可能是字符串的情况
-            let classesJson = classItem.classesJson;
+            let classesJson = classItem.classesJson
             if (typeof classesJson === "string") {
               try {
-                classesJson = JSON.parse(classesJson);
+                classesJson = JSON.parse(classesJson)
               } catch (error) {
-                console.error("解析 classesJson 失败:", error);
-                return classAcc;
+                console.error("解析 classesJson 失败:", error)
+                return classAcc
               }
             }
             if (!classesJson.distance || classItem.sportType !== "RUN") {
-              return classAcc;
+              return classAcc
             }
             if (
               !classesJson.distance ||
               classesJson.distance === "--km" ||
               classesJson.distance === "--"
             ) {
-              return classAcc;
+              return classAcc
             }
             if (
               typeof classesJson.distance === "string" &&
               classesJson.distance.includes("km")
             ) {
-              return classAcc + Number(classesJson.distance.replace("km", ""));
+              return classAcc + Number(classesJson.distance.replace("km", ""))
             }
-            return classAcc + Number(classesJson.distance);
+            return classAcc + Number(classesJson.distance)
           }, 0)
-        );
-      }, 0);
-      return this.roundDistance(totalDistance);
+        )
+      }, 0)
+      return this.roundDistance(totalDistance)
     },
     // 计算周力量时长总和
     getweekPowerDuration(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       return week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
             if (
               !classItem.classesJson.duration ||
@@ -886,37 +892,37 @@ export default {
               classItem.classesJson.duration === "--:--:--" ||
               classItem.sportType !== "STRENGTH"
             ) {
-              return classAcc;
+              return classAcc
             }
-            return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
+            return classAcc + hhmmssToSeconds(classItem.classesJson.duration)
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     // 计算周其他时长总和
     getweekOtherDuration(weekIndex) {
-      const week = this.planList[weekIndex];
+      const week = this.planList[weekIndex]
       if (!week || !Array.isArray(week)) {
-        return 0;
+        return 0
       }
       return week.reduce((acc, item) => {
         if (!item || !item.details || !Array.isArray(item.details)) {
-          return acc;
+          return acc
         }
         return (
           acc +
           item.details.reduce((classAcc, classItem) => {
             if (!classItem) {
-              return classAcc;
+              return classAcc
             }
             if (
               !classItem.classesJson.duration ||
               classItem.classesJson.duration === "00:00:00" ||
               classItem.classesJson.duration === "--:--:--"
             ) {
-              return classAcc;
+              return classAcc
             }
-            console.log(classItem.sportType, "classItem.sportType");
+            console.log(classItem.sportType, "classItem.sportType")
             if (
               classItem.sportType === "REMARK" ||
               classItem.sportType === "REST" ||
@@ -926,13 +932,13 @@ export default {
                 classItem.classesJson.duration,
                 classAcc + hhmmssToSeconds(classItem.classesJson.duration),
                 "classItem.classesJson.duration"
-              );
-              return classAcc + hhmmssToSeconds(classItem.classesJson.duration);
+              )
+              return classAcc + hhmmssToSeconds(classItem.classesJson.duration)
             }
-            return classAcc;
+            return classAcc
           }, 0)
-        );
-      }, 0);
+        )
+      }, 0)
     },
     /**
      * 获取指定天的课程数组引用（用于 vuedraggable）
@@ -942,31 +948,31 @@ export default {
      */
     getDayDetailsArray(weekData, globalDay) {
       if (!weekData || !Array.isArray(weekData)) {
-        return [];
+        return []
       }
 
       // 查找该天的数据对象
-      let dayData = weekData.find((item) => item && item.day === globalDay);
+      let dayData = weekData.find((item) => item && item.day === globalDay)
 
       if (!dayData) {
         // 如果不存在，创建一个新的，使用 Vue.set 确保响应式
         dayData = {
           day: globalDay,
           details: [],
-        };
+        }
         // 使用 $set 确保响应式
-        const index = weekData.length;
-        this.$set(weekData, index, dayData);
+        const index = weekData.length
+        this.$set(weekData, index, dayData)
       }
 
       // 确保 details 是数组且是响应式的
       if (!Array.isArray(dayData.details)) {
-        this.$set(dayData, "details", []);
+        this.$set(dayData, "details", [])
       }
 
       // 返回数组引用，确保 vuedraggable 可以正确追踪
       // 这个引用是稳定的，因为 dayData 对象是响应式的
-      return dayData.details;
+      return dayData.details
     },
     /**
      * 计算容器高度
@@ -975,13 +981,13 @@ export default {
     calculateContainerHeight() {
       // 获取视口高度
       const viewportHeight =
-        window.innerHeight || document.documentElement.clientHeight;
+        window.innerHeight || document.documentElement.clientHeight
       // 减去头部高度（Planned Schedule 头部大约80px）
-      const headerHeight = 60;
+      const headerHeight = 60
       // 计算可用高度
-      const availableHeight = viewportHeight - headerHeight;
+      const availableHeight = viewportHeight - headerHeight
       // 最小高度为400px
-      this.containerHeight = `${Math.max(400, availableHeight)}px`;
+      this.containerHeight = `${Math.max(400, availableHeight)}px`
     },
 
     /**
@@ -992,36 +998,36 @@ export default {
      */
     getDayClasses(week, globalDay) {
       if (!week || !Array.isArray(week)) {
-        return [];
+        return []
       }
 
       // 查找该天的数据对象
-      const dayData = week.find((item) => item && item.day === globalDay);
+      const dayData = week.find((item) => item && item.day === globalDay)
 
       if (!dayData || !dayData.details || !Array.isArray(dayData.details)) {
-        return [];
+        return []
       }
 
       // 处理每个课程，解析 classesJson 字符串为对象
       return dayData.details.map((classItem) => {
-        const processedItem = { ...classItem };
+        const processedItem = { ...classItem }
 
         // 如果 classesJson 是字符串，解析为对象
         if (typeof classItem.classesJson === "string") {
           try {
-            processedItem.classesJson = JSON.parse(classItem.classesJson);
+            processedItem.classesJson = JSON.parse(classItem.classesJson)
           } catch (error) {
             console.error(
               "解析 classesJson 失败:",
               error,
               classItem.classesJson
-            );
-            processedItem.classesJson = {};
+            )
+            processedItem.classesJson = {}
           }
         }
 
-        return processedItem;
-      });
+        return processedItem
+      })
     },
     /**
      * 获取指定天的赛事列表
@@ -1031,21 +1037,21 @@ export default {
      */
     getDayEvents(week, globalDay) {
       if (!week || !Array.isArray(week)) {
-        return [];
+        return []
       }
 
       // 查找该天的数据对象
-      const dayData = week.find((item) => item && item.day === globalDay);
+      const dayData = week.find((item) => item && item.day === globalDay)
 
       if (
         !dayData ||
         !dayData.competitionDtoList ||
         !Array.isArray(dayData.competitionDtoList)
       ) {
-        return [];
+        return []
       }
 
-      return dayData.competitionDtoList;
+      return dayData.competitionDtoList
     },
     /**
      * 获取指定天的赛事数组引用（用于 vuedraggable）
@@ -1055,11 +1061,11 @@ export default {
      */
     getDayEventsArray(weekData, globalDay) {
       if (!weekData || !Array.isArray(weekData)) {
-        return [];
+        return []
       }
 
       // 查找该天的数据对象
-      let dayData = weekData.find((item) => item && item.day === globalDay);
+      let dayData = weekData.find((item) => item && item.day === globalDay)
 
       if (!dayData) {
         // 如果不存在，创建一个新的，使用 Vue.set 确保响应式
@@ -1067,65 +1073,65 @@ export default {
           day: globalDay,
           details: [],
           competitionDtoList: [],
-        };
+        }
         // 使用 $set 确保响应式
-        const index = weekData.length;
-        this.$set(weekData, index, dayData);
+        const index = weekData.length
+        this.$set(weekData, index, dayData)
       }
 
       // 确保 competitionDtoList 是数组且是响应式的
       if (!Array.isArray(dayData.competitionDtoList)) {
-        this.$set(dayData, "competitionDtoList", []);
+        this.$set(dayData, "competitionDtoList", [])
       }
 
       // 返回数组引用，确保 vuedraggable 可以正确追踪
-      return dayData.competitionDtoList;
+      return dayData.competitionDtoList
     },
     handleBoxClick(globalDay, weekIndex) {
       this.$emit("box-click", {
         weekNumber: weekIndex + 1,
         globalDay: globalDay,
-      });
+      })
     },
     handleDeleteClass(classItem, classIndex, weekNumber, globalDay) {
-      this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
+      this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay)
     },
     handleEditClass(classItem, classIndex, weekNumber, globalDay) {
-      console.log("handleEditClass-classItem-1", classItem);
-      this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay);
+      console.log("handleEditClass-classItem-1", classItem)
+      this.$emit("edit-class", classItem, classIndex, weekNumber, globalDay)
     },
     handleDeleteEvent(eventItem, eventIndex, weekNumber, globalDay) {
-      this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay);
+      this.$emit("delete-event", eventItem, eventIndex, weekNumber, globalDay)
     },
     handleEditEvent(eventItem, eventIndex, weekNumber, globalDay) {
-      this.$emit("edit-event", eventItem, eventIndex, weekNumber, globalDay);
+      this.$emit("edit-event", eventItem, eventIndex, weekNumber, globalDay)
     },
     showContextMenu(event, globalDay, weekIndex, boxIndex) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
       this.$nextTick(() => {
-        this.contextMenuVisible = true;
-        this.contextMenuX = event.clientX;
-        this.contextMenuY = event.clientY;
-        this.contextMenuGlobalDay = globalDay;
-        this.contextMenuWeekIndex = weekIndex;
-      });
+        this.contextMenuVisible = true
+        this.contextMenuX = event.clientX
+        this.contextMenuY = event.clientY
+        this.contextMenuGlobalDay = globalDay
+        this.contextMenuWeekIndex = weekIndex
+      })
     },
     hideContextMenu() {
-      this.contextMenuVisible = false;
-      this.contextMenuGlobalDay = null;
-      this.contextMenuWeekIndex = null;
+      this.contextMenuVisible = false
+      this.contextMenuGlobalDay = null
+      this.contextMenuWeekIndex = null
       // 不要清除 copiedClass 和 hasCopiedClass，这样复制状态会保留
     },
     handlePaste(weekIndex) {
       if (this.copiedClass !== null) {
-        const weekNumber = weekIndex + 1;
+        const weekNumber = weekIndex + 1
         this.$emit(
           "paste-class",
           this.contextMenuGlobalDay,
           weekNumber,
           this.copiedClass
-        );
-        this.hideContextMenu();
+        )
+        this.hideContextMenu()
         if (this.cutClass.isCut) {
           this.$emit(
             "delete-class",
@@ -1134,25 +1140,25 @@ export default {
             this.cutClass.weekNumber,
             this.cutClass.globalDay,
             true
-          );
+          )
           this.cutClass = {
             isCut: false,
             classItem: null,
             classIndex: null,
             weekNumber: null,
             globalDay: null,
-          };
+          }
         }
       }
       if (this.copiedEvent !== null) {
-        const weekNumber = weekIndex + 1;
+        const weekNumber = weekIndex + 1
         this.$emit(
           "paste-event",
           this.contextMenuGlobalDay,
           weekNumber,
           this.copiedEvent
-        );
-        this.hideContextMenu();
+        )
+        this.hideContextMenu()
         if (this.cutEvent.isCut) {
           this.$emit(
             "delete-event",
@@ -1161,25 +1167,25 @@ export default {
             this.cutEvent.weekNumber,
             this.cutEvent.globalDay,
             true
-          );
+          )
           this.cutEvent = {
             isCut: false,
             eventItem: null,
             eventIndex: null,
             weekNumber: null,
             globalDay: null,
-          };
+          }
         }
       }
       // 粘贴完成后清除复制状态
-      this.hasCopiedClass = false;
-      this.copiedClass = null;
-      this.hasCopiedEvent = false;
-      this.copiedEvent = null;
+      this.hasCopiedClass = false
+      this.copiedClass = null
+      this.hasCopiedEvent = false
+      this.copiedEvent = null
     },
     handleCopyClass(classItem) {
-      this.copiedClass = { ...classItem };
-      this.hasCopiedClass = true;
+      this.copiedClass = { ...classItem }
+      this.hasCopiedClass = true
       // 清除剪切状态，因为复制操作会覆盖剪切操作
       this.cutClass = {
         isCut: false,
@@ -1187,41 +1193,41 @@ export default {
         classIndex: null,
         weekNumber: null,
         globalDay: null,
-      };
+      }
       this.$message({
         message: "课程已复制，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
     },
     handleCutClass(classItem, classIndex, weekNumber, globalDay) {
-      console.log("handleCutClass-classItem-1", classItem);
-      this.copiedClass = { ...classItem };
-      this.hasCopiedClass = true;
+      console.log("handleCutClass-classItem-1", classItem)
+      this.copiedClass = { ...classItem }
+      this.hasCopiedClass = true
       this.$message({
         message: "课程已剪切，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
       this.cutClass = {
         classItem,
         classIndex,
         weekNumber,
         globalDay,
         isCut: true,
-      };
+      }
       // this.$emit("delete-class", classItem, classIndex, weekNumber, globalDay);
     },
     // 赛事复制
     handleCopyEvent(eventItem) {
       if (!eventItem) {
-        console.error("handleCopyEvent: eventItem is null or undefined");
-        return;
+        console.error("handleCopyEvent: eventItem is null or undefined")
+        return
       }
       // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
-      const { id, ...eventData } = eventItem;
-      this.copiedEvent = { ...eventData };
-      this.hasCopiedEvent = true;
+      const { id, ...eventData } = eventItem
+      this.copiedEvent = { ...eventData }
+      this.hasCopiedEvent = true
       // 清除剪切状态，因为复制操作会覆盖剪切操作
       this.cutEvent = {
         isCut: false,
@@ -1229,31 +1235,31 @@ export default {
         eventIndex: null,
         weekNumber: null,
         globalDay: null,
-      };
+      }
       this.$message({
         message: "赛事已复制，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
     },
     // 赛事剪切
     handleCutEvent(eventItem, eventIndex, weekNumber, globalDay) {
       // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
-      const { id, ...eventData } = eventItem;
-      this.copiedEvent = { ...eventData };
-      this.hasCopiedEvent = true;
+      const { id, ...eventData } = eventItem
+      this.copiedEvent = { ...eventData }
+      this.hasCopiedEvent = true
       this.$message({
         message: "赛事已剪切，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
       this.cutEvent = {
         eventItem,
         eventIndex,
         weekNumber,
         globalDay,
         isCut: true,
-      };
+      }
     },
     /**
      * 拖拽变化事件（包括克隆元素的添加）
@@ -1277,13 +1283,13 @@ export default {
      * 拖拽开始事件
      */
     handleDragStart(evt) {
-      this.isDragging = true;
+      this.isDragging = true
     },
     /**
      * 拖拽结束事件
      */
     handleDragEnd(evt) {
-      this.isDragging = false;
+      this.isDragging = false
     },
     /**
      * 判断是否可以放入课程容器
@@ -1295,14 +1301,14 @@ export default {
     canPutInClassContainer(to, from, dragEl) {
       // 如果参数不存在，默认不允许放入
       if (!from || !dragEl) {
-        return false;
+        return false
       }
       // 检查拖拽元素是否来自赛事容器，如果是则不允许放入
       if (
         from.classList &&
         from.classList.contains("draggable-events-container")
       ) {
-        return false;
+        return false
       }
       // 检查拖拽元素是否是 EventCard，如果是则不允许放入
       const isEventCard =
@@ -1311,24 +1317,24 @@ export default {
         (dragEl.closest &&
           dragEl.closest('[data-type="planEvent"]') !== null) ||
         (dragEl.getAttribute &&
-          dragEl.getAttribute("data-type") === "planEvent");
+          dragEl.getAttribute("data-type") === "planEvent")
       if (isEventCard) {
-        return false;
+        return false
       }
       // 其他情况允许放入（是 ClassCard）
-      return true;
+      return true
     },
     /**
      * 赛事拖拽结束事件
      */
     handleEventDragEnd(evt) {
-      console.log("handleEventDragEnd-evt-1", evt);
-      this.isDragging = false;
+      console.log("handleEventDragEnd-evt-1", evt)
+      this.isDragging = false
     },
     /**
      * 赛事拖拽添加事件
      */
-    handleEventDragAdd(evt) {},
+    handleEventDragAdd(evt) { },
     /**
      * 判断是否可以放入赛事容器
      * @param {HTMLElement} to - 目标容器
@@ -1339,24 +1345,24 @@ export default {
     canPutInEventContainer(to, from, dragEl) {
       // 如果参数不存在，默认不允许放入
       if (!from || !dragEl) {
-        return false;
+        return false
       }
       // 只允许来自赛事容器的项目放入
       if (
         from.classList &&
         from.classList.contains("draggable-events-container")
       ) {
-        return true;
+        return true
       }
       // 检查拖拽元素是否是 EventCard
       const isEventCard =
         (dragEl.querySelector &&
           dragEl.querySelector('[data-type="planEvent"]') !== null) ||
-        (dragEl.closest && dragEl.closest('[data-type="planEvent"]') !== null);
-      return isEventCard;
+        (dragEl.closest && dragEl.closest('[data-type="planEvent"]') !== null)
+      return isEventCard
     },
   },
-};
+}
 </script>
 
 <style scoped lang="scss">
@@ -1398,6 +1404,7 @@ export default {
   scrollbar-width: thin;
   scrollbar-color: #c0c4cc rgba(0, 0, 0, 0.02);
 }
+
 // .schedule-boxes-wrapper {
 //   width: 100%;
 // }
@@ -1452,11 +1459,13 @@ export default {
       color: #101010;
       font-weight: 600;
       margin-bottom: 8px;
+
       // text-align: center;
       .box-day-text-week {
         color: #F92B30;
         margin-right: 12px;
       }
+
       .box-day-text-day {
         color: #101010;
       }
@@ -1468,6 +1477,7 @@ export default {
       background-color: #e5e5e5;
     }
   }
+
   .box-content-classes {
     flex: 1;
     width: 100%;
@@ -1494,6 +1504,7 @@ export default {
 
     &:hover:not(.is-dragging) {
       opacity: 1;
+
       .box-plus-circle {
         border-color: #bc362e;
 
@@ -1599,6 +1610,7 @@ export default {
     line-height: 32px;
     color: #101010;
     cursor: pointer;
+
     &:hover {
       background-color: #c3c9d740;
       font-family: PingFang SC;
@@ -1622,7 +1634,7 @@ export default {
 .schedule-boxes-wrapper-content-right {
   flex: 0.15;
   background-color: #fff;
-  padding:0 20px;
+  padding: 0 20px;
   display: flex;
   flex-direction: column;
   min-width: 248px;
@@ -1657,7 +1669,7 @@ export default {
   //   border-bottom: none;
   // }
 
-  > div {
+  >div {
     font-size: 14px;
     color: #606266;
     display: flex;
@@ -1693,6 +1705,7 @@ export default {
     }
   }
 }
+
 .box-content-week {
   display: flex;
   align-items: center;
@@ -1702,14 +1715,17 @@ export default {
 
   &:hover {
     border-color: #bc362e;
-      .box-plus-circle {
-        border-color: #bc362e;
+
+    .box-plus-circle {
+      border-color: #bc362e;
+      color: #bc362e;
+
+      .box-plus {
         color: #bc362e;
-        .box-plus {
-          color: #bc362e;
-        }
       }
     }
+  }
+
   .box-plus-circle {
     display: flex;
     align-items: center;
@@ -1719,6 +1735,7 @@ export default {
     padding: 20px;
     box-sizing: border-box;
     flex: 0.847;
+
     .box-plus {
       font-size: 22px;
       color: #303133;

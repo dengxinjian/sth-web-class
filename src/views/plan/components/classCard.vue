@@ -55,6 +55,7 @@
                 </div>
                 <div
                   class="btn-list-hover-item"
+                  style="color: #f92b30"
                   @click.stop="$emit('delete', classItem)">
                   删除
                 </div>
@@ -180,7 +181,7 @@
         <div class="context-menu-item" @click.stop="handleCopy">
           复制
         </div>
-        <div class="context-menu-item" @click.stop="handleDelete">
+        <div class="context-menu-item" @click.stop="handleDelete" style="color: #f92b30">
           删除
         </div>
       </div>
@@ -402,10 +403,7 @@ export default {
 <style lang="scss" scoped>
 .class-schedule-card-container {
   margin-bottom: 5px;
-  cursor: pointer;
-  // max-width: 200px;
-  width: 100%;
-
+  margin-top: 5px;
   .sport-drap-handle {
     display: none;
   }
@@ -416,46 +414,40 @@ export default {
   margin-right: 2px;
   position: relative;
   border: 1px solid #e5e5e5;
-  transition: all 0.3s ease;
+  // transition: all 0.3s ease;
   overflow: hidden;
-  border-radius: 6px;
-  background-color: #ffffff;
-  padding-top: 10px;
-  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.75);
+  border-radius: 5px;
+  box-shadow: 0px 2px 6px 0px #00000026;
+  background-color: #fff;
+  padding-bottom: 10px;
 
-  &:hover:not(.is-dragging) {
+  &:hover {
     transform: scale(1.02);
   }
 
-  &.is-dragging {
-    pointer-events: none;
-  }
-
-  >.classScheduleCard {
+  > .classScheduleCard {
     display: none;
   }
 
   .card-body {
     width: 100%;
-    padding-left: 2px;
-    padding-right: 2px;
     padding-bottom: 5px;
+    padding: 0 10px;
 
     .body-title {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
-      background-color: white;
       padding: 5px 3px;
 
       .sport-type-icon {
         display: flex;
-        align-content: center;
+        align-items: center;
 
         .sport-type-name {
-          width: 15px;
-          height: 15px;
+          width: 16px;
+          height: 16px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -469,11 +461,12 @@ export default {
         .sport-type-color1 {
           background-color: #7fb135;
         }
-
         .sport-type-color2 {
           background-color: #c72a29;
         }
-
+        .sport-type-color3 {
+          background-color: #f5a623;
+        }
         .sport-type-color0 {
           background-color: #aaaaaa;
         }
@@ -485,19 +478,36 @@ export default {
     }
 
     .title {
-      font-size: 14px;
-      font-weight: bold;
+      font-size: 15px;
+      line-height: 20px;
+      font-weight: 400;
+      flex: 1;
+      overflow: hidden;
+      // margin-left: 6px;
+      font-family: PingFang SC;
+      font-style: Regular;
+      color: #101010;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
     }
 
     .keyword {
       font-size: 12px;
       font-weight: bold;
+      font-family: PingFang SC;
+      font-weight: 500;
+      font-style: Medium;
+      font-size: 13px;
+      letter-spacing: 0%;
+      vertical-align: middle;
+      color: #101010;
+      margin-top: 4px;
     }
 
     .stage-details-p {
-      font-size: 12px;
-      color: #999;
-      padding: 5px 5px 0;
+      // padding: 5px 5px 0;
       line-height: 16px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -506,6 +516,13 @@ export default {
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 5;
       line-clamp: 5;
+      font-family: PingFang SC;
+      font-weight: 400;
+      font-style: Regular;
+      font-size: 12px;
+      color: #101010;
+
+      // margin-bottom: 5px;
     }
   }
 }
@@ -514,7 +531,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-
   .btn-list-hover-item {
     width: 60px;
     height: 32px;
@@ -527,7 +543,6 @@ export default {
     line-height: 32px;
     color: #101010;
     cursor: pointer;
-
     &:hover {
       background-color: #c3c9d740;
       font-family: PingFang SC;

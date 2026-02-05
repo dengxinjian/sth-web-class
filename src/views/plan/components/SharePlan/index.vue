@@ -157,7 +157,7 @@ export default {
           filterDataId: this.planInfo.id,
           filterDataType: 2,
         })
-        this.teams = res.result
+        this.teams = [res.result]
       }
       console.log(this.teams, "this.teams")
     },
