@@ -26,8 +26,10 @@
         :class="{ 'active-title': activeClassType === 'official' }"
         @click="handleClassTypeChange('official')">
         <div class="title"
-          :class="{ 'active-title': activeClassType === 'official' }" style="color: #FFFFFF; font-size: 14px;">
-          <img src="../../../assets/plan/Group.png" alt="计划示例" style="width: 100%; height:32px;">
+          :class="{ 'active-title': activeClassType === 'official' }"
+          style="color: #FFFFFF; font-size: 14px;">
+          <img src="../../../assets/plan/Group.png" alt="计划示例"
+            style="width: 100%; height:32px;">
           <!-- 计划示例 -->
         </div>
         <div class="title-icon" v-if="activeClassType === 'official'">
@@ -156,7 +158,8 @@
                       }}</span>
                   </div>
                 </span>
-                <HoverPlanDetail :planInfo="classItem" :activeClassType="activeClassType"
+                <HoverPlanDetail :planInfo="classItem"
+                  :activeClassType="activeClassType"
                   @move="handleMovePlan">
                 </HoverPlanDetail>
               </el-popover>
@@ -367,23 +370,24 @@ export default {
       deep: true,
     },
     // 监听 activeClassType 变化
-    activeClassType: {
-      handler(newVal, oldVal) {
-        // 清空搜索输入
-        this.searchInput = ""
-        // 当 activeClassType 改变时显示 loading 并折叠所有项
-        if (oldVal !== undefined && newVal !== oldVal) {
-          this.loading = true
-          this.activeCollapse = null
-        }
-        this.handleClassTypeChange(newVal)
-      },
-      immediate: true,
-    },
+    // activeClassType: {
+    //   handler(newVal, oldVal) {
+    //     // 清空搜索输入
+    //     this.searchInput = ""
+    //     // 当 activeClassType 改变时显示 loading 并折叠所有项
+    //     if (oldVal !== undefined && newVal !== oldVal) {
+    //       this.loading = true
+    //       this.activeCollapse = null
+    //     }
+    //     this.handleClassTypeChange(newVal)
+    //   },
+    //   immediate: true,
+    // },
   },
   mounted() {
     // 组件挂载后，延迟检查以确保数据已加载
     // 使用 setTimeout 确保在异步数据加载完成后也能展开
+    this.handleClassTypeChange(this.activeClassType)
     setTimeout(() => {
       this.tryExpandGroup()
     }, 100)
@@ -397,21 +401,6 @@ export default {
     handleClassTypeChange(type) {
       // 清空搜索输入
       this.searchInput = ""
-      // if (type === "official") {
-      //   let flag = false
-      //   userApi.getIsSubscribe(localStorage.getItem("triUserId")).then((res) => {
-      //     if (res.success && res.result) {
-      //       console.log(res.result, "res.result--是否订阅")
-      //       if (res.result.length === 0) {
-      //         this.$message.warning("请先订阅VIP才能查看团队计划")
-      //         flag = true
-      //       }
-      //     }
-      //   })
-      //   if (flag) {
-      //     return
-      //   }
-      // }
       this.$emit("update:activeClassType", type)
       // 触发 class-type-change 事件，让父组件处理类型切换
       this.$emit("class-type-change", type)
@@ -655,6 +644,7 @@ export default {
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       .title {
         width: 69px;
         height: 32px;
@@ -668,6 +658,7 @@ export default {
         font-size: 15px;
         line-height: 32px;
         letter-spacing: 0%;
+        cursor: pointer;
       }
 
       .title-icon {

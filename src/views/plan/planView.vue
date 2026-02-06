@@ -2,79 +2,117 @@
   <div class="container" :style="{ width: isPlan ? '100%' : '' }">
     <div class="plan-container">
       <div class="type-change">
-        <PlanList ref="planListRef" :class-list="classList" :active-class-type.sync="activeClassType"
-          @class-type-change="handleClassTypeChange" @search="handlePlanSearch" :show-add-class-btn="true"
-          @view-class="handleViewClass" @add-plan="handleAddPlan" @add-group="handleAddGroup"
-          @edit-group="handleEditGroup" @delete-group="handleDeleteGroup" @choose-plan="handlePlanDayDetail"
-          @view-plan="handleViewPlanView" @add-share-group="handleAddShareGroup"
-          @edit-share-group="handleEditShareGroup" @delete-share-group="handleDeleteShareGroup"
-          @move-share-group="handleMoveShareGroup" @move-plan="handleMovePlan" :selected-plan-id="currentPlanId"
+        <PlanList ref="planListRef" :class-list="classList"
+          :active-class-type.sync="activeClassType"
+          @class-type-change="handleClassTypeChange"
+          @search="handlePlanSearch" :show-add-class-btn="true"
+          @view-class="handleViewClass" @add-plan="handleAddPlan"
+          @add-group="handleAddGroup"
+          @edit-group="handleEditGroup"
+          @delete-group="handleDeleteGroup"
+          @choose-plan="handlePlanDayDetail"
+          @view-plan="handleViewPlanView"
+          @add-share-group="handleAddShareGroup"
+          @edit-share-group="handleEditShareGroup"
+          @delete-share-group="handleDeleteShareGroup"
+          @move-share-group="handleMoveShareGroup"
+          @move-plan="handleMovePlan"
+          :selected-plan-id="currentPlanId"
           :current-plan-group-id="currentPlanGroupId" />
       </div>
-      <PlannedScheduleView v-if="isPlan" :planList="planList" :planTitle="planTitle" :showMore="showMore"
+      <PlannedScheduleView v-if="isPlan" :planList="planList"
+        :planTitle="planTitle" :showMore="showMore"
         :shareUserId="shareUserId"
-        :shareAuth="shareAuth" :activeClassType="activeClassType" @options-click="handleOptionsClick"
+        :shareAuth="shareAuth" :activeClassType="activeClassType"
+        @options-click="handleOptionsClick"
         @view-class="handleViewPlanClass" />
     </div>
     <!-- 查看计划详情 -->
-    <ViewPlanDetail :visible="showViewPlanDetail" :class-item="classModalData" :click-position="clickPosition"
+    <ViewPlanDetail :visible="showViewPlanDetail"
+      :class-item="classModalData" :click-position="clickPosition"
       @close="showViewPlanDetail = false" />
     <!-- 复制课程 -->
-    <CopyClassFromOfficial v-model="showCopyClassFromOfficial" :class-id="copyClassFromOfficialClassId"
-      :group-id="copyClassFromOfficialGroupId" :data="copyClassFromOfficialData" :active-class-type="activeClassType"
+    <CopyClassFromOfficial v-model="showCopyClassFromOfficial"
+      :class-id="copyClassFromOfficialClassId"
+      :group-id="copyClassFromOfficialGroupId"
+      :data="copyClassFromOfficialData"
+      :active-class-type="activeClassType"
       @save="onSaveCopyClassFromOfficial" />
 
     <!-- 添加计划 -->
-    <AddPlan v-model="addPlanVisible" :current-group-id="addPlanGroupId" :activeClassType="activeClassType"
-      :copyOfficialPlanInfo="copyOfficialPlanInfo" :planList="planList" @addPlanSuccess="handleAddPlanSuccess"
+    <AddPlan v-model="addPlanVisible"
+      :current-group-id="addPlanGroupId"
+      :activeClassType="activeClassType"
+      :copyOfficialPlanInfo="copyOfficialPlanInfo"
+      :planList="planList" @addPlanSuccess="handleAddPlanSuccess"
       @cancel="handleAddPlanCancel" />
     <!-- 添加分组 -->
-    <AddGroup v-model="addGroupVisible" :data="currentGroup" @save="handleAddGroupSave" />
+    <AddGroup v-model="addGroupVisible" :data="currentGroup"
+      @save="handleAddGroupSave" />
     <!-- 添加分享分组 -->
-    <AddShareGroup v-model="addShareGroupVisible" :data="currentShareGroup" @save="handleAddShareGroupSave" />
+    <AddShareGroup v-model="addShareGroupVisible"
+      :data="currentShareGroup" @save="handleAddShareGroupSave" />
     <!-- 移动分享分组 -->
-    <MoveShareGroup v-model="moveShareGroupVisible" :data="currentMoveShareGroup" @save="handleMoveShareGroupSave" />
+    <MoveShareGroup v-model="moveShareGroupVisible"
+      :data="currentMoveShareGroup"
+      @save="handleMoveShareGroupSave" />
     <!-- 概要 -->
-    <SummaryPreview v-model="showSummaryPreview" :active-class-type="activeClassType" :planInfo="currentPlanDetail"
+    <SummaryPreview v-model="showSummaryPreview"
+      :active-class-type="activeClassType"
+      :planInfo="currentPlanDetail"
       :planClasses="planList" @cancel="handleSummaryPreviewCancel" />
     <!-- 复制 -->
-    <Copy :defaultTitle="`${currentPlanDetail.planTitle}_复制`" :defaultGroupId="currentPlanDetail.planGroupId"
-      v-model="showCopy" :planInfo="currentPlanDetail" :planClasses="planList" @save="onSaveCopy" />
+    <Copy :defaultTitle="`${currentPlanDetail.planTitle}_复制`"
+      :defaultGroupId="currentPlanDetail.planGroupId"
+      v-model="showCopy" :planInfo="currentPlanDetail"
+      :planClasses="planList" @save="onSaveCopy" />
     <!-- 应用计划 -->
-    <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail" :planClasses="planList"
-      @cancel="handleApplyCoachCancel" @viewApplyHistory="handleViewApplyHistory" />
+    <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail"
+      :planClasses="planList"
+      @cancel="handleApplyCoachCancel"
+      @viewApplyHistory="handleViewApplyHistory" />
     <!-- 计划分享 -->
-    <SharePlan v-model="showSharePlan" :planInfo="currentPlanDetail" @shareSuccess="handleShareSuccess" />
+    <SharePlan v-model="showSharePlan" :planInfo="currentPlanDetail"
+      @shareSuccess="handleShareSuccess" />
     <!-- 应用历史 -->
-    <ApplyHistory v-model="showApplyHistory" :planInfo="currentPlanDetail" />
+    <ApplyHistory v-model="showApplyHistory"
+      :planInfo="currentPlanDetail" />
     <!-- 移动计划到分组 -->
-    <MovePlan v-model="showMovePlan" :planInfo="currentPlanDetail" @save="handleMovePlanSave" />
+    <MovePlan v-model="showMovePlan" :planInfo="currentPlanDetail"
+      @save="handleMovePlanSave" />
     <!-- 权限调整 -->
-    <PermissionAdjust v-model="showSharePlanPersion" :shareAuth="shareAuth" :planInfo="currentPlanDetail"
+    <PermissionAdjust v-model="showSharePlanPersion"
+      :shareAuth="shareAuth" :planInfo="currentPlanDetail"
       @close="handleSharePlanPersionClose" />
+    <!-- 订阅 -->
+    <Vip1 :visible.sync="showVip1" />
+    <Vip2 :visible.sync="showVip2" />
   </div>
 </template>
 
 <script>
-import { parseClassesJson } from "../classManagement/utils/helpers";
-import PlanList from "./components/PlanList.vue";
-import ViewPlanDetail from "./components/ViewPlanDetail/index.vue";
-import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOfficial/index.vue";
-import PlannedScheduleView from "./components/plannedScheduleView.vue";
-import AddPlan from "./components/AddPlan";
-import AddGroup from "./components/AddGroup";
-import AddShareGroup from "./components/AddShareGroup";
-import MoveShareGroup from "./components/MoveShareGroup";
-import MovePlan from "./components/MovePlan/index.vue";
-import SummaryPreview from "./components/SummaryPreview/index.vue";
-import Copy from "./components/Copy/index.vue";
-import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue";
-import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue";
-import SharePlan from "./components/SharePlan/index.vue";
-import PermissionAdjust from "./components/SharePlanPersion/index.vue";
+import { parseClassesJson } from "../classManagement/utils/helpers"
+import PlanList from "./components/PlanList.vue"
+import ViewPlanDetail from "./components/ViewPlanDetail/index.vue"
+import CopyClassFromOfficial from "../classManagement/components/CopyClassFromOfficial/index.vue"
+import PlannedScheduleView from "./components/plannedScheduleView.vue"
+import AddPlan from "./components/AddPlan"
+import AddGroup from "./components/AddGroup"
+import AddShareGroup from "./components/AddShareGroup"
+import MoveShareGroup from "./components/MoveShareGroup"
+import MovePlan from "./components/MovePlan/index.vue"
+import SummaryPreview from "./components/SummaryPreview/index.vue"
+import Copy from "./components/Copy/index.vue"
+import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue"
+import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue"
+import SharePlan from "./components/SharePlan/index.vue"
+import PermissionAdjust from "./components/SharePlanPersion/index.vue"
+import Vip1 from "./components/vip1.vue"
+import Vip2 from "./components/vip2.vue"
 // 服务和工具导入
-import { planApi, groupApi } from "./services/planManagement";
-import { getData } from "@/api/common";
+import { planApi, groupApi } from "./services/planManagement"
+import { getData } from "@/api/common"
+import { userApi } from "./services/planManagement"
 
 export default {
   name: "PlanView",
@@ -94,6 +132,8 @@ export default {
     ApplyHistory,
     SharePlan,
     PermissionAdjust,
+    Vip1,
+    Vip2,
   },
   props: {
     isPlan: {
@@ -134,6 +174,8 @@ export default {
       showSharePlan: false,
       showMovePlan: false,
       showSharePlanPersion: false,
+      showVip1: false,
+      showVip2: false,
       currentPlanId: "",
       currentPlanGroupId: "",
       planTitle: "",
@@ -153,12 +195,12 @@ export default {
       limitValue: 0, // 计划限制数量
       currentCount: 0, // 当前计划数量
       shareUserId: "",
-    };
+    }
   },
   watch: {
     currentPlanDetail: {
       handler(newVal) {
-        this.planTitle = newVal?.planTitle || "";
+        this.planTitle = newVal?.planTitle || ""
       },
       deep: true,
     },
@@ -167,12 +209,12 @@ export default {
         // console.log(newVal, "newVal");
         if (newVal) {
           if (Object.keys(this.$route.query).length > 0) {
-            const { id, planGroupId, type } = this.$route.query;
+            const { id, planGroupId, type } = this.$route.query
             if (id) {
-              this.currentPlanId = parseInt(id);
+              this.currentPlanId = parseInt(id)
               // this.currentPlanGroupId = parseInt(planGroupId);
-              this.getPlanDetail(id);
-              this.getPlanDayDetail(id);
+              this.getPlanDetail(id)
+              this.getPlanDayDetail(id)
             }
 
             // if (type === "edit") {
@@ -181,18 +223,18 @@ export default {
             // }
 
             if (type === "cancel" && this.$store.state.plan.planData?.id) {
-              this.currentPlanId = this.$store.state.plan.planData?.id;
+              this.currentPlanId = this.$store.state.plan.planData?.id
               if (this.currentPlanId) {
-                this.getPlanDetail(this.currentPlanId);
-                this.getPlanDayDetail(this.currentPlanId);
+                this.getPlanDetail(this.currentPlanId)
+                this.getPlanDayDetail(this.currentPlanId)
               }
             }
             // this.$emit("choose-plan");
           }
-          this.getPlanList();
+          this.getPlanList()
           // this.getPlanLimitCount();
           // this.getTeamList();
-          this.getDefaultTeam(); // 个人初始团队id
+          this.getDefaultTeam() // 个人初始团队id
         }
       },
       immediate: true,
@@ -201,26 +243,26 @@ export default {
   mounted() {
     if (localStorage.getItem("loginType") !== "1") {
       // this.getDefaultTeam();
-      this.getDefaultTeam();
+      this.getDefaultTeam()
     }
   },
   methods: {
     async getTeamList() {
-      const _this = this;
+      const _this = this
       getData({
         url: "/consumer/api/team/coach/all-teams",
       }).then((res) => {
         if (res.success) {
-          _this.ownerTeams = res.result;
+          _this.ownerTeams = res.result
           const list = [..._this.teamList, ...res.result].reduce(
             (acc, team) => {
               if (team && team.id && !acc.find((t) => t.id === team.id)) {
-                acc.push(team);
+                acc.push(team)
               }
-              return acc;
+              return acc
             },
             []
-          );
+          )
           // console.log(list, "*======list====过滤团队数组");
           _this.teamList = list.map((item) => {
             return {
@@ -231,20 +273,20 @@ export default {
               groupName: item.teamName,
               membersCount: item.members?.length || 0,
               triUserId: item.triUserId,
-            };
-          });
+            }
+          })
           // console.log(_this.teamList, "*======teamList====重组团队数据");
         }
-      });
+      })
     },
     async getDefaultTeam() {
-      const _this = this;
+      const _this = this
       const res = await getData({
         url: "/gateway/team/my-team",
-      });
+      })
       if (res.success) {
-        _this.teamList = [..._this.teamList, res.result] || [];
-        _this.getTeamList();
+        _this.teamList = [..._this.teamList, res.result] || []
+        _this.getTeamList()
       }
       // getData({
       //   url: "/gateway/team/my-team",
@@ -254,77 +296,77 @@ export default {
       // });
     },
     async getPlanLimitCount() {
-      const res = await planApi.getPlanLimitCount();
-      this.limitValue = res.result.limitValue;
-      this.currentCount = res.result.currentCount;
-      return res.result;
+      const res = await planApi.getPlanLimitCount()
+      this.limitValue = res.result.limitValue
+      this.currentCount = res.result.currentCount
+      return res.result
     },
     handleAddPlanCancel() {
-      this.addPlanVisible = false;
-      this.copyOfficialPlanInfo = null;
+      this.addPlanVisible = false
+      this.copyOfficialPlanInfo = null
     },
     handleAddPlanSuccess(payload) {
-      this.getPlanDetail(payload.id);
-      this.getPlanDayDetail(payload.id);
+      this.getPlanDetail(payload.id)
+      this.getPlanDayDetail(payload.id)
       this.$nextTick(() => {
-        this.activeClassType = "my";
-        this.currentPlanId = payload.id;
-        this.currentPlanGroupId = payload.planGroupId;
-        this.planTitle = payload.planTitle;
-        this.currentPlanDetail = payload;
-        this.copyOfficialPlanInfo = null;
-        this.addPlanVisible = false;
-      });
+        this.activeClassType = "my"
+        this.currentPlanId = payload.id
+        this.currentPlanGroupId = payload.planGroupId
+        this.planTitle = payload.planTitle
+        this.currentPlanDetail = payload
+        this.copyOfficialPlanInfo = null
+        this.addPlanVisible = false
+      })
     },
     onSaveCopy(payload) {
-      this.showCopy = false;
-      this.getPlanList();
+      this.showCopy = false
+      this.getPlanList()
     },
     handleApplyCoachCancel(payload) {
-      this.showApplyCoach = false;
+      this.showApplyCoach = false
       // this.getPlanList();
     },
     handleViewApplyHistory(planId) {
-      this.showApplyHistory = true;
-      this.currentPlanId = planId;
+      this.showApplyHistory = true
+      this.currentPlanId = planId
     },
     handleShareSuccess(payload) {
-      this.showSharePlan = false;
+      this.showSharePlan = false
     },
     /**
      * 处理概要预览取消事件
      * @param {boolean} payload - 是否需要重新获取计划列表
      */
     async handleSummaryPreviewCancel(payload) {
-      this.showSummaryPreview = false;
+      this.showSummaryPreview = false
       if (payload) {
-        await this.getPlanList();
-        await this.getPlanDetail(this.currentPlanId);
-        await this.getPlanDayDetail(this.currentPlanId);
+        await this.getPlanList()
+        await this.getPlanDetail(this.currentPlanId)
+        await this.getPlanDayDetail(this.currentPlanId)
       }
     },
     async handlePlanDayDetail(id, groupId) {
-      this.currentPlanId = id;
-      this.currentPlanGroupId = groupId;
-      this.$emit("choose-plan", true);
-      await this.getPlanDetail(id);
-      await this.getPlanDayDetail(id);
+      this.currentPlanId = id
+      this.currentPlanGroupId = groupId
+      this.$emit("choose-plan", true)
+      await this.getPlanDetail(id)
+      await this.getPlanDayDetail(id)
     },
     async handleViewPlanView(id, data) {
       // console.log("handleViewPlan===选择分享计划", id,data);
-      this.shareAuth = data.shareAuth;
-      this.shareUserId = data.shareUserId;
-      this.$emit("choose-plan", true);
-      await this.getPlanDetail(id);
-      await this.getPlanDayDetail(id);
+      this.shareAuth = data.shareAuth
+      this.shareUserId = data.shareUserId
+      this.$emit("choose-plan", true)
+      await this.getPlanDetail(id)
+      await this.getPlanDayDetail(id)
     },
     /**
      * 获取计划详情
      */
     async getPlanDetail(id) {
-      const res = await planApi.getPlanDetail(id);
-      this.currentPlanDetail = res.result;
-      this.currentPlanId = res.result.id;
+      const res = await planApi.getPlanDetail(id)
+      this.currentPlanDetail = res.result
+      this.currentPlanId = res.result.id
       // 是否展开
       // this.currentPlanGroupId = res.result.planGroupId;
     },
@@ -334,22 +376,22 @@ export default {
      * @returns {Array} 重组后的数据格式 [[{day: 1, details: [...]}, ...], [{day: 8, details: [...]}, ...], ...]
      */
     formatPlanDayDetail(data) {
-      const result = [];
+      const result = []
       // 将data中的28条数据，按每7天一组组成二维数组
       for (let i = 0; i < data.length; i += 7) {
-        result.push(data.slice(i, i + 7));
+        result.push(data.slice(i, i + 7))
       }
-      return result;
+      return result
     },
     async getPlanDayDetail(id) {
-      const resDayDetail = await planApi.getPlanDayDetail(id);
+      const resDayDetail = await planApi.getPlanDayDetail(id)
       // 处理并重组数据
-      const completeData = this.completePlanDayData(resDayDetail.result);
-      const formattedData = this.formatPlanDayDetail(completeData);
+      const completeData = this.completePlanDayData(resDayDetail.result)
+      const formattedData = this.formatPlanDayDetail(completeData)
 
       // return formattedData;
-      this.planList = formattedData;
-      this.showMore = true;
+      this.planList = formattedData
+      this.showMore = true
     },
     /**
      * 补充完整周数的数据
@@ -362,44 +404,44 @@ export default {
     completePlanDayData(data) {
       if (!Array.isArray(data) || data.length === 0) {
         // 如果数据为空，返回28天的空数据（4周）
-        const result = [];
+        const result = []
         for (let day = 1; day <= 28; day++) {
           result.push({
             day: day,
             details: [],
             competitionDtoList: [],
-          });
+          })
         }
-        return result;
+        return result
       }
 
       // 创建day到数据的映射，方便查找
-      const dayMap = new Map();
+      const dayMap = new Map()
       data.forEach((item) => {
-        dayMap.set(item.day, item);
-      });
+        dayMap.set(item.day, item)
+      })
 
       // 找到最大的day值（最后一条数据的day）
-      const maxDay = Math.max(...data.map((item) => item.day));
+      const maxDay = Math.max(...data.map((item) => item.day))
 
       // 计算周数：最后一条day的数值除以7向上取整
-      const weekCount = Math.ceil(maxDay / 7);
+      const weekCount = Math.ceil(maxDay / 7)
 
       // 确定目标天数
-      let targetDays;
+      let targetDays
       if (weekCount < 4) {
         // 如果周数小于4，补充至4周（28天）
-        targetDays = 28;
+        targetDays = 28
       } else {
         // 如果周数大于等于4，补充至当前周数（周数 * 7天）
-        targetDays = weekCount * 7;
+        targetDays = weekCount * 7
       }
 
       // 确保1到目标天数的数据都存在，如果中间有缺失的天数也要补充
-      const completeData = [];
+      const completeData = []
       for (let day = 1; day <= targetDays; day++) {
         if (dayMap.has(day)) {
-          completeData.push(dayMap.get(day));
+          completeData.push(dayMap.get(day))
         } else {
           const newDayData = {
             day: day,
@@ -407,28 +449,48 @@ export default {
             // 将原始数据中的competitionDtoList补充到新数据中
             competitionDtoList:
               data.find((item) => item.day === day)?.competitionDtoList || [],
-          };
-          completeData.push(newDayData);
+          }
+          completeData.push(newDayData)
           // 同时更新dayMap，保持一致性
-          dayMap.set(day, newDayData);
+          dayMap.set(day, newDayData)
         }
       }
 
-      return completeData;
+      return completeData
     },
-    handleClassTypeChange(type) {
-      this.planSearchInput = "";
-      this.activeClassType = type;
+    async handleClassTypeChange(type) {
+      this.planSearchInput = ""
+      let flag = false
+      if (type === "official") {
+        const res = await userApi.getIsSubscribe(localStorage.getItem("triUserId"))
+        if (res.success && res.result) {
+          console.log(res.result, "res.result--是否订阅")
+          if (res.result.length === 0) {
+            if (localStorage.getItem("loginType") === "2") {
+              this.showVip1 = true
+            } else {
+              this.showVip2 = true
+            }
+            flag = true
+          }
+        }
+      }
+      if (flag) {
+        this.activeClassType = "my"
+        return
+      }
+      this.activeClassType = type
+      console.log(type, "type--handleClassTypeChange")
       if (type === "team") {
         // this.getTeamPlanList();
       } else {
-        this.restPageInfo();
-        this.getPlanList();
+        this.restPageInfo()
+        this.getPlanList()
       }
     },
     handlePlanSearch(keyword) {
-      this.planSearchInput = keyword;
-      this.getPlanList();
+      this.planSearchInput = keyword
+      this.getPlanList()
     },
     // 获取团队计划
     // async getTeamPlanList() {
@@ -442,9 +504,9 @@ export default {
       const apiMethod =
         this.activeClassType === "official"
           ? planApi.getOfficialPlans
-          : planApi.getPlansByUserId;
+          : planApi.getPlansByUserId
 
-      const res = await apiMethod(this.planSearchInput);
+      const res = await apiMethod(this.planSearchInput)
       if (res.success) {
         // console.log(res.result, "*======res.result");
         this.classList = res.result.map((item) => ({
@@ -455,12 +517,12 @@ export default {
             ...part,
             classesJson: parseClassesJson(part.classesJson),
           })),
-        }));
+        }))
         // this.$nextTick(() => {
         //   this.classSlideChange();
         // });
       } else {
-        this.classList = [];
+        this.classList = []
       }
     },
     /**
@@ -473,18 +535,18 @@ export default {
      * 移动课程
      */
     handleMoveClass(classId, groupId) {
-      this.moveClassId = classId;
-      this.moveGroupId = groupId;
-      this.moveType = "class";
-      this.showMoveGroup = true;
+      this.moveClassId = classId
+      this.moveGroupId = groupId
+      this.moveType = "class"
+      this.showMoveGroup = true
     },
 
     /**
      * 查看课程
      */
     handleViewClass(classId) {
-      this.showViewClassCard = true;
-      this.classModalData = this.findClassById(classId);
+      this.showViewClassCard = true
+      this.classModalData = this.findClassById(classId)
     },
     handleViewPlanClass(classItem, clickPosition) {
       // if (!classItem) {
@@ -492,43 +554,43 @@ export default {
       //   return;
       // }
       // 使用 classItem 作为课程数据
-      this.classModalData = classItem;
+      this.classModalData = classItem
       // 保存点击位置
-      this.clickPosition = clickPosition || null;
+      this.clickPosition = clickPosition || null
       // 最后设置 visible，确保数据已准备好
       this.$nextTick(() => {
-        this.showViewPlanDetail = true;
-      });
+        this.showViewPlanDetail = true
+      })
     },
     /**
      * 通过ID查找课程
      */
     findClassById(id) {
-      let findClass = {};
+      let findClass = {}
       this.classList.forEach((item) => {
         item.classesList.forEach((part) => {
           if (part.id === +id) {
-            findClass = part;
+            findClass = part
           }
-        });
-      });
-      return findClass;
+        })
+      })
+      return findClass
     },
     /**
      * 复制/添加课程
      */
     handleCopyClassFromOfficial(classData, groupId) {
-      this.copyClassFromOfficialClassId = classData.id;
-      this.copyClassFromOfficialGroupId = groupId;
-      this.copyClassFromOfficialData = classData;
-      this.showCopyClassFromOfficial = true;
+      this.copyClassFromOfficialClassId = classData.id
+      this.copyClassFromOfficialGroupId = groupId
+      this.copyClassFromOfficialData = classData
+      this.showCopyClassFromOfficial = true
     },
     /**
      * 保存复制课程
      */
     onSaveCopyClassFromOfficial() {
-      this.showCopyClassFromOfficial = false;
-      this.getPlanList();
+      this.showCopyClassFromOfficial = false
+      this.getPlanList()
     },
     /**
      * 添加计划
@@ -539,23 +601,23 @@ export default {
       //   this.$message.error("您当前的计划数量已达上限，无法添加更多计划");
       //   return;
       // }
-      this.addPlanGroupId = payload;
-      this.addPlanVisible = true;
+      this.addPlanGroupId = payload
+      this.addPlanVisible = true
     },
     /**
      * 创建分组
      */
     handleAddGroup() {
-      this.currentGroup = { id: "", groupName: "" };
-      this.addGroupVisible = true;
+      this.currentGroup = { id: "", groupName: "" }
+      this.addGroupVisible = true
     },
     /**
      * 保存分组成功
      */
     handleAddGroupSave(payload) {
-      this.addGroupVisible = false;
-      this.currentGroup = { id: "", groupName: "" };
-      this.getPlanList();
+      this.addGroupVisible = false
+      this.currentGroup = { id: "", groupName: "" }
+      this.getPlanList()
     },
     /*
      *编辑分组
@@ -564,8 +626,8 @@ export default {
       this.currentGroup = {
         id: payload.groupId,
         groupName: payload.groupName,
-      };
-      this.addGroupVisible = true;
+      }
+      this.addGroupVisible = true
     },
     /**
      * 删除分组
@@ -579,11 +641,11 @@ export default {
         // 调用删除分组API
         groupApi.deleteGroup(item.groupId).then((res) => {
           if (res.success) {
-            this.$message.success("删除成功");
-            this.getPlanList();
+            this.$message.success("删除成功")
+            this.getPlanList()
           }
-        });
-      });
+        })
+      })
     },
     // 添加分享分组
     handleAddShareGroup(node) {
@@ -591,13 +653,13 @@ export default {
         id: "",
         groupName: "",
         teamId: node.teamId,
-      };
-      this.addShareGroupVisible = true;
+      }
+      this.addShareGroupVisible = true
     },
     // 编辑分享分组
     handleEditShareGroup(node) {
-      this.currentShareGroup = { ...node };
-      this.addShareGroupVisible = true;
+      this.currentShareGroup = { ...node }
+      this.addShareGroupVisible = true
     },
     // 删除分享分组
     handleDeleteShareGroup(node) {
@@ -616,74 +678,74 @@ export default {
           })
           .then((res) => {
             if (res.success) {
-              this.$message.success("删除成功");
+              this.$message.success("删除成功")
               // 刷新团队树数据
-              this.refreshTeamTree();
+              this.refreshTeamTree()
             }
-          });
-      });
+          })
+      })
     },
     // 移动分享分组
     handleMoveShareGroup(node) {
-      console.log(node, "node--移动分享分组");
-      this.currentMoveShareGroup = { ...node };
-      this.moveShareGroupVisible = true;
+      console.log(node, "node--移动分享分组")
+      this.currentMoveShareGroup = { ...node }
+      this.moveShareGroupVisible = true
     },
     // 保存分享分组
     handleAddShareGroupSave(payload) {
-      this.addShareGroupVisible = false;
-      this.currentShareGroup = { id: "", groupName: "", teamId: null };
+      this.addShareGroupVisible = false
+      this.currentShareGroup = { id: "", groupName: "", teamId: null }
       // 刷新团队树数据
-      this.refreshTeamTree();
+      this.refreshTeamTree()
     },
     handleMoveShareGroupSave(payload) {
-      this.moveShareGroupVisible = false;
-      this.currentMoveShareGroup = { id: "", teamId: null };
+      this.moveShareGroupVisible = false
+      this.currentMoveShareGroup = { id: "", teamId: null }
       // 刷新团队树数据
-      this.refreshTeamTree();
+      this.refreshTeamTree()
     },
     /**
      * 移动计划
      */
     handleMovePlan(planDetail) {
-      this.currentPlanDetail = planDetail;
-      this.showMovePlan = true;
+      this.currentPlanDetail = planDetail
+      this.showMovePlan = true
     },
     // 移动计划成功
     handleMovePlanSave(payload) {
-      this.showMovePlan = false;
-      console.log(payload, "*======payload");
+      this.showMovePlan = false
+      console.log(payload, "*======payload")
       if (payload && payload.planGroupId) {
-        this.currentPlanGroupId = payload.planGroupId;
+        this.currentPlanGroupId = payload.planGroupId
       }
       // 重新获取计划列表
-      this.getPlanList();
+      this.getPlanList()
     },
     // 刷新团队树数据
     refreshTeamTree() {
       // 只在团队计划类型时刷新
       if (this.activeClassType === 'team' && this.$refs.planListRef && this.$refs.planListRef.refreshTeamTree) {
-        this.$refs.planListRef.refreshTeamTree();
+        this.$refs.planListRef.refreshTeamTree()
       }
     },
     handleSharePlanPersionClose(payload) {
-      this.showSharePlanPersion = false;
+      this.showSharePlanPersion = false
       if (!payload.revoke) {
-        this.shareAuth = payload.shareToAuth;
+        this.shareAuth = payload.shareToAuth
       }
       // 关闭权限调整后刷新团队数据渲染
-      this.refreshTeamTree();
-      this.getPlanList();
+      this.refreshTeamTree()
+      this.getPlanList()
     },
     /**
      * 处理选项的点击事件
      */
     async handleOptionsClick(item, index) {
-      const _this = this;
+      const _this = this
       const optMap = {
         // 概要预览
         1: () => {
-          _this.showSummaryPreview = true;
+          _this.showSummaryPreview = true
         },
         // 添加
         2: async () => {
@@ -701,14 +763,14 @@ export default {
               ownerName: localStorage.getItem("name").split("#")[0],
               ownerId: localStorage.getItem("triUserId"),
               loginType: parseInt(localStorage.getItem("loginType")),
-            };
-            _this.$emit("choose-plan", true);
-            _this.handleAddPlan();
-          });
+            }
+            _this.$emit("choose-plan", true)
+            _this.handleAddPlan()
+          })
         },
         // 编辑
         3: async () => {
-          _this.handleEditPlan();
+          _this.handleEditPlan()
         },
         // 复制
         4: async () => {
@@ -718,53 +780,53 @@ export default {
           //   return;
           // }
           _this.$nextTick(() => {
-            _this.showCopy = true;
-          });
+            _this.showCopy = true
+          })
         },
         // 应用
         5: () => {
-          _this.showApplyCoach = true;
+          _this.showApplyCoach = true
         },
         // 应用历史
         6: () => {
-          _this.showApplyHistory = true;
+          _this.showApplyHistory = true
         },
         // 删除
         7: () => {
           // _this.handleDeleteGroup();
-          _this.handleDeletePlan();
+          _this.handleDeletePlan()
         },
         // 分享到团队
         8: () => {
-          _this.showSharePlan = true;
+          _this.showSharePlan = true
         },
         // 权限调整
         9: () => {
-          _this.showSharePlanPersion = true;
+          _this.showSharePlanPersion = true
         },
-      };
-      optMap[index]();
+      }
+      optMap[index]()
     },
     handleEditPlan() {
       const params = {
         ...this.currentPlanDetail,
         dayDetails: this.planList,
-      };
+      }
       // 将 params 保存到 planStore 中的 planData
-      this.$store.dispatch("plan/savePlanData", params);
+      this.$store.dispatch("plan/savePlanData", params)
       // 跳转到 planEdit 页面
       this.$router.push({
         path: "/plan/add",
         query: {
           type: "edit",
         },
-      });
+      })
     },
     /**
      * 删除计划
      */
     handleDeletePlan() {
-      const _this = this;
+      const _this = this
       if (_this.currentPlanDetail.id) {
         this.$confirm(
           `确认删除计划【${_this.currentPlanDetail?.planTitle}】？`,
@@ -778,36 +840,36 @@ export default {
           // 调用删除分组API
           planApi.deletePlan(_this.currentPlanDetail.id).then((res) => {
             if (res.success) {
-              _this.$message.success("删除成功");
-              const currentPlanId = String(_this.currentPlanDetail.id);
-              const queryPlanId = _this.$route.query?.id;
-              _this.$emit("choose-plan", false);
+              _this.$message.success("删除成功")
+              const currentPlanId = String(_this.currentPlanDetail.id)
+              const queryPlanId = _this.$route.query?.id
+              _this.$emit("choose-plan", false)
               if (queryPlanId && String(queryPlanId) === currentPlanId) {
                 _this.$router.replace({
                   path: "/timeTable/class",
-                });
-                _this.getPlanList();
-                _this.restPageInfo();
+                })
+                _this.getPlanList()
+                _this.restPageInfo()
               } else {
                 // _this.getPlanLimitCount();
-                _this.restPageInfo();
-                _this.getPlanList();
+                _this.restPageInfo()
+                _this.getPlanList()
               }
             }
-          });
-        });
+          })
+        })
       }
     },
     restPageInfo() {
-      this.showMore = false;
-      this.planList = [[], [], [], []];
-      this.currentPlanId = "";
-      this.currentPlanGroupId = "";
-      this.planTitle = "";
-      this.currentPlanDetail = {};
+      this.showMore = false
+      this.planList = [[], [], [], []]
+      this.currentPlanId = ""
+      this.currentPlanGroupId = ""
+      this.planTitle = ""
+      this.currentPlanDetail = {}
     },
   },
-};
+}
 </script>
 
 <style scoped lang="scss">
