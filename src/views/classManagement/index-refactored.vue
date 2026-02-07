@@ -213,7 +213,7 @@
       <div class="content-container"
         style="display: flex; width: 100%"
         v-if="activeName === 'plan'">
-        <PlanView :isPlan="isPlan" @choose-plan="handleChoosePlan" />
+        <PlanView :isPlan="isPlan" @choose-plan="handleChoosePlan" :selected-team="selectedTeam" />
         <!-- 日程表 -->
         <ScheduleCalendar v-if="!isPlan" :current-week="currentWeek"
           :team-list="teamList" :athletic-list="athleticList"
@@ -298,6 +298,7 @@
       @save="onSaveCopyClassFromOfficial" />
 
     <ViewClassCard :visible="showViewClassCard"
+      :activeClassType="activeClassType"
       :class-item="classModalData"
       :active-class-type="activeClassType"
       @close="showViewClassCard = false" @move="handleMoveClass"
@@ -492,6 +493,7 @@ export default {
       // 课程数据
       classList: [],
       classSearchInput: "",
+      teamClassSearchKeyword: "",
       // 课程数量限制 -- 后续根据待用功能添加
       // currentUserClassConfig: {},
 
@@ -691,7 +693,7 @@ export default {
     getDeviceName(deviceType) {
       return DEVICE_TYPE_DICT[deviceType] || "未知设备"
     },
-    // 选择分享团队（再次点击同一项时折叠收起）
+    // 选择分享团队（从已加载的 teamTreeList 取 groups，不再请求接口）
     handleShareTeamClick(teamId) {
       const isSameTeam = String(this.currentShareTeamId) === String(teamId)
       if (isSameTeam) {
@@ -699,50 +701,20 @@ export default {
         this.shareGroupList = []
         return
       }
-      console.log(teamId, "teamId--选择分享团队")
       this.currentShareTeamId = teamId
-      getData({
-        url: `/training/api/shareTeamGroup/list?teamId=${teamId}&shareDataType=1`,
-      }).then((res) => {
-        if (res.success && res.result) {
-          console.log(res.result, "res.result--分享团队下的分享组")
-          this.shareGroupList = res.result
-        }
-      })
+      const team = this.teamTreeList.find((t) => String(t.id) === String(teamId))
+      if (team && Array.isArray(team.groups)) {
+        this.shareGroupList = this.mapCoachTeamsGroupsToShareGroupList(
+          team.groups,
+          teamId
+        )
+      } else {
+        this.shareGroupList = []
+      }
     },
     handleShareTeamGroupClick(id) {
-      console.log(id, "id---分享分组id")
       if (!id && id !== 0) return
-      const findGroup = this.shareGroupList.find(el => el.id === id)
-      this.getShareGroupClass(findGroup)
-    },
-    getShareGroupClass(node) {
-      const _this = this
-      getData({
-        url: `/training/api/teamShare/pageByGroupId`,
-        groupId: node.id,
-        teamId: node.teamId,
-        shareDataType: 1,
-        current: 1,
-        size: 20,
-      })
-        .then((res) => {
-          if (res.success && res.result) {
-            console.log('====分享课程', res)
-            _this.shareGroupList = _this.shareGroupList.map(el => {
-              if (el.id === node.id) {
-                return {
-                  ...el,
-                  classesList: res.result.records.map(item => ({
-                    ...item,
-                    classesJson: parseClassesJson(item.classesJson),
-                  }))
-                }
-              }
-              return el
-            })
-          }
-        })
+      // 分组与课程数据已由 getAllTeamsTreeList 接口全部返回，无需再请求
     },
     /**
      * 删除该日期所有课表
@@ -1161,13 +1133,12 @@ export default {
         const loginType = localStorage.getItem("loginType")
         console.log(loginType, "=======******loginType")
         if (loginType === "2") {
-          this.getAllTeamsTreeList()
+          this.getAllTeamsTreeList(this.teamClassSearchKeyword)
         } else {
           console.log("运动员登陆时")
           this.getMyTeamsTreeList()
         }
         this.refreshTeamTree()
-        this.refreshShareGroupList()
       }
     },
 
@@ -1180,38 +1151,71 @@ export default {
       }
     },
 
-    async getAllTeamsTreeList() {
-      const resDefault = await getData({ url: "/gateway/team/my-team" })
-      const resTeam = await getData({
-        url: "/consumer/api/team/coach/all-teams",
-      })
-      if (resDefault.success && resTeam.success) {
-        const list = [resDefault.result, ...resTeam.result].reduce(
-          (acc, team) => {
-            if (team && team.id && !acc.find((t) => t.id === team.id)) {
-              acc.push(team)
-            }
-            return acc
-          },
-          []
-        )
-        const teamTreeList = list.map((item) => ({
-          id: item.id,
-          name: item.teamName,
-          teamOwnerId: item.teamOwnerId,
-          members: item.members,
-        }))
-        this.teamTreeList = teamTreeList
-        console.log("=======******this.teamTreeList", this.teamTreeList)
+    async getAllTeamsTreeList(nameKeyword) {
+      const params = {
+        url: "/gateway/training/teamShare/coach-teams-share",
+        shareDataType: 1,
+        teamId: this.selectedTeam,
       }
+      if (nameKeyword != null && String(nameKeyword).trim() !== "") {
+        params.nameKeyword = String(nameKeyword).trim()
+      }
+      const res = await getData(params)
+      if (res && res.success && Array.isArray(res.result)) {
+        this.teamTreeList = res.result.map((t) => ({
+          id: t.teamId,
+          name: t.teamName,
+          totalCount: t.totalCount,
+          groups: t.groups || [],
+        }))
+        if (this.currentShareTeamId) {
+          const team = res.result.find(
+            (t) => String(t.teamId) === String(this.currentShareTeamId)
+          )
+          this.shareGroupList = team
+            ? this.mapCoachTeamsGroupsToShareGroupList(
+              team.groups || [],
+              this.currentShareTeamId
+            )
+            : []
+        }
+        console.log("=======******this.teamTreeList", this.teamTreeList)
+      } else {
+        this.teamTreeList = []
+      }
+    },
+    mapCoachTeamsGroupsToShareGroupList(groups, teamId) {
+      const list = Array.isArray(groups) ? groups : []
+      return list.map((g) => ({
+        id: g.groupId,
+        groupId: g.groupId,
+        groupName: g.groupName || "未分组",
+        groupCount: (g.classesList || []).length,
+        teamId: teamId || g.teamId,
+        classesList: (g.classesList || []).map((c) => {
+          const parsed = parseClassesJson(c.classesJson)
+          return {
+            ...c,
+            classesJson: {
+              ...(typeof parsed === "object" && parsed ? parsed : {}),
+              title: (typeof parsed === "object" && parsed && parsed.title) || c.classesTitle || "",
+            },
+          }
+        }),
+      }))
     },
 
     /**
-     * 课程搜索
+     * 课程搜索（我的课程用 classSearchInput + getClassList；团队课程用 nameKeyword + getAllTeamsTreeList）
      */
     handleClassSearch(keyword) {
       this.classSearchInput = keyword
-      this.getClassList()
+      if (this.activeClassType === "team") {
+        this.teamClassSearchKeyword = keyword
+        this.getAllTeamsTreeList(keyword)
+      } else {
+        this.getClassList()
+      }
     },
     async getDefaultTeam() {
       const _this = this
@@ -1298,7 +1302,15 @@ export default {
       this.selectedTeam = id
       this.selectedOrgType = type
       console.log(this.selectedTeam, this.selectedOrgType, "this.selectedTeam, this.selectedOrgType")
+      this.currentWeek.forEach(item => {
+        item.activityList = []
+        item.classSchedule = []
+        item.competitionList = []
+        item.healthInfos = []
+      })
+      // this.currentWeek = []
       this.getAthleticList()
+      this.getAllTeamsTreeList(this.teamClassSearchKeyword)
     },
 
     /**
@@ -1432,9 +1444,11 @@ export default {
      * 获取日程数据
      */
     async getScheduleData() {
-      if (!this.selectedAthletic) return
+      console.log(this.currentWeek, "this.currentWeek")
+      if (!this.selectedAthletic) {
+        return
+      }
       this.loading = true
-
       const res = await scheduleApi.getCalendarOverview({
         begin: this.currentWeek[0].commonDate + " 00:00:00",
         end: this.currentWeek[6].commonDate + " 23:59:59",
@@ -2141,11 +2155,7 @@ export default {
           this.$message.success("更新成功")
           if (flag) this.showViewClassCard = false
           if (this.activeClassType === "team") {
-            this.getShareGroupClass({
-              teamId: this.classModalData.teamId,
-              id: this.classModalData.classesGroupId
-
-            })
+            this.refreshShareGroupList()
           } else {
             this.getClassList()
           }
@@ -2406,6 +2416,9 @@ export default {
       const classId = e.item.firstChild.dataset.id || e.item.dataset.id
       const date = e.to.dataset.date
       console.log(classId, date, "classId, date")
+      if (!this.selectedAthletic) {
+        return
+      }
 
       let newClassSchedule = {}
       const sortVoList = []
@@ -3162,16 +3175,9 @@ export default {
         this.$refs.planListRef.refreshTeamTree()
       }
     },
-    // 刷新当前团队的分享分组列表（用于添加/编辑/删除分组后更新右侧列表）
+    // 刷新当前团队的分享分组列表（重新拉取 coach-teams-share，接口会返回全量含 groups）
     refreshShareGroupList() {
-      if (!this.currentShareTeamId) return
-      getData({
-        url: `/training/api/shareTeamGroup/list?teamId=${this.currentShareTeamId}&shareDataType=1`,
-      }).then((res) => {
-        if (res.success && res.result) {
-          this.shareGroupList = res.result
-        }
-      })
+      this.getAllTeamsTreeList(this.teamClassSearchKeyword)
     },
     /**
      * 保存分组

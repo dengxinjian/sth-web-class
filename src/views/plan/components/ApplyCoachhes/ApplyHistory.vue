@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       :visible.sync="innerVisible"
-      width="900px"
+      width="1000px"
       append-to-body
       :before-close="onCancel"
       class="add-class-title-modal"
@@ -39,7 +39,7 @@
           width="120"
           align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.applyDimension === 1 ? '团队' : '俱乐部' }}</span>
+            <span>{{ scope.row.applyDimension === 1 ? '团队' : scope.row.applyDimension === 2 ? '俱乐部' : '个人' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="teamName" label="名称" width="180"
@@ -149,7 +149,7 @@
     /> -->
       <!-- 应用历史分页 -->
       <el-pagination
-        v-if="activeTab === 'apply' && (loginType === '2' && total > 10)"
+        v-if="activeTab === 'apply' && total > 10"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="pagination.page"

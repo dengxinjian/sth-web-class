@@ -63,45 +63,33 @@ export default {
           title: "会员标识",
           subTitle: "会员专属图标",
           img: require("@/assets/vip/vip1.png"),
-          children: [{ idx: 1, label: "头像框带有会员专属标识" }],
+          children: [{ idx: 1, label: "精英版专属头像框" }],
         },
         {
-          title: "团队管理",
-          subTitle: "科学管理",
+          title: "运动分析",
+          subTitle: "运动数据分析",
           img: require("@/assets/vip/vip2.png"),
           children: [
-            { idx: 1, label: "运动员管理" },
-            { idx: 2, label: "执教管理" },
-            { idx: 3, label: "团队课程管理" },
-            { idx: 4, label: "团队计划管理" },
+            { idx: 1, label: "任意时段刷选" },
+            { idx: 2, label: "所选时段指标分析" },
           ],
         },
         {
-          title: "数据总览",
-          subTitle: "可视化分析",
+          title: "运动表现",
+          subTitle: "运动峰值表现",
           img: require("@/assets/vip/vip3.png"),
           children: [
-            { idx: 1, label: "解放90%的行政时间" },
-            { idx: 2, label: "成员数据可视化仪，一眼掌握团队全局" },
+            { idx: 1, label: "多维度峰值统计" },
+            { idx: 2, label: "历史峰值对；" },
+            { idx: 3, label: "数十种指标峰值统计" },
           ],
         },
         {
-          title: "效率与专业",
-          subTitle: "数据决策",
-          img: require("@/assets/vip/vip4.png"),
-          children: [
-            { idx: 1, label: "拥有“数据透视眼”，精准识别谁已过度、谁临突破" },
-            { idx: 2, label: "每一次计划调整都有据可依，大幅提升教练权威" },
-          ],
-        },
-        {
-          title: "价值体现",
-          subTitle: "价值提升与变现",
+          title: "训练计划",
+          subTitle: "示例计划可用",
           img: require("@/assets/vip/vip5.png"),
           children: [
-            { idx: 1, label: "管理增值，实现教练价值的杠杆化" },
-            { idx: 2, label: "课程库和计划模板系统化、产品化" },
-            { idx: 3, label: "自动生成学员成长报告和团队训练年鉴" },
+            { idx: 1, label: "定期更新高效示例计划库可用" },
           ],
         },
       ],
@@ -130,7 +118,7 @@ export default {
       submitData({
         url: "/consumer/api/vipSubscribe/subscribe",
         requestData: {
-          identityType: "B",
+          identityType: "R",
           subscribeType: 1,
         },
       }).then((res) => {

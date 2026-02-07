@@ -46,7 +46,7 @@
 
     <!-- 分享历史分页 -->
     <el-pagination
-      v-if="activeTab === 'share' && shareTotal > sharePagination.limit"
+      v-if="shareTotal > sharePagination.limit"
       @size-change="handleShareSizeChange"
       @current-change="handleShareCurrentChange"
       :current-page="sharePagination.page"

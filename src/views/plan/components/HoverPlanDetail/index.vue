@@ -3,12 +3,12 @@
     <!-- <h2>概要</h2> -->
     <div slot="title"
       style="display: flex; justify-content: end; align-items: center">
-      <el-popover popper-class="athletic-btn-popover" v-if="activeClassType !== 'team'"
+      <el-popover popper-class="athletic-btn-popover" v-if="activeClassType == 'team'"
         placement="right" trigger="hover" :tabindex="999">
         <div class="btn-list-hover">
           <span>
             <div class="btn-list-hover-item" @click.stop="
-              $emit('move', planDetail)
+              $emit('move', planDetail,planInfo)
               ">
               移动
             </div>

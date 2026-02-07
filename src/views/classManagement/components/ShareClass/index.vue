@@ -145,7 +145,7 @@ export default {
           filterDataId: this.classId,
           filterDataType: 1,
         })
-        this.teams = [res.result]
+        this.teams = res.result.length > 0 ? [res.result] : []
       }
       console.log(this.teams, "this.teams")
     },

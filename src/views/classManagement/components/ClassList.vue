@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="class-type-item" :class="{ 'active-title': activeClassType === 'team' }"
-        @click="handleClassTypeChange('team')">
+        @click="handleClassTypeChange('team')" v-if="loginType === '2'">
         <div class="title" :class="{ 'active-title': activeClassType === 'team' }">
           团队课程
         </div>
@@ -126,7 +126,7 @@
     </div>
 
     <!-- 团队课程操作栏 -->
-    <div class="team-operation" v-if="activeClassType === 'team'">
+    <div class="team-operation" v-if="activeClassType === 'team' && loginType === '2'">
       <div class="team-operation-container" v-for="shareItem in teamTreeList" :key="shareItem.id">
         <div class="team-operation-item" :class="{ 'is-active': currentShareTeamId === shareItem.id }"
           @click="$emit('share-team-click', shareItem.id)">
@@ -178,7 +178,7 @@
               <draggable class="js-class-drag-container" :list="item.classesList"
                 :group="{ name: groupName, put: false, pull: 'clone' }" :animation="0" :sort="false"
                 :force-fallback="true" :fallback-on-body="true" :fallback-tolerance="5" :scroll="true"
-                :scroll-sensitivity="40" :scroll-speed="10" ghost-class="is-plan-drag-ghost" :key="item.timespan"
+                :scroll-sensitivity="40" :scroll-speed="10" ghost-class="is-plan-drag-ghost" :key="item.groupId ?? item.id"
                 @end="handleClassDragEnd">
                 <ClassCard v-for="classItem in item.classesList" :key="classItem.id" :class-data="classItem"
                   :active-class-type="activeClassType" :group-id="item.groupId"
@@ -244,6 +244,7 @@ export default {
       activeTeamItemId: "",
       currentTeamClassList: [],
       currentShareGroupList: [],
+      loginType: localStorage.getItem("loginType") ,
     };
   },
   watch: {

@@ -18,7 +18,8 @@
           @move-share-group="handleMoveShareGroup"
           @move-plan="handleMovePlan"
           :selected-plan-id="currentPlanId"
-          :current-plan-group-id="currentPlanGroupId" />
+          :current-plan-group-id="currentPlanGroupId"
+          :selected-team="selectedTeam" />
       </div>
       <PlannedScheduleView v-if="isPlan" :planList="planList"
         :planTitle="planTitle" :showMore="showMore"
@@ -54,6 +55,7 @@
       :data="currentShareGroup" @save="handleAddShareGroupSave" />
     <!-- 移动分享分组 -->
     <MoveShareGroup v-model="moveShareGroupVisible"
+      :planInfo="currentMoveSharePlanInfo"
       :data="currentMoveShareGroup"
       @save="handleMoveShareGroupSave" />
     <!-- 概要 -->
@@ -69,6 +71,8 @@
     <!-- 应用计划 -->
     <ApplyCoach v-model="showApplyCoach" :planInfo="currentPlanDetail"
       :planClasses="planList"
+      :is-team-plan="activeClassType === 'team'"
+      :plan-team-id="currentPlanTeamId"
       @cancel="handleApplyCoachCancel"
       @viewApplyHistory="handleViewApplyHistory" />
     <!-- 计划分享 -->
@@ -140,6 +144,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    selectedTeam: {
+      type: [String, Number],
+      default: null,
+    },
   },
   data() {
     return {
@@ -161,6 +169,7 @@ export default {
       currentGroup: { id: "", groupName: "" },
       currentShareGroup: { id: "", groupName: "", teamId: null },
       currentMoveShareGroup: { id: "", teamId: null },
+      currentMoveSharePlanInfo: {},
       // 对话框状态
       addPlanVisible: false,
       addGroupVisible: false,
@@ -190,6 +199,7 @@ export default {
       // 计划列表数据
       planSearchInput: "",
       currentPlanDetail: {},
+      currentPlanTeamId: null,
       currentPlanDayDetail: [],
       copyOfficialPlanInfo: null,
       limitValue: 0, // 计划限制数量
@@ -309,7 +319,7 @@ export default {
       this.getPlanDetail(payload.id)
       this.getPlanDayDetail(payload.id)
       this.$nextTick(() => {
-        this.activeClassType = "my"
+        // this.activeClassType = "my"
         this.currentPlanId = payload.id
         this.currentPlanGroupId = payload.planGroupId
         this.planTitle = payload.planTitle
@@ -345,17 +355,18 @@ export default {
         await this.getPlanDayDetail(this.currentPlanId)
       }
     },
-    async handlePlanDayDetail(id, groupId) {
+    async     handlePlanDayDetail(id, groupId) {
       this.currentPlanId = id
       this.currentPlanGroupId = groupId
+      this.currentPlanTeamId = null
       this.$emit("choose-plan", true)
       await this.getPlanDetail(id)
       await this.getPlanDayDetail(id)
     },
     async handleViewPlanView(id, data) {
-      // console.log("handleViewPlan===选择分享计划", id,data);
       this.shareAuth = data.shareAuth
       this.shareUserId = data.shareUserId
+      this.currentPlanTeamId = data?.teamId ?? null
       this.$emit("choose-plan", true)
       await this.getPlanDetail(id)
       await this.getPlanDayDetail(id)
@@ -686,9 +697,10 @@ export default {
       })
     },
     // 移动分享分组
-    handleMoveShareGroup(node) {
+    handleMoveShareGroup(node, planInfo) {
       console.log(node, "node--移动分享分组")
       this.currentMoveShareGroup = { ...node }
+      this.currentMoveSharePlanInfo = planInfo
       this.moveShareGroupVisible = true
     },
     // 保存分享分组
@@ -811,6 +823,7 @@ export default {
       const params = {
         ...this.currentPlanDetail,
         dayDetails: this.planList,
+        teamId: this.selectedTeam,
       }
       // 将 params 保存到 planStore 中的 planData
       this.$store.dispatch("plan/savePlanData", params)

@@ -7,8 +7,7 @@
       append-to-body
       :close-on-click-modal="false"
       custom-class="edit-class-dialog"
-      top="5vh"
-    >
+      top="5vh">
       <!-- <span slot="title" class="dialog-title">课表简介</span> -->
       <div class="header-title" style="margin-bottom: 16px;">
         <!-- <div v-if="classData.classesJson?.title || classData.activityName">
@@ -32,24 +31,21 @@
           ref="titleRef"
           :model="form"
           :rules="rules"
-          label-width="70px"
-        >
-          <el-form-item label="标题：" prop="title" style="margin-top: 16px;">
+          label-width="70px">
+          <el-form-item label="标题：" prop="title"
+            style="margin-top: 16px;">
             <el-input
               type="text"
               placeholder="标题"
               v-model="form.title"
-              :disabled="
-                !classData.classesJson?.title && !!classData.activityName
-              "
+              :disabled="!classData.classesJson?.title && !!classData.activityName
+                "
               :maxlength="50"
-              style="width: 100%;"
-            />
+              style="width: 100%;" />
           </el-form-item>
         </el-form>
-        <span style="font-weight: 600;" v-else
-          >{{ getSportTypeName(classData.sportType) }}_手动录入数据</span
-        >
+        <span style="font-weight: 600;"
+          v-else>{{ getSportTypeName(classData.sportType) }}_手动录入数据</span>
       </div>
 
       <div class="class-detail-content">
@@ -60,8 +56,7 @@
               <img
                 class="sport-icon"
                 :src="getSportIcon(classData.sportType)"
-                alt=""
-              />
+                alt="" />
             </div>
             <div class="metric-item">
               <div class="metric-value" v-if="!isActivity">
@@ -83,8 +78,7 @@
                   v-if="
                     classData.classesJson?.distanceUnit &&
                     classData.classesJson.distanceUnit !== 'km'
-                  "
-                >
+                  ">
                   {{ classData.classesJson?.distanceUnit }}
                 </span>
                 <span v-else>km</span>
@@ -111,14 +105,11 @@
           </div>
           <div
             class="metric-item"
-            v-if="!isActivity && !isRestType(classData.sportType)"
-          >
+            v-if="!isActivity && !isRestType(classData.sportType)">
             <el-button
               type="primary"
               @click="handleEditClassDetail"
-              class="edit-class-detail-btn"
-              >编辑课表详情</el-button
-            >
+              class="edit-class-detail-btn">编辑课表详情</el-button>
           </div>
         </div>
 
@@ -128,21 +119,19 @@
             classData.classesJson?.timeline &&
             classData.classesJson.timeline.length > 0
           "
-          class="intensity-chart"
-        >
+          class="intensity-chart">
           <div
             v-for="(stage, index) in classData.classesJson.timeline"
             :key="index"
             class="time-stage"
-            :style="{ flex: stage.duration }"
-          >
+            :style="{ flex: stage.duration }">
             <div style="display: flex; gap: 1px; height: 30px">
-              <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
+              <div v-for="n in +stage.times" :key="n"
+                :style="{ flex: 1 }">
                 <ExerciseProcessChart
                   :exerciseList="stage.stageTimeline"
                   :maxIntensity="classData.classesJson?.maxIntensity"
-                  :height="30"
-                />
+                  :height="30" />
               </div>
             </div>
           </div>
@@ -150,7 +139,8 @@
 
         <div class="scrollable-content">
           <!-- 计划 vs 实际 对比表格 -->
-          <div class="comparison-table" v-if="!isRestType(classData.sportType)">
+          <div class="comparison-table"
+            v-if="!isRestType(classData.sportType)">
             <table>
               <thead>
                 <tr>
@@ -175,39 +165,30 @@
                         v-if="
                           classData.activityId &&
                           actualData.duration !== originalData.duration
-                        "
-                        >*</span
-                      >
+                        ">*</span>
                       <TimeInput
                         v-model="actualData.duration"
                         size="small"
-                        :disabled="isInputDisabled"
-                      />
+                        :disabled="isInputDisabled" />
                       <div class="action-buttons">
                         <el-button
                           type="text"
                           size="small"
                           @click="restoreField('duration')"
-                          :disabled="
-                            !(
-                              classData.activityId &&
-                              actualData.duration !== originalData.duration
-                            ) || isInputDisabled
-                          "
-                          >还原</el-button
-                        >
+                          :disabled="!(
+                            classData.activityId &&
+                            actualData.duration !== originalData.duration
+                          ) || isInputDisabled
+                            ">还原</el-button>
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('duration')"
-                          :disabled="
-                            !(
-                              classData.manualActivityId &&
-                              actualData.duration !== defaultData.duration
-                            ) || isInputDisabled
-                          "
-                          >重置</el-button
-                        >
+                          :disabled="!(
+                            classData.manualActivityId &&
+                            actualData.duration !== defaultData.duration
+                          ) || isInputDisabled
+                            ">重置</el-button>
                       </div>
                     </div>
                   </td>
@@ -234,8 +215,7 @@
                       <TimeInput
                         v-model="actualData.activityDuration"
                         size="small"
-                        :disabled="isInputDisabled"
-                      />
+                        :disabled="isInputDisabled" />
                       <div class="action-buttons">
                         <!-- <el-button
                           type="text"
@@ -254,15 +234,12 @@
                           type="text"
                           size="small"
                           @click="resetField('activityDuration')"
-                          :disabled="
-                            !(
-                              classData.manualActivityId &&
-                              actualData.activityDuration !==
-                                defaultData.activityDuration
-                            ) || isInputDisabled
-                          "
-                          >重置</el-button
-                        >
+                          :disabled="!(
+                            classData.manualActivityId &&
+                            actualData.activityDuration !==
+                            defaultData.activityDuration
+                          ) || isInputDisabled
+                            ">重置</el-button>
                       </div>
                     </div>
                   </td>
@@ -284,9 +261,7 @@
                     <div class="input-with-actions">
                       <span
                         class="modified-indicator"
-                        v-if="!restoreVerification('distance')"
-                        >*</span
-                      >
+                        v-if="!restoreVerification('distance')">*</span>
                       <el-input-number
                         v-model="actualData.distance"
                         size="small"
@@ -295,23 +270,18 @@
                         :step="actualData.distanceUnit === 'km' ? 0.01 : 1"
                         :controls="false"
                         :disabled="isInputDisabled"
-                        @input="handleDistanceInput"
-                      />
+                        @input="handleDistanceInput" />
                       <div class="action-buttons">
                         <el-button
                           type="text"
                           size="small"
                           @click="restoreField('distance')"
-                          :disabled="restoreVerification('distance')"
-                          >还原</el-button
-                        >
+                          :disabled="restoreVerification('distance')">还原</el-button>
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('distance')"
-                          :disabled="resetVerification('distance')"
-                          >重置</el-button
-                        >
+                          :disabled="resetVerification('distance')">重置</el-button>
                       </div>
                     </div>
                   </td>
@@ -320,8 +290,7 @@
                       v-model="actualData.distanceUnit"
                       :disabled="isInputDisabled"
                       placeholder="请选择"
-                      @change="handleDistanceUnitChange"
-                    >
+                      @change="handleDistanceUnitChange">
                       <el-option label="km" value="km"></el-option>
                       <el-option label="m" value="m"></el-option>
                     </el-select>
@@ -337,9 +306,7 @@
                         v-if="
                           classData.activityId &&
                           actualData.sthValue !== originalData.sthValue
-                        "
-                        >*</span
-                      >
+                        ">*</span>
                       <el-input-number
                         v-model="actualData.sthValue"
                         size="small"
@@ -348,33 +315,26 @@
                         :min="0"
                         :step-strictly="true"
                         :controls="false"
-                        :disabled="isInputDisabled"
-                      />
+                        :disabled="isInputDisabled" />
                       <div class="action-buttons">
                         <el-button
                           type="text"
                           size="small"
                           @click="restoreField('sthValue')"
-                          :disabled="
-                            !(
-                              classData.activityId &&
-                              actualData.sthValue !== originalData.sthValue
-                            ) || isInputDisabled
-                          "
-                          >还原</el-button
-                        >
+                          :disabled="!(
+                            classData.activityId &&
+                            actualData.sthValue !== originalData.sthValue
+                          ) || isInputDisabled
+                            ">还原</el-button>
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('sthValue')"
-                          :disabled="
-                            !(
-                              classData.manualActivityId &&
-                              actualData.sthValue !== defaultData.sthValue
-                            ) || isInputDisabled
-                          "
-                          >重置</el-button
-                        >
+                          :disabled="!(
+                            classData.manualActivityId &&
+                            actualData.sthValue !== defaultData.sthValue
+                          ) || isInputDisabled
+                            ">重置</el-button>
                       </div>
                     </div>
                   </td>
@@ -390,9 +350,7 @@
                         v-if="
                           classData.activityId &&
                           actualData.calories !== originalData.calories
-                        "
-                        >*</span
-                      >
+                        ">*</span>
                       <el-input-number
                         v-model="actualData.calories"
                         size="small"
@@ -401,33 +359,26 @@
                         :min="0"
                         :step-strictly="true"
                         :controls="false"
-                        :disabled="isInputDisabled"
-                      />
+                        :disabled="isInputDisabled" />
                       <div class="action-buttons">
                         <el-button
                           type="text"
                           size="small"
                           @click="restoreField('calories')"
-                          :disabled="
-                            !(
-                              classData.activityId &&
-                              actualData.calories !== originalData.calories
-                            ) || isInputDisabled
-                          "
-                          >还原</el-button
-                        >
+                          :disabled="!(
+                            classData.activityId &&
+                            actualData.calories !== originalData.calories
+                          ) || isInputDisabled
+                            ">还原</el-button>
                         <el-button
                           type="text"
                           size="small"
                           @click="resetField('calories')"
-                          :disabled="
-                            !(
-                              classData.manualActivityId &&
-                              actualData.calories !== defaultData.calories
-                            ) || isInputDisabled
-                          "
-                          >重置</el-button
-                        >
+                          :disabled="!(
+                            classData.manualActivityId &&
+                            actualData.calories !== defaultData.calories
+                          ) || isInputDisabled
+                            ">重置</el-button>
                       </div>
                     </div>
                   </td>
@@ -436,41 +387,40 @@
               </tbody>
             </table>
             <!-- 运动参数部分 -->
-            <div class="edit-section" v-if="isActivity && classData.activityId">
+            <div class="edit-section"
+              v-if="isActivity && classData.activityId">
               <div class="section-header">
                 <span class="section-title">同步参数</span>
               </div>
               <div class="sync-params">
                 <span>时间：{{ sportDetail.startTime }}</span>
-                <span
-                  >距离：{{
-                    actualformatDistance(
-                      sportDetail.distance,
-                      sportDetail.sportType
-                    )
-                  }}
-                  {{ sportDetail.sportType === 3 ? "m" : "km" }}</span
-                >
+                <span>距离：{{
+                  actualformatDistance(
+                    sportDetail.distance,
+                    sportDetail.sportType
+                  )
+                }}
+                  {{ sportDetail.sportType === 3 ? "m" : "km" }}</span>
               </div>
               <div class="sync-params">
-                <span
-                  >平均{{ sportDetail.sportType === 1 ? "速度" : "配速" }}：{{
+                <span>平均{{ sportDetail.sportType === 1 ? "速度" : "配速"
+                  }}：{{
                     sportDetail.avgSpeed
                   }}
                   {{
                     sportDetail.sportType === 1
                       ? "km/h"
                       : sportDetail.sportType === 2
-                      ? "km"
-                      : sportDetail.sportType === 3
-                      ? "/100m"
-                      : "m"
-                  }}</span
-                >
+                        ? "km"
+                        : sportDetail.sportType === 3
+                          ? "/100m"
+                          : "m"
+                  }}</span>
                 <span>卡路里：{{ sportDetail.calories }} kcal</span>
               </div>
               <div class="sync-params">
-                <span>爬升：{{ sportDetail.totalAscent || "--" }} m</span>
+                <span>爬升：{{ sportDetail.totalAscent || "--" }}
+                  m</span>
                 <span>STH：{{ sportDetail.sthValue }}</span>
               </div>
               <div class="sync-params">
@@ -500,7 +450,8 @@
                   <td>w</td>
                 </tr>
                 <tr v-if="sportDetail.sportType !== 4">
-                  <td>{{ sportDetail.sportType === 1 ? "速度" : "配速" }}</td>
+                  <td>{{ sportDetail.sportType === 1 ? "速度" : "配速" }}
+                  </td>
                   <td>{{ sportDetail.minSpeed || "-" }}</td>
                   <td>{{ sportDetail.avgSpeed || "-" }}</td>
                   <td>{{ sportDetail.maxSpeed || "-" }}</td>
@@ -509,8 +460,8 @@
                       sportDetail.sportType === 1
                         ? "km/h"
                         : sportDetail.sportType === 2
-                        ? "/km"
-                        : "/100m"
+                          ? "/km"
+                          : "/100m"
                     }}
                   </td>
                 </tr>
@@ -520,8 +471,8 @@
                       sportDetail.sportType === 1
                         ? "踏频"
                         : sportDetail.sportType === 2
-                        ? "步频"
-                        : "划频"
+                          ? "步频"
+                          : "划频"
                     }}
                   </td>
                   <td>{{ sportDetail.minCadence || "-" }}</td>
@@ -532,8 +483,8 @@
                       sportDetail.sportType === 1
                         ? "rpm"
                         : sportDetail.sportType === 2
-                        ? "spm"
-                        : "/min"
+                          ? "spm"
+                          : "/min"
                     }}
                   </td>
                 </tr>
@@ -569,8 +520,7 @@
                   v-model="classData.classesJson.summary"
                   :maxlength="classData.sportType === 'REMARK' ? 2000 : 500"
                   show-word-limit
-                  placeholder="请输入概要内容"
-                ></el-input>
+                  placeholder="请输入概要内容"></el-input>
               </div>
             </div>
             <div>
@@ -583,8 +533,7 @@
                     width="20"
                     height="20"
                     alt=""
-                    @click="handleAddLink"
-                  />
+                    @click="handleAddLink" />
                 </div>
               </div>
               <div class="section-content">
@@ -592,8 +541,7 @@
                   class="link-row"
                   v-for="(item, index) in classData.classesJson?.links"
                   :key="index"
-                  style="margin-bottom: 16px"
-                >
+                  style="margin-bottom: 16px">
                   <el-col :span="24" style="margin-bottom: 4px">
                     <el-row
                       style="
@@ -601,14 +549,12 @@
                         display: flex;
                         align-items: center;
                         justify-content: flex-start;
-                      "
-                    >
+                      ">
                       <el-col :span="22">
                         <el-input
                           size="small"
                           v-model="item.title"
-                          placeholder="请输入链接标题"
-                        />
+                          placeholder="请输入链接标题" />
                       </el-col>
                       <el-col :span="2">
                         <div
@@ -618,8 +564,7 @@
                             align-items: center;
                             justify-content: flex-end;
                             margin-right: 5px;
-                          "
-                        >
+                          ">
                           <i
                             class="el-icon-remove-outline"
                             @click="handleRemoveLink(index)"
@@ -627,8 +572,7 @@
                               cursor: pointer;
                               font-size: 19px;
                               color: #d83b36;
-                            "
-                          ></i>
+                            "></i>
                         </div>
                       </el-col>
                     </el-row>
@@ -638,8 +582,7 @@
                       size="small"
                       style="width: 100%"
                       v-model="item.type"
-                      placeholder="请选择链接类型"
-                    >
+                      placeholder="请选择链接类型">
                       <el-option label="网页链接" value="1" />
                       <el-option label="小程序链接" value="2" />
                       <el-option label="其他" value="3" />
@@ -652,14 +595,12 @@
                         display: flex;
                         align-items: center;
                         justify-content: flex-start;
-                      "
-                    >
+                      ">
                       <el-col :span="22">
                         <el-input
                           size="small"
                           v-model="item.url"
-                          placeholder="请输入链接"
-                        />
+                          placeholder="请输入链接" />
                       </el-col>
                       <el-col :span="2">
                         <div
@@ -669,8 +610,7 @@
                             align-items: center;
                             justify-content: flex-end;
                             margin-right: 5px;
-                          "
-                        >
+                          ">
                           <i
                             class="el-icon-document-copy"
                             @click="handleCopyUrl(item.url)"
@@ -678,8 +618,7 @@
                               cursor: pointer;
                               font-size: 19px;
                               color: #d83b36;
-                            "
-                          ></i>
+                            "></i>
                         </div>
                       </el-col>
                     </el-row>
@@ -719,49 +658,42 @@
               </div>
             </div>
             <!-- 训练建议 -->
-            <div class="section" v-if="!isTrainingAdvice(classData.sportType)">
+            <div class="section"
+              v-if="!isTrainingAdvice(classData.sportType)">
               <div class="section-header">
                 <span class="section-title">训练建议</span>
               </div>
               <div class="section-content">
-                <el-input
-                  v-if="classData.classesJson"
-                  type="textarea"
+                <el-input v-if="classData.classesJson" type="textarea"
                   :rows="4"
                   v-model="classData.classesJson.trainingAdvice"
-                  placeholder="请输入训练建议"
-                ></el-input>
+                  placeholder="请输入训练建议"></el-input>
               </div>
             </div>
 
             <!-- 阶段明细 -->
-            <div
-              class="section"
-              v-if="
-                classData.classesJson?.timeline &&
-                classData.classesJson.timeline.length > 0
-              "
-            >
+            <div class="section" v-if="
+              classData.classesJson?.timeline &&
+              classData.classesJson.timeline.length > 0
+            ">
               <div class="section-header">
                 <span class="section-title">阶段明细</span>
               </div>
               <div class="section-content">
                 <!-- 骑行详情 -->
-                <template
-                  v-if="
-                    classData.sportType === 'CYCLE' || classData.sportType === 1
-                  "
-                >
-                  <CycleStageDetails :class-data="classData.classesJson" />
+                <template v-if="
+                  classData.sportType === 'CYCLE' || classData.sportType === 1
+                ">
+                  <CycleStageDetails
+                    :class-data="classData.classesJson" />
                 </template>
 
                 <!-- 跑步详情 -->
-                <template
-                  v-else-if="
-                    classData.sportType === 'RUN' || classData.sportType === 2
-                  "
-                >
-                  <RunStageDetails :class-data="classData.classesJson" />
+                <template v-else-if="
+                  classData.sportType === 'RUN' || classData.sportType === 2
+                ">
+                  <RunStageDetails
+                    :class-data="classData.classesJson" />
                 </template>
               </div>
             </div>
@@ -781,38 +713,33 @@
         <div></div>
         <div>
           <el-button @click="handleClose">取消</el-button>
-          <el-button type="primary" @click="handleSave(false)">保存</el-button>
-          <el-button type="primary" @click="handleSave(true)"
-            >保存并关闭</el-button
-          >
+          <el-button type="primary"
+            @click="handleSave(false)">保存</el-button>
+          <el-button type="primary"
+            @click="handleSave(true)">保存并关闭</el-button>
         </div>
       </div>
     </el-dialog>
-    <ClassDetailModal
-      :visible="showClassDetailModal"
-      :type="normalizedSportType"
-      scheduleType="edit"
+    <ClassDetailModal :visible="showClassDetailModal"
+      :type="normalizedSportType" scheduleType="edit"
       :data="classData"
-      :athleticThreshold="athleticThreshold"
-      :triUserId="triUserId"
-      @save="$emit('save', $event)"
-      @cancel="handleClassDetailClose"
-      v-if="!isActivity"
-    />
+      :athleticThreshold="athleticThreshold" :triUserId="triUserId"
+      @save="$emit('save', $event)" @cancel="handleClassDetailClose"
+      v-if="!isActivity" />
   </div>
 </template>
 
 <script>
-import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import CycleStageDetails from "./CycleStageDetails.vue";
-import RunStageDetails from "./RunStageDetails.vue";
-import { SPORT_TYPE_ICONS, ACTIVITY_TYPE_DICT } from "../constants";
-import { submitData, getData } from "@/api/common.js";
-import ClassDetailModal from "./ClassDetailModal/index.vue";
-import { scheduleApi } from "../services/classManagement.js";
-import TimeInput from "@/views/classManagement/components/timeInpt";
-import { getClassImageIcon, getSportTypeName } from "../utils/helpers";
-import { hhmmssToSeconds } from "@/utils/index";
+import ExerciseProcessChart from "@/components/ExerciseProcessChart"
+import CycleStageDetails from "./CycleStageDetails.vue"
+import RunStageDetails from "./RunStageDetails.vue"
+import { SPORT_TYPE_ICONS, ACTIVITY_TYPE_DICT } from "../constants"
+import { submitData, getData } from "@/api/common.js"
+import ClassDetailModal from "./ClassDetailModal/index.vue"
+import { scheduleApi } from "../services/classManagement.js"
+import TimeInput from "@/views/classManagement/components/timeInpt"
+import { getClassImageIcon, getSportTypeName } from "../utils/helpers"
+import { hhmmssToSeconds } from "@/utils/index"
 
 export default {
   name: "EditClass",
@@ -888,39 +815,39 @@ export default {
           },
         ],
       },
-    };
+    }
   },
   computed: {
     // 判断是否应该禁用输入（当课表日期大于当前时间时禁用）
     isInputDisabled() {
-      if (!this.classData.classesDate) return false;
-      const classDate = new Date(this.classData.classesDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return classDate > today;
+      if (!this.classData.classesDate) return false
+      const classDate = new Date(this.classData.classesDate)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return classDate > today
     },
     // 将sportType从数字转换为字符串类型
     normalizedSportType() {
-      if (!this.classData.sportType) return "RUN";
+      if (!this.classData.sportType) return "RUN"
 
       // 如果已经是字符串类型，直接返回
       if (typeof this.classData.sportType === "string") {
-        return this.classData.sportType;
+        return this.classData.sportType
       }
 
       // 如果是数字类型，使用常量映射转换为字符串
-      return ACTIVITY_TYPE_DICT[this.classData.sportType] || "RUN";
+      return ACTIVITY_TYPE_DICT[this.classData.sportType] || "RUN"
     },
     filteredLinks() {
-      const links = this.classData.classesJson?.links || [];
+      const links = this.classData.classesJson?.links || []
       return links.filter(
         (item) => item.url !== "" && item.url !== null && item.url !== undefined
-      );
+      )
     },
   },
   watch: {
     visible(val) {
-      this.innerVisible = val;
+      this.innerVisible = val
     },
     innerVisible(val) {
       // 对话框完全关闭后重置数据
@@ -928,7 +855,7 @@ export default {
         this.$nextTick(() => {
           this.classData = {
             classesJson: {},
-          };
+          }
           this.actualData = {
             duration: "00:00:00",
             activityDuration: "00:00:00",
@@ -936,7 +863,7 @@ export default {
             sthValue: 0,
             calories: 0,
             distanceUnit: "km",
-          };
+          }
           this.originalData = {
             duration: "00:00:00",
             activityDuration: "00:00:00",
@@ -944,64 +871,64 @@ export default {
             sthValue: 0,
             calories: 0,
             distanceUnit: "km",
-          };
-          this.form.title = "";
-        });
+          }
+          this.form.title = ""
+        })
       } else {
         if (this.isActivity) {
-          this.classData = this.classItem;
+          this.classData = this.classItem
           console.log(
             this.classData,
             this.isActivity,
             "classData====获取-this.isActivity"
-          );
+          )
           // 同步标题到 form
           this.form.title =
             this.classData.classesJson?.title ||
             this.classData.activityName ||
-            "";
+            ""
           if (this.classData.activityId) {
-            this.getSportDetail();
+            this.getSportDetail()
           } else {
             this.classData.classesJson = this.classData.classesJson ? {
               ...this.classData.classesJson,
               links: this.classData.classesJson?.links || [],
-            } : this.classData.classesJson;
-            console.log(this.classData, "classData====获取2");
+            } : this.classData.classesJson
+            console.log(this.classData, "classData====获取2")
             this.actualData = {
               duration: this.classData.duration || "00:00:00",
               // activityDuration:
               //   this.translateSecondsToFormat(
               //     this.classData.activityDuration
               //   ) || "00:00:00",
-              activityDuration: this.classData.activityDuration || "00:00:00",
+              activityDuration: this.classData.activityDuration ? this.translateSecondsToFormat(this.classData.activityDuration) : "00:00:00",
               distance: this.classData.distance || 0,
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
               distanceUnit:
                 this.classData.distanceUnit ||
                 (this.classData.sportType === "SWIM" ||
-                this.classData.sportType === 3
+                  this.classData.sportType === 3
                   ? "m"
                   : "km"),
-            };
+            }
             this.defaultData = {
               duration: this.classData.duration || "00:00:00",
               // activityDuration:
               //   this.translateSecondsToFormat(
               //     this.classData.activityDuration
               //   ) || "00:00:00",
-              activityDuration: this.classData.activityDuration || "00:00:00",
+              activityDuration: this.classData.activityDuration ? this.translateSecondsToFormat(this.classData.activityDuration) : "00:00:00",
               distance: this.classData.distance || 0,
               sthValue: this.classData.sthValue || 0,
               calories: this.classData.calories || 0,
               distanceUnit:
                 this.classData.distanceUnit ||
                 (this.classData.sportType === "SWIM" ||
-                this.classData.sportType === 3
+                  this.classData.sportType === 3
                   ? "m"
                   : "km"),
-            };
+            }
             // if (
             //   this.classData.sportType === "SWIM" ||
             //   this.classData.sportType === 3
@@ -1012,21 +939,21 @@ export default {
             //   this.actualData.distance = this.classData.distance;
             // }
             if (this.actualData.distanceUnit === "m") {
-              this.actualData.distance = this.classData.preciseDistance;
+              this.actualData.distance = this.classData.preciseDistance
               console.log(
                 this.actualData.distance,
                 "=========this.actualData.distance"
-              );
-              this.defaultData.distance = this.classData.preciseDistance;
+              )
+              this.defaultData.distance = this.classData.preciseDistance
             } else {
-              this.actualData.distance = this.classData.preciseDistance / 1000;
-              this.defaultData.distance = this.classData.preciseDistance / 1000;
+              this.actualData.distance = this.classData.preciseDistance / 1000
+              this.defaultData.distance = this.classData.preciseDistance / 1000
             }
-            console.log(this.actualData, "this.actualData");
+            console.log(this.actualData, "this.actualData")
           }
         } else if (!this.classItem.manualActivityId) {
-          console.log(this.classItem, "this.classItem====获取3");
-          this.getClassScheduleInfo(this.classItem.id);
+          console.log(this.classItem, "this.classItem====获取3")
+          this.getClassScheduleInfo(this.classItem.id)
         }
       }
     },
@@ -1041,106 +968,106 @@ export default {
         title: "",
         type: "1",
         url: "",
-      });
+      })
     },
     handleRemoveLink(index) {
-      this.classData.classesJson?.links?.splice(index, 1);
+      this.classData.classesJson?.links?.splice(index, 1)
     },
     async handleCopyUrl(url) {
       if (!url) {
-        this.$message.warning("链接地址为空");
-        return;
+        this.$message.warning("链接地址为空")
+        return
       }
       try {
         // 使用现代 Clipboard API
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(url);
-          this.$message.success("复制成功");
+          await navigator.clipboard.writeText(url)
+          this.$message.success("复制成功")
         } else {
           // 降级方案：使用传统的复制方法
-          const textArea = document.createElement("textarea");
-          textArea.value = url;
-          textArea.style.position = "fixed";
-          textArea.style.left = "-999999px";
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand("copy");
-          document.body.removeChild(textArea);
-          this.$message.success("复制成功");
+          const textArea = document.createElement("textarea")
+          textArea.value = url
+          textArea.style.position = "fixed"
+          textArea.style.left = "-999999px"
+          document.body.appendChild(textArea)
+          textArea.select()
+          document.execCommand("copy")
+          document.body.removeChild(textArea)
+          this.$message.success("复制成功")
         }
       } catch (err) {
-        console.error("复制失败:", err);
-        this.$message.error("复制失败");
+        console.error("复制失败:", err)
+        this.$message.error("复制失败")
       }
     },
     restoreVerification(field) {
       if (this.isInputDisabled) {
-        return true;
+        return true
       }
       const distance =
         this.actualData.distanceUnit === "km"
           ? this.actualData[field] * 1000
-          : this.actualData[field];
+          : this.actualData[field]
       if (this.classData.activityId) {
-        return distance === this.originalData[field];
+        return distance === this.originalData[field]
       } else {
-        return true;
+        return true
       }
     },
     resetVerification(field) {
       if (this.isInputDisabled) {
-        return true;
+        return true
       }
-      let distance = 0;
+      let distance = 0
       if (
         this.defaultData.distanceUnit === "km" &&
         this.actualData.distanceUnit === "km"
       ) {
-        distance = this.defaultData.distance;
+        distance = this.defaultData.distance
       } else if (
         this.defaultData.distanceUnit === "m" &&
         this.actualData.distanceUnit === "m"
       ) {
-        distance = this.defaultData.distance;
+        distance = this.defaultData.distance
       } else if (
         this.defaultData.distanceUnit === "m" &&
         this.actualData.distanceUnit === "km"
       ) {
-        distance = this.defaultData.distance / 1000;
+        distance = this.defaultData.distance / 1000
       } else if (
         this.defaultData.distanceUnit === "km" &&
         this.actualData.distanceUnit === "m"
       ) {
-        distance = this.defaultData.distance * 1000;
+        distance = this.defaultData.distance * 1000
       }
       if (this.classData.manualActivityId) {
-        return distance === this.actualData[field];
+        return distance === this.actualData[field]
       } else {
-        return true;
+        return true
       }
     },
     getSportTypeName(sportType) {
-      return getSportTypeName(sportType);
+      return getSportTypeName(sportType)
     },
     // 编辑进入弹框时，查询课表数据
     getClassScheduleInfo(id) {
-      if (!this.classItem.classesJson) return;
+      if (!this.classItem.classesJson) return
       getData({
         url: "/gateway/training/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
-          const classData = JSON.parse(res.result.classesJson);
+          const classData = JSON.parse(res.result.classesJson)
           this.classData = {
             ...res.result,
             classesJson: {
               ...classData,
               links: classData?.links || [],
             },
-          };
-          console.log("====当前课表数据====this.classData", this.classData);
+          }
+          console.log("====当前课表数据====this.classData", this.classData)
           // 同步标题到 form
-          this.form.title = this.classData.classesJson?.title || "";
+          this.form.title = this.classData.classesJson?.title || ""
           this.actualData = {
             duration: this.classData.duration || "00:00:00",
             activityDuration: "00:00:00",
@@ -1149,22 +1076,22 @@ export default {
             calories: this.classData.calories || 0,
             distanceUnit:
               this.classData.classesJson?.distanceUnit &&
-              this.classData.classesJson.distanceUnit !== "km"
+                this.classData.classesJson.distanceUnit !== "km"
                 ? "m"
                 : "km",
-          };
+          }
         }
-      });
+      })
     },
     isRestType(sportType) {
-      return ["REST", "REMARK"].includes(sportType);
+      return ["REST", "REMARK"].includes(sportType)
     },
     isTrainingAdvice(sportType) {
-      return ["REMARK", "OTHER", "REST"].includes(sportType);
+      return ["REMARK", "OTHER", "REST"].includes(sportType)
     },
     deleteClass(classData) {
-      console.log(classData, "classData====删除课表");
-      const title = classData.classesJson?.title || classData.activityName ? classData.classesJson?.title || classData.activityName : `${getSportTypeName(classData.sportType)}_手动录入数据}`;
+      console.log(classData, "classData====删除课表")
+      const title = classData.classesJson?.title || classData.activityName ? classData.classesJson?.title || classData.activityName : `${getSportTypeName(classData.sportType)}_手动录入数据}`
       this.$confirm(
         `确认删除【${title}】？`,
         "提示",
@@ -1177,94 +1104,98 @@ export default {
         const res = await scheduleApi.deleteSchedule({
           id: classData?.id,
           triUserId: this.triUserId,
-        });
+        })
         if (res.success) {
-          this.$message.success("删除成功");
-          this.handleClose();
-          this.$emit("save", true);
+          this.$message.success("删除成功")
+          this.handleClose()
+          this.$emit("save", true)
         }
-      });
+      })
     },
     // s转换成hh:mm:ss
     translateSecondsToFormat(seconds) {
+      // 如果为 01:00:00 格式 seconds为字符串
+      if (typeof seconds === "string" && seconds.includes(":")) {
+        return seconds
+      }
       // 计算小时、分钟和剩余秒数
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
+      const hours = Math.floor(seconds / 3600)
+      const minutes = Math.floor((seconds % 3600) / 60)
+      const secs = seconds % 60
 
       // 格式化各部分为两位数
-      const pad = (num) => num.toString().padStart(2, "0");
+      const pad = (num) => num.toString().padStart(2, "0")
 
-      return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+      return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`
     },
     // 将速度按运动类型格式化显示
     formatSpeedBySport(sportType, min, avg, max) {
       const toPace = (secondsPerUnit, unitLabel) => {
-        if (!secondsPerUnit || secondsPerUnit <= 0) return "-";
-        const minutes = Math.floor(secondsPerUnit / 60);
-        const seconds = Math.round(secondsPerUnit % 60);
-        return `${minutes}:${String(seconds).padStart(2, "0")}`;
-      };
+        if (!secondsPerUnit || secondsPerUnit <= 0) return "-"
+        const minutes = Math.floor(secondsPerUnit / 60)
+        const seconds = Math.round(secondsPerUnit % 60)
+        return `${minutes}:${String(seconds).padStart(2, "0")}`
+      }
 
       const toKmPerHour = (val) => {
-        if (val === undefined || val === null) return "-";
-        return `${(val * 3.6).toFixed(1)}`;
-      };
+        if (val === undefined || val === null) return "-"
+        return `${(val * 3.6).toFixed(1)}`
+      }
 
       const convertValue = (val) => {
-        const isSwim = sportType === "SWIM" || sportType === 3;
-        const isRun = sportType === "RUN" || sportType === 2;
-        const isCycle = sportType === "CYCLE" || sportType === 1;
-        console.log(val, "val");
+        const isSwim = sportType === "SWIM" || sportType === 3
+        const isRun = sportType === "RUN" || sportType === 2
+        const isCycle = sportType === "CYCLE" || sportType === 1
+        console.log(val, "val")
 
         if (!val || val === undefined || val === null || Number.isNaN(val)) {
-          return "-";
+          return "-"
         }
         // val 预期为 m/s
         if (isSwim) {
-          const secPer100m = 100 / val;
-          return toPace(secPer100m);
+          const secPer100m = 100 / val
+          return toPace(secPer100m)
         }
         if (isRun) {
-          const secPerKm = 1000 / val;
-          return toPace(secPerKm);
+          const secPerKm = 1000 / val
+          return toPace(secPerKm)
         }
         if (isCycle) {
-          return toKmPerHour(val);
+          return toKmPerHour(val)
         }
         // 其他默认 km/h
-        return toKmPerHour(val);
-      };
+        return toKmPerHour(val)
+      }
 
       return {
         minSpeed: convertValue(min),
         avgSpeed: convertValue(avg),
         maxSpeed: convertValue(max),
-      };
+      }
     },
     // 将步频按运动类型格式化显示
     formatCadenceBySport(sportType, min, avg, max) {
       const formatVal = (val) =>
         val === undefined || val === null || Number.isNaN(val)
           ? "-"
-          : `${val} `;
+          : `${val} `
       return {
         minCadence: formatVal(min),
         avgCadence: formatVal(avg),
         maxCadence: formatVal(max),
-      };
+      }
     },
     // 步幅格式化（单位米）
     formatStride(min, avg, max) {
       const formatVal = (val) =>
         val === undefined || val === null || Number.isNaN(val)
           ? "-"
-          : `${Number(val)} `;
+          : `${Number(val)} `
       return {
         minStrideLength: formatVal(min),
         avgStrideLength: formatVal(avg),
         maxStrideLength: formatVal(max),
-      };
+      }
     },
     formatOutlineData(result = {}) {
       const {
@@ -1292,38 +1223,38 @@ export default {
         productName = "",
         np,
         if: intensityFactor,
-      } = result;
+      } = result
       const formattedSpeeds = this.formatSpeedBySport(
         sportType,
         minSpeed,
         avgSpeed,
         maxSpeed
-      );
+      )
       const formattedCadence = this.formatCadenceBySport(
         sportType,
         minCadence,
         avgCadence,
         maxCadence
-      );
+      )
       const formattedStride =
         sportType === 2
           ? this.formatStride(minStrideLength, avgStrideLength, maxStrideLength)
           : {
-              minStrideLength: "-",
-              avgStrideLength: "-",
-              maxStrideLength: "-",
-            };
+            minStrideLength: "-",
+            avgStrideLength: "-",
+            maxStrideLength: "-",
+          }
 
       const deviceTypeFormat = [
         { en: "COROS", cn: "高驰" },
         { en: "GARMIN", cn: "佳明中国" },
         { en: "GARMIN", cn: "佳明国际" },
         { en: "HUAMI", cn: "华米" },
-      ];
+      ]
       const deviceName =
         deviceType && deviceTypeFormat[deviceType - 1]
           ? deviceTypeFormat[deviceType - 1].en
-          : "";
+          : ""
 
       return {
         ...result,
@@ -1345,7 +1276,7 @@ export default {
         np: np || "-",
         if: intensityFactor || "-",
         productName: `${deviceName || ""} ${productName || ""}`.trim(),
-      };
+      }
     },
     // 查询运动详情
     getSportDetail() {
@@ -1353,7 +1284,7 @@ export default {
         .getActivityDetail(this.classData.activityId, this.triUserId)
         .then((res) => {
           if (res.success) {
-            this.sportDetail = this.formatOutlineData(res.result);
+            this.sportDetail = this.formatOutlineData(res.result)
             const actualData = {
               duration: this.translateSecondsToFormat(
                 this.sportDetail.duration
@@ -1362,20 +1293,20 @@ export default {
                 typeof this.sportDetail.netDuration === "string"
                   ? this.sportDetail.netDuration
                   : this.translateSecondsToFormat(
-                      this.sportDetail.netDuration || 0
-                    ),
+                    this.sportDetail.netDuration || 0
+                  ),
               distance: parseFloat(this.sportDetail.distance),
               sthValue: this.sportDetail.sthValue,
               calories: this.sportDetail.calories,
               distanceUnit: this.sportDetail.sportType === 3 ? "m" : "km",
-            };
+            }
             actualData.distance =
               actualData.distanceUnit === "km"
                 ? actualData.distance / 1000
-                : actualData.distance;
-            this.defaultData = JSON.parse(JSON.stringify(actualData));
+                : actualData.distance
+            this.defaultData = JSON.parse(JSON.stringify(actualData))
             if (!this.classData.manualActivityId) {
-              this.actualData = actualData;
+              this.actualData = actualData
             } else {
               this.actualData = {
                 duration: this.classData.duration,
@@ -1386,23 +1317,23 @@ export default {
                   typeof this.classData.activityDuration === "string"
                     ? this.classData.activityDuration
                     : this.translateSecondsToFormat(
-                        this.classData.activityDuration || 0
-                      ),
+                      this.classData.activityDuration || 0
+                    ),
                 sthValue: this.classData.sthValue,
                 calories: this.classData.calories,
-              };
+              }
               if (!this.classData.distanceUnit) {
                 this.$set(
                   this.actualData,
                   "distanceUnit",
                   this.sportDetail.sportType === 3 ? "m" : "km"
-                );
+                )
               } else {
                 this.$set(
                   this.actualData,
                   "distanceUnit",
                   this.classData.distanceUnit
-                );
+                )
               }
               this.$set(
                 this.actualData,
@@ -1410,18 +1341,18 @@ export default {
                 this.actualData.distanceUnit === "km"
                   ? this.classData.preciseDistance / 1000
                   : this.classData.preciseDistance
-              );
-              console.log(this.actualData, "this.actualData");
-              this.defaultData = JSON.parse(JSON.stringify(this.actualData));
+              )
+              console.log(this.actualData, "this.actualData")
+              this.defaultData = JSON.parse(JSON.stringify(this.actualData))
             }
             // 保存原始数据
-            this.originalData = JSON.parse(JSON.stringify(actualData));
+            this.originalData = JSON.parse(JSON.stringify(actualData))
             this.originalData.distance = parseFloat(
               this.sportDetail.distance.toFixed(0)
-            );
-            console.log(this.originalData, "originalData");
+            )
+            console.log(this.originalData, "originalData")
           }
-        });
+        })
     },
     // 还原字段到原始值
     restoreField(field) {
@@ -1432,9 +1363,9 @@ export default {
           this.actualData.distanceUnit === "km"
             ? this.originalData[field] / 1000
             : this.originalData[field]
-        );
+        )
       } else {
-        this.$set(this.actualData, field, this.originalData[field]);
+        this.$set(this.actualData, field, this.originalData[field])
       }
     },
     // 重置字段到默认值
@@ -1444,12 +1375,12 @@ export default {
           this.actualData.distanceUnit === "km" &&
           this.defaultData.distanceUnit === "km"
         ) {
-          this.$set(this.actualData, "distance", this.defaultData.distance);
+          this.$set(this.actualData, "distance", this.defaultData.distance)
         } else if (
           this.actualData.distanceUnit === "m" &&
           this.defaultData.distanceUnit === "m"
         ) {
-          this.$set(this.actualData, "distance", this.defaultData.distance);
+          this.$set(this.actualData, "distance", this.defaultData.distance)
         } else if (
           this.actualData.distanceUnit === "m" &&
           this.defaultData.distanceUnit === "km"
@@ -1458,7 +1389,7 @@ export default {
             this.actualData,
             "distance",
             this.defaultData.distance * 1000
-          );
+          )
         } else if (
           this.actualData.distanceUnit === "km" &&
           this.defaultData.distanceUnit === "m"
@@ -1467,30 +1398,30 @@ export default {
             this.actualData,
             "distance",
             this.defaultData.distance / 1000
-          );
+          )
         } else {
-          this.$set(this.actualData, "distance", this.defaultData.distance);
+          this.$set(this.actualData, "distance", this.defaultData.distance)
         }
       } else {
-        this.$set(this.actualData, field, this.defaultData[field]);
+        this.$set(this.actualData, field, this.defaultData[field])
       }
     },
     handleDistanceUnitChange(value) {
-      console.log(value, "value");
+      console.log(value, "value")
       if (value === "km") {
         this.$set(
           this.actualData,
           "distance",
           parseFloat(this.actualData.distance / 1000)
-        );
+        )
       } else {
         // 当切换为米时，确保距离是整数
-        const distanceInMeters = parseFloat(this.actualData.distance * 1000);
-        this.$set(this.actualData, "distance", Math.round(distanceInMeters));
+        const distanceInMeters = parseFloat(this.actualData.distance * 1000)
+        this.$set(this.actualData, "distance", Math.round(distanceInMeters))
       }
-      console.log(this.actualData, "this.actualData");
-      console.log(this.originalData, "this.originalData");
-      console.log(this.defaultData, "this.defaultData");
+      console.log(this.actualData, "this.actualData")
+      console.log(this.originalData, "this.originalData")
+      console.log(this.defaultData, "this.defaultData")
     },
     handleDistanceInput(value) {
       // 当单位为米时，确保输入的值是整数
@@ -1499,26 +1430,26 @@ export default {
         value !== null &&
         value !== undefined
       ) {
-        const intValue = Math.round(value);
+        const intValue = Math.round(value)
         if (intValue !== value) {
-          this.$set(this.actualData, "distance", intValue);
+          this.$set(this.actualData, "distance", intValue)
         }
       }
     },
     handleEditClassDetail() {
       // 只打开子对话框，不关闭当前对话框
-      this.showClassDetailModal = true;
+      this.showClassDetailModal = true
     },
     handleClassDetailClose() {
       // 子对话框关闭时的回调
-      this.showClassDetailModal = false;
-      this.getClassScheduleInfo(this.classItem.id);
-      this.handleClose();
+      this.showClassDetailModal = false
+      this.getClassScheduleInfo(this.classItem.id)
+      this.handleClose()
     },
     handleClose() {
-      console.log("handleClose");
-      this.showClassDetailModal = false;
-      this.$emit("close");
+      console.log("handleClose")
+      this.showClassDetailModal = false
+      this.$emit("close")
     },
     // 判断是课表时 actualData是否被修改过（不是默认值）
     isActualDataModified() {
@@ -1528,7 +1459,7 @@ export default {
         distance: 0,
         sthValue: 0,
         calories: 0,
-      };
+      }
       // 判断是否有任何字段不等于默认值
       return (
         this.actualData.duration !== defaultData.duration ||
@@ -1542,7 +1473,7 @@ export default {
         (this.actualData.calories !== defaultData.calories &&
           this.actualData.calories !== null &&
           this.actualData.calories !== undefined)
-      );
+      )
     },
     // 判断 运动数据时 actualData是否被修改过（不是原始值）
     isActualDataModifiedForActivity() {
@@ -1551,26 +1482,26 @@ export default {
         this.actualData,
         this.defaultData,
         "this.actualData.duration, this.defaultData.duration"
-      );
+      )
       return (
         this.actualData.duration === this.defaultData.duration &&
         this.actualData.activityDuration ===
-          this.defaultData.activityDuration &&
+        this.defaultData.activityDuration &&
         this.actualData.distance === this.defaultData.distance &&
         this.actualData.sthValue === this.defaultData.sthValue &&
         this.actualData.calories === this.defaultData.calories
-      );
+      )
     },
     saveClassSchedule(flag) {
-      const isModified = this.isActualDataModified();
-      let distance = null;
+      const isModified = this.isActualDataModified()
+      let distance = null
       if (this.actualData.distance) {
         distance =
           this.actualData.distanceUnit === "km"
             ? this.actualData.distance * 1000
-            : this.actualData.distance;
+            : this.actualData.distance
       }
-      const links = this.classData.classesJson?.links.filter(item => item.url !== "");
+      const links = this.classData.classesJson?.links.filter(item => item.url !== "")
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.isActivity
@@ -1591,23 +1522,23 @@ export default {
         flag: isModified, // 如果修改过为true，否则为false
       }).then((res) => {
         if (res.success) {
-          this.$message.success("课表保存成功");
+          this.$message.success("课表保存成功")
           if (isModified) {
-            this.handleClose();
-            this.$emit("save", flag);
-            return;
+            this.handleClose()
+            this.$emit("save", flag)
+            return
           }
-          if (flag) this.handleClose();
-          this.$emit("save", flag);
+          if (flag) this.handleClose()
+          this.$emit("save", flag)
         }
-      });
+      })
     },
     saveActivitySchedule(flag) {
       if (this.isActualDataModifiedForActivity()) {
-        this.$message.error("运动数据未修改，无需保存");
-        return;
+        this.$message.error("运动数据未修改，无需保存")
+        return
       }
-      const links = this.classData.classesJson?.links.filter(item => item.url !== "");
+      const links = this.classData.classesJson?.links.filter(item => item.url !== "")
       submitData({
         url: "/training/api/activity/updateActivityDetail",
         activityId: this.classData.activityId,
@@ -1627,11 +1558,11 @@ export default {
         distanceUnit: this.actualData.distanceUnit,
       }).then((res) => {
         if (res.success) {
-          this.$message.success("运动记录保存成功");
-          this.handleClose();
-          this.$emit("save", flag);
+          this.$message.success("运动记录保存成功")
+          this.handleClose()
+          this.$emit("save", flag)
         }
-      });
+      })
     },
     saveActivityScheduleForManual(flag) {
       submitData({
@@ -1650,31 +1581,31 @@ export default {
         title: this.form.title,
       }).then((res) => {
         if (res.success) {
-          this.$message.success("运动记录保存成功");
-          this.handleClose();
-          this.$emit("save", flag);
+          this.$message.success("运动记录保存成功")
+          this.handleClose()
+          this.$emit("save", flag)
         }
-      });
+      })
     },
     async handleSave(flag) {
-      console.log(this.classData, "classData");
+      console.log(this.classData, "classData")
       // 如果有标题表单且可编辑（有 classesJson.title），先验证并同步标题
       if (this.$refs.titleRef && this.classData.classesJson?.title) {
         try {
-          await this.$refs.titleRef.validate();
+          await this.$refs.titleRef.validate()
           // 同步 form.title 到 classData.classesJson.title
           if (!this.classData.classesJson) {
-            this.$set(this.classData, "classesJson", {});
+            this.$set(this.classData, "classesJson", {})
           }
-          const links = this.classData.classesJson?.links.filter(item => item.url !== "");
+          const links = this.classData.classesJson?.links.filter(item => item.url !== "")
           this.$set({
             ...this.classData.classesJson,
             links: links,
             title: this.form.title,
-          }, "title", this.form.title);
+          }, "title", this.form.title)
         } catch (error) {
           // 验证失败，不继续保存
-          return;
+          return
         }
       }
       // if (!this.isActivity || !this.classData.activityId) {
@@ -1687,87 +1618,87 @@ export default {
         this.classData.activityId &&
         !this.classData.classScheduleId
       ) {
-        this.saveActivitySchedule(flag);
+        this.saveActivitySchedule(flag)
       } else if (
         this.isActivity &&
         !this.classData.activityId &&
         !this.classData.classScheduleId
       ) {
-        this.saveActivityScheduleForManual(flag);
+        this.saveActivityScheduleForManual(flag)
       } else {
-        this.saveClassSchedule(flag);
+        this.saveClassSchedule(flag)
       }
     },
     getSportIcon(sportType) {
-      console.log(sportType, "sportType");
+      console.log(sportType, "sportType")
       if (!this.isActivity) {
-        return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+        return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
       } else {
-        return getClassImageIcon(sportType);
+        return getClassImageIcon(sportType)
       }
     },
     formatDuration(duration) {
-      return duration === "00:00:00" || !duration ? "--:--:--" : duration;
+      return duration === "00:00:00" || !duration ? "--:--:--" : duration
     },
     actualformatDistance(distance, sportType) {
-      let result = "";
+      let result = ""
       if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "");
+        result = distance.replace("km", "")
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance;
+        result = distance
       }
       if (sportType === 3) {
-        result = distance;
+        result = distance
       } else {
-        result = Math.round(result / 10) / 100;
+        result = Math.round(result / 10) / 100
       }
       if (!result || result === "0") {
-        result = "--";
+        result = "--"
       }
-      return result;
+      return result
     },
     scheduleFormatDistance(distance, sportType) {
-      let result = "";
+      let result = ""
       if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "");
+        result = distance.replace("km", "")
       }
       if (distance && Number(distance) > 0) {
-        result = distance;
+        result = distance
       }
       if (!result || result === "0") {
-        result = "--";
+        result = "--"
       }
-      return result;
+      return result
     },
     formatDistance(distance, distanceUnit) {
-      let result = "";
+      let result = ""
       if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "");
+        result = distance.replace("km", "")
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance;
+        result = distance
       }
       if (!result || result === "0") {
-        result = "--";
+        result = "--"
       }
       if (
         distanceUnit === "m" &&
         result !== "--" &&
         this.classData.classesJson?.sportType !== "SWIM"
       ) {
-        result = result * 1000;
+        result = result * 1000
       } else if (
         distanceUnit === "km" &&
         result !== "--" &&
         this.classData.classesJson?.sportType === "SWIM"
       ) {
-        result = result / 1000;
+        result = result / 1000
       }
-      return result;
+      return result
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1782,17 +1713,21 @@ export default {
     font-weight: 600;
     color: #333;
     gap: 10px;
+
     div {
       display: flex;
       align-items: center;
       gap: 10px;
-      > span {
+
+      >span {
         flex: 1;
         white-space: nowrap;
       }
     }
+
     ::v-deep .el-form-item {
       margin-left: 0;
+
       .el-form-item__content {
         margin-left: 0 !important;
       }
@@ -1809,6 +1744,7 @@ export default {
     }
   }
 }
+
 ::v-deep .el-dialog__body {
   padding-top: 0px;
 }
@@ -1866,10 +1802,12 @@ export default {
       justify-content: center;
       gap: 4px;
       position: relative;
+
       .modified-indicator {
         position: absolute;
         left: -10px;
       }
+
       .el-input-number--small {
         width: 110px !important;
         flex-shrink: 0;
@@ -1910,28 +1848,35 @@ export default {
       justify-content: space-between;
       align-content: center;
       margin-bottom: 5px;
-      > span {
+
+      >span {
         flex: 2;
       }
+
       span:last-child {
         flex: 1.2;
       }
     }
+
     .sync-params-table {
       font-size: 12px;
       line-height: 20px;
       width: 100%;
       border-collapse: collapse;
+
       td {
         flex: 1;
         text-align: center;
       }
+
       td:last-child {
         flex: 1;
       }
+
       td:first-child {
         flex: 1;
       }
+
       tr:first-child {
         background-color: #f5f5f5;
       }
@@ -2001,21 +1946,25 @@ export default {
       }
     }
   }
+
   .edit-section {
     margin-top: 10px;
   }
+
   .section-header {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
+
   .section-title {
     font-size: 14px;
     font-weight: 600;
     color: #333;
     margin-bottom: 10px;
   }
+
   .section {
     margin-bottom: 20px;
 
@@ -2084,6 +2033,7 @@ export default {
   justify-content: space-between;
   margin-bottom: 10px;
   font-size: 14px;
+
   .link-item-title {
     flex: 0.9;
     word-wrap: break-word;
@@ -2095,6 +2045,7 @@ export default {
     line-clamp: 3;
     line-height: 1.5;
   }
+
   .link-item-button {
     flex: 0.11;
     color: #f92b30;
@@ -2109,12 +2060,14 @@ export default {
   display: flex;
   justify-content: space-between;
   gap: 10px;
+
   .delete-icon {
     width: 24px;
     height: 24px;
     cursor: pointer;
   }
 }
+
 .dialog-footer .el-button {
   min-width: 102px;
   border-radius: 5px;
@@ -2125,14 +2078,17 @@ export default {
   padding: 0px;
   height: 32px;
 }
+
 .dialog-footer .el-button--warning {
   background: #f5a623;
   border-color: #f5a623;
 }
+
 .dialog-footer .el-button--danger {
   background: #d83b36;
   border-color: #d83b36;
 }
+
 .edit-class-detail-btn {
   width: 116px;
   color: #101010;

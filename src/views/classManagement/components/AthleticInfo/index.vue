@@ -423,6 +423,7 @@
                 <el-input
                   v-model="baseForm.nickname"
                   placeholder="请输入昵称"
+                  maxlength="20"
                   :disabled="loginType === '2'"
                 />
               </el-form-item>

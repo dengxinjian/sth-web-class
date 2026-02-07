@@ -35,15 +35,15 @@
                 移动
               </div>
             </span>
-            <span v-if="showShareBtn && isClassShare">
+            <span v-if="showShareBtn && isClassShare && loginType === '2'">
               <div class="btn-list-hover-item" @click.stop="
                 $emit('share', classItem.id)
               handleClose()
                 ">
-                分享课程
+                分享团队
               </div>
             </span>
-            <span v-if="isClassShare">
+            <span v-if="isClassShare && loginType === '2'">
               <div class="btn-list-hover-item" @click.stop="
                 $emit('share-history', classItem)
               handleClose()
@@ -76,13 +76,15 @@
             </span>
             <span>
               <div class="btn-list-hover-item"
-                @click.stop="handleMoveShareClass" v-if="isClassShare">
+                @click.stop="handleMoveShareClass"
+                v-if="isClassShare">
                 移动
               </div>
             </span>
             <span>
               <div class="btn-list-hover-item"
-                @click.stop="handleShareAuthEdit" v-if="triUserId === classItem.shareUserId && isClassShare">
+                @click.stop="handleShareAuthEdit"
+                v-if="triUserId === classItem.shareUserId && isClassShare">
                 权限调整
               </div>
             </span>
@@ -118,6 +120,10 @@
                     }}
                   </div>
                 </div>
+              </div>
+              <div class="keyword" style="font-size: 12px;"
+                v-if="activeClassType === 'team'">
+                分享人：{{ classItem.shareUserName }}
               </div>
 
               <div style="
@@ -297,6 +303,7 @@ export default {
       innerVisible: false,
       showEditClass: false,
       triUserId: localStorage.getItem("triUserId"),
+      loginType: localStorage.getItem("loginType"),
     }
   },
   computed: {

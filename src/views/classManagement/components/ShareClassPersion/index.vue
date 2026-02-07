@@ -89,7 +89,6 @@ export default {
         if (val && this.record) {
           console.log(this.record, "this.record====操作权限");
           console.log(this.shareAuth, "this.shareAuth====操作权限");
-          this.getCurrentShareRecord()
           this.form = {
             revoke: false,
             shareToAuth: this.shareAuth != null ? Number(this.shareAuth) : 1,
@@ -104,30 +103,6 @@ export default {
     },
   },
   methods: {
-    getCurrentShareRecord() {
-      const requestUserId = localStorage.getItem("triUserId")
-      if (!requestUserId) {
-        return
-      }
-      submitData({
-        url: "/gateway/training/share/queryShareRecords",
-        requestData: {
-          requestUserId,
-          shareDataId: this.record.sourceClassId,
-          shareDataType: 1, // 1=团队课程 2=计划
-          shareUserId: this.record.shareUserId,
-          pageNum: 1,
-          pageSize: 10,
-        },
-      })
-        .then((res) => {
-          this.shareRecordList = res.result.records || []
-        })
-        .catch((err) => {
-          console.error("获取分享历史失败:", err)
-          this.shareRecordList = []
-        })
-    },
     handleClose() {
       this.innerVisible = false
       this.$emit("close", this.form)
@@ -135,7 +110,8 @@ export default {
       this.shareRecordList = []
     },
     async handleConfirm() {
-      const record = this.shareRecordList[0]
+      const record = this.planInfo
+      console.log(this.planInfo, "record====权限调整");
       if (!record || (record.id == null && record.shareRecordId == null)) {
         this.$message.warning("未找到分享记录")
         return

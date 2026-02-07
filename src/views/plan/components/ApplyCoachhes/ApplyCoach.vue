@@ -29,8 +29,9 @@
           <el-select
             v-model="form.teamId"
             :placeholder="form.applyDimension === '2' ? '请选择俱乐部' : '请选择团队'"
+            :disabled="teamSelectDisabled"
             filterable
-            clearable
+            :clearable="!teamSelectDisabled"
             style="width: 100%"
             @change="handleOrgChange">
             <el-option
@@ -41,31 +42,37 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="人员选择" prop="athleteIds">
-          <!-- <el-select
-            v-model="form.athleteIds"
-            placeholder="请选择人员"
-            filterable
-            clearable
-            multiple
-            style="width: 100%"
-            @change="handleAthleteChange"
-          >
-            <el-option
-              v-for="g in athletesOptions"
-              :key="g.triUserId"
-              :label="g.userNickname"
-              :value="g.triUserId"
-            />
-          </el-select> -->
+        <el-form-item
+          v-if="form.applyDimension === '1'"
+          label="人员选择"
+          prop="athleteIds">
           <el-cascader
-            :key="cascaderKey"
-            v-model="form.athleteIds"
+            :key="'team-' + teamCascaderKey"
+            :value="sanitizedTeamAthleteIds"
             :options="teamGroupList"
             :props="memberProps"
             clearable
             style="width: 100%"
-            @change="handleCascaderChange"></el-cascader>
+            placeholder="请选择人员"
+            @input="onTeamAthleteIdsInput"
+            @change="handleCascaderChange"
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="form.applyDimension === '2'"
+          label="人员选择"
+          prop="clubAthleteIds">
+          <el-cascader
+            :key="'club-' + clubCascaderKey"
+            :value="sanitizedClubAthleteIds"
+            :options="clubGroupList"
+            :props="memberProps"
+            clearable
+            style="width: 100%"
+            placeholder="请选择人员"
+            @input="onClubAthleteIdsInput"
+            @change="handleCascaderChange"
+          />
         </el-form-item>
 
         <el-form-item label="类型" prop="athleteType">
@@ -449,8 +456,10 @@ export default {
     value: { type: Boolean, default: undefined },
     defaultTitle: { type: String, default: "" },
     defaultGroupId: { type: [String, Number], default: undefined },
-    planInfo: { type: Object, default: () => { } },
+    planInfo: { type: Object, default: () => ({}) },
     planClasses: { type: Array, default: () => [] },
+    isTeamPlan: { type: Boolean, default: false },
+    planTeamId: { type: [String, Number], default: null },
   },
   data() {
     return {
@@ -458,6 +467,7 @@ export default {
       form: {
         teamId: undefined,
         athleteIds: [],
+        clubAthleteIds: [],
         athleteType: 1,
         applyMode: 1,
         applyDate: moment().format("YYYY-MM-DD"),
@@ -476,7 +486,24 @@ export default {
         ],
         teamId: [{ required: true, message: "请选择团队", trigger: "change" }],
         athleteIds: [
-          { required: true, message: "请选择人员", trigger: "change" },
+          {
+            validator: (rule, value, cb) => {
+              if (this.form.applyDimension !== "1") return cb()
+              if (!value || value.length === 0) return cb(new Error("请选择人员"))
+              cb()
+            },
+            trigger: "change",
+          },
+        ],
+        clubAthleteIds: [
+          {
+            validator: (rule, value, cb) => {
+              if (this.form.applyDimension !== "2") return cb()
+              if (!value || value.length === 0) return cb(new Error("请选择人员"))
+              cb()
+            },
+            trigger: "change",
+          },
         ],
         athleteType: [
           { required: true, message: "请选择类型", trigger: "change" },
@@ -497,10 +524,12 @@ export default {
       },
       teams: [],
       teamGroupList: [],
+      clubGroupList: [],
       athletesList: [],
       members: [],
       loading: false,
-      cascaderKey: 0, // 用于强制级联选择器重新渲染
+      teamCascaderKey: 0,
+      clubCascaderKey: 0,
       memberProps: {
         multiple: true,
         emitPath: true,
@@ -551,6 +580,21 @@ export default {
       const finalMax = lastDay > 0 ? lastDay : 28
       return Array.from({ length: finalMax }, (_, idx) => idx + 1)
     },
+    teamSelectDisabled() {
+      return this.isTeamPlan && this.form.applyDimension === "1"
+    },
+    sanitizedTeamAthleteIds() {
+      return this.sanitizePathsForOptions(
+        this.form.athleteIds || [],
+        this.teamGroupList || []
+      )
+    },
+    sanitizedClubAthleteIds() {
+      return this.sanitizePathsForOptions(
+        this.form.clubAthleteIds || [],
+        this.clubGroupList || []
+      )
+    },
   },
   watch: {
     visible(val) {
@@ -563,11 +607,15 @@ export default {
       this.$emit("update:visible", val)
       this.$emit("input", val)
       if (val) {
-        // reset form when opening
         this.resetForm()
         this.getDefaultTeam()
         this.getTeamList()
         this.getClubList()
+        if (this.isTeamPlan && this.planTeamId) {
+          this.form.applyDimension = "1"
+          this.form.teamId = this.planTeamId
+          this.getTeamGroupList(this.planTeamId)
+        }
         console.log("planClasses", this.planClasses)
       } else {
         // clear validation when closing
@@ -609,14 +657,15 @@ export default {
   },
   methods: {
     handleApplyDimensionChange(value) {
-      // 清空所有相关数据
       this.form.teamId = undefined
       this.form.athleteIds = []
+      this.form.clubAthleteIds = []
       this.members = []
       this.teamGroupList = []
+      this.clubGroupList = []
       this.originAthletesAll = []
-      // 强制级联选择器重新渲染，清空显示
-      this.cascaderKey = Date.now()
+      this.teamCascaderKey += 1
+      this.clubCascaderKey += 1
     },
     handleOrgChange(id) {
       // 团队/俱乐部切换时，刷新人员列表
@@ -629,6 +678,61 @@ export default {
     },
     viewApplyHistory() {
       this.$emit("viewApplyHistory", this.planInfo.id)
+    },
+    sanitizePathsForOptions(paths, opts) {
+      const raw = Array.isArray(paths) ? paths : []
+      const normalized = raw
+        .map((path) =>
+          Array.isArray(path) && path.length >= 2
+            ? [String(path[0]), String(path[1])]
+            : null
+        )
+        .filter(Boolean)
+      const valid = normalized.filter((path) => {
+        const gId = String(path[0])
+        const uId = String(path[1])
+        const group = opts.find(
+          (g) =>
+            g &&
+            (String(g.value) === gId ||
+              String(g.id) === gId)
+        )
+        if (!group || !Array.isArray(group.children)) return false
+        return group.children.some(
+          (c) =>
+            c &&
+            (String(c.value) === uId || String(c.triUserId) === uId)
+        )
+      })
+      return valid.map((path) => [String(path[0]), String(path[1])])
+    },
+    onTeamAthleteIdsInput(value) {
+      const sanitized = this.sanitizePathsForOptions(
+        value || [],
+        this.teamGroupList || []
+      )
+      const oldLen = (this.form.athleteIds || []).length
+      this.form.athleteIds = sanitized
+      this.handleCascaderChange(this.form.athleteIds)
+      if (sanitized.length < oldLen) {
+        this.$nextTick(() => {
+          this.teamCascaderKey += 1
+        })
+      }
+    },
+    onClubAthleteIdsInput(value) {
+      const sanitized = this.sanitizePathsForOptions(
+        value || [],
+        this.clubGroupList || []
+      )
+      const oldLen = (this.form.clubAthleteIds || []).length
+      this.form.clubAthleteIds = sanitized
+      this.handleCascaderChange(this.form.clubAthleteIds)
+      if (sanitized.length < oldLen) {
+        this.$nextTick(() => {
+          this.clubCascaderKey += 1
+        })
+      }
     },
     handleCascaderChange(value) {
       if (!value || !Array.isArray(value)) {
@@ -775,7 +879,6 @@ export default {
       this.form.athleteIds = []
       this.members = []
       this.teamGroupList = []
-      if (!teamId) return
       this.teamGroupList = []
       if (!teamId) return
       getData({
@@ -812,50 +915,43 @@ export default {
 
     // 俱乐部成员列表（按 groupName 分组，结构与 teamGroupList 一致）
     getClubMemberList(clubId) {
-      this.form.athleteIds = []
+      this.form.clubAthleteIds = []
       this.members = []
-      this.teamGroupList = []
+      this.clubGroupList = []
       this.originAthletesAll = []
       if (!clubId) return
-
+      // https://testk8s.strongtri.com/strong-heart-training/consumer/api/club/query/groups-with-members/c8795c300e6c8f88b87fe183d4ad22ee?clubId=c8795c300e6c8f88b87fe183d4ad22ee
       getData({
         // swagger 里一般是 /api/club/member/list/{clubId}，这里按你提供的 consumer 前缀走
-        url: `/consumer/api/club/member/list/${clubId}`,
+        url: `/consumer/api/club/query/groups-with-members/${clubId}`,
         clubId,
       }).then((res) => {
-        const list = (res && res.success && Array.isArray(res.result))
-          ? res.result
-          : []
+        // 新接口返回：[{ groupId, groupName, groupCount, members: [{ triUserId, userNickname, userAvatar }] }]
+        const list =
+          res && res.success && Array.isArray(res.result) ? res.result : []
 
-        // 只保留已通过成员（如果后端有其它状态，可在这里调整）
-        const approvedMembers = list.filter((m) => m && m.userId && m.userNickname)
+        const treeData = list
+          .filter((g) => g && (g.groupId || g.groupName))
+          .map((g) => {
+            const members = Array.isArray(g.members) ? g.members : []
+            return {
+              id: g.groupId,
+              value: g.groupId,
+              label: g.groupName || "未分组",
+              children: members
+                .filter((m) => m && m.triUserId && m.userNickname)
+                .map((member) => ({
+                  ...member,
+                  label: member.userNickname || "",
+                  value: member.triUserId,
+                })),
+            }
+          })
 
-        // 按 groupId/groupName 分组（无分组归入“未分类”）
-        const groupMap = new Map()
-        approvedMembers.forEach((m) => {
-          const groupId = m.groupId || "unGrouped"
-          const groupName = m.groupName || "未分类"
-          if (!groupMap.has(groupId)) {
-            groupMap.set(groupId, { groupId, groupName, members: [] })
-          }
-          groupMap.get(groupId).members.push(m)
-        })
-
-        const treeData = Array.from(groupMap.values()).map((g) => ({
-          id: g.groupId,
-          value: g.groupId,
-          label: g.groupName,
-          children: g.members.map((member) => ({
-            ...member,
-            // 兼容现有逻辑：把 userId 当作 triUserId 使用
-            triUserId: member.userId,
-            label: member.userNickname || "",
-            value: member.userId,
-          })),
-        }))
-
-        this.teamGroupList = treeData
-        this.originAthletesAll = treeData.map((item) => item.children || []).flat()
+        this.clubGroupList = treeData
+        this.originAthletesAll = treeData
+          .map((item) => item.children || [])
+          .flat()
       })
     },
     getMembersList(teamId) {
@@ -871,6 +967,7 @@ export default {
       this.form = {
         teamId: undefined,
         athleteIds: [],
+        clubAthleteIds: [],
         athleteType: 1,
         applyMode: 1,
         applyDate: moment().format("YYYY-MM-DD"),
@@ -894,35 +991,114 @@ export default {
       }
 
       // 找出最大day值
-      const maxDay = classes.reduce(
-        (max, item) => Math.max(max, item.day || 0),
-        classes[0]?.day || 0
-      )
+      let maxDay = 0
+      // 批量设置时，找出最大day值
+      if (this.form.athleteType === 1) {
+        // 全部应用找出最大day值
+        if (this.form.applyRange === 0) {
+          maxDay = classes.reduce(
+            (max, item) => Math.max(max, item.day || 0),
+            classes[0]?.day || 0
+          )
+          // 判断是否所有日期都在结束日期之后
+          // 计算结束日期：今天 + maxDay 天 应该为2026-02-08 不算时分
+          const endDate = moment().add(maxDay, "days").format("YYYY-MM-DD")
+          console.log(endDate, "endDate")
+          const dateResults = dates.map((date) => {
+            // 判断日期是否在结束日期之后
+            const isAfter = (date.applyDate === endDate) || moment(date.applyDate).isAfter(endDate)
+            return {
+              date: date,
+              isAfter: isAfter,
+            }
+          })
+          console.log(dateResults, "dateResults")
+          const isAfter = dateResults.every((item) => item.isAfter === false)
+          // 获取所有在结束日期之后的日期
+          const isAfterArr = dateResults
+            .filter((item) => item.isAfter === false)
+            .map((item) => item.date)
 
-      // 计算结束日期：今天 + maxDay 天
-      const endDate = moment().add(maxDay, "days")
-
-      // 遍历dates中的每一项，判断是否在结束日期之后
-      const dateResults = dates.map((date) => {
-        const isAfter = moment(date.applyDate).isAfter(endDate)
-        return {
-          date: date,
-          isAfter: isAfter,
+          return {
+            isAfter: isAfter,
+            endDate: endDate,
+            isAfterArr: isAfterArr,
+            maxDay: maxDay,
+          }
+        } else {
+          // 部分应用找出最大day值
+          // const applyDays =
+          //   [1, 2, 3, 4, 5]
+          maxDay = dates[0].applyDays.reduce((max, item) => Math.max(max, item), 0)
+          // 判断是否所有日期都在结束日期之后
+          const endDate = moment().add(maxDay, "days").format("YYYY-MM-DD")
+          console.log(endDate, "endDate", maxDay)
+          const dateResults = dates.map((date) => {
+            console.log(moment(date.applyDate).isAfter(endDate), "date.applyDate, endDate")
+            const isAfter = (date.applyDate === endDate) || moment(date.applyDate).isAfter(endDate)
+            return {
+              date: date,
+              isAfter: isAfter,
+            }
+          })
+          console.log(dateResults, "dateResults")
+          const isAfter = dateResults.every((item) => item.isAfter === false)
+          const isAfterArr = dateResults
+            .filter((item) => item.isAfter === false)
+            .map((item) => item.date)
+          console.log({
+            isAfter: isAfter,
+            endDate: endDate,
+            isAfterArr: isAfterArr,
+            maxDay: maxDay,
+          }, "diffAffterDate")
+          return {
+            isAfter: isAfter,
+            endDate: endDate,
+            isAfterArr: isAfterArr,
+            maxDay: maxDay,
+          }
         }
-      })
-      // 判断是否所有日期都在结束日期之后
-      const isAfter = dateResults.every((item) => item.isAfter === false)
-
-      // 获取所有在结束日期之后的日期
-      const isAfterArr = dateResults
-        .filter((item) => item.isAfter === false)
-        .map((item) => item.date)
-      // 返回结果
-      return {
-        isAfter: isAfter, // true: 存在应用日期超出计划日期，false: 所有应用日期都在计划日期之内
-        isAfterArr: isAfterArr,
-        endDate: endDate,
-        maxDay: maxDay,
+      } else {
+        // maxDay = dates.applyDays.reduce((max, item) => Math.max(max, item), 0)
+        const dateResults = []
+        dates.forEach(item => {
+          if (item.applyRange === 0) {
+            item.maxDay = classes.reduce(
+              (max, item) => Math.max(max, item.day || 0),
+              classes[0]?.day || 0)
+            const endDate = moment().add(item.maxDay, "days").format("YYYY-MM-DD")
+            dateResults.push({
+              date: item,
+              isAfter: (item.applyDate === endDate) || moment(item.applyDate).isAfter(endDate),
+            })
+            console.log(dateResults, "dateResults")
+            console.log(item, "item")
+          } else {
+            item.maxDay = item.applyDays.reduce((max, item) => Math.max(max, item), 0)
+            const endDate = moment().add(item.maxDay, "days").format("YYYY-MM-DD")
+            console.log(item, "item")
+            dateResults.push({
+              date: item,
+              isAfter: (item.applyDate === endDate) || moment(item.applyDate).isAfter(endDate),
+            })
+          }
+        })
+        console.log(dateResults, "dateResults")
+        const isAfterArr = dateResults
+          .filter((item) => item.isAfter === false)
+          .map((item) => item.date)
+        const isAfter = isAfterArr.length > 0
+        console.log({
+          isAfter: isAfter,
+          isAfterArr: isAfterArr,
+          maxDay: maxDay,
+        }, "diffAffterDate")
+        return {
+          isAfter: isAfter,
+          isAfterArr: isAfterArr,
+          maxDay: maxDay,
+        }
       }
     },
     // 告警提示
@@ -954,7 +1130,11 @@ export default {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return
         _this.loading = true
-        const choosedAthletes = _this.form.athleteIds
+        const currentIds =
+          _this.form.applyDimension === "2"
+            ? _this.form.clubAthleteIds
+            : _this.form.athleteIds
+        const choosedAthletes = (currentIds || [])
           .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))
           .filter((val) => val !== undefined && val !== null)
 
@@ -1031,7 +1211,7 @@ export default {
           .flat()
           .filter((item) => item.details.length > 0)
         const diffAffterDate = _this.diffAffterDate(findEndDate, planList)
-        console.log(diffAffterDate, "diffAffterDate")
+        console.log(diffAffterDate, "diffAffterDate===============")
         if (!diffAffterDate.isAfter) {
           _this.applyPlanClasses(targets)
           return
@@ -1098,6 +1278,7 @@ export default {
             this.form = {
               teamId: undefined,
               athleteIds: [],
+              clubAthleteIds: [],
               athleteType: 1,
             }
             this.members = []
@@ -1119,6 +1300,7 @@ export default {
       this.form = {
         teamId: undefined,
         athleteIds: [],
+        clubAthleteIds: [],
         athleteType: 1,
         applyMode: 1,
         applyDate: moment().format("YYYY-MM-DD"),
@@ -1130,9 +1312,10 @@ export default {
         dayPickerVisibleForm: false,
       }
       this.members = []
-      this.teamGroupList = [] // 清空团队分组列表
-      // 更新 key 强制级联选择器重新渲染
-      this.cascaderKey += 1
+      this.teamGroupList = []
+      this.clubGroupList = []
+      this.teamCascaderKey += 1
+      this.clubCascaderKey += 1
       this.$nextTick(() => {
         if (this.$refs.formRef) {
           this.$refs.formRef.clearValidate()
@@ -1140,9 +1323,17 @@ export default {
       })
     },
     removeMember(item, index) {
-      this.form.athleteIds = this.form.athleteIds.filter(
-        (el) => !el.includes(item.triUserId)
-      )
+      if (this.form.applyDimension === "2") {
+        this.form.clubAthleteIds = this.form.clubAthleteIds.filter(
+          (el) => !el.includes(item.triUserId)
+        )
+        this.handleCascaderChange(this.form.clubAthleteIds)
+      } else {
+        this.form.athleteIds = this.form.athleteIds.filter(
+          (el) => !el.includes(item.triUserId)
+        )
+        this.handleCascaderChange(this.form.athleteIds)
+      }
       this.members.splice(index, 1)
     },
   },

@@ -78,7 +78,7 @@
                 <span
                   class="group-name-text">{{ item.groupName }}</span>
                 <span class="group-name-count">({{ item.classesCount
-                }})</span>
+                  }})</span>
               </div>
               <el-popover
                 v-if="activeClassType === 'my' && showAddClassBtn"
@@ -131,7 +131,8 @@
                 :disabled="!classItem.planTitle"
                 popper-class="hover-plan-detail-popover">
                 <!-- <span slot="reference" @click.stop>{{ classItem.planTitle }}</span> -->
-                <span slot="reference">
+                <span slot="reference"
+                  style="width: 100%; cursor: pointer">
                   <div style="width: 100%; cursor: pointer">
                     {{ classItem.planTitle }}
                   </div>
@@ -149,11 +150,12 @@
                       :colors="['#F92B30', '#F92B30', '#F92B30']"
                       text-color="#999999"
                       disabled-void-color="#E1E4EC"></el-rate>
-                    <span style="font-size: 10px; color: #979fb0">{{
-                      classItem.level ? "" : "未评分"
-                    }}</span>
+                    <span style="font-size: 10px; color: #979fb0"
+                      v-if="!classItem.level">{{
+                        classItem.level ? "" : "未评分"
+                      }}</span>
                     <span v-if="classItem.isShare"
-                      style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px;">{{
+                      style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px; width: 70px; text-align: center;">{{
                         classItem.isShare ? "已分享" : ""
                       }}</span>
                   </div>
@@ -205,7 +207,7 @@
                     <span
                       class="group-name-text">{{ item.groupName }}</span>
                     <span class="group-name-count">({{ item.groupCount
-                    }})</span>
+                      }})</span>
                   </div>
                   <el-popover popper-class="athletic-btn-popover"
                     placement="right" width="80" trigger="hover">
@@ -245,7 +247,7 @@
               </template>
 
               <div class="plan-js-class-drag-container"
-                :key="item.timespan">
+                :key="item.groupId ?? item.id">
                 <div class="plan-item"
                   :class="{ active: selectedPlanId === classItem.sourcePlanId }"
                   v-for="classItem in item.classesList"
@@ -255,7 +257,8 @@
                     trigger="hover" :disabled="!classItem.planTitle"
                     popper-class="hover-plan-detail-popover">
                     <!-- <span slot="reference" @click.stop>{{ classItem.planTitle }}</span> -->
-                    <span slot="reference">
+                    <span slot="reference"
+                      style="width: 100%; cursor: pointer">
                       <div style="width: 100%; cursor: pointer">
                         {{ classItem.planTitle }}
                       </div>
@@ -325,6 +328,10 @@ export default {
       type: [String, Number],
       default: null,
     },
+    selectedTeam: {
+      type: [String, Number],
+      default: null,
+    },
   },
   data() {
     return {
@@ -333,6 +340,7 @@ export default {
       loading: false,
       loginType: localStorage.getItem("loginType") || "1",
       teamPlanList: [],
+      teamPlanSearchKeyword: "",
       currentShareTeamId: '',
       currentShareGroupList: [],
       currentSharePlanList: [],
@@ -407,9 +415,9 @@ export default {
       this.currentShareTeamId = ''
       this.currentShareGroupList = []
       this.currentSharePlanList = []
-      // 切换到 team 类型时，触发重新加载团队列表并强制重新渲染 el-tree
+      // 切换到 team 类型时，触发重新加载团队列表（使用 coach-teams-share 全量返回）
       if (type === "team") {
-        this.getTeamPlanList()
+        this.getTeamPlanList(this.teamPlanSearchKeyword)
         // this.$emit("reload-team-list");
         // // 重置 el-tree 的当前选中节点
         // this.$nextTick(() => {
@@ -419,34 +427,56 @@ export default {
         // });
       }
     },
-    async getTeamPlanList() {
+    async getTeamPlanList(nameKeyword) {
       const _this = this
-      const resDefault = await getData({ url: "/gateway/team/my-team" })
-      const resTeam = await getData({
-        url: "/consumer/api/team/coach/all-teams",
-      })
-      if (resDefault.success && resTeam.success) {
-        const list = [resDefault.result, ...resTeam.result].reduce(
-          (acc, team) => {
-            if (team && team.id && !acc.find((t) => t.id === team.id)) {
-              acc.push(team)
-            }
-            return acc
-          },
-          []
-        )
-        const teamTreeList = list.map((item) => ({
-          id: item.id,
-          name: item.teamName,
-          teamOwnerId: item.teamOwnerId,
-          members: item.members,
+      const params = {
+        url: "/gateway/training/teamShare/coach-teams-share",
+        shareDataType: 2,
+      }
+      if (this.selectedTeam != null && this.selectedTeam !== "") {
+        params.teamId = this.selectedTeam
+      }
+      if (nameKeyword != null && String(nameKeyword).trim() !== "") {
+        params.nameKeyword = String(nameKeyword).trim()
+      }
+      const res = await getData(params)
+      if (res && res.success && Array.isArray(res.result)) {
+        _this.teamPlanList = res.result.map((t) => ({
+          id: t.teamId,
+          name: t.teamName,
+          totalCount: t.totalCount,
+          groups: t.groups || [],
         }))
-        console.log(teamTreeList, "list--团队计划列表")
-        _this.teamPlanList = teamTreeList
+        if (this.currentShareTeamId) {
+          const team = res.result.find(
+            (t) => String(t.teamId) === String(this.currentShareTeamId)
+          )
+          this.currentShareGroupList = team
+            ? this.mapTeamPlanGroupsToShareGroupList(
+              team.groups || [],
+              this.currentShareTeamId
+            )
+            : []
+        }
+        _this.loading = false
+        console.log(_this.teamPlanList, "list--团队计划列表")
+      } else {
+        _this.teamPlanList = []
         _this.loading = false
       }
     },
-    // 点击团队分组
+    mapTeamPlanGroupsToShareGroupList(groups, teamId) {
+      const list = Array.isArray(groups) ? groups : []
+      return list.map((g) => ({
+        id: g.groupId,
+        groupId: g.groupId,
+        groupName: g.groupName || "未分组",
+        groupCount: (g.plansList || []).length,
+        teamId: teamId || g.teamId,
+        classesList: (g.plansList || []).map((p) => ({ ...p, planType: "share" })),
+      }))
+    },
+    // 点击团队（从已加载的 teamPlanList 取 groups，不再请求接口）
     handleShareTeamClick(id) {
       const isSameTeam = String(this.currentShareTeamId) === String(id)
       if (isSameTeam) {
@@ -455,59 +485,19 @@ export default {
         return
       }
       this.currentShareTeamId = id
-      if (id) {
-        this.getTeamPlanGroupList(id)
+      const team = this.teamPlanList.find((t) => String(t.id) === String(id))
+      if (team && Array.isArray(team.groups)) {
+        this.currentShareGroupList = this.mapTeamPlanGroupsToShareGroupList(
+          team.groups,
+          id
+        )
+      } else {
+        this.currentShareGroupList = []
       }
     },
-    async getTeamPlanGroupList(id) {
-      const _this = this
-      getData({
-        url: `/training/api/shareTeamGroup/list?teamId=${id}&shareDataType=2`,
-      }).then((res) => {
-        if (res.success && res.result) {
-          console.log(res.result, "res.result--团队计划分组列表")
-          _this.currentShareGroupList = res.result
-          _this.loading = false
-        }
-      })
-    },
     handleShareGroupCollapseChange(activeNames) {
-      console.log(activeNames, "id--团队计划分组折叠变化")
-      // 折叠关闭时 activeNames 可能为空，find 会返回 undefined
       if (activeNames == null || activeNames === "") return
-      const findGroup = this.currentShareGroupList.find(el => el.id === activeNames)
-      console.log(findGroup, "findGroup--团队计划分组折叠变化")
-      if (!findGroup) return
-      this.getShareGroupPlanList(findGroup)
-    },
-    // 点击团队计划
-    getShareGroupPlanList(node) {
-      if (!node || node.id == null) return
-      const _this = this
-      // 根据分享分组获取分组下的所有分享计划
-      getData({
-        url: `/training/api/teamShare/pageByGroupId`,
-        groupId: node.id,
-        teamId: node.teamId,
-        shareDataType: 2,
-        current: 1,
-        size: 20,
-      })
-        .then((res) => {
-          if (res.success && res.result) {
-            console.log(res.result, "res.result--分组下团队计划列表")
-            _this.currentShareGroupList = _this.currentShareGroupList.map(el => {
-              if (el.id === node.id) {
-                el.classesList = res.result.records.map(el => ({
-                  ...el,
-                  planType: 'share',
-                }))
-              }
-              return el
-            })
-            _this.loading = false
-          }
-        })
+      // 分组与计划数据已由 coach-teams-share 接口全部返回，无需再请求
     },
     handleSharePlanClick(node) {
       console.log('====点击了分享计划', node)
@@ -520,9 +510,14 @@ export default {
           this.activeCollapse = group.id
         })
       }
-      this.$emit("view-plan", node.sourcePlanId, node)
+      const teamId = group && (group.teamId != null ? group.teamId : group.id)
+      this.$emit("view-plan", node.sourcePlanId, { ...node, teamId })
     },
     handleSearch() {
+      if (this.activeClassType === "team") {
+        this.teamPlanSearchKeyword = this.searchInput
+        this.getTeamPlanList(this.searchInput)
+      }
       if (this.emitSearch) {
         this.emitSearch()
       }
@@ -571,8 +566,10 @@ export default {
     handleDeleteShareGroup(node) {
       this.$emit("delete-share-group", node)
     },
-    handleMoveShareGroup(node) {
-      this.$emit("move-share-group", { ...node, teamId: this.currentShareTeamId })
+    handleMoveShareGroup(node, planInfo) {
+      console.log(node, "node====移动分享计划", this.currentShareTeamId)
+      console.log(planInfo, "planInfo====当前计划信息")
+      this.$emit("move-share-group", { ...node, teamId: this.currentShareTeamId, }, planInfo)
     },
     handleViewPlan(sourcePlanId, data) {
       this.$emit("view-plan", sourcePlanId, data)
@@ -606,13 +603,10 @@ export default {
       }
     },
     /**
-     * 刷新团队树数据/分享分组列表
+     * 刷新团队树数据/分享分组列表（重新拉取 coach-teams-share，接口会返回全量含 groups）
      */
     refreshTeamTree() {
-      // 刷新当前团队的分享分组列表
-      if (this.currentShareTeamId) {
-        this.getTeamPlanGroupList(this.currentShareTeamId)
-      }
+      this.getTeamPlanList(this.teamPlanSearchKeyword)
     },
     handleMovePlan(planDetail) {
       this.$emit("move-plan", planDetail)
@@ -622,6 +616,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep(.el-rate) {
+  width: 250px;
+}
+
 .plan-container {
   height: 100%;
   display: flex;
@@ -748,6 +746,12 @@ export default {
   gap: 10px;
   padding: 10px;
   border-bottom: 1px solid#c3c9d72e;
+  width: 100%;
+
+  span {
+    width: 100%;
+  }
+
   // background-color: #f9f9f9;
 }
 
