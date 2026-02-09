@@ -191,7 +191,7 @@ export default {
     },
     logoUrl() {
       // 这里可以设置logo图片路径
-      return require("@/assets/logo-text.png");
+      return require("@/assets/logo-text.svg");
     },
     logoSth() {
       // 这里可以设置logo图片路径
@@ -463,8 +463,8 @@ export default {
     width: 320px;
 
     .logo {
-      width: 100px;
-      height: 27px;
+      width: 98px;
+      height: 28px;
       margin: 0 12px;
     }
 

@@ -344,8 +344,10 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 
   .plan-type-list {
+    flex-shrink: 0;
     height: 46px;
     display: flex;
     flex-direction: row;
@@ -433,6 +435,7 @@ export default {
   }
 
   .class-operation {
+    flex-shrink: 0;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -441,9 +444,10 @@ export default {
   }
 
   .schedule-class-container {
+    flex: 1;
+    min-height: 0;
     padding: 5px 0px;
     background-color: #fff;
-    flex: 1;
     overflow-y: auto;
 
     /* 自定义滚动条样式 */
@@ -514,6 +518,28 @@ export default {
     font-weight: 500;
     font-style: Medium;
     font-size: 14px;
+  }
+}
+
+.team-operation {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  /* 与 schedule-class-container 一致的滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2.5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2.5px;
+    &:hover {
+      background: #a8a8a8;
+    }
   }
 }
 

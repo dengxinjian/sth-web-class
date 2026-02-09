@@ -33,6 +33,7 @@
         @plan-item-move="handlePlanItemMove"
         @plan-library-drop="handlePlanLibraryDrop"
         @save="handleSave"
+        @cancel="handleCancel"
         @save-and-exit="handleSaveAndExit" />
     </div>
     <ViewClassCard
@@ -256,6 +257,15 @@ export default {
     window.removeEventListener("beforeunload", this.handleBeforeUnload)
   },
   methods: {
+    handleCancel() {
+      this.$router.push({
+        path: "/timeTable/class",
+        query: {
+          teamId: this.$route.query.teamId,
+          type: "cancel",
+        },
+      })
+    },
     // 检测数据是否有变更
     checkDataChanged() {
       const currentData = JSON.stringify(this.planData)
@@ -452,15 +462,8 @@ export default {
     },
     // 保存并关闭
     async handleSaveAndExit() {
+      // 只负责触发带 isExit=true 的保存逻辑，具体跳转统一在 addPlan / updatePlan 内部处理
       await this.handleSave(true)
-      this.$router.replace({
-        path: "/timeTable/class",
-        query: {
-          id: this.planData.id,
-          planGroupId: this.planData.planGroupId,
-          type: "edit",
-        },
-      })
     },
     // 保存
     async handleSave(isExit = false) {
@@ -519,11 +522,12 @@ export default {
         }
 
         if (isExit) {
-          this.$router.replace({
+          this.$router.push({
             path: "/timeTable/class",
             query: {
               id: this.planData.id,
               planGroupId: this.planData.planGroupId,
+              teamId: this.$route.query.teamId,
               type: "edit",
             },
           })
@@ -553,11 +557,12 @@ export default {
           ...res.result,
         }
         if (isExit) {
-          this.$router.replace({
+          this.$router.push({
             path: "/timeTable/class",
             query: {
               id: res.result.id,
               planGroupId: this.planData.planGroupId,
+              teamId: this.$route.query.teamId,
             },
           })
         }
@@ -601,7 +606,9 @@ export default {
         url: "/gateway/training/teamShare/coach-teams-share",
         shareDataType: 1,
       }
-      const teamId = this.planData?.teamId ?? this.$route?.query?.teamId
+      console.log(this.planData, "this.planData")
+      const teamId = this.$route?.query?.teamId
+
       if (teamId != null && teamId !== "") {
         params.teamId = teamId
       }

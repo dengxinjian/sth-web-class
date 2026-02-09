@@ -160,6 +160,7 @@ export default {
     activeClassType: { type: String, default: "my" },
     copyOfficialPlanInfo: { type: Object, default: null },
     planList: { type: Array, default: () => [] },
+    myTeamId: { type: [String, Number], default: undefined },
   },
   data() {
     return {
@@ -441,6 +442,7 @@ export default {
           path: "/plan/add",
           query: {
             type: "add",
+            teamId: this.myTeamId,
           },
         });
       });

@@ -1687,7 +1687,7 @@ export default {
         result !== "--" &&
         this.classData.classesJson?.sportType !== "SWIM"
       ) {
-        result = result * 1000
+        console.log(result, "result")
       } else if (
         distanceUnit === "km" &&
         result !== "--" &&

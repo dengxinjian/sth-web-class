@@ -648,12 +648,25 @@ export default {
     },
   },
   watch: {
-    // 监听路由变化，同步菜单状态
+    // 监听路由变化，同步菜单状态；
+    // 只有从 /plan/add 跳转到本页，且 URL 带 teamId 时，才用路由参数更新 selectedTeam
     $route: {
       handler(to, from) {
         // this.initMenuFromRoute();
         console.log(to, "to")
         console.log(from, "from")
+        const fromPath = this.$store && this.$store.state && this.$store.state.fromPath
+        const shouldUseRouteTeamId = fromPath === "/plan/add"
+        const routeTeamId = shouldUseRouteTeamId && to && to.query && to.query.teamId
+        if (!routeTeamId || this.teamOrClubList.length === 0) return
+        const found = this.teamOrClubList.find(
+          (item) => String(item.id) === String(routeTeamId)
+        )
+        if (!found) return
+        this.selectedTeam = found.id
+        this.selectedOrgType = found.type || "team"
+        this.getAthleticList()
+        this.getScheduleData()
       },
       immediate: false,
     },
@@ -1274,18 +1287,38 @@ export default {
       }))
       _this.teamList = teams
       _this.teamOrClubList = [...teamItems, ...clubs]
-      // 默认选中：优先当前用户的团队，否则第一个团队，否则第一个俱乐部
+      // 默认选中：
+      // - 只有从 /plan/add 跳转过来且 URL 带 teamId 时，才用路由参数
+      // - 其他情况（直接进入 /timeTable/class、刷新、从其他页面来），都忽略 teamId，用当前用户团队或第一项
       if (_this.teamOrClubList.length > 0) {
-        const triUserId = localStorage.getItem("triUserId")
-        const ownerTeam = _this.teamList.find(
-          (item) => item.teamOwnerId === triUserId
-        )
-        if (ownerTeam) {
-          _this.selectedTeam = ownerTeam.id
-          _this.selectedOrgType = "team"
+        const fromPath = _this.$store.state.fromPath
+        console.log(fromPath, "fromPath")
+        const shouldUseRouteTeamId = fromPath === "/plan/add"
+        console.log(shouldUseRouteTeamId, "shouldUseRouteTeamId")
+        const routeTeamId = shouldUseRouteTeamId && _this.$route.query.teamId
+        console.log(_this.$route.query.teamId, "_this.$route.query.teamId")
+        console.log(routeTeamId, "routeTeamId")
+        const foundByRoute =
+          routeTeamId &&
+          _this.teamOrClubList.find(
+            (item) => String(item.id) === String(routeTeamId)
+          )
+        console.log(foundByRoute, "foundByRoute")
+        if (foundByRoute) {
+          _this.selectedTeam = foundByRoute.id
+          _this.selectedOrgType = foundByRoute.type || "team"
         } else {
-          _this.selectedTeam = _this.teamOrClubList[0].id
-          _this.selectedOrgType = _this.teamOrClubList[0].type
+          const triUserId = localStorage.getItem("triUserId")
+          const ownerTeam = _this.teamList.find(
+            (item) => item.teamOwnerId === triUserId
+          )
+          if (ownerTeam) {
+            _this.selectedTeam = ownerTeam.id
+            _this.selectedOrgType = "team"
+          } else {
+            _this.selectedTeam = _this.teamOrClubList[0].id
+            _this.selectedOrgType = _this.teamOrClubList[0].type
+          }
         }
         _this.getAthleticList()
         _this.getScheduleData()

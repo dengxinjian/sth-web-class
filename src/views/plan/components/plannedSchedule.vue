@@ -284,7 +284,15 @@ export default {
       this.$emit("add-week");
     },
     handleCancel() {
-      this.$router.replace("/timeTable/class?type=cancel");
+      // this.$router.push("/timeTable/class?type=cancel");
+      // this.$router.push({
+      //   path: "/timeTable/class",
+      //   query: {
+      //     teamId: ,
+      //     type: "cancel",
+      //   },
+      // });
+      this.$emit("cancel");
     },
     handleSave() {
       this.$emit("save");

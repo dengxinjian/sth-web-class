@@ -4,7 +4,6 @@
 
 import { SPORT_TYPE_ICONS, COMPLETION_COLORS, SPORT_TYPE_NAMES } from "../constants"
 import { getLunar } from "chinese-lunar-calendar"
-
 /**
  * 获取运动类型图标
  * @param {String} sportType 运动类型
@@ -83,9 +82,16 @@ export function getClassIconArrowColor(sportType) {
  * @param {Number} percent 完成百分比
  * @returns {Array} [backgroundColor, textColor]
  */
-export function getSportBackgroundColor(percent) {
+export function getSportBackgroundColor(percent, ClassesJson, commonDate) {
+  // 如果课程已匹配，但未完成，且日期小于今天，则显示红色
+  console.log(percent, ClassesJson, commonDate, "percent, ClassesJson, commonDate")
+  console.log(isExpired(commonDate), "isExpired(commonDate)")
+  if (!percent && isExpired(commonDate) &&
+    ClassesJson
+  ) {
+    return ["#a32015", "#333"]
+  }
   if (!percent) return ["#C3C9D7", "#333"]
-
   if (percent > 80 && percent <= 120) {
     return ["#00B06D", "#fff"] // 绿色 - 完成良好
   } else if (

@@ -90,6 +90,7 @@
               :class="item.commonDate === today ? 'schedule-table-cell-title-cur' : 'schedule-table-cell-title'"
               @contextmenu.stop.prevent="showDateTitleContextMenu($event, item.commonDate)">
               <div>{{ new Date(item?.commonDate).getDate() }}</div>
+              <div style="font-size: 12px;margin-left: 5px;">{{ getWeekDayLabel(item?.commonDate) }}</div>
               <div>
                 （{{ convertToLunar(item?.commonDate).dateStr }}）
               </div>
@@ -306,6 +307,12 @@ export default {
   methods: {
     isToday,
     convertToLunar,
+    getWeekDayLabel(date) {
+      if (!date) return ""
+      const weekDays = ["日", "一", "二", "三", "四", "五", "六"]
+      const day = new Date(date).getDay()
+      return `周${weekDays[day]}`
+    },
     handleClickDate(date) {
       this.$emit("click-date", date);
     },

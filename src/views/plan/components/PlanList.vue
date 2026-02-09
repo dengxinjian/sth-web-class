@@ -28,7 +28,7 @@
         <div class="title"
           :class="{ 'active-title': activeClassType === 'official' }"
           style="color: #FFFFFF; font-size: 14px;">
-          <img src="../../../assets/plan/Group.png" alt="计划示例"
+          <img src="../../../assets/plan/Group.svg" alt="计划示例"
             style="width: 100%; height:32px;">
           <!-- 计划示例 -->
         </div>

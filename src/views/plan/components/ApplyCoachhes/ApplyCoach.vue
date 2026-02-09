@@ -15,8 +15,10 @@
       :label-width="loginType === '2' ? '145px' : '120px'"
       size="small">
       <template v-if="loginType === '2'">
-        <el-form-item label="应用维度" prop="applyDimension">
+        <el-form-item label="应用维度" prop="applyDimension"
+          v-if="!teamSelectDisabled">
           <el-radio-group v-model="form.applyDimension"
+            :disabled="teamSelectDisabled"
             @change="handleApplyDimensionChange">
             <el-radio label="1">团队</el-radio>
             <el-radio label="2">俱乐部</el-radio>
@@ -55,8 +57,7 @@
             style="width: 100%"
             placeholder="请选择人员"
             @input="onTeamAthleteIdsInput"
-            @change="handleCascaderChange"
-          />
+            @change="handleCascaderChange" />
         </el-form-item>
         <el-form-item
           v-if="form.applyDimension === '2'"
@@ -71,8 +72,7 @@
             style="width: 100%"
             placeholder="请选择人员"
             @input="onClubAthleteIdsInput"
-            @change="handleCascaderChange"
-          />
+            @change="handleCascaderChange" />
         </el-form-item>
 
         <el-form-item label="类型" prop="athleteType">
@@ -1001,8 +1001,8 @@ export default {
             classes[0]?.day || 0
           )
           // 判断是否所有日期都在结束日期之后
-          // 计算结束日期：今天 + maxDay 天 应该为2026-02-08 不算时分
-          const endDate = moment().add(maxDay, "days").format("YYYY-MM-DD")
+          // 计算结束日期：今天 + maxDay 天 再减一天（不含结束日当天）
+          const endDate = moment().add(maxDay, "days").subtract(1, "day").format("YYYY-MM-DD")
           console.log(endDate, "endDate")
           const dateResults = dates.map((date) => {
             // 判断日期是否在结束日期之后
@@ -1029,9 +1029,9 @@ export default {
           // 部分应用找出最大day值
           // const applyDays =
           //   [1, 2, 3, 4, 5]
-          maxDay = dates[0].applyDays.reduce((max, item) => Math.max(max, item), 0)
-          // 判断是否所有日期都在结束日期之后
-          const endDate = moment().add(maxDay, "days").format("YYYY-MM-DD")
+          maxDay = dates[0].applyDays.length
+          // 判断是否所有日期都在结束日期之后（结束日期减一天）
+          const endDate = moment().add(maxDay, "days").subtract(1, "day").format("YYYY-MM-DD")
           console.log(endDate, "endDate", maxDay)
           const dateResults = dates.map((date) => {
             console.log(moment(date.applyDate).isAfter(endDate), "date.applyDate, endDate")
@@ -1067,7 +1067,7 @@ export default {
             item.maxDay = classes.reduce(
               (max, item) => Math.max(max, item.day || 0),
               classes[0]?.day || 0)
-            const endDate = moment().add(item.maxDay, "days").format("YYYY-MM-DD")
+            const endDate = moment().add(item.maxDay, "days").subtract(1, "day").format("YYYY-MM-DD")
             dateResults.push({
               date: item,
               isAfter: (item.applyDate === endDate) || moment(item.applyDate).isAfter(endDate),
@@ -1075,8 +1075,8 @@ export default {
             console.log(dateResults, "dateResults")
             console.log(item, "item")
           } else {
-            item.maxDay = item.applyDays.reduce((max, item) => Math.max(max, item), 0)
-            const endDate = moment().add(item.maxDay, "days").format("YYYY-MM-DD")
+            item.maxDay = item.applyDays.length
+            const endDate = moment().add(item.maxDay, "days").subtract(1, "day").format("YYYY-MM-DD")
             console.log(item, "item")
             dateResults.push({
               date: item,

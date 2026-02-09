@@ -46,6 +46,7 @@
       :activeClassType="activeClassType"
       :copyOfficialPlanInfo="copyOfficialPlanInfo"
       :planList="planList" @addPlanSuccess="handleAddPlanSuccess"
+      :myTeamId="selectedTeam"
       @cancel="handleAddPlanCancel" />
     <!-- 添加分组 -->
     <AddGroup v-model="addGroupVisible" :data="currentGroup"
@@ -832,6 +833,7 @@ export default {
         path: "/plan/add",
         query: {
           type: "edit",
+          teamId: this.selectedTeam,
         },
       })
     },

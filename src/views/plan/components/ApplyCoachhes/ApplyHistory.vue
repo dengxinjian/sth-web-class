@@ -39,7 +39,8 @@
           width="120"
           align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.applyDimension === 1 ? '团队' : scope.row.applyDimension === 2 ? '俱乐部' : '个人' }}</span>
+            <!-- applyDimension === null 显示/ 0为个人-->
+            <span>{{ scope.row.applyDimension === 1 ? '团队' : scope.row.applyDimension === 2 ? '俱乐部' : scope.row.applyDimension === 0 ? '个人' : '/' }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="teamName" label="名称" width="180"
