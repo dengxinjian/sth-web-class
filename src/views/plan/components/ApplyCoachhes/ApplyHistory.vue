@@ -2,7 +2,7 @@
   <div>
     <el-dialog
       :visible.sync="innerVisible"
-      width="1000px"
+      width="1100px"
       append-to-body
       :before-close="onCancel"
       class="add-class-title-modal"
@@ -60,7 +60,7 @@
           </template>
         </el-table-column>
         <!-- 操作 -->
-        <el-table-column label="操作" width="120" align="center">
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <!-- 同步 取消 -->
             <el-button type="text" size="small"
@@ -651,9 +651,9 @@ export default {
     // 根据状态值返回对应的 CSS 类名
     getStatusClass(status) {
       if (status === 0) {
-        return "status-success" // 应用中 - 蓝色
+        return "status-applying" // 应用中 - 蓝色
       } else if (status === 1) {
-        return "status-applying" // 成功 - 绿色
+        return "status-success" // 成功 - 绿色
       } else if (status === 2) {
         return "status-failed" // 失败 - 红色
       } else if (status === 3) {
