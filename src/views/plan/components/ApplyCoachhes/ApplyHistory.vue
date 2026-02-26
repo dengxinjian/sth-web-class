@@ -13,7 +13,7 @@
       <el-tabs v-model="activeTab" type="card"
         @tab-click="handleTabChange">
         <el-tab-pane label="应用历史" name="apply" />
-        <el-tab-pane label="分享历史" name="share" />
+        <el-tab-pane label="分享历史" name="share" v-if="loginType === '2'" />
       </el-tabs>
 
       <!-- 应用历史 -->

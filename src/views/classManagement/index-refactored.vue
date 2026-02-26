@@ -3,7 +3,6 @@
     <div class="athletic-container" v-loading="loading">
       <!-- 左侧菜单 -->
       <LeftMenu v-model="activeName" @change="handleTypeChange" />
-
       <div class="content-container"
         style="display: flex; width: 100%"
         v-if="activeName === 'athletic' || activeName === 'class'">
@@ -93,13 +92,22 @@
                   <el-dropdown trigger="click"
                     placement="bottom-start"
                     @command="handleAthleticChange"
+                    @visible-change="onAthleticDropdownVisibleChange"
                     class="athletic-dropdown">
                     <span
                       class="el-dropdown-link athletic-select-title">
-                      <img v-if="getSelectedAthleticAvatar"
-                        :src="getSelectedAthleticAvatar"
-                        class="athletic-avatar"
-                        alt="" />
+                      <div v-if="getSelectedAthleticAvatar"
+                        class="avatar-with-frame avatar-with-frame--sm"
+                        :class="{ 'has-frame': getVipFrameSrc(getSelectedAthleticVipSubStatus) }">
+                        <img
+                          v-if="getVipFrameSrc(getSelectedAthleticVipSubStatus)"
+                          :src="getVipFrameSrc(getSelectedAthleticVipSubStatus)"
+                          class="avatar-frame"
+                          alt="" />
+                        <img :src="getSelectedAthleticAvatar"
+                          class="athletic-avatar"
+                          alt="" />
+                      </div>
                       <span class="athletic-name-text">
                         {{ getSelectedAthleticName || "选择人员" }}
                       </span>
@@ -107,23 +115,43 @@
                     </span>
                     <el-dropdown-menu slot="dropdown"
                       class="athletic-dropdown-menu">
-                      <el-dropdown-item
-                        v-for="item in athleticDropdownItems"
-                        :key="item.key"
-                        :command="item.type === 'member' ? item.value : null"
-                        :disabled="item.type === 'group'" :class="{
-                          'group-header': item.type === 'group',
-                          active: item.type === 'member' && selectedAthletic === item.value,
-                        }">
-                        <div v-if="item.type === 'member'"
-                          class="athletic-menu-item">
-                          <img v-if="item.raw && item.raw.userAvatar"
-                            :src="!item.raw.userAvatar || item.raw.userAvatar.includes('wxfile') ? 'https://web-home.tos-cn-beijing.volces.com/avatar.png' : item.raw.userAvatar"
-                            class="athletic-menu-avatar" alt="" />
-                          <span>{{ item.label }}</span>
-                        </div>
-                        <span v-else>{{ item.label }}</span>
-                      </el-dropdown-item>
+                      <div class="athletic-dropdown-search"
+                        @click.stop>
+                        <el-input
+                          v-model="athleticDropdownSearch"
+                          size="mini"
+                          placeholder="搜索人员"
+                          clearable
+                          prefix-icon="el-icon-search" />
+                      </div>
+                      <div class="athletic-dropdown-list">
+                        <el-dropdown-item
+                          v-for="item in filteredAthleticDropdownItems"
+                          :key="item.key"
+                          :command="item.type === 'member' ? item.value : null"
+                          :disabled="item.type === 'group'" :class="{
+                            'group-header': item.type === 'group',
+                            active: item.type === 'member' && selectedAthletic === item.value,
+                          }">
+                          <div v-if="item.type === 'member'"
+                            class="athletic-menu-item">
+                            <div v-if="item.raw"
+                              class="avatar-with-frame avatar-with-frame--menu"
+                              :class="{ 'has-frame': getVipFrameSrc(item.raw.vipSubStatus) }">
+                              <img
+                                v-if="getVipFrameSrc(item.raw.vipSubStatus)"
+                                :src="getVipFrameSrc(item.raw.vipSubStatus)"
+                                class="avatar-frame"
+                                alt="" />
+                              <img
+                                :src="(item.raw.userAvatar && !item.raw.userAvatar.includes('wxfile')) ? item.raw.userAvatar : 'https://web-home.tos-cn-beijing.volces.com/avatar.png'"
+                                class="athletic-menu-avatar" alt="" />
+                            </div>
+                            <span>{{ item.label }}</span>
+                          </div>
+                          <span v-else>{{ item.label }}</span>
+                        </el-dropdown-item>
+                      </div>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </div>
@@ -139,7 +167,7 @@
                 信息查看
               </el-button> -->
               <img src="@/assets/addClass/userInfo.png" alt=""
-                @click="showAthleticInfoDialog = true" />
+                @click="handleAthleticInfoClick()" />
               <img src="@/assets/addClass/Statistics.png" alt=""
                 @click="showMonthStatisticDialog = true" />
               <div class="schedule-table-header-cell-data">
@@ -213,7 +241,8 @@
       <div class="content-container"
         style="display: flex; width: 100%"
         v-if="activeName === 'plan'">
-        <PlanView :isPlan="isPlan" @choose-plan="handleChoosePlan" :selected-team="selectedTeam" />
+        <PlanView :isPlan.sync="isPlan" @choose-plan="handleChoosePlan"
+          :selected-team="selectedTeam" />
         <!-- 日程表 -->
         <ScheduleCalendar v-if="!isPlan" :current-week="currentWeek"
           :team-list="teamList" :athletic-list="athleticList"
@@ -476,6 +505,8 @@ export default {
       athleticList: [],
       selectedTeam: null,
       selectedAthletic: null,
+      /** 人员下拉框模糊搜索关键字 */
+      athleticDropdownSearch: "",
       athleticCascaderProps: {
         emitPath: false,
         value: "value",
@@ -628,6 +659,37 @@ export default {
       })
       return items
     },
+    /** 按关键字模糊过滤后的下拉项（匹配分组名或人员名） */
+    filteredAthleticDropdownItems() {
+      const keyword = (this.athleticDropdownSearch || "").trim().toLowerCase()
+      if (!keyword) return this.athleticDropdownItems
+      const items = []
+      this.athleticGroupOptions.forEach((group) => {
+        const matchLabel = (s) => (s || "").toLowerCase().includes(keyword)
+        const filteredChildren = group.children.filter(
+          (m) =>
+            matchLabel(m.label) ||
+            matchLabel(m.raw?.userNickname) ||
+            matchLabel(m.raw?.name)
+        )
+        if (filteredChildren.length === 0) return
+        items.push({
+          type: "group",
+          key: `group-${group.value}`,
+          label: group.label,
+        })
+        filteredChildren.forEach((member) => {
+          items.push({
+            type: "member",
+            key: `member-${member.value}`,
+            value: member.value,
+            label: member.label,
+            raw: member.raw,
+          })
+        })
+      })
+      return items
+    },
     getSelectedAthleticName() {
       if (!this.selectedAthletic) return ""
       const athletic = this.athleticList.find(
@@ -645,6 +707,13 @@ export default {
         return 'https://web-home.tos-cn-beijing.volces.com/avatar.png'
       }
       return athletic && athletic.userAvatar ? athletic.userAvatar : 'https://web-home.tos-cn-beijing.volces.com/avatar.png'
+    },
+    getSelectedAthleticVipSubStatus() {
+      if (!this.selectedAthletic) return 0
+      const athletic = this.athleticList.find(
+        (item) => item.triUserId === this.selectedAthletic
+      )
+      return (athletic && athletic.vipSubStatus != null) ? Number(athletic.vipSubStatus) : 0
     },
   },
   watch: {
@@ -698,6 +767,23 @@ export default {
     this.$root.$off("identity-changed", this.handleIdentityChanged)
   },
   methods: {
+    // vipSubStatus: 0 未订阅 1 精英 2 专业 4 精英&专业 → 头框图片
+    getVipFrameSrc(vipSubStatus) {
+      const v = Number(vipSubStatus)
+      if (v === 1) return require('@/assets/addClass/vip1.png')
+      if (v === 2) return require('@/assets/addClass/vip2.png')
+      if (v === 4) return require('@/assets/addClass/vip4.png')
+      return null
+    },
+    handleAthleticInfoClick() {
+      console.log(this.selectedAthletic, "this.selectedAthletic")
+      console.log(this.athleticInfoData, "this.athleticInfoData")
+      if (this.selectedAthletic) {
+        this.showAthleticInfoDialog = true
+        return
+      }
+      this.$message.error("请先选择运动员")
+    },
     handleCloseResetViewClassCard() {
       this.showViewClassCard = false
       this.getClassList()
@@ -1269,6 +1355,7 @@ export default {
               userType: member.userType,
               lastMatchType: member.lastMatchType,
               userAvatar: member.userAvatar,
+              vipSubStatus: member.vipSubStatus,
             }))
             : [],
       }))
@@ -1341,6 +1428,8 @@ export default {
         item.competitionList = []
         item.healthInfos = []
       })
+      this.selectedAthletic = null
+      this.athleticInfoData = {}
       // this.currentWeek = []
       this.getAthleticList()
       this.getAllTeamsTreeList(this.teamClassSearchKeyword)
@@ -1349,6 +1438,9 @@ export default {
     /**
      * 运动员切换
      */
+    onAthleticDropdownVisibleChange(visible) {
+      if (!visible) this.athleticDropdownSearch = ""
+    },
     handleAthleticChange(athleticId) {
       this.selectedAthletic = athleticId
       this.athleticInfoData = this.athleticList.find(
@@ -1413,6 +1505,7 @@ export default {
                 userAvatar: m.userAvatar,
                 groupId,
                 groupName,
+                vipSubStatus: m.vipSubStatus,
               })
             })
           })
@@ -3530,6 +3623,54 @@ export default {
       border-color: #c0c4cc;
     }
 
+    .avatar-with-frame {
+      position: relative;
+      flex-shrink: 0;
+
+      &.avatar-with-frame--sm {
+        width: 20px;
+        height: 20px;
+
+        .avatar-frame {
+          width: 20px;
+          height: 20px;
+        }
+
+        .athletic-avatar {
+          width: 100%;
+          height: 100%;
+        }
+
+        &.has-frame .athletic-avatar {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      .avatar-frame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: contain;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .athletic-avatar {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        z-index: 1;
+      }
+    }
+
     .athletic-avatar {
       width: 20px;
       height: 20px;
@@ -3556,6 +3697,32 @@ export default {
 
 .athletic-dropdown-menu {
   min-width: 200px;
+  max-height: 320px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .athletic-dropdown-search {
+    flex-shrink: 0;
+    padding: 8px;
+    border-bottom: 1px solid #ebeef5;
+    .el-input__inner {
+      border-radius: 4px;
+    }
+  }
+
+  .athletic-dropdown-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #dcdfe6;
+      border-radius: 3px;
+    }
+  }
 
   .group-header {
     font-weight: 600;
@@ -3576,12 +3743,41 @@ export default {
     align-items: center;
     gap: 8px;
 
-    .athletic-menu-avatar {
+    .avatar-with-frame.avatar-with-frame--menu {
+      position: relative;
       width: 24px;
       height: 24px;
-      border-radius: 50%;
-      object-fit: cover;
       flex-shrink: 0;
+
+      .avatar-frame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: contain;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .athletic-menu-avatar {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        z-index: 1;
+      }
+
+      &.has-frame .athletic-menu-avatar {
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 
@@ -3608,7 +3804,7 @@ export default {
 
 .schedule-top {
   // padding: 10px;
-  height: 58px;
+  min-height: 58px;
   background-color: #fff;
   display: flex;
   justify-content: space-between;
@@ -3636,4 +3832,5 @@ export default {
     }
   }
 }
+
 </style>

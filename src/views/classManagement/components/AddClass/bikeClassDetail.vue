@@ -1145,12 +1145,13 @@ export default {
     },
     // 创建深拷贝的section模板
     createSectionTemplate(title, stageMode) {
+      const template = JSON.parse(JSON.stringify(this.sectionTemplate))
       if (stageMode === "warmup") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdFtpRange: [55, 65],
           thresholdFtp: 60,
           thresholdHeartRate: 60,
@@ -1159,10 +1160,10 @@ export default {
       }
       if (stageMode === "bike") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdFtpRange: [70, 80],
           thresholdFtp: 75,
           thresholdHeartRate: 75,
@@ -1171,10 +1172,10 @@ export default {
       }
       if (stageMode === "recover") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdFtpRange: [45, 55],
           thresholdFtp: 50,
           thresholdHeartRate: 50,
@@ -1183,10 +1184,10 @@ export default {
       }
       if (stageMode === "cooling") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdFtpRange: [50, 60],
           thresholdFtp: 55,
           thresholdHeartRate: 55,

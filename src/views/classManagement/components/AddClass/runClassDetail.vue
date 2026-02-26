@@ -281,7 +281,7 @@
                     @ {{ part.thresholdSpeedRange[0] }}~
                     {{ part.thresholdSpeedRange[1] }}% 阈值配速
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div
                     v-if="classInfo.mode === 2 && part.range === 'range'">
@@ -293,7 +293,7 @@
                     @ {{ part.thresholdHeartRateRange[0] }}~
                     {{ part.thresholdHeartRateRange[1] }}% 阈值心率
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div
                     v-if="classInfo.mode === 1 && part.range === 'target'">
@@ -306,7 +306,7 @@
                     }}
                     @ {{ part.thresholdSpeed }}% 阈值配速
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div
                     v-if="classInfo.mode === 2 && part.range === 'target'">
@@ -317,7 +317,7 @@
                     }}
                     @ {{ part.thresholdHeartRate }}% 阈值心率
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div
                     v-if="classInfo.mode === 3 && part.range === 'range'">
@@ -329,7 +329,7 @@
                     @ {{ part.targetSpeedRange[0] }}~
                     {{ part.targetSpeedRange[1] }}/km
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div
                     v-if="classInfo.mode === 4 && part.range === 'range'">
@@ -341,7 +341,7 @@
                     @ {{ part.targetHeartRateRange[0] }}~
                     {{ part.targetHeartRateRange[1] }}bpm
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div
                     v-if="classInfo.mode === 3 && part.range === 'target'">
@@ -352,7 +352,7 @@
                     }}
                     @ {{ part.targetSpeed }}/km
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div
                     v-if="classInfo.mode === 4 && part.range === 'target'">
@@ -363,7 +363,7 @@
                     }}
                     @ {{ part.targetHeartRate }}bpm
                     <span v-if="part.hasCadence">步频{{ part.cadence[0]
-                    }}~{{ part.cadence[1] }}</span>
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div v-if="part.lap">按LAP进入下一段落</div>
                 </div>
@@ -860,7 +860,7 @@ export default {
       if (val) {
         this.getTagList()
         if (this.data.id && this.originalType === "my") {
-          console.log(this.data, "this.data====打开弹框=====");
+          console.log(this.data, "this.data====打开弹框=====")
           // 如果数据已经包含完整的 classesJson，直接使用，不需要调用 API
           if (this.data.classesJson) {
             const classesJson =
@@ -877,15 +877,15 @@ export default {
             this.classInfo.groupId =
               this.data.classesGroupId || this.data.groupId
           } else {
-            console.log(this.data, "this.data====打开弹框2=====");
+            console.log(this.data, "this.data====打开弹框2=====")
             // 只有 id 没有 classesJson 时，才调用 API 获取完整数据
             this.getClassInfo(this.data.id)
           }
         } else if (this.originalType === "my") {
           this.resetForm()
         } else {
-          console.log(this.data, "this.data");
-          console.log(this.data, "this.data====打开弹框3=====");
+          console.log(this.data, "this.data")
+          console.log(this.data, "this.data====打开弹框3=====")
           const classesJson =
             typeof this.data.classesJson === "string"
               ? JSON.parse(this.data.classesJson)
@@ -1204,13 +1204,13 @@ export default {
                   Number(stage.times || 1)
                 this.classInfo.duration += timer
               } else {
-                const timer1 = mmssToSeconds(section.targetSpeedRange[0]);
-                const timer2 = mmssToSeconds(section.targetSpeedRange[1]);
-                const timer3 = (timer1 + timer2) / 2;
+                const timer1 = mmssToSeconds(section.targetSpeedRange[0])
+                const timer2 = mmssToSeconds(section.targetSpeedRange[1])
+                const timer3 = (timer1 + timer2) / 2
                 // this.classInfo.duration +=
                 //   distanceIncrement * timer3 * Number(stage.times || 1);
                 this.classInfo.duration +=
-                  section.targetDistance * timer3 * Number(stage.times || 1);
+                  section.targetDistance * timer3 * Number(stage.times || 1)
               }
             }
           }
@@ -1313,12 +1313,13 @@ export default {
     },
     // 创建深拷贝的section模板
     createSectionTemplate(title, stageMode) {
+      const template = JSON.parse(JSON.stringify(this.sectionTemplate))
       if (stageMode === "warmup") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdSpeedRange: [55, 65],
           thresholdSpeed: 60,
           thresholdHeartRate: 60,
@@ -1327,10 +1328,10 @@ export default {
       }
       if (stageMode === "bike") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdSpeedRange: [70, 80],
           thresholdSpeed: 75,
           thresholdHeartRate: 75,
@@ -1339,10 +1340,10 @@ export default {
       }
       if (stageMode === "recover") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdSpeedRange: [45, 55],
           thresholdSpeed: 50,
           thresholdHeartRate: 50,
@@ -1351,10 +1352,10 @@ export default {
       }
       if (stageMode === "cooling") {
         return {
-          ...this.sectionTemplate,
+          ...template,
           title,
           stageMode,
-          tags: [...this.sectionTemplate.tags], // 深拷贝数组
+          tags: [...template.tags], // 深拷贝数组
           thresholdSpeedRange: [50, 60],
           thresholdSpeed: 55,
           thresholdHeartRate: 55,

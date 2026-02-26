@@ -84,13 +84,13 @@ export function getClassIconArrowColor(sportType) {
  */
 export function getSportBackgroundColor(percent, ClassesJson, commonDate) {
   // 如果课程已匹配，但未完成，且日期小于今天，则显示红色
-  console.log(percent, ClassesJson, commonDate, "percent, ClassesJson, commonDate")
-  console.log(isExpired(commonDate), "isExpired(commonDate)")
-  if (!percent && isExpired(commonDate) &&
-    ClassesJson
-  ) {
-    return ["#a32015", "#333"]
-  }
+  // console.log(percent, ClassesJson, commonDate, "percent, ClassesJson, commonDate")
+  // console.log(isExpired(commonDate), "isExpired(commonDate)")
+  // if (!percent && isExpired(commonDate) &&
+  //   ClassesJson
+  // ) {
+  //   return ["#a32015", "#333"]
+  // }
   if (!percent) return ["#C3C9D7", "#333"]
   if (percent > 80 && percent <= 120) {
     return ["#00B06D", "#fff"] // 绿色 - 完成良好

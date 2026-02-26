@@ -22,7 +22,8 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="handleClose">取消</el-button>
+      <!-- 只负责改变显示状态，真正的收尾逻辑统一走 @close -->
+      <el-button @click="innerVisible = false">取消</el-button>
       <el-button type="primary" :loading="submitting" @click="handleConfirm">确定</el-button>
     </span>
   </el-dialog>
@@ -89,7 +90,6 @@ export default {
         if (val && this.record) {
           console.log(this.record, "this.record====操作权限");
           console.log(this.shareAuth, "this.shareAuth====操作权限");
-          this.getCurrentShareRecord()
           this.form = {
             revoke: false,
             shareToAuth: this.shareAuth != null ? Number(this.shareAuth) : 1,
@@ -104,43 +104,13 @@ export default {
     },
   },
   methods: {
-    getCurrentShareRecord() {
-      const requestUserId = localStorage.getItem("triUserId")
-      if (!requestUserId) {
-        return
-      }
-      submitData({
-        url: "/gateway/training/share/queryShareRecords",
-        requestData: {
-          requestUserId,
-          shareDataId: this.record.id,
-          shareDataType: 2, // 1=团队课程 2=计划
-          pageNum: 1,
-          pageSize: 10,
-        },
-      })
-        .then((res) => {
-          console.log(res, "res====获取分享历史");
-          this.shareRecordList = res.result.records || []
-        })
-        .catch((err) => {
-          console.error("获取分享历史失败:", err)
-          this.shareRecordList = []
-        })
-    },
     handleClose() {
-      this.innerVisible = false
       this.$emit("close", this.form)
       this.form = { revoke: false, shareToAuth: 1 }
       this.shareRecordList = []
     },
     async handleConfirm() {
-      const record = this.shareRecordList[0]
-      if (!record || (record.id == null && record.shareRecordId == null)) {
-        this.$message.warning("未找到分享记录")
-        return
-      }
-      const shareRecordId = record.shareRecordId != null ? record.shareRecordId : record.id
+      const shareRecordId = this.planInfo.id
       const requestUserId = localStorage.getItem("triUserId")
       this.submitting = true
       try {
@@ -155,8 +125,9 @@ export default {
         })
         if (res && res.success) {
           this.$message.success("权限已更新")
-          this.handleClose()
-          this.$emit("success")
+          this.$emit("success", this.form.revoke)
+          // 只关闭弹窗，后续统一由 @close 回调做收尾
+          this.innerVisible = false
         } else {
           this.$message.error(res?.message || "更新失败，请稍后重试")
         }

@@ -76,7 +76,7 @@ export default {
         },
         {
           title: "运动表现",
-          subTitle: "运动峰值表现",
+          subTitle: "运动峰值表现(强者之心统计)",
           img: require("@/assets/vip/vip3.png"),
           children: [
             { idx: 1, label: "多维度峰值统计" },

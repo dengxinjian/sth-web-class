@@ -87,8 +87,9 @@
       @save="handleMovePlanSave" />
     <!-- 权限调整 -->
     <PermissionAdjust v-model="showSharePlanPersion"
-      :shareAuth="shareAuth" :planInfo="currentPlanDetail"
-      @close="handleSharePlanPersionClose" />
+      :shareAuth="shareAuth" :planInfo="currentShareAuthEdit"
+      @close="handleSharePlanPersionClose"
+      @success="handleSharePlanPersionSuccess" />
     <!-- 订阅 -->
     <Vip1 :visible.sync="showVip1" />
     <Vip2 :visible.sync="showVip2" />
@@ -206,6 +207,7 @@ export default {
       limitValue: 0, // 计划限制数量
       currentCount: 0, // 当前计划数量
       shareUserId: "",
+      currentShareAuthEdit: {},
     }
   },
   watch: {
@@ -356,7 +358,7 @@ export default {
         await this.getPlanDayDetail(this.currentPlanId)
       }
     },
-    async     handlePlanDayDetail(id, groupId) {
+    async handlePlanDayDetail(id, groupId) {
       this.currentPlanId = id
       this.currentPlanGroupId = groupId
       this.currentPlanTeamId = null
@@ -366,6 +368,7 @@ export default {
     },
     async handleViewPlanView(id, data) {
       this.shareAuth = data.shareAuth
+      this.currentShareAuthEdit = data
       this.shareUserId = data.shareUserId
       this.currentPlanTeamId = data?.teamId ?? null
       this.$emit("choose-plan", true)
@@ -741,12 +744,20 @@ export default {
         this.$refs.planListRef.refreshTeamTree()
       }
     },
+    async handleSharePlanPersionSuccess(payload) {
+      console.log(payload, "payload====权限调整成功")
+      if (payload) {
+        console.log(this.isPlan, "this.isPlan====权限调整成功")
+        this.$emit("update:isPlan", false)
+        return
+      }
+      await this.getPlanDetail(this.currentShareAuthEdit.sourcePlanId)
+      await this.getPlanDayDetail(this.currentShareAuthEdit.sourcePlanId)
+    },
     handleSharePlanPersionClose(payload) {
       this.showSharePlanPersion = false
-      if (!payload.revoke) {
-        this.shareAuth = payload.shareToAuth
-      }
-      // 关闭权限调整后刷新团队数据渲染
+      console.log(payload, "payload====权限调整")
+      this.shareAuth = payload.shareToAuth
       this.refreshTeamTree()
       this.getPlanList()
     },

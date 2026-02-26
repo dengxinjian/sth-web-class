@@ -37,7 +37,14 @@
       <!-- <el-divider direction="vertical"></el-divider> -->
       <el-dropdown trigger="click">
         <div class="user-info">
-          <img :src="userAvatar" alt="" />
+          <div class="avatar-with-frame avatar-with-frame--navbar"
+            :class="{ 'has-frame': getVipFrameSrc(vipSubStatus) }">
+            <img v-if="getVipFrameSrc(vipSubStatus)"
+              :src="getVipFrameSrc(vipSubStatus)"
+              class="avatar-frame"
+              alt="" />
+            <img :src="userAvatar" alt="" class="user-avatar-img" />
+          </div>
           <span>{{ name }}</span>
           <i class="el-icon-caret-bottom" style="margin-left: 10px; font-size: 12px"></i>
         </div>
@@ -119,12 +126,14 @@ export default {
       loginType: localStorage.getItem("loginType"),
       triUserId: localStorage.getItem("triUserId"),
       webIdentityType: localStorage.getItem("webIdentityType"),
+      vipSubStatus: localStorage.getItem("vipSubStatus") || 0,
       userAvatar:
         localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png"),
       // 用于触发 watch 的响应式属性
       avatarUrlWatcher: localStorage.getItem("avatarUrl"),
       loginTypeWatcher: localStorage.getItem("loginType"),
       nameWatcher: localStorage.getItem("name"),
+      vipSubStatusWatcher: localStorage.getItem("vipSubStatus"),
       vipDialogVisible: false,
       activeTab: "1",
       vipInfoList: [
@@ -132,45 +141,42 @@ export default {
           title: "会员标识",
           subTitle: "会员专属图标",
           img: require("@/assets/vip/vip_1.png"),
-          children: [{ idx: 1, label: "头像框带有会员专属标识" }],
+          children: [{ idx: 1, label: "专业版专属头像框" }],
         },
         {
-          title: "团队管理",
-          subTitle: "科学管理",
+          title: "运动员高阶数据",
+          subTitle: "数据分析/运动峰值表现可见",
           img: require("@/assets/vip/vip_2.png"),
           children: [
-            { idx: 1, label: "运动员管理" },
-            { idx: 2, label: "执教管理" },
-            { idx: 3, label: "团队课程管理" },
-            { idx: 4, label: "团队计划管理" },
+            { idx: 1, label: "从数据出发，深入了解你的运动员" },
+          ],
+        },
+        {
+          title: "一站式团队管理",
+          subTitle: "科学管理",
+          img: require("@/assets/vip/vip_3.png"),
+          children: [
+            { idx: 1, label: "身份切换可用(可切换至教练身份)" },
+            { idx: 2, label: "运动员管理" },
+            { idx: 3, label: "执教管理" },
+            { idx: 4, label: "团队课程管理" },
+            { idx: 5, label: "团队计划管理" },
           ],
         },
         {
           title: "数据总览",
           subTitle: "可视化分析",
-          img: require("@/assets/vip/vip_3.png"),
-          children: [
-            { idx: 1, label: "解放90%的行政时间" },
-            { idx: 2, label: "成员数据可视化仪，一眼掌握团队全局" },
-          ],
-        },
-        {
-          title: "效率与专业",
-          subTitle: "数据决策",
           img: require("@/assets/vip/vip_4.png"),
           children: [
-            { idx: 1, label: "拥有“数据透视眼”，精准识别谁已过度、谁临突破" },
-            { idx: 2, label: "每一次计划调整都有据可依，大幅提升教练权威" },
+            { idx: 1, label: "成员日程/数据可视化，掌握团队全局训练情况。" },
           ],
         },
         {
-          title: "价值体现",
-          subTitle: "价值提升与变现",
+          title: "训练计划",
+          subTitle: "示例计划可用",
           img: require("@/assets/vip/vip_5.png"),
           children: [
-            { idx: 1, label: "管理增值，实现教练价值的杠杆化" },
-            { idx: 2, label: "课程库和计划模板系统化、产品化" },
-            { idx: 3, label: "自动生成学员成长报告和团队训练年鉴" },
+            { idx: 1, label: "定期更新高效示例计划库可用" },
           ],
         },
       ],
@@ -261,6 +267,14 @@ export default {
         console.log("取消退出或发生错误:", error);
       }
     },
+    // vipSubStatus: 0 未订阅 1 精英 2 专业 4 精英&专业 → 头框图片
+    getVipFrameSrc(vipSubStatus) {
+      const v = Number(vipSubStatus);
+      if (v === 1) return require("@/assets/addClass/vip1.png");
+      if (v === 2) return require("@/assets/addClass/vip2.png");
+      if (v === 4) return require("@/assets/addClass/vip4.png");
+      return null;
+    },
     getAthleticInfo() {
       getData({
         url: "/consumer/wx/getUserProfile",
@@ -272,6 +286,7 @@ export default {
           this.userInfo = res.result;
           this.name = res.result.nicknameTag;
           this.userAvatar = res.result.avatarUrl;
+          this.vipSubStatus = res.result.vipSubStatus;
           localStorage.setItem("webIdentityType", res.result.webIdentityType);
           this.webIdentityType = res.result.webIdentityType;
           // 更新 localStorage 和 watcher 属性
@@ -282,6 +297,10 @@ export default {
           if (res.result.avatarUrl) {
             localStorage.setItem("avatarUrl", res.result.avatarUrl);
             this.avatarUrlWatcher = res.result.avatarUrl;
+          }
+          if (res.result.vipSubStatus) {
+            localStorage.setItem("vipSubStatus", res.result.vipSubStatus);
+            this.vipSubStatusWatcher = res.result.vipSubStatus;
           }
         }
       });
@@ -412,6 +431,9 @@ export default {
       } else if (e.key === "name") {
         this.nameWatcher = e.newValue;
         this.name = e.newValue;
+      } else if (e.key === "vipSubStatus") {
+        this.vipSubStatusWatcher = e.newValue;
+        this.vipSubStatus = e.newValue || 0;
       }
     },
     // 检查 localStorage 的变化（同标签页内）
@@ -419,6 +441,7 @@ export default {
       const currentAvatarUrl = localStorage.getItem("avatarUrl");
       const currentLoginType = localStorage.getItem("loginType");
       const currentName = localStorage.getItem("name");
+      const currentVipSubStatus = localStorage.getItem("vipSubStatus");
 
       if (currentAvatarUrl !== this.avatarUrlWatcher) {
         this.avatarUrlWatcher = currentAvatarUrl;
@@ -427,6 +450,10 @@ export default {
       if (currentLoginType !== this.loginTypeWatcher) {
         this.loginTypeWatcher = currentLoginType;
         this.loginType = currentLoginType;
+      }
+      if (currentVipSubStatus !== this.vipSubStatusWatcher) {
+        this.vipSubStatusWatcher = currentVipSubStatus;
+        this.vipSubStatus = currentVipSubStatus || 0;
       }
       if (currentName !== this.nameWatcher) {
         this.nameWatcher = currentName;
@@ -484,11 +511,39 @@ export default {
     align-items: center;
     cursor: pointer;
 
-    img {
+    .avatar-with-frame.avatar-with-frame--navbar {
+      position: relative;
       width: 30px;
       height: 30px;
-      border-radius: 50%;
+      flex-shrink: 0;
       margin-right: 10px;
+      .avatar-frame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: contain;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .user-avatar-img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        z-index: 1;
+      }
+      &.has-frame .user-avatar-img {
+        width: 24px;
+        height: 24px;
+      }
     }
 
     span {

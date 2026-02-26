@@ -710,7 +710,7 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
-    min-width: 138px; /* 13寸默认 */
+    min-width: 168px; /* 13寸默认 */
     max-width: 194px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
@@ -719,27 +719,27 @@ export default {
 
     /* 14寸电脑 */
     @media (min-width: 1366px) {
-      min-width: 130px;
+      min-width: 168px;
     }
 
     /* 15寸电脑 */
     @media (min-width: 1440px) {
-      min-width: 138px;
+      min-width: 168px;
     }
 
     /* 16寸电脑 */
     @media (min-width: 1600px) {
-      min-width: 149px;
+      min-width: 169px;
     }
 
     /* 17寸电脑 */
     @media (min-width: 1700px) {
-      min-width: 159px;
+      min-width: 179px;
     }
 
     /* 18寸电脑 */
     @media (min-width: 1800px) {
-      min-width: 170px;
+      min-width: 180px;
     }
 
     /* 19寸电脑 */
