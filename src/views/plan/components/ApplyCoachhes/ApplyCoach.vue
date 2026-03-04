@@ -440,7 +440,7 @@
 
     <span slot="footer" class="dialog-footer">
       <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="onConfirm"
+      <el-button type="primary" @click="applyConfirm"
         :loading="loading">确定</el-button>
     </span>
   </el-dialog>
@@ -1125,138 +1125,148 @@ export default {
       }
       return days
     },
-    onConfirm() {
-      const _this = this
+    applyConfirm() {
       this.$refs.formRef.validate((valid) => {
         if (!valid) return
-        _this.loading = true
-        const currentIds =
-          _this.form.applyDimension === "2"
-            ? _this.form.clubAthleteIds
-            : _this.form.athleteIds
-        const choosedAthletes = (currentIds || [])
-          .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))
-          .filter((val) => val !== undefined && val !== null)
-
-        // 根据登录类型构建 targets 数组
-        let targets = []
-        if (_this.loginType === "2") {
-          if (_this.form.athleteType === 1) {
-            targets = choosedAthletes.map((item) => ({
-              triUserId: item,
-              applyDate: _this.form.applyDate,
-              applyMode: _this.form.applyMode,
-              applyRange: _this.form.applyRange,
-              applyDays:
-                _this.form.applyRange === 1 &&
-                  _this.form.applyStartDay &&
-                  _this.form.applyEndDay
-                  ? _this.buildApplyDays(
-                    _this.form.applyStartDay,
-                    _this.form.applyEndDay
-                  )
-                  : [],
-              syncFlag: _this.form.syncFlag,
-            }))
-          } else {
-            targets = _this.members.map((item) => ({
-              triUserId: item.triUserId,
-              applyDate: item.applyDate,
-              applyMode: item.applyMode,
-              applyRange: item.applyRange,
-              applyDays:
-                item.applyRange === 1
-                  ? _this.buildApplyDays(item.applyStartDay, item.applyEndDay)
-                  : [],
-              syncFlag: item.syncFlag,
-            }))
-          }
-          const findEmptyDateOrApplyMode = targets.filter(
-            (item) => !item.applyDate || !item.applyMode
-          )
-          if (findEmptyDateOrApplyMode.length > 0) {
-            _this.$message.error("日期和方式不能为空，请选择日期和方式")
-            _this.loading = false
-            return
-          }
-          // 单独设置：部分应用必须选择天数
-          const invalidApplyDays = targets.filter(
-            (t) =>
-              t.applyRange === 1 &&
-              (!Array.isArray(t.applyDays) || t.applyDays.length === 0)
-          )
-          if (invalidApplyDays.length > 0) {
-            _this.$message.error("部分应用时，开始天数必须小于结束天数")
-            _this.loading = false
-            return
-          }
-        } else {
-          targets = [
-            {
-              triUserId: _this.triUserId,
-              applyDate: _this.form.applyDate,
-              applyMode: _this.form.applyMode,
-              applyRange: _this.form.applyRange,
-              applyDays:
-                _this.form.applyRange === 1
-                  ? _this.buildApplyDays(_this.form.applyStartDay, _this.form.applyEndDay)
-                  : [],
-              syncFlag: _this.form.syncFlag,
-            },
-          ]
-        }
-        const findEndDate = targets.filter((item) => item.applyMode === 2)
-
-        const planList = _this.planClasses
-          .flat()
-          .filter((item) => item.details.length > 0)
-        const diffAffterDate = _this.diffAffterDate(findEndDate, planList)
-        console.log(diffAffterDate, "diffAffterDate===============")
-        if (!diffAffterDate.isAfter) {
-          _this.applyPlanClasses(targets)
-          return
-        } else {
-          if (_this.loginType === "1") {
-            const message =
-              "当前应用周期小于计划周期，只会应用部分，确认是否应用？"
-            _this.alarmConfirm(message, targets)
-          } else {
-            // 查找所有在结束日期之前的日期对应的人员信息
-            const findPersons = diffAffterDate.isAfterArr
-              .map((item) =>
-                _this.originAthletesAll.find(
-                  (el) => el.triUserId === item.triUserId
-                )
-              )
-              .filter((person) => person !== undefined)
-
-            // 生成提示信息
-            let message = ""
-            if (findPersons.length === 1) {
-              message = `${findPersons[0].userNickname} 的应用周期小于计划周期，只会应用部分，确认是否应用？`
-            } else if (findPersons.length > 1) {
-              let names = ""
-              if (findPersons.length > 10) {
-                names =
-                  findPersons
-                    .slice(0, 10)
-                    .map((person) => person.userNickname)
-                    .join("、") + `...等${findPersons.length}位运动员`
-              } else {
-                names = findPersons
-                  .map((person) => person.userNickname)
-                  .join("、")
-              }
-              message = `${names} 的应用周期小于计划周期，只会应用部分，确认是否应用？`
-            } else {
-              message =
-                "当前应用周期小于计划周期，只会应用部分，确认是否应用？"
-            }
-
-            _this.alarmConfirm(message, targets)
-          }
-        }
+        this.$confirm("计划应用需要一些时间，可在应用历史中查看计划应用结果，请确认是否立即应用？", "提示", {
+          confirmButtonText: "确认应用",
+          cancelButtonText: "取消",
+          type: "warning",
+        }).then(() => {
+          this.onConfirm()
+        })
       })
+    },
+    onConfirm() {
+      const _this = this
+
+      _this.loading = true
+      const currentIds =
+        _this.form.applyDimension === "2"
+          ? _this.form.clubAthleteIds
+          : _this.form.athleteIds
+      const choosedAthletes = (currentIds || [])
+        .map((path) => (Array.isArray(path) ? path[path.length - 1] : path))
+        .filter((val) => val !== undefined && val !== null)
+
+      // 根据登录类型构建 targets 数组
+      let targets = []
+      if (_this.loginType === "2") {
+        if (_this.form.athleteType === 1) {
+          targets = choosedAthletes.map((item) => ({
+            triUserId: item,
+            applyDate: _this.form.applyDate,
+            applyMode: _this.form.applyMode,
+            applyRange: _this.form.applyRange,
+            applyDays:
+              _this.form.applyRange === 1 &&
+                _this.form.applyStartDay &&
+                _this.form.applyEndDay
+                ? _this.buildApplyDays(
+                  _this.form.applyStartDay,
+                  _this.form.applyEndDay
+                )
+                : [],
+            syncFlag: _this.form.syncFlag,
+          }))
+        } else {
+          targets = _this.members.map((item) => ({
+            triUserId: item.triUserId,
+            applyDate: item.applyDate,
+            applyMode: item.applyMode,
+            applyRange: item.applyRange,
+            applyDays:
+              item.applyRange === 1
+                ? _this.buildApplyDays(item.applyStartDay, item.applyEndDay)
+                : [],
+            syncFlag: item.syncFlag,
+          }))
+        }
+        const findEmptyDateOrApplyMode = targets.filter(
+          (item) => !item.applyDate || !item.applyMode
+        )
+        if (findEmptyDateOrApplyMode.length > 0) {
+          _this.$message.error("日期和方式不能为空，请选择日期和方式")
+          _this.loading = false
+          return
+        }
+        // 单独设置：部分应用必须选择天数
+        const invalidApplyDays = targets.filter(
+          (t) =>
+            t.applyRange === 1 &&
+            (!Array.isArray(t.applyDays) || t.applyDays.length === 0)
+        )
+        if (invalidApplyDays.length > 0) {
+          _this.$message.error("部分应用时，开始天数必须小于结束天数")
+          _this.loading = false
+          return
+        }
+      } else {
+        targets = [
+          {
+            triUserId: _this.triUserId,
+            applyDate: _this.form.applyDate,
+            applyMode: _this.form.applyMode,
+            applyRange: _this.form.applyRange,
+            applyDays:
+              _this.form.applyRange === 1
+                ? _this.buildApplyDays(_this.form.applyStartDay, _this.form.applyEndDay)
+                : [],
+            syncFlag: _this.form.syncFlag,
+          },
+        ]
+      }
+      const findEndDate = targets.filter((item) => item.applyMode === 2)
+
+      const planList = _this.planClasses
+        .flat()
+        .filter((item) => item.details.length > 0)
+      const diffAffterDate = _this.diffAffterDate(findEndDate, planList)
+      console.log(diffAffterDate, "diffAffterDate===============")
+      if (!diffAffterDate.isAfter) {
+        _this.applyPlanClasses(targets)
+        return
+      } else {
+        if (_this.loginType === "1") {
+          const message =
+            "当前应用周期小于计划周期，只会应用部分，确认是否应用？"
+          _this.alarmConfirm(message, targets)
+        } else {
+          // 查找所有在结束日期之前的日期对应的人员信息
+          const findPersons = diffAffterDate.isAfterArr
+            .map((item) =>
+              _this.originAthletesAll.find(
+                (el) => el.triUserId === item.triUserId
+              )
+            )
+            .filter((person) => person !== undefined)
+
+          // 生成提示信息
+          let message = ""
+          if (findPersons.length === 1) {
+            message = `${findPersons[0].userNickname} 的应用周期小于计划周期，只会应用部分，确认是否应用？`
+          } else if (findPersons.length > 1) {
+            let names = ""
+            if (findPersons.length > 10) {
+              names =
+                findPersons
+                  .slice(0, 10)
+                  .map((person) => person.userNickname)
+                  .join("、") + `...等${findPersons.length}位运动员`
+            } else {
+              names = findPersons
+                .map((person) => person.userNickname)
+                .join("、")
+            }
+            message = `${names} 的应用周期小于计划周期，只会应用部分，确认是否应用？`
+          } else {
+            message =
+              "当前应用周期小于计划周期，只会应用部分，确认是否应用？"
+          }
+
+          _this.alarmConfirm(message, targets)
+        }
+      }
     },
     applyPlanClasses(targets) {
       const _this = this

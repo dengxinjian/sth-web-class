@@ -1,19 +1,29 @@
-"use strict";
-const path = require("path");
-const defaultSettings = require("./src/settings.js");
+"use strict"
+const path = require("path")
+const defaultSettings = require("./src/settings.js")
 
 function resolve(dir) {
-  return path.join(__dirname, dir);
+  return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || "vue Element Admin"; // page title
+const name = defaultSettings.title || "vue Element Admin" // page title
+// 從 prepare-version.js 產生的版本檔讀取，確保與 version.json 一致（建置時）；開發時 fallback
+const version = (() => {
+  try {
+    const versionFile = path.join(__dirname, "version-timestamp.json");
+    const content = require("fs").readFileSync(versionFile, "utf8");
+    return JSON.parse(content).version;
+  } catch {
+    return new Date().getTime().toString();
+  }
+})();
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
 // For example, Mac: sudo npm run
 // You can change the port by the following method:
 // port = 9527 npm run dev OR npm run dev --port = 9527
-const port = process.env.port || process.env.npm_config_port || 8088; // dev port
+const port = process.env.port || process.env.npm_config_port || 8088 // dev port
 
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
@@ -75,35 +85,38 @@ module.exports = {
   configureWebpack: (config) => {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
-    config.name = name;
+    config.name = name
     config.resolve = {
       ...config.resolve,
       alias: {
         ...config.resolve?.alias,
         "@": resolve("src"),
       },
-    };
+    }
+    config.plugins.push(new (require('webpack')).DefinePlugin({
+      'process.env.VUE_APP_VERSION': JSON.stringify(version),
+    }),)
 
     // 配置文件指纹（生产环境和 staging 环境）
     if (process.env.NODE_ENV !== "development") {
-      const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+      const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
       config.output = {
         ...config.output,
         // 注意：publicPath 应该在 Vue CLI 顶层配置，不能在这里修改
         filename: "static/js/[name].[contenthash].js",
         chunkFilename: "static/js/[name].[contenthash].js",
-      };
+      }
 
       // 查找并更新 MiniCssExtractPlugin 配置
       const miniCssExtractPlugin = config.plugins.find(
         (plugin) => plugin instanceof MiniCssExtractPlugin
-      );
+      )
       if (miniCssExtractPlugin) {
         miniCssExtractPlugin.options.filename =
-          "static/css/[name].[contenthash].css";
+          "static/css/[name].[contenthash].css"
         miniCssExtractPlugin.options.chunkFilename =
-          "static/css/[name].[contenthash].css";
+          "static/css/[name].[contenthash].css"
       } else {
         // 如果没有找到，添加新的插件
         config.plugins.push(
@@ -111,7 +124,7 @@ module.exports = {
             filename: "static/css/[name].[contenthash].css",
             chunkFilename: "static/css/[name].[contenthash].css",
           })
-        );
+        )
       }
     }
   },
@@ -126,13 +139,13 @@ module.exports = {
         fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
         include: "initial",
       },
-    ]);
+    ])
 
     // when there are many pages, it will cause too many meaningless requests
-    config.plugins.delete("prefetch");
+    config.plugins.delete("prefetch")
 
     // set svg-sprite-loader
-    config.module.rule("svg").exclude.add(resolve("src/icons")).end();
+    config.module.rule("svg").exclude.add(resolve("src/icons")).end()
     config.module
       .rule("icons")
       .test(/\.svg$/)
@@ -143,9 +156,13 @@ module.exports = {
       .options({
         symbolId: "icon-[name]",
       })
-      .end();
+      .end()
 
     config.when(process.env.NODE_ENV !== "development", (config) => {
+      // 添加版本文件生成插件
+      config.plugin('version-file').use(require('webpack').DefinePlugin, [{
+        'process.env.VUE_APP_VERSION': JSON.stringify(version),
+      }])
       // 文件指纹配置已在 configureWebpack 中统一处理，这里不再重复配置
 
       config
@@ -157,7 +174,7 @@ module.exports = {
             inline: /runtime\..*\.js$/,
           },
         ])
-        .end();
+        .end()
       config.optimization.splitChunks({
         chunks: "all",
         cacheGroups: {
@@ -180,9 +197,9 @@ module.exports = {
             reuseExistingChunk: true,
           },
         },
-      });
+      })
       // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
-      config.optimization.runtimeChunk("single");
-    });
+      config.optimization.runtimeChunk("single")
+    })
   },
-};
+}

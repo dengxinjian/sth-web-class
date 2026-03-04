@@ -71,7 +71,7 @@
               size="small"
               class="history-cancel-btn"
               @click="cancelApply(scope.row)"
-              v-if="scope.row.applyStatus === 0 || scope.row.applyStatus === 1">取消</el-button>
+              v-if=" scope.row.applyStatus === 1">取消</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -104,7 +104,7 @@
               size="small"
               class="history-cancel-btn"
               @click="cancelApply(scope.row)"
-              v-if="scope.row.applyStatus === 0 || scope.row.applyStatus === 1">取消</el-button>
+              v-if="scope.row.applyStatus === 1">取消</el-button>
           </template>
         </el-table-column>
       </el-table>

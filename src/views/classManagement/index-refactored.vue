@@ -241,7 +241,8 @@
       <div class="content-container"
         style="display: flex; width: 100%"
         v-if="activeName === 'plan'">
-        <PlanView :isPlan.sync="isPlan" @choose-plan="handleChoosePlan"
+        <PlanView :isPlan.sync="isPlan"
+          @choose-plan="handleChoosePlan"
           :selected-team="selectedTeam" />
         <!-- 日程表 -->
         <ScheduleCalendar v-if="!isPlan" :current-week="currentWeek"
@@ -1571,6 +1572,7 @@ export default {
      */
     async getScheduleData() {
       console.log(this.currentWeek, "this.currentWeek")
+      console.log(process.env.VUE_APP_VERSION, "process.env.VUE_APP_VERSION")
       if (!this.selectedAthletic) {
         return
       }
@@ -1629,6 +1631,7 @@ export default {
                       : null,
                     distance: Math.round(i.distance / 10) / 100,
                     preciseDistance: i.distance,
+                    movingTime: i.activityDuration,
                   })
                   console.log(activityList, "activityList")
                 } else {
@@ -1648,6 +1651,7 @@ export default {
                           item.oldActivityDistance
                         ),
                         oldActivitySthValue: item.oldActivitySthValue,
+                        movingTime: i.activityDuration,
                       }
                       console.log(activityList[index], "activityList[index]")
                     }
@@ -2108,8 +2112,31 @@ export default {
           deviceType: device.deviceType,
         })
         if (res.success) {
+          const result = res.result
+          const messages = []
+          // 判断课表更新状态
+          if (result && result.classScheduleUpdateOk) {
+            messages.push("同步成功")
+          } else if (result && result.classScheduleUpdateOk === false) {
+            messages.push("同步失败")
+          }
+          // 判断设备同步状态
+          if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+            result.deviceSyncList.forEach((item) => {
+              if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+                messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
+              }
+            })
+          }
+          const message = messages.length > 0 ? messages.join("<br>") : "同步成功"
+          this.$message({
+            message,
+            dangerouslyUseHTMLString: message.includes("<br>"),
+            type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+            duration: Math.max(2000, messages.length * 1000)
+          })
           // this.$message.success(res.result);
-          this.$message.success("同步成功")
           this.getScheduleData()
         } else {
           // this.$message.error(res.message);
@@ -2368,7 +2395,30 @@ export default {
             triUserId: this.selectedAthletic,
           })
           if (res.success) {
-            this.$message.success("删除成功")
+            const result = res.result
+            const messages = []
+            // 判断课表更新状态
+            if (result && result.classScheduleUpdateOk) {
+              messages.push("课程删除成功")
+            } else if (result && result.classScheduleUpdateOk === false) {
+              messages.push("课程删除失败")
+            }
+            // 判断设备同步状态
+            if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+              result.deviceSyncList.forEach((item) => {
+                if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                  const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+                  messages.push(item.deviceSyncOk ? `课程删除${deviceName}成功` : `课程删除${deviceName}失败`)
+                }
+              })
+            }
+            const message = messages.length > 0 ? messages.join("<br>") : "课程删除成功"
+            this.$message({
+              message,
+              dangerouslyUseHTMLString: message.includes("<br>"),
+              type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+              duration: Math.max(2000, messages.length * 1000)
+            })
             this.getScheduleData()
           }
         })
@@ -2376,6 +2426,30 @@ export default {
         const res = await scheduleApi.deleteSchedule({
           id: classItem?.id,
           triUserId: this.selectedAthletic,
+        })
+        const result = res.result
+        const messages = []
+        // 判断课表更新状态
+        if (result && result.classScheduleUpdateOk) {
+          messages.push("课程删除成功")
+        } else if (result && result.classScheduleUpdateOk === false) {
+          messages.push("课程删除失败")
+        }
+        // 判断设备同步状态
+        if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+          result.deviceSyncList.forEach((item) => {
+            if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+              const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+              messages.push(item.deviceSyncOk ? `课程删除${deviceName}成功` : `课程删除${deviceName}失败`)
+            }
+          })
+        }
+        const message = messages.length > 0 ? messages.join("<br>") : "课程删除成功"
+        this.$message({
+          message,
+          dangerouslyUseHTMLString: message.includes("<br>"),
+          type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+          duration: Math.max(2000, messages.length * 1000)
         })
         if (res.success) {
           this.$message.success("课表剪切成功")
@@ -2628,7 +2702,30 @@ export default {
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("课表移动成功")
+            const result = res.result
+            const messages = []
+            // 判断课表更新状态
+            if (result && result.classScheduleUpdateOk) {
+              messages.push("课程移动成功")
+            } else if (result && result.classScheduleUpdateOk === false) {
+              messages.push("课程移动失败")
+            }
+            // 判断设备同步状态
+            if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+              result.deviceSyncList.forEach((item) => {
+                if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                  const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+                  messages.push(item.deviceSyncOk ? `课程移动${deviceName}成功` : `课程移动${deviceName}失败`)
+                }
+              })
+            }
+            const message = messages.length > 0 ? messages.join("<br>") : "课程移动成功"
+            this.$message({
+              message,
+              dangerouslyUseHTMLString: message.includes("<br>"),
+              type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+              duration: Math.max(2000, messages.length * 1000)
+            })
           }
         })
         .finally(() => {
@@ -3389,11 +3486,35 @@ export default {
                   triUserId: this.selectedAthletic,
                 })
                 .then((res) => {
-                  if (res.success) {
-                    this.$message.success("匹配成功")
-                  } else {
-                    this.$message.error(res.message)
+                  // if (res.success) {
+                  //   this.$message.success("匹配成功")
+                  // } else {
+                  //   this.$message.error(res.message)
+                  // }
+                  const result = res.result
+                  const messages = []
+                  // 判断课表更新状态
+                  if (result && result.classScheduleUpdateOk) {
+                    messages.push("匹配成功")
+                  } else if (result && result.classScheduleUpdateOk === false) {
+                    messages.push("匹配失败")
                   }
+                  // 判断设备同步状态
+                  if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+                    result.deviceSyncList.forEach((item) => {
+                      if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                        const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+                        messages.push(item.deviceSyncOk ? `匹配${deviceName}成功` : `匹配${deviceName}失败`)
+                      }
+                    })
+                  }
+                  const message = messages.length > 0 ? messages.join("<br>") : "匹配成功"
+                  this.$message({
+                    message,
+                    dangerouslyUseHTMLString: message.includes("<br>"),
+                    type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+                    duration: Math.max(2000, messages.length * 1000)
+                  })
                   // 关闭对话框并刷新数据
                   this.showBindModal = false
                   this.$nextTick(() => {
@@ -3435,7 +3556,30 @@ export default {
         })
         .then((res) => {
           if (res.success) {
-            this.$message.success("匹配成功")
+            const result = res.result
+            const messages = []
+            // 判断课表更新状态
+            if (result && result.classScheduleUpdateOk) {
+              messages.push("匹配成功")
+            } else if (result && result.classScheduleUpdateOk === false) {
+              messages.push("匹配失败")
+            }
+            // 判断设备同步状态
+            if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+              result.deviceSyncList.forEach((item) => {
+                if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                  const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+                  messages.push(item.deviceSyncOk ? `匹配${deviceName}成功` : `匹配${deviceName}失败`)
+                }
+              })
+            }
+            const message = messages.length > 0 ? messages.join("<br>") : "匹配成功"
+            this.$message({
+              message,
+              dangerouslyUseHTMLString: message.includes("<br>"),
+              type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+              duration: Math.max(2000, messages.length * 1000)
+            })
           } else {
             this.$message.error(res.message)
           }
@@ -3706,6 +3850,7 @@ export default {
     flex-shrink: 0;
     padding: 8px;
     border-bottom: 1px solid #ebeef5;
+
     .el-input__inner {
       border-radius: 4px;
     }
@@ -3715,9 +3860,11 @@ export default {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+
     &::-webkit-scrollbar {
       width: 6px;
     }
+
     &::-webkit-scrollbar-thumb {
       background: #dcdfe6;
       border-radius: 3px;
@@ -3832,5 +3979,4 @@ export default {
     }
   }
 }
-
 </style>

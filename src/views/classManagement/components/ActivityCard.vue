@@ -104,7 +104,7 @@
           ">
           <div class="keyword">
             {{ restoreVerification("duration") ? "" : "*" }}
-            {{ activity.duration }}
+            {{ activity.movingTime }}
           </div>
           <div style="display: flex">
             <div class="keyword">

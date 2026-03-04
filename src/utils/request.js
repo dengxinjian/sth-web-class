@@ -5,6 +5,60 @@ import router from "@/router";
 import { getToken } from "@/utils/auth";
 const isPoint401 = false;
 
+// 版本更新提示防重複彈框
+let versionUpdatePromptShown = false;
+
+/**
+ * 從 extInfo 解析伺服器版本號
+ * extInfo 格式: {"version":"{\"version\":\"1772502805183\",\"buildTime\":\"...\",\"environment\":\"...\"}"}
+ */
+function getServerVersionFromExtInfo(extInfo) {
+  if (!extInfo || typeof extInfo !== "string") return null;
+  try {
+    const parsed = JSON.parse(extInfo);
+    const versionStr = parsed?.version;
+    if (typeof versionStr === "string") {
+      try {
+        const inner = JSON.parse(versionStr);
+        return inner?.version || null;
+      } catch {
+        return versionStr;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 檢查版本並在非開發環境下提示更新
+ */
+function checkVersionAndPromptUpdate(extInfo) {
+  console.log(process.env.NODE_ENV);
+  console.log(process.env.VUE_APP_VERSION);
+  if (process.env.NODE_ENV === "development") return;
+  if (versionUpdatePromptShown) return;
+
+  const serverVersion = getServerVersionFromExtInfo(extInfo);
+  if (!serverVersion) return;
+
+  const currentVersion = process.env.VUE_APP_VERSION || "";
+  if (currentVersion === serverVersion) return;
+
+  versionUpdatePromptShown = true;
+  MessageBox.confirm("系统已更新，请刷新页面以使用最新版本", "版本更新提示", {
+    confirmButtonText: "立即刷新",
+    showCancelButton: false,
+    showClose: false,
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    type: "warning",
+  }).then(() => {
+    location.reload(true);
+  });
+}
+
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
@@ -75,6 +129,10 @@ service.interceptors.response.use(
       }
       return Promise.reject(res);
     } else {
+      // 非開發環境下檢查版本，若與伺服器不一致則提示更新並強制刷新
+      if (res.extInfo) {
+        checkVersionAndPromptUpdate(res.extInfo);
+      }
       return res;
     }
   },

@@ -18,6 +18,11 @@ export const statisticKeyToTitle = {
     unit: "",
     color: "#F92B30",
   },
+  totalMovingTime: {
+    title: "总运动时长",
+    unit: "",
+    color: "#F92B30",
+  },
   runTime: {
     title: "时间",
     icon: require("@/assets/addClass/icon-run.png"),
