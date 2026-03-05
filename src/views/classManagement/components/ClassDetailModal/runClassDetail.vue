@@ -6,10 +6,8 @@
     append-to-body
     class="add-swim-class-dialog"
     :close-on-click-modal="false"
-    custom-class="class-dialog"
-  >
-    <span slot="title"
-      >{{ scheduleType === "add" ? "新增" : "编辑" }}跑步课表
+    custom-class="class-dialog">
+    <span slot="title">{{ scheduleType === "add" ? "新增" : "编辑" }}跑步课表
     </span>
     <div class="basic-info">
       <div class="basic-info-item">
@@ -21,31 +19,28 @@
           ref="titleRef"
           :rules="rules"
           :model="classInfo"
-          label-width="70px"
-        >
+          label-width="70px">
           <el-form-item label="标题：" prop="title">
             <el-input
               type="text"
               placeholder="标题"
               v-model="classInfo.title"
-              maxlength="50"
-            />
+              maxlength="50" />
           </el-form-item>
         </el-form>
         <div class="basic-info-total">
           <span>
-            <img src="~@/assets/addClass/icon-run.png" width="30" alt="" />
+            <img src="~@/assets/addClass/icon-run.png" width="30"
+              alt="" />
           </span>
           <span>{{
             classInfo.duration == "00:00:00" || !classInfo.duration
               ? "--:--:--"
               : classInfo.duration
           }}</span>
-          <span
-            >{{
-              formatDistance(classInfo.distance, classInfo.sportType)
-            }}km</span
-          >
+          <span>{{
+            formatDistance(classInfo.distance, classInfo.sportType)
+          }}km</span>
           <span>
             {{ classInfo.sth || "--" }}
             <img src="~@/assets/addClass/sth.png" width="28" alt="" />
@@ -54,38 +49,44 @@
       </div>
       <div class="basic-info-item">
         <div class="basic-info-modal">
-          <div class="modal-container" @click="handleAddStage('warmup')">
+          <div class="modal-container"
+            @click="handleAddStage('warmup')">
             <div class="modal-block">
               <div class="modal-block-warmup"></div>
             </div>
             <span>热身</span>
           </div>
-          <div class="modal-container" @click="handleAddStage('recover')">
+          <div class="modal-container"
+            @click="handleAddStage('recover')">
             <div class="modal-block">
               <div class="modal-block-recover"></div>
             </div>
             <span>恢复</span>
           </div>
-          <div class="modal-container" @click="handleAddStage('cooling')">
+          <div class="modal-container"
+            @click="handleAddStage('cooling')">
             <div class="modal-block">
               <div class="modal-block-cooling"></div>
             </div>
             <span>冷身</span>
           </div>
-          <div class="modal-container" @click="handleAddStage('stage1')">
+          <div class="modal-container"
+            @click="handleAddStage('stage1')">
             <div class="modal-block">
               <div class="modal-block-warmup"></div>
             </div>
             <span>1个段落</span>
           </div>
-          <div class="modal-container" @click="handleAddStage('stage2')">
+          <div class="modal-container"
+            @click="handleAddStage('stage2')">
             <div class="modal-block">
               <div class="modal-block-recover"></div>
               <div class="modal-block-warmup"></div>
             </div>
             <span>2个段落</span>
           </div>
-          <div class="modal-container" @click="handleAddStage('stage3')">
+          <div class="modal-container"
+            @click="handleAddStage('stage3')">
             <div class="modal-block">
               <div class="modal-block-cooling"></div>
               <div class="modal-block-recover"></div>
@@ -101,8 +102,7 @@
           <el-select
             v-model="classInfo.mode"
             class="pill-select short"
-            @change="handleModeChange"
-          >
+            @change="handleModeChange">
             <el-option label="跟随阈值配速" :value="1" />
             <el-option label="跟随阈值心率" :value="2" />
             <el-option label="固定配速" :value="3" />
@@ -117,11 +117,10 @@
         v-for="(item, index) in timeline"
         :key="`timeline-${index}-${item.duration}-${item.times}`"
         class="time-stage"
-        :style="{ flex: item.duration, minWidth: 0 }"
-      >
-        <span class="time-stage-close" @click="handleDeleteStage(index)"
-          ><i class="el-icon-close"></i
-        ></span>
+        :style="{ flex: item.duration, minWidth: 0 }">
+        <span class="time-stage-close"
+          @click="handleDeleteStage(index)"><i
+            class="el-icon-close"></i></span>
         <div class="time-stage-title">
           {{
             item.stageTimeline.length > 1 ? "跑步" : item.stageTimeline[0].title
@@ -131,13 +130,11 @@
           <div
             v-for="n in +item.times"
             :key="`stage-${index}-${n}-${item.duration}`"
-            class="time-stage-item"
-          >
+            class="time-stage-item">
             <ExerciseProcessChart
               :exerciseList="item.stageTimeline"
               :maxIntensity="maxIntensity"
-              :height="30"
-            />
+              :height="30" />
           </div>
         </div>
       </div>
@@ -155,11 +152,10 @@
               v-model="classInfo.summary"
               type="textarea"
               :rows="6"
-              placeholder="请输入课程概要"
+              placeholder="请输入课表概要"
               maxlength="500"
               show-word-limit
-              class="summary-textarea"
-            />
+              class="summary-textarea" />
           </div>
         </div>
 
@@ -172,36 +168,34 @@
               width="20"
               height="20"
               alt=""
-              @click="handleAddLink"
-            />
+              @click="handleAddLink" />
           </div>
           <div class="summary-input-container">
             <el-row
               class="link-row"
               v-for="(item, index) in classInfo.links"
               :key="index"
-              style="margin-bottom: 16px;"
-            >
-            <el-col :span="24" style="margin-bottom: 4px">
-                <el-row style="height: 100%;display: flex;align-items: center;justify-content: flex-start;">
+              style="margin-bottom: 16px;">
+              <el-col :span="24" style="margin-bottom: 4px">
+                <el-row
+                  style="height: 100%;display: flex;align-items: center;justify-content: flex-start;">
                   <el-col :span="22">
                     <el-input
                       size="small"
                       v-model="item.title"
-                      placeholder="请输入链接标题"
-                    />
+                      placeholder="请输入链接标题" />
                   </el-col>
                   <el-col :span="2">
-                    <div style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
+                    <div
+                      style="height: 100%;display: flex;align-items: center;justify-content: flex-end;">
                       <i
-                      class="el-icon-remove-outline"
-                      @click="handleRemoveLink(index)"
-                      style="
+                        class="el-icon-remove-outline"
+                        @click="handleRemoveLink(index)"
+                        style="
                         cursor: pointer;
                         font-size: 19px;
                         color: #d83b36;
-                      "
-                    ></i>
+                      "></i>
                     </div>
                   </el-col>
                 </el-row>
@@ -211,8 +205,7 @@
                   size="small"
                   style="width: 100%"
                   v-model="item.type"
-                  placeholder="请选择链接类型"
-                >
+                  placeholder="请选择链接类型">
                   <el-option label="网页链接" value="1" />
                   <el-option label="小程序链接" value="2" />
                   <el-option label="其他" value="3" />
@@ -222,8 +215,7 @@
                 <el-input
                   size="small"
                   v-model="item.url"
-                  placeholder="请输入链接"
-                />
+                  placeholder="请输入链接" />
               </el-col>
             </el-row>
           </div>
@@ -241,8 +233,7 @@
               placeholder="请输入训练建议"
               maxlength="500"
               show-word-limit
-              class="summary-textarea"
-            />
+              class="summary-textarea" />
           </div>
         </div>
 
@@ -256,29 +247,30 @@
               <div
                 v-for="(item, index) in classInfo.stages"
                 :key="index"
-                class="phase-item-content"
-              >
+                class="phase-item-content">
                 <div v-if="item.times > 1">重复{{ item.times }}次</div>
                 <div v-for="(part, idx) in item.sections" :key="idx">
                   <div>{{ part.title }}</div>
-                  <div v-if="classInfo.mode === 1 && part.range === 'range'">
+                  <div
+                    v-if="classInfo.mode === 1 && part.range === 'range'">
                     {{
                       part.capacity === "time"
                         ? part.target
                         : part.targetDistance
-                        ? part.targetDistance + part.targetUnit
-                        : 0 + part.targetUnit
+                          ? part.targetDistance + part.targetUnit
+                          : 0 + part.targetUnit
                     }}
-                    @ {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~
+                    @
+                    {{ secondsToMMSS(part.thresholdSpeedRangeNum[0]) }}~
                     {{ secondsToMMSS(part.thresholdSpeedRangeNum[1]) }}/km
                     {{ part.thresholdSpeedRangeNumZone[0] }}~{{
                       part.thresholdSpeedRangeNumZone[1]
                     }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
-                  <div v-if="classInfo.mode === 2 && part.range === 'range'">
+                  <div
+                    v-if="classInfo.mode === 2 && part.range === 'range'">
                     {{
                       part.capacity === "time"
                         ? part.target
@@ -289,25 +281,25 @@
                     {{ part.thresholdHeartRateRangeNumZone[0] }}~{{
                       part.thresholdHeartRateRangeNumZone[1]
                     }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
-                  <div v-if="classInfo.mode === 1 && part.range === 'target'">
+                  <div
+                    v-if="classInfo.mode === 1 && part.range === 'target'">
                     {{
                       part.capacity === "time"
                         ? part.target
                         : part.targetDistance
-                        ? part.targetDistance + part.targetUnit
-                        : 0 + part.targetUnit
+                          ? part.targetDistance + part.targetUnit
+                          : 0 + part.targetUnit
                     }}
                     @ {{ secondsToMMSS(part.thresholdSpeedNum) }}/km
                     {{ part.thresholdSpeedNumZone }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
-                  <div v-if="classInfo.mode === 2 && part.range === 'target'">
+                  <div
+                    v-if="classInfo.mode === 2 && part.range === 'target'">
                     {{
                       part.capacity === "time"
                         ? part.target
@@ -315,11 +307,11 @@
                     }}
                     @ {{ part.thresholdHeartRateNum }}bpm
                     {{ part.thresholdHeartRateNumZone }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
-                  <div v-if="classInfo.mode === 3 && part.range === 'range'">
+                  <div
+                    v-if="classInfo.mode === 3 && part.range === 'range'">
                     {{
                       part.capacity === "time"
                         ? part.target
@@ -330,11 +322,11 @@
                     {{ part.targetSpeedRangeNumZone[0] }}~{{
                       part.targetSpeedRangeNumZone[1]
                     }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
-                  <div v-if="classInfo.mode === 4 && part.range === 'range'">
+                  <div
+                    v-if="classInfo.mode === 4 && part.range === 'range'">
                     {{
                       part.capacity === "time"
                         ? part.target
@@ -345,11 +337,11 @@
                     {{ part.targetHeartRateRangeNumZone[0] }}~{{
                       part.targetHeartRateRangeNumZone[1]
                     }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
-                  <div v-if="classInfo.mode === 3 && part.range === 'target'">
+                  <div
+                    v-if="classInfo.mode === 3 && part.range === 'target'">
                     {{
                       part.capacity === "time"
                         ? part.target
@@ -357,11 +349,11 @@
                     }}
                     @ {{ part.targetSpeed }}/km
                     {{ part.targetSpeedNumZone }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
-                  <div v-if="classInfo.mode === 4 && part.range === 'target'">
+                  <div
+                    v-if="classInfo.mode === 4 && part.range === 'target'">
                     {{
                       part.capacity === "time"
                         ? part.target
@@ -369,9 +361,8 @@
                     }}
                     @ {{ part.targetHeartRate }}bpm
                     {{ part.targetHeartRateNumZone }}
-                    <span v-if="part.hasCadence"
-                      >步频{{ part.cadence[0] }}~{{ part.cadence[1] }}</span
-                    >
+                    <span v-if="part.hasCadence">步频{{ part.cadence[0]
+                      }}~{{ part.cadence[1] }}</span>
                   </div>
                   <div v-if="part.lap">按LAP进入下一段落</div>
                 </div>
@@ -394,14 +385,12 @@
                 multiple
                 allow-create
                 filterable
-                style="width: 100%"
-              >
+                style="width: 100%">
                 <el-option
                   v-for="tag in existingTags"
                   :key="tag.label"
                   :label="tag.label"
-                  :value="tag.label"
-                ></el-option>
+                  :value="tag.label"></el-option>
               </el-select>
             </div>
           </div>
@@ -416,8 +405,7 @@
           <div
             v-for="(item, index) in classInfo.stages"
             :key="index"
-            class="stage-section"
-          >
+            class="stage-section">
             <div v-if="item.sections.length > 1" class="stage-header">
               <span class="stage-title">重复次数</span>
               <el-input-number
@@ -429,14 +417,12 @@
                 class="times-input"
                 size="small"
                 @blur="handleTimesChange(index)"
-                @change="handleTimesChange(index)"
-              />
+                @change="handleTimesChange(index)" />
             </div>
             <div
               v-for="(part, idx) in item.sections"
               :key="idx + '' + index"
-              class="stage-config"
-            >
+              class="stage-config">
               <div class="config-row">
                 <div class="config-item">
                   <span class="label required">阶段名</span>
@@ -444,8 +430,7 @@
                     v-model="part.title"
                     placeholder="请输入阶段名称"
                     size="small"
-                    @change="calculateTimeline()"
-                  />
+                    @change="calculateTimeline()" />
                 </div>
                 <div class="config-item">
                   <span class="label required">段落模式选择</span>
@@ -453,8 +438,7 @@
                     v-model="part.stageMode"
                     placeholder="请选择"
                     size="small"
-                    @change="handleStageModeChange(index, idx)"
-                  >
+                    @change="handleStageModeChange(index, idx)">
                     <el-option label="热身" value="warmup" />
                     <el-option label="跑步" value="bike" />
                     <el-option label="恢复" value="recover" />
@@ -467,8 +451,7 @@
                     v-model="part.capacity"
                     placeholder="请选择"
                     size="small"
-                    @change="handleTargetChange(index, idx)"
-                  >
+                    @change="handleTargetChange(index, idx)">
                     <el-option label="运动时间" value="time" />
                     <el-option label="距离" value="distance" />
                   </el-select>
@@ -479,8 +462,7 @@
                     v-model="part.range"
                     placeholder="请选择"
                     size="small"
-                    @change="calculateTimeline()"
-                  >
+                    @change="calculateTimeline()">
                     <el-option label="目标值" value="target" />
                     <el-option label="范围" value="range" />
                   </el-select>
@@ -497,8 +479,7 @@
                     v-if="part.capacity === 'time'"
                     v-model="part.target"
                     size="small"
-                    @change="handleTargetChange(index, idx)"
-                  />
+                    @change="handleTargetChange(index, idx)" />
                   <el-input-number
                     v-if="part.capacity === 'distance'"
                     :controls="false"
@@ -507,24 +488,21 @@
                     :step-strictly="true"
                     v-model="part.targetDistance"
                     size="small"
-                    @change="handleTargetChange(index, idx)"
-                  />
+                    @change="handleTargetChange(index, idx)" />
                   <el-select
                     v-if="part.capacity === 'distance'"
                     v-model="part.targetUnit"
                     placeholder="请选择"
                     size="small"
                     :style="{ width: '80px', marginLeft: '8px' }"
-                    @change="handleTargetChange(index, idx)"
-                  >
+                    @change="handleTargetChange(index, idx)">
                     <el-option label="km" value="km" />
                     <el-option label="m" value="m" />
                   </el-select>
                 </div>
                 <div
                   v-if="classInfo.mode === 1 && part.range === 'range'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <el-input-number
                     :controls="false"
@@ -533,8 +511,7 @@
                     v-model="part.thresholdSpeedRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
+                    @change="handleTargetChange(index, idx)" />
                   <span class="unit">~</span>
                   <el-input-number
                     :controls="false"
@@ -543,10 +520,8 @@
                     v-model="part.thresholdSpeedRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >%阈值配速 &nbsp; &nbsp;
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">%阈值配速 &nbsp; &nbsp;
                     {{
                       calculateThresholdSpeedRangeNumZone(
                         part.thresholdSpeedRange
@@ -555,8 +530,7 @@
                       calculateThresholdSpeedRangeNumZone(
                         part.thresholdSpeedRange
                       )[1]
-                    }}</span
-                  >
+                    }}</span>
                   <!-- <span class="label"
                     >{{
                       secondsToMMSS(
@@ -571,26 +545,23 @@
                         )[1]
                       )
                     }}/km</span> -->
-                  <span class="label"
-                    >{{
-                      secondsToMMSS(
-                        calculateThresholdSpeedRangeNum(
-                          part.thresholdSpeedRange
-                        )[0]
-                      )
-                    }}~{{
+                  <span class="label">{{
+                    secondsToMMSS(
+                      calculateThresholdSpeedRangeNum(
+                        part.thresholdSpeedRange
+                      )[0]
+                    )
+                  }}~{{
                       secondsToMMSS(
                         calculateThresholdSpeedRangeNum(
                           part.thresholdSpeedRange
                         )[1]
                       )
-                    }}/km</span
-                  >
+                    }}/km</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 1 && part.range === 'target'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <el-input-number
                     :controls="false"
@@ -600,26 +571,20 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >%阈值配速 &nbsp; &nbsp;
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">%阈值配速 &nbsp; &nbsp;
                     {{
                       calculateThresholdSpeedNumZone(part.thresholdSpeed)
-                    }}</span
-                  >
-                  <span class="label"
-                    >{{
-                      secondsToMMSS(
-                        calculateThresholdSpeedNum(part.thresholdSpeed)
-                      )
-                    }}/km</span
-                  >
+                    }}</span>
+                  <span class="label">{{
+                    secondsToMMSS(
+                      calculateThresholdSpeedNum(part.thresholdSpeed)
+                    )
+                  }}/km</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 2 && part.range === 'range'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <el-input-number
                     :controls="false"
@@ -628,8 +593,7 @@
                     v-model="part.thresholdHeartRateRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
+                    @change="handleTargetChange(index, idx)" />
                   <span class="unit">~</span>
                   <el-input-number
                     :controls="false"
@@ -638,28 +602,22 @@
                     v-model="part.thresholdHeartRateRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >%阈值心率 &nbsp; &nbsp;
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">%阈值心率 &nbsp; &nbsp;
                     {{
                       calculateThresholdHeartRateRangeNumZone(
                         part.thresholdHeartRateRange
                       ).join(" ~ ")
-                    }}</span
-                  >
-                  <span class="label"
-                    >{{
-                      calculateThresholdHeartRateRangeNum(
-                        part.thresholdHeartRateRange
-                      ).join(" ~ ")
-                    }}bpm</span
-                  >
+                    }}</span>
+                  <span class="label">{{
+                    calculateThresholdHeartRateRangeNum(
+                      part.thresholdHeartRateRange
+                    ).join(" ~ ")
+                  }}bpm</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 2 && part.range === 'target'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <el-input-number
                     :controls="false"
@@ -669,66 +627,51 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >%阈值心率 &nbsp; &nbsp;
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">%阈值心率 &nbsp; &nbsp;
                     {{
                       calculateThresholdHeartRateNumZone(
                         part.thresholdHeartRate
                       )
-                    }}</span
-                  >
-                  <span class="label"
-                    >{{
-                      calculateThresholdHeartRateNum(part.thresholdHeartRate)
-                    }}bpm</span
-                  >
+                    }}</span>
+                  <span class="label">{{
+                    calculateThresholdHeartRateNum(part.thresholdHeartRate)
+                  }}bpm</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 3 && part.range === 'range'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <TimeInput
                     v-model="part.targetSpeedRange[0]"
                     timerType="mm:ss"
-                    @change="handleTargetChange(index, idx)"
-                  />
+                    @change="handleTargetChange(index, idx)" />
                   <span class="unit">~</span>
                   <TimeInput
                     v-model="part.targetSpeedRange[1]"
                     timerType="mm:ss"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >min/km &nbsp; &nbsp;
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">min/km &nbsp; &nbsp;
                     {{
                       calculateTargetSpeedRangeNumZone(
                         part.targetSpeedRange
                       ).join(" ~ ")
-                    }}</span
-                  >
+                    }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 3 && part.range === 'target'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <TimeInput
                     v-model="part.targetSpeed"
                     timerType="mm:ss"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >min/km &nbsp; &nbsp;
-                    {{ calculateTargetSpeedNumZone(part.targetSpeed) }}</span
-                  >
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">min/km &nbsp; &nbsp;
+                    {{ calculateTargetSpeedNumZone(part.targetSpeed) }}</span>
                 </div>
                 <div
                   v-if="classInfo.mode === 4 && part.range === 'range'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <el-input-number
                     :controls="false"
@@ -737,8 +680,7 @@
                     v-model="part.targetHeartRateRange[0]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
+                    @change="handleTargetChange(index, idx)" />
                   <span class="unit">~</span>
                   <el-input-number
                     :controls="false"
@@ -747,21 +689,17 @@
                     v-model="part.targetHeartRateRange[1]"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >bpm &nbsp; &nbsp;
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">bpm &nbsp; &nbsp;
                     {{
                       calculateTargetHeartRateRangeNumZone(
                         part.targetHeartRateRange
                       ).join(" ~ ")
-                    }}</span
-                  >
+                    }}</span>
                 </div>
                 <div
                   v-else-if="classInfo.mode === 4 && part.range === 'target'"
-                  class="config-item"
-                >
+                  class="config-item">
                   <span class="label">运动值</span>
                   <el-input-number
                     :controls="false"
@@ -771,14 +709,11 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="handleTargetChange(index, idx)"
-                  />
-                  <span class="unit"
-                    >bpm &nbsp; &nbsp;
+                    @change="handleTargetChange(index, idx)" />
+                  <span class="unit">bpm &nbsp; &nbsp;
                     {{
                       calculateTargetHeartRateNumZone(part.targetHeartRate)
-                    }}</span
-                  >
+                    }}</span>
                 </div>
                 <div v-if="part.hasCadence" class="config-item">
                   <el-input-number
@@ -789,8 +724,7 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline()"
-                  />
+                    @change="calculateTimeline()" />
                   <span class="unit">~</span>
                   <el-input-number
                     :controls="false"
@@ -800,14 +734,12 @@
                     placeholder="80"
                     size="small"
                     :style="{ width: '80px' }"
-                    @change="calculateTimeline()"
-                  />
+                    @change="calculateTimeline()" />
                   <span class="unit">spm</span>
                   <i
                     class="el-icon-close"
                     @click="handleRemoveCadence(index, idx)"
-                    style="cursor: pointer"
-                  ></i>
+                    style="cursor: pointer"></i>
                 </div>
               </div>
 
@@ -818,8 +750,7 @@
                     type="text"
                     size="mini"
                     circle
-                    @click="handleAddSection(index)"
-                  >
+                    @click="handleAddSection(index)">
                     <i class="el-icon-plus"></i>增加段落
                   </el-button>
                   <el-button
@@ -827,8 +758,7 @@
                     type="text"
                     size="mini"
                     circle
-                    @click="handleRemoveSection(index, idx)"
-                  >
+                    @click="handleRemoveSection(index, idx)">
                     <i class="el-icon-close"></i>移除段落
                   </el-button>
                   <el-button
@@ -836,8 +766,7 @@
                     type="text"
                     size="mini"
                     class="add-cadence-btn"
-                    @click="handleAddCadence(index, idx)"
-                  >
+                    @click="handleAddCadence(index, idx)">
                     <i class="el-icon-plus"></i>添加步频范围
                   </el-button>
                 </div>
@@ -855,29 +784,31 @@
     <span slot="footer" class="dialog-footer">
       <!-- <el-button @click="onDelete" :disabled="!classInfo.id">删除</el-button> -->
       <el-button @click="onCancel" :disabled="saving">取消</el-button>
-      <el-button type="warning" @click="onSave(false)" :loading="saving">保存</el-button>
-      <el-button type="danger" @click="onSave(true)" :disabled="saving || savingOnly">保存并关闭</el-button>
+      <el-button type="warning" @click="onSave(false)"
+        :loading="saving">保存</el-button>
+      <el-button type="danger" @click="onSave(true)"
+        :disabled="saving || savingOnly">保存并关闭</el-button>
     </span>
   </el-dialog>
 </template>
 <script>
-import Sortable from "sortablejs";
-import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import { getData, submitData } from "@/api/common.js";
-import TimeInput from "@/views/classManagement/components/timeInpt";
+import Sortable from "sortablejs"
+import ExerciseProcessChart from "@/components/ExerciseProcessChart"
+import { getData, submitData } from "@/api/common.js"
+import TimeInput from "@/views/classManagement/components/timeInpt"
 import {
   getLunarDate,
   secondsToHHMMSS,
   secondsToMMSS,
   mmssToSeconds,
-} from "@/utils/index";
+} from "@/utils/index"
 import {
   debounce,
   CalculateRun,
   checkForm,
-} from "@/views/classManagement/uilt";
-import { athleteApi } from "../../services/classManagement";
-import { scheduleApi } from "../../services/classManagement";
+} from "@/views/classManagement/uilt"
+import { athleteApi } from "../../services/classManagement"
+import { scheduleApi } from "../../services/classManagement"
 export default {
   name: "AddRunClassDialog",
   components: {
@@ -965,199 +896,199 @@ export default {
       rules: {
         title: [{ required: true, message: "请输入标题", trigger: "change" }],
       },
-    };
+    }
   },
   computed: {
     canDelete() {
-      return !!(this.data && this.data.id);
+      return !!(this.data && this.data.id)
     },
     summaryLength() {
-      return (this.form.summary || "").length;
+      return (this.form.summary || "").length
     },
   },
   watch: {
     visible(val) {
-      this.innerVisible = val;
+      this.innerVisible = val
     },
     value(val) {
-      if (typeof val !== "undefined") this.innerVisible = val;
+      if (typeof val !== "undefined") this.innerVisible = val
     },
     innerVisible(val) {
       // 当弹框打开时
       if (val) {
-        this.getTagList();
+        this.getTagList()
         if (this.data.id) {
           // 如果有ID，先获取数据，获取完成后再重置表单（保留获取到的数据）
-          this.getClassInfo(this.data.classScheduleId || this.data.id);
+          this.getClassInfo(this.data.classScheduleId || this.data.id)
         } else {
           // 如果没有ID，说明是新增，重置表单
-          this.resetForm();
-          this.getAthleticThreshold(this.localClassesDate);
+          this.resetForm()
+          this.getAthleticThreshold(this.localClassesDate)
         }
       } else {
         // 弹窗关闭时重置 saving 标志
-        this.saving = false;
-        this.savingOnly = false;
+        this.saving = false
+        this.savingOnly = false
       }
     },
     data(val) {
-      this.getTagList();
+      this.getTagList()
       if (this.data.id) {
-        this.getClassInfo(this.data.classScheduleId || this.data.id);
+        this.getClassInfo(this.data.classScheduleId || this.data.id)
       } else {
-        this.resetForm();
+        this.resetForm()
       }
     },
     classesDate(val) {
       // Sync prop changes to local data property
-      this.localClassesDate = val;
+      this.localClassesDate = val
     },
   },
-  created() {},
+  created() { },
   mounted() {
     if (this.innerVisible) {
-      this.getTagList();
+      this.getTagList()
     }
   },
   methods: {
     handleRemoveLink(index) {
-      this.classInfo.links.splice(index, 1);
+      this.classInfo.links.splice(index, 1)
     },
     handleAddLink() {
-      this.classInfo.links.push({ title: "", type: '1', url: "" });
+      this.classInfo.links.push({ title: "", type: '1', url: "" })
     },
     formatDistance(distance, sportType) {
-      let result = "";
+      let result = ""
       if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "");
+        result = distance.replace("km", "")
       }
       if (distance && Number(distance) > 0) {
-        result = distance;
+        result = distance
       }
       if (!result || result === "0") {
-        result = "--";
+        result = "--"
       }
-      return result;
+      return result
     },
     async getAthleticThreshold(classesDate) {
       if (!this.triUserId) {
-        console.warn("triUserId is empty, skip getAthleticThreshold");
-        return;
+        console.warn("triUserId is empty, skip getAthleticThreshold")
+        return
       }
-      console.log(this.data, "this.data.classesDate");
-      const res = await athleteApi.getUserProfile(this.triUserId, classesDate);
+      console.log(this.data, "this.data.classesDate")
+      const res = await athleteApi.getUserProfile(this.triUserId, classesDate)
       if (res.result && res.result.thresholdRecordList) {
         res.result.thresholdRecordList.forEach((item) => {
           switch (item.thresholdType) {
             case 1:
-              this.athleticThreshold.heartRate = item.threshold;
-              break;
+              this.athleticThreshold.heartRate = item.threshold
+              break
             case 2:
-              this.athleticThreshold.cycle = item.threshold;
-              break;
+              this.athleticThreshold.cycle = item.threshold
+              break
             case 3:
-              this.athleticThreshold.run = item.threshold;
-              break;
+              this.athleticThreshold.run = item.threshold
+              break
             case 4:
-              this.athleticThreshold.swim = item.threshold;
-              break;
+              this.athleticThreshold.swim = item.threshold
+              break
           }
-        });
-        console.log(this.athleticThreshold, "this.athleticThreshold");
+        })
+        console.log(this.athleticThreshold, "this.athleticThreshold")
       }
     },
     handleTimesChange(stageIndex) {
-      const stage = this.classInfo.stages[stageIndex];
-      console.log(stage, "stage", stageIndex);
+      const stage = this.classInfo.stages[stageIndex]
+      console.log(stage, "stage", stageIndex)
 
-      let times = Number(stage.times);
+      let times = Number(stage.times)
       // 当输入框被清空或为非法值时，重置为 1
       if (isNaN(times) || times < 1) {
-        times = 1;
+        times = 1
       } else if (!Number.isInteger(times)) {
-        times = Math.max(1, Math.round(times));
+        times = Math.max(1, Math.round(times))
       }
 
       // 强制写回到响应式数据，触发 el-input-number 重新渲染
-      this.$set(this.classInfo.stages[stageIndex], "times", times);
+      this.$set(this.classInfo.stages[stageIndex], "times", times)
 
       // 失焦后统一刷新时间线，保证视图和数据同步
       this.$nextTick(() => {
-        this.calculateTimeline(times);
-      });
+        this.calculateTimeline(times)
+      })
     },
     secondsToMMSS,
     calculateThresholdSpeedRangeNum(thresholdSpeedRange, run) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdSpeedRangeNum(thresholdSpeedRange);
+      ).calculateThresholdSpeedRangeNum(thresholdSpeedRange)
     },
     calculateThresholdSpeedRangeNumZone(thresholdSpeedRange) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdSpeedRangeNumZone(thresholdSpeedRange);
+      ).calculateThresholdSpeedRangeNumZone(thresholdSpeedRange)
     },
     calculateThresholdSpeedNum(thresholdSpeed) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdSpeedNum(thresholdSpeed);
+      ).calculateThresholdSpeedNum(thresholdSpeed)
     },
     calculateThresholdSpeedNumZone(thresholdSpeed) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdSpeedNumZone(thresholdSpeed);
+      ).calculateThresholdSpeedNumZone(thresholdSpeed)
     },
     // 计算跟随阀值心率目标值的分组
     calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange);
+      ).calculateThresholdHeartRateRangeNumZone(thresholdHeartRateRange)
     },
     calculateThresholdHeartRateRangeNum(thresholdHeartRateRange) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdHeartRateRangeNum(thresholdHeartRateRange);
+      ).calculateThresholdHeartRateRangeNum(thresholdHeartRateRange)
     },
     calculateThresholdHeartRateNum(thresholdHeartRate) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdHeartRateNum(thresholdHeartRate);
+      ).calculateThresholdHeartRateNum(thresholdHeartRate)
     },
     calculateThresholdHeartRateNumZone(thresholdHeartRate) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateThresholdHeartRateNumZone(thresholdHeartRate);
+      ).calculateThresholdHeartRateNumZone(thresholdHeartRate)
     },
     // 计算固定配速运动值的分组
     calculateTargetSpeedRangeNumZone(targetSpeedRange) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateTargetSpeedRangeNumZone(targetSpeedRange);
+      ).calculateTargetSpeedRangeNumZone(targetSpeedRange)
     },
     calculateTargetSpeedNumZone(targetSpeed) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateTargetSpeedNumZone(targetSpeed);
+      ).calculateTargetSpeedNumZone(targetSpeed)
     },
     // 计算固定心率分组
     calculateTargetHeartRateRangeNumZone(targetHeartRateRange) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateTargetHeartRateRangeNumZone(targetHeartRateRange);
+      ).calculateTargetHeartRateRangeNumZone(targetHeartRateRange)
     },
     calculateTargetHeartRateNumZone(targetHeartRate) {
       return new CalculateRun(
         this.athleticThreshold
-      ).calculateTargetHeartRateNumZone(targetHeartRate);
+      ).calculateTargetHeartRateNumZone(targetHeartRate)
     },
     updateClassInfoCalculatedValues() {
       // 更新所有阶段的阈值功率计算值
-      console.log(this.classInfo, "this.classInfo");
+      console.log(this.classInfo, "this.classInfo")
 
       this.classInfo = new CalculateRun(
         this.athleticThreshold,
         this.classInfo
-      ).updateClassInfoCalculatedValues();
+      ).updateClassInfoCalculatedValues()
     },
     // 获取标签列表
     getTagList() {
@@ -1165,36 +1096,36 @@ export default {
         url: "/training/api/classesLabel/user/getLabelsByUserId",
       }).then((res) => {
         if (res.success) {
-          this.existingTags = res.result;
+          this.existingTags = res.result
         } else {
-          this.existingTags = [];
+          this.existingTags = []
         }
-      });
+      })
     },
-    // 编辑进入弹框时，查询课程数据
+    // 编辑进入弹框时，查询课表数据
     getClassInfo(id) {
-      if (!this.data.classesJson) return;
-      console.log(this.data, "this.data");
+      if (!this.data.classesJson) return
+      console.log(this.data, "this.data")
       getData({
         url: "/gateway/training/classSchedule/getClassScheduleById",
         id,
       }).then((res) => {
         if (res.success) {
           this.$nextTick(async () => {
-            this.localClassesDate = res.result.classesDate;
-            await this.getAthleticThreshold(res.result.classesDate);
-            this.classInfo = {...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || []};
-            this.timeline = JSON.parse(res.result.classesJson).timeline;
-            this.classInfo.id = res.result.id;
-            this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity;
-            console.log(this.classInfo, "this.classInfo");
-            this.updateClassInfoCalculatedValues(); // 更新计算值
-            this.handleClassDrag();
-          });
+            this.localClassesDate = res.result.classesDate
+            await this.getAthleticThreshold(res.result.classesDate)
+            this.classInfo = { ...JSON.parse(res.result.classesJson), links: JSON.parse(res.result.classesJson)?.links || [] }
+            this.timeline = JSON.parse(res.result.classesJson).timeline
+            this.classInfo.id = res.result.id
+            this.maxIntensity = JSON.parse(res.result.classesJson).maxIntensity
+            console.log(this.classInfo, "this.classInfo")
+            this.updateClassInfoCalculatedValues() // 更新计算值
+            this.handleClassDrag()
+          })
         }
-      });
+      })
     },
-    // 新增课程
+    // 新增课表
     submitNewClass(flag) {
       this.$emit("save", {
         classesTitle: this.classInfo.title,
@@ -1210,23 +1141,23 @@ export default {
           maxIntensity: this.maxIntensity,
         }),
         triUserId: this.triUserId,
-      });
+      })
       // 延迟重置 saving 标志，确保父组件已经处理完保存事件
       // 如果是保存并关闭，等待弹窗关闭后再重置
       if (flag) {
-        this.onCancel();
+        this.onCancel()
         this.$nextTick(() => {
           setTimeout(() => {
-            this.saving = false;
-            this.savingOnly = false;
-          }, 1500);
-        });
+            this.saving = false
+            this.savingOnly = false
+          }, 1500)
+        })
       } else {
         // 仅保存时，延迟重置以确保父组件有时间处理
         setTimeout(() => {
-          this.saving = false;
-          this.savingOnly = false;
-        }, 1500);
+          this.saving = false
+          this.savingOnly = false
+        }, 1500)
       }
       // scheduleApi
       //   .createSchedule({
@@ -1246,7 +1177,7 @@ export default {
       //     if (res.success) {
       //       this.$emit("save", flag);
       //       this.form = res.result;
-      //       this.$message.success("课程保存成功");
+      //       this.$message.success("课表保存成功");
       //     }
       //     if (flag) this.onCancel();
       //   });
@@ -1265,14 +1196,14 @@ export default {
       //   if (res.success) {
       //     this.classInfo.id = res.result;
       //     this.$emit("save", flag);
-      //     this.$message.success("课程保存成功");
+      //     this.$message.success("课表保存成功");
       //   }
       //   if (flag) this.onCancel();
       // });
     },
     // 更新课表
     submitUpdateClass(flag) {
-      const links = this.classInfo.links.filter(item => item.url !== "");
+      const links = this.classInfo.links.filter(item => item.url !== "")
       submitData({
         url: "/gateway/training/classSchedule/updateClassSchedule",
         id: this.classInfo.id,
@@ -1303,7 +1234,7 @@ export default {
               }),
             },
             flag
-          );
+          )
           const result = res.result
           const messages = []
           // 判断课表更新状态
@@ -1315,13 +1246,13 @@ export default {
           // 判断设备同步状态
           if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
             result.deviceSyncList.forEach((item) => {
-              if (item.needSyncDevice) {
-                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+              if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明"
                 messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
               }
             })
           }
-          const message = messages.length > 0 ? messages.join("<br>") : "课表保存成功"
+          const message = messages.length > 0 ? messages.join("<br>") : "课表更新成功"
           this.$message({
             message,
             dangerouslyUseHTMLString: message.includes("<br>"),
@@ -1330,30 +1261,30 @@ export default {
           })
           // 延迟重置 saving 标志
           if (flag) {
-            this.onCancel();
+            this.onCancel()
             this.$nextTick(() => {
               setTimeout(() => {
-                this.saving = false;
-                this.savingOnly = false;
-              }, 1500);
-            });
+                this.saving = false
+                this.savingOnly = false
+              }, 1500)
+            })
           } else {
             setTimeout(() => {
-              this.saving = false;
-              this.savingOnly = false;
-            }, 1500);
+              this.saving = false
+              this.savingOnly = false
+            }, 1500)
           }
         }
-        console.log(flag, "flag");
+        console.log(flag, "flag")
       }).catch((error) => {
-        console.error("更新课程失败:", error);
-        this.saving = false; // 保存失败时重置标志
-        this.savingOnly = false;
-      });
+        console.error("更新课表失败:", error)
+        this.saving = false // 保存失败时重置标志
+        this.savingOnly = false
+      })
     },
-    // 删除课程
+    // 删除课表
     submitDeleteClass() {
-      this.$confirm("确认删除该课程？", "提示", {
+      this.$confirm("确认删除该课表？", "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
         type: "warning",
@@ -1363,23 +1294,46 @@ export default {
             url: "/training/api/classes/deleteClasses?id=" + this.classInfo.id,
           }).then((res) => {
             if (res.success) {
-              this.resetForm();
-              this.$emit("save", true);
-              this.$message.success("课程删除成功");
-              this.onCancel();
+              this.resetForm()
+              this.$emit("save", true)
+              const result = res.result
+              const messages = []
+              // 判断课表更新状态
+              if (result && result.classScheduleUpdateOk) {
+                messages.push("课表删除成功")
+              } else if (result && result.classScheduleUpdateOk === false) {
+                messages.push("课表删除失败")
+              }
+              // 判断设备同步状态
+              if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+                result.deviceSyncList.forEach((item) => {
+                  if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                    const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明"
+                    messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
+                  }
+                })
+              }
+              const message = messages.length > 0 ? messages.join("<br>") : "课表删除成功"
+              this.$message({
+                message,
+                dangerouslyUseHTMLString: message.includes("<br>"),
+                type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+                duration: Math.max(2000, messages.length * 1000)
+              })
+              this.onCancel()
             }
-          });
+          })
         })
-        .catch(() => {});
+        .catch(() => { })
     },
     // 获取sth值
     getSth() {
-      const validation = checkForm(this.classInfo);
+      const validation = checkForm(this.classInfo)
       if (!validation.isValid) {
-        this.$message.error(validation.message);
-        return;
+        this.$message.error(validation.message)
+        return
       }
-      const links = this.classInfo.links.filter(item => item.url !== "");
+      const links = this.classInfo.links.filter(item => item.url !== "")
       submitData({
         url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1398,42 +1352,42 @@ export default {
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
-          this.classInfo.sth = res.result?.sth || "";
+          this.classInfo.sth = res.result?.sth || ""
           this.classInfo.distance = res.result?.distance
             ? res.result.distance
-            : "";
-          this.classInfo.duration = this.translateTime(res.result?.time || "");
-          console.log(this.classInfo.distance, "this.classInfo.distance");
+            : ""
+          this.classInfo.duration = this.translateTime(res.result?.time || "")
+          console.log(this.classInfo.distance, "this.classInfo.distance")
         }
-      });
+      })
     },
     handleClose() {
-      this.onCancel();
+      this.onCancel()
     },
     onCancel() {
-      this.$emit("cancel");
+      this.$emit("cancel")
     },
     async onSave(closeAfter) {
       // 防止重复保存
       if (this.saving) {
-        return;
+        return
       }
 
-      await this.$refs.titleRef.validate();
-      const validation = checkForm(this.classInfo);
+      await this.$refs.titleRef.validate()
+      const validation = checkForm(this.classInfo)
       if (!validation.isValid) {
-        this.$message.error(validation.message);
-        return;
+        this.$message.error(validation.message)
+        return
       }
 
-      this.saving = true; // 设置保存中标志
+      this.saving = true // 设置保存中标志
       // 如果是仅保存（不关闭），设置 savingOnly 标志以禁用"保存并关闭"按钮
       if (!closeAfter) {
-        this.savingOnly = true;
+        this.savingOnly = true
       }
 
-      console.log(JSON.stringify(this.classInfo));
-      const links = this.classInfo.links.filter(item => item.url !== "");
+      console.log(JSON.stringify(this.classInfo))
+      const links = this.classInfo.links.filter(item => item.url !== "")
       submitData({
         url: "/gateway/analysis/classScheduleCalculateTimeDistanceSth",
         classesTitle: this.classInfo.title,
@@ -1452,31 +1406,31 @@ export default {
         triUserId: this.triUserId,
       }).then((res) => {
         if (res.success) {
-          this.classInfo.sth = res.result?.sth || "";
+          this.classInfo.sth = res.result?.sth || ""
           this.classInfo.distance = res.result?.distance
             ? res.result.distance
-            : "";
-          this.classInfo.duration = this.translateTime(res.result?.time || "");
-          console.log(this.classInfo.distance, "this.classInfo.distance");
+            : ""
+          this.classInfo.duration = this.translateTime(res.result?.time || "")
+          console.log(this.classInfo.distance, "this.classInfo.distance")
           if (this.classInfo.id) {
-            this.submitUpdateClass(closeAfter);
+            this.submitUpdateClass(closeAfter)
           } else {
-            this.submitNewClass(closeAfter);
+            this.submitNewClass(closeAfter)
           }
         }
       }).catch((error) => {
-        console.error("保存失败:", error);
-        this.saving = false; // 保存失败时重置标志
-        this.savingOnly = false;
-      });
+        console.error("保存失败:", error)
+        this.saving = false // 保存失败时重置标志
+        this.savingOnly = false
+      })
     },
     onDelete() {
       if (this.classInfo.id) {
-        this.submitDeleteClass();
+        this.submitDeleteClass()
       } else {
-        this.resetForm();
+        this.resetForm()
       }
-      this.$emit("delete", this.form);
+      this.$emit("delete", this.form)
     },
     resetForm() {
       // 清空表单数据，但保留传入的title
@@ -1496,13 +1450,13 @@ export default {
 
         durationSeconds: "",
         distanceMeters: "",
-      };
-      this.timeline = [];
+      }
+      this.timeline = []
     },
     // 删除阶段
     handleDeleteStage(index) {
-      this.classInfo.stages.splice(index, 1);
-      this.calculateTimeline();
+      this.classInfo.stages.splice(index, 1)
+      this.calculateTimeline()
     },
     handleStageModeChange(index, idx) {
       if (this.classInfo.stages[index].sections[idx].stageMode === "warmup") {
@@ -1586,26 +1540,26 @@ export default {
           this.classInfo.stages.push({
             times: 1,
             sections: [this.createSectionTemplate("热身", "warmup")],
-          });
-          break;
+          })
+          break
         case "recover":
           this.classInfo.stages.push({
             times: 1,
             sections: [this.createSectionTemplate("恢复", "recover")],
-          });
-          break;
+          })
+          break
         case "cooling":
           this.classInfo.stages.push({
             times: 1,
             sections: [this.createSectionTemplate("冷身", "cooling")],
-          });
-          break;
+          })
+          break
         case "stage1":
           this.classInfo.stages.push({
             times: 1,
             sections: [this.createSectionTemplate("跑步", "bike")],
-          });
-          break;
+          })
+          break
         case "stage2":
           this.classInfo.stages.push({
             times: 1,
@@ -1613,8 +1567,8 @@ export default {
               this.createSectionTemplate("跑步", "bike"),
               this.createSectionTemplate("跑步", "bike"),
             ],
-          });
-          break;
+          })
+          break
         case "stage3":
           this.classInfo.stages.push({
             times: 1,
@@ -1623,86 +1577,86 @@ export default {
               this.createSectionTemplate("跑步", "bike"),
               this.createSectionTemplate("跑步", "bike"),
             ],
-          });
-          break;
+          })
+          break
       }
-      this.calculateTimeline();
+      this.calculateTimeline()
     },
     handleAddSection(index) {
       this.classInfo.stages[index].sections.push({
         ...this.sectionTemplate,
         title: "跑步",
         stageMode: "bike",
-      });
-      this.calculateTimeline();
+      })
+      this.calculateTimeline()
     },
     handleRemoveSection(index, sectionIndex) {
       if (this.classInfo.stages[index].sections.length > 1) {
-        this.classInfo.stages[index].sections.splice(sectionIndex, 1);
+        this.classInfo.stages[index].sections.splice(sectionIndex, 1)
         if (this.classInfo.stages[index].sections.length === 1) {
-          this.classInfo.stages[index].times = 1;
+          this.classInfo.stages[index].times = 1
         }
       } else {
-        this.classInfo.stages.splice(index, 1);
+        this.classInfo.stages.splice(index, 1)
       }
-      this.calculateTimeline();
+      this.calculateTimeline()
     },
     handleAddCadence(index, sectionIndex) {
-      this.classInfo.stages[index].sections[sectionIndex].hasCadence = true;
+      this.classInfo.stages[index].sections[sectionIndex].hasCadence = true
     },
     handleRemoveCadence(index, sectionIndex) {
-      this.classInfo.stages[index].sections[sectionIndex].hasCadence = false;
+      this.classInfo.stages[index].sections[sectionIndex].hasCadence = false
     },
     translateTarget(target, targetDistance, capacity, mode, speed = 3000) {
       if (capacity === "time") {
         return target
           .split(":")
           .map((item) => parseInt(item))
-          .reduce((prev, curr) => prev * 60 + curr);
+          .reduce((prev, curr) => prev * 60 + curr)
       } else if (capacity === "distance" && mode === 3) {
-        return targetDistance * speed;
+        return targetDistance * speed
       } else {
-        return 600;
+        return 600
       }
     },
     // s转换成hh:mm:ss
     translateSecondsToFormat(seconds) {
       // 计算小时、分钟和剩余秒数
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
+      const hours = Math.floor(seconds / 3600)
+      const minutes = Math.floor((seconds % 3600) / 60)
+      const secs = seconds % 60
 
       // 格式化各部分为两位数
-      const pad = (num) => num.toString().padStart(2, "0");
+      const pad = (num) => num.toString().padStart(2, "0")
 
-      return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+      return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`
     },
     // 速度转换成s
     translateSpeedToSeconds(speed) {
-      return parseInt(speed.split(":")[0]) * 60 + parseInt(speed.split(":")[1]);
+      return parseInt(speed.split(":")[0]) * 60 + parseInt(speed.split(":")[1])
     },
     // 根据速度和距离换算成时间
     translateSpeedToTime(speed, distance, unit) {
       const seconds =
-        parseInt(speed.split(":")[0]) * 60 + parseInt(speed.split(":")[1]);
-      let time = 0;
+        parseInt(speed.split(":")[0]) * 60 + parseInt(speed.split(":")[1])
+      let time = 0
       if (unit === "m") {
-        time = Math.round((distance * seconds) / 1000);
+        time = Math.round((distance * seconds) / 1000)
       } else if (unit === "km") {
-        time = Math.round(distance * seconds);
+        time = Math.round(distance * seconds)
       }
       return {
         seconds: time,
         format: this.translateSecondsToFormat(time),
-      };
+      }
     },
     // 根据时间和速度换算成距离
     translateSpeedToDistance(speed, time) {
       const seconds =
         parseInt(time.split(":")[0]) * 3600 +
         parseInt(time.split(":")[1]) * 60 +
-        parseInt(time.split(":")[2]);
-      return Math.round((seconds / speed) * 1000);
+        parseInt(time.split(":")[2])
+      return Math.round((seconds / speed) * 1000)
     },
     handleTargetChange(index, sectionIndex) {
       const {
@@ -1713,19 +1667,19 @@ export default {
         range,
         targetSpeedRange,
         targetSpeed,
-      } = this.classInfo.stages[index].sections[sectionIndex];
+      } = this.classInfo.stages[index].sections[sectionIndex]
       const kmDistance =
         targetUnit === "m"
           ? Math.round(targetDistance / 1000) || 1
-          : targetDistance;
-      let speed = 3000;
+          : targetDistance
+      let speed = 3000
       if (range === "range") {
         speed =
           (this.translateSpeedToSeconds(targetSpeedRange[0]) +
             this.translateSpeedToSeconds(targetSpeedRange[1])) /
-          2;
+          2
       } else {
-        speed = this.translateSpeedToSeconds(targetSpeed);
+        speed = this.translateSpeedToSeconds(targetSpeed)
       }
       this.classInfo.stages[index].sections[sectionIndex].targetSeconds =
         this.translateTarget(
@@ -1734,8 +1688,8 @@ export default {
           capacity,
           this.classInfo.mode,
           speed
-        );
-      this.calculateTimeline();
+        )
+      this.calculateTimeline()
     },
     calculateIndent(section, mode) {
       switch (mode) {
@@ -1745,9 +1699,9 @@ export default {
               (section.thresholdSpeedRange[0] +
                 section.thresholdSpeedRange[1]) /
               2
-            );
+            )
           } else {
-            return section.thresholdSpeed;
+            return section.thresholdSpeed
           }
         case 2:
           if (section.range === "range") {
@@ -1755,23 +1709,23 @@ export default {
               (section.thresholdHeartRateRange[0] +
                 section.thresholdHeartRateRange[1]) /
               2
-            );
+            )
           } else {
-            return section.thresholdHeartRate;
+            return section.thresholdHeartRate
           }
         case 3:
           if (section.range === "range") {
             return Math.round(
               100000 /
-                ((this.translateSpeedToSeconds(section.targetSpeedRange[0]) +
-                  this.translateSpeedToSeconds(section.targetSpeedRange[1])) /
-                  2 -
-                  120)
-            );
+              ((this.translateSpeedToSeconds(section.targetSpeedRange[0]) +
+                this.translateSpeedToSeconds(section.targetSpeedRange[1])) /
+                2 -
+                120)
+            )
           } else {
             return Math.round(
               100000 / (this.translateSpeedToSeconds(section.targetSpeed) - 120)
-            );
+            )
           }
         case 4:
           if (section.range === "range") {
@@ -1779,47 +1733,47 @@ export default {
               (section.targetHeartRateRange[0] +
                 section.targetHeartRateRange[1]) /
               2
-            );
+            )
           } else {
-            return section.targetHeartRate;
+            return section.targetHeartRate
           }
       }
     },
     // 秒转换成HH:mm:ss
     translateTime(seconds) {
-      return new Date(seconds * 1000).toISOString().substr(11, 8);
+      return new Date(seconds * 1000).toISOString().substr(11, 8)
     },
     // 模式变更时重新计算时间
     handleModeChange() {
       if (this.classInfo.mode === 3) {
         this.classInfo.stages.forEach((stage, index) => {
           stage.sections.forEach((section, idx) => {
-            this.handleTargetChange(index, idx);
-          });
-        });
+            this.handleTargetChange(index, idx)
+          })
+        })
       }
-      this.calculateTimeline();
+      this.calculateTimeline()
     },
     // 计算时间线
     calculateTimeline(times = 1) {
-      const timesNum = Number(times);
+      const timesNum = Number(times)
       if (isNaN(timesNum) || timesNum < 1) {
-        return;
+        return
       } else if (!Number.isInteger(timesNum)) {
-        return;
+        return
       }
-      this.updateClassInfoCalculatedValues(); // 更新计算值
-      this.getSth();
-      let duration = 0;
-      let distance = 0;
-      let timeFlag = false; // 判断是否可以显示时间，当存在阶段 模式≠3 且 容量=距离 时，不显示时间
-      let distanceFlag = false; // 判断是否可以显示距离，当存在阶段 模式≠3 且 容量=时间 时，不显示距离
-      this.maxIntensity = 0;
+      this.updateClassInfoCalculatedValues() // 更新计算值
+      this.getSth()
+      let duration = 0
+      let distance = 0
+      let timeFlag = false // 判断是否可以显示时间，当存在阶段 模式≠3 且 容量=距离 时，不显示时间
+      let distanceFlag = false // 判断是否可以显示距离，当存在阶段 模式≠3 且 容量=时间 时，不显示距离
+      this.maxIntensity = 0
       this.timeline = this.classInfo.stages.map((stage) => {
-        let totalTime = 0;
-        let totalDistance = 0;
+        let totalTime = 0
+        let totalDistance = 0
         stage.sections.forEach((section) => {
-          totalTime += section.targetSeconds;
+          totalTime += section.targetSeconds
           // 下面的逻辑用来计算总距离，mode=3 capacity=time的情况下需要把距离计算出来，其他情况直接相加，用其他逻辑判断距离是否显示
           if (
             this.classInfo.mode === 3 &&
@@ -1829,7 +1783,7 @@ export default {
             totalDistance += this.translateSpeedToDistance(
               this.translateSpeedToSeconds(section.targetSpeed),
               section.target
-            );
+            )
           } else if (
             this.classInfo.mode === 3 &&
             section.capacity === "time" &&
@@ -1838,49 +1792,49 @@ export default {
             const speed =
               (this.translateSpeedToSeconds(section.targetSpeedRange[0]) +
                 this.translateSpeedToSeconds(section.targetSpeedRange[1])) /
-              2;
+              2
             totalDistance += this.translateSpeedToDistance(
               speed,
               section.target
-            );
+            )
           } else {
             if (section.targetUnit === "km") {
-              totalDistance += section.targetDistance * 1000;
+              totalDistance += section.targetDistance * 1000
             } else {
-              totalDistance += section.targetDistance;
+              totalDistance += section.targetDistance
             }
           }
-        });
-        duration = 0;
+        })
+        duration = 0
         const stageTimeline = stage.sections.map((section) => {
-          duration += section.targetSeconds;
-          const intensity = this.calculateIndent(section, this.classInfo.mode);
+          duration += section.targetSeconds
+          const intensity = this.calculateIndent(section, this.classInfo.mode)
           if (this.maxIntensity < intensity) {
-            this.maxIntensity = intensity;
+            this.maxIntensity = intensity
           }
           if (section.capacity === "distance" && this.classInfo.mode !== 3) {
-            timeFlag = true;
+            timeFlag = true
           }
           if (section.capacity === "time" && this.classInfo.mode !== 3) {
-            distanceFlag = true;
+            distanceFlag = true
           }
           return {
             duration: section.targetSeconds,
             intensity,
             title: section.title,
-          };
-        });
-        duration += totalTime * stage.times;
-        distance += totalDistance * stage.times;
+          }
+        })
+        duration += totalTime * stage.times
+        distance += totalDistance * stage.times
         return {
           duration: totalTime * stage.times,
           stageTimeline,
           times: stage.times,
           distance: stage.distance,
-        };
-      });
-      this.handleClassDrag();
-      console.log(this.timeline, "this.timeline");
+        }
+      })
+      this.handleClassDrag()
+      console.log(this.timeline, "this.timeline")
     },
     // 段落图形拖拽
     handleClassDrag(e) {
@@ -1889,40 +1843,43 @@ export default {
           group: { name: "classLineDrag" },
           animation: 150,
           onEnd: (evt) => {
-            this.handleClassSort(evt.oldIndex, evt.newIndex);
+            this.handleClassSort(evt.oldIndex, evt.newIndex)
           },
-        });
-      });
+        })
+      })
     },
     // 拖拽后重新排序
     handleClassSort(oldIndex, newIndex) {
-      if (oldIndex === newIndex) return;
-      const stages = { ...this.classInfo.stages };
-      const dragStage = stages[oldIndex];
+      if (oldIndex === newIndex) return
+      const stages = { ...this.classInfo.stages }
+      const dragStage = stages[oldIndex]
       if (oldIndex < newIndex) {
-        this.classInfo.stages.splice(oldIndex, 1);
-        this.classInfo.stages.splice(newIndex, 0, dragStage);
+        this.classInfo.stages.splice(oldIndex, 1)
+        this.classInfo.stages.splice(newIndex, 0, dragStage)
       } else {
-        this.classInfo.stages.splice(newIndex, 0, dragStage);
-        this.classInfo.stages.splice(oldIndex + 1, 1);
+        this.classInfo.stages.splice(newIndex, 0, dragStage)
+        this.classInfo.stages.splice(oldIndex + 1, 1)
       }
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .dialog-footer {
   display: flex;
   justify-content: center;
 }
+
 .dialog-footer .el-button {
   min-width: 120px;
   border-radius: 22px;
 }
+
 .dialog-footer .el-button--warning {
   background: #f5a623;
   border-color: #f5a623;
 }
+
 .dialog-footer .el-button--danger {
   background: #d83b36;
   border-color: #d83b36;
@@ -1931,6 +1888,7 @@ export default {
 .basic-info {
   display: flex;
   gap: 20px;
+
   .basic-info-item {
     flex: 1;
     background-color: rgba(0, 0, 0, 0.04);
@@ -1940,11 +1898,13 @@ export default {
     .basic-info-title {
       display: flex;
       align-items: center;
-      > span {
+
+      >span {
         flex: 1;
         white-space: nowrap;
       }
     }
+
     .basic-info-total {
       display: flex;
       justify-content: space-around;
@@ -1952,11 +1912,13 @@ export default {
       margin-top: 20px;
       font-weight: 600;
     }
+
     .basic-info-modal {
       display: flex;
       flex-wrap: wrap;
       gap: 5%;
       row-gap: 10px;
+
       .modal-container {
         flex: 1 1 30%;
         text-align: center;
@@ -1964,6 +1926,7 @@ export default {
         line-height: 18px;
         cursor: pointer;
       }
+
       .modal-block {
         height: 42px;
         display: flex;
@@ -1971,16 +1934,19 @@ export default {
         border-radius: 6px;
         overflow: hidden;
         background-color: #fff;
+
         .modal-block-warmup {
           flex: 1;
           height: 21px;
           background-color: #bbc2d1;
         }
+
         .modal-block-recover {
           flex: 1;
           height: 30px;
           background-color: #bbc2d1;
         }
+
         .modal-block-cooling {
           flex: 1;
           height: 10px;
@@ -2000,8 +1966,10 @@ export default {
     flex: 1;
     position: relative;
     height: auto;
+
     &:hover {
       background-color: #e8e8e8;
+
       .time-stage-close {
         display: block;
       }
@@ -2015,6 +1983,7 @@ export default {
       display: none;
       cursor: pointer;
     }
+
     .time-stage-title {
       font-size: 12px;
       line-height: 18px;
@@ -2024,6 +1993,7 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .time-stage-for {
       display: flex;
       gap: 2px;
@@ -2112,11 +2082,12 @@ export default {
             // background-color: #e9ecef;
             // transform: translateX(4px);
           }
-          > div {
+
+          >div {
             margin-bottom: 8px;
           }
 
-          > div:last-child {
+          >div:last-child {
             margin-bottom: 0;
           }
         }
@@ -2263,11 +2234,12 @@ export default {
         background-color: #fff;
         border: 2px solid #e4e7ed;
         // padding: 5px;
-        padding:16px;
+        padding: 16px;
         border-radius: 8px !important;
         margin-bottom: 10px;
         // box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
         border: 1px solid #00000026;
+
         .times-input {
           width: 130px;
         }
@@ -2290,10 +2262,12 @@ export default {
         .stage-config {
           border-bottom: 1px solid #e4e7ed;
           margin-bottom: 10px;
+
           &:last-child {
             border-bottom: none;
             margin-bottom: 0;
           }
+
           .config-row {
             display: flex;
             gap: 10px;
@@ -2369,6 +2343,7 @@ export default {
             align-items: center;
             padding-bottom: 10px;
           }
+
           .lap-toggle {
             display: flex;
             align-items: center;

@@ -329,7 +329,7 @@ export default {
         }
       })
     },
-    // 编辑进入弹框时，查询课程数据
+    // 编辑进入弹框时，查询课表数据
     getClassInfo(id) {
       getData({
         url: "/gateway/training/classSchedule/getClassScheduleById",
@@ -349,7 +349,7 @@ export default {
         }
       })
     },
-    // 新增课程
+    // 新增课表
     submitNewClass(flag) {
       const links = this.form.links.filter(item => item.url !== "")
       this.$emit("save", {
@@ -363,7 +363,7 @@ export default {
       })
       if (flag) this.onCancel()
     },
-    // 更新课程
+    // 更新课表
     submitUpdateClass(flag) {
       const links = this.form.links.filter(item => item.url !== "")
       submitData({
@@ -396,13 +396,13 @@ export default {
           // 判断设备同步状态
           if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
             result.deviceSyncList.forEach((item) => {
-              if (item.needSyncDevice) {
-                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+              if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明"
                 messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
               }
             })
           }
-          const message = messages.length > 0 ? messages.join("<br>") : "课表保存成功"
+          const message = messages.length > 0 ? messages.join("<br>") : "课表更新成功"
           this.$message({
             message,
             dangerouslyUseHTMLString: message.includes("<br>"),
@@ -413,7 +413,7 @@ export default {
         if (flag) this.onCancel()
       })
     },
-    // 删除课程
+    // 删除课表
     submitDeleteClass() {
       this.$confirm(`确认删除课表【${this.form.title}】？`, "提示", {
         confirmButtonText: "删除",
@@ -433,20 +433,20 @@ export default {
               const messages = []
               // 判断课表更新状态
               if (result && result.classScheduleUpdateOk) {
-                messages.push("课程删除成功")
+                messages.push("课表删除成功")
               } else if (result && result.classScheduleUpdateOk === false) {
-                messages.push("课程删除失败")
+                messages.push("课表删除失败")
               }
               // 判断设备同步状态
               if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
                 result.deviceSyncList.forEach((item) => {
-                  if (item.needSyncDevice) {
-                    const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+                  if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                    const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明"
                     messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
                   }
                 })
               }
-              const message = messages.length > 0 ? messages.join("<br>") : "课程删除成功"
+              const message = messages.length > 0 ? messages.join("<br>") : "课表删除成功"
               this.$message({
                 message,
                 dangerouslyUseHTMLString: message.includes("<br>"),

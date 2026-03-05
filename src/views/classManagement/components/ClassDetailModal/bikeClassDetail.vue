@@ -1181,13 +1181,13 @@ export default {
           // 判断设备同步状态
           if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
             result.deviceSyncList.forEach((item) => {
-              if (item.needSyncDevice) {
-                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+              if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明"
                 messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
               }
             })
           }
-          const message = messages.length > 0 ? messages.join("<br>") : "课表保存成功"
+          const message = messages.length > 0 ? messages.join("<br>") : "课表更新成功"
           this.$message({
             message,
             dangerouslyUseHTMLString: message.includes("<br>"),
@@ -1233,7 +1233,30 @@ export default {
             if (res.success) {
               this.resetForm()
               this.$emit("save", true)
-              this.$message.success("课程删除成功")
+              const result = res.result
+              const messages = []
+              // 判断课表更新状态
+              if (result && result.classScheduleUpdateOk) {
+                messages.push("课表删除成功")
+              } else if (result && result.classScheduleUpdateOk === false) {
+                messages.push("课表删除失败")
+              }
+              // 判断设备同步状态
+              if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
+                result.deviceSyncList.forEach((item) => {
+                  if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                    const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明"
+                    messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
+                  }
+                })
+              }
+              const message = messages.length > 0 ? messages.join("<br>") : "课表删除成功"
+              this.$message({
+                message,
+                dangerouslyUseHTMLString: message.includes("<br>"),
+                type: messages.some((m) => m && m.includes("失败")) ? "warning" : "success",
+                duration: Math.max(2000, messages.length * 1000)
+              })
               this.onCancel()
             }
           })

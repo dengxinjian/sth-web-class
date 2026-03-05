@@ -404,7 +404,7 @@
               </div>
               <div class="sync-params">
                 <span>平均{{ sportDetail.sportType === 1 ? "速度" : "配速"
-                }}：{{
+                  }}：{{
                     sportDetail.avgSpeed
                   }}
                   {{
@@ -1117,8 +1117,8 @@ export default {
           // 判断设备同步状态
           if (result && result.syncDevice && result.deviceSyncList && result.deviceSyncList.length > 0) {
             result.deviceSyncList.forEach((item) => {
-              if (item.needSyncDevice) {
-                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明国际"
+              if (item.needSyncDevice && (item.deviceType === "1" || item.deviceType === 1 || item.deviceType === "2" || item.deviceType === 2)) {
+                const deviceName = item.deviceType === "1" || item.deviceType === 1 ? "高驰" : "佳明"
                 messages.push(item.deviceSyncOk ? `同步${deviceName}成功` : `同步${deviceName}失败`)
               }
             })
