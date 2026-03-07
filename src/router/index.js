@@ -174,6 +174,20 @@ export const asyncRoutes = [
     ],
   },
   {
+    path: "/member",
+    component: TopLayout,
+    redirect: "/member/center",
+    hidden: true,
+    meta: { title: "会员中心" },
+    children: [
+      {
+        path: "center",
+        component: () => import("@/views/memberCenter/index.vue"),
+        meta: { title: "会员中心" },
+      },
+    ],
+  },
+  {
     path: "/plan/add",
     component: () => import("@/views/plan/planEdit.vue"),
     meta: { title: "计划管理" },

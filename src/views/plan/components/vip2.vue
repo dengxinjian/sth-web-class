@@ -2,9 +2,11 @@
   <div class="vip-dialog-mask" v-if="innerVisible">
     <div class="mask-container">
       <div class="container-top-box">
-        <div class="container-top-box-title">订阅</div>
-        <img src="~@/assets/plan/close.png" alt=""
-          class="close-icon" @click="onCancel" />
+        <div class="container-top-box-title">
+          {{ tradeType === '2' || tradeType === 2 ? '续费' : '订阅' }}
+        </div>
+        <img src="~@/assets/plan/close.png" alt="" class="close-icon"
+          @click="onCancel" />
       </div>
       <div class="container-content">
         <div class="container-content-title-box">
@@ -15,30 +17,118 @@
               class="container-content-title-bg" />
           </div>
         </div>
-        <div class="content-box">
-          <div class="content-box-title">权益说明</div>
-          <div class="content-box-list">
-            <div class="list-item" v-for="item in vipInfoList"
-              :key="item.label">
-              <img :src="item.img" alt="" />
-              <div class="list-item-content">
-                <!-- <div class="list-item-title">{{ item.title }}</div> -->
-                <div class="list-item-sub-title">{{ item.subTitle }}
-                </div>
-                <div class="list-item-content-item"
-                  v-for="child in item.children" :key="child.idx">
-                  <div class="list-item-content-icon-box">
-                    <span class="list-item-content-icon"></span>
+        <!-- 左右两栏：左侧会员专属权益，右侧订阅方式与支付 -->
+        <div class="content-layout">
+          <!-- 左侧：会员专属权益 -->
+          <div class="content-left">
+            <div class="content-box-title">会员专属权益</div>
+            <ul class="benefit-list">
+              <li class="benefit-item" v-for="item in vipInfoList"
+                :key="item.subTitle">
+                <img :src="item.img" alt="" class="benefit-icon" />
+                <el-tooltip placement="right" effect="light"
+                  popper-class="vip-benefit-tooltip">
+                  <span
+                    class="benefit-title">{{ item.subTitle }}</span>
+                  <div slot="content" class="benefit-tooltip-content">
+                    <div
+                      v-for="child in item.children"
+                      :key="child.idx"
+                      class="benefit-tooltip-item">• {{ child.label }}
+                    </div>
                   </div>
-                  <span class="list-item-content-text">{{
-                    child.label
-                  }}</span>
+                </el-tooltip>
+              </li>
+            </ul>
+          </div>
+          <!-- 右侧：订阅方式 + 支付 -->
+          <div class="content-right">
+            <div class="subscribe-section">
+              <div class="section-title">订阅方式</div>
+              <div class="subscribe-cards">
+                <div v-for="plan in plans" :key="plan.type"
+                  class="subscribe-card"
+                  :class="{ active: selectedPlanType === plan.type }"
+                  @click="selectedPlanType = plan.type">
+                  <div class="card-type">{{ plan.label }}</div>
+                  <div class="card-price-wrap">
+                    <span class="card-price">¥<em>{{ plan.price }}</em></span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="content-box-btn" @click="handleSubscribeVip">
-            立即预约，免费试用
+            <div class="payment-section">
+              <div class="payment-qr-module">
+                <div class="payment-qr-placeholder">
+                  <template v-if="payOrderLoading">
+                    <span class="qr-hint">正在生成订单...</span>
+                  </template>
+                  <template v-else-if="payCodeUrl">
+                    <img :src="payCodeUrl" alt="微信支付二维码"
+                      class="payment-qr-img" />
+                  </template>
+                  <template v-else>
+                    <span class="qr-hint">{{
+                      selectedPaymentMethod === 'wechat'
+                        ? '请先勾选下方协议以显示支付二维码'
+                        : '支付宝无需二维码，点击右侧去订阅'
+                    }}</span>
+                  </template>
+                </div>
+                <div class="payment-amount">¥{{ selectedPlanPrice }}</div>
+              </div>
+              <div class="payment-content-module">
+                <div class="payment-detail">
+                  <div class="detail-row">
+                    <span class="detail-label">类型</span>
+                    <span
+                      class="detail-value">{{ tradeType === '2' || tradeType === 2 ? '续费' : '订阅' }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">版本</span>
+                    <span class="detail-value">精英版</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">预期生效时间</span>
+                    <span class="detail-value">即时生效</span>
+                  </div>
+                  <div class="payment-methods">
+                    <span class="method-item wechat"
+                      :class="{ active: selectedPaymentMethod === 'wechat' }"
+                      @click="selectedPaymentMethod = 'wechat'">
+                      <img src="~@/assets/Payment/wx.svg" alt="微信支付"
+                        class="method-icon" />
+                      微信支付
+                    </span>
+                    <span class="method-item alipay"
+                      :class="{ active: selectedPaymentMethod === 'alipay' }"
+                      @click="selectedPaymentMethod = 'alipay'">
+                      <img src="~@/assets/Payment/zfb.svg" alt="支付宝"
+                        class="method-icon" />
+                      支付宝
+                    </span>
+                  </div>
+                </div>
+                <button v-if="selectedPaymentMethod !== 'wechat'"
+                  class="subscribe-btn" @click="handleSubscribeVip">
+                  {{
+                    selectedPaymentMethod === 'alipay'
+                      ? (tradeType === '2' || tradeType === 2 ? '去续费' : '去订阅')
+                      : (tradeType === '2' || tradeType === 2 ? '续费' : '订阅')
+                  }}
+                </button>
+                <label class="agreement-wrap">
+                  <input type="checkbox" v-model="agreementChecked"
+                    class="agreement-checkbox" />
+                  <span class="agreement-text">
+                    已阅读同意
+                    <a href="#" class="agreement-link">《服务协议》</a>
+                    和
+                    <a href="#" class="agreement-link">《自动续费服务协议》</a>
+                  </span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -47,17 +137,30 @@
 </template>
 
 <script>
-import { submitData } from "@/api/common"
+import QRCode from "qrcode"
+import { submitData, getData } from "@/api/common"
 
 export default {
-  name: "Vip1",
+  name: "Vip2",
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: false },
+    tradeType: { type: String, default: "" },
   },
   data() {
     return {
       innerVisible: this.visible || this.value || false,
+      selectedPlanType: "monthly",
+      selectedPaymentMethod: "wechat",
+      agreementChecked: false,
+      plans: [
+        { type: "monthly", label: "月卡", price: 50, subscribeType: 1 },
+        { type: "yearly", label: "年卡", price: 365, subscribeType: 3 },
+      ],
+      payOrderLoading: false,
+      payCodeUrl: "",
+      outTradeNo: "",
+      payPollTimer: null,
       vipInfoList: [
         {
           title: "会员标识",
@@ -80,7 +183,7 @@ export default {
           img: require("@/assets/vip/vip3.png"),
           children: [
             { idx: 1, label: "多维度峰值统计" },
-            { idx: 2, label: "历史峰值对；" },
+            { idx: 2, label: "历史峰值对比" },
             { idx: 3, label: "数十种指标峰值统计" },
           ],
         },
@@ -96,7 +199,12 @@ export default {
     }
   },
   computed: {
-
+    selectedPlan() {
+      return this.plans.find((p) => p.type === this.selectedPlanType) || this.plans[0]
+    },
+    selectedPlanPrice() {
+      return this.selectedPlan?.price ?? 0
+    },
   },
   watch: {
     visible(val) {
@@ -107,87 +215,182 @@ export default {
     },
     innerVisible(val) {
       this.$emit("update:visible", val)
+      if (!val) {
+        this.stopPayPoll()
+        this.payCodeUrl = ""
+        this.outTradeNo = ""
+      }
+    },
+    agreementChecked(val) {
+      if (val && this.selectedPaymentMethod === "wechat" && !this.payCodeUrl && !this.payOrderLoading) {
+        this.createWeChatOrder()
+      }
+    },
+    selectedPlanType() {
+      this.resetPayState()
+      if (this.agreementChecked && this.selectedPaymentMethod === "wechat" && !this.payOrderLoading) {
+        this.createWeChatOrder()
+      }
+    },
+    selectedPaymentMethod(val) {
+      this.resetPayState()
+      if (val === "wechat" && this.agreementChecked && !this.payOrderLoading) {
+        this.createWeChatOrder()
+      }
     },
   },
   methods: {
     onCancel() {
       this.$emit("update:visible", false)
     },
-    async handleSubscribeVip() {
-      const _this = this
-      submitData({
-        url: "/consumer/api/vipSubscribe/subscribe",
-        requestData: {
-          identityType: "R",
-          subscribeType: 1,
-        },
-      }).then((res) => {
-        if (res.success) {
-          _this.$message.success("订阅成功")
-          _this.onCancel()
-        } else {
-          _this.$message.error(res.message)
+    resetPayState() {
+      this.stopPayPoll()
+      this.payCodeUrl = ""
+      this.outTradeNo = ""
+      this.payOrderLoading = false
+    },
+    stopPayPoll() {
+      if (this.payPollTimer) {
+        clearInterval(this.payPollTimer)
+        this.payPollTimer = null
+      }
+    },
+    startPayPoll() {
+      this.stopPayPoll()
+      const poll = async () => {
+        if (!this.outTradeNo) return
+        try {
+          const res = await getData({
+            url: "consumer/api/vipPay/queryPayStatus",
+            outTradeNo: this.outTradeNo,
+          })
+          if (res && res.success && res.result) {
+            const status = res.result.payStatus ?? res.result.status
+            if (status === 1 || status === "SUCCESS" || status === "PAID") {
+              this.stopPayPoll()
+              this.$message.success("支付成功")
+              setTimeout(() => {
+                window.location.reload()
+              }, 600)
+            }
+          }
+        } catch (e) {
+          // 单次轮询失败忽略
         }
-      })
+      }
+      poll()
+      this.payPollTimer = setInterval(poll, 2000)
+    },
+    getPayParams() {
+      const subscribeType = this.selectedPlan?.subscribeType ?? 1
+      // const orderAmount = this.selectedPlanType === "yearly" ? 36500 : 5000
+      const orderAmount = 1
+      return { subscribeType, orderAmount }
+    },
+    async createWeChatOrder() {
+      const { subscribeType, orderAmount } = this.getPayParams()
+      this.payOrderLoading = true
+      this.payCodeUrl = ""
+      this.outTradeNo = ""
+      try {
+        const res = await submitData({
+          url: "consumer/api/vipPay/createOrder",
+          method: "post",
+          requestData: {
+            triUserId: "",
+            openId: "",
+            payType: 1,
+            payMode: 2,
+            tradeType: Number(this.tradeType) || 1,
+            identityType: "R",
+            subscribeType,
+            coachSeat: 0,
+            athleteSeat: 0,
+            orderAmount,
+          },
+        })
+        if (res && res.success && res.result) {
+          const codeUrl = res.result.codeUrl || res.result.code_url
+          this.outTradeNo = res.result.outTradeNo || res.result.out_trade_no
+          if (codeUrl && this.outTradeNo) {
+            this.payCodeUrl = await QRCode.toDataURL(codeUrl, { width: 200, margin: 1 })
+            this.startPayPoll()
+          } else {
+            this.$message.error(res.message || "未返回支付二维码")
+          }
+        } else {
+          this.$message.error(res?.message || "创建订单失败")
+        }
+      } catch (e) {
+        this.$message.error(e?.message || "创建订单失败")
+      } finally {
+        this.payOrderLoading = false
+      }
+    },
+    async createAliPayPagePay() {
+      const { subscribeType, orderAmount } = this.getPayParams()
+      this.payOrderLoading = true
+      this.payCodeUrl = ""
+      this.outTradeNo = ""
+      try {
+        const returnUrl = location.href
+        const res = await submitData({
+          url: `consumer/api/aliPay/createOrderPagePay?returnUrl=${encodeURIComponent(returnUrl)}`,
+          method: "post",
+          requestData: {
+            triUserId: "",
+            openId: "",
+            payType: 2,
+            payMode: 3,
+            tradeType: Number(this.tradeType) || 1,
+            identityType: "R",
+            subscribeType,
+            coachSeat: 0,
+            athleteSeat: 0,
+            orderAmount,
+          },
+        })
+
+        if (!res || !res.success) {
+          this.$message.error(res?.message || "创建支付宝订单失败")
+          return
+        }
+
+        const result = res.result || {}
+        const pageUrl =
+          (typeof result === "string" ? result : "") ||
+          result.pagePayFormBody ||
+          result.page_pay_form_body ||
+          ""
+
+        if (!pageUrl) {
+          this.$message.error(res.message || "未返回支付宝支付链接")
+          return
+        }
+
+        window.location.href = pageUrl
+      } catch (e) {
+        this.$message.error(e?.message || "创建支付宝订单失败")
+      } finally {
+        this.payOrderLoading = false
+      }
+    },
+    async handleSubscribeVip() {
+      if (!this.agreementChecked) {
+        this.$message.warning("请先阅读并同意《服务协议》和《自动续费服务协议》")
+        return
+      }
+      if (this.selectedPaymentMethod === "alipay") {
+        await this.createAliPayPagePay()
+        return
+      }
+      await this.createWeChatOrder()
     },
   },
 }
 </script>
 
 <style scoped lang="scss">
-.add-class-title-modal ::v-deep(.el-dialog__header) {
-  padding: 16px 24px;
-}
-
-.add-class-title-modal ::v-deep(.el-dialog__body) {
-  padding: 10px 24px 0 24px;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.statistics-divider-wrapper {
-  margin: 8px 0;
-}
-
-.statistics-divider-wrapper ::v-deep(.el-divider__text) {
-  font-size: 12px;
-}
-
-/* 僅針對下方團隊列使用 flex，避免影響上方多選刪除時的排版 */
-.add-class-title-modal .share-team-item ::v-deep(.el-form-item__content) {
-  margin-left: 0;
-  display: flex;
-  align-items: center;
-  margin-top: 4px;
-}
-
-/* 分享團隊名稱不換行，過長以省略號顯示 */
-.add-class-title-modal .share-team-item ::v-deep(.el-form-item__label) {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 團隊選擇下拉框內標籤不換行 */
-.add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag) {
-  max-width: 100%;
-}
-
-.add-class-title-modal .share-team-select ::v-deep(.el-select__tags .el-tag .el-select__tags-text) {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: inline-block;
-  max-width: 100%;
-}
-
-::v-deep(.el-select .el-tag__close.el-icon-close) {
-  top: -5px;
-}
-
 .vip-dialog-mask {
   position: fixed;
   top: 0;
@@ -199,14 +402,13 @@ export default {
 
   .mask-container {
     width: 880px;
-    min-height: 500px;
+    min-height: 460px;
     background: #fff;
     border-radius: 10px;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    // 背景图 从顶部，不变形，高度不变，宽度自适应
     background-image: url("~@/assets/Rectangle3031.png");
     background-repeat: no-repeat;
     background-position: top center;
@@ -233,156 +435,377 @@ export default {
 
     .container-content {
       width: 100%;
-      height: 520px;
+      min-height: 480px;
       background: #fff;
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
       border-bottom-left-radius: 15px;
       border-bottom-right-radius: 15px;
-      padding: 16px;
+      padding: 16px 24px 32px;
       box-sizing: border-box;
       position: relative;
+    }
 
-      .container-content-title-box {
-        width: 750px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: absolute;
-        left: 50px;
-        top: -38px;
+    .container-content .container-content-title-box {
+      width: 750px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      left: 50px;
+      top: -38px;
+    }
 
-        .container-content-title {
-          width: 120px;
-          height: 40px;
+    .container-content .container-content-title {
+      width: 120px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      position: relative;
+    }
+
+    .container-content .container-content-title-img {
+      width: 57px;
+      height: 16px;
+    }
+
+    .container-content .container-content-title-bg {
+      width: 144px;
+      height: 12px;
+      position: absolute;
+      left: -12px;
+      bottom: 0;
+    }
+
+    .content-layout {
+      display: flex;
+      gap: 15px;
+      margin-top: 8px;
+      min-height: 380px;
+    }
+
+    .content-left {
+      flex: 0 0 240px;
+      border: 1px solid #f8e7e5;
+      background: linear-gradient(180deg, #D9EDE8 0%, #FFFFFF 30%);
+      border-radius: 8px;
+      padding: 20px 16px 24px;
+      box-sizing: border-box;
+
+      .content-box-title {
+        text-align: center;
+        color: #101010;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+
+      .benefit-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        .benefit-item {
           display: flex;
-          justify-content: center;
           align-items: center;
-          background: #fff;
-          border-top-left-radius: 10px;
-          border-top-right-radius: 10px;
-          position: relative;
+          margin-bottom: 16px;
+          color: #666;
+          font-size: 13px;
 
-          .container-content-title-img {
-            width: 57px;
-            height: 16px;
+          .benefit-icon {
+            width: 28px;
+            height: 28px;
+            margin-right: 12px;
+            flex-shrink: 0;
           }
 
-          .container-content-title-bg {
-            width: 144px;
-            height: 12px;
-            position: absolute;
-            left: -12px;
-            bottom: 0;
+          .benefit-title {
+            cursor: default;
+            border-bottom: 1px dashed transparent;
+
+            &:hover {
+              border-bottom-color: #ccc;
+            }
+          }
+        }
+      }
+    }
+
+    .content-right {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #101010;
+        margin-bottom: 12px;
+      }
+
+      .subscribe-section {
+        margin-bottom: 20px;
+      }
+
+      .subscribe-cards {
+        display: flex;
+        gap: 12px;
+      }
+
+      .subscribe-card {
+        flex: 1;
+        min-width: 100px;
+        background: #fff;
+        border: 1.5px solid #e8e8e8;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        &.active {
+          border: 2px solid transparent;
+          background:
+            linear-gradient(#fff, #fff) padding-box,
+            linear-gradient(143.7deg, #2a2a2a 0%, #008867 50%, #2a2a2a 100%) border-box;
+          background-clip: padding-box, border-box;
+          background-origin: padding-box, border-box;
+          box-shadow: none;
+
+          .card-price,
+          .card-price em {
+            display: inline-block;
+            background-image: linear-gradient(143.7deg, #2a2a2a 0%, #008867 50%, #2a2a2a 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+          }
+        }
+
+        .card-type {
+          font-size: 13px;
+          color: #2a2a2a;
+          padding: 12px 0 6px;
+        }
+
+        .card-price-wrap {
+          padding: 4px 12px 10px;
+        }
+
+        .card-price {
+          font-size: 14px;
+          color: #008867;
+          display: block;
+          margin-bottom: 4px;
+
+          em {
+            font-size: 22px;
+            font-weight: 700;
+            font-style: normal;
           }
         }
       }
 
-      .content-box {
-        width: 100%;
-        height: 100%;
-        border: 1px solid #f8e7e5;
-        background: linear-gradient(180deg, #D9EDE8 0%, #FFFFFF 30%);
+      .payment-section {
+        display: flex;
+        flex-direction: row;
+        gap: 32px;
+        align-items: center;
+        padding: 16px;
+        border: 1px solid #00000026;
+        background: #ffffff;
         border-radius: 8px;
-        padding: 20px 40px 40px 16px;
-        box-sizing: border-box;
-        position: relative;
+      }
 
-        .content-box-title {
-          text-align: center;
-          color: #101010;
-          font-size: 14px;
-          font-weight: 600;
+      .payment-qr-module {
+        flex-shrink: 0;
+        width: 140px;
+        text-align: center;
+
+        .payment-qr-placeholder {
+          width: 140px;
+          height: 140px;
+          background: #fff;
+          border: 1px solid #eee;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 10px;
+          overflow: hidden;
         }
 
-        .content-box-list {
+        .payment-qr-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .qr-hint {
+          font-size: 12px;
+          color: #999;
+        }
+
+        .payment-amount {
+          font-size: 18px;
+          font-weight: 600;
+          color: #F92B30;
+          line-height: 1.2;
+        }
+      }
+
+      .payment-content-module {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .payment-detail {
+        flex: 1;
+        min-width: 0;
+        font-size: 14px;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        .detail-row {
           display: flex;
-          flex-wrap: wrap;
-          justify-content: flex-start;
-          margin-top: 26px;
-          // 每行3等分，可以换行，行距为10px
-          column-gap: 16px;
-          row-gap: 10px;
-          margin-top: 16px;
+          align-items: center;
+          min-height: 28px;
+          line-height: 28px;
 
-          .list-item {
-            // width: 33.33%;
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
-            // gap: 10px;
-            // 每行3个，减去2个gap（16px * 2 = 32px）
-            width: calc((100% - 32px) / 3);
-            box-sizing: border-box;
-            margin-bottom: 16px;
+          .detail-label {
+            flex: 0 0 100px;
+            color: #666;
+            font-size: 14px;
+          }
 
-            img {
-              width: 30px;
-              height: 30px;
-              margin-right: 13px;
-              flex-shrink: 0;
-            }
-
-            .list-item-title {
-              font-size: 13px;
-              color: #101010;
-            }
-
-            .list-item-content {
-              .list-item-sub-title {
-                height: 30px;
-                line-height: 30px;
-                font-size: 15px;
-                font-weight: 600;
-              }
-
-              .list-item-content-item {
-                display: flex;
-                align-items: flex-start;
-                margin-top: 8px;
-
-                .list-item-content-icon-box {
-                  height: 16px;
-                  width: 6px !important;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  margin-right: 6px;
-                }
-
-                .list-item-content-icon {
-                  width: 4px;
-                  height: 4px;
-                  border-radius: 4px;
-                  background: #999;
-                }
-
-                .list-item-content-text {
-                  flex: 1;
-                  font-size: 12px;
-                  line-height: 16px;
-                  font-weight: 400;
-                  color: #999;
-                }
-              }
-            }
+          .detail-value {
+            flex: 1;
+            font-weight: 600;
+            color: #101010;
           }
         }
 
-        .content-box-btn {
-          width: 352px;
-          height: 32px;
-          border-radius: 6px;
-          background: linear-gradient(90.94deg, #2A2A2A 10%, #008867 50%, #2A2A2A 90%);
-          text-align: center;
-          line-height: 32px;
-          font-size: 14px;
-          color: #fff;
-          cursor: pointer;
-          position: fixed;
-          left: 264px;
-          bottom: 32px;
+        .payment-methods {
+          margin-top: 20px;
+          padding-top: 30px;
+          border-top: 1px solid #f0f0f0;
+          display: flex;
+          gap: 20px;
+          align-items: center;
+
+          .method-item {
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+            padding: 5px 10px;
+            border: 1px solid #00000026;
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s, color 0.2s;
+
+            &.active {
+              font-weight: 500;
+              border-color: #008867;
+              box-shadow: 0 0 0 1px #008867;
+            }
+
+            &.wechat.active {
+              color: #07c160;
+            }
+
+            &.alipay.active {
+              color: #1677ff;
+            }
+
+            .method-icon {
+              width: 24px;
+              height: 24px;
+              margin-right: 8px;
+              border-radius: 4px;
+              flex-shrink: 0;
+              object-fit: contain;
+              vertical-align: middle;
+            }
+          }
         }
+      }
+
+      .subscribe-btn {
+        width: 100%;
+        height: 32px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(90.94deg, #2A2A2A 10%, #008867 50%, #2A2A2A 90%);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 16px;
+        transition: opacity 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+        &:hover {
+          opacity: 0.95;
+        }
+      }
+
+      .agreement-wrap {
+        display: flex;
+        align-items: flex-start;
+        cursor: pointer;
+        font-size: 12px;
+        color: #666;
+
+        .agreement-checkbox {
+          margin: 2px 8px 0 0;
+          flex-shrink: 0;
+        }
+
+        .agreement-link {
+          color: #1677ff;
+          font-weight: 600;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+.vip-benefit-tooltip {
+  max-width: 320px;
+  padding: 12px 14px !important;
+
+  .benefit-tooltip-content {
+    .benefit-tooltip-item {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #666;
+      margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
       }
     }
   }
