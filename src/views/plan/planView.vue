@@ -185,7 +185,7 @@ export default {
       showSharePlan: false,
       showMovePlan: false,
       showSharePlanPersion: false,
-      showVip1: true,
+      showVip1: false,
       showVip2: false,
       currentPlanId: "",
       currentPlanGroupId: "",
