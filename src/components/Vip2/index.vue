@@ -1,163 +1,173 @@
 <template>
   <div>
     <div class="vip-dialog-mask" v-if="innerVisible">
-    <div class="mask-container">
-      <div class="container-top-box">
-        <div class="container-top-box-title">
-          {{ tradeType === '2' || tradeType === 2 ? '续费' : '订阅' }}
-        </div>
-        <img src="~@/assets/plan/close.png" alt="" class="close-icon"
-          @click="onCancel" />
-      </div>
-      <div class="container-content">
-        <div class="container-content-title-box">
-          <div class="container-content-title">
-            <img src="~@/assets/vip/per_title1.png" alt=""
-              class="container-content-title-img" />
-            <img src="~@/assets/vip/jiao.png" alt=""
-              class="container-content-title-bg" />
+      <div class="mask-container">
+        <div class="container-top-box">
+          <div class="container-top-box-title">
+            {{ tradeType === '2' || tradeType === 2 ? '续费' : '订阅' }}
           </div>
+          <img src="~@/assets/plan/close.png" alt=""
+            class="close-icon"
+            @click="onCancel" />
         </div>
-        <!-- 左右两栏：左侧会员专属权益，右侧订阅方式与支付 -->
-        <div class="content-layout">
-          <!-- 左侧：会员专属权益 -->
-          <div class="content-left">
-            <div class="content-box-title">会员专属权益</div>
-            <ul class="benefit-list">
-              <li class="benefit-item" v-for="item in vipInfoList"
-                :key="item.subTitle">
-                <img :src="item.img" alt="" class="benefit-icon" />
-                <el-tooltip placement="right" effect="light"
-                  popper-class="vip-benefit-tooltip">
-                  <span
-                    class="benefit-title">{{ item.subTitle }}</span>
-                  <div slot="content" class="benefit-tooltip-content">
-                    <div
-                      v-for="child in item.children"
-                      :key="child.idx"
-                      class="benefit-tooltip-item">• {{ child.label }}
+        <div class="container-content">
+          <div class="container-content-title-box">
+            <div class="container-content-title">
+              <img src="~@/assets/vip/per_title1.png" alt=""
+                class="container-content-title-img" />
+              <img src="~@/assets/vip/jiao.png" alt=""
+                class="container-content-title-bg" />
+            </div>
+          </div>
+          <!-- 左右两栏：左侧会员专属权益，右侧订阅方式与支付 -->
+          <div class="content-layout">
+            <!-- 左侧：会员专属权益 -->
+            <div class="content-left">
+              <div class="content-box-title">会员专属权益</div>
+              <ul class="benefit-list">
+                <li class="benefit-item" v-for="item in vipInfoList"
+                  :key="item.subTitle">
+                  <img :src="item.img" alt="" class="benefit-icon" />
+                  <el-tooltip placement="right" effect="light"
+                    popper-class="vip-benefit-tooltip">
+                    <span
+                      class="benefit-title">{{ item.subTitle }}</span>
+                    <div slot="content"
+                      class="benefit-tooltip-content">
+                      <div
+                        v-for="child in item.children"
+                        :key="child.idx"
+                        class="benefit-tooltip-item">•
+                        {{ child.label }}
+                      </div>
+                    </div>
+                  </el-tooltip>
+                </li>
+              </ul>
+            </div>
+            <!-- 右侧：订阅方式 + 支付 -->
+            <div class="content-right">
+              <div class="subscribe-section">
+                <div class="section-title">订阅方式</div>
+                <div class="subscribe-cards">
+                  <div v-for="plan in plans" :key="plan.type"
+                    class="subscribe-card"
+                    :class="{ active: selectedPlanType === plan.type }"
+                    @click="selectedPlanType = plan.type">
+                    <div class="card-type">{{ plan.label }}</div>
+                    <div class="card-price-wrap">
+                      <span
+                        class="card-price">¥<em>{{ plan.price }}</em></span>
+                      <div class="card-original">原价
+                        {{ plan.originalPrice }}
+                      </div>
                     </div>
                   </div>
-                </el-tooltip>
-              </li>
-            </ul>
-          </div>
-          <!-- 右侧：订阅方式 + 支付 -->
-          <div class="content-right">
-            <div class="subscribe-section">
-              <div class="section-title">订阅方式</div>
-              <div class="subscribe-cards">
-                <div v-for="plan in plans" :key="plan.type"
-                  class="subscribe-card"
-                  :class="{ active: selectedPlanType === plan.type }"
-                  @click="selectedPlanType = plan.type">
-                  <div class="card-type">{{ plan.label }}</div>
-                  <div class="card-price-wrap">
-                    <span class="card-price">¥<em>{{ plan.price }}</em></span>
-                  </div>
                 </div>
               </div>
-            </div>
-            <div class="payment-section">
-              <div class="payment-qr-module">
-                <div class="payment-qr-placeholder">
-                  <template v-if="payOrderLoading">
-                    <span class="qr-hint">正在生成订单...</span>
-                  </template>
-                  <template v-else-if="payCodeUrl">
-                    <img :src="payCodeUrl" alt="微信支付二维码"
-                      class="payment-qr-img" />
-                  </template>
-                  <template v-else>
-                    <span class="qr-hint">{{
-                      selectedPaymentMethod === 'wechat'
-                        ? '请先勾选下方协议以显示支付二维码'
-                        : '支付宝无需二维码，点击右侧去订阅'
-                    }}</span>
-                  </template>
-                </div>
-                <div class="payment-amount">¥{{ selectedPlanPrice }}</div>
-              </div>
-              <div class="payment-content-module">
-                <div class="payment-detail">
-                  <div class="detail-row">
-                    <span class="detail-label">类型</span>
-                    <span
-                      class="detail-value">{{ tradeType === '2' || tradeType === 2 ? '续费' : '订阅' }}</span>
+              <div class="payment-section">
+                <div class="payment-qr-module">
+                  <div class="payment-qr-placeholder">
+                    <template v-if="payOrderLoading">
+                      <span class="qr-hint">正在生成订单...</span>
+                    </template>
+                    <template v-else-if="payCodeUrl">
+                      <img :src="payCodeUrl" alt="微信支付二维码"
+                        class="payment-qr-img" />
+                    </template>
+                    <template v-else>
+                      <span class="qr-hint">{{
+                        selectedPaymentMethod === 'wechat'
+                          ? '请先勾选下方协议以显示支付二维码'
+                          : '支付宝无需二维码，点击右侧去订阅'
+                      }}</span>
+                    </template>
                   </div>
-                  <div class="detail-row">
-                    <span class="detail-label">版本</span>
-                    <span class="detail-value">精英版</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">预期生效时间</span>
-                    <span class="detail-value">即时生效</span>
-                  </div>
-                  <div class="payment-methods">
-                    <span class="method-item wechat"
-                      :class="{ active: selectedPaymentMethod === 'wechat' }"
-                      @click="selectedPaymentMethod = 'wechat'">
-                      <img src="~@/assets/Payment/wx.svg" alt="微信支付"
-                        class="method-icon" />
-                      微信支付
-                    </span>
-                    <span class="method-item alipay"
-                      :class="{ active: selectedPaymentMethod === 'alipay' }"
-                      @click="selectedPaymentMethod = 'alipay'">
-                      <img src="~@/assets/Payment/zfb.svg" alt="支付宝"
-                        class="method-icon" />
-                      支付宝
-                    </span>
+                  <div class="payment-amount">¥{{ selectedPlanPrice }}
                   </div>
                 </div>
-                <button v-if="selectedPaymentMethod !== 'wechat'"
-                  class="subscribe-btn" @click="handleSubscribeVip">
-                  {{
-                    selectedPaymentMethod === 'alipay'
-                      ? (tradeType === '2' || tradeType === 2 ? '去续费' : '去订阅')
-                      : (tradeType === '2' || tradeType === 2 ? '续费' : '订阅')
-                  }}
-                </button>
-                <label class="agreement-wrap">
-                  <input
-                    type="checkbox"
-                    v-model="agreementChecked"
-                    class="agreement-checkbox" />
-                  <span class="agreement-text">
-                    已阅读同意
-                    <a
-                      href="javascript:;"
-                      class="agreement-link"
-                      @click.stop.prevent="agreementDialogVisible = true">
-                      《会员订阅服务协议》
-                    </a>
-                  </span>
-                </label>
+                <div class="payment-content-module">
+                  <div class="payment-detail">
+                    <div class="detail-row">
+                      <span class="detail-label">类型</span>
+                      <span
+                        class="detail-value">{{ tradeType === '2' || tradeType === 2 ? '续费' : '订阅' }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">版本</span>
+                      <span class="detail-value">精英版</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">预期生效时间</span>
+                      <span class="detail-value">即时生效</span>
+                    </div>
+                    <div class="payment-methods">
+                      <span class="method-item wechat"
+                        :class="{ active: selectedPaymentMethod === 'wechat' }"
+                        @click="selectedPaymentMethod = 'wechat'">
+                        <img src="~@/assets/Payment/wx.svg" alt="微信支付"
+                          class="method-icon" />
+                        微信支付
+                      </span>
+                      <span class="method-item alipay"
+                        :class="{ active: selectedPaymentMethod === 'alipay' }"
+                        @click="selectedPaymentMethod = 'alipay'">
+                        <img src="~@/assets/Payment/zfb.svg" alt="支付宝"
+                          class="method-icon" />
+                        支付宝
+                      </span>
+                    </div>
+                  </div>
+                  <button v-if="selectedPaymentMethod !== 'wechat'"
+                    class="subscribe-btn" @click="handleSubscribeVip">
+                    {{
+                      selectedPaymentMethod === 'alipay'
+                        ? (tradeType === '2' || tradeType === 2 ? '去续费' : '去订阅')
+                        : (tradeType === '2' || tradeType === 2 ? '续费' : '订阅')
+                    }}
+                  </button>
+                  <label class="agreement-wrap">
+                    <input type="checkbox" v-model="agreementChecked"
+                      class="agreement-checkbox" />
+                    <span class="agreement-text">
+                      已阅读同意
+                      <a href="javascript:;" class="agreement-link"
+                        @click.stop.prevent="agreementDialogVisible = true">
+                        《会员订阅服务协议》
+                      </a>
+                    </span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <el-dialog
-    :visible.sync="agreementDialogVisible"
-    width="720px"
-    class="vip-agreement-dialog"
-    append-to-body>
-    <div class="vip-agreement-content">
-      <h3 class="title">会员订阅服务协议</h3>
-      <p>本协议由您与「STH 平台」就精英版会员、专业版会员订阅服务所订立，请您在勾选前仔细阅读并理解各条款。</p>
-      <p>1. 协议主体：当您在页面勾选“同意并支付”并完成支付，即视为您已阅读并同意本协议全部内容。</p>
-      <p>2. 会员类型与订阅周期：平台提供精英版会员、专业版会员两种会员服务，可单独订阅，也可同时订阅。订阅周期以页面展示的包月、包年等方式为准。</p>
-      <p>3. 服务内容：会员开通后，即可在平台内使用相应版本所包含的功能与权益，具体以页面展示为准。</p>
-      <p>4. 付费与退款规则：会员服务属于数字化虚拟商品，自您支付成功且服务开通之时起，不支持退款、转让或变更套餐，法律法规另有规定的除外。</p>
-      <p>5. 有效期：会员有效期自支付成功之日起按所选周期自动计算；同时订阅多个会员版本的，有效期分别独立计算。</p>
-      <p>6. 用户义务：您应保证所填写的账户、身份等信息真实有效，并妥善保管账号与密码，如因您自身原因造成账号被盗、丢失等，由您自行承担责任。</p>
-      <p>7. 平台权利：若您存在违规使用、恶意套利、侵权等行为，平台有权视情节对您的会员资格进行限制、暂停或终止，且不予退款。</p>
-      <p>8. 其他：平台有权根据业务需要对本协议进行调整，更新后的协议将在页面公示，若您继续使用会员服务，即视为接受更新后的协议。</p>
-    </div>
-  </el-dialog>
+    <el-dialog :visible.sync="agreementDialogVisible" width="720px"
+      class="vip-agreement-dialog" append-to-body>
+      <div class="vip-agreement-content">
+        <h3 class="title">会员订阅服务协议</h3>
+        <p>本协议由您与「STH 平台」就精英版会员、专业版会员订阅服务所订立，请您在勾选前仔细阅读并理解各条款。</p>
+        <p>1. 协议主体：当您在页面勾选“同意并支付”并完成支付，即视为您已阅读并同意本协议全部内容。</p>
+        <p>2.
+          会员类型与订阅周期：平台提供精英版会员、专业版会员两种会员服务，可单独订阅，也可同时订阅。订阅周期以页面展示的包月、包年等方式为准。
+        </p>
+        <p>3. 服务内容：会员开通后，即可在平台内使用相应版本所包含的功能与权益，具体以页面展示为准。</p>
+        <p>4.
+          付费与退款规则：会员服务属于数字化虚拟商品，自您支付成功且服务开通之时起，不支持退款、转让或变更套餐，法律法规另有规定的除外。
+        </p>
+        <p>5. 有效期：会员有效期自支付成功之日起按所选周期自动计算；同时订阅多个会员版本的，有效期分别独立计算。</p>
+        <p>6.
+          用户义务：您应保证所填写的账户、身份等信息真实有效，并妥善保管账号与密码，如因您自身原因造成账号被盗、丢失等，由您自行承担责任。
+        </p>
+        <p>7. 平台权利：若您存在违规使用、恶意套利、侵权等行为，平台有权视情节对您的会员资格进行限制、暂停或终止，且不予退款。
+        </p>
+        <p>8.
+          其他：平台有权根据业务需要对本协议进行调整，更新后的协议将在页面公示，若您继续使用会员服务，即视为接受更新后的协议。
+        </p>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -180,8 +190,8 @@ export default {
       agreementChecked: false,
       agreementDialogVisible: false,
       plans: [
-        { type: "monthly", label: "月卡", price: 50, subscribeType: 1 },
-        { type: "yearly", label: "年卡", price: 365, subscribeType: 3 },
+        { type: "monthly", label: "月卡", price: 50, subscribeType: 1, originalPrice: 60 },
+        { type: "yearly", label: "年卡", price: 365, subscribeType: 3, originalPrice: 548 },
       ],
       payOrderLoading: false,
       payCodeUrl: "",
@@ -616,6 +626,12 @@ export default {
           }
         }
 
+        .card-original {
+          font-size: 12px;
+          color: #999;
+          text-decoration: line-through;
+        }
+
         .card-type {
           font-size: 13px;
           color: #2a2a2a;
@@ -850,6 +866,7 @@ export default {
   max-height: 520px;
   overflow-y: auto;
 }
+
 .vip-agreement-content {
   font-size: 14px;
   line-height: 1.6;

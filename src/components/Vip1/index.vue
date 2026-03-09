@@ -53,7 +53,7 @@
                   <div class="card-type">{{ plan.label }}</div>
                   <div class="card-price-wrap">
                     <span class="card-price">¥<em>{{ plan.price }}</em></span>
-                    <!-- <div class="card-original">原价 ¥75</div> -->
+                    <div class="card-original">原价 {{ plan.originalPrice }}</div>
                   </div>
                   <!-- <div class="card-discount-bar">促销折扣文案</div> -->
                 </div>
@@ -183,8 +183,8 @@ export default {
       agreementChecked: false,
       agreementDialogVisible: false,
       plans: [
-        { type: "monthly", label: "月卡", price: 80, subscribeType: 1 },
-        { type: "yearly", label: "年卡", price: 648, subscribeType: 3 },
+        { type: "monthly", label: "月卡", price: 80, subscribeType: 1, originalPrice: 118 },
+        { type: "yearly", label: "年卡", price: 648, subscribeType: 3, originalPrice: 1136 },
       ],
       payOrderLoading: false,
       payCodeUrl: "",
