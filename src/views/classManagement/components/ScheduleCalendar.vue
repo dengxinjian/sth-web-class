@@ -700,32 +700,21 @@ export default {
 }
 
 .schedule-table-body {
-  /* 右侧统计/侧边栏存在时预留空间，小屏下自动收缩 */
-  width: calc(100vw - 560px);
+  /* 由父级 flex 布局决定可用宽度，避免与收起侧栏冲突 */
+  width: 100%;
   flex: 1;
   display: flex;
   flex-direction: row;
   overflow: auto;
   min-width: 0;
 
-  @media (max-width: 1440px) {
-    width: calc(100vw - 500px);
-  }
-
-  @media (max-width: 1366px) {
-    width: calc(100vw - 460px);
-  }
-
-  @media (max-width: 1280px) {
-    width: calc(100vw - 420px);
-  }
-
   .schedule-table-cell {
-    flex: 1;
+    /* 作为 flex 子项平均分配宽度，收起侧栏后可自动撑满 */
+    flex: 1 0 0;
     display: flex;
     flex-direction: column;
     min-width: 168px; /* 默认 */
-    max-width: 194px;
+    max-width: none;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
