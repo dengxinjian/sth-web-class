@@ -113,8 +113,8 @@ import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue"
 import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue"
 import SharePlan from "./components/SharePlan/index.vue"
 import PermissionAdjust from "./components/SharePlanPersion/index.vue"
-import Vip1 from "./components/vip1.vue"
-import Vip2 from "./components/vip2.vue"
+import Vip1 from "@/components/Vip1"
+import Vip2 from "@/components/Vip2"
 // 服务和工具导入
 import { planApi, groupApi } from "./services/planManagement"
 import { getData } from "@/api/common"
@@ -185,7 +185,7 @@ export default {
       showSharePlan: false,
       showMovePlan: false,
       showSharePlanPersion: false,
-      showVip1: true,
+      showVip1: false,
       showVip2: false,
       currentPlanId: "",
       currentPlanGroupId: "",

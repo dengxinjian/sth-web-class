@@ -76,51 +76,7 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-    </div>
-    <div class="vip-dialog-mask" v-if="vipDialogVisible">
-      <div class="mask-container">
-        <div class="container-top-box">
-          <div class="container-top-box-title">订阅</div>
-          <img src="~@/assets/plan/close.png" alt=""
-            class="close-icon" @click="vipDialogVisible = false" />
-        </div>
-        <div class="container-content">
-          <div class="container-content-title-box">
-            <div class="container-content-title">
-              <img src="~@/assets/vip/per_title.png" alt=""
-                class="container-content-title-img" />
-              <img src="~@/assets/vip/jiao.png" alt=""
-                class="container-content-title-bg" />
-            </div>
-          </div>
-          <div class="content-box">
-            <div class="content-box-title">权益说明</div>
-            <div class="content-box-list">
-              <div class="list-item" v-for="item in vipInfoList"
-                :key="item.label">
-                <img :src="item.img" alt="" />
-                <div class="list-item-content">
-                  <!-- <div class="list-item-title">{{ item.title }}</div> -->
-                  <div class="list-item-sub-title">{{ item.subTitle }}
-                  </div>
-                  <div class="list-item-content-item"
-                    v-for="child in item.children" :key="child.idx">
-                    <div class="list-item-content-icon-box">
-                      <span class="list-item-content-icon"></span>
-                    </div>
-                    <span class="list-item-content-text">{{
-                      child.label
-                    }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="content-box-btn" @click="handleSubscribeVip">
-              立即预约，免费试用
-            </div>
-          </div>
-        </div>
-      </div>
+      <vip1 :visible.sync="vipDialogVisible" />
     </div>
   </div>
 </template>
@@ -129,12 +85,14 @@
 import { mapGetters, mapState, mapMutations } from "vuex"
 import Breadcrumb from "@/components/Breadcrumb"
 import { getData, submitData } from "@/api/common"
+import vip1 from "@/components/Vip1";
 
 export default {
   name: "TopNavbar",
   inject: ["reload"],
   components: {
     Breadcrumb,
+    vip1
   },
   data() {
     return {
@@ -404,24 +362,41 @@ export default {
     },
     async getSubscribeInfo() {
       const _this = this
-      getData({
-        url: "/consumer/api/vipSubscribe/getSubscribeRecords",
-        triUserId: this.triUserId,
-        identityType: "C",
-      }).then((res) => {
-        if (res.success) {
-          if (res.result.length === 0) {
-            _this.vipDialogVisible = true
-          } else {
-            const result = res.result[0]
-            if (result.subscribeType === 1) {
-              _this.resetPageData()
-            } else {
-              _this.vipDialogVisible = true
-            }
-          }
+      try {
+        const res = await getData({
+          url: "consumer/api/vipSubscribe/getUserSubscribeInfo",
+          identityType: "C",
+        })
+        if (!res || !res.success) {
+          _this.vipDialogVisible = true
+          return
         }
-      })
+        const result = res.result
+        let proInfo = null
+        if (Array.isArray(result)) {
+          proInfo = result.find((it) => it?.identityType === "C") || null
+        } else if (result && (result.identityType === "R" || result.identityType === "C")) {
+          proInfo = result.identityType === "C" ? result : null
+        }
+        const subscribeType = proInfo?.subscribeType
+        const expireTime = proInfo?.expireTime
+        const hasSubscribe = subscribeType != null && !!expireTime
+        const isExpired = (exp) => {
+          if (!exp) return false
+          const d = typeof exp === "number"
+            ? new Date(exp < 1e12 ? exp * 1000 : exp)
+            : new Date(String(exp).replace(/-/g, "/"))
+          return !Number.isNaN(d.getTime()) && d.getTime() < Date.now()
+        }
+        const expired = hasSubscribe ? isExpired(expireTime) : false
+        if (!hasSubscribe || expired) {
+          _this.vipDialogVisible = true
+        } else {
+          _this.resetPageData()
+        }
+      } catch (e) {
+        _this.vipDialogVisible = true
+      }
     },
     async changeIdentify() {
       const _this = this

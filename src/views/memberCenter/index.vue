@@ -1,6 +1,15 @@
 <template>
   <div class="member-center-page">
-    <LegacyDialog v-if="useLegacyDialog" />
+    <Vip1 :visible.sync="showVip1" :tradeType="vip1TradeType" />
+    <Vip2 :visible.sync="showVip2" :tradeType="vip2TradeType" />
+    <RenewManageDialog
+      :visible.sync="showRenewManage"
+      :identityType="renewIdentityType" />
+    <SeatPurchaseDialog
+      :visible.sync="showSeatPurchase"
+      :coachTotal="seatsView.coachTotal"
+      :athleteTotal="seatsView.athleteTotal"
+      @success="fetchSubscribeInfo" />
     <div class="member-center-container" v-loading="loading">
       <div class="page-toolbar">
         <el-button class="back-btn" size="small"
@@ -20,7 +29,7 @@
           </div>
           <div class="meta-row" v-if="eliteView.showRenewManage">
             <span class="meta-label">续费管理：</span>
-            <a class="meta-link" href="#" @click.prevent>去管理</a>
+            <a class="meta-link" href="#" @click.prevent="openRenewManage('R')">去管理</a>
           </div>
           <div class="meta-row">
             <span class="meta-label">{{ eliteView.timeLabel }}：</span>
@@ -40,7 +49,8 @@
         </div>
 
         <div class="block-actions">
-          <el-button type="primary" size="small">{{
+          <el-button type="primary" size="small"
+            @click="openEliteDialog(eliteView.actionLabel === '续费' ? '2' : '')">{{
             eliteView.actionLabel
           }}</el-button>
           <el-button type="text" size="small"
@@ -61,7 +71,7 @@
           </div>
           <div class="meta-row" v-if="proView.showRenewManage">
             <span class="meta-label">续费管理：</span>
-            <a class="meta-link" href="#" @click.prevent>去管理</a>
+            <a class="meta-link" href="#" @click.prevent="openRenewManage('C')">去管理</a>
           </div>
           <div class="meta-row">
             <span class="meta-label">{{ proView.timeLabel }}：</span>
@@ -100,10 +110,12 @@
         </div>
 
         <div class="block-actions">
-          <el-button type="primary" size="small">{{
+          <el-button type="primary" size="small"
+            @click="openProDialog(proView.actionLabel === '续费' ? '2' : '')">{{
             proView.actionLabel
           }}</el-button>
-          <el-button v-if="showSeatBox" size="small" type="primary">购买席位</el-button>
+          <el-button v-if="showSeatBox" size="small" type="primary"
+            @click="showSeatPurchase = true">购买席位</el-button>
           <el-button type="text" size="small"
             class="muted-btn">激活码兑换</el-button>
         </div>
@@ -113,20 +125,28 @@
 </template>
 
 <script>
-import LegacyDialog from "./legacy-dialog.vue"
+import Vip1 from "@/components/Vip1"
+import Vip2 from "@/components/Vip2"
+import RenewManageDialog from "@/components/RenewManageDialog"
+import SeatPurchaseDialog from "@/components/SeatPurchaseDialog"
 import { getData } from "@/api/common"
 
 export default {
   name: "MemberCenter",
-  components: { LegacyDialog },
+  components: { Vip1, Vip2, RenewManageDialog, SeatPurchaseDialog },
   data() {
     return {
-      // 旧版本“弹窗式会员中心”保留开关（默认关闭，不影响当前 UI）
-      useLegacyDialog: false,
       loading: false,
       identityType: localStorage.getItem("webIdentityType") || "",
       subscribeInfoMap: { R: null, C: null },
       subscribeInfo: null,
+      showVip1: false,
+      showVip2: false,
+      showRenewManage: false,
+      renewIdentityType: "C",
+      showSeatPurchase: false,
+      vip1TradeType: "",
+      vip2TradeType: "",
       elitePlan: {
         subscribeText: "年卡",
         expireDate: "2026-10-01",
@@ -189,10 +209,30 @@ export default {
       return this.identityType === "C" || hasAnySeat
     },
   },
+  watch: {
+    showVip1(val) {
+      if (!val) this.fetchSubscribeInfo()
+    },
+    showVip2(val) {
+      if (!val) this.fetchSubscribeInfo()
+    },
+  },
   mounted() {
     this.fetchSubscribeInfo()
   },
   methods: {
+    openEliteDialog(tradeType) {
+      this.vip2TradeType = tradeType || ""
+      this.showVip2 = true
+    },
+    openProDialog(tradeType) {
+      this.vip1TradeType = tradeType || ""
+      this.showVip1 = true
+    },
+    openRenewManage(identityType) {
+      this.renewIdentityType = identityType || "C"
+      this.showRenewManage = true
+    },
     async fetchSubscribeInfo() {
       this.loading = true
       try {
@@ -241,7 +281,10 @@ export default {
       const y = d.getFullYear()
       const m = String(d.getMonth() + 1).padStart(2, "0")
       const day = String(d.getDate()).padStart(2, "0")
-      return `${y}-${m}-${day}`
+      const h = String(d.getHours()).padStart(2, "0")
+      const min = String(d.getMinutes()).padStart(2, "0")
+      const s = String(d.getSeconds()).padStart(2, "0")
+      return `${y}-${m}-${day} ${h}:${min}:${s}`
     },
     getRecordTime(record) {
       const r = record || {}
@@ -296,9 +339,14 @@ export default {
       return { subscribeText, actionLabel, showRenewManage, timeLabel, timeValue }
     },
     handleBack() {
-      // 优先返回上一页；若没有上一页则回到课程页
+      // 仅当上一页是本站页面时才 history.back，避免从支付宝等外部页面返回
       try {
-        if (window.history.length > 1) {
+        const ref = document.referrer || ""
+        const sameOrigin =
+          ref &&
+          ref.indexOf(window.location.origin) === 0
+
+        if (window.history.length > 1 && sameOrigin) {
           this.$router.back()
           return
         }
@@ -307,7 +355,7 @@ export default {
       }
       const pushResult = this.$router.push("/timeTable/class")
       if (pushResult && typeof pushResult.catch === "function") {
-        pushResult.catch(() => { })
+        pushResult.catch(() => {})
       }
     },
   },

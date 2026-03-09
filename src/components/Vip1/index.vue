@@ -90,7 +90,7 @@
                   </div>
                   <div class="detail-row">
                     <span class="detail-label">版本</span>
-                    <span class="detail-value">教练版</span>
+                    <span class="detail-value">专业版</span>
                   </div>
                   <div class="detail-row">
                     <span class="detail-label">预期生效时间</span>
@@ -123,13 +123,18 @@
                   }}
                 </button>
                 <label class="agreement-wrap">
-                  <input type="checkbox" v-model="agreementChecked"
+                  <input
+                    type="checkbox"
+                    v-model="agreementChecked"
                     class="agreement-checkbox" />
                   <span class="agreement-text">
                     已阅读同意
-                    <a href="#" class="agreement-link">《服务协议》</a>
-                    和
-                    <a href="#" class="agreement-link">《自动续费服务协议》</a>
+                    <a
+                      href="javascript:;"
+                      class="agreement-link"
+                      @click.stop.prevent="agreementDialogVisible = true">
+                      《会员订阅服务协议》
+                    </a>
                   </span>
                 </label>
               </div>
@@ -138,6 +143,24 @@
         </div>
       </div>
     </div>
+    <el-dialog
+    :visible.sync="agreementDialogVisible"
+    width="720px"
+    class="vip-agreement-dialog"
+    append-to-body>
+    <div class="vip-agreement-content">
+      <h3 class="title">会员订阅服务协议</h3>
+      <p>本协议由您与「STH 平台」就精英版会员、专业版会员订阅服务所订立，请您在勾选前仔细阅读并理解各条款。</p>
+      <p>1. 协议主体：当您在页面勾选“同意并支付”并完成支付，即视为您已阅读并同意本协议全部内容。</p>
+      <p>2. 会员类型与订阅周期：平台提供精英版会员、专业版会员两种会员服务，可单独订阅，也可同时订阅。订阅周期以页面展示的包月、包年等方式为准。</p>
+      <p>3. 服务内容：会员开通后，即可在平台内使用相应版本所包含的功能与权益，具体以页面展示为准。</p>
+      <p>4. 付费与退款规则：会员服务属于数字化虚拟商品，自您支付成功且服务开通之时起，不支持退款、转让或变更套餐，法律法规另有规定的除外。</p>
+      <p>5. 有效期：会员有效期自支付成功之日起按所选周期自动计算；同时订阅多个会员版本的，有效期分别独立计算。</p>
+      <p>6. 用户义务：您应保证所填写的账户、身份等信息真实有效，并妥善保管账号与密码，如因您自身原因造成账号被盗、丢失等，由您自行承担责任。</p>
+      <p>7. 平台权利：若您存在违规使用、恶意套利、侵权等行为，平台有权视情节对您的会员资格进行限制、暂停或终止，且不予退款。</p>
+      <p>8. 其他：平台有权根据业务需要对本协议进行调整，更新后的协议将在页面公示，若您继续使用会员服务，即视为接受更新后的协议。</p>
+    </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -158,6 +181,7 @@ export default {
       selectedPlanType: "monthly", // monthly | yearly
       selectedPaymentMethod: "wechat", // wechat | alipay
       agreementChecked: false,
+      agreementDialogVisible: false,
       plans: [
         { type: "monthly", label: "月卡", price: 80, subscribeType: 1 },
         { type: "yearly", label: "年卡", price: 648, subscribeType: 3 },
@@ -388,8 +412,8 @@ export default {
             tradeType: Number(this.tradeType) || 1,
             identityType: "C",
             subscribeType,
-            coachSeat: 5,
-            athleteSeat: 15,
+            coachSeat: 0,
+            athleteSeat: 0,
             orderAmount,
           },
         })
@@ -423,7 +447,7 @@ export default {
     },
     async handleSubscribeVip() {
       if (!this.agreementChecked) {
-        this.$message.warning("请先阅读并同意《服务协议》和《自动续费服务协议》")
+        this.$message.warning("请先阅读并同意《会员订阅服务协议》")
         return
       }
       if (this.selectedPaymentMethod === "alipay") {
@@ -829,28 +853,37 @@ export default {
           .method-item {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             font-size: 14px;
-            color: #666;
+            font-weight: 600;
+            color: #333;
             line-height: 1.5;
-            padding: 5px 10px;
-            border: 1px solid #00000026;
+            padding: 10px 16px;
+            border: 2px solid #e8e8e8;
             border-radius: 8px;
             background: #ffffff;
             cursor: pointer;
             transition: border-color 0.2s, box-shadow 0.2s, color 0.2s;
+            min-width: 120px;
+            white-space: nowrap;
 
-            &.active {
-              font-weight: 500;
-              border-color: #b81300;
-              box-shadow: 0 0 0 1px #b81300;
+            &:hover:not(.active) {
+              border-color: #c0c4cc;
+              background: #f7f8fa;
             }
 
-            &.wechat.active {
-              color: #07c160;
+            &.active.wechat {
+              border-color: #07c160;
+              background: #e8f8f0;
+              color: #0a6e42;
+              box-shadow: 0 0 0 1px rgba(7, 193, 96, 0.2);
             }
 
-            &.alipay.active {
-              color: #1677ff;
+            &.active.alipay {
+              border-color: #1677ff;
+              background: #eef4ff;
+              color: #0b3f9b;
+              box-shadow: 0 0 0 1px rgba(22, 119, 255, 0.18);
             }
 
             .method-icon {
@@ -929,6 +962,26 @@ export default {
         margin-bottom: 0;
       }
     }
+  }
+}
+
+.vip-agreement-dialog ::v-deep(.el-dialog__body) {
+  max-height: 520px;
+  overflow-y: auto;
+}
+.vip-agreement-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-bottom: 8px;
   }
 }
 </style>
