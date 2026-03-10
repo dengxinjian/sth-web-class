@@ -13,7 +13,7 @@
         <div class="container-content">
           <div class="container-content-title-box">
             <div class="container-content-title">
-              <img src="~@/assets/vip/per_title1.png" alt=""
+              <img src="~@/assets/vip/per_title1.svg" alt=""
                 class="container-content-title-img" />
               <img src="~@/assets/vip/jiao.png" alt=""
                 class="container-content-title-bg" />
@@ -343,6 +343,7 @@ export default {
             coachSeat: 0,
             athleteSeat: 0,
             orderAmount,
+            clientType: 2,
           },
         })
         if (res && res.success && res.result) {
@@ -384,6 +385,7 @@ export default {
             coachSeat: 0,
             athleteSeat: 0,
             orderAmount,
+            clientType: 2,
           },
         })
 

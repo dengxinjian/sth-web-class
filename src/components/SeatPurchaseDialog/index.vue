@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="vip-dialog-mask seat-purchase-mask" v-if="innerVisible">
+    <div class="vip-dialog-mask seat-purchase-mask"
+      v-if="innerVisible">
       <div class="mask-container mask-container--pro">
         <div class="container-top-box">
           <div class="container-top-box-title">购买席位</div>
@@ -25,7 +26,8 @@
                     </div>
                     <div class="seat-line">
                       <span class="seat-label">运动员席位：</span>
-                      <span class="seat-num">{{ currentAthlete }}</span>
+                      <span
+                        class="seat-num">{{ currentAthlete }}</span>
                     </div>
                   </div>
                 </div>
@@ -147,7 +149,8 @@
                 </div>
 
                 <div class="qr-amount-row">
-                  <div class="payment-qr-module payment-qr-module--compact">
+                  <div
+                    class="payment-qr-module payment-qr-module--compact">
                     <div class="payment-qr-placeholder">
                       <template v-if="payOrderLoading">
                         <span class="qr-hint">正在生成订单...</span>
@@ -169,28 +172,24 @@
                   </div>
                   <div class="amount-inline">
                     <span class="amount-label">订单金额</span>
-                    <span class="amount-value">¥{{ totalAmount }}</span>
+                    <span class="amount-value">¥{{ totalAmount
+                    }}</span>
                   </div>
                 </div>
 
                 <!-- 微信支付：不显示按钮，勾选协议后自动出码扫码支付；支付宝：显示按钮跳转支付 -->
-                <button
-                  v-if="selectedPaymentMethod !== 'wechat'"
+                <button v-if="selectedPaymentMethod !== 'wechat'"
                   class="subscribe-btn pay-btn"
                   :disabled="totalAmount <= 0"
                   @click="handlePay">
                   支付
                 </button>
                 <label class="agreement-wrap agreement-wrap--right">
-                  <input
-                    v-model="agreementChecked"
-                    type="checkbox"
+                  <input v-model="agreementChecked" type="checkbox"
                     class="agreement-checkbox" />
                   <span class="agreement-text">
                     已阅读同意
-                    <a
-                      href="javascript:;"
-                      class="agreement-link"
+                    <a href="javascript:;" class="agreement-link"
                       @click.stop.prevent="agreementDialogVisible = true">
                       《服务协议》
                     </a>
@@ -202,22 +201,28 @@
         </div>
       </div>
     </div>
-    <el-dialog
-      :visible.sync="agreementDialogVisible"
-      width="720px"
-      class="vip-agreement-dialog"
-      append-to-body>
+    <el-dialog :visible.sync="agreementDialogVisible" width="720px"
+      class="vip-agreement-dialog" append-to-body>
       <div class="vip-agreement-content">
         <h3 class="title">会员订阅服务协议</h3>
         <p>本协议由您与「STH 平台」就精英版会员、专业版会员订阅服务所订立，请您在勾选前仔细阅读并理解各条款。</p>
         <p>1. 协议主体：当您在页面勾选“同意并支付”并完成支付，即视为您已阅读并同意本协议全部内容。</p>
-        <p>2. 会员类型与订阅周期：平台提供精英版会员、专业版会员两种会员服务，可单独订阅，也可同时订阅。订阅周期以页面展示的包月、包年等方式为准。</p>
+        <p>2.
+          会员类型与订阅周期：平台提供精英版会员、专业版会员两种会员服务，可单独订阅，也可同时订阅。订阅周期以页面展示的包月、包年等方式为准。
+        </p>
         <p>3. 服务内容：会员开通后，即可在平台内使用相应版本所包含的功能与权益，具体以页面展示为准。</p>
-        <p>4. 付费与退款规则：会员服务属于数字化虚拟商品，自您支付成功且服务开通之时起，不支持退款、转让或变更套餐，法律法规另有规定的除外。</p>
+        <p>4.
+          付费与退款规则：会员服务属于数字化虚拟商品，自您支付成功且服务开通之时起，不支持退款、转让或变更套餐，法律法规另有规定的除外。
+        </p>
         <p>5. 有效期：会员有效期自支付成功之日起按所选周期自动计算；同时订阅多个会员版本的，有效期分别独立计算。</p>
-        <p>6. 用户义务：您应保证所填写的账户、身份等信息真实有效，并妥善保管账号与密码，如因您自身原因造成账号被盗、丢失等，由您自行承担责任。</p>
-        <p>7. 平台权利：若您存在违规使用、恶意套利、侵权等行为，平台有权视情节对您的会员资格进行限制、暂停或终止，且不予退款。</p>
-        <p>8. 其他：平台有权根据业务需要对本协议进行调整，更新后的协议将在页面公示，若您继续使用会员服务，即视为接受更新后的协议。</p>
+        <p>6.
+          用户义务：您应保证所填写的账户、身份等信息真实有效，并妥善保管账号与密码，如因您自身原因造成账号被盗、丢失等，由您自行承担责任。
+        </p>
+        <p>7. 平台权利：若您存在违规使用、恶意套利、侵权等行为，平台有权视情节对您的会员资格进行限制、暂停或终止，且不予退款。
+        </p>
+        <p>8.
+          其他：平台有权根据业务需要对本协议进行调整，更新后的协议将在页面公示，若您继续使用会员服务，即视为接受更新后的协议。
+        </p>
       </div>
     </el-dialog>
   </div>
@@ -422,6 +427,7 @@ export default {
             coachSeat: Number(this.purchaseCoach) || 0,
             athleteSeat: Number(this.purchaseAthlete) || 0,
             orderAmount: this.orderAmountCents,
+            clientType: 2,
           },
         })
         if (res && res.success && res.result) {
@@ -450,6 +456,7 @@ export default {
       this.payOrderLoading = true
       this.payCodeUrl = ""
       this.outTradeNo = ""
+      console.log(location.href)
       try {
         const returnUrl = location.href
         const res = await submitData({
@@ -466,12 +473,14 @@ export default {
             coachSeat: Number(this.purchaseCoach) || 0,
             athleteSeat: Number(this.purchaseAthlete) || 0,
             orderAmount: this.orderAmountCents,
+            clientType: 2,
           },
         })
         if (!res || !res.success) {
           this.$message.error(res?.message || "创建支付宝订单失败")
           return
         }
+        console.log(res)
         const result = res.result || {}
         const pageUrl =
           (typeof result === "string" ? result : "") ||
@@ -600,6 +609,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
     background: linear-gradient(135deg, #fff5f4 0%, #ffebea 100%);
     border: 1px solid rgba(184, 19, 0, 0.12);
     color: $primary-red;
+
     .seat-num {
       font-weight: 700;
       font-size: 15px;
@@ -612,6 +622,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -623,10 +634,12 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   align-items: center;
   margin-bottom: 10px;
   font-size: 14px;
+
   .seat-label {
     color: $text-primary;
     font-weight: 500;
   }
+
   .seat-price {
     color: $primary-red;
     font-weight: 700;
@@ -640,6 +653,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   border-radius: $radius-sm;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+
   .stepper-btn {
     width: 40px;
     height: 40px;
@@ -651,31 +665,37 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
     line-height: 1;
     color: $text-secondary;
     transition: all 0.2s ease;
+
     &:first-child {
       border-right: none;
       border-radius: $radius-sm 0 0 $radius-sm;
     }
+
     &:last-child {
       border-left: none;
       border-radius: 0 $radius-sm $radius-sm 0;
       color: $primary-red;
       font-weight: 500;
+
       &:hover:not(:disabled) {
         background: $primary-red-light;
         color: $primary-red;
         border-color: rgba(184, 19, 0, 0.25);
       }
     }
+
     &:hover:not(:disabled):first-child {
       background: #f7f8fa;
       color: $text-primary;
     }
+
     &:disabled {
       cursor: not-allowed;
       color: #c0c4cc;
       background: #f5f7fa;
     }
   }
+
   .stepper-input {
     width: 52px;
     height: 40px;
@@ -688,11 +708,13 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
     color: $text-primary;
     outline: none;
     transition: border-color 0.2s ease;
+
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
+
     &:focus {
       border-color: rgba(184, 19, 0, 0.4);
     }
@@ -721,6 +743,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
     line-height: 1.5;
     text-align: center;
   }
+
   .payment-qr-img {
     width: 150px;
     height: 150px;
@@ -770,6 +793,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   display: flex;
   gap: 12px;
 }
+
 .payment-methods--row .method-item {
   display: inline-flex;
   align-items: center;
@@ -785,23 +809,27 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   transition: all 0.2s ease;
   min-width: 108px;
   white-space: nowrap;
+
   .method-icon {
     width: 26px;
     height: 26px;
     flex: 0 0 auto;
   }
+
   &.active.wechat {
     border-color: $wechat-green;
     background: $wechat-green-bg;
     color: #0a6e42;
     box-shadow: 0 0 0 1px rgba(7, 193, 96, 0.2);
   }
+
   &.active.alipay {
     border-color: #1677ff;
     background: #eef4ff;
     color: #0b3f9b;
     box-shadow: 0 0 0 1px rgba(22, 119, 255, 0.18);
   }
+
   &:hover:not(.active) {
     border-color: #c0c4cc;
     background: #f7f8fa;
@@ -819,6 +847,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   width: 200px;
   height: 200px;
 }
+
 .payment-qr-module--compact .payment-qr-img {
   width: 200px;
   height: 200px;
@@ -833,10 +862,12 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   justify-content: flex-start;
   padding: 0;
 }
+
 .amount-label {
   color: $text-secondary;
   font-size: 13px;
 }
+
 .amount-value {
   color: $primary-red;
   font-size: 32px;
@@ -858,13 +889,16 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   box-shadow: $shadow-btn;
   transition: transform 0.15s ease, box-shadow 0.2s ease;
   letter-spacing: 0.05em;
+
   &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(184, 19, 0, 0.4);
   }
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
+
   &:disabled {
     background: #c0c4cc;
     cursor: not-allowed;
@@ -879,16 +913,20 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   margin-top: 14px;
   font-size: 12px;
   color: $text-secondary;
+
   .agreement-checkbox {
     margin-top: 3px;
     cursor: pointer;
   }
+
   .agreement-text {
     line-height: 1.5;
   }
+
   .agreement-link {
     color: #409eff;
     text-decoration: none;
+
     &:hover {
       text-decoration: underline;
     }
@@ -906,18 +944,21 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
+
   .container-top-box-title {
     font-size: 18px;
     font-weight: 700;
     color: #1a1a1a;
     letter-spacing: 0.03em;
   }
+
   .close-icon {
     width: 24px;
     height: 24px;
     cursor: pointer;
     opacity: 0.75;
     transition: opacity 0.2s ease;
+
     &:hover {
       opacity: 1;
     }
@@ -929,7 +970,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   min-height: 360px;
   background: #fff;
   border-radius: 12px 12px 15px 15px;
-  padding: 20px 28px 28px;
+  padding: 0px 28px 28px;
   box-sizing: border-box;
 }
 
@@ -941,6 +982,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+
   .mask-container {
     width: 880px;
     min-height: 460px;
@@ -957,15 +999,18 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   max-height: 520px;
   overflow-y: auto;
 }
+
 .vip-agreement-content {
   font-size: 14px;
   line-height: 1.6;
   color: #333;
+
   .title {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 12px;
   }
+
   p {
     margin-bottom: 8px;
   }
