@@ -6,11 +6,14 @@
       <div class="content-container"
         v-if="activeName === 'athletic' || activeName === 'class'">
         <!-- 中间内容区 -->
-        <div class="type-change" :class="{ 'is-collapsed': leftPanelCollapsed }">
-          <div class="panel-collapse-handle panel-collapse-handle--left"
+        <div class="type-change"
+          :class="{ 'is-collapsed': leftPanelCollapsed }">
+          <div
+            class="panel-collapse-handle panel-collapse-handle--left"
             :title="leftPanelCollapsed ? '展开左侧栏' : '收起左侧栏'"
             @click="toggleLeftPanel">
-            <i :class="leftPanelCollapsed ? 'el-icon-arrow-right' : 'el-icon-arrow-left'"></i>
+            <i
+              :class="leftPanelCollapsed ? 'el-icon-arrow-right' : 'el-icon-arrow-left'"></i>
           </div>
           <!-- 运动员管理 -->
           <div v-show="activeName === 'athletic'">
@@ -238,10 +241,12 @@
             <!-- 右侧统计面板 -->
             <div class="right-stat-wrapper"
               :class="{ 'is-collapsed': rightPanelCollapsed }">
-              <div class="panel-collapse-handle panel-collapse-handle--right"
+              <div
+                class="panel-collapse-handle panel-collapse-handle--right"
                 :title="rightPanelCollapsed ? '展开统计栏' : '收起统计栏'"
                 @click="toggleRightPanel">
-                <i :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
+                <i
+                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
               </div>
               <StatisticsPanel v-if="!rightPanelCollapsed"
                 :sth-data="sthData"
@@ -254,24 +259,17 @@
       </div>
       <div class="content-container"
         v-if="activeName === 'plan'">
-        <!-- 左侧：计划列表，支持收起 -->
-        <div class="type-change" :class="{ 'is-collapsed': leftPanelCollapsed }">
-          <div class="panel-collapse-handle panel-collapse-handle--left"
-            :title="leftPanelCollapsed ? '展开左侧栏' : '收起左侧栏'"
-            @click="toggleLeftPanel">
-            <i :class="leftPanelCollapsed ? 'el-icon-arrow-right' : 'el-icon-arrow-left'"></i>
-          </div>
-          <PlanView :isPlan.sync="isPlan"
-            @choose-plan="handleChoosePlan"
-            :selected-team="selectedTeam" />
-        </div>
-
         <!-- 中间：日程表 + 右侧统计 -->
         <div class="schedule-center-wrapper">
           <!-- 这里计划视图不需要第二个顶部工具栏，直接复用上方全局头部 -->
           <div class="schedule-main-row">
             <!-- 日程表 -->
-            <ScheduleCalendar v-if="!isPlan" :current-week="currentWeek"
+
+            <PlanView :isPlan.sync="isPlan"
+              @choose-plan="handleChoosePlan"
+              :selected-team="selectedTeam" />
+              <ScheduleCalendar v-if="!isPlan"
+              :current-week="currentWeek"
               :team-list="teamList" :athletic-list="athleticList"
               :selected-team="selectedTeam"
               :selected-athletic="selectedAthletic"
@@ -289,7 +287,8 @@
               @device-click="handleDeviceClick"
               @edit-schedule="handleEditClassSchedule"
               @edit-activity="handleEditActivity"
-              @paste-class="handlePasteClass" @cut-class="handleCutClass"
+              @paste-class="handlePasteClass"
+              @cut-class="handleCutClass"
               @paste-event="handlePasteEvent"
               @cut-event="handleCutEvent"
               @view-health-data="handleViewHealthData"
@@ -301,16 +300,19 @@
               @delete-all-schedules="handleDeleteAllSchedules" />
 
             <!-- 右侧统计面板（同样支持收起） -->
-            <div class="right-stat-wrapper"
+            <div class="right-stat-wrapper" v-if="!isPlan"
               :class="{ 'is-collapsed': rightPanelCollapsed }">
-              <div class="panel-collapse-handle panel-collapse-handle--right"
+              <div
+                class="panel-collapse-handle panel-collapse-handle--right"
                 :title="rightPanelCollapsed ? '展开统计栏' : '收起统计栏'"
                 @click="toggleRightPanel">
-                <i :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
+                <i
+                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
               </div>
               <StatisticsPanel v-if="!isPlan && !rightPanelCollapsed"
                 :sth-data="sthData"
-                :statistic-data="statisticData" :device-list="deviceList"
+                :statistic-data="statisticData"
+                :device-list="deviceList"
                 @device-change="handleDeviceChange" />
             </div>
           </div>
@@ -3738,6 +3740,7 @@ export default {
     overflow: visible;
     border-left: none;
     border-right: none;
+
     /* 收起时隐藏内部内容，仅保留把手 */
     > :not(.panel-collapse-handle) {
       opacity: 0;
@@ -3795,6 +3798,7 @@ export default {
     width: 0;
     overflow: visible;
     border-left: none;
+
     /* 收起时隐藏内部内容，仅保留把手 */
     > :not(.panel-collapse-handle) {
       opacity: 0;
