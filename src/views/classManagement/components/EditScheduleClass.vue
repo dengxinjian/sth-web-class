@@ -1640,17 +1640,24 @@ export default {
       if (this.$refs.titleRef && this.classData.classesJson?.title) {
         try {
           await this.$refs.titleRef.validate()
-          // 同步 form.title 到 classData.classesJson.title
+          // 确保存在 classesJson 对象
           if (!this.classData.classesJson) {
             this.$set(this.classData, "classesJson", {})
           }
-          const links = this.classData.classesJson?.links.filter(item => item.url !== "")
-          this.$set({
+          // 安全处理 links 列表，过滤掉空链接
+          const rawLinks = Array.isArray(this.classData.classesJson.links)
+            ? this.classData.classesJson.links
+            : []
+          const links = rawLinks.filter((item) => item && item.url !== "")
+          // 合并生成新的 classesJson，并一次性写回，保持响应式
+          const nextClassesJson = {
             ...this.classData.classesJson,
-            links: links,
+            links,
             title: this.form.title,
-          }, "title", this.form.title)
+          }
+          this.$set(this.classData, "classesJson", nextClassesJson)
         } catch (error) {
+          console.log(error, "error")
           // 验证失败，不继续保存
           return
         }
@@ -1665,14 +1672,17 @@ export default {
         this.classData.activityId &&
         !this.classData.classScheduleId
       ) {
+        console.log("saveActivitySchedule")
         this.saveActivitySchedule(flag)
       } else if (
         this.isActivity &&
         !this.classData.activityId &&
         !this.classData.classScheduleId
       ) {
+        console.log("saveActivityScheduleForManual")
         this.saveActivityScheduleForManual(flag)
       } else {
+        console.log("saveClassSchedule")
         this.saveClassSchedule(flag)
       }
     },

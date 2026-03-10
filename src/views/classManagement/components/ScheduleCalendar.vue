@@ -89,11 +89,11 @@
             <div
               :class="item.commonDate === today ? 'schedule-table-cell-title-cur' : 'schedule-table-cell-title'"
               @contextmenu.stop.prevent="showDateTitleContextMenu($event, item.commonDate)">
-              <div>{{ new Date(item?.commonDate).getDate() }}</div>
-              <div style="font-size: 12px;margin-left: 5px;">{{ getWeekDayLabel(item?.commonDate) }}</div>
-              <div>
-                （{{ convertToLunar(item?.commonDate).dateStr }}）
+              <div class="cell-title-main">
+                <span class="cell-title-day">{{ new Date(item?.commonDate).getDate() }}</span>
+                <span class="cell-title-week">{{ getWeekDayLabel(item?.commonDate) }}</span>
               </div>
+              <div class="cell-title-lunar">（{{ convertToLunar(item?.commonDate).dateStr }}）</div>
             </div>
             <div
               class="schedule-table-cell-item js-schedule-drag-container"
@@ -700,31 +700,37 @@ export default {
 }
 
 .schedule-table-body {
-  width: calc(100vw - 560px);
+  /* 由父级 flex 布局决定可用宽度，避免与收起侧栏冲突 */
+  width: 100%;
   flex: 1;
   display: flex;
   flex-direction: row;
   overflow: auto;
+  min-width: 0;
 
   .schedule-table-cell {
-    flex: 1;
+    /* 作为 flex 子项平均分配宽度，收起侧栏后可自动撑满 */
+    flex: 1 0 0;
     display: flex;
     flex-direction: column;
-    min-width: 168px; /* 13寸默认 */
-    max-width: 194px;
+    min-width: 168px; /* 默认 */
+    max-width: none;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
     box-sizing: border-box;
 
-    /* 14寸电脑 */
-    @media (min-width: 1366px) {
-      min-width: 168px;
+    /* 小屏优先：收缩列宽，避免横向溢出过多 */
+    @media (max-width: 1440px) {
+      min-width: 140px;
     }
 
-    /* 15寸电脑 */
-    @media (min-width: 1440px) {
-      min-width: 168px;
+    @media (max-width: 1366px) {
+      min-width: 120px;
+    }
+
+    @media (max-width: 1280px) {
+      min-width: 110px;
     }
 
     /* 16寸电脑 */
@@ -758,16 +764,44 @@ export default {
       display: flex;
       align-items: center;
       padding: 0 20px;
-      div:first-child {
-        text-align: center;
-      }
-      div:last-child {
-        font-family: PingFang SC;
-        font-weight: 400;
-        font-style: Regular;
-        font-size: 12px;
-        color: #666666;
+      justify-content: space-between;
 
+      .cell-title-main {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+        min-width: 0;
+      }
+      .cell-title-day {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+      }
+      .cell-title-week {
+        font-size: 12px;
+        color: #666;
+        white-space: nowrap;
+      }
+      .cell-title-lunar {
+        font-size: 12px;
+        color: #666;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 1366px) {
+        padding: 0 14px;
+        /* 小屏：标题纵向堆叠，避免挤压错乱 */
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        line-height: 18px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        row-gap: 4px;
+
+        .cell-title-lunar {
+          white-space: normal;
+        }
       }
     }
 
@@ -782,20 +816,47 @@ export default {
       display: flex;
       align-items: center;
       padding: 0 20px;
+      justify-content: space-between;
+
+      .cell-title-main {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+        min-width: 0;
+      }
+      .cell-title-day {
+        font-size: 15px;
+        font-weight: 600;
+        color: #F92B30;
+      }
+      .cell-title-week {
+        font-size: 12px;
+        color: #F92B30;
+        white-space: nowrap;
+      }
+      .cell-title-lunar {
+        font-size: 12px;
+        color: #F92B30;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 1366px) {
+        padding: 0 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        line-height: 18px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        row-gap: 4px;
+
+        .cell-title-lunar {
+          white-space: normal;
+        }
+      }
       background-color: #F92B300D;
       color: #F92B30;
       border: 1px solid #F92B304D;
-      div:first-child {
-        text-align: center;
-      }
-      div:last-child {
-        font-family: PingFang SC;
-        font-weight: 400;
-        font-style: Regular;
-        font-size: 12px;
-        color: #F92B30;
-
-      }
     }
 
     .schedule-table-cell-item {

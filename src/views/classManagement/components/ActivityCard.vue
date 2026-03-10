@@ -278,7 +278,7 @@ export default {
   },
   computed: {
     bgColor() {
-      return getSportBackgroundColor(this.activity.percent, this.activity.classesJson, this.date)[0]
+      return getSportBackgroundColor(this.activity.movingPercent, this.activity.classesJson, this.date)[0]
     },
   },
   mounted() {

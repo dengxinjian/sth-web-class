@@ -4,10 +4,17 @@
       <!-- 左侧菜单 -->
       <LeftMenu v-model="activeName" @change="handleTypeChange" />
       <div class="content-container"
-        style="display: flex; width: 100%"
         v-if="activeName === 'athletic' || activeName === 'class'">
         <!-- 中间内容区 -->
-        <div class="type-change">
+        <div class="type-change"
+          :class="{ 'is-collapsed': leftPanelCollapsed }">
+          <div
+            class="panel-collapse-handle panel-collapse-handle--left"
+            :title="leftPanelCollapsed ? '展开左侧栏' : '收起左侧栏'"
+            @click="toggleLeftPanel">
+            <i
+              :class="leftPanelCollapsed ? 'el-icon-arrow-right' : 'el-icon-arrow-left'"></i>
+          </div>
           <!-- 运动员管理 -->
           <div v-show="activeName === 'athletic'">
             <div v-if="loginType === '2'"
@@ -74,8 +81,9 @@
           </div>
         </div>
 
-        <div>
-          <div class="schedule-top">
+        <div class="schedule-center-wrapper">
+          <div class="schedule-top"
+            :class="{ 'schedule-top--with-right-panel': !rightPanelCollapsed }">
             <div style="
                 display: flex;
                 align-items: center;
@@ -198,7 +206,7 @@
             </div>
           </div>
 
-          <div style="display: flex;flex:1; width: 100%">
+          <div class="schedule-main-row">
             <!-- 日程表 -->
             <ScheduleCalendar :current-week="currentWeek"
               :team-list="teamList" :athletic-list="athleticList"
@@ -231,52 +239,84 @@
               @click-event-activity="handleEditActivity" />
 
             <!-- 右侧统计面板 -->
-            <StatisticsPanel :sth-data="sthData"
-              :statistic-data="statisticData"
-              :device-list="deviceList"
-              @device-change="handleDeviceChange" />
+            <div class="right-stat-wrapper"
+              :class="{ 'is-collapsed': rightPanelCollapsed }">
+              <div
+                class="panel-collapse-handle panel-collapse-handle--right"
+                :title="rightPanelCollapsed ? '展开统计栏' : '收起统计栏'"
+                @click="toggleRightPanel">
+                <i
+                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
+              </div>
+              <StatisticsPanel v-if="!rightPanelCollapsed"
+                :sth-data="sthData"
+                :statistic-data="statisticData"
+                :device-list="deviceList"
+                @device-change="handleDeviceChange" />
+            </div>
           </div>
         </div>
       </div>
       <div class="content-container"
-        style="display: flex; width: 100%"
         v-if="activeName === 'plan'">
-        <PlanView :isPlan.sync="isPlan"
-          @choose-plan="handleChoosePlan"
-          :selected-team="selectedTeam" />
-        <!-- 日程表 -->
-        <ScheduleCalendar v-if="!isPlan" :current-week="currentWeek"
-          :team-list="teamList" :athletic-list="athleticList"
-          :selected-team="selectedTeam"
-          :selected-athletic="selectedAthletic"
-          @week-change="onWeekChange"
-          @team-change="handleTeamChange"
-          @athletic-change="handleAthleticChange"
-          @show-info="showAthleticInfoDialog = true"
-          @show-statistic="showMonthStatisticDialog = true"
-          @refresh="handleRefresh"
-          @class-detail="handleClassScheduleDetail"
-          @activity-detail="handleSportDetail"
-          @delete-schedule="handleDeleteClassSchedule"
-          @unbind="handleUnbind"
-          @delete-activity="handleDeleteActivity"
-          @device-click="handleDeviceClick"
-          @edit-schedule="handleEditClassSchedule"
-          @edit-activity="handleEditActivity"
-          @paste-class="handlePasteClass" @cut-class="handleCutClass"
-          @paste-event="handlePasteEvent"
-          @cut-event="handleCutEvent"
-          @view-health-data="handleViewHealthData"
-          @add-schedule="handleAddSchedule"
-          @event-detail="handleEventDetail"
-          @edit-event="handleEditEvent"
-          @input-activity="handleInputActivity"
-          @click-event-activity="handleEditActivity"
-          @delete-all-schedules="handleDeleteAllSchedules" />
-        <!-- 右侧统计面板 -->
-        <StatisticsPanel v-if="!isPlan" :sth-data="sthData"
-          :statistic-data="statisticData" :device-list="deviceList"
-          @device-change="handleDeviceChange" />
+        <!-- 中间：日程表 + 右侧统计 -->
+        <div class="schedule-center-wrapper">
+          <!-- 这里计划视图不需要第二个顶部工具栏，直接复用上方全局头部 -->
+          <div class="schedule-main-row">
+            <!-- 日程表 -->
+
+            <PlanView :isPlan.sync="isPlan"
+              @choose-plan="handleChoosePlan"
+              :selected-team="selectedTeam" />
+              <ScheduleCalendar v-if="!isPlan"
+              :current-week="currentWeek"
+              :team-list="teamList" :athletic-list="athleticList"
+              :selected-team="selectedTeam"
+              :selected-athletic="selectedAthletic"
+              @week-change="onWeekChange"
+              @team-change="handleTeamChange"
+              @athletic-change="handleAthleticChange"
+              @show-info="showAthleticInfoDialog = true"
+              @show-statistic="showMonthStatisticDialog = true"
+              @refresh="handleRefresh"
+              @class-detail="handleClassScheduleDetail"
+              @activity-detail="handleSportDetail"
+              @delete-schedule="handleDeleteClassSchedule"
+              @unbind="handleUnbind"
+              @delete-activity="handleDeleteActivity"
+              @device-click="handleDeviceClick"
+              @edit-schedule="handleEditClassSchedule"
+              @edit-activity="handleEditActivity"
+              @paste-class="handlePasteClass"
+              @cut-class="handleCutClass"
+              @paste-event="handlePasteEvent"
+              @cut-event="handleCutEvent"
+              @view-health-data="handleViewHealthData"
+              @add-schedule="handleAddSchedule"
+              @event-detail="handleEventDetail"
+              @edit-event="handleEditEvent"
+              @input-activity="handleInputActivity"
+              @click-event-activity="handleEditActivity"
+              @delete-all-schedules="handleDeleteAllSchedules" />
+
+            <!-- 右侧统计面板（同样支持收起） -->
+            <div class="right-stat-wrapper" v-if="!isPlan"
+              :class="{ 'is-collapsed': rightPanelCollapsed }">
+              <div
+                class="panel-collapse-handle panel-collapse-handle--right"
+                :title="rightPanelCollapsed ? '展开统计栏' : '收起统计栏'"
+                @click="toggleRightPanel">
+                <i
+                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
+              </div>
+              <StatisticsPanel v-if="!isPlan && !rightPanelCollapsed"
+                :sth-data="sthData"
+                :statistic-data="statisticData"
+                :device-list="deviceList"
+                @device-change="handleDeviceChange" />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -525,6 +565,10 @@ export default {
       // 课程数据
       classList: [],
       classSearchInput: "",
+      /** 左侧栏（运动员/课程列表区）是否收起 */
+      leftPanelCollapsed: localStorage.getItem("cm_leftPanelCollapsed") === "1",
+      /** 右侧统计栏是否收起 */
+      rightPanelCollapsed: localStorage.getItem("cm_rightPanelCollapsed") === "1",
       teamClassSearchKeyword: "",
       // 课程数量限制 -- 后续根据待用功能添加
       // currentUserClassConfig: {},
@@ -768,6 +812,14 @@ export default {
     this.$root.$off("identity-changed", this.handleIdentityChanged)
   },
   methods: {
+    toggleLeftPanel() {
+      this.leftPanelCollapsed = !this.leftPanelCollapsed
+      localStorage.setItem("cm_leftPanelCollapsed", this.leftPanelCollapsed ? "1" : "0")
+    },
+    toggleRightPanel() {
+      this.rightPanelCollapsed = !this.rightPanelCollapsed
+      localStorage.setItem("cm_rightPanelCollapsed", this.rightPanelCollapsed ? "1" : "0")
+    },
     // vipSubStatus: 0 未订阅 1 精英 2 专业 4 精英&专业 → 头框图片
     getVipFrameSrc(vipSubStatus) {
       const v = Number(vipSubStatus)
@@ -3640,8 +3692,10 @@ export default {
   display: flex;
   height: 100%;
   max-height: calc(100vh - 60px);
+  /* 整个中间区域允许纵向滚动，横向滚动仍交给内部日历区域处理 */
+  // overflow-y: auto;
+  overflow-x: scroll;
   overflow-y: hidden;
-  overflow-x: auto;
 
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {
@@ -3663,6 +3717,11 @@ export default {
   }
 }
 
+.content-container {
+  flex: 1;
+  display: flex;
+}
+
 .type-change {
   flex: 0 0 260px;
   height: 100vh;
@@ -3672,6 +3731,22 @@ export default {
   overflow-x: hidden;
   border-left: 1px solid #e5e5e5;
   border-right: 1px solid #e5e5e5;
+  position: relative;
+  transition: flex-basis 0.2s ease, width 0.2s ease;
+
+  &.is-collapsed {
+    flex: 0 0 0;
+    width: 0;
+    overflow: visible;
+    border-left: none;
+    border-right: none;
+
+    /* 收起时隐藏内部内容，仅保留把手 */
+    > :not(.panel-collapse-handle) {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
 
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {
@@ -3691,6 +3766,96 @@ export default {
       background: #a8a8a8;
     }
   }
+}
+
+.schedule-center-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-main-row {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.right-stat-wrapper {
+  position: relative;
+  flex: 0 0 235px;
+  width: 235px;
+  max-height: calc(100vh - 60px);
+  // overflow-y: auto;
+  // overflow-x: scroll;
+  transition: flex-basis 0.2s ease, width 0.2s ease;
+  border-left: 1px solid #e5e5e5;
+  background: #fff;
+
+  &.is-collapsed {
+    flex: 0 0 0;
+    width: 0;
+    overflow: visible;
+    border-left: none;
+
+    /* 收起时隐藏内部内容，仅保留把手 */
+    > :not(.panel-collapse-handle) {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  /* 自定义滚动条样式（与左侧栏保持一致） */
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2.5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2.5px;
+
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+}
+
+.panel-collapse-handle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 40px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #666;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: #f7f8fa;
+    color: #333;
+  }
+}
+
+.panel-collapse-handle--left {
+  right: -12px;
+}
+
+.panel-collapse-handle--right {
+  left: -12px;
 }
 
 .class-container-wrapper {
@@ -3957,7 +4122,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
-  max-width: 1640px;
+  width: 100%;
   flex-wrap: wrap;
   gap: 10px;
   box-shadow: 0px 1px 0px 0px #00000026;
@@ -3977,6 +4142,19 @@ export default {
       height: 24px;
       cursor: pointer;
     }
+  }
+}
+
+/* 右侧统计栏展开时，让头部背景延伸到统计栏下方，小屏下视觉上“占满” */
+.schedule-top--with-right-panel {
+  margin-right: -235px;
+
+  @media (max-width: 1440px) {
+    margin-right: -220px;
+  }
+
+  @media (max-width: 1280px) {
+    margin-right: -200px;
   }
 }
 </style>
