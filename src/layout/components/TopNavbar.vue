@@ -336,7 +336,7 @@ export default {
     async handleSubscribeVip() {
       const _this = this
       submitData({
-        url: "/consumer/api/vipSubscribe/subscribe",
+        url: "/operate/api/vipSubscribe/subscribe",
         requestData: {
           identityType: "C",
           subscribeType: 1,
@@ -351,20 +351,11 @@ export default {
         }
       })
     },
-    async handleCancelSubscribeVip() {
-      submitData({
-        url: "/consumer/api/vipSubscribe/cancelSubscribe",
-        requestData: {
-          identityType: "C",
-          subscribeType: 1,
-        },
-      }).then((res) => { })
-    },
     async getSubscribeInfo() {
       const _this = this
       try {
         const res = await getData({
-          url: "consumer/api/vipSubscribe/getUserSubscribeInfo",
+          url: "/operate/api/vipSubscribe/getUserSubscribeInfo",
           identityType: "C",
         })
         if (!res || !res.success) {
@@ -378,18 +369,9 @@ export default {
         } else if (result && (result.identityType === "R" || result.identityType === "C")) {
           proInfo = result.identityType === "C" ? result : null
         }
+        console.log('=====proInfo=====', proInfo)
         const subscribeType = proInfo?.subscribeType
-        const expireTime = proInfo?.expireTime
-        const hasSubscribe = subscribeType != null && !!expireTime
-        const isExpired = (exp) => {
-          if (!exp) return false
-          const d = typeof exp === "number"
-            ? new Date(exp < 1e12 ? exp * 1000 : exp)
-            : new Date(String(exp).replace(/-/g, "/"))
-          return !Number.isNaN(d.getTime()) && d.getTime() < Date.now()
-        }
-        const expired = hasSubscribe ? isExpired(expireTime) : false
-        if (!hasSubscribe || expired) {
+        if (subscribeType !== 1) {
           _this.vipDialogVisible = true
         } else {
           _this.resetPageData()

@@ -196,12 +196,12 @@ export const teamApi = {
     })
   },
 }
-// GET /consumer/api/vipSubscribe/getSubscribeRecords?triUserId=efa5faaa841b4b28bce89a167ce28d07
+// GET /operate/api/vipSubscribe/getSubscribeRecords?triUserId=efa5faaa841b4b28bce89a167ce28d07
 export const userApi = {
   // 获取是否订阅
   getIsSubscribe(triUserId) {
     return getData({
-      url: "/consumer/api/vipSubscribe/getSubscribeRecords",
+      url: "/operate/api/vipSubscribe/getSubscribeRecords",
       triUserId,
     })
   },

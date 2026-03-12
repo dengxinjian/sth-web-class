@@ -148,24 +148,49 @@
       class="vip-agreement-dialog" append-to-body>
       <div class="vip-agreement-content">
         <h3 class="title">会员订阅服务协议</h3>
-        <p>本协议由您与「STH 平台」就精英版会员、专业版会员订阅服务所订立，请您在勾选前仔细阅读并理解各条款。</p>
-        <p>1. 协议主体：当您在页面勾选“同意并支付”并完成支付，即视为您已阅读并同意本协议全部内容。</p>
-        <p>2.
-          会员类型与订阅周期：平台提供精英版会员、专业版会员两种会员服务，可单独订阅，也可同时订阅。订阅周期以页面展示的包月、包年等方式为准。
+        <p class="lead">本协议由你与【STH 平台】（以下简称“平台”）就精英版会员、专业版会员订阅服务所订立。</p>
+
+        <h4 class="section-title">1. 协议主体</h4>
+        <p>本协议由你与平台就精英版会员、专业版会员订阅服务所订立。</p>
+
+        <h4 class="section-title">2. 会员类型与订阅周期</h4>
+        <p>
+          平台提供两种会员服务：精英版会员、专业版会员。两种会员相互独立，可单独订阅，可同时订阅，权益、有效期、计费互不影响。订阅周期包括：包月、包年。
         </p>
-        <p>3. 服务内容：会员开通后，即可在平台内使用相应版本所包含的功能与权益，具体以页面展示为准。</p>
-        <p>4.
-          付费与退款规则：会员服务属于数字化虚拟商品，自您支付成功且服务开通之时起，不支持退款、转让或变更套餐，法律法规另有规定的除外。
-        </p>
-        <p>5. 有效期：会员有效期自支付成功之日起按所选周期自动计算；同时订阅多个会员版本的，有效期分别独立计算。</p>
-        <p>6.
-          用户义务：您应保证所填写的账户、身份等信息真实有效，并妥善保管账号与密码，如因您自身原因造成账号被盗、丢失等，由您自行承担责任。
-        </p>
-        <p>7. 平台权利：若您存在违规使用、恶意套利、侵权等行为，平台有权视情节对您的会员资格进行限制、暂停或终止，且不予退款。
-        </p>
-        <p>8.
-          其他：平台有权根据业务需要对本协议进行调整，更新后的协议将在页面公示，若您继续使用会员服务，即视为接受更新后的协议。
-        </p>
+
+        <h4 class="section-title">3. 服务内容</h4>
+        <p>会员为平台内虚拟数字服务，开通后立即生效，提供对应功能权限。</p>
+
+        <h4 class="section-title">4. 付费与退款规则</h4>
+        <ul class="bullet">
+          <li>会员服务属于数字化虚拟商品，一经支付开通、权益已即时生效，不支持退款、不支持折现、不支持转让。</li>
+          <li>因用户个人原因（误购、不再使用、设备更换、账号问题等）申请退款的，平台不予受理。</li>
+          <li>因平台故障、服务重大瑕疵导致完全无法使用的，按实际无法使用时长进行补偿或退款。</li>
+        </ul>
+
+        <h4 class="section-title">5. 有效期</h4>
+        <ul class="bullet">
+          <li>按用户选择周期自动计算，从支付成功时刻起算。</li>
+          <li>同时订阅精英版 + 专业版时，两个会员有效期独立计算。</li>
+        </ul>
+
+        <h4 class="section-title">6. 用户义务</h4>
+        <ul class="bullet">
+          <li>保证支付信息真实有效。</li>
+          <li>妥善保管账号，因账号共享、被盗产生的损失由用户承担。</li>
+        </ul>
+
+        <h4 class="section-title">7. 平台权利</h4>
+        <ul class="bullet">
+          <li>平台有权调整会员权益（不影响已购周期）。</li>
+          <li>平台对违规使用、恶意套利、侵权行为有权暂停/终止服务，不予退款。</li>
+        </ul>
+
+        <h4 class="section-title">8. 其他</h4>
+        <ul class="bullet">
+          <li>本协议自用户点击“同意协议”或勾选“我已充分阅读并同意【会员订阅服务协议】”时生效。</li>
+          <li>平台有权更新协议，更新后公示 7 日生效，用户继续使用视为同意新版本。</li>
+        </ul>
       </div>
     </el-dialog>
   </div>
@@ -221,6 +246,15 @@ export default {
             { idx: 1, label: "多维度峰值统计" },
             { idx: 2, label: "历史峰值对比" },
             { idx: 3, label: "数十种指标峰值统计" },
+          ],
+        },
+        {
+          title: "日程规划",
+          subTitle: "未来日期课表",
+          img: require("@/assets/vip/vip4.png"),
+          children: [
+            { idx: 1, label: "未来日期课表布置可用" },
+            { idx: 2, label: "计划应用到未来日期可用" },
           ],
         },
         {
@@ -297,7 +331,7 @@ export default {
         if (!this.outTradeNo) return
         try {
           const res = await getData({
-            url: "consumer/api/vipPay/queryPayStatus",
+            url: "operate/api/vipPay/queryPayStatus",
             outTradeNo: this.outTradeNo,
           })
           if (res && res.success && res.result) {
@@ -330,7 +364,7 @@ export default {
       this.outTradeNo = ""
       try {
         const res = await submitData({
-          url: "consumer/api/vipPay/createOrder",
+          url: "operate/api/vipPay/createOrder",
           method: "post",
           requestData: {
             triUserId: "",
@@ -372,7 +406,7 @@ export default {
       try {
         const returnUrl = location.href
         const res = await submitData({
-          url: `consumer/api/aliPay/createOrderPagePay?returnUrl=${encodeURIComponent(returnUrl)}`,
+          url: `operate/api/aliPay/createOrderPagePay?returnUrl=${encodeURIComponent(returnUrl)}`,
           method: "post",
           requestData: {
             triUserId: "",
@@ -875,9 +909,31 @@ export default {
   color: #333;
 
   .title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
     margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .lead {
+    color: #555;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    color: #111;
+  }
+
+  .bullet {
+    padding-left: 18px;
+    margin: 6px 0 10px;
+
+    li {
+      margin: 6px 0;
+    }
   }
 
   p {

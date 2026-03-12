@@ -221,7 +221,7 @@ export default {
       if (!this.identityType) return
       try {
         const params = {
-          url: "consumer/api/vipPay/getLatestTradeRecord",
+          url: "operate/api/vipPay/getLatestTradeRecord",
           identityType: this.identityType,
         }
         const res = await getData(params)
@@ -244,7 +244,7 @@ export default {
       this.loading = true
       try {
         const params = {
-          url: "consumer/api/vipPay/listTradeRecords",
+          url: "operate/api/vipPay/listTradeRecords",
           identityType: this.identityType,
           pageNo: this.pagination.pageNo,
           pageSize: this.pagination.pageSize,

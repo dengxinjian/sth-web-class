@@ -186,10 +186,10 @@ export default {
       return this.subscribeInfoMap?.C || null
     },
     eliteView() {
-      return this.buildIdentityView(this.eliteInfo)
+      return this.buildIdentityView(this.eliteInfo, { edition: "elite", identityType: "R" })
     },
     proView() {
-      return this.buildIdentityView(this.proInfo)
+      return this.buildIdentityView(this.proInfo, { edition: "pro", identityType: "C" })
     },
     seatsView() {
       const info = this.proInfo || {}
@@ -201,12 +201,7 @@ export default {
       }
     },
     showSeatBox() {
-      const hasAnySeat =
-        Number(this.seatsView.athleteTotal) > 0 ||
-        Number(this.seatsView.coachTotal) > 0 ||
-        Number(this.seatsView.athletePurchased) > 0 ||
-        Number(this.seatsView.coachPurchased) > 0
-      return this.identityType === "C" || hasAnySeat
+      return this.proView.isSubscribed
     },
   },
   watch: {
@@ -236,7 +231,7 @@ export default {
     async fetchSubscribeInfo() {
       this.loading = true
       try {
-        const params = { url: "consumer/api/vipSubscribe/getUserSubscribeInfo" }
+        const params = { url: "operate/api/vipSubscribe/getUserSubscribeInfo" }
         const res = await getData(params)
         if (res && res.success) {
           const result = res.result
@@ -313,30 +308,58 @@ export default {
       if (v === 2) return "连续包月"
       if (v === 3) return "年卡"
       if (v === 4) return "连续包年"
+      if (v === 11) return "精英版"
+      if (v === 12) return "专业版"
+      if (v === 13) return "精英天使用户"
+      if (v === 14) return "专业天使用户"
+      if (v === 15) return "PRO 版"
+      if (v === 16) return "认证教练"
       return "-"
     },
-    buildIdentityView(info) {
+    buildIdentityView(info, options = {}) {
       const subscribeType = info?.subscribeType
+      const subStatus = Number(info?.subStatus)
       const expire = info?.expireTime
-      const hasSubscribe = subscribeType !== null && typeof subscribeType !== "undefined" && !!expire
 
-      const expired = hasSubscribe ? this.isExpired({ expireTime: expire }) : false
-      const isSubscribed = hasSubscribe && !expired
+      // subStatus: 0=未订阅，1=已订阅（expireTime 可能为 null 表示永久），-1=已过期
+      const isSubscribed = subStatus === 1
+      const isExpired = subStatus === -1
+      const isUnsubscribed = subStatus === 0 || Number.isNaN(subStatus)
 
-      const subscribeText = !hasSubscribe
+      const isPermanent = isSubscribed && (expire == null || expire === "")
+
+      const subscribeText = isUnsubscribed
         ? "未订阅"
-        : expired
+        : isExpired
           ? "已过期"
-          : this.subscribeTypeText(subscribeType)
+          : isPermanent
+            ? "永久会员"
+            : this.subscribeTypeText(subscribeType)
 
       const actionLabel = isSubscribed ? "续费" : "订阅"
-      const showRenewManage = isSubscribed
+      const showSubscribeAction = !isPermanent
+
+      const isPro = options?.edition === "pro" || options?.identityType === "C"
+      // 专业版：已订阅就展示续费管理（永久会员也展示）
+      // 精英版：永久会员不展示续费管理
+      const showRenewManage = isSubscribed && (isPro ? true : !isPermanent)
 
       const isAuto = [2, 4].includes(Number(subscribeType))
       const timeLabel = isAuto ? "下次续费时间" : "服务到期时间"
-      const timeValue = expire ? this.formatDate(expire) : "-"
+      // 已订阅但 expireTime 为空：服务到期时间展示“永久”
+      const timeValue = isPermanent ? "永久" : (expire ? this.formatDate(expire) : "-")
 
-      return { subscribeText, actionLabel, showRenewManage, timeLabel, timeValue }
+      return {
+        subscribeText,
+        actionLabel,
+        showRenewManage,
+        showSubscribeAction,
+        timeLabel,
+        timeValue,
+        isSubscribed,
+        isPermanent,
+        subStatus,
+      }
     },
     handleBack() {
       // 仅当上一页是本站页面时才 history.back，避免从支付宝等外部页面返回
