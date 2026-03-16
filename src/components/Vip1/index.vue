@@ -381,8 +381,8 @@ export default {
     getPayParams() {
       const subscribeType = this.selectedPlan?.subscribeType ?? 1
       // 订单金额：单位分（按接口文档）
-      // const orderAmount = this.selectedPlanType === "yearly" ? 64800 : 8000
-      const orderAmount = 1
+      const orderAmount = this.selectedPlanType === "yearly" ? 64800 : 8000
+      // const orderAmount = 1
       return { subscribeType, orderAmount }
     },
     async createWeChatOrder() {
@@ -434,7 +434,10 @@ export default {
       this.payCodeUrl = ""
       this.outTradeNo = ""
       try {
-        const returnUrl = location.href
+        const { origin, pathname, hash } = window.location
+        // 过滤掉所有参数：包括 ?query 以及 hash 路由里的 ?query
+        const cleanHash = (hash || "").split("?")[0]
+        const returnUrl = `${origin}${pathname}${cleanHash}`
         const res = await submitData({
           url: `operate/api/aliPay/createOrderPagePay?returnUrl=${encodeURIComponent(returnUrl)}`,
           method: "post",
@@ -473,7 +476,7 @@ export default {
         }
 
         // 覆盖当前页面，直接跳转到支付宝收银台
-        window.location.href = pageUrl
+        window.location.assign(pageUrl)
         // window.open(pageUrl, "_blank")
       } catch (e) {
         this.$message.error(e?.message || "创建支付宝订单失败")

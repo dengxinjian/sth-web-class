@@ -205,12 +205,9 @@
       class="vip-agreement-dialog" append-to-body>
       <div class="vip-agreement-content">
         <h3 class="title">席位购买服务协议</h3>
-        <p class="lead">
-          本协议由你与【STH 平台】（以下简称“平台”）就团队教练席位和运动员席位购买服务所订立。
-        </p>
 
         <h4 class="section-title">1. 协议主体</h4>
-        <p>本协议由你与平台就席位购买服务所订立。</p>
+        <p>本协议由你与【武汉强大之心体育有限公司】（以下简称 “平台”）就强者之心网页版用户团队教练席位和运动员席位购买服务所订立。</p>
 
         <h4 class="section-title">2. 购买席位生效周期</h4>
         <p>
@@ -484,9 +481,11 @@ export default {
       this.payOrderLoading = true
       this.payCodeUrl = ""
       this.outTradeNo = ""
-      console.log(location.href)
       try {
-        const returnUrl = location.href
+        const { origin, pathname, hash } = window.location
+        // 过滤掉所有参数：包括 ?query 以及 hash 路由里的 ?query
+        const cleanHash = (hash || "").split("?")[0]
+        const returnUrl = `${origin}${pathname}${cleanHash}`
         const res = await submitData({
           url: `operate/api/aliPay/createOrderPagePay?returnUrl=${encodeURIComponent(returnUrl)}`,
           method: "post",
@@ -519,7 +518,7 @@ export default {
           this.$message.error(res.message || "未返回支付宝支付链接")
           return
         }
-        window.location.href = pageUrl
+        window.location.assign(pageUrl)
       } catch (e) {
         this.$message.error(e?.message || "创建支付宝订单失败")
       } finally {

@@ -148,7 +148,8 @@
       class="vip-agreement-dialog" append-to-body>
       <div class="vip-agreement-content">
         <h3 class="title">会员订阅服务协议</h3>
-        <p class="lead">本协议由你与【STH 平台】（以下简称“平台”）就精英版会员、专业版会员订阅服务所订立。</p>
+        <p class="lead">本协议由你与【STH 平台】（以下简称“平台”）就精英版会员、专业版会员订阅服务所订立。
+        </p>
 
         <h4 class="section-title">1. 协议主体</h4>
         <p>本协议由你与平台就精英版会员、专业版会员订阅服务所订立。</p>
@@ -353,8 +354,8 @@ export default {
     },
     getPayParams() {
       const subscribeType = this.selectedPlan?.subscribeType ?? 1
-      // const orderAmount = this.selectedPlanType === "yearly" ? 36500 : 5000
-      const orderAmount = 1
+      const orderAmount = this.selectedPlanType === "yearly" ? 36500 : 5000
+      //   const orderAmount = 1
       return { subscribeType, orderAmount }
     },
     async createWeChatOrder() {
@@ -404,7 +405,10 @@ export default {
       this.payCodeUrl = ""
       this.outTradeNo = ""
       try {
-        const returnUrl = location.href
+        const { origin, pathname, hash } = window.location
+        // 过滤掉所有参数：包括 ?query 以及 hash 路由里的 ?query
+        const cleanHash = (hash || "").split("?")[0]
+        const returnUrl = `${origin}${pathname}${cleanHash}`
         const res = await submitData({
           url: `operate/api/aliPay/createOrderPagePay?returnUrl=${encodeURIComponent(returnUrl)}`,
           method: "post",
@@ -440,7 +444,7 @@ export default {
           return
         }
 
-        window.location.href = pageUrl
+        window.location.assign(pageUrl)
       } catch (e) {
         this.$message.error(e?.message || "创建支付宝订单失败")
       } finally {
