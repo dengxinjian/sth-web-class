@@ -69,7 +69,7 @@
                 <div class="payment-qr-module">
                   <div class="payment-qr-placeholder">
                     <template v-if="payOrderLoading">
-                      <span class="qr-hint">正在生成订单...</span>
+                      <span class="qr-hint">正在生成二维码...</span>
                     </template>
                     <template v-else-if="payCodeUrl">
                       <img :src="payCodeUrl" alt="微信支付二维码"

@@ -153,7 +153,7 @@
                     class="payment-qr-module payment-qr-module--compact">
                     <div class="payment-qr-placeholder">
                       <template v-if="payOrderLoading">
-                        <span class="qr-hint">正在生成订单...</span>
+                        <span class="qr-hint">正在生成二维码...</span>
                       </template>
                       <template v-else-if="payCodeUrl">
                         <img
