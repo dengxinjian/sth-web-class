@@ -357,12 +357,23 @@ export default {
     border-bottom: 1px solid #01010126;
     box-sizing: border-box;
 
+    @media (max-width: 1680px) {
+      padding: 0 10px;
+      gap: 10px;
+    }
+
+    @media (max-width: 1440px) {
+      padding: 0 8px;
+      gap: 8px;
+    }
+
     .class-type-item {
       height: 46px;
       line-height: 46px;
       text-align: center;
       cursor: pointer;
       position: relative;
+      white-space: nowrap;
 
       .title {
         height: 46px;
@@ -373,6 +384,18 @@ export default {
         font-size: 15px;
         color: #939393;
         border-bottom: 4px solid transparent;
+
+        @media (max-width: 1680px) {
+          font-size: 13px;
+        }
+
+        @media (max-width: 1440px) {
+          font-size: 12px;
+        }
+
+        @media (max-width: 1280px) {
+          font-size: 11px;
+        }
       }
 
       .active-title {
@@ -382,6 +405,18 @@ export default {
         font-size: 15px;
         color: #101010;
         border-bottom: 4px solid #f92b30;
+
+        @media (max-width: 1680px) {
+          font-size: 13px;
+        }
+
+        @media (max-width: 1440px) {
+          font-size: 12px;
+        }
+
+        @media (max-width: 1280px) {
+          font-size: 11px;
+        }
       }
     }
   }
@@ -476,6 +511,18 @@ export default {
       width: 200px;
       padding: 0 10px;
 
+      @media (max-width: 1680px) {
+        width: 170px;
+      }
+
+      @media (max-width: 1440px) {
+        width: 150px;
+      }
+
+      @media (max-width: 1280px) {
+        width: 130px;
+      }
+
       .group-name {
         display: flex;
         flex-direction: row;
@@ -487,6 +534,33 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          font-size: 14px;
+
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
+        }
+
+        .group-name-count {
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
         }
       }
     }
@@ -512,12 +586,39 @@ export default {
   color: #101010;
   cursor: pointer;
 
+  @media (max-width: 1680px) {
+    font-size: 12px;
+    width: 76px;
+    height: 28px;
+    line-height: 28px;
+  }
+
+  @media (max-width: 1440px) {
+    font-size: 11px;
+  }
+
+  @media (max-width: 1280px) {
+    font-size: 10px;
+  }
+
   &:hover {
     background-color: #c3c9d740;
     font-family: PingFang SC;
     font-weight: 500;
     font-style: Medium;
     font-size: 14px;
+
+    @media (max-width: 1680px) {
+      font-size: 12px;
+    }
+
+    @media (max-width: 1440px) {
+      font-size: 11px;
+    }
+
+    @media (max-width: 1280px) {
+      font-size: 10px;
+    }
   }
 }
 
@@ -559,6 +660,20 @@ export default {
     padding: 0 10px;
     box-sizing: border-box;
 
+    @media (max-width: 1680px) {
+      font-size: 12px;
+      height: 38px;
+      line-height: 38px;
+    }
+
+    @media (max-width: 1440px) {
+      font-size: 11px;
+    }
+
+    @media (max-width: 1280px) {
+      font-size: 10px;
+    }
+
     .team-operation-arrow {
       transition: transform 0.2s ease;
     }
@@ -578,6 +693,18 @@ export default {
       width: 198px;
       padding: 0 10px;
 
+      @media (max-width: 1680px) {
+        width: 168px;
+      }
+
+      @media (max-width: 1440px) {
+        width: 148px;
+      }
+
+      @media (max-width: 1280px) {
+        width: 128px;
+      }
+
       .group-name {
         display: flex;
         flex-direction: row;
@@ -589,6 +716,33 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          font-size: 14px;
+
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
+        }
+
+        .group-name-count {
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
         }
       }
     }

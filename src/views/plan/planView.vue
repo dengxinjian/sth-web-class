@@ -930,14 +930,26 @@ export default {
   }
 
   .type-change {
-    flex: 0 0 260px;
+    flex: 0 0 240px;
     height: 100vh;
     max-height: calc(100vh - 60px);
     background-color: #fff;
     overflow-y: auto;
     overflow-x: hidden;
-    // border-left: 1px solid #e5e5e5;
+    border-left: 1px solid #e5e5e5;
     border-right: 1px solid #e5e5e5;
+
+    @media (max-width: 1680px) {
+      flex: 0 0 220px;
+    }
+
+    @media (max-width: 1280px) {
+      flex: 0 0 200px;
+    }
+
+    @media (max-width: 1024px) {
+      flex: 0 0 180px;
+    }
   }
 }
 </style>

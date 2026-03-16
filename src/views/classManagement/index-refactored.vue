@@ -268,7 +268,7 @@
             <PlanView :isPlan.sync="isPlan"
               @choose-plan="handleChoosePlan"
               :selected-team="selectedTeam" />
-              <ScheduleCalendar v-if="!isPlan"
+            <ScheduleCalendar v-if="!isPlan"
               :current-week="currentWeek"
               :team-list="teamList" :athletic-list="athleticList"
               :selected-team="selectedTeam"
@@ -3723,7 +3723,7 @@ export default {
 }
 
 .type-change {
-  flex: 0 0 260px;
+  flex: 0 0 240px;
   height: 100vh;
   max-height: calc(100vh - 60px);
   background-color: #fff;
@@ -3733,6 +3733,18 @@ export default {
   border-right: 1px solid #e5e5e5;
   position: relative;
   transition: flex-basis 0.2s ease, width 0.2s ease;
+
+  @media (max-width: 1680px) {
+    flex: 0 0 220px;
+  }
+
+  @media (max-width: 1440px) {
+    flex: 0 0 200px;
+  }
+
+  @media (max-width: 1280px) {
+    flex: 0 0 180px;
+  }
 
   &.is-collapsed {
     flex: 0 0 0;
@@ -4149,7 +4161,7 @@ export default {
 .schedule-top--with-right-panel {
   margin-right: -235px;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1680px) {
     margin-right: -220px;
   }
 

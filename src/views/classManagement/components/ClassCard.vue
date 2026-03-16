@@ -152,11 +152,19 @@ export default {
   // border-radius: 6px;
   cursor: pointer;
 
+  @media (max-width: 1680px) {
+    padding: 10px 8px 4px 8px;
+  }
+
   .schedule-class-info-item-title {
     display: flex;
     gap: 6px;
     justify-content: space-between;
     margin-bottom: 14px;
+
+    @media (max-width: 1680px) {
+      margin-bottom: 10px;
+    }
 
     > div {
       flex: 1;
@@ -165,6 +173,14 @@ export default {
       font-style: Regular;
       font-size: 14px;
       line-height: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      @media (max-width: 1680px) {
+        font-size: 12px;
+        line-height: 12px;
+      }
     }
   }
 
@@ -174,20 +190,40 @@ export default {
     gap: 10px;
     align-items: center;
     margin-bottom: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+
+    @media (max-width: 1680px) {
+      gap: 4px;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
 
     img {
       width: 20px;
       vertical-align: middle;
       margin-top: -3px;
+
+      @media (max-width: 1680px) {
+        width: 16px;
+      }
     }
 
     .sth {
       width: 24px;
       vertical-align: middle;
+
+      @media (max-width: 1680px) {
+        width: 20px;
+      }
     }
 
     > span:nth-child(1) {
       flex: 0 0 20px;
+
+      @media (max-width: 1680px) {
+        flex: 0 0 16px;
+      }
     }
     > span:nth-child(2) {
       flex: 1;
