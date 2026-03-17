@@ -136,6 +136,21 @@ export default {
   width: 60px;
   height: 100%;
   background-color: #fff;
+  position: relative;
+  flex: 0 0 60px;
+
+  /* 用伪元素画分隔线，避免相邻面板收起/overflow 时 border 被覆盖 */
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    background: #e5e5e5;
+    z-index: 2;
+    pointer-events: none;
+  }
 }
 
 // el-menu 样式定制

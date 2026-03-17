@@ -95,6 +95,7 @@ export default {
       radioOptions: [
         { label: "查看", value: 1 },
         { label: "编辑", value: 2 },
+        { label: "共有", value: 3 },
       ],
     }
   },

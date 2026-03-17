@@ -35,7 +35,8 @@
                 移动
               </div>
             </span>
-            <span v-if="showShareBtn && isClassShare && loginType === '2'">
+            <span
+              v-if="showShareBtn && isClassShare && loginType === '2'">
               <div class="btn-list-hover-item" @click.stop="
                 $emit('share', classItem.id)
               handleClose()
@@ -66,7 +67,16 @@
           popper-class="athletic-btn-popover" placement="right"
           trigger="hover" :tabindex="999">
           <div class="btn-list-hover">
-            <span v-if="classItem.shareAuth === 2 && isClassShare">
+            <span v-if="classItem.shareAuth === 3 && isClassShare">
+              <div class="btn-list-hover-item" @click.stop="
+                $emit('copy', classItem,'', 'team')
+              handleClose()
+                ">
+                添加
+              </div>
+            </span>
+            <span
+              v-if="(classItem.shareAuth === 2 || classItem.shareAuth === 3) && isClassShare">
               <div class="btn-list-hover-item" @click.stop="
                 showEditClass = true
               handleClose()

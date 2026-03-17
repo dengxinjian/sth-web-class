@@ -625,6 +625,7 @@ export default {
   display: flex;
   flex-direction: column;
   background: #fff;
+  border-left: 1px solid #e5e5e5;
 
   .plan-type-list {
     height: 46px;

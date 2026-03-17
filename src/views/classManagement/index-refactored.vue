@@ -2612,7 +2612,7 @@ export default {
     /**
      * 复制/添加课程
      */
-    handleCopyClassFromOfficial(classData, groupId) {
+    handleCopyClassFromOfficial(classData, groupId, type) {
       // 课程数量限制 -- 后续根据待用功能添加
       // if (
       //   this.currentUserClassConfig.currentCount >=
@@ -2621,7 +2621,15 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
-      this.copyClassFromOfficialClassId = classData.id
+      console.log(classData, groupId, type, "classData, groupId, type")
+      if (type === 'team') {
+        console.log(classData.sourceClassId, "classData.sourceClassId")
+        this.copyClassFromOfficialClassId = classData.sourceClassId
+      } else {
+        console.log(classData.id, "classData.id")
+        this.copyClassFromOfficialClassId = classData.id
+      }
+      console.log(this.copyClassFromOfficialClassId, "this.copyClassFromOfficialClassId")
       this.copyClassFromOfficialGroupId = groupId
       this.copyClassFromOfficialData = classData
       this.showCopyClassFromOfficial = true
@@ -3773,7 +3781,8 @@ export default {
     width: 0;
     overflow: visible;
     border-left: none;
-    border-right: none;
+    // 收起后仍保留与右侧内容的分隔线
+    border-right: 1px solid #e5e5e5;
 
     /* 收起时隐藏内部内容，仅保留把手 */
     > :not(.panel-collapse-handle) {

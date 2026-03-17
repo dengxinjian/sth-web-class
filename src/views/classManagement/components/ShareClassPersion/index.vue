@@ -18,6 +18,7 @@
         <el-radio-group v-model="form.shareToAuth">
           <el-radio :label="1">查看</el-radio>
           <el-radio :label="2">编辑</el-radio>
+          <el-radio :label="3">共有</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>

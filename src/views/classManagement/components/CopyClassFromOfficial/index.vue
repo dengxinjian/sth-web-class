@@ -141,6 +141,7 @@ export default {
       });
     },
     submitClassAdd() {
+      console.log(this.classId, "this.classId")
       if (!this.classId) return;
       if (this.activeClassType !== "my") {
         submitData({
