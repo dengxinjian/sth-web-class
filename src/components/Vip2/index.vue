@@ -137,6 +137,8 @@
                       </a>
                     </span>
                   </label>
+                  <el-button type="text" size="small" class="activate-code-btn"
+                    @click="showActivateCode = true">激活码兑换</el-button>
                 </div>
               </div>
             </div>
@@ -144,6 +146,9 @@
         </div>
       </div>
     </div>
+    <ActivateCodeDialog
+      :visible.sync="showActivateCode"
+      @success="onActivateSuccess" />
     <el-dialog :visible.sync="agreementDialogVisible" width="720px"
       class="vip-agreement-dialog" append-to-body>
       <div class="vip-agreement-content">
@@ -200,9 +205,11 @@
 <script>
 import QRCode from "qrcode"
 import { submitData, getData } from "@/api/common"
+import ActivateCodeDialog from "@/components/ActivateCodeDialog"
 
 export default {
   name: "Vip2",
+  components: { ActivateCodeDialog },
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: false },
@@ -211,6 +218,7 @@ export default {
   data() {
     return {
       innerVisible: this.visible || this.value || false,
+      showActivateCode: false,
       selectedPlanType: "monthly",
       selectedPaymentMethod: "wechat",
       agreementChecked: false,
@@ -313,6 +321,12 @@ export default {
   methods: {
     onCancel() {
       this.$emit("update:visible", false)
+    },
+    onActivateSuccess() {
+      this.onCancel()
+      setTimeout(() => {
+        window.location.reload()
+      }, 600)
     },
     resetPayState() {
       this.stopPayPoll()

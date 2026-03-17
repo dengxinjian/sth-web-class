@@ -10,6 +10,9 @@
       :coachTotal="seatsView.coachTotal"
       :athleteTotal="seatsView.athleteTotal"
       @success="fetchSubscribeInfo" />
+    <ActivateCodeDialog
+      :visible.sync="showActivateCode"
+      @success="fetchSubscribeInfo" />
     <div class="member-center-container" v-loading="loading">
       <div class="page-toolbar">
         <el-button class="back-btn" size="small"
@@ -54,7 +57,7 @@
             eliteView.actionLabel
           }}</el-button>
           <el-button type="text" size="small"
-            class="muted-btn">激活码兑换</el-button>
+            class="muted-btn" @click="showActivateCode = true">激活码兑换</el-button>
         </div>
       </section>
 
@@ -117,7 +120,7 @@
           <el-button v-if="showSeatBox" size="small" type="primary"
             @click="showSeatPurchase = true">购买席位</el-button>
           <el-button type="text" size="small"
-            class="muted-btn">激活码兑换</el-button>
+            class="muted-btn" @click="showActivateCode = true">激活码兑换</el-button>
         </div>
       </section>
     </div>
@@ -129,11 +132,12 @@ import Vip1 from "@/components/Vip1"
 import Vip2 from "@/components/Vip2"
 import RenewManageDialog from "@/components/RenewManageDialog"
 import SeatPurchaseDialog from "@/components/SeatPurchaseDialog"
+import ActivateCodeDialog from "@/components/ActivateCodeDialog"
 import { getData } from "@/api/common"
 
 export default {
   name: "MemberCenter",
-  components: { Vip1, Vip2, RenewManageDialog, SeatPurchaseDialog },
+  components: { Vip1, Vip2, RenewManageDialog, SeatPurchaseDialog, ActivateCodeDialog },
   data() {
     return {
       loading: false,
@@ -145,6 +149,7 @@ export default {
       showRenewManage: false,
       renewIdentityType: "C",
       showSeatPurchase: false,
+      showActivateCode: false,
       vip1TradeType: "",
       vip2TradeType: "",
       elitePlan: {

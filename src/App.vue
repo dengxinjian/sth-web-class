@@ -32,10 +32,6 @@ export default {
 </script>
 
 <style lang="scss">
-html, body {
-  overscroll-behavior-x: none;
-}
-
 .el-dialog {
   border-radius: 12px;
 }

@@ -19,8 +19,8 @@
               :key="'opt-' + shareAuth + '-' + idx">
               <div
                 :class="el.value === 7
-                    ? 'add-class-btn-popover-more-list-item-del'
-                    : 'add-class-btn-popover-more-list-item'
+                  ? 'add-class-btn-popover-more-list-item-del'
+                  : 'add-class-btn-popover-more-list-item'
                   "
                 :key="idx"
                 @click="$emit('options-click', el, el.value)">
@@ -196,6 +196,19 @@ export default {
             { label: "历史", value: 6 },
             { label: "权限调整", value: 9 },
           ]
+        }
+        if (this.shareAuth === 3) {
+          const list = [
+            { label: "添加", value: 2 },
+            { label: "编辑", value: 3 },
+            { label: "概要", value: 1 },
+            { label: "应用", value: 5 },
+            { label: "历史", value: 6 },
+          ]
+          if (this.shareUserId === this.triUserId) {
+            list.push({ label: "权限调整", value: 9 })
+          }
+          return list
         }
         return [
           { label: "概要", value: 1 },

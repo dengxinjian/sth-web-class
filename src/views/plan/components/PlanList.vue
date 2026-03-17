@@ -636,31 +636,17 @@ export default {
     border-bottom: 1px solid #01010126;
     box-sizing: border-box;
 
-    @media (max-width: 1680px) {
-      padding: 0 10px;
-      gap: 10px;
-    }
-    @media (max-width: 1440px) {
-      padding: 0 10px;
-      gap: 10px;
-    }
-
-    @media (max-width: 1280px) {
-      padding: 0 8px;
-      gap: 8px;
-    }
-
     .class-type-item {
       padding-top: 5px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      white-space: nowrap;
 
       .title {
-        width: auto;
+        width: 69px;
         height: 32px;
+        // border-radius: 6px;
         text-align: center;
         color: #939393;
         border-bottom: 4px solid transparent;
@@ -671,18 +657,6 @@ export default {
         line-height: 32px;
         letter-spacing: 0%;
         cursor: pointer;
-
-        @media (max-width: 1680px) {
-          font-size: 13px;
-        }
-
-        @media (max-width: 1440px) {
-          font-size: 12px;
-        }
-
-        @media (max-width: 1280px) {
-          font-size: 11px;
-        }
       }
 
       .title-icon {
@@ -697,18 +671,7 @@ export default {
         font-style: Medium;
         font-size: 15px;
         color: #101010;
-
-        @media (max-width: 1680px) {
-          font-size: 13px;
-        }
-
-        @media (max-width: 1440px) {
-          font-size: 12px;
-        }
-
-        @media (max-width: 1280px) {
-          font-size: 11px;
-        }
+        // border-bottom: 4px solid #f92b30;
       }
     }
   }
@@ -753,18 +716,6 @@ export default {
       width: 200px;
       padding: 0 10px;
 
-      @media (max-width: 1680px) {
-        width: 170px;
-      }
-
-      @media (max-width: 1280px) {
-        width: 150px;
-      }
-
-      @media (max-width: 1024px) {
-        width: 130px;
-      }
-
       .group-name {
         display: flex;
         flex-direction: row;
@@ -776,33 +727,6 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          font-size: 14px;
-
-          @media (max-width: 1680px) {
-            font-size: 12px;
-          }
-
-          @media (max-width: 1280px) {
-            font-size: 11px;
-          }
-
-          @media (max-width: 1024px) {
-            font-size: 10px;
-          }
-        }
-
-        .group-name-count {
-          @media (max-width: 1680px) {
-            font-size: 12px;
-          }
-
-          @media (max-width: 1440px) {
-            font-size: 11px;
-          }
-
-          @media (max-width: 1280px) {
-            font-size: 10px;
-          }
         }
       }
     }
@@ -823,21 +747,6 @@ export default {
   padding: 10px;
   border-bottom: 1px solid#c3c9d72e;
   width: 100%;
-  font-size: 14px;
-
-  @media (max-width: 1680px) {
-    font-size: 12px;
-    gap: 6px;
-    padding: 8px;
-  }
-
-  @media (max-width: 1440px) {
-    font-size: 11px;
-  }
-
-  @media (max-width: 1280px) {
-    font-size: 10px;
-  }
 
   span {
     width: 100%;
@@ -892,21 +801,6 @@ export default {
   border-radius: 5px;
   font-size: 14px;
   color: #101010;
-
-  @media (max-width: 1680px) {
-    font-size: 12px;
-    width: 76px;
-    height: 28px;
-    line-height: 28px;
-  }
-
-  @media (max-width: 1440px) {
-    font-size: 11px;
-  }
-
-  @media (max-width: 1280px) {
-    font-size: 10px;
-  }
 
   &:hover {
     cursor: pointer;
@@ -1122,20 +1016,6 @@ export default {
     padding: 0 10px;
     box-sizing: border-box;
 
-    @media (max-width: 1680px) {
-      font-size: 12px;
-      height: 38px;
-      line-height: 38px;
-    }
-
-    @media (max-width: 1440px) {
-      font-size: 11px;
-    }
-
-    @media (max-width: 1280px) {
-      font-size: 10px;
-    }
-
     .team-operation-arrow {
       transition: transform 0.2s ease;
     }
@@ -1156,18 +1036,6 @@ export default {
       width: 198px;
       padding: 0 10px;
 
-      @media (max-width: 1680px) {
-        width: 168px;
-      }
-
-      @media (max-width: 1280px) {
-        width: 148px;
-      }
-
-      @media (max-width: 1024px) {
-        width: 128px;
-      }
-
       .group-name {
         display: flex;
         flex-direction: row;
@@ -1179,33 +1047,6 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          font-size: 14px;
-
-          @media (max-width: 1680px) {
-            font-size: 12px;
-          }
-
-          @media (max-width: 1440px) {
-            font-size: 11px;
-          }
-
-          @media (max-width: 1280px) {
-            font-size: 10px;
-          }
-        }
-
-        .group-name-count {
-          @media (max-width: 1680px) {
-            font-size: 12px;
-          }
-
-          @media (max-width: 1440px) {
-            font-size: 11px;
-          }
-
-          @media (max-width: 1280px) {
-            font-size: 10px;
-          }
         }
       }
     }

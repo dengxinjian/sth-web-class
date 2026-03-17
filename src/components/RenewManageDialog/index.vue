@@ -17,18 +17,22 @@
           <div v-if="summary.payType != null" class="summary-row">
             <span class="summary-item">
               <span class="summary-label">支付方式：</span>
-              <span class="summary-value">{{ formatPayType(summary.payType) }}</span>
+              <span
+                class="summary-value">{{ formatPayType(summary.payType, summary.subscribeType) }}</span>
             </span>
             <span class="summary-item">
               <span class="summary-label">支付金额：</span>
-              <span class="summary-value">¥{{ formatAmount(summary.orderAmount) }}</span>
+              <span class="summary-value">¥{{
+                formatAmount(summary.orderAmount) }}</span>
             </span>
             <span class="summary-item">
               <span class="summary-label">到期时间：</span>
-              <span class="summary-value">{{ formatDate(summary.expireTime) }}</span>
+              <span
+                class="summary-value">{{ formatDate(summary.expireTime) }}</span>
             </span>
           </div>
-          <div v-else-if="!loading && records.length === 0" class="summary-empty">
+          <div v-else-if="!loading && records.length === 0"
+            class="summary-empty">
             暂无付款记录
           </div>
 
@@ -39,30 +43,40 @@
             stripe
             size="small"
             class="record-table">
-            <el-table-column prop="outTradeNo" label="订单号" min-width="140" show-overflow-tooltip />
+            <el-table-column prop="outTradeNo" label="订单号"
+              min-width="140" show-overflow-tooltip />
             <el-table-column label="订单类型" width="90">
-              <template slot-scope="{ row }">{{ formatTradeType(row.tradeType) }}</template>
+              <template
+                slot-scope="{ row }">{{ formatTradeType(row.tradeType) }}</template>
             </el-table-column>
             <el-table-column label="时长" width="90">
-              <template slot-scope="{ row }">{{ formatSubscribeType(row.subscribeType) }}</template>
+              <template
+                slot-scope="{ row }">{{ formatSubscribeType(row.subscribeType, row.subscribeDay) }}</template>
             </el-table-column>
             <el-table-column label="生效时间" width="165">
-              <template slot-scope="{ row }">{{ formatDate(row.effectTime) }}</template>
+              <template
+                slot-scope="{ row }">{{ formatDate(row.effectTime) }}</template>
             </el-table-column>
             <el-table-column label="失效时间" width="165">
-              <template slot-scope="{ row }">{{ formatDate(row.expireTime) }}</template>
+              <template
+                slot-scope="{ row }">{{ formatDate(row.expireTime) }}</template>
             </el-table-column>
-            <el-table-column label="订单状态" width="100">
-              <template slot-scope="{ row }">{{ formatPayStatus(row.payStatus) }}</template>
+            <el-table-column label="支付方式" width="100">
+              <template
+                slot-scope="{ row }">{{ formatPayType(row.payType, row.subscribeType) }}</template>
             </el-table-column>
-            <el-table-column label="订单金额(元)" width="110" align="right">
-          <template slot-scope="{ row }">{{ formatAmount(row.orderAmount) }}</template>
+            <el-table-column label="订单金额(元)" width="110"
+              align="right">
+              <template
+                slot-scope="{ row }">{{ formatAmount(row.orderAmount) }}</template>
             </el-table-column>
             <el-table-column label="下单时间" width="165">
-              <template slot-scope="{ row }">{{ formatDate(row.orderTime) }}</template>
+              <template
+                slot-scope="{ row }">{{ formatDate(row.orderTime) }}</template>
             </el-table-column>
             <el-table-column label="支付时间" width="165">
-              <template slot-scope="{ row }">{{ formatDate(row.payTime) }}</template>
+              <template
+                slot-scope="{ row }">{{ formatDate(row.payTime) }}</template>
             </el-table-column>
           </el-table>
 
@@ -70,15 +84,11 @@
             <div class="footer-note">
               说明：开票请前往相关开票页面
             </div>
-            <el-pagination
-              v-if="pagination.total > 0"
+            <el-pagination v-if="pagination.total > 0"
               :current-page="pagination.pageNo"
               :page-size="pagination.pageSize"
-              :total="pagination.total"
-              layout="prev, pager, next"
-              prev-text="上一页"
-              next-text="下一页"
-              class="renew-pagination"
+              :total="pagination.total" layout="prev, pager, next"
+              prev-text="上一页" next-text="下一页" class="renew-pagination"
               :class="editionPaginationClass"
               @current-change="onPageChange" />
           </div>
@@ -181,10 +191,20 @@ export default {
       const s = String(d.getSeconds()).padStart(2, "0")
       return `${y}-${m}-${day} ${h}:${min}:${s}`
     },
-    formatPayType(v) {
+    formatPayType(v, subscribeType) {
+      console.log(v, subscribeType)
       const n = Number(v)
+      const s = Number(subscribeType)
       if (n === 1) return "微信"
       if (n === 2) return "支付宝"
+      if (n === 3) {
+        if (s === 11) return "激活码-精英版"
+        if (s === 12) return "激活码-专业版"
+        if (s === 13) return "激活码-精英天使用户"
+        if (s === 14) return "激活码-专业天使用户"
+        if (s === 15) return "激活码-PRO 版"
+        if (s === 16) return "激活码-认证教练"
+      }
       return "-"
     },
     formatSubscribeType(v) {
@@ -193,6 +213,12 @@ export default {
       if (n === 2) return "连续包月"
       if (n === 3) return "年卡"
       if (n === 4) return "连续包年"
+      if (n === 11) return "精英版"
+      if (n === 12) return "专业版"
+      if (n === 13) return "精英天使用户"
+      if (n === 14) return "专业天使用户"
+      if (n === 15) return "PRO 版"
+      if (n === 16) return "认证教练"
       return "-"
     },
     formatTradeType(v) {
@@ -200,6 +226,7 @@ export default {
       if (n === 1) return "订阅"
       if (n === 2) return "续费"
       if (n === 3) return "购买席位"
+      if (n === 4) return "激活码兑换"
       return "-"
     },
     formatPayStatus(v) {
@@ -231,6 +258,7 @@ export default {
             payType: latest.payType,
             orderAmount: latest.orderAmount,
             expireTime: latest.expireTime,
+            subscribeType: latest.subscribeType,
           }
         } else {
           this.summary = {}
@@ -340,9 +368,11 @@ export default {
     }
   }
 }
+
 .renew-manage-body {
   min-height: 200px;
 }
+
 .edition-header {
   font-size: 16px;
   font-weight: 700;
@@ -351,6 +381,7 @@ export default {
   padding-left: 10px;
   position: relative;
 }
+
 .edition-header::before {
   content: "";
   position: absolute;
@@ -360,12 +391,15 @@ export default {
   height: 18px;
   border-radius: 2px;
 }
+
 .edition-header--elite::before {
   background: linear-gradient(180deg, #008867 0%, #2bb673 100%);
 }
+
 .edition-header--pro::before {
   background: linear-gradient(180deg, #b81300 0%, #f92b30 100%);
 }
+
 .summary-row {
   display: flex;
   flex-wrap: wrap;
@@ -376,29 +410,35 @@ export default {
   border-radius: 8px;
   font-size: 14px;
 }
+
 .summary-item {
   .summary-label {
     color: #666;
   }
+
   .summary-value {
     color: #101010;
     font-weight: 600;
   }
 }
+
 .summary-empty {
   color: #999;
   font-size: 14px;
   margin-bottom: 16px;
 }
+
 .table-title {
   font-size: 14px;
   font-weight: 600;
   color: #101010;
   margin-bottom: 10px;
 }
+
 .record-table {
   margin-bottom: 16px;
 }
+
 .dialog-footer-row {
   display: flex;
   align-items: center;
@@ -406,17 +446,21 @@ export default {
   flex-wrap: wrap;
   gap: 12px;
 }
+
 .footer-note {
   font-size: 12px;
   color: #999;
 }
+
 .renew-pagination {
   display: flex;
   justify-content: flex-end;
 }
+
 .renew-pagination ::v-deep(.el-pagination) {
   font-weight: normal;
 }
+
 // .renew-pagination--pro ::v-deep(.el-pager li.active) {
 //   background-color: #b81300;
 // }
