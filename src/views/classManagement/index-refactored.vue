@@ -6,7 +6,7 @@
       <div class="content-container"
         v-if="activeName === 'athletic' || activeName === 'class'">
         <!-- 中间内容区 -->
-        <div class="type-change" ref="typeChangePanel"
+        <div class="type-change"
           :class="{ 'is-collapsed': leftPanelCollapsed }">
           <div
             class="panel-collapse-handle panel-collapse-handle--left"
@@ -371,7 +371,6 @@
     <ViewClassCard :visible="showViewClassCard"
       :activeClassType="activeClassType"
       :class-item="classModalData"
-      :dialog-margin-left="dialogMarginLeft"
       :active-class-type="activeClassType"
       @close="showViewClassCard = false" @move="handleMoveClass"
       @move-share-group="handleMoveShareGroup"
@@ -539,6 +538,7 @@ export default {
       activeName: "class",
       activeClassType: "my",
       loginType: localStorage.getItem("loginType") || "2",
+
       // 团队和运动员数据（下拉：团队 + 俱乐部）
       teamOrClubList: [],
       teamList: [],
@@ -570,7 +570,6 @@ export default {
       leftPanelCollapsed: localStorage.getItem("cm_leftPanelCollapsed") === "1",
       /** 右侧统计栏是否收起 */
       rightPanelCollapsed: localStorage.getItem("cm_rightPanelCollapsed") === "1",
-      typeChangePanelWidth: 0,
       scheduleTopHeight: 0,
       teamClassSearchKeyword: "",
       // 课程数量限制 -- 后续根据待用功能添加
@@ -662,9 +661,6 @@ export default {
     }
   },
   computed: {
-    dialogMarginLeft() {
-      return (this.typeChangePanelWidth + 70) + "px"
-    },
     leftHandleTop() {
       return `calc(50% + 56px)`
     },
@@ -799,9 +795,7 @@ export default {
       if (this.$refs.scheduleTop) {
         this.scheduleTopHeight = 58
       }
-      this.updateTypeChangePanelWidth()
     })
-    window.addEventListener("resize", this.updateTypeChangePanelWidth)
     // 根据路由初始化菜单状态
     this.activeName = localStorage.getItem("activeName") || "class"
     console.log(this.activeName, "this.activeName")
@@ -824,16 +818,10 @@ export default {
     this.$root.$on("identity-changed", this.handleIdentityChanged)
   },
   beforeDestroy() {
+    // 移除事件监听
     this.$root.$off("identity-changed", this.handleIdentityChanged)
-    window.removeEventListener("resize", this.updateTypeChangePanelWidth)
   },
   methods: {
-    updateTypeChangePanelWidth() {
-      this.$nextTick(() => {
-        const el = this.$refs.typeChangePanel
-        this.typeChangePanelWidth = el ? el.offsetWidth : 0
-      })
-    },
     toggleLeftPanel() {
       this.leftPanelCollapsed = !this.leftPanelCollapsed
       localStorage.setItem("cm_leftPanelCollapsed", this.leftPanelCollapsed ? "1" : "0")
@@ -2612,7 +2600,7 @@ export default {
     /**
      * 复制/添加课程
      */
-    handleCopyClassFromOfficial(classData, groupId, type) {
+    handleCopyClassFromOfficial(classData, groupId) {
       // 课程数量限制 -- 后续根据待用功能添加
       // if (
       //   this.currentUserClassConfig.currentCount >=
@@ -2621,15 +2609,7 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
-      console.log(classData, groupId, type, "classData, groupId, type")
-      if (type === 'team') {
-        console.log(classData.sourceClassId, "classData.sourceClassId")
-        this.copyClassFromOfficialClassId = classData.sourceClassId
-      } else {
-        console.log(classData.id, "classData.id")
-        this.copyClassFromOfficialClassId = classData.id
-      }
-      console.log(this.copyClassFromOfficialClassId, "this.copyClassFromOfficialClassId")
+      this.copyClassFromOfficialClassId = classData.id
       this.copyClassFromOfficialGroupId = groupId
       this.copyClassFromOfficialData = classData
       this.showCopyClassFromOfficial = true
@@ -3781,8 +3761,7 @@ export default {
     width: 0;
     overflow: visible;
     border-left: none;
-    // 收起后仍保留与右侧内容的分隔线
-    border-right: 1px solid #e5e5e5;
+    border-right: none;
 
     /* 收起时隐藏内部内容，仅保留把手 */
     > :not(.panel-collapse-handle) {
