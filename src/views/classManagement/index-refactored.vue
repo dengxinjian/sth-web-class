@@ -6,10 +6,11 @@
       <div class="content-container"
         v-if="activeName === 'athletic' || activeName === 'class'">
         <!-- 中间内容区 -->
-        <div class="type-change"
+        <div class="type-change" ref="typeChangePanel"
           :class="{ 'is-collapsed': leftPanelCollapsed }">
           <div
             class="panel-collapse-handle panel-collapse-handle--left"
+            :style="{ top: leftHandleTop }"
             :title="leftPanelCollapsed ? '展开左侧栏' : '收起左侧栏'"
             @click="toggleLeftPanel">
             <i
@@ -82,7 +83,7 @@
         </div>
 
         <div class="schedule-center-wrapper">
-          <div class="schedule-top"
+          <div class="schedule-top" ref="scheduleTop"
             :class="{ 'schedule-top--with-right-panel': !rightPanelCollapsed }">
             <div style="
                 display: flex;
@@ -268,7 +269,7 @@
             <PlanView :isPlan.sync="isPlan"
               @choose-plan="handleChoosePlan"
               :selected-team="selectedTeam" />
-              <ScheduleCalendar v-if="!isPlan"
+            <ScheduleCalendar v-if="!isPlan"
               :current-week="currentWeek"
               :team-list="teamList" :athletic-list="athleticList"
               :selected-team="selectedTeam"
@@ -370,6 +371,7 @@
     <ViewClassCard :visible="showViewClassCard"
       :activeClassType="activeClassType"
       :class-item="classModalData"
+      :dialog-margin-left="dialogMarginLeft"
       :active-class-type="activeClassType"
       @close="showViewClassCard = false" @move="handleMoveClass"
       @move-share-group="handleMoveShareGroup"
@@ -537,7 +539,6 @@ export default {
       activeName: "class",
       activeClassType: "my",
       loginType: localStorage.getItem("loginType") || "2",
-
       // 团队和运动员数据（下拉：团队 + 俱乐部）
       teamOrClubList: [],
       teamList: [],
@@ -569,6 +570,8 @@ export default {
       leftPanelCollapsed: localStorage.getItem("cm_leftPanelCollapsed") === "1",
       /** 右侧统计栏是否收起 */
       rightPanelCollapsed: localStorage.getItem("cm_rightPanelCollapsed") === "1",
+      typeChangePanelWidth: 0,
+      scheduleTopHeight: 0,
       teamClassSearchKeyword: "",
       // 课程数量限制 -- 后续根据待用功能添加
       // currentUserClassConfig: {},
@@ -659,6 +662,12 @@ export default {
     }
   },
   computed: {
+    dialogMarginLeft() {
+      return (this.typeChangePanelWidth + 70) + "px"
+    },
+    leftHandleTop() {
+      return `calc(50% + 56px)`
+    },
     athleticGroupOptions() {
       const list = Array.isArray(this.athleticList) ? this.athleticList : []
       console.log(list, "list")
@@ -786,6 +795,13 @@ export default {
     },
   },
   mounted() {
+    this.$nextTick(() => {
+      if (this.$refs.scheduleTop) {
+        this.scheduleTopHeight = 58
+      }
+      this.updateTypeChangePanelWidth()
+    })
+    window.addEventListener("resize", this.updateTypeChangePanelWidth)
     // 根据路由初始化菜单状态
     this.activeName = localStorage.getItem("activeName") || "class"
     console.log(this.activeName, "this.activeName")
@@ -808,10 +824,16 @@ export default {
     this.$root.$on("identity-changed", this.handleIdentityChanged)
   },
   beforeDestroy() {
-    // 移除事件监听
     this.$root.$off("identity-changed", this.handleIdentityChanged)
+    window.removeEventListener("resize", this.updateTypeChangePanelWidth)
   },
   methods: {
+    updateTypeChangePanelWidth() {
+      this.$nextTick(() => {
+        const el = this.$refs.typeChangePanel
+        this.typeChangePanelWidth = el ? el.offsetWidth : 0
+      })
+    },
     toggleLeftPanel() {
       this.leftPanelCollapsed = !this.leftPanelCollapsed
       localStorage.setItem("cm_leftPanelCollapsed", this.leftPanelCollapsed ? "1" : "0")
@@ -3723,7 +3745,7 @@ export default {
 }
 
 .type-change {
-  flex: 0 0 260px;
+  flex: 0 0 240px;
   height: 100vh;
   max-height: calc(100vh - 60px);
   background-color: #fff;
@@ -3733,6 +3755,18 @@ export default {
   border-right: 1px solid #e5e5e5;
   position: relative;
   transition: flex-basis 0.2s ease, width 0.2s ease;
+
+  @media (max-width: 1680px) {
+    flex: 0 0 220px;
+  }
+
+  @media (max-width: 1440px) {
+    flex: 0 0 200px;
+  }
+
+  @media (max-width: 1280px) {
+    flex: 0 0 180px;
+  }
 
   &.is-collapsed {
     flex: 0 0 0;
@@ -3803,6 +3837,10 @@ export default {
     > :not(.panel-collapse-handle) {
       opacity: 0;
       pointer-events: none;
+    }
+
+    .panel-collapse-handle--right {
+      left: -22px;
     }
   }
 
@@ -4149,7 +4187,7 @@ export default {
 .schedule-top--with-right-panel {
   margin-right: -235px;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1680px) {
     margin-right: -220px;
   }
 

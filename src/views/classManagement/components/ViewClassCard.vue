@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible.sync="innerVisible" width="20%"
+    <el-dialog :visible.sync="innerVisible" width="300px"
       :before-close="handleClose" append-to-body :show-close="false"
       :modal="false" top="20vh" :custom-class="dialogCustomClass"
       :style="{ '--dialog-margin-left': dialogMarginLeft }">
