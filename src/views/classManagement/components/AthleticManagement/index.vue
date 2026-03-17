@@ -1080,9 +1080,13 @@ export default {
 }
 .athletic-btn {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+
+  .el-button + .el-button {
+    margin-left: 0;
+  }
 }
 .athletic-operation {
   display: flex;

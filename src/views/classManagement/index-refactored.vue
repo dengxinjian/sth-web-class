@@ -10,6 +10,7 @@
           :class="{ 'is-collapsed': leftPanelCollapsed }">
           <div
             class="panel-collapse-handle panel-collapse-handle--left"
+            :style="{ top: leftHandleTop }"
             :title="leftPanelCollapsed ? '展开左侧栏' : '收起左侧栏'"
             @click="toggleLeftPanel">
             <i
@@ -82,7 +83,7 @@
         </div>
 
         <div class="schedule-center-wrapper">
-          <div class="schedule-top"
+          <div class="schedule-top" ref="scheduleTop"
             :class="{ 'schedule-top--with-right-panel': !rightPanelCollapsed }">
             <div style="
                 display: flex;
@@ -268,7 +269,7 @@
             <PlanView :isPlan.sync="isPlan"
               @choose-plan="handleChoosePlan"
               :selected-team="selectedTeam" />
-              <ScheduleCalendar v-if="!isPlan"
+            <ScheduleCalendar v-if="!isPlan"
               :current-week="currentWeek"
               :team-list="teamList" :athletic-list="athleticList"
               :selected-team="selectedTeam"
@@ -569,6 +570,7 @@ export default {
       leftPanelCollapsed: localStorage.getItem("cm_leftPanelCollapsed") === "1",
       /** 右侧统计栏是否收起 */
       rightPanelCollapsed: localStorage.getItem("cm_rightPanelCollapsed") === "1",
+      scheduleTopHeight: 0,
       teamClassSearchKeyword: "",
       // 课程数量限制 -- 后续根据待用功能添加
       // currentUserClassConfig: {},
@@ -659,6 +661,9 @@ export default {
     }
   },
   computed: {
+    leftHandleTop() {
+      return `calc(50% + 56px)`
+    },
     athleticGroupOptions() {
       const list = Array.isArray(this.athleticList) ? this.athleticList : []
       console.log(list, "list")
@@ -786,6 +791,11 @@ export default {
     },
   },
   mounted() {
+    this.$nextTick(() => {
+      if (this.$refs.scheduleTop) {
+        this.scheduleTopHeight = 58
+      }
+    })
     // 根据路由初始化菜单状态
     this.activeName = localStorage.getItem("activeName") || "class"
     console.log(this.activeName, "this.activeName")
@@ -3723,7 +3733,7 @@ export default {
 }
 
 .type-change {
-  flex: 0 0 260px;
+  flex: 0 0 240px;
   height: 100vh;
   max-height: calc(100vh - 60px);
   background-color: #fff;
@@ -3733,6 +3743,18 @@ export default {
   border-right: 1px solid #e5e5e5;
   position: relative;
   transition: flex-basis 0.2s ease, width 0.2s ease;
+
+  @media (max-width: 1680px) {
+    flex: 0 0 220px;
+  }
+
+  @media (max-width: 1440px) {
+    flex: 0 0 200px;
+  }
+
+  @media (max-width: 1280px) {
+    flex: 0 0 180px;
+  }
 
   &.is-collapsed {
     flex: 0 0 0;
@@ -3803,6 +3825,10 @@ export default {
     > :not(.panel-collapse-handle) {
       opacity: 0;
       pointer-events: none;
+    }
+
+    .panel-collapse-handle--right {
+      left: -22px;
     }
   }
 
@@ -4149,7 +4175,7 @@ export default {
 .schedule-top--with-right-panel {
   margin-right: -235px;
 
-  @media (max-width: 1440px) {
+  @media (max-width: 1680px) {
     margin-right: -220px;
   }
 

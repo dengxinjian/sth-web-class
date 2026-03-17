@@ -81,27 +81,27 @@
         <div class="schedule-table-body">
           <div
             v-for="(item, index) in currentWeek"
-            :key="`day-${item.commonDate || index}-${
-              item.timesp || Date.now()
-            }`"
-            class="schedule-table-cell"
-          >
+            :key="`day-${item.commonDate || index}-${item.timesp || Date.now()
+              }`"
+            class="schedule-table-cell">
             <div
               :class="item.commonDate === today ? 'schedule-table-cell-title-cur' : 'schedule-table-cell-title'"
               @contextmenu.stop.prevent="showDateTitleContextMenu($event, item.commonDate)">
               <div class="cell-title-main">
-                <span class="cell-title-day">{{ new Date(item?.commonDate).getDate() }}</span>
-                <span class="cell-title-week">{{ getWeekDayLabel(item?.commonDate) }}</span>
+                <span
+                  class="cell-title-day">{{ new Date(item?.commonDate).getDate() }}</span>
+                <span
+                  class="cell-title-week">{{ getWeekDayLabel(item?.commonDate) }}</span>
               </div>
-              <div class="cell-title-lunar">（{{ convertToLunar(item?.commonDate).dateStr }}）</div>
+              <div class="cell-title-lunar">（{{
+                convertToLunar(item?.commonDate).dateStr }}）</div>
             </div>
             <div
               class="schedule-table-cell-item js-schedule-drag-container"
               :data-date="item.commonDate"
               @contextmenu.stop.prevent="
                 showContextMenu($event, item.commonDate)
-              "
-            >
+                ">
               <!-- 健康数据 -->
               <HealthDataCard
                 v-for="healthDataItem in item.healthInfos"
@@ -109,8 +109,7 @@
                 class="js-health-data-no-drag"
                 :health-data="healthDataItem"
                 :date="item.commonDate"
-                @click="$emit('view-health-data', $event)"
-              />
+                @click="$emit('view-health-data', $event)" />
 
               <!-- 赛事 -->
               <EventCard
@@ -122,8 +121,7 @@
                 @edit="handleEditEvent"
                 @copy="handleCopyEvent"
                 @cut="handleCutEvent"
-                @click-event-activity="handleClickEventActivity"
-              />
+                @click-event-activity="handleClickEventActivity" />
               <!-- 课表卡片 -->
               <ScheduleClassCard
                 v-for="classItem in item.classSchedule"
@@ -135,35 +133,31 @@
                 @device-click="handleDeviceClick"
                 @edit="$emit('edit-schedule', $event)"
                 @copy="handleCopyClass"
-                @cut="handleCutClass"
-              />
+                @cut="handleCutClass" />
               <!-- 运动记录卡片 -->
               <ActivityCard
                 v-for="(activityItem, activityIndex) in item.activityList"
-                :key="`activity-${item.commonDate}-${
-                  activityItem.activityId ||
+                :key="`activity-${item.commonDate}-${activityItem.activityId ||
                   activityItem.manualActivityId ||
                   activityIndex
-                }-${
-                  activityItem.classScheduleId || 'unmatched'
-                }-${!!activityItem.classesJson}-${item.timesp || Date.now()}`"
+                  }-${activityItem.classScheduleId || 'unmatched'
+                  }-${!!activityItem.classesJson}-${item.timesp || Date.now()}`"
                 :activity="activityItem"
                 :date="item.commonDate"
                 @click="$emit('activity-detail', activityItem)"
                 @unbind="$emit('unbind', $event)"
                 @delete="$emit('delete-activity', $event)"
                 @edit="$emit('edit-activity', activityItem)"
-                @copy="handleCopyActivity"
-              />
+                @copy="handleCopyActivity" />
 
               <!-- 添加课表 -->
               <div
                 class="box-content js-schedule-drag-no-drag"
-                @click="handleAddSchedule(item.commonDate)"
-              >
+                @click="handleAddSchedule(item.commonDate)">
                 <div class="box-plus-circle">
                   <!-- <div class="box-plus">+</div> -->
-                   <img src="~@/assets/addClass/add-circle.png" alt="" style="width: 24px;height: 24px;">
+                  <img src="~@/assets/addClass/add-circle.png" alt=""
+                    style="width: 24px;height: 24px;">
                 </div>
               </div>
             </div>
@@ -175,15 +169,13 @@
                   left: contextMenuX + 'px',
                   top: contextMenuY + 'px',
                 }"
-                @click.stop
-              >
+                @click.stop>
                 <div
                   class="context-menu-item"
                   @click="
-                    handleAddSchedule(contextMenuDate);
-                    hideContextMenu();
-                  "
-                >
+                    handleAddSchedule(contextMenuDate)
+                  hideContextMenu()
+                    ">
                   <span>添加</span>
                 </div>
                 <!-- 录入运动 只有在当前日期小于等于今天时才显示-->
@@ -193,17 +185,15 @@
                   "
                   class="context-menu-item"
                   @click="
-                    handleInputActivity(contextMenuDate);
-                    hideContextMenu();
-                  "
-                >
+                    handleInputActivity(contextMenuDate)
+                  hideContextMenu()
+                    ">
                   <span>录入运动</span>
                 </div>
                 <div
                   v-if="hasCopiedClass || hasCopiedEvent"
                   class="context-menu-item"
-                  @click="handlePaste"
-                >
+                  @click="handlePaste">
                   <span>粘贴</span>
                 </div>
               </div>
@@ -233,14 +223,14 @@
 </template>
 
 <script>
-import WeekRangePicker from "@/components/WeekRangePicker";
-import ScheduleClassCard from "./ScheduleClassCard.vue";
-import ActivityCard from "./ActivityCard.vue";
-import HealthDataCard from "./HealthDataCard.vue";
-import { WEEK_LIST, ACTIVITY_TYPE_DICT } from "../constants";
-import { isToday, convertToLunar } from "../utils/helpers";
-import draggable from "vuedraggable";
-import EventCard from "./eventCard.vue";
+import WeekRangePicker from "@/components/WeekRangePicker"
+import ScheduleClassCard from "./ScheduleClassCard.vue"
+import ActivityCard from "./ActivityCard.vue"
+import HealthDataCard from "./HealthDataCard.vue"
+import { WEEK_LIST, ACTIVITY_TYPE_DICT } from "../constants"
+import { isToday, convertToLunar } from "../utils/helpers"
+import draggable from "vuedraggable"
+import EventCard from "./eventCard.vue"
 
 export default {
   name: "ScheduleCalendar",
@@ -294,15 +284,15 @@ export default {
       dateTitleContextMenuX: 0, // 日期标题右键菜单位置X
       dateTitleContextMenuY: 0, // 日期标题右键菜单位置Y
       dateTitleContextMenuDate: null, // 日期标题右键菜单的日期
-    };
+    }
   },
   mounted() {
-    document.addEventListener("click", this.hideContextMenu);
-    document.addEventListener("click", this.hideDateTitleContextMenu);
+    document.addEventListener("click", this.hideContextMenu)
+    document.addEventListener("click", this.hideDateTitleContextMenu)
   },
   beforeDestroy() {
-    document.removeEventListener("click", this.hideContextMenu);
-    document.removeEventListener("click", this.hideDateTitleContextMenu);
+    document.removeEventListener("click", this.hideContextMenu)
+    document.removeEventListener("click", this.hideDateTitleContextMenu)
   },
   methods: {
     isToday,
@@ -314,79 +304,79 @@ export default {
       return `周${weekDays[day]}`
     },
     handleClickDate(date) {
-      this.$emit("click-date", date);
+      this.$emit("click-date", date)
     },
     handleClickEventActivity(activity) {
-      console.log("handleClickEventActivity-activity-1", activity);
-      this.$emit("click-event-activity", activity);
+      console.log("handleClickEventActivity-activity-1", activity)
+      this.$emit("click-event-activity", activity)
     },
     handleEditEvent(eventItem, type) {
-      this.$emit("edit-event", eventItem, type);
+      this.$emit("edit-event", eventItem, type)
     },
     handleDeviceClick(classItem, device) {
-      this.$emit("device-click", classItem, device);
+      this.$emit("device-click", classItem, device)
     },
     // 添加课表
     handleAddSchedule(date) {
-      this.$emit("add-schedule", date);
+      this.$emit("add-schedule", date)
     },
     showContextMenu(event, date) {
-      console.log("showContextMenu-1", event, date);
+      console.log("showContextMenu-1", event, date)
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
       this.$nextTick(() => {
-        this.contextMenuVisible = true;
-        this.contextMenuDate = date;
+        this.contextMenuVisible = true
+        this.contextMenuDate = date
 
         // 先设置初始位置
-        let x = event.clientX;
-        let y = event.clientY;
+        let x = event.clientX
+        let y = event.clientY
 
         // 等待菜单渲染完成后再计算边界并调整位置
         this.$nextTick(() => {
-          const menuElement = document.querySelector(".context-menu");
+          const menuElement = document.querySelector(".context-menu")
           if (!menuElement) {
-            this.contextMenuX = x;
-            this.contextMenuY = y;
-            return;
+            this.contextMenuX = x
+            this.contextMenuY = y
+            return
           }
 
-          const menuRect = menuElement.getBoundingClientRect();
-          const menuWidth = menuRect.width;
-          const menuHeight = menuRect.height;
+          const menuRect = menuElement.getBoundingClientRect()
+          const menuWidth = menuRect.width
+          const menuHeight = menuRect.height
 
           // 获取视口尺寸
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
+          const viewportWidth = window.innerWidth
+          const viewportHeight = window.innerHeight
 
           // 限制右边界
           if (x + menuWidth > viewportWidth) {
-            x = viewportWidth - menuWidth - 10;
+            x = viewportWidth - menuWidth - 10
           }
 
           // 限制左边界
           if (x < 10) {
-            x = 10;
+            x = 10
           }
 
           // 限制下边界
           if (y + menuHeight > viewportHeight) {
-            y = viewportHeight - menuHeight - 10;
+            y = viewportHeight - menuHeight - 10
           }
 
           // 限制上边界
           if (y < 10) {
-            y = 10;
+            y = 10
           }
 
           // 更新菜单位置
-          this.contextMenuX = x;
-          this.contextMenuY = y;
-        });
-      });
+          this.contextMenuX = x
+          this.contextMenuY = y
+        })
+      })
     },
     hideContextMenu() {
-      this.contextMenuVisible = false;
-      this.contextMenuDate = null;
+      this.contextMenuVisible = false
+      this.contextMenuDate = null
       // 不要清除 copiedClass 和 hasCopiedClass，这样复制状态会保留
     },
     handlePaste() {
@@ -395,22 +385,22 @@ export default {
         this.contextMenuDate,
         this.copiedClass,
         this.copiedEvent
-      );
+      )
 
       // 处理课程粘贴
       if (this.copiedClass !== null) {
         if (this.hasCutClass) {
-          this.$emit("cut-class", this.contextMenuDate, this.copiedClass);
-          this.hideContextMenu();
-          this.hasCutClass = false;
-          this.copiedClass = null;
-          this.hasCopiedClass = false;
-          return;
+          this.$emit("cut-class", this.contextMenuDate, this.copiedClass)
+          this.hideContextMenu()
+          this.hasCutClass = false
+          this.copiedClass = null
+          this.hasCopiedClass = false
+          return
         }
-        this.$emit("paste-class", this.contextMenuDate, this.copiedClass);
-        this.hideContextMenu();
-        this.hasCopiedClass = false;
-        this.copiedClass = null;
+        this.$emit("paste-class", this.contextMenuDate, this.copiedClass)
+        this.hideContextMenu()
+        this.hasCopiedClass = false
+        this.copiedClass = null
       }
 
       // 处理赛事粘贴
@@ -421,40 +411,40 @@ export default {
             this.contextMenuDate,
             this.copiedEvent,
             this.cutEvent
-          );
-          this.hideContextMenu();
-          this.hasCutEvent = false;
-          this.copiedEvent = null;
-          this.hasCopiedEvent = false;
-          this.cutEvent = null;
-          return;
+          )
+          this.hideContextMenu()
+          this.hasCutEvent = false
+          this.copiedEvent = null
+          this.hasCopiedEvent = false
+          this.cutEvent = null
+          return
         }
-        this.$emit("paste-event", this.contextMenuDate, this.copiedEvent);
-        this.hideContextMenu();
-        this.hasCopiedEvent = false;
-        this.copiedEvent = null;
+        this.$emit("paste-event", this.contextMenuDate, this.copiedEvent)
+        this.hideContextMenu()
+        this.hasCopiedEvent = false
+        this.copiedEvent = null
       }
     },
     handleCutClass(classItem) {
-      this.copiedClass = { ...classItem };
-      this.hasCopiedClass = true;
-      this.hasCutClass = true;
+      this.copiedClass = { ...classItem }
+      this.hasCopiedClass = true
+      this.hasCutClass = true
       this.$message({
         message: "课表已剪切，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
     },
     handleCopyClass(classItem) {
-      this.copiedClass = { ...classItem };
-      this.hasCopiedClass = true;
+      this.copiedClass = { ...classItem }
+      this.hasCopiedClass = true
       // 清除剪切状态，因为复制操作会覆盖剪切操作
-      this.hasCutClass = false;
+      this.hasCutClass = false
       this.$message({
         message: "课表已复制，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
     },
     handleCopyActivity(activity) {
       this.copiedClass = {
@@ -463,54 +453,54 @@ export default {
         labels: activity.classesJson.labels,
         classesTitle: activity.classesJson.title,
         classesGroupId: activity.classesJson.groupId,
-      };
-      this.hasCopiedClass = true;
+      }
+      this.hasCopiedClass = true
       this.$message({
         message: "课表已复制，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
     },
     // 赛事复制
     handleCopyEvent(eventItem) {
       if (!eventItem) {
-        console.error("handleCopyEvent: eventItem is null or undefined");
-        return;
+        console.error("handleCopyEvent: eventItem is null or undefined")
+        return
       }
       // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
-      const { id, ...eventData } = eventItem;
-      this.copiedEvent = { ...eventData };
-      this.hasCopiedEvent = true;
+      const { id, ...eventData } = eventItem
+      this.copiedEvent = { ...eventData }
+      this.hasCopiedEvent = true
       // 清除剪切状态，因为复制操作会覆盖剪切操作
-      this.hasCutEvent = false;
-      this.cutEvent = null;
+      this.hasCutEvent = false
+      this.cutEvent = null
       this.$message({
         message: "赛事已复制，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
     },
     // 赛事剪切
     handleCutEvent(eventItem) {
       if (!eventItem) {
-        console.error("handleCutEvent: eventItem is null or undefined");
-        return;
+        console.error("handleCutEvent: eventItem is null or undefined")
+        return
       }
       // 复制赛事数据，但清除 id 字段（因为粘贴时是新赛事）
-      const { id, ...eventData } = eventItem;
-      this.copiedEvent = { ...eventData };
-      this.hasCopiedEvent = true;
-      this.hasCutEvent = true;
+      const { id, ...eventData } = eventItem
+      this.copiedEvent = { ...eventData }
+      this.hasCopiedEvent = true
+      this.hasCutEvent = true
       // 保存剪切信息，用于删除原位置
       this.cutEvent = {
         eventItem: { ...eventItem }, // 保存完整的原赛事数据，包括 id
         date: eventItem.competitionTime || this.contextMenuDate,
-      };
+      }
       this.$message({
         message: "赛事已剪切，右键点击目标日期可粘贴",
         type: "success",
         duration: 2000,
-      });
+      })
     },
     handleDragMove(evt) {
       // 处理拖拽移动事件，确保空容器也能接收拖拽
@@ -519,95 +509,95 @@ export default {
         // 检查目标容器是否存在且有效
         if (evt && evt.to) {
           // 确保目标容器有有效的 Sortable 实例
-          const sortableInstance = evt.to.sortableInstance;
+          const sortableInstance = evt.to.sortableInstance
           if (sortableInstance && sortableInstance.options) {
-            return true;
+            return true
           }
           // 即使没有实例，也允许移动（vuedraggable 会自动处理）
-          return true;
+          return true
         }
-        return false;
+        return false
       } catch (error) {
         // 如果出现错误，允许移动以避免阻塞拖拽功能
-        console.warn("拖拽移动事件处理出错:", error);
-        return true;
+        console.warn("拖拽移动事件处理出错:", error)
+        return true
       }
     },
     handleInputActivity(date) {
-      this.$emit("input-activity", date);
+      this.$emit("input-activity", date)
     },
     // 显示日期标题右键菜单
     showDateTitleContextMenu(event, date) {
-      event.preventDefault();
-      event.stopPropagation();
+      event.preventDefault()
+      event.stopPropagation()
 
-      this.dateTitleContextMenuVisible = true;
-      this.dateTitleContextMenuDate = date;
+      this.dateTitleContextMenuVisible = true
+      this.dateTitleContextMenuDate = date
 
       // 直接使用鼠标位置（相对于视口，因为菜单使用 fixed 定位）
-      let x = event.clientX;
-      let y = event.clientY;
+      let x = event.clientX
+      let y = event.clientY
 
       // 使用 nextTick 确保菜单已渲染，然后调整位置避免超出视口
       this.$nextTick(() => {
-        const menuElement = document.querySelector(".date-title-context-menu");
+        const menuElement = document.querySelector(".date-title-context-menu")
         if (!menuElement) {
-          this.dateTitleContextMenuX = x;
-          this.dateTitleContextMenuY = y;
-          return;
+          this.dateTitleContextMenuX = x
+          this.dateTitleContextMenuY = y
+          return
         }
 
-        const menuRect = menuElement.getBoundingClientRect();
-        const menuWidth = menuRect.width;
-        const menuHeight = menuRect.height;
+        const menuRect = menuElement.getBoundingClientRect()
+        const menuWidth = menuRect.width
+        const menuHeight = menuRect.height
 
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth
+        const viewportHeight = window.innerHeight
 
         // 调整位置，确保菜单不超出视口
         if (x + menuWidth > viewportWidth) {
-          x = viewportWidth - menuWidth - 10;
+          x = viewportWidth - menuWidth - 10
         }
 
         if (x < 10) {
-          x = 10;
+          x = 10
         }
 
         if (y + menuHeight > viewportHeight) {
-          y = viewportHeight - menuHeight - 10;
+          y = viewportHeight - menuHeight - 10
         }
 
         if (y < 10) {
-          y = 10;
+          y = 10
         }
 
-        this.dateTitleContextMenuX = x;
-        this.dateTitleContextMenuY = y;
-      });
+        this.dateTitleContextMenuX = x
+        this.dateTitleContextMenuY = y
+      })
     },
     // 隐藏日期标题右键菜单
     hideDateTitleContextMenu() {
-      this.dateTitleContextMenuVisible = false;
-      this.dateTitleContextMenuDate = null;
+      this.dateTitleContextMenuVisible = false
+      this.dateTitleContextMenuDate = null
     },
     // 删除该日期所有课表
     handleDeleteAllSchedules() {
-      if (!this.dateTitleContextMenuDate) return;
+      if (!this.dateTitleContextMenuDate) return
 
       // 先保存日期值，避免在 hideDateTitleContextMenu 中被清空
-      const targetDate = this.dateTitleContextMenuDate;
+      const targetDate = this.dateTitleContextMenuDate
 
       const dateItem = this.currentWeek.find(
         (item) => item.commonDate === targetDate
-      );
+      )
 
       if (!dateItem || !dateItem.classSchedule || dateItem.classSchedule.length === 0) {
-        this.$message.info("该日期没有课表");
-        this.hideDateTitleContextMenu();
-        return;
+        this.$message.info("该日期没有课表")
+        this.hideDateTitleContextMenu()
+        return
       }
 
-      const scheduleCount = dateItem.classSchedule.length;
+      const scheduleCount = dateItem.classSchedule.length
       this.$confirm(
         `确认删除该日期下的所有课表（共${scheduleCount}个）？`,
         "提示",
@@ -619,21 +609,22 @@ export default {
       )
         .then(() => {
           // 使用保存的日期值触发事件
-          this.$emit("delete-all-schedules", targetDate);
-          this.hideDateTitleContextMenu();
+          this.$emit("delete-all-schedules", targetDate)
+          this.hideDateTitleContextMenu()
         })
         .catch(() => {
-          this.hideDateTitleContextMenu();
-        });
+          this.hideDateTitleContextMenu()
+        })
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
 .schedule-class {
   display: none !important;
 }
+
 .schedule {
   flex: 1;
   // display: flex;
@@ -709,49 +700,14 @@ export default {
   min-width: 0;
 
   .schedule-table-cell {
-    /* 作为 flex 子项平均分配宽度，收起侧栏后可自动撑满 */
-    flex: 1 0 0;
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    min-width: 168px; /* 默认 */
-    max-width: none;
+    min-width: 100px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
     box-sizing: border-box;
-
-    /* 小屏优先：收缩列宽，避免横向溢出过多 */
-    @media (max-width: 1440px) {
-      min-width: 140px;
-    }
-
-    @media (max-width: 1366px) {
-      min-width: 120px;
-    }
-
-    @media (max-width: 1280px) {
-      min-width: 110px;
-    }
-
-    /* 16寸电脑 */
-    @media (min-width: 1600px) {
-      min-width: 169px;
-    }
-
-    /* 17寸电脑 */
-    @media (min-width: 1700px) {
-      min-width: 179px;
-    }
-
-    /* 18寸电脑 */
-    @media (min-width: 1800px) {
-      min-width: 180px;
-    }
-
-    /* 19寸电脑 */
-    @media (min-width: 1920px) {
-      min-width: 194px;
-    }
 
     .schedule-table-cell-title {
       line-height: 40px;
@@ -772,34 +728,52 @@ export default {
         gap: 6px;
         min-width: 0;
       }
+
       .cell-title-day {
         font-size: 15px;
         font-weight: 600;
         color: #333;
       }
+
       .cell-title-week {
         font-size: 12px;
         color: #666;
         white-space: nowrap;
       }
+
       .cell-title-lunar {
         font-size: 12px;
         color: #666;
         white-space: nowrap;
       }
 
-      @media (max-width: 1366px) {
-        padding: 0 14px;
-        /* 小屏：标题纵向堆叠，避免挤压错乱 */
+      @media (max-width: 1580px) {
+        padding: 0 10px;
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
         line-height: 18px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        row-gap: 4px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        row-gap: 2px;
+        font-size: 13px;
+
+        .cell-title-main {
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .cell-title-day {
+          font-size: 13px;
+        }
+
+        .cell-title-week {
+          font-size: 11px;
+          white-space: normal;
+        }
 
         .cell-title-lunar {
+          font-size: 11px;
           white-space: normal;
         }
       }
@@ -824,36 +798,56 @@ export default {
         gap: 6px;
         min-width: 0;
       }
+
       .cell-title-day {
         font-size: 15px;
         font-weight: 600;
         color: #F92B30;
       }
+
       .cell-title-week {
         font-size: 12px;
         color: #F92B30;
         white-space: nowrap;
       }
+
       .cell-title-lunar {
         font-size: 12px;
         color: #F92B30;
         white-space: nowrap;
       }
 
-      @media (max-width: 1366px) {
-        padding: 0 14px;
+      @media (max-width: 1580px) {
+        padding: 0 10px;
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
         line-height: 18px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        row-gap: 4px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        row-gap: 2px;
+        font-size: 13px;
+
+        .cell-title-main {
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .cell-title-day {
+          font-size: 13px;
+        }
+
+        .cell-title-week {
+          font-size: 11px;
+          white-space: normal;
+        }
 
         .cell-title-lunar {
+          font-size: 11px;
           white-space: normal;
         }
       }
+
       background-color: #F92B300D;
       color: #F92B30;
       border: 1px solid #F92B304D;
@@ -866,14 +860,18 @@ export default {
       color: #333;
       cursor: pointer;
       padding-bottom: 100px;
-      transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
-      will-change: transform; /* 提示浏览器优化渲染 */
+      transform: none !important;
+      /* 避免与Sortable的矩阵变换冲突 */
+      will-change: transform;
+      /* 提示浏览器优化渲染 */
       /* 显示添加入口：整个单元格悬停时展示 */
       // background-color: #f6f6f6;
       height: 100%;
+
       &:hover {
         .box-content {
           opacity: 1;
+
           .box-plus-circle {
             border-color: #bc362e;
 
@@ -915,13 +913,16 @@ export default {
       }
     }
   }
+
   .schedule-table-cell:first-child {
     border-left: none;
   }
 }
+
 ::v-deep .is-drag-chosen {
   background-color: #fff !important;
 }
+
 /* 拖拽克隆元素样式 - 红色矩形带渐变效果 */
 ::v-deep .is-drag-ghost {
   position: relative;
@@ -952,13 +953,11 @@ export default {
     left: 0;
     right: 0;
     height: 25%;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.35) 0%,
-      rgba(255, 240, 240, 0.2) 30%,
-      rgba(255, 200, 200, 0.1) 60%,
-      transparent 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.35) 0%,
+        rgba(255, 240, 240, 0.2) 30%,
+        rgba(255, 200, 200, 0.1) 60%,
+        transparent 100%);
     pointer-events: none;
     border-radius: 6px 6px 0 0;
     z-index: 1;
@@ -972,12 +971,10 @@ export default {
     left: 0;
     right: 0;
     height: 20%;
-    background: linear-gradient(
-      to top,
-      rgba(180, 0, 0, 0.3) 0%,
-      rgba(200, 50, 50, 0.15) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(to top,
+        rgba(180, 0, 0, 0.3) 0%,
+        rgba(200, 50, 50, 0.15) 50%,
+        transparent 100%);
     pointer-events: none;
     border-radius: 0 0 6px 6px;
     z-index: 1;
@@ -986,8 +983,10 @@ export default {
 
 ::v-deep .js-class-drag-container {
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  min-height: 40px; /* 确保空容器也有足够的高度以被检测到 */
-  position: relative; /* 确保定位上下文正确 */
+  min-height: 40px;
+  /* 确保空容器也有足够的高度以被检测到 */
+  position: relative;
+  /* 确保定位上下文正确 */
 }
 
 ::v-deep .js-class-drag-container.is-class-drop-target {
@@ -1028,6 +1027,7 @@ export default {
     line-height: 32px;
     color: #101010;
     cursor: pointer;
+
     &:hover {
       background-color: #c3c9d740;
       font-family: PingFang SC;
@@ -1037,6 +1037,7 @@ export default {
     }
   }
 }
+
 .context-menu-fade-enter-active,
 .context-menu-fade-leave-active {
   transition: opacity 0.2s ease;

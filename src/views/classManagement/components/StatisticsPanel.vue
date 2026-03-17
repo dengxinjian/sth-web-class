@@ -153,7 +153,7 @@ export default {
 
 <style lang="scss" scoped>
 .week-statistic {
-  flex: 0 0 235px;
+  flex: 0 0 220px;
   background-color: #fff;
   display: flex;
   flex-direction: column;
