@@ -667,6 +667,7 @@ export default {
 .schedule-class {
   display: none !important;
 }
+
 .schedule {
   flex: 1;
   // display: flex;
@@ -742,49 +743,14 @@ export default {
   min-width: 0;
 
   .schedule-table-cell {
-    /* 作为 flex 子项平均分配宽度，收起侧栏后可自动撑满 */
-    flex: 1 0 0;
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    min-width: 168px; /* 默认 */
-    max-width: none;
+    min-width: 100px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
     border-left: 1px solid #e5e5e5;
     box-sizing: border-box;
-
-    /* 小屏优先：收缩列宽，避免横向溢出过多 */
-    @media (max-width: 1440px) {
-      min-width: 140px;
-    }
-
-    @media (max-width: 1366px) {
-      min-width: 120px;
-    }
-
-    @media (max-width: 1280px) {
-      min-width: 110px;
-    }
-
-    /* 16寸电脑 */
-    @media (min-width: 1600px) {
-      min-width: 169px;
-    }
-
-    /* 17寸电脑 */
-    @media (min-width: 1700px) {
-      min-width: 179px;
-    }
-
-    /* 18寸电脑 */
-    @media (min-width: 1800px) {
-      min-width: 180px;
-    }
-
-    /* 19寸电脑 */
-    @media (min-width: 1920px) {
-      min-width: 194px;
-    }
 
     .schedule-table-cell-title {
       line-height: 40px;
@@ -805,34 +771,52 @@ export default {
         gap: 6px;
         min-width: 0;
       }
+
       .cell-title-day {
         font-size: 15px;
         font-weight: 600;
         color: #333;
       }
+
       .cell-title-week {
         font-size: 12px;
         color: #666;
         white-space: nowrap;
       }
+
       .cell-title-lunar {
         font-size: 12px;
         color: #666;
         white-space: nowrap;
       }
 
-      @media (max-width: 1366px) {
-        padding: 0 14px;
-        /* 小屏：标题纵向堆叠，避免挤压错乱 */
+      @media (max-width: 1580px) {
+        padding: 0 10px;
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
         line-height: 18px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        row-gap: 4px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        row-gap: 2px;
+        font-size: 13px;
+
+        .cell-title-main {
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .cell-title-day {
+          font-size: 13px;
+        }
+
+        .cell-title-week {
+          font-size: 11px;
+          white-space: normal;
+        }
 
         .cell-title-lunar {
+          font-size: 11px;
           white-space: normal;
         }
       }
@@ -857,36 +841,56 @@ export default {
         gap: 6px;
         min-width: 0;
       }
+
       .cell-title-day {
         font-size: 15px;
         font-weight: 600;
         color: #F92B30;
       }
+
       .cell-title-week {
         font-size: 12px;
         color: #F92B30;
         white-space: nowrap;
       }
+
       .cell-title-lunar {
         font-size: 12px;
         color: #F92B30;
         white-space: nowrap;
       }
 
-      @media (max-width: 1366px) {
-        padding: 0 14px;
+      @media (max-width: 1580px) {
+        padding: 0 10px;
         flex-direction: column;
         align-items: flex-start;
         justify-content: center;
         line-height: 18px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        row-gap: 4px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        row-gap: 2px;
+        font-size: 13px;
+
+        .cell-title-main {
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .cell-title-day {
+          font-size: 13px;
+        }
+
+        .cell-title-week {
+          font-size: 11px;
+          white-space: normal;
+        }
 
         .cell-title-lunar {
+          font-size: 11px;
           white-space: normal;
         }
       }
+
       background-color: #F92B300D;
       color: #F92B30;
       border: 1px solid #F92B304D;
@@ -899,14 +903,18 @@ export default {
       color: #333;
       cursor: pointer;
       padding-bottom: 100px;
-      transform: none !important; /* 避免与Sortable的矩阵变换冲突 */
-      will-change: transform; /* 提示浏览器优化渲染 */
+      transform: none !important;
+      /* 避免与Sortable的矩阵变换冲突 */
+      will-change: transform;
+      /* 提示浏览器优化渲染 */
       /* 显示添加入口：整个单元格悬停时展示 */
       // background-color: #f6f6f6;
       height: 100%;
+
       &:hover {
         .box-content {
           opacity: 1;
+
           .box-plus-circle {
             border-color: #bc362e;
 
@@ -948,13 +956,16 @@ export default {
       }
     }
   }
+
   .schedule-table-cell:first-child {
     border-left: none;
   }
 }
+
 ::v-deep .is-drag-chosen {
   background-color: #fff !important;
 }
+
 /* 拖拽克隆元素样式 - 红色矩形带渐变效果 */
 ::v-deep .is-drag-ghost {
   position: relative;
@@ -985,13 +996,11 @@ export default {
     left: 0;
     right: 0;
     height: 25%;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.35) 0%,
-      rgba(255, 240, 240, 0.2) 30%,
-      rgba(255, 200, 200, 0.1) 60%,
-      transparent 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.35) 0%,
+        rgba(255, 240, 240, 0.2) 30%,
+        rgba(255, 200, 200, 0.1) 60%,
+        transparent 100%);
     pointer-events: none;
     border-radius: 6px 6px 0 0;
     z-index: 1;
@@ -1005,12 +1014,10 @@ export default {
     left: 0;
     right: 0;
     height: 20%;
-    background: linear-gradient(
-      to top,
-      rgba(180, 0, 0, 0.3) 0%,
-      rgba(200, 50, 50, 0.15) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(to top,
+        rgba(180, 0, 0, 0.3) 0%,
+        rgba(200, 50, 50, 0.15) 50%,
+        transparent 100%);
     pointer-events: none;
     border-radius: 0 0 6px 6px;
     z-index: 1;
@@ -1019,8 +1026,10 @@ export default {
 
 ::v-deep .js-class-drag-container {
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
-  min-height: 40px; /* 确保空容器也有足够的高度以被检测到 */
-  position: relative; /* 确保定位上下文正确 */
+  min-height: 40px;
+  /* 确保空容器也有足够的高度以被检测到 */
+  position: relative;
+  /* 确保定位上下文正确 */
 }
 
 ::v-deep .js-class-drag-container.is-class-drop-target {
@@ -1061,6 +1070,7 @@ export default {
     line-height: 32px;
     color: #101010;
     cursor: pointer;
+
     &:hover {
       background-color: #c3c9d740;
       font-family: PingFang SC;
@@ -1070,6 +1080,7 @@ export default {
     }
   }
 }
+
 .context-menu-fade-enter-active,
 .context-menu-fade-leave-active {
   transition: opacity 0.2s ease;
