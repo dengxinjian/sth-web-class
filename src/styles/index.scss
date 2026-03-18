@@ -15,6 +15,7 @@ body {
   text-rendering: optimizeLegibility;
   font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB,
     Microsoft YaHei, Arial, sans-serif;
+  overscroll-behavior-x: none;
 }
 
 label {
@@ -24,6 +25,7 @@ label {
 html {
   height: 100%;
   box-sizing: border-box;
+  overscroll-behavior-x: none;
 }
 
 #app {

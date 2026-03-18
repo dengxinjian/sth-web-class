@@ -746,6 +746,7 @@ export default {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
+    width: 100px;
     min-width: 100px;
     background-color: #fff;
     box-shadow: 0px 1px 0px 0px #00000026;
@@ -790,7 +791,7 @@ export default {
         white-space: nowrap;
       }
 
-      @media (max-width: 1580px) {
+      @media (max-width: 1680px) {
         padding: 0 10px;
         flex-direction: column;
         align-items: flex-start;
@@ -860,7 +861,7 @@ export default {
         white-space: nowrap;
       }
 
-      @media (max-width: 1580px) {
+      @media (max-width: 1680px) {
         padding: 0 10px;
         flex-direction: column;
         align-items: flex-start;
