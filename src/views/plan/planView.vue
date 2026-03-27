@@ -233,7 +233,8 @@ export default {
                 this.activeClassType = "team"
                 this.currentPlanTeamId = teamId
                 returnTeamId = teamId
-                this.returnTeamFilterId = teamId || null
+                // 先不按回跳 teamId 过滤，后续通过 planId 反查真实团队再设置
+                this.returnTeamFilterId = null
                 shouldLocateTeamPlan = true
               } else if (isReturnFromEdit && (classType === "my" || classType === "official")) {
                 this.activeClassType = classType
@@ -243,7 +244,8 @@ export default {
                 this.activeClassType = "team"
                 this.currentPlanTeamId = teamId
                 returnTeamId = teamId
-                this.returnTeamFilterId = teamId || null
+                // 先不按回跳 teamId 过滤，后续通过 planId 反查真实团队再设置
+                this.returnTeamFilterId = null
                 shouldLocateTeamPlan = true
               }
               this.$emit("choose-plan", true)
@@ -266,7 +268,8 @@ export default {
               if (classType === "team") {
                 this.activeClassType = "team"
                 returnTeamId = teamId || planData?.teamId
-                this.returnTeamFilterId = returnTeamId || null
+                // 先不按回跳 teamId 过滤，后续通过 planId 反查真实团队再设置
+                this.returnTeamFilterId = null
                 shouldLocateTeamPlan = true
               } else if (classType === "my" || classType === "official") {
                 this.activeClassType = classType
@@ -275,7 +278,8 @@ export default {
                 // 仅兼容历史回跳参数未携带 classType 的场景
                 this.activeClassType = "team"
                 returnTeamId = teamId || planData?.teamId
-                this.returnTeamFilterId = returnTeamId || null
+                // 先不按回跳 teamId 过滤，后续通过 planId 反查真实团队再设置
+                this.returnTeamFilterId = null
                 shouldLocateTeamPlan = true
               }
               if (this.currentPlanId) {
@@ -301,6 +305,11 @@ export default {
               this.returnTeamFilterId = locateResult.teamId
               if (locateResult.groupId != null) {
                 this.currentPlanGroupId = locateResult.groupId
+              }
+              // 反查成功后立刻收敛为单团队列表，避免界面残留多个团队
+              await this.$nextTick()
+              if (this.$refs.planListRef?.getTeamPlanList) {
+                await this.$refs.planListRef.getTeamPlanList("")
               }
             } else {
               await this.$refs.planListRef.locateTeamPlan({
@@ -401,7 +410,6 @@ export default {
       this.copyOfficialPlanInfo = null
     },
     handleAddPlanSuccess(payload) {
-      console.log(payload, "payload--handleAddPlanSuccess")
       return
       this.getPlanDetail(payload.id)
       this.getPlanDayDetail(payload.id)
@@ -473,7 +481,12 @@ export default {
         if (res.result && res.result.shareUserId != null) {
           this.shareUserId = String(res.result.shareUserId)
         }
-        if (res.result && res.result.teamId != null) {
+        // 团队计划返回时以“当前点击的分享记录 teamId”为准，避免被详情中的 owner/team 字段覆盖
+        if (
+          (this.currentPlanTeamId == null || String(this.currentPlanTeamId) === "") &&
+          res.result &&
+          res.result.teamId != null
+        ) {
           this.currentPlanTeamId = res.result.teamId
         }
       }
@@ -951,7 +964,10 @@ export default {
     handleEditPlan() {
       const returnTeamId =
         this.activeClassType === "team"
-          ? this.currentPlanTeamId || this.selectedTeam || null
+          ? this.currentShareAuthEdit?.teamId ||
+          this.currentPlanTeamId ||
+          this.selectedTeam ||
+          null
           : null
       const params = {
         ...this.currentPlanDetail,
