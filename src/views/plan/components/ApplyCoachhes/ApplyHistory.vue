@@ -192,6 +192,7 @@
           <el-radio-group v-model="permissionForm.shareToAuth">
             <el-radio :label="1">查看</el-radio>
             <el-radio :label="2">编辑</el-radio>
+            <el-radio :label="3">共有</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -591,6 +592,7 @@ export default {
         0: "无",
         1: "查看",
         2: "编辑",
+        3: "共有",
       }
       return map[auth] || "无"
     },

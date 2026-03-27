@@ -8,77 +8,72 @@
         <!-- 中间内容区 -->
         <div class="type-change"
           :class="{ 'is-collapsed': leftPanelCollapsed }">
-          <div
-            class="panel-collapse-handle panel-collapse-handle--left"
-            :style="{ top: leftHandleTop }"
-            :title="leftPanelCollapsed ? '展开左侧栏' : '收起左侧栏'"
-            @click="toggleLeftPanel">
-            <i
-              :class="leftPanelCollapsed ? 'el-icon-arrow-right' : 'el-icon-arrow-left'"></i>
-          </div>
-          <!-- 运动员管理 -->
-          <div v-show="activeName === 'athletic'">
-            <div v-if="loginType === '2'"
-              class="team-select-container">
-              <el-dropdown trigger="click" placement="bottom-start"
-                @command="handleTeamChange" class="team-dropdown">
-                <span class="el-dropdown-link team-name-title">
-                  {{ getTeamName(selectedTeam) }}
-                  <i class="el-icon-caret-bottom"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown"
-                  class="team-dropdown-menu">
-                  <el-dropdown-item v-for="t in teamOrClubList"
-                    :key="t.type + '_' + t.id"
-                    :command="{ id: t.id, type: t.type }"
-                    :class="{ 'active': selectedTeam === t.id && selectedOrgType === t.type }">
-                    {{ t.displayName }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
+          <div class="type-change-inner">
+            <!-- 运动员管理 -->
+            <div v-show="activeName === 'athletic'">
+              <div v-if="loginType === '2'"
+                class="team-select-container">
+                <el-dropdown trigger="click" placement="bottom-start"
+                  @command="handleTeamChange" class="team-dropdown">
+                  <span class="el-dropdown-link team-name-title">
+                    {{ getTeamName(selectedTeam) }}
+                    <i class="el-icon-caret-bottom"></i>
+                  </span>
+                  <el-dropdown-menu slot="dropdown"
+                    class="team-dropdown-menu">
+                    <el-dropdown-item v-for="t in teamOrClubList"
+                      :key="t.type + '_' + t.id"
+                      :command="{ id: t.id, type: t.type }"
+                      :class="{ 'active': selectedTeam === t.id && selectedOrgType === t.type }">
+                      {{ t.displayName }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </div>
+              <AthleticManagement
+                v-if="selectedTeam && selectedOrgType === 'team'"
+                :teamId="selectedTeam"
+                :teamName="getTeamName(selectedTeam)"
+                :activeName="activeName"
+                :defaultTeamId="defaultTeamId"
+                @athletic-click="handleAthleticChange" />
+              <cludList v-else :clubId="selectedTeam"
+                :teamName="getTeamName(selectedTeam)"
+                :activeName="activeName"
+                @member-click="handleAthleticChange"></cludList>
             </div>
-            <AthleticManagement
-              v-if="selectedTeam && selectedOrgType === 'team'"
-              :teamId="selectedTeam"
-              :teamName="getTeamName(selectedTeam)"
-              :activeName="activeName"
-              :defaultTeamId="defaultTeamId"
-              @athletic-click="handleAthleticChange" />
-            <cludList v-else :clubId="selectedTeam"
-              :teamName="getTeamName(selectedTeam)"
-              :activeName="activeName"
-              @member-click="handleAthleticChange"></cludList>
-          </div>
 
-          <!-- 课程管理 -->
-          <div v-show="activeName === 'class'"
-            class="class-container-wrapper">
-            <ClassList ref="planListRef" :class-list="classList"
-              :team-tree-list="teamTreeList"
-              :active-class-type.sync="activeClassType"
-              @class-type-change="handleClassTypeChange"
-              @search="handleClassSearch" @add-class="handleAddClass"
-              @add-group="handleAddGroup"
-              @edit-group="handleEditGroup"
-              @delete-group="handleDeleteGroup"
-              @move-group="handleMoveGroup"
-              @class-detail="handleClassDetail"
-              @share-class-detail="handleShareClassDetail"
-              @move-class="handleMoveClass"
-              @move-share-class="handleMoveShareClass"
-              @delete-class="handleDeleteClass"
-              @delete-share-class="handleDeleteShareClass"
-              @copy-class="handleCopyClassFromOfficial"
-              @collapse-change="classSlideChange"
-              @view-class="handleViewClass"
-              @view-share-class="handleViewShareClase"
-              @add-share-group="handleAddShareGroup"
-              @edit-share-group="handleEditShareGroup"
-              @delete-share-group="handleDeleteShareGroup"
-              @share-team-click="handleShareTeamClick"
-              @share-team-group-click="handleShareTeamGroupClick"
-              :share-group-list="shareGroupList"
-              :current-share-team-id="currentShareTeamId" />
+            <!-- 课程管理 -->
+            <div v-show="activeName === 'class'"
+              class="class-container-wrapper">
+              <ClassList ref="planListRef" :class-list="classList"
+                :team-tree-list="teamTreeList"
+                :active-class-type.sync="activeClassType"
+                @class-type-change="handleClassTypeChange"
+                @search="handleClassSearch"
+                @add-class="handleAddClass"
+                @add-group="handleAddGroup"
+                @edit-group="handleEditGroup"
+                @delete-group="handleDeleteGroup"
+                @move-group="handleMoveGroup"
+                @class-detail="handleClassDetail"
+                @share-class-detail="handleShareClassDetail"
+                @move-class="handleMoveClass"
+                @move-share-class="handleMoveShareClass"
+                @delete-class="handleDeleteClass"
+                @delete-share-class="handleDeleteShareClass"
+                @copy-class="handleCopyClassFromOfficial"
+                @collapse-change="classSlideChange"
+                @view-class="handleViewClass"
+                @view-share-class="handleViewShareClase"
+                @add-share-group="handleAddShareGroup"
+                @edit-share-group="handleEditShareGroup"
+                @delete-share-group="handleDeleteShareGroup"
+                @share-team-click="handleShareTeamClick"
+                @share-team-group-click="handleShareTeamGroupClick"
+                :share-group-list="shareGroupList"
+                :current-share-team-id="currentShareTeamId" />
+            </div>
           </div>
         </div>
 
@@ -267,6 +262,7 @@
             <!-- 日程表 -->
 
             <PlanView :isPlan.sync="isPlan"
+              :left-panel-collapsed="leftPanelCollapsed"
               @choose-plan="handleChoosePlan"
               :selected-team="selectedTeam" />
             <ScheduleCalendar v-if="!isPlan"
@@ -330,7 +326,8 @@
       @cancel="onCancelMonthStatistic" />
 
     <SportTypeModal v-model="showSportTypeModal" :isClass="isClass"
-      :isSchedule="isSchedule" @select="onSelectSportType"
+      :isSchedule="isSchedule" :selected-date="addScheduleDate"
+      @select="onSelectSportType"
       @addEvent="handleAddEvent" @cancel="handleCancelSportType" />
 
     <SportDetailModal v-model="showSportDetailModal"
@@ -661,9 +658,6 @@ export default {
     }
   },
   computed: {
-    leftHandleTop() {
-      return `calc(50% + 56px)`
-    },
     athleticGroupOptions() {
       const list = Array.isArray(this.athleticList) ? this.athleticList : []
       console.log(list, "list")
@@ -814,6 +808,8 @@ export default {
     if (this.$store.state.fromPath === "/plan/add") {
       this.isPlan = true
     }
+    // 查询精英版订阅状态（存储到 Vuex，子组件通过 mapGetters 获取）
+    this.$store.dispatch("user/checkEliteSubscription")
     // 监听身份切换事件
     this.$root.$on("identity-changed", this.handleIdentityChanged)
   },
@@ -822,10 +818,6 @@ export default {
     this.$root.$off("identity-changed", this.handleIdentityChanged)
   },
   methods: {
-    toggleLeftPanel() {
-      this.leftPanelCollapsed = !this.leftPanelCollapsed
-      localStorage.setItem("cm_leftPanelCollapsed", this.leftPanelCollapsed ? "1" : "0")
-    },
     toggleRightPanel() {
       this.rightPanelCollapsed = !this.rightPanelCollapsed
       localStorage.setItem("cm_rightPanelCollapsed", this.rightPanelCollapsed ? "1" : "0")
@@ -902,8 +894,9 @@ export default {
      */
     handleIdentityChanged(loginType) {
       console.log("监听到身份切换事件")
-      // 在这里添加你需要处理的逻辑
-      // 例如：重新加载数据、重置状态等
+      this.loginType = loginType
+      // 身份切换后重新查询精英版订阅状态
+      this.$store.dispatch("user/checkEliteSubscription")
       this.activeName = "class"
       localStorage.setItem("activeName", "class")
       console.log(this.activeName, "this.activeName")
@@ -922,6 +915,7 @@ export default {
         this.isPlan = true
       }
     },
+
     handleChoosePlan(isPlan) {
       console.log("handleChoosePlan")
       this.isPlan = isPlan
@@ -1279,7 +1273,17 @@ export default {
      * 类型切换（运动员/课程）
      */
     handleTypeChange(type) {
+      if (type === this.activeName) {
+        this.leftPanelCollapsed = !this.leftPanelCollapsed
+        localStorage.setItem("cm_leftPanelCollapsed", this.leftPanelCollapsed ? "1" : "0")
+        return
+      }
+
       this.activeName = type
+      if (this.leftPanelCollapsed) {
+        this.leftPanelCollapsed = false
+        localStorage.setItem("cm_leftPanelCollapsed", "0")
+      }
       this.getClassList()
       this.isPlan = false
     },
@@ -2600,7 +2604,7 @@ export default {
     /**
      * 复制/添加课程
      */
-    handleCopyClassFromOfficial(classData, groupId) {
+    handleCopyClassFromOfficial(classData, groupId, type) {
       // 课程数量限制 -- 后续根据待用功能添加
       // if (
       //   this.currentUserClassConfig.currentCount >=
@@ -2609,7 +2613,11 @@ export default {
       //   this.$message.error("超出课程数量上限");
       //   return;
       // }
-      this.copyClassFromOfficialClassId = classData.id
+      if (type === 'team') {
+        this.copyClassFromOfficialClassId = classData.sourceClassId
+      } else {
+        this.copyClassFromOfficialClassId = classData.id
+      }
       this.copyClassFromOfficialGroupId = groupId
       this.copyClassFromOfficialData = classData
       this.showCopyClassFromOfficial = true
@@ -3734,15 +3742,14 @@ export default {
 
 .type-change {
   flex: 0 0 240px;
+  min-width: 0;
   height: 100vh;
   max-height: calc(100vh - 60px);
   background-color: #fff;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border-left: 1px solid #e5e5e5;
-  border-right: 1px solid #e5e5e5;
+  overflow: visible;
   position: relative;
   transition: flex-basis 0.2s ease, width 0.2s ease;
+  border-right: 1px solid #f0f0f0;
 
   @media (max-width: 1680px) {
     flex: 0 0 220px;
@@ -3759,18 +3766,21 @@ export default {
   &.is-collapsed {
     flex: 0 0 0;
     width: 0;
-    overflow: visible;
     border-left: none;
     border-right: none;
 
-    /* 收起时隐藏内部内容，仅保留把手 */
-    > :not(.panel-collapse-handle) {
+    .type-change-inner {
       opacity: 0;
       pointer-events: none;
     }
   }
+}
 
-  /* 自定义滚动条样式 */
+.type-change-inner {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
   &::-webkit-scrollbar {
     width: 5px;
   }
@@ -3876,10 +3886,6 @@ export default {
   }
 }
 
-.panel-collapse-handle--left {
-  right: -12px;
-}
-
 .panel-collapse-handle--right {
   left: -12px;
 }
@@ -3888,8 +3894,8 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #e5e5e5;
   background-color: #fff;
+  overflow: hidden;
 }
 
 .team-select-container {

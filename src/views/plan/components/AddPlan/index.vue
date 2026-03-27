@@ -51,7 +51,8 @@
           v-model="form.teamId"
           placeholder="请选择团队"
           filterable
-          clearable
+          :clearable="!isTeamSelectionLocked"
+          :disabled="isTeamSelectionLocked"
           style="width: 100%"
           @change="handleTeamChange"
         >
@@ -221,6 +222,15 @@ export default {
     teamOptions() {
       return Array.isArray(this.teams) ? this.teams : [];
     },
+    isTeamSelectionLocked() {
+      return (
+        this.loginType === "2" &&
+        this.activeClassType === "team" &&
+        this.myTeamId !== undefined &&
+        this.myTeamId !== null &&
+        this.myTeamId !== ""
+      );
+    },
   },
   watch: {
     visible(val) {
@@ -235,6 +245,7 @@ export default {
       if (val) {
         // reset form when opening
         this.resetForm();
+        this.syncTeamSelection();
         // 如果存在 currentGroupId，设置到表单中
         if (this.currentGroupId) {
           this.$nextTick(() => {
@@ -261,6 +272,15 @@ export default {
         this.form.planGroupId = val;
       }
     },
+    activeClassType() {
+      this.syncTeamSelection();
+    },
+    myTeamId() {
+      this.syncTeamSelection();
+    },
+    teams() {
+      this.syncTeamSelection();
+    },
     copyOfficialPlanInfo(val) {
       console.log('=======copyOfficialPlanInfo-当前--传入',val);
       if (val) {
@@ -270,7 +290,7 @@ export default {
             ...val,
             planTitle: val.planTitle,
             // planGroupId: this.currentGroupId,
-            teamId: val.teamId,
+            teamId: this.isTeamSelectionLocked ? this.myTeamId : val.teamId,
             planSource: val.planSourceTeamIdName
               ? `${val.planSourceTeamIdName} - ${val.planSourceNickname}`
               : val.planSourceNickname,
@@ -292,6 +312,16 @@ export default {
     this.resetForm();
   },
   methods: {
+    syncTeamSelection() {
+      if (!this.isTeamSelectionLocked) return;
+      this.form.teamId = this.myTeamId;
+      this.handleTeamChange(this.myTeamId);
+      this.$nextTick(() => {
+        if (this.$refs.formRef) {
+          this.$refs.formRef.clearValidate("teamId");
+        }
+      });
+    },
     onCopyPlan() {
       this.$emit("copyPlan", this.form);
     },
@@ -457,9 +487,11 @@ export default {
         planGroupId: this.copyOfficialPlanInfo
           ? this.copyOfficialPlanInfo.planGroupId
           : undefined,
-        teamId: this.copyOfficialPlanInfo
-          ? this.copyOfficialPlanInfo.teamId
-          : undefined,
+        teamId: this.isTeamSelectionLocked
+          ? this.myTeamId
+          : this.copyOfficialPlanInfo
+            ? this.copyOfficialPlanInfo.teamId
+            : undefined,
         planSource: this.copyOfficialPlanInfo
           ? this.copyOfficialPlanInfo.teamName
             ? `${this.copyOfficialPlanInfo.teamName} - ${this.copyOfficialPlanInfo.possessNickname}`

@@ -50,7 +50,7 @@
           <i class="el-icon-caret-bottom"
             style="margin-left: 10px; font-size: 12px"></i>
         </div>
-        <el-dropdown-menu slot="dropdown">
+        <el-dropdown-menu slot="dropdown" class="navbar-user-dropdown">
           <el-dropdown-item @click.native="changeIdentify">
             <el-button type="primary" size="small"
               style="width: 100%; margin-bottom: 10px; border: none"
@@ -76,7 +76,6 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <vip1 :visible.sync="vipDialogVisible" />
     </div>
   </div>
 </template>
@@ -85,14 +84,12 @@
 import { mapGetters, mapState, mapMutations } from "vuex"
 import Breadcrumb from "@/components/Breadcrumb"
 import { getData, submitData } from "@/api/common"
-import vip1 from "@/components/Vip1";
 
 export default {
   name: "TopNavbar",
   inject: ["reload"],
   components: {
-    Breadcrumb,
-    vip1
+    Breadcrumb
   },
   data() {
     return {
@@ -109,52 +106,6 @@ export default {
       loginTypeWatcher: localStorage.getItem("loginType"),
       nameWatcher: localStorage.getItem("name"),
       vipSubStatusWatcher: localStorage.getItem("vipSubStatus"),
-      vipDialogVisible: false,
-      activeTab: "1",
-      vipInfoList: [
-        {
-          title: "会员标识",
-          subTitle: "会员专属图标",
-          img: require("@/assets/vip/vip_1.png"),
-          children: [{ idx: 1, label: "专业版专属头像框" }],
-        },
-        {
-          title: "运动员高阶数据",
-          subTitle: "数据分析/运动峰值表现可见",
-          img: require("@/assets/vip/vip_2.png"),
-          children: [
-            { idx: 1, label: "从数据出发，深入了解你的运动员" },
-          ],
-        },
-        {
-          title: "一站式团队管理",
-          subTitle: "科学管理",
-          img: require("@/assets/vip/vip_3.png"),
-          children: [
-            { idx: 1, label: "身份切换可用(可切换至教练身份)" },
-            { idx: 2, label: "运动员管理" },
-            { idx: 3, label: "执教管理" },
-            { idx: 4, label: "团队课程管理" },
-            { idx: 5, label: "团队计划管理" },
-          ],
-        },
-        {
-          title: "数据总览",
-          subTitle: "可视化分析",
-          img: require("@/assets/vip/vip_4.png"),
-          children: [
-            { idx: 1, label: "成员日程/数据可视化，掌握团队全局训练情况。" },
-          ],
-        },
-        {
-          title: "训练计划",
-          subTitle: "示例计划可用",
-          img: require("@/assets/vip/vip_5.png"),
-          children: [
-            { idx: 1, label: "定期更新高效示例计划库可用" },
-          ],
-        },
-      ],
       userInfo: null,
     }
   },
@@ -291,6 +242,12 @@ export default {
       this.userAvatar =
         localStorage.getItem("avatarUrl") || require("@/assets/logo-sth.png")
     },
+    openVip1Dialog(tradeType = "") {
+      this.$vip1({
+        tradeType,
+        forceShow: false,
+      })
+    },
     async resetPageData() {
       await this.updateUserInfo()
       const newLoginType = this.loginType === "1" ? "2" : "1"
@@ -343,7 +300,6 @@ export default {
         },
       }).then((res) => {
         if (res.success) {
-          _this.vipDialogVisible = false
           _this.$message.success("订阅成功")
           _this.resetPageData()
         } else {
@@ -359,7 +315,7 @@ export default {
           identityType: "C",
         })
         if (!res || !res.success) {
-          _this.vipDialogVisible = true
+          _this.openVip1Dialog()
           return
         }
         const result = res.result
@@ -370,14 +326,14 @@ export default {
           proInfo = result.identityType === "C" ? result : null
         }
         console.log('=====proInfo=====', proInfo)
-        const subscribeType = proInfo?.subscribeType
-        if (subscribeType !== 1) {
-          _this.vipDialogVisible = true
+        const subStatus = proInfo?.subStatus
+        if (subStatus !== 1) {
+          _this.openVip1Dialog()
         } else {
           _this.resetPageData()
         }
       } catch (e) {
-        _this.vipDialogVisible = true
+        _this.openVip1Dialog()
       }
     },
     async changeIdentify() {
@@ -636,206 +592,26 @@ export default {
   }
 }
 
-.vip-dialog-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+</style>
 
-  .mask-container {
-    width: 880px;
-    min-height: 500px;
-    background: #fff;
-    border-radius: 10px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    // 背景图 从顶部，不变形，高度不变，宽度自适应
-    background-image: url("~@/assets/professional_vip.png");
-    background-repeat: no-repeat;
-    background-position: top center;
-    background-size: 100% auto;
+<style lang="scss">
+.navbar-user-dropdown .el-dropdown-menu__item,
+.navbar-user-dropdown .el-dropdown-menu__item:not(.is-disabled):hover,
+.navbar-user-dropdown .el-dropdown-menu__item:not(.is-disabled):focus,
+.navbar-user-dropdown .el-dropdown-menu__item:hover,
+.navbar-user-dropdown .el-dropdown-menu__item:focus {
+  background-color: transparent !important;
+}
 
-    .container-top-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
+.navbar-user-dropdown .member-center-button:hover,
+.navbar-user-dropdown .member-center-button:focus {
+  color: #fff !important;
+  box-shadow: none !important;
+}
 
-      .container-top-box-title {
-        font-size: 16px;
-        font-weight: bold;
-        color: #101010;
-      }
-
-      .close-icon {
-        width: 24px;
-        height: 24px;
-        cursor: pointer;
-      }
-    }
-
-    .container-content {
-      width: 100%;
-      height: 520px;
-      background: #fff;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-      border-bottom-left-radius: 15px;
-      border-bottom-right-radius: 15px;
-      padding: 16px;
-      box-sizing: border-box;
-      position: relative;
-
-      .container-content-title-box {
-        width: 750px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: absolute;
-        left: 50px;
-        top: -38px;
-
-        .container-content-title {
-          width: 120px;
-          height: 40px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: #fff;
-          border-top-left-radius: 10px;
-          border-top-right-radius: 10px;
-          position: relative;
-
-          .container-content-title-img {
-            width: 57px;
-            height: 16px;
-          }
-
-          .container-content-title-bg {
-            width: 144px;
-            height: 12px;
-            position: absolute;
-            left: -12px;
-            bottom: 0;
-          }
-        }
-      }
-
-      .content-box {
-        width: 100%;
-        height: 100%;
-        border: 1px solid #f8e7e5;
-        background: linear-gradient(180deg, #f8e7e5 0%, #ffffff 30%);
-        border-radius: 8px;
-        padding: 20px 40px 40px 16px;
-        box-sizing: border-box;
-        position: relative;
-
-        .content-box-title {
-          text-align: center;
-          color: #101010;
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        .content-box-list {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: flex-start;
-          margin-top: 26px;
-          // 每行3等分，可以换行，行距为10px
-          column-gap: 16px;
-          row-gap: 10px;
-          margin-top: 16px;
-
-          .list-item {
-            // width: 33.33%;
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
-            // gap: 10px;
-            // 每行3个，减去2个gap（16px * 2 = 32px）
-            width: calc((100% - 32px) / 3);
-            box-sizing: border-box;
-            margin-bottom: 16px;
-
-            img {
-              width: 30px;
-              height: 30px;
-              margin-right: 13px;
-              flex-shrink: 0;
-            }
-
-            .list-item-title {
-              font-size: 13px;
-              color: #101010;
-            }
-
-            .list-item-content {
-              .list-item-sub-title {
-                height: 30px;
-                line-height: 30px;
-                font-size: 15px;
-                font-weight: 600;
-              }
-
-              .list-item-content-item {
-                display: flex;
-                align-items: flex-start;
-                margin-top: 8px;
-
-                .list-item-content-icon-box {
-                  height: 16px;
-                  width: 6px !important;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  margin-right: 6px;
-                }
-
-                .list-item-content-icon {
-                  width: 4px;
-                  height: 4px;
-                  border-radius: 4px;
-                  background: #999;
-                }
-
-                .list-item-content-text {
-                  flex: 1;
-                  font-size: 12px;
-                  line-height: 16px;
-                  font-weight: 400;
-                  color: #999;
-                }
-              }
-            }
-          }
-        }
-
-        .content-box-btn {
-          width: 352px;
-          height: 32px;
-          border-radius: 6px;
-          background: linear-gradient(90.94deg,
-              #2a2a2a 10%,
-              #b81300 50%,
-              #2a2a2a 90%);
-          text-align: center;
-          line-height: 32px;
-          font-size: 14px;
-          color: #fff;
-          cursor: pointer;
-          position: fixed;
-          left: 264px;
-          bottom: 32px;
-        }
-      }
-    }
-  }
+.navbar-user-dropdown .logout-button:hover,
+.navbar-user-dropdown .logout-button:focus {
+  background: #909399 !important;
+  border-color: #909399 !important;
 }
 </style>

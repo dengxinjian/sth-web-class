@@ -71,7 +71,7 @@
       <el-collapse v-model="activeCollapse" accordion
         @change="$emit('collapse-change')" v-loading="loading">
         <el-collapse-item v-for="item in classList"
-          :key="item.groupId" :name="item.groupId">
+          :key="item.groupId" :name="String(item.groupId)">
           <template slot="title">
             <div class="schedule-class-title">
               <div class="group-name">
@@ -136,26 +136,20 @@
                   <div style="width: 100%; cursor: pointer">
                     {{ classItem.planTitle }}
                   </div>
-                  <div style="
-                      width: 100%;
-                      cursor: pointer;
-                      display: flex;
-                      flex-direction: row;
-                      align-items: center;
-                      gap: 5px;
-                    ">
+                  <div class="plan-item-meta">
                     <el-rate v-model="classItem.level"
                       :allow-half="true"
                       disabled
                       :colors="['#F92B30', '#F92B30', '#F92B30']"
                       text-color="#999999"
                       disabled-void-color="#E1E4EC"></el-rate>
-                    <span style="font-size: 10px; color: #979fb0"
+                    <span class="plan-item-score-text"
                       v-if="!classItem.level">{{
                         classItem.level ? "" : "未评分"
                       }}</span>
                     <span v-if="classItem.isShare"
-                      style="font-size: 10px; color: #979fb0;background: #C3C9D740;padding: 3px 5px;border-radius: 3px; width: 70px; text-align: center;">{{
+                     style="width: auto;"
+                      class="plan-item-share-tag">{{
                         classItem.isShare ? "已分享" : ""
                       }}</span>
                   </div>
@@ -200,7 +194,7 @@
             @change="handleShareGroupCollapseChange"
             v-loading="loading">
             <el-collapse-item v-for="item in currentShareGroupList"
-              :key="item.id" :name="item.id">
+              :key="item.id" :name="String(item.id)">
               <template slot="title">
                 <div class="schedule-class-title">
                   <div class="group-name">
@@ -262,21 +256,13 @@
                       <div style="width: 100%; cursor: pointer">
                         {{ classItem.planTitle }}
                       </div>
-                      <div style="
-                      width: 100%;
-                      cursor: pointer;
-                      display: flex;
-                      flex-direction: row;
-                      align-items: center;
-                      gap: 5px;
-                    ">
+                      <div class="plan-item-meta">
                         <el-rate v-model="classItem.level"
                           :allow-half="true" disabled
                           :colors="['#F92B30', '#F92B30', '#F92B30']"
                           text-color="#999999"
                           disabled-void-color="#E1E4EC"></el-rate>
-                        <span
-                          style="font-size: 10px; color: #979fb0">{{
+                        <span class="plan-item-score-text">{{
                             classItem.level ? "" : "未评分"
                           }}</span>
                       </div>
@@ -350,7 +336,7 @@ export default {
     currentPlanGroupId: {
       handler(newVal) {
         // 如果有值，尝试展开
-        if (newVal) {
+        if (newVal != null && newVal !== "") {
           // 延迟执行，确保 classList 已更新
           this.$nextTick(() => {
             this.tryExpandGroup()
@@ -377,20 +363,20 @@ export default {
       immediate: true,
       deep: true,
     },
-    // 监听 activeClassType 变化
-    // activeClassType: {
-    //   handler(newVal, oldVal) {
-    //     // 清空搜索输入
-    //     this.searchInput = ""
-    //     // 当 activeClassType 改变时显示 loading 并折叠所有项
-    //     if (oldVal !== undefined && newVal !== oldVal) {
-    //       this.loading = true
-    //       this.activeCollapse = null
-    //     }
-    //     this.handleClassTypeChange(newVal)
-    //   },
-    //   immediate: true,
-    // },
+    activeClassType: {
+      handler(newVal, oldVal) {
+        if (oldVal === undefined || newVal === oldVal) return
+        this.searchInput = ""
+        this.activeCollapse = null
+        this.currentShareTeamId = ""
+        this.currentShareGroupList = []
+        this.currentSharePlanList = []
+        if (newVal === "team") {
+          this.getTeamPlanList(this.teamPlanSearchKeyword)
+        }
+      },
+      immediate: false,
+    },
   },
   mounted() {
     // 组件挂载后，延迟检查以确保数据已加载
@@ -427,13 +413,125 @@ export default {
         // });
       }
     },
-    async getTeamPlanList(nameKeyword) {
+    async locateTeamPlan({ teamId, groupId }) {
+      if (!teamId) return
+      if (!Array.isArray(this.teamPlanList) || this.teamPlanList.length === 0) {
+        await this.getTeamPlanList(this.teamPlanSearchKeyword)
+      }
+      this.currentShareTeamId = teamId
+      const team = this.teamPlanList.find((t) => String(t.id) === String(teamId))
+      if (team && Array.isArray(team.groups)) {
+        this.currentShareGroupList = this.mapTeamPlanGroupsToShareGroupList(
+          team.groups,
+          teamId
+        )
+      } else {
+        this.currentShareGroupList = []
+      }
+      if (groupId != null && groupId !== "") {
+        this.$nextTick(() => {
+          this.activeCollapse = String(groupId)
+        })
+      }
+    },
+    async locateAndSelectTeamPlan({ teamId, groupId, planId }) {
+      if (!planId) return { selected: false, teamId: null, groupId: null }
+      const targetPlanId = String(planId)
+      if (!Array.isArray(this.teamPlanList) || this.teamPlanList.length === 0) {
+        await this.getTeamPlanList(this.teamPlanSearchKeyword, {
+          ignoreSelectedTeamFilter: true,
+        })
+      }
+
+      let resolvedTeamId = teamId
+      let resolvedGroup = null
+      let resolvedPlan = null
+
+      const tryResolveFromCurrentGroupList = () => {
+        const group = this.currentShareGroupList.find(
+          (g) =>
+            Array.isArray(g.classesList) &&
+            g.classesList.some(
+              (c) => String(c.sourcePlanId || c.id) === targetPlanId
+            )
+        )
+        if (!group) return false
+        const plan = group.classesList.find(
+          (c) => String(c.sourcePlanId || c.id) === targetPlanId
+        )
+        if (!plan) return false
+        resolvedGroup = group
+        resolvedPlan = plan
+        return true
+      }
+
+      if (resolvedTeamId) {
+        await this.locateTeamPlan({ teamId: resolvedTeamId, groupId })
+        tryResolveFromCurrentGroupList()
+      }
+
+      if (!resolvedGroup || !resolvedPlan) {
+        await this.getTeamPlanList(this.teamPlanSearchKeyword, {
+          ignoreSelectedTeamFilter: true,
+        })
+        for (const team of this.teamPlanList) {
+          const mappedGroups = this.mapTeamPlanGroupsToShareGroupList(
+            team.groups || [],
+            team.id
+          )
+          const group = mappedGroups.find(
+            (g) =>
+              Array.isArray(g.classesList) &&
+              g.classesList.some(
+                (c) => String(c.sourcePlanId || c.id) === targetPlanId
+              )
+          )
+          if (group) {
+            const plan = group.classesList.find(
+              (c) => String(c.sourcePlanId || c.id) === targetPlanId
+            )
+            if (plan) {
+              resolvedTeamId = team.id
+              this.currentShareTeamId = team.id
+              this.currentShareGroupList = mappedGroups
+              resolvedGroup = group
+              resolvedPlan = plan
+              break
+            }
+          }
+        }
+      }
+
+      if (!resolvedGroup || !resolvedPlan || !resolvedTeamId) {
+        return { selected: false, teamId: null, groupId: null }
+      }
+
+      this.activeCollapse = String(resolvedGroup.id)
+      const emitPlanId = resolvedPlan.sourcePlanId || resolvedPlan.id
+      const emitTeamId =
+        resolvedGroup.teamId != null ? resolvedGroup.teamId : resolvedTeamId
+      this.$emit("view-plan", emitPlanId, {
+        ...resolvedPlan,
+        teamId: emitTeamId,
+      })
+      return {
+        selected: true,
+        teamId: emitTeamId,
+        groupId: resolvedGroup.id,
+      }
+    },
+    async getTeamPlanList(nameKeyword, options = {}) {
       const _this = this
       const params = {
         url: "/gateway/training/teamShare/coach-teams-share",
         shareDataType: 2,
       }
-      if (this.selectedTeam != null && this.selectedTeam !== "") {
+      const ignoreSelectedTeamFilter = !!options.ignoreSelectedTeamFilter
+      if (
+        !ignoreSelectedTeamFilter &&
+        this.selectedTeam != null &&
+        this.selectedTeam !== ""
+      ) {
         params.teamId = this.selectedTeam
       }
       if (nameKeyword != null && String(nameKeyword).trim() !== "") {
@@ -507,7 +605,7 @@ export default {
       )
       if (group && group.id != null) {
         this.$nextTick(() => {
-          this.activeCollapse = group.id
+          this.activeCollapse = String(group.id)
         })
       }
       const teamId = group && (group.teamId != null ? group.teamId : group.id)
@@ -553,7 +651,7 @@ export default {
         this.isGroupExists(this.currentPlanGroupId)
       ) {
         this.$nextTick(() => {
-          this.activeCollapse = this.currentPlanGroupId
+          this.activeCollapse = String(this.currentPlanGroupId)
         })
       }
     },
@@ -617,7 +715,11 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep(.el-rate) {
-  width: 250px;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .plan-container {
@@ -632,10 +734,25 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0 16px;
-    gap: 16px;
+    padding: 0 12px;
+    gap: 5px;
     border-bottom: 1px solid #01010126;
     box-sizing: border-box;
+
+    @media (max-width: 1680px) {
+      padding: 0 12px;
+      gap: 5px;
+    }
+
+    @media (max-width: 1440px) {
+      padding: 0 10px;
+      gap: 5px;
+    }
+
+    @media (max-width: 1280px) {
+      padding: 0 8px;
+      gap: 5px;
+    }
 
     .class-type-item {
       padding-top: 5px;
@@ -658,12 +775,39 @@ export default {
         line-height: 32px;
         letter-spacing: 0%;
         cursor: pointer;
+
+        @media (max-width: 1680px) {
+          width: 62px;
+          font-size: 13px;
+        }
+
+        @media (max-width: 1440px) {
+          width: 56px;
+          font-size: 12px;
+        }
+
+        @media (max-width: 1280px) {
+          width: 50px;
+          font-size: 11px;
+        }
       }
 
       .title-icon {
         width: 60px;
         height: 3px;
         background: #f92b30;
+
+        @media (max-width: 1680px) {
+          width: 54px;
+        }
+
+        @media (max-width: 1440px) {
+          width: 48px;
+        }
+
+        @media (max-width: 1280px) {
+          width: 42px;
+        }
       }
 
       .active-title {
@@ -673,6 +817,18 @@ export default {
         font-size: 15px;
         color: #101010;
         // border-bottom: 4px solid #f92b30;
+
+        @media (max-width: 1680px) {
+          font-size: 13px;
+        }
+
+        @media (max-width: 1440px) {
+          font-size: 12px;
+        }
+
+        @media (max-width: 1280px) {
+          font-size: 11px;
+        }
       }
     }
   }
@@ -683,6 +839,29 @@ export default {
     align-items: center;
     gap: 10px;
     padding: 12px 10px;
+
+    :deep(.el-button) {
+      margin-left: 0;
+    }
+
+    :deep(.el-input) {
+      flex: 1;
+      min-width: 0;
+    }
+
+    @media (max-width: 1280px) {
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1280px) {
+      :deep(.el-button) {
+        flex: 1 1 100%;
+      }
+
+      :deep(.el-input) {
+        flex-basis: 100%;
+      }
+    }
   }
 
   .schedule-plan-container {
@@ -717,6 +896,18 @@ export default {
       width: 200px;
       padding: 0 10px;
 
+      @media (max-width: 1680px) {
+        width: 168px;
+      }
+
+      @media (max-width: 1440px) {
+        width: 148px;
+      }
+
+      @media (max-width: 1280px) {
+        width: 128px;
+      }
+
       .group-name {
         display: flex;
         flex-direction: row;
@@ -728,6 +919,32 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
+        }
+
+        .group-name-count {
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
         }
       }
     }
@@ -748,10 +965,6 @@ export default {
   padding: 10px;
   border-bottom: 1px solid#c3c9d72e;
   width: 100%;
-
-  span {
-    width: 100%;
-  }
 
   // background-color: #f9f9f9;
 }
@@ -792,6 +1005,35 @@ export default {
 
 .plan-item ::v-deep(.el-rate__icon) {
   font-size: 16px;
+}
+
+.plan-item-meta {
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  overflow: visible;
+  min-width: 0;
+}
+
+.plan-item-score-text {
+  font-size: 10px;
+  color: #979fb0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.plan-item-share-tag {
+  font-size: 10px;
+  color: #979fb0;
+  background: #c3c9d740;
+  padding: 3px 5px;
+  border-radius: 3px;
+  text-align: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .add-class-btn {
@@ -1017,6 +1259,20 @@ export default {
     padding: 0 10px;
     box-sizing: border-box;
 
+    @media (max-width: 1680px) {
+      font-size: 12px;
+      height: 38px;
+      line-height: 38px;
+    }
+
+    @media (max-width: 1440px) {
+      font-size: 11px;
+    }
+
+    @media (max-width: 1280px) {
+      font-size: 10px;
+    }
+
     .team-operation-arrow {
       transition: transform 0.2s ease;
     }
@@ -1037,6 +1293,18 @@ export default {
       width: 198px;
       padding: 0 10px;
 
+      @media (max-width: 1680px) {
+        width: 168px;
+      }
+
+      @media (max-width: 1440px) {
+        width: 148px;
+      }
+
+      @media (max-width: 1280px) {
+        width: 128px;
+      }
+
       .group-name {
         display: flex;
         flex-direction: row;
@@ -1048,6 +1316,32 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
+        }
+
+        .group-name-count {
+          @media (max-width: 1680px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 1440px) {
+            font-size: 11px;
+          }
+
+          @media (max-width: 1280px) {
+            font-size: 10px;
+          }
         }
       }
     }

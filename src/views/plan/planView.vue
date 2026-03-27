@@ -1,7 +1,7 @@
 <template>
   <div class="container" :style="{ width: isPlan ? '100%' : '' }">
     <div class="plan-container">
-      <div class="type-change">
+      <div class="type-change" :class="{ 'is-collapsed': leftPanelCollapsed }">
         <PlanList ref="planListRef" :class-list="classList"
           :active-class-type.sync="activeClassType"
           @class-type-change="handleClassTypeChange"
@@ -19,7 +19,7 @@
           @move-plan="handleMovePlan"
           :selected-plan-id="currentPlanId"
           :current-plan-group-id="currentPlanGroupId"
-          :selected-team="selectedTeam" />
+          :selected-team="returnTeamFilterId || selectedTeam" />
       </div>
       <PlannedScheduleView v-if="isPlan" :planList="planList"
         :planTitle="planTitle" :showMore="showMore"
@@ -90,9 +90,6 @@
       :shareAuth="shareAuth" :planInfo="currentShareAuthEdit"
       @close="handleSharePlanPersionClose"
       @success="handleSharePlanPersionSuccess" />
-    <!-- 订阅 -->
-    <Vip1 :visible.sync="showVip1" />
-    <Vip2 :visible.sync="showVip2" />
   </div>
 </template>
 
@@ -113,12 +110,9 @@ import ApplyCoach from "./components/ApplyCoachhes/ApplyCoach.vue"
 import ApplyHistory from "./components/ApplyCoachhes/ApplyHistory.vue"
 import SharePlan from "./components/SharePlan/index.vue"
 import PermissionAdjust from "./components/SharePlanPersion/index.vue"
-import Vip1 from "@/components/Vip1"
-import Vip2 from "@/components/Vip2"
 // 服务和工具导入
 import { planApi, groupApi } from "./services/planManagement"
 import { getData } from "@/api/common"
-import { userApi } from "./services/planManagement"
 
 export default {
   name: "PlanView",
@@ -138,8 +132,6 @@ export default {
     ApplyHistory,
     SharePlan,
     PermissionAdjust,
-    Vip1,
-    Vip2,
   },
   props: {
     isPlan: {
@@ -149,6 +141,10 @@ export default {
     selectedTeam: {
       type: [String, Number],
       default: null,
+    },
+    leftPanelCollapsed: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -185,8 +181,6 @@ export default {
       showSharePlan: false,
       showMovePlan: false,
       showSharePlanPersion: false,
-      showVip1: false,
-      showVip2: false,
       currentPlanId: "",
       currentPlanGroupId: "",
       planTitle: "",
@@ -208,6 +202,8 @@ export default {
       currentCount: 0, // 当前计划数量
       shareUserId: "",
       currentShareAuthEdit: {},
+      returnTeamFilterId: null,
+      isRestoringFromPlanReturn: false,
     }
   },
   watch: {
@@ -218,16 +214,41 @@ export default {
       deep: true,
     },
     isPlan: {
-      handler(newVal) {
+      async handler(newVal) {
         // console.log(newVal, "newVal");
         if (newVal) {
+          this.isRestoringFromPlanReturn = true
+          let shouldLocateTeamPlan = false
+          let returnTeamId = null
+          let shouldClearReturnQuery = false
           if (Object.keys(this.$route.query).length > 0) {
-            const { id, planGroupId, type } = this.$route.query
+            const { id, planGroupId, type, teamId, classType } = this.$route.query
+            const isReturnFromEdit = type === "edit" || type === "cancel"
+            const hasTeamId = teamId != null && String(teamId) !== ""
+            const hasClassType = ["my", "team", "official"].includes(classType)
             if (id) {
               this.currentPlanId = parseInt(id)
-              // this.currentPlanGroupId = parseInt(planGroupId);
-              this.getPlanDetail(id)
-              this.getPlanDayDetail(id)
+              this.currentPlanGroupId = planGroupId
+              if (isReturnFromEdit && classType === "team") {
+                this.activeClassType = "team"
+                this.currentPlanTeamId = teamId
+                returnTeamId = teamId
+                this.returnTeamFilterId = teamId || null
+                shouldLocateTeamPlan = true
+              } else if (isReturnFromEdit && (classType === "my" || classType === "official")) {
+                this.activeClassType = classType
+                this.returnTeamFilterId = null
+              } else if (isReturnFromEdit && !hasClassType && hasTeamId) {
+                // 仅兼容历史回跳参数未携带 classType 的场景
+                this.activeClassType = "team"
+                this.currentPlanTeamId = teamId
+                returnTeamId = teamId
+                this.returnTeamFilterId = teamId || null
+                shouldLocateTeamPlan = true
+              }
+              this.$emit("choose-plan", true)
+              await this.getPlanDetail(id)
+              await this.getPlanDayDetail(id)
             }
 
             // if (type === "edit") {
@@ -235,19 +256,68 @@ export default {
             //   this.getPlanDayDetail(this.currentPlanDetail.id);
             // }
 
-            if (type === "cancel" && this.$store.state.plan.planData?.id) {
-              this.currentPlanId = this.$store.state.plan.planData?.id
-              if (this.currentPlanId) {
-                this.getPlanDetail(this.currentPlanId)
-                this.getPlanDayDetail(this.currentPlanId)
+            if (type === "cancel" && !id && this.$store.state.plan.planData?.id) {
+              const planData = this.$store.state.plan.planData
+              this.currentPlanId = planData?.id
+              this.currentPlanGroupId = planData?.planGroupId
+              const cancelHasTeamId =
+                (teamId != null && String(teamId) !== "") ||
+                (planData?.teamId != null && String(planData?.teamId) !== "")
+              if (classType === "team") {
+                this.activeClassType = "team"
+                returnTeamId = teamId || planData?.teamId
+                this.returnTeamFilterId = returnTeamId || null
+                shouldLocateTeamPlan = true
+              } else if (classType === "my" || classType === "official") {
+                this.activeClassType = classType
+                this.returnTeamFilterId = null
+              } else if (!hasClassType && cancelHasTeamId) {
+                // 仅兼容历史回跳参数未携带 classType 的场景
+                this.activeClassType = "team"
+                returnTeamId = teamId || planData?.teamId
+                this.returnTeamFilterId = returnTeamId || null
+                shouldLocateTeamPlan = true
               }
+              if (this.currentPlanId) {
+                this.$emit("choose-plan", true)
+                await this.getPlanDetail(this.currentPlanId)
+                await this.getPlanDayDetail(this.currentPlanId)
+              }
+            }
+            if (isReturnFromEdit) {
+              shouldClearReturnQuery = true
             }
             // this.$emit("choose-plan");
           }
-          this.getPlanList()
+          await this.getPlanList()
+          if (shouldLocateTeamPlan && this.$refs.planListRef) {
+            await this.$nextTick()
+            const locateResult = await this.$refs.planListRef.locateAndSelectTeamPlan({
+              teamId: returnTeamId,
+              groupId: this.currentPlanGroupId,
+              planId: this.currentPlanId,
+            })
+            if (locateResult && locateResult.selected && locateResult.teamId) {
+              this.returnTeamFilterId = locateResult.teamId
+              if (locateResult.groupId != null) {
+                this.currentPlanGroupId = locateResult.groupId
+              }
+            } else {
+              await this.$refs.planListRef.locateTeamPlan({
+                teamId: returnTeamId,
+                groupId: this.currentPlanGroupId,
+              })
+            }
+          }
+          if (shouldClearReturnQuery) {
+            this.clearPlanReturnQuery()
+          }
           // this.getPlanLimitCount();
           // this.getTeamList();
           this.getDefaultTeam() // 个人初始团队id
+          this.$nextTick(() => {
+            this.isRestoringFromPlanReturn = false
+          })
         }
       },
       immediate: true,
@@ -260,6 +330,18 @@ export default {
     }
   },
   methods: {
+    clearPlanReturnQuery() {
+      const query = { ...(this.$route.query || {}) }
+      delete query.type
+      delete query.classType
+      delete query.teamId
+      delete query.id
+      delete query.planGroupId
+      this.$router.replace({
+        path: this.$route.path,
+        query,
+      })
+    },
     async getTeamList() {
       const _this = this
       getData({
@@ -319,6 +401,8 @@ export default {
       this.copyOfficialPlanInfo = null
     },
     handleAddPlanSuccess(payload) {
+      console.log(payload, "payload--handleAddPlanSuccess")
+      return
       this.getPlanDetail(payload.id)
       this.getPlanDayDetail(payload.id)
       this.$nextTick(() => {
@@ -382,6 +466,17 @@ export default {
       const res = await planApi.getPlanDetail(id)
       this.currentPlanDetail = res.result
       this.currentPlanId = res.result.id
+      if (this.activeClassType === "team") {
+        if (res.result && res.result.shareAuth != null) {
+          this.shareAuth = Number(res.result.shareAuth)
+        }
+        if (res.result && res.result.shareUserId != null) {
+          this.shareUserId = String(res.result.shareUserId)
+        }
+        if (res.result && res.result.teamId != null) {
+          this.currentPlanTeamId = res.result.teamId
+        }
+      }
       // 是否展开
       // this.currentPlanGroupId = res.result.planGroupId;
     },
@@ -473,22 +568,44 @@ export default {
 
       return completeData
     },
+    async checkVipSubscribeForOfficialPlan() {
+      const loginType = localStorage.getItem("loginType")
+      const identityType = loginType === "2" ? "C" : "R"
+      try {
+        const res = await getData({ url: "operate/api/vipSubscribe/getUserSubscribeInfo" })
+        if (!res || !res.success) return false
+
+        const result = res.result
+        let currentIdentityInfo = null
+        if (Array.isArray(result)) {
+          currentIdentityInfo = result.find((item) => item?.identityType === identityType) || null
+        } else if (result && typeof result === "object") {
+          currentIdentityInfo = result.identityType === identityType ? result : null
+        }
+
+        const subStatus = Number(currentIdentityInfo?.subStatus)
+        const shouldPromptVipDialog = !currentIdentityInfo || subStatus === 0 || subStatus === -1
+        if (!shouldPromptVipDialog) return false
+
+        if (loginType === "2") {
+          this.$vip1()
+        } else {
+          this.$vip2()
+        }
+        return true
+      } catch (error) {
+        return false
+      }
+    },
     async handleClassTypeChange(type) {
+      // 仅在用户手动切换时清理返回过滤；返回恢复流程中不清理
+      if (!this.isRestoringFromPlanReturn) {
+        this.returnTeamFilterId = null
+      }
       this.planSearchInput = ""
       let flag = false
       if (type === "official") {
-        const res = await userApi.getIsSubscribe(localStorage.getItem("triUserId"))
-        if (res.success && res.result) {
-          console.log(res.result, "res.result--是否订阅")
-          if (res.result.length === 0) {
-            if (localStorage.getItem("loginType") === "2") {
-              this.showVip1 = true
-            } else {
-              this.showVip2 = true
-            }
-            flag = true
-          }
-        }
+        flag = await this.checkVipSubscribeForOfficialPlan()
       }
       if (flag) {
         this.activeClassType = "my"
@@ -832,10 +949,14 @@ export default {
       optMap[index]()
     },
     handleEditPlan() {
+      const returnTeamId =
+        this.activeClassType === "team"
+          ? this.currentPlanTeamId || this.selectedTeam || null
+          : null
       const params = {
         ...this.currentPlanDetail,
         dayDetails: this.planList,
-        teamId: this.selectedTeam,
+        teamId: returnTeamId,
       }
       // 将 params 保存到 planStore 中的 planData
       this.$store.dispatch("plan/savePlanData", params)
@@ -844,7 +965,8 @@ export default {
         path: "/plan/add",
         query: {
           type: "edit",
-          teamId: this.selectedTeam,
+          teamId: returnTeamId || undefined,
+          classType: this.activeClassType,
         },
       })
     },
@@ -930,7 +1052,9 @@ export default {
   }
 
   .type-change {
-    flex: 0 0 260px;
+    flex: 0 0 240px;
+    width: 240px;
+    min-width: 0;
     height: 100vh;
     max-height: calc(100vh - 60px);
     background-color: #fff;
@@ -938,6 +1062,29 @@ export default {
     overflow-x: hidden;
     // border-left: 1px solid #e5e5e5;
     border-right: 1px solid #e5e5e5;
+    transition: flex-basis 0.2s ease, width 0.2s ease;
+
+    @media (max-width: 1680px) {
+      flex: 0 0 220px;
+      width: 220px;
+    }
+
+    @media (max-width: 1440px) {
+      flex: 0 0 200px;
+      width: 200px;
+    }
+
+    @media (max-width: 1280px) {
+      flex: 0 0 180px;
+      width: 180px;
+    }
+
+    &.is-collapsed {
+      flex: 0 0 0;
+      width: 0;
+      border-right: none;
+      overflow: hidden;
+    }
   }
 }
 </style>

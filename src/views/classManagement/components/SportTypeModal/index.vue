@@ -7,11 +7,12 @@
     class="sport-type-modal"
     :close-on-click-modal="false"
   >
-    <span slot="title">选择运动类型</span>
+    <span slot="title" v-if="canShowSportTypes">选择运动类型</span>
     <!-- <div class="add-class-img">
       <img :src="currentIcon" alt="" />
     </div> -->
-    <div class="type-grid">
+    <!-- 精英版订阅用户才显示运动类型选择 -->
+    <div class="type-grid" v-if="canShowSportTypes">
       <div
         v-for="item in types"
         :key="item.key"
@@ -35,11 +36,17 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "SportTypeModal",
   props: {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: undefined },
+    selectedDate: {
+      type: String,
+      default: "",
+    },
     isClass: {
       type: Boolean,
       default: false,
@@ -92,6 +99,13 @@ export default {
     };
   },
   computed: {
+    // 从 Vuex 获取精英版订阅状态，控制运动类型选择弹窗的显示
+    ...mapGetters(["isEliteAthlete"]),
+    canShowSportTypes() {
+      if (this.isEliteAthlete) return true;
+      if (!this.selectedDate) return true;
+      return !this.isFutureDate(this.selectedDate);
+    },
     currentIcon() {
       return this.isSchedule
         ? require("@/assets/addClass/type-title.png")
@@ -111,6 +125,16 @@ export default {
     },
   },
   methods: {
+    isFutureDate(dateStr) {
+      if (!dateStr) return false;
+      const normalizedDate = String(dateStr).split(" ")[0].split("T")[0];
+      const targetDate = new Date(`${normalizedDate}T00:00:00`);
+      if (Number.isNaN(targetDate.getTime())) return false;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return targetDate > today;
+    },
     onCancel() {
       this.innerVisible = false;
       this.$emit("cancel");

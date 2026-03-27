@@ -151,6 +151,8 @@ export default {
   padding: 14px 10px 5px 10px;
   // border-radius: 6px;
   cursor: pointer;
+  overflow: hidden;
+  min-width: 0;
 
   @media (max-width: 1680px) {
     padding: 10px 8px 4px 8px;
@@ -192,6 +194,8 @@ export default {
     margin-bottom: 10px;
     font-size: 13px;
     white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
 
     @media (max-width: 1680px) {
       gap: 4px;

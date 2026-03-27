@@ -199,8 +199,9 @@
                 >
                   <span>录入运动</span>
                 </div>
+                <!-- 非精英版用户在未来日期不显示粘贴 -->
                 <div
-                  v-if="hasCopiedClass || hasCopiedEvent"
+                  v-if="(hasCopiedClass || hasCopiedEvent) && (isEliteAthlete || contextMenuDate <= today)"
                   class="context-menu-item"
                   @click="handlePaste"
                 >
@@ -242,6 +243,7 @@ import { isToday, convertToLunar } from "../utils/helpers";
 import draggable from "vuedraggable";
 import EventCard from "./eventCard.vue";
 import { getData } from "@/api/common.js";
+import { mapGetters } from "vuex";
 
 export default {
   name: "ScheduleCalendar",
@@ -295,47 +297,23 @@ export default {
       dateTitleContextMenuX: 0, // 日期标题右键菜单位置X
       dateTitleContextMenuY: 0, // 日期标题右键菜单位置Y
       dateTitleContextMenuDate: null, // 日期标题右键菜单的日期
-      isEliteAthlete: false, // 是否为精英版订阅的运动员
     };
+  },
+  computed: {
+    // 从 Vuex 获取精英版订阅状态，用于控制拖拽权限
+    ...mapGetters(["isEliteAthlete"]),
   },
   mounted() {
     document.addEventListener("click", this.hideContextMenu);
     document.addEventListener("click", this.hideDateTitleContextMenu);
-    this.checkEliteSubscription();
-    this.$root.$on("identity-changed", this.handleIdentitySwitch);
   },
   beforeDestroy() {
     document.removeEventListener("click", this.hideContextMenu);
     document.removeEventListener("click", this.hideDateTitleContextMenu);
-    this.$root.$off("identity-changed", this.handleIdentitySwitch);
   },
   methods: {
     isToday,
     convertToLunar,
-    handleIdentitySwitch(newLoginType) {
-      this.loginType = newLoginType;
-      this.checkEliteSubscription();
-    },
-    async checkEliteSubscription() {
-      if (this.loginType !== "1") {
-        this.isEliteAthlete = true;
-        return;
-      }
-      try {
-        const res = await getData({
-          url: "operate/api/vipSubscribe/getUserSubscribeInfo",
-        });
-        if (res && res.success && Array.isArray(res.result)) {
-          const eliteInfo = res.result.find(
-            (item) => item.identityType === "R"
-          );
-          this.isEliteAthlete = !!(eliteInfo && eliteInfo.subStatus === 1);
-        }
-      } catch (e) {
-        console.warn("查询精英版订阅状态失败:", e);
-        this.isEliteAthlete = false;
-      }
-    },
     shouldShowDragClass(date) {
       if (this.isEliteAthlete) return true;
       return date <= this.today;

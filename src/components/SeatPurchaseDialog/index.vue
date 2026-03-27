@@ -34,7 +34,7 @@
                 <div class="seat-block">
                   <div class="seat-row-head">
                     <span class="seat-label">教练席位</span>
-                    <span class="seat-price">¥99/永久席位</span>
+                    <span class="seat-price">¥{{ coachUnitPrice }}/永久席位</span>
                   </div>
                   <div class="seat-stepper">
                     <button
@@ -63,7 +63,7 @@
                 <div class="seat-block">
                   <div class="seat-row-head">
                     <span class="seat-label">运动员席位</span>
-                    <span class="seat-price">¥50/永久席位</span>
+                    <span class="seat-price">¥{{ athleteUnitPrice }}/永久席位</span>
                   </div>
                   <div class="seat-stepper">
                     <button
@@ -155,7 +155,7 @@
                       <template v-if="payOrderLoading">
                         <span class="qr-hint">正在生成二维码...</span>
                       </template>
-                      <template v-else-if="payCodeUrl">
+                      <template v-else-if="agreementChecked && payCodeUrl">
                         <img
                           :src="payCodeUrl"
                           alt="微信支付二维码"
@@ -172,7 +172,7 @@
                   </div>
                   <div class="amount-inline">
                     <span class="amount-label">订单金额</span>
-                    <span class="amount-value">¥{{ totalAmount
+                    <span class="amount-value">¥{{ totalAmountDisplay
                     }}</span>
                   </div>
                 </div>
@@ -180,7 +180,7 @@
                 <!-- 微信支付：不显示按钮，勾选协议后自动出码扫码支付；支付宝：显示按钮跳转支付 -->
                 <button v-if="selectedPaymentMethod !== 'wechat'"
                   class="subscribe-btn pay-btn"
-                  :disabled="totalAmount <= 0"
+                  :disabled="totalAmount <= 0 || !agreementChecked"
                   @click="handlePay">
                   支付
                 </button>
@@ -191,7 +191,7 @@
                     已阅读同意
                     <a href="javascript:;" class="agreement-link"
                       @click.stop.prevent="agreementDialogVisible = true">
-                      《服务协议》
+                      《席位购买服务协议》
                     </a>
                   </span>
                 </label>
@@ -248,6 +248,12 @@
           <li>本协议自用户点击“同意协议”时生效。</li>
           <li>平台有权更新协议，更新后公示 7 日生效，用户继续使用视为同意新版本。</li>
         </ul>
+        <label class="agreement-dialog-check">
+          <input v-model="agreementChecked" type="checkbox"
+            @change="handleAgreementDialogChange"
+            class="agreement-checkbox" />
+          <span>我已阅读同意《席位购买服务协议》</span>
+        </label>
       </div>
     </el-dialog>
   </div>
@@ -256,9 +262,14 @@
 <script>
 import QRCode from "qrcode"
 import { submitData, getData } from "@/api/common"
-
-const COACH_PRICE = 99
-const ATHLETE_PRICE = 50
+import {
+  VIP_PRODUCT_PRICE_KEYS,
+  formatPriceFen,
+  getDefaultPriceFen,
+  getProductPriceFen,
+  getVipProductPriceMap,
+  priceFenToYuanNumber,
+} from "@/utils/vipProductPrice"
 
 export default {
   name: "SeatPurchaseDialog",
@@ -275,6 +286,8 @@ export default {
       innerVisible: this.visible || this.value || false,
       purchaseCoach: 0,
       purchaseAthlete: 0,
+      coachPriceFen: getDefaultPriceFen(VIP_PRODUCT_PRICE_KEYS.coachSeat),
+      athletePriceFen: getDefaultPriceFen(VIP_PRODUCT_PRICE_KEYS.athleteSeat),
       selectedPaymentMethod: "wechat",
       agreementChecked: false,
       agreementDialogVisible: false,
@@ -297,16 +310,29 @@ export default {
     athleteAfter() {
       return this.currentAthlete + (Number(this.purchaseAthlete) || 0)
     },
-    /** 订单金额（元） */
-    totalAmount() {
+    coachUnitPrice() {
+      return formatPriceFen(this.coachPriceFen)
+    },
+    athleteUnitPrice() {
+      return formatPriceFen(this.athletePriceFen)
+    },
+    totalAmountFen() {
       const c = Math.min(99, Math.max(0, Number(this.purchaseCoach) || 0))
       const a = Math.min(99, Math.max(0, Number(this.purchaseAthlete) || 0))
-      return c * COACH_PRICE + a * ATHLETE_PRICE
+      return c * this.coachPriceFen + a * this.athletePriceFen
     },
-    /** 订单金额（分），用于接口 */
+    totalAmount() {
+      return priceFenToYuanNumber(this.totalAmountFen)
+    },
+    totalAmountDisplay() {
+      return formatPriceFen(this.totalAmountFen)
+    },
     orderAmountCents() {
-      return this.totalAmount * 100
+      return this.totalAmountFen
     },
+  },
+  mounted() {
+    this.loadProductPrices()
   },
   watch: {
     visible(val) {
@@ -328,9 +354,16 @@ export default {
     innerVisible(val) {
       this.$emit("update:visible", val)
       this.$emit("input", val)
-      if (!val) this.resetPayState()
+      if (!val) {
+        this.resetPayState()
+        this.agreementChecked = false
+      }
     },
     agreementChecked(val) {
+      if (!val) {
+        this.resetPayState()
+        return
+      }
       if (
         val &&
         this.selectedPaymentMethod === "wechat" &&
@@ -365,6 +398,15 @@ export default {
     },
   },
   methods: {
+    async loadProductPrices() {
+      try {
+        const priceMap = await getVipProductPriceMap({ systemType: "web" })
+        this.coachPriceFen = getProductPriceFen(priceMap, VIP_PRODUCT_PRICE_KEYS.coachSeat)
+        this.athletePriceFen = getProductPriceFen(priceMap, VIP_PRODUCT_PRICE_KEYS.athleteSeat)
+      } catch (error) {
+        console.error("获取席位价格失败", error)
+      }
+    },
     onCancel() {
       this.innerVisible = false
     },
@@ -392,6 +434,11 @@ export default {
     },
     onAthleteInput() {
       this.purchaseAthlete = this.clamp(this.purchaseAthlete, 0, 99)
+    },
+    handleAgreementDialogChange() {
+      if (this.agreementChecked) {
+        this.agreementDialogVisible = false
+      }
     },
     resetPayState() {
       this.stopPayPoll()
@@ -421,7 +468,7 @@ export default {
               this.$message.success("支付成功")
               this.$emit("success")
               setTimeout(() => {
-                window.location.reload()
+                this.$router.go(0)
               }, 600)
             }
           }
@@ -471,7 +518,7 @@ export default {
           this.$message.error(res?.message || "创建订单失败")
         }
       } catch (e) {
-        this.$message.error(e?.message || "创建订单失败")
+        // this.$message.error(e?.message || "创建订单失败")
       } finally {
         this.payOrderLoading = false
       }
@@ -545,7 +592,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-$primary-red: #b81300;
+$primary-red: #F92B30;
 $primary-red-hover: #9a0f00;
 $primary-red-light: #fff5f4;
 $wechat-green: #07c160;
@@ -898,7 +945,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
 .amount-value {
   color: $primary-red;
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.02em;
 }
 
@@ -908,7 +955,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
   padding: 12px 20px;
   font-size: 16px;
   font-weight: 600;
-  background: linear-gradient(180deg, #c91616 0%, $primary-red 50%, $primary-red-hover 100%);
+  background: linear-gradient(180deg, #ff6f73 0%, #f94f55 50%, #ef3c42 100%);
   color: #fff;
   border: none;
   border-radius: $radius-md;
@@ -919,7 +966,7 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(184, 19, 0, 0.4);
+    box-shadow: 0 6px 16px rgba(239, 60, 66, 0.34);
   }
 
   &:active:not(:disabled) {
@@ -1064,6 +1111,24 @@ $shadow-btn: 0 4px 12px rgba(184, 19, 0, 0.35);
 
   p {
     margin-bottom: 8px;
+  }
+
+  .agreement-dialog-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+
+    .agreement-checkbox {
+      margin: 0;
+      flex-shrink: 0;
+    }
   }
 }
 </style>

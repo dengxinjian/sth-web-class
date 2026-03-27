@@ -1,94 +1,92 @@
 <template>
   <div>
-  <el-dialog
-    :visible.sync="innerVisible"
-    width="780px"
-    append-to-body
-    :before-close="onCancel"
-    class="add-class-title-modal"
-    :close-on-click-modal="false">
-    <span slot="title">分享历史</span>
+    <el-dialog
+      :visible.sync="innerVisible"
+      width="780px"
+      append-to-body
+      :before-close="onCancel"
+      class="add-class-title-modal"
+      :close-on-click-modal="false">
+      <span slot="title">分享历史</span>
 
-    <!-- 分享历史 -->
-    <el-table
-      :data="shareTableData"
-      border
-      style="width: 100%; margin-top: 10px"
-    >
-      <el-table-column
-        prop="shareToName"
-        label="分享团队名称"
-        align="center"
-      />
-      <el-table-column
-        prop="shareTime"
-        label="分享时间"
-        width="180"
-        align="center"
-      />
-      <el-table-column
-        prop="permissionDesc"
-        label="权限"
-        width="120"
-        align="center"
-      />
-      <el-table-column label="操作" width="120" align="center">
-        <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="small"
-            :disabled="scope.row.shareToAuth === 0 || scope.row.shareUserId !== triUserId"
-            @click="handleAdjustPermission(scope.row)"
-          >权限调整</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+      <!-- 分享历史 -->
+      <el-table
+        :data="shareTableData"
+        border
+        style="width: 100%; margin-top: 10px">
+        <el-table-column
+          prop="shareToName"
+          label="分享团队名称"
+          align="center" />
+        <el-table-column
+          prop="shareTime"
+          label="分享时间"
+          width="180"
+          align="center" />
+        <el-table-column
+          prop="permissionDesc"
+          label="权限"
+          width="120"
+          align="center">
+          <template slot-scope="scope">
+            <span
+              :style="{ color: scope.row.shareToAuth === 0 ? '' : '#e5423c' }">{{ scope.row.permissionDesc }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="120" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              size="small"
+              :disabled="scope.row.shareToAuth === 0 || scope.row.shareUserId !== triUserId"
+              @click="handleAdjustPermission(scope.row)">权限调整</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <!-- 分享历史分页 -->
-    <el-pagination
-      v-if="shareTotal > sharePagination.limit"
-      @size-change="handleShareSizeChange"
-      @current-change="handleShareCurrentChange"
-      :current-page="sharePagination.page"
-      :page-sizes="[10, 20, 50, 100]"
-      :page-size="sharePagination.limit"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="shareTotal"
-      style="margin-top: 20px; text-align: right;margin-bottom: 20px;"
-    />
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel">关闭</el-button>
-    </span>
-  </el-dialog>
+      <!-- 分享历史分页 -->
+      <el-pagination v-if="shareTotal > sharePagination.limit"
+        @size-change="handleShareSizeChange"
+        @current-change="handleShareCurrentChange"
+        :current-page="sharePagination.page"
+        :page-sizes="[10, 20, 50, 100]"
+        :page-size="sharePagination.limit"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="shareTotal"
+        style="margin-top: 20px; text-align: right;margin-bottom: 20px;" />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="onCancel">关闭</el-button>
+      </span>
+    </el-dialog>
 
-  <!-- 权限调整弹框 -->
-  <el-dialog
-    title="权限调整"
-    :visible.sync="permissionDialogVisible"
-    width="420px"
-    append-to-body
-    class="permission-adjust-modal"
-    @close="closePermissionDialog"
-  >
-    <el-form ref="permissionFormRef" :model="permissionForm" label-width="80px">
-      <el-form-item label="撤回:" required>
-        <el-radio-group v-model="permissionForm.revoke">
-          <el-radio :label="true">是</el-radio>
-          <el-radio :label="false">否</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="权限:" required v-if="!permissionForm.revoke">
-        <el-radio-group v-model="permissionForm.shareToAuth">
-          <el-radio :label="1">查看</el-radio>
-          <el-radio :label="2">编辑</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    </el-form>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="closePermissionDialog">取消</el-button>
-      <el-button type="primary" @click="confirmPermissionAdjust">确定</el-button>
-    </span>
-  </el-dialog>
+    <!-- 权限调整弹框 -->
+    <el-dialog title="权限调整" :visible.sync="permissionDialogVisible"
+      width="420px" append-to-body class="permission-adjust-modal"
+      @close="closePermissionDialog">
+      <el-form ref="permissionFormRef" :model="permissionForm"
+        label-width="80px">
+        <el-form-item label="撤回:" required>
+          <el-radio-group v-model="permissionForm.revoke">
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="权限:" required
+          v-if="!permissionForm.revoke">
+          <el-radio-group v-model="permissionForm.shareToAuth">
+            <el-radio :label="1">查看</el-radio>
+            <el-radio :label="2">编辑</el-radio>
+            <el-radio :label="3">共有</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closePermissionDialog">取消</el-button>
+        <el-button type="primary"
+          @click="confirmPermissionAdjust">确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -427,6 +425,7 @@ export default {
         0: "无",
         1: "查看",
         2: "编辑",
+        3: "共有",
       }
       return map[auth] || "无"
     },

@@ -4,19 +4,14 @@
       class="class-schedule-card-container js-class-schedule-card js-sport-container-noDrag"
       :data-id="classItem.id"
       :data-date="date"
-      data-type="classSchedule"
-    >
+      data-type="classSchedule">
       <div
         class="classScheduleCard"
         :data-id="classItem.id"
         :data-date="date"
         data-type="classSchedule"
-        @click.stop="
-          $emit('edit', classItem);
-          hideContextMenu();
-        "
-        @contextmenu.stop.prevent="showContextMenu"
-      >
+        @click.stop="handleEdit"
+        @contextmenu.stop.prevent="showContextMenu">
         <div :style="cardStyle"></div>
         <div class="card-body class-drap-handle">
           <!-- 标题栏 -->
@@ -25,8 +20,7 @@
               <img
                 class="image-icon"
                 :src="getSportIcon(classItem.sportType)"
-                alt=""
-              />
+                alt="" />
               <!-- 设备同步状态 -->
               <template v-if="!isBeforeToday(date)">
                 <div
@@ -36,54 +30,39 @@
                     'sport-type-name',
                     'sport-type-color' + device.syncStatus,
                   ]"
-                  @click.stop="$emit('device-click', classItem, device)"
-                >
+                  @click.stop="$emit('device-click', classItem, device)">
                   {{ getDeviceIcon(device.deviceType) }}
                 </div>
               </template>
             </div>
-            <el-popover
-              popper-class="athletic-btn-popover"
+            <el-popover popper-class="athletic-btn-popover"
               placement="right"
-              trigger="hover"
-              :tabindex="9999"
-            >
+              trigger="hover" :tabindex="9999">
               <div class="btn-list-hover">
-                <div
-                  class="btn-list-hover-item"
-                  @click.stop="$emit('edit', classItem)"
-                >
+                <div class="btn-list-hover-item"
+                  @click.stop="handleEdit"
+                  v-if="canEdit">
                   编辑
                 </div>
-                <div
-                  class="btn-list-hover-item"
-                  @click.stop="$emit('cut', classItem)"
-                >
+                <div class="btn-list-hover-item"
+                  @click.stop="$emit('cut', classItem)">
                   剪切
                 </div>
-                <div
-                  class="btn-list-hover-item"
-                  @click.stop="$emit('copy', classItem)"
-                >
+                <div class="btn-list-hover-item"
+                  @click.stop="$emit('copy', classItem)">
                   复制
                 </div>
 
-                <div
-                  class="btn-list-hover-item"
+                <div class="btn-list-hover-item"
                   style="color: #f92b30"
-                  @click.stop="$emit('delete', classItem)"
-                >
+                  @click.stop="$emit('delete', classItem)">
                   删除
                 </div>
               </div>
               <!-- <i class="el-icon-more" slot="reference" @click.stop></i> -->
-              <img
-                src="@/assets/addClass/Component 117.png"
-                alt=""
+              <img src="@/assets/addClass/Component 117.png" alt=""
                 @click.stop
-                slot="reference"
-                style="width: 16px; height: 16px"
-              />
+                slot="reference" style="width: 16px; height: 16px" />
             </el-popover>
           </div>
 
@@ -107,7 +86,8 @@
           </div>
 
           <!-- 距离 -->
-          <div style="display: flex" v-if="!isRestType(classItem.sportType)">
+          <div style="display: flex"
+            v-if="!isRestType(classItem.sportType)">
             <div class="keyword">
               {{
                 formatDistance(
@@ -115,13 +95,11 @@
                   classItem.sportType
                 )
               }}
-              <span
-                v-if="
-                  classItem.classesJson &&
-                  classItem.classesJson.distanceUnit &&
-                  classItem.classesJson.distanceUnit !== 'km'
-                "
-              >
+              <span v-if="
+                classItem.classesJson &&
+                classItem.classesJson.distanceUnit &&
+                classItem.classesJson.distanceUnit !== 'km'
+              ">
                 {{ classItem.classesJson.distanceUnit }}
               </span>
               <span v-else>km</span>
@@ -130,10 +108,8 @@
           </div>
 
           <!-- STH -->
-          <div
-            style="display: flex; gap: 4px; margin-top: 4px"
-            v-if="!isRestType(classItem.sportType)"
-          >
+          <div style="display: flex; gap: 4px; margin-top: 4px"
+            v-if="!isRestType(classItem.sportType)">
             <div class="keyword" style="margin-top: 0px">
               {{
                 !classItem.classesJson || !classItem.classesJson.sth
@@ -142,68 +118,58 @@
               }}
             </div>
             <div>
-              <img class="sth" src="~@/assets/addClass/sth.png" alt="" />
+              <img class="sth" src="~@/assets/addClass/sth.png"
+                alt="" />
             </div>
           </div>
-          <template
-            v-if="
-              classItem.classesJson &&
-              (classItem.classesJson.summary ||
-                classItem.classesJson.trainingAdvice)
-            "
-          >
+          <template v-if="
+            classItem.classesJson &&
+            (classItem.classesJson.summary ||
+              classItem.classesJson.trainingAdvice)
+          ">
             <!-- 概要 -->
-            <pre v-if="classItem.classesJson.summary" class="stage-details-p">
-          {{ truncateByLines(classItem.classesJson.summary) }}
-        </pre
-            >
+            <pre v-if="classItem.classesJson.summary"
+              class="stage-details-p">
+            {{ truncateByLines(classItem.classesJson.summary) }}
+            </pre>
             <!-- 训练建议 -->
             <pre class="stage-details-p">
-  {{ truncateByLines(classItem.classesJson.trainingAdvice) }}</pre
-            >
+            {{ truncateByLines(classItem.classesJson.trainingAdvice) }}
+            </pre>
           </template>
 
           <!-- 骑行详情 -->
           <template
-            v-else-if="classItem.sportType === 'CYCLE' && classItem.classesJson"
-          >
+            v-else-if="classItem.sportType === 'CYCLE' && classItem.classesJson">
             <CycleStageDetails
               :class-data="classItem.classesJson"
-              :max-stages="2"
-            />
+              :max-stages="2" />
           </template>
 
           <!-- 跑步详情 -->
           <template
-            v-else-if="classItem.sportType === 'RUN' && classItem.classesJson"
-          >
+            v-else-if="classItem.sportType === 'RUN' && classItem.classesJson">
             <RunStageDetails
               :class-data="classItem.classesJson"
-              :max-stages="2"
-            />
+              :max-stages="2" />
           </template>
 
           <!-- 训练强度可视化 -->
           <div
             v-if="classItem.classesJson && classItem.classesJson.timeline"
-            style="height: 16px; display: flex; gap: 1px"
-          >
+            style="height: 16px; display: flex; gap: 1px">
             <div
               v-for="(stage, index) in classItem.classesJson.timeline"
-              :key="index"
-              class="time-stage"
-              :style="{ flex: stage.duration }"
-            >
-              <div
-                style="display: flex; gap: 1px; height: 16px"
-                v-if="stage.stageTimeline.length > 0"
-              >
-                <div v-for="n in +stage.times" :key="n" :style="{ flex: 1 }">
+              :key="index" class="time-stage"
+              :style="{ flex: stage.duration }">
+              <div style="display: flex; gap: 1px; height: 16px"
+                v-if="stage.stageTimeline.length > 0">
+                <div v-for="n in +stage.times" :key="n"
+                  :style="{ flex: 1 }">
                   <ExerciseProcessChart
                     :exerciseList="stage.stageTimeline"
                     :maxIntensity="classItem.classesJson.maxIntensity"
-                    :height="16"
-                  />
+                    :height="16" />
                 </div>
               </div>
             </div>
@@ -214,28 +180,18 @@
 
     <!-- 自定义右键菜单 -->
     <transition name="context-menu-fade">
-      <div
-        v-if="contextMenuVisible"
-        class="context-menu"
+      <div v-if="contextMenuVisible" class="context-menu"
         :style="{ left: contextMenuX + 'px', top: contextMenuY + 'px' }"
-        @click.stop
-      >
-        <div
-          class="context-menu-item"
-          @click="
-            $emit('edit', classItem);
-            hideContextMenu();
-          "
-        >
+        @click.stop>
+        <div class="context-menu-item" @click="
+          handleEdit()
+          " v-if="canEdit">
           编辑
         </div>
         <div class="context-menu-item" @click="handleCut">剪切</div>
         <div class="context-menu-item" @click="handleCopy">复制</div>
-        <div
-          class="context-menu-item"
-          @click="handleDelete"
-          style="color: #f92b30"
-        >
+        <div class="context-menu-item" @click="handleDelete"
+          style="color: #f92b30">
           删除
         </div>
       </div>
@@ -244,11 +200,12 @@
 </template>
 
 <script>
-import ExerciseProcessChart from "@/components/ExerciseProcessChart";
-import CycleStageDetails from "./CycleStageDetails.vue";
-import RunStageDetails from "./RunStageDetails.vue";
-import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from "../constants";
-import { truncateByLines, isExpired } from "../utils/helpers";
+import ExerciseProcessChart from "@/components/ExerciseProcessChart"
+import CycleStageDetails from "./CycleStageDetails.vue"
+import RunStageDetails from "./RunStageDetails.vue"
+import { SPORT_TYPE_ICONS, DEVICE_TYPE_ICON_DICT } from "../constants"
+import { truncateByLines, isExpired } from "../utils/helpers"
+import { mapGetters } from "vuex"
 
 export default {
   name: "ScheduleClassCard",
@@ -272,9 +229,14 @@ export default {
       contextMenuVisible: false,
       contextMenuX: 0,
       contextMenuY: 0,
-    };
+    }
   },
   computed: {
+    // 从 Vuex 获取精英版订阅状态
+    ...mapGetters(["isEliteAthlete"]),
+    canEdit() {
+      return this.isEliteAthlete || !this.isFutureDate(this.date)
+    },
     cardStyle() {
       // 过期且有时长的课程显示为红色
       if (
@@ -283,101 +245,113 @@ export default {
         this.classItem.classesJson.duration &&
         this.classItem.classesJson.duration !== "00:00:00"
       ) {
-        return { backgroundColor: "#B20000", height: "6px" };
+        return { backgroundColor: "#B20000", height: "6px" }
       }
-      return { backgroundColor: "#fff", height: "6px" };
+      return { backgroundColor: "#fff", height: "6px" }
     },
   },
   mounted() {
-    document.addEventListener("click", this.hideContextMenu);
+    document.addEventListener("click", this.hideContextMenu)
   },
   beforeDestroy() {
-    document.removeEventListener("click", this.hideContextMenu);
+    document.removeEventListener("click", this.hideContextMenu)
   },
   methods: {
     truncateByLines,
     getSportIcon(sportType) {
-      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER;
+      return SPORT_TYPE_ICONS[sportType] || SPORT_TYPE_ICONS.OTHER
     },
     getDeviceIcon(deviceType) {
-      return DEVICE_TYPE_ICON_DICT[deviceType] || "";
+      return DEVICE_TYPE_ICON_DICT[deviceType] || ""
     },
     isRestType(sportType) {
-      return ["REST", "REMARK"].includes(sportType);
+      return ["REST", "REMARK"].includes(sportType)
     },
     formatDuration(duration) {
-      return duration === "00:00:00" ? "--:--:--" : duration;
+      return duration === "00:00:00" ? "--:--:--" : duration
     },
     formatDistance(distance, sportType) {
-      console.log(distance, sportType, "distance, sportType");
-      let result = "";
+      console.log(distance, sportType, "distance, sportType")
+      let result = ""
       if (distance && typeof distance === "string" && distance.includes("km")) {
-        result = distance.replace("km", "");
+        result = distance.replace("km", "")
       }
       if (distance && typeof distance === "number" && distance > 0) {
-        result = distance.toString();
+        result = distance.toString()
       }
       if (!result || result === "0") {
-        result = "--";
+        result = "--"
       }
-      return result;
+      return result
     },
     isBeforeToday(dateStr) {
-      if (!dateStr) return false;
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const targetDate = new Date(dateStr);
-      targetDate.setHours(0, 0, 0, 0);
-      return targetDate < today;
+      if (!dateStr) return false
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const targetDate = new Date(dateStr)
+      targetDate.setHours(0, 0, 0, 0)
+      return targetDate < today
+    },
+    isFutureDate(dateStr) {
+      if (!dateStr) return false
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const targetDate = new Date(dateStr)
+      targetDate.setHours(0, 0, 0, 0)
+      return targetDate > today
+    },
+    handleEdit() {
+      this.$emit("edit", this.classItem)
+      this.hideContextMenu()
     },
     showContextMenu(event) {
       // 使用 nextTick 确保在隐藏旧菜单后再显示新菜单
       this.$nextTick(() => {
         // 获取组件根元素
-        const rootElement = this.$el;
-        const rootRect = rootElement.getBoundingClientRect();
+        const rootElement = this.$el
+        const rootRect = rootElement.getBoundingClientRect()
 
         // 计算相对于组件根元素的初始坐标
-        let x = event.clientX - rootRect.left;
-        let y = event.clientY - rootRect.top;
+        let x = event.clientX - rootRect.left
+        let y = event.clientY - rootRect.top
 
         // 先设置菜单可见，以便获取菜单尺寸
-        this.contextMenuX = x;
-        this.contextMenuY = y;
-        this.contextMenuVisible = true;
+        this.contextMenuX = x
+        this.contextMenuY = y
+        this.contextMenuVisible = true
 
         // 等待菜单渲染完成后再计算边界并调整位置
         this.$nextTick(() => {
-          const menuElement = this.$el.querySelector(".context-menu");
-          if (!menuElement) return;
+          const menuElement = this.$el.querySelector(".context-menu")
+          if (!menuElement) return
 
-          const menuRect = menuElement.getBoundingClientRect();
-          const menuWidth = menuRect.width;
-          const menuHeight = menuRect.height;
+          const menuRect = menuElement.getBoundingClientRect()
+          const menuWidth = menuRect.width
+          const menuHeight = menuRect.height
 
           // 获取视口和容器边界
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
-          const containerWidth = rootRect.width;
-          const containerHeight = rootRect.height;
+          const viewportWidth = window.innerWidth
+          const viewportHeight = window.innerHeight
+          const containerWidth = rootRect.width
+          const containerHeight = rootRect.height
 
           // 计算菜单在视口中的绝对位置
-          const menuAbsoluteX = rootRect.left + x;
-          const menuAbsoluteY = rootRect.top + y;
+          const menuAbsoluteX = rootRect.left + x
+          const menuAbsoluteY = rootRect.top + y
 
           // 限制右边界（优先考虑视口，然后考虑容器）
           if (menuAbsoluteX + menuWidth > viewportWidth) {
             x = Math.min(
               containerWidth - menuWidth - 5,
               viewportWidth - rootRect.left - menuWidth - 5
-            );
+            )
           } else if (x + menuWidth > containerWidth) {
-            x = containerWidth - menuWidth - 5;
+            x = containerWidth - menuWidth - 5
           }
 
           // 限制左边界（确保不会超出容器左边界）
           if (x < 0) {
-            x = 5;
+            x = 5
           }
 
           // 限制下边界（优先考虑视口，然后考虑容器）
@@ -385,47 +359,48 @@ export default {
             y = Math.min(
               containerHeight - menuHeight - 5,
               viewportHeight - rootRect.top - menuHeight - 5
-            );
+            )
           } else if (y + menuHeight > containerHeight) {
-            y = containerHeight - menuHeight - 5;
+            y = containerHeight - menuHeight - 5
           }
 
           // 限制上边界（确保不会超出容器上边界）
           if (y < 0) {
-            y = 5;
+            y = 5
           }
 
           // 更新菜单位置（仅在需要调整时更新，避免不必要的闪烁）
           if (this.contextMenuX !== x || this.contextMenuY !== y) {
-            this.contextMenuX = x;
-            this.contextMenuY = y;
+            this.contextMenuX = x
+            this.contextMenuY = y
           }
-        });
-      });
+        })
+      })
     },
     hideContextMenu() {
-      this.contextMenuVisible = false;
+      this.contextMenuVisible = false
     },
     handleDelete() {
-      this.hideContextMenu();
-      this.$emit("delete", this.classItem);
+      this.hideContextMenu()
+      this.$emit("delete", this.classItem)
     },
     handleCopy() {
-      this.hideContextMenu();
-      this.$emit("copy", this.classItem);
+      this.hideContextMenu()
+      this.$emit("copy", this.classItem)
     },
     handleCut() {
-      this.hideContextMenu();
-      this.$emit("cut", this.classItem);
+      this.hideContextMenu()
+      this.$emit("cut", this.classItem)
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
 .class-schedule-card-container {
   margin-bottom: 5px;
   margin-top: 5px;
+
   .sport-drap-handle {
     display: none;
   }
@@ -447,7 +422,7 @@ export default {
     transform: scale(1.02);
   }
 
-  > .classScheduleCard {
+  >.classScheduleCard {
     display: none;
   }
 
@@ -483,12 +458,15 @@ export default {
         .sport-type-color1 {
           background-color: #7fb135;
         }
+
         .sport-type-color2 {
           background-color: #c72a29;
         }
+
         .sport-type-color3 {
           background-color: #f5a623;
         }
+
         .sport-type-color0 {
           background-color: #aaaaaa;
         }
@@ -553,6 +531,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+
   .btn-list-hover-item {
     width: 60px;
     height: 32px;
@@ -565,6 +544,7 @@ export default {
     line-height: 32px;
     color: #101010;
     cursor: pointer;
+
     &:hover {
       background-color: #c3c9d740;
       font-family: PingFang SC;
@@ -604,6 +584,7 @@ export default {
     line-height: 32px;
     color: #101010;
     cursor: pointer;
+
     &:hover {
       background-color: #c3c9d740;
       font-family: PingFang SC;

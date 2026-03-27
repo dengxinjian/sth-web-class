@@ -1,6 +1,7 @@
 <template>
-  <div class="vip-dialog-mask" v-if="innerVisible">
-    <div class="mask-container">
+  <div ref="mask" class="vip-dialog-mask" v-if="innerVisible"
+    :style="maskStyle">
+    <div ref="container" class="mask-container">
       <div class="container-top-box">
         <div class="container-top-box-title">
           {{ tradeType === '2' || tradeType === 2 ? '续费' : '订阅' }}
@@ -52,8 +53,11 @@
                   @click="selectedPlanType = plan.type">
                   <div class="card-type">{{ plan.label }}</div>
                   <div class="card-price-wrap">
-                    <span class="card-price">¥<em>{{ plan.price }}</em></span>
-                    <div class="card-original">原价 {{ plan.originalPrice }}</div>
+                    <span
+                      class="card-price">¥<em>{{ formatPrice(plan.priceFen) }}</em></span>
+                    <div class="card-original">原价
+                      {{ plan.originalPrice }}
+                    </div>
                   </div>
                   <!-- <div class="card-discount-bar">促销折扣文案</div> -->
                 </div>
@@ -66,7 +70,8 @@
                   <template v-if="payOrderLoading">
                     <span class="qr-hint">正在生成二维码...</span>
                   </template>
-                  <template v-else-if="payCodeUrl">
+                  <template
+                    v-else-if="agreementChecked && payCodeUrl">
                     <img :src="payCodeUrl" alt="微信支付二维码"
                       class="payment-qr-img" />
                   </template>
@@ -78,7 +83,8 @@
                     }}</span>
                   </template>
                 </div>
-                <div class="payment-amount">¥{{ selectedPlanPrice }}</div>
+                <div class="payment-amount">¥{{ selectedPlanPrice }}
+                </div>
               </div>
               <!-- 右侧模块：订阅详情 + 支付方式 + 订阅按钮 + 协议 -->
               <div class="payment-content-module">
@@ -115,7 +121,8 @@
                 </div>
                 <!-- 微信支付时不显示订阅按钮，勾选协议后自动出现二维码 -->
                 <button v-if="selectedPaymentMethod !== 'wechat'"
-                  class="subscribe-btn" @click="handleSubscribeVip">
+                  class="subscribe-btn" :disabled="!agreementChecked"
+                  @click="handleSubscribeVip">
                   {{
                     selectedPaymentMethod === 'alipay'
                       ? (tradeType === '2' || tradeType === 2 ? '去续费' : '去订阅')
@@ -123,82 +130,84 @@
                   }}
                 </button>
                 <label class="agreement-wrap">
-                  <input
-                    type="checkbox"
-                    v-model="agreementChecked"
+                  <input type="checkbox" v-model="agreementChecked"
                     class="agreement-checkbox" />
                   <span class="agreement-text">
                     已阅读同意
-                    <a
-                      href="javascript:;"
-                      class="agreement-link"
+                    <a href="javascript:;" class="agreement-link"
                       @click.stop.prevent="agreementDialogVisible = true">
                       《会员订阅服务协议》
                     </a>
                   </span>
                 </label>
-                <el-button type="text" size="small" class="activate-code-btn"
-                  @click="showActivateCode = true">激活码兑换</el-button>
+                <el-button type="text" size="small"
+                  class="activate-code-btn"
+                  @click="handleActivateCodeExchange">激活码兑换</el-button>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <ActivateCodeDialog
-      :visible.sync="showActivateCode"
+    <ActivateCodeDialog :visible.sync="showActivateCode"
       @success="onActivateSuccess" />
-    <el-dialog
-    :visible.sync="agreementDialogVisible"
-    width="720px"
-    class="vip-agreement-dialog"
-    append-to-body>
-    <div class="vip-agreement-content">
-      <h3 class="title">会员订阅服务协议</h3>
-      <p class="lead">本协议由你与【STH 平台】（以下简称“平台”）就精英版会员、专业版会员订阅服务所订立。</p>
+    <el-dialog :visible.sync="agreementDialogVisible" width="720px"
+      class="vip-agreement-dialog" append-to-body>
+      <div class="vip-agreement-content">
+        <h3 class="title">会员订阅服务协议</h3>
+        <p class="lead">本协议由你与【STH 平台】（以下简称“平台”）就精英版会员、专业版会员订阅服务所订立。
+        </p>
 
-      <h4 class="section-title">1. 协议主体</h4>
-      <p>本协议由你与平台就精英版会员、专业版会员订阅服务所订立。</p>
+        <h4 class="section-title">1. 协议主体</h4>
+        <p>本协议由你与平台就精英版会员、专业版会员订阅服务所订立。</p>
 
-      <h4 class="section-title">2. 会员类型与订阅周期</h4>
-      <p>
-        平台提供两种会员服务：精英版会员、专业版会员。两种会员相互独立，可单独订阅，可同时订阅，权益、有效期、计费互不影响。订阅周期包括：包月、包年。
-      </p>
+        <h4 class="section-title">2. 会员类型与订阅周期</h4>
+        <p>
+          平台提供两种会员服务：精英版会员、专业版会员。两种会员相互独立，可单独订阅，可同时订阅，权益、有效期、计费互不影响。订阅周期包括：包月、包年。
+        </p>
 
-      <h4 class="section-title">3. 服务内容</h4>
-      <p>会员为平台内虚拟数字服务，开通后立即生效，提供对应功能权限。</p>
+        <h4 class="section-title">3. 服务内容</h4>
+        <p>会员为平台内虚拟数字服务，开通后立即生效，提供对应功能权限。</p>
 
-      <h4 class="section-title">4. 付费与退款规则</h4>
-      <ul class="bullet">
-        <li>会员服务属于数字化虚拟商品，一经支付开通、权益已即时生效，不支持退款、不支持折现、不支持转让。</li>
-        <li>因用户个人原因（误购、不再使用、设备更换、账号问题等）申请退款的，平台不予受理。</li>
-        <li>因平台故障、服务重大瑕疵导致完全无法使用的，按实际无法使用时长进行补偿或退款。</li>
-      </ul>
+        <h4 class="section-title">4. 付费与退款规则</h4>
+        <ul class="bullet">
+          <li>会员服务属于数字化虚拟商品，一经支付开通、权益已即时生效，不支持退款、不支持折现、不支持转让。</li>
+          <li>因用户个人原因（误购、不再使用、设备更换、账号问题等）申请退款的，平台不予受理。</li>
+          <li>因平台故障、服务重大瑕疵导致完全无法使用的，按实际无法使用时长进行补偿或退款。</li>
+        </ul>
 
-      <h4 class="section-title">5. 有效期</h4>
-      <ul class="bullet">
-        <li>按用户选择周期自动计算，从支付成功时刻起算。</li>
-        <li>同时订阅精英版 + 专业版时，两个会员有效期独立计算。</li>
-      </ul>
+        <h4 class="section-title">5. 有效期</h4>
+        <ul class="bullet">
+          <li>按用户选择周期自动计算，从支付成功时刻起算。</li>
+          <li>同时订阅精英版 + 专业版时，两个会员有效期独立计算。</li>
+        </ul>
 
-      <h4 class="section-title">6. 用户义务</h4>
-      <ul class="bullet">
-        <li>保证支付信息真实有效。</li>
-        <li>妥善保管账号，因账号共享、被盗产生的损失由用户承担。</li>
-      </ul>
+        <h4 class="section-title">6. 用户义务</h4>
+        <ul class="bullet">
+          <li>保证支付信息真实有效。</li>
+          <li>妥善保管账号，因账号共享、被盗产生的损失由用户承担。</li>
+        </ul>
 
-      <h4 class="section-title">7. 平台权利</h4>
-      <ul class="bullet">
-        <li>平台有权调整会员权益（不影响已购周期）。</li>
-        <li>平台对违规使用、恶意套利、侵权行为有权暂停/终止服务，不予退款。</li>
-      </ul>
+        <h4 class="section-title">7. 平台权利</h4>
+        <ul class="bullet">
+          <li>平台有权调整会员权益（不影响已购周期）。</li>
+          <li>平台对违规使用、恶意套利、侵权行为有权暂停/终止服务，不予退款。</li>
+        </ul>
 
-      <h4 class="section-title">8. 其他</h4>
-      <ul class="bullet">
-        <li>本协议自用户点击“同意协议”或勾选“我已充分阅读并同意【会员订阅服务协议】”时生效。</li>
-        <li>平台有权更新协议，更新后公示 7 日生效，用户继续使用视为同意新版本。</li>
-      </ul>
-    </div>
+        <h4 class="section-title">8. 其他</h4>
+        <ul class="bullet">
+          <li>本协议自用户点击“同意协议”或勾选“我已充分阅读并同意【会员订阅服务协议】”时生效。</li>
+          <li>平台有权更新协议，更新后公示 7 日生效，用户继续使用视为同意新版本。</li>
+        </ul>
+        <label class="agreement-dialog-check">
+          <input v-model="agreementChecked" type="checkbox"
+            @change="handleAgreementDialogChange"
+            class="agreement-checkbox" />
+          <span>
+            我已阅读同意《会员订阅服务协议》
+          </span>
+        </label>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -207,6 +216,13 @@
 import QRCode from "qrcode"
 import { submitData, getData } from "@/api/common"
 import ActivateCodeDialog from "@/components/ActivateCodeDialog"
+import {
+  VIP_PRODUCT_PRICE_KEYS,
+  formatPriceFen,
+  getDefaultPriceFen,
+  getProductPriceFen,
+  getVipProductPriceMap,
+} from "@/utils/vipProductPrice"
 
 export default {
   name: "Vip1",
@@ -215,6 +231,7 @@ export default {
     visible: { type: Boolean, default: false },
     value: { type: Boolean, default: false },
     tradeType: { type: String, default: "" },
+    forceShow: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -225,13 +242,30 @@ export default {
       agreementChecked: false,
       agreementDialogVisible: false,
       plans: [
-        { type: "monthly", label: "月卡", price: 80, subscribeType: 1, originalPrice: 118 },
-        { type: "yearly", label: "年卡", price: 648, subscribeType: 3, originalPrice: 1136 },
+        {
+          type: "monthly",
+          label: "月卡",
+          priceKey: VIP_PRODUCT_PRICE_KEYS.vipProMonthly,
+          priceFen: getDefaultPriceFen(VIP_PRODUCT_PRICE_KEYS.vipProMonthly),
+          subscribeType: 1,
+          originalPrice: 118,
+        },
+        {
+          type: "yearly",
+          label: "年卡",
+          priceKey: VIP_PRODUCT_PRICE_KEYS.vipProYearly,
+          priceFen: getDefaultPriceFen(VIP_PRODUCT_PRICE_KEYS.vipProYearly),
+          subscribeType: 3,
+          originalPrice: 1136,
+        },
       ],
       payOrderLoading: false,
       payCodeUrl: "",
       outTradeNo: "",
       payPollTimer: null,
+      visibilityGuardObserver: null,
+      visibilityGuardTimer: null,
+      maskZIndex: 1000,
       vipInfoList: [
         {
           title: "会员标识",
@@ -283,25 +317,57 @@ export default {
       return this.plans.find((p) => p.type === this.selectedPlanType) || this.plans[0]
     },
     selectedPlanPrice() {
-      return this.selectedPlan?.price ?? 0
+      return this.formatPrice(this.selectedPlan?.priceFen)
+    },
+    maskStyle() {
+      return {
+        zIndex: this.maskZIndex,
+        pointerEvents: this.showActivateCode ? "none" : "auto",
+      }
     },
   },
   watch: {
     visible(val) {
       this.innerVisible = val
+      this.$nextTick(() => {
+        this.syncOverlayLevel()
+      })
     },
     value(val) {
       if (typeof val !== "undefined") this.innerVisible = val
+      this.$nextTick(() => {
+        this.syncOverlayLevel()
+      })
     },
     innerVisible(val) {
+      // forceShow 模式下阻止任何关闭行为（包括控制台篡改）
+      if (this.forceShow && !val) {
+        this.$nextTick(() => { this.innerVisible = true })
+        return
+      }
       this.$emit("update:visible", val)
       if (!val) {
         this.stopPayPoll()
         this.payCodeUrl = ""
         this.outTradeNo = ""
+        this.agreementChecked = false
       }
+      this.$nextTick(() => {
+        this.syncVisibilityGuard()
+        this.syncOverlayLevel()
+      })
+    },
+    forceShow() {
+      this.$nextTick(() => {
+        this.syncVisibilityGuard()
+        this.syncOverlayLevel()
+      })
     },
     agreementChecked(val) {
+      if (!val) {
+        this.resetPayState()
+        return
+      }
       if (val && this.selectedPaymentMethod === "wechat" && !this.payCodeUrl && !this.payOrderLoading) {
         this.createWeChatOrder()
       }
@@ -320,16 +386,128 @@ export default {
         this.createWeChatOrder()
       }
     },
+    showActivateCode() {
+      this.$nextTick(() => {
+        this.enforceVisibleState()
+      })
+    },
+  },
+  mounted() {
+    this.loadProductPrices()
+    this.syncVisibilityGuard()
+    this.syncOverlayLevel()
+  },
+  beforeDestroy() {
+    this.stopVisibilityGuard()
   },
   methods: {
+    formatPrice(priceFen) {
+      return formatPriceFen(priceFen)
+    },
+    async loadProductPrices() {
+      try {
+        const priceMap = await getVipProductPriceMap({ systemType: "web" })
+        this.plans = this.plans.map((plan) => ({
+          ...plan,
+          priceFen: getProductPriceFen(priceMap, plan.priceKey),
+        }))
+      } catch (error) {
+        console.error("获取专业版会员价格失败", error)
+      }
+    },
+    getTopPopupZIndex() {
+      if (typeof document === "undefined") return 1000
+      const popupSelectors = [
+        ".el-message-box__wrapper",
+        ".el-dialog__wrapper",
+        ".v-modal",
+        ".el-popup-parent--hidden + .v-modal",
+      ]
+      const popupNodes = popupSelectors.flatMap((selector) =>
+        Array.from(document.querySelectorAll(selector))
+      )
+      const zIndexList = popupNodes
+        .map((node) => Number(window.getComputedStyle(node).zIndex) || 0)
+        .filter((zIndex) => zIndex > 0)
+      return zIndexList.length ? Math.max(...zIndexList) : 1000
+    },
+    syncOverlayLevel() {
+      if (!this.innerVisible) {
+        this.maskZIndex = 1000
+        return
+      }
+      this.maskZIndex = this.forceShow
+        ? this.getTopPopupZIndex() + 2
+        : 1000
+    },
+    getVisibilityGuardTargets() {
+      return [this.$el, this.$refs.mask, this.$refs.container].filter(Boolean)
+    },
+    enforceVisibleState() {
+      if (!this.forceShow || !this.innerVisible) return
+      this.getVisibilityGuardTargets().forEach((el) => {
+        el.hidden = false
+        el.style.setProperty("display", "block", "important")
+        el.style.setProperty("visibility", "visible", "important")
+        el.style.setProperty("opacity", "1", "important")
+        const shouldDisableMaskPointerEvents = this.showActivateCode && el === this.$refs.mask
+        el.style.setProperty(
+          "pointer-events",
+          shouldDisableMaskPointerEvents ? "none" : "auto",
+          "important"
+        )
+      })
+    },
+    stopVisibilityGuard() {
+      if (this.visibilityGuardObserver) {
+        this.visibilityGuardObserver.disconnect()
+        this.visibilityGuardObserver = null
+      }
+      if (this.visibilityGuardTimer) {
+        clearInterval(this.visibilityGuardTimer)
+        this.visibilityGuardTimer = null
+      }
+    },
+    startVisibilityGuard() {
+      if (typeof window === "undefined") return
+      this.$nextTick(() => {
+        const targets = this.getVisibilityGuardTargets()
+        if (!targets.length) return
+        this.stopVisibilityGuard()
+        this.enforceVisibleState()
+        this.visibilityGuardObserver = new MutationObserver(() => {
+          this.enforceVisibleState()
+        })
+        targets.forEach((el) => {
+          this.visibilityGuardObserver.observe(el, {
+            attributes: true,
+            attributeFilter: ["style", "class", "hidden"],
+          })
+        })
+        this.visibilityGuardTimer = window.setInterval(() => {
+          this.enforceVisibleState()
+        }, 300)
+      })
+    },
+    syncVisibilityGuard() {
+      if (this.forceShow && this.innerVisible) {
+        this.startVisibilityGuard()
+        return
+      }
+      this.stopVisibilityGuard()
+    },
     onCancel() {
       this.$emit("update:visible", false)
     },
     onActivateSuccess() {
-      this.onCancel()
-      setTimeout(() => {
-        window.location.reload()
-      }, 600)
+      // this.onCancel()
+      // window.location.reload()
+      this.$router.go(0)
+    },
+    handleAgreementDialogChange() {
+      if (this.agreementChecked) {
+        this.agreementDialogVisible = false
+      }
     },
     resetPayState() {
       this.stopPayPoll()
@@ -381,7 +559,9 @@ export default {
               // this.onCancel()
               // 支付成功后强制刷新，确保页面状态/权限立即更新
               setTimeout(() => {
-                window.location.reload()
+                // window.location.reload()
+                //  刷新页面
+                this.$router.go(0)
               }, 600)
             }
           }
@@ -394,9 +574,7 @@ export default {
     },
     getPayParams() {
       const subscribeType = this.selectedPlan?.subscribeType ?? 1
-      // 订单金额：单位分（按接口文档）
-      const orderAmount = this.selectedPlanType === "yearly" ? 64800 : 8000
-      // const orderAmount = 1
+      const orderAmount = Number(this.selectedPlan?.priceFen) || 0
       return { subscribeType, orderAmount }
     },
     async createWeChatOrder() {
@@ -508,6 +686,13 @@ export default {
         return
       }
       await this.createWeChatOrder()
+    },
+    handleActivateCodeExchange() {
+      if (!this.agreementChecked) {
+        this.$message.warning("请先阅读并同意《会员订阅服务协议》")
+        return
+      }
+      this.showActivateCode = true
     },
   },
 }
@@ -969,6 +1154,14 @@ export default {
         &:hover {
           opacity: 0.95;
         }
+
+        &:disabled {
+          background: #c0c4cc;
+          color: #fff;
+          cursor: not-allowed;
+          opacity: 1;
+          box-shadow: none;
+        }
       }
 
       .agreement-wrap {
@@ -991,6 +1184,17 @@ export default {
           &:hover {
             text-decoration: underline;
           }
+        }
+      }
+
+      .activate-code-btn {
+        color: #666;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+          color: #666;
+          text-decoration: underline;
         }
       }
     }
@@ -1018,10 +1222,11 @@ export default {
   }
 }
 
-.vip-agreement-dialog ::v-deep(.el-dialog__body) {
-  max-height: 520px;
+.vip-agreement-dialog .el-dialog__body {
+  max-height: 620px;
   overflow-y: auto;
 }
+
 .vip-agreement-content {
   font-size: 14px;
   line-height: 1.6;
@@ -1057,6 +1262,24 @@ export default {
 
   p {
     margin-bottom: 8px;
+  }
+
+  .agreement-dialog-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+
+    .agreement-checkbox {
+      margin: 0;
+      flex-shrink: 0;
+    }
   }
 }
 </style>

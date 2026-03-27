@@ -1,7 +1,5 @@
 <template>
   <div class="member-center-page">
-    <Vip1 :visible.sync="showVip1" :tradeType="vip1TradeType" />
-    <Vip2 :visible.sync="showVip2" :tradeType="vip2TradeType" />
     <RenewManageDialog
       :visible.sync="showRenewManage"
       :identityType="renewIdentityType" />
@@ -9,9 +7,6 @@
       :visible.sync="showSeatPurchase"
       :coachTotal="seatsView.coachTotal"
       :athleteTotal="seatsView.athleteTotal"
-      @success="fetchSubscribeInfo" />
-    <ActivateCodeDialog
-      :visible.sync="showActivateCode"
       @success="fetchSubscribeInfo" />
     <div class="member-center-container" v-loading="loading">
       <div class="page-toolbar">
@@ -28,11 +23,13 @@
         <div class="plan-meta">
           <div class="meta-row">
             <span class="meta-label">订阅方式：</span>
-            <span class="meta-value">{{ eliteView.subscribeText }}</span>
+            <span
+              class="meta-value">{{ eliteView.subscribeText }}</span>
           </div>
           <div class="meta-row" v-if="eliteView.showRenewManage">
             <span class="meta-label">续费管理：</span>
-            <a class="meta-link" href="#" @click.prevent="openRenewManage('R')">去管理</a>
+            <a class="meta-link" href="#"
+              @click.prevent="openRenewManage('R')">去管理</a>
           </div>
           <div class="meta-row">
             <span class="meta-label">{{ eliteView.timeLabel }}：</span>
@@ -54,10 +51,8 @@
         <div class="block-actions">
           <el-button type="primary" size="small"
             @click="openEliteDialog(eliteView.actionLabel === '续费' ? '2' : '')">{{
-            eliteView.actionLabel
-          }}</el-button>
-          <el-button type="text" size="small"
-            class="muted-btn" @click="showActivateCode = true">激活码兑换</el-button>
+              eliteView.actionLabel
+            }}</el-button>
         </div>
       </section>
 
@@ -70,11 +65,13 @@
         <div class="plan-meta">
           <div class="meta-row">
             <span class="meta-label">订阅方式：</span>
-            <span class="meta-value">{{ proView.subscribeText }}</span>
+            <span
+              class="meta-value">{{ proView.subscribeText }}</span>
           </div>
           <div class="meta-row" v-if="proView.showRenewManage">
             <span class="meta-label">续费管理：</span>
-            <a class="meta-link" href="#" @click.prevent="openRenewManage('C')">去管理</a>
+            <a class="meta-link" href="#"
+              @click.prevent="openRenewManage('C')">去管理</a>
           </div>
           <div class="meta-row">
             <span class="meta-label">{{ proView.timeLabel }}：</span>
@@ -92,35 +89,36 @@
           </div>
         </div>
 
-        <div v-if="showSeatBox" class="block-title block-title--tight">
+        <div v-if="showSeatBox"
+          class="block-title block-title--tight">
           席位包
         </div>
         <div v-if="showSeatBox" class="seat-box">
           <div class="seat-row">
             <span class="seat-label">运动员席位数：</span>
-            <span class="seat-value">{{ seatsView.athleteTotal }}</span>
+            <span
+              class="seat-value">{{ seatsView.athleteTotal }}</span>
             <span class="seat-note">（包含已付费席位{{
               seatsView.athletePurchased
-            }}个）</span>
+              }}个）</span>
           </div>
           <div class="seat-row">
             <span class="seat-label">教练席位数：</span>
             <span class="seat-value">{{ seatsView.coachTotal }}</span>
             <span class="seat-note">（包含已付费席位{{
               seatsView.coachPurchased
-            }}个）</span>
+              }}个）</span>
           </div>
         </div>
 
         <div class="block-actions">
           <el-button type="primary" size="small"
             @click="openProDialog(proView.actionLabel === '续费' ? '2' : '')">{{
-            proView.actionLabel
-          }}</el-button>
+              proView.actionLabel
+            }}</el-button>
           <el-button v-if="showSeatBox" size="small" type="primary"
-            @click="showSeatPurchase = true">购买席位</el-button>
-          <el-button type="text" size="small"
-            class="muted-btn" @click="showActivateCode = true">激活码兑换</el-button>
+            :disabled="isSeatPurchaseDisabled"
+            @click="handleSeatPurchaseClick">购买席位</el-button>
         </div>
       </section>
     </div>
@@ -128,37 +126,30 @@
 </template>
 
 <script>
-import Vip1 from "@/components/Vip1"
-import Vip2 from "@/components/Vip2"
 import RenewManageDialog from "@/components/RenewManageDialog"
 import SeatPurchaseDialog from "@/components/SeatPurchaseDialog"
-import ActivateCodeDialog from "@/components/ActivateCodeDialog"
 import { getData } from "@/api/common"
 
 export default {
   name: "MemberCenter",
-  components: { Vip1, Vip2, RenewManageDialog, SeatPurchaseDialog, ActivateCodeDialog },
+  components: { RenewManageDialog, SeatPurchaseDialog },
   data() {
     return {
       loading: false,
       identityType: localStorage.getItem("webIdentityType") || "",
       subscribeInfoMap: { R: null, C: null },
       subscribeInfo: null,
-      showVip1: false,
-      showVip2: false,
       showRenewManage: false,
       renewIdentityType: "C",
       showSeatPurchase: false,
-      showActivateCode: false,
-      vip1TradeType: "",
-      vip2TradeType: "",
+      seatConfigPayBefore: false,
       elitePlan: {
         subscribeText: "年卡",
         expireDate: "2026-10-01",
         benefitTitle: "",
         benefitLines: [
           "精英版会员专属头像框",
-          "运动数据分析/运动峰值表现可见",
+          "运动数据分析查看，可选择任意时段并查看指标分析",
           "运动峰值表现可见，包含强者之心统计，多维度峰值统计，历史峰值对比",
           "定期更新高效示例计划库可用",
         ],
@@ -208,13 +199,8 @@ export default {
     showSeatBox() {
       return this.proView.isSubscribed
     },
-  },
-  watch: {
-    showVip1(val) {
-      if (!val) this.fetchSubscribeInfo()
-    },
-    showVip2(val) {
-      if (!val) this.fetchSubscribeInfo()
+    isSeatPurchaseDisabled() {
+      return this.showSeatBox && this.seatConfigPayBefore
     },
   },
   mounted() {
@@ -222,16 +208,45 @@ export default {
   },
   methods: {
     openEliteDialog(tradeType) {
-      this.vip2TradeType = tradeType || ""
-      this.showVip2 = true
+      this.$vip2({
+        tradeType: tradeType || "",
+        onClose: () => this.fetchSubscribeInfo(),
+      })
     },
     openProDialog(tradeType) {
-      this.vip1TradeType = tradeType || ""
-      this.showVip1 = true
+      this.$vip1({
+        tradeType: tradeType || "",
+        onClose: () => this.fetchSubscribeInfo(),
+      })
     },
     openRenewManage(identityType) {
       this.renewIdentityType = identityType || "C"
       this.showRenewManage = true
+    },
+    handleSeatPurchaseClick() {
+      if (this.isSeatPurchaseDisabled) return
+      this.showSeatPurchase = true
+    },
+    async fetchSeatConfigPayBefore() {
+      if (!this.proView.isSubscribed) {
+        this.seatConfigPayBefore = false
+        return
+      }
+      try {
+        const res = await getData({
+          url: "strong-heart-web/api/sys/kvs/isSeatConfigPayBefore",
+        })
+        if (res && res.success) {
+          const result = typeof res.result === "boolean"
+            ? res.result
+            : res.result === "true" || res.result === 1 || res.result === "1"
+          this.seatConfigPayBefore = Boolean(result)
+        } else {
+          this.seatConfigPayBefore = false
+        }
+      } catch (e) {
+        this.seatConfigPayBefore = false
+      }
     },
     async fetchSubscribeInfo() {
       this.loading = true
@@ -252,13 +267,16 @@ export default {
           this.subscribeInfoMap = map
           // 兼容旧逻辑（如果外部仍依赖 subscribeInfo）
           this.subscribeInfo = map[this.identityType] || (Array.isArray(result) ? result[0] : result)
+          await this.fetchSeatConfigPayBefore()
         } else {
           this.subscribeInfo = null
           this.subscribeInfoMap = { R: null, C: null }
+          this.seatConfigPayBefore = false
         }
       } catch (e) {
         this.subscribeInfo = null
         this.subscribeInfoMap = { R: null, C: null }
+        this.seatConfigPayBefore = false
       } finally {
         this.loading = false
       }
@@ -313,12 +331,12 @@ export default {
       if (v === 2) return "连续包月"
       if (v === 3) return "年卡"
       if (v === 4) return "连续包年"
-      if (v === 11) return "精英版"
-      if (v === 12) return "专业版"
-      if (v === 13) return "精英天使用户"
-      if (v === 14) return "专业天使用户"
-      if (v === 15) return "PRO 版"
-      if (v === 16) return "认证教练"
+      if (v === 11) return "激活码-精英版"
+      if (v === 12) return "激活码-专业版"
+      if (v === 13) return "激活码-精英天使用户"
+      if (v === 14) return "激活码-专业天使用户"
+      if (v === 15) return "激活码-PRO 版"
+      if (v === 16) return "激活码-认证教练"
       return "-"
     },
     buildIdentityView(info, options = {}) {
@@ -336,18 +354,15 @@ export default {
       const subscribeText = isUnsubscribed
         ? "未订阅"
         : isExpired
-          ? "已过期"
-          : isPermanent
-            ? "永久会员"
-            : this.subscribeTypeText(subscribeType)
+          ? this.subscribeTypeText(subscribeType) + "(已过期)"
+          : this.subscribeTypeText(subscribeType)
 
       const actionLabel = isSubscribed ? "续费" : "订阅"
       const showSubscribeAction = !isPermanent
 
       const isPro = options?.edition === "pro" || options?.identityType === "C"
-      // 专业版：已订阅就展示续费管理（永久会员也展示）
-      // 精英版：永久会员不展示续费管理
-      const showRenewManage = isSubscribed && (isPro ? true : !isPermanent)
+      // 精英版、专业版：已订阅或已过期都展示续费管理（永久会员也展示）
+      const showRenewManage = isSubscribed || isExpired
 
       const isAuto = [2, 4].includes(Number(subscribeType))
       const timeLabel = isAuto ? "下次续费时间" : "服务到期时间"
@@ -383,7 +398,7 @@ export default {
       }
       const pushResult = this.$router.push("/timeTable/class")
       if (pushResult && typeof pushResult.catch === "function") {
-        pushResult.catch(() => {})
+        pushResult.catch(() => { })
       }
     },
   },

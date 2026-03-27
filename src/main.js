@@ -23,6 +23,7 @@ import * as filters from "./filters"; // global filters
 import * as echarts from "echarts";
 import permission from "@/directive/permission/index.js";
 import { message } from "@/views/classManagement/uilt";
+import vipDialog from "@/plugins/vip-dialog";
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import VueVirtualScroller from 'vue-virtual-scroller'
 Vue.use(VueVirtualScroller)
@@ -48,6 +49,7 @@ const isMac = /macintosh|mac os x/i.test(userAgent);
 // }
 
 Vue.use(permission);
+Vue.use(vipDialog);
 Vue.use(Element, {
   size: Cookies.get("size") || "medium", // set element-ui default size
   i18n: (key, value) => i18n.t(key, value),

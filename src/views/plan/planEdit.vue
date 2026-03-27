@@ -262,6 +262,9 @@ export default {
         path: "/timeTable/class",
         query: {
           teamId: this.$route.query.teamId,
+          classType: this.$route.query.classType,
+          id: this.planData?.id,
+          planGroupId: this.planData?.planGroupId,
           type: "cancel",
         },
       })
@@ -528,6 +531,7 @@ export default {
               id: this.planData.id,
               planGroupId: this.planData.planGroupId,
               teamId: this.$route.query.teamId,
+              classType: this.$route.query.classType,
               type: "edit",
             },
           })
@@ -563,6 +567,7 @@ export default {
               id: res.result.id,
               planGroupId: this.planData.planGroupId,
               teamId: this.$route.query.teamId,
+              classType: this.$route.query.classType,
             },
           })
         }

@@ -1,8 +1,8 @@
 import { login, logout, getInfo, getRoleInfo } from "@/api/user";
+import { getData } from "@/api/common";
 import { getToken, setToken, removeToken } from "@/utils/auth";
-import router, { resetRouter } from "@/router";
+import { resetRouter } from "@/router";
 import store from "@/store";
-import { identity } from "lodash";
 
 const state = {
   token: getToken(),
@@ -12,6 +12,7 @@ const state = {
   roles: [],
   userInfo: {},
   identity: "",
+  isEliteAthlete: false, // 是否为精英版订阅用户
 };
 
 const mutations = {
@@ -35,6 +36,9 @@ const mutations = {
   },
   SET_IDENTITY: (state, identity) => {
     state.identity = identity;
+  },
+  SET_IS_ELITE_ATHLETE: (state, val) => {
+    state.isEliteAthlete = val;
   },
 };
 
@@ -148,6 +152,32 @@ const actions = {
   },
   changeIdentify({ commit }, identity) {
     commit("SET_IDENTITY", identity);
+  },
+  /**
+   * 查询精英版订阅状态
+   * - 非运动员身份（loginType !== "1"）默认视为精英版
+   * - 运动员身份通过接口查询 identityType === "R" 且 subStatus === 1 判断
+   */
+  async checkEliteSubscription({ commit }) {
+    const loginType = localStorage.getItem("loginType");
+    if (loginType !== "1") {
+      commit("SET_IS_ELITE_ATHLETE", true);
+      return;
+    }
+    try {
+      const res = await getData({
+        url: "operate/api/vipSubscribe/getUserSubscribeInfo",
+      });
+      if (res && res.success && Array.isArray(res.result)) {
+        const eliteInfo = res.result.find(
+          (item) => item.identityType === "R"
+        );
+        commit("SET_IS_ELITE_ATHLETE", !!(eliteInfo && eliteInfo.subStatus === 1));
+      }
+    } catch (e) {
+      console.warn("查询精英版订阅状态失败:", e);
+      commit("SET_IS_ELITE_ATHLETE", false);
+    }
   },
 };
 

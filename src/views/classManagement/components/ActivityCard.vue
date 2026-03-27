@@ -16,6 +16,10 @@
         :data-activityId="activity.activityId"
         :data-manualActivityId="activity.manualActivityId"
         :data-date="date"
+        @click="
+          $emit('click', activity)
+        hideContextMenu()
+          "
         @contextmenu.prevent.stop="showContextMenu">
         <div class="body-title">
           <div class="sport-type-icon">
@@ -97,11 +101,7 @@
         </div>
 
         <div
-          class="sport-record-data"
-          @click="
-            $emit('click', activity)
-          hideContextMenu()
-          ">
+          class="sport-record-data">
           <div class="keyword">
             {{ restoreVerification("duration") ? "" : "*" }}
             {{ activity.movingTime }}
@@ -229,7 +229,7 @@
         <div class="context-menu-item" @click="
           $emit('edit', activity)
         hideContextMenu()
-        ">
+          ">
           编辑
         </div>
         <div v-if="!activity.classesJson" class="context-menu-item"

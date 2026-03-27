@@ -1083,6 +1083,20 @@ export default {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+
+  :deep(.el-button) {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 1280px) {
+  .athletic-btn {
+    flex-wrap: wrap;
+  }
+
+  .athletic-btn :deep(.el-button) {
+    flex: 1 1 100%;
+  }
 }
 .athletic-operation {
   display: flex;

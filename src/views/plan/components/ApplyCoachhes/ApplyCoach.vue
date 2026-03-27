@@ -1,454 +1,521 @@
 <template>
-  <el-dialog
-    :visible.sync="innerVisible"
-    :width="loginType === '2' ? '880px' : '480px'"
-    append-to-body
-    :before-close="onCancel"
-    class="add-class-title-modal"
-    :close-on-click-modal="false">
-    <span slot="title">应用</span>
+  <div>
+    <el-dialog
+      :visible.sync="innerVisible"
+      :width="loginType === '2' ? '880px' : '480px'"
+      append-to-body
+      :before-close="onCancel"
+      class="add-class-title-modal"
+      :close-on-click-modal="false">
+      <span slot="title">应用</span>
 
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      :label-width="loginType === '2' ? '145px' : '120px'"
-      size="small">
-      <template v-if="loginType === '2'">
-        <el-form-item label="应用维度" prop="applyDimension"
-          v-if="!teamSelectDisabled">
-          <el-radio-group v-model="form.applyDimension"
-            :disabled="teamSelectDisabled"
-            @change="handleApplyDimensionChange">
-            <el-radio label="1">团队</el-radio>
-            <el-radio label="2">俱乐部</el-radio>
-          </el-radio-group>
-        </el-form-item>
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        :label-width="loginType === '2' ? '145px' : '120px'"
+        size="small">
+        <template v-if="loginType === '2'">
+          <el-form-item label="应用维度" prop="applyDimension"
+            v-if="!teamSelectDisabled">
+            <el-radio-group v-model="form.applyDimension"
+              :disabled="teamSelectDisabled"
+              @change="handleApplyDimensionChange">
+              <el-radio label="1">团队</el-radio>
+              <el-radio label="2">俱乐部</el-radio>
+            </el-radio-group>
+          </el-form-item>
 
-        <el-form-item
-          :label="form.applyDimension === '2' ? '俱乐部选择' : '团队选择'"
-          prop="teamId">
-          <el-select
-            v-model="form.teamId"
-            :placeholder="form.applyDimension === '2' ? '请选择俱乐部' : '请选择团队'"
-            :disabled="teamSelectDisabled"
-            filterable
-            :clearable="!teamSelectDisabled"
-            style="width: 100%"
-            @change="handleOrgChange">
-            <el-option
-              v-for="g in teamOptions"
-              :key="g.id"
-              :label="g.teamName || g.clubName || g.name"
-              :value="g.id" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item
-          v-if="form.applyDimension === '1'"
-          label="人员选择"
-          prop="athleteIds">
-          <el-cascader
-            :key="'team-' + teamCascaderKey"
-            :value="sanitizedTeamAthleteIds"
-            :options="teamGroupList"
-            :props="memberProps"
-            clearable
-            style="width: 100%"
-            placeholder="请选择人员"
-            @input="onTeamAthleteIdsInput"
-            @change="handleCascaderChange" />
-        </el-form-item>
-        <el-form-item
-          v-if="form.applyDimension === '2'"
-          label="人员选择"
-          prop="clubAthleteIds">
-          <el-cascader
-            :key="'club-' + clubCascaderKey"
-            :value="sanitizedClubAthleteIds"
-            :options="clubGroupList"
-            :props="memberProps"
-            clearable
-            style="width: 100%"
-            placeholder="请选择人员"
-            @input="onClubAthleteIdsInput"
-            @change="handleCascaderChange" />
-        </el-form-item>
-
-        <el-form-item label="类型" prop="athleteType">
-          <el-radio-group v-model="form.athleteType">
-            <el-radio :label="1">批量设置</el-radio>
-            <el-radio :label="2">单独设置</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item
-          v-if="form.athleteType === 1"
-          label="方式"
-          prop="applyMode">
-          <el-select
-            v-model="form.applyMode"
-            placeholder="请选择"
-            style="width: 90%">
-            <el-option label="以开始日期" :value="1"></el-option>
-            <el-option label="以结束日期" :value="2"></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item
-          v-if="form.athleteType === 1"
-          label="时间"
-          prop="applyDate">
-          <el-date-picker
-            v-model="form.applyDate"
-            value-format="yyyy-MM-dd"
-            type="date"
-            placeholder="选择日期"
-            style="width: 90%"
-            :picker-options="pickerOptions">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="计划应用范围" v-if="form.athleteType === 1">
-          <div class="apply-range-cell">
+          <el-form-item
+            :label="form.applyDimension === '2' ? '俱乐部选择' : '团队选择'"
+            prop="teamId">
             <el-select
-              v-model="form.applyRange"
+              v-model="form.teamId"
+              :placeholder="form.applyDimension === '2' ? '请选择俱乐部' : '请选择团队'"
+              :disabled="teamSelectDisabled"
+              filterable
+              :clearable="!teamSelectDisabled"
+              style="width: 100%"
+              @change="handleOrgChange">
+              <el-option
+                v-for="g in teamOptions"
+                :key="g.id"
+                :label="g.teamName || g.clubName || g.name"
+                :value="g.id" />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item
+            v-if="form.applyDimension === '1'"
+            label="人员选择"
+            prop="athleteIds">
+            <el-cascader
+              :key="'team-' + teamCascaderKey"
+              :value="sanitizedTeamAthleteIds"
+              :options="teamGroupList"
+              :props="memberProps"
+              clearable
+              style="width: 100%"
+              placeholder="请选择人员"
+              @input="onTeamAthleteIdsInput"
+              @change="handleCascaderChange" />
+          </el-form-item>
+          <el-form-item
+            v-if="form.applyDimension === '2'"
+            label="人员选择"
+            prop="clubAthleteIds">
+            <el-cascader
+              :key="'club-' + clubCascaderKey"
+              :value="sanitizedClubAthleteIds"
+              :options="clubGroupList"
+              :props="memberProps"
+              clearable
+              style="width: 100%"
+              placeholder="请选择人员"
+              @input="onClubAthleteIdsInput"
+              @change="handleCascaderChange" />
+          </el-form-item>
+
+          <el-form-item label="类型" prop="athleteType">
+            <el-radio-group v-model="form.athleteType">
+              <el-radio :label="1">批量设置</el-radio>
+              <el-radio :label="2">单独设置</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item
+            v-if="form.athleteType === 1"
+            label="方式"
+            prop="applyMode">
+            <el-select
+              v-model="form.applyMode"
+              placeholder="请选择"
+              style="width: 90%">
+              <el-option label="以开始日期" :value="1"></el-option>
+              <el-option label="以结束日期" :value="2"></el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item
+            v-if="form.athleteType === 1"
+            label="时间"
+            prop="applyDate">
+            <el-date-picker
+              v-model="form.applyDate"
+              value-format="yyyy-MM-dd"
+              type="date"
+              placeholder="选择日期"
+              style="width: 90%"
+              :picker-options="pickerOptions">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item label="计划应用范围" v-if="form.athleteType === 1">
+            <div class="apply-range-cell">
+              <el-select
+                v-model="form.applyRange"
+                placeholder="请选择"
+                size="small"
+                style="width: 120px; flex-shrink: 0"
+                @change="onFormApplyRangeChange">
+                <el-option label="全部应用" :value="0"></el-option>
+                <el-option label="部分应用" :value="1"></el-option>
+              </el-select>
+              <el-popover
+                v-model="form.dayPickerVisibleForm"
+                placement="bottom-start"
+                trigger="click"
+                popper-class="day-range-popper"
+                :disabled="form.applyRange !== 1">
+                <div class="day-range-popover">
+                  <div class="day-range-title">选择天数</div>
+                  <div class="day-range-row">
+                    <span class="day-range-label">开始天数</span>
+                    <el-select
+                      v-model="form.applyStartDay"
+                      placeholder="开始"
+                      size="small"
+                      style="width: 140px"
+                      @change="onFormStartDayChange">
+                      <el-option
+                        v-for="d in planDayOptions"
+                        :key="`form-start-${d}`"
+                        :label="`第${d}天`"
+                        :value="d" />
+                    </el-select>
+                  </div>
+                  <div class="day-range-row">
+                    <span class="day-range-label">结束天数</span>
+                    <el-select
+                      v-model="form.applyEndDay"
+                      placeholder="结束"
+                      size="small"
+                      style="width: 140px">
+                      <el-option
+                        v-for="d in planDayOptions"
+                        :key="`form-end-${d}`"
+                        :label="`第${d}天`"
+                        :value="d"
+                        :disabled="form.applyStartDay && d <= form.applyStartDay" />
+                    </el-select>
+                  </div>
+                </div>
+                <div
+                  slot="reference"
+                  class="day-range-input"
+                  :class="{ disabled: form.applyRange !== 1 }">
+                  <span class="day-range-input-text">
+                    {{
+                      form.applyRange === 1 &&
+                        form.applyStartDay &&
+                        form.applyEndDay
+                        ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
+                        : "选择天数"
+                    }}
+                  </span>
+                  <i class="el-icon-date"></i>
+                </div>
+              </el-popover>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="是否同步设备" v-if="form.athleteType === 1">
+            <el-select
+              v-model="form.syncFlag"
               placeholder="请选择"
               size="small"
-              style="width: 120px; flex-shrink: 0"
-              @change="onFormApplyRangeChange">
-              <el-option label="全部应用" :value="0"></el-option>
-              <el-option label="部分应用" :value="1"></el-option>
+              style="width: 120px">
+              <el-option label="不同步" :value="0"></el-option>
+              <el-option label="同步" :value="1"></el-option>
             </el-select>
-            <el-popover
-              v-model="form.dayPickerVisibleForm"
-              placement="bottom-start"
-              trigger="click"
-              popper-class="day-range-popper"
-              :disabled="form.applyRange !== 1">
-              <div class="day-range-popover">
-                <div class="day-range-title">选择天数</div>
-                <div class="day-range-row">
-                  <span class="day-range-label">开始天数</span>
-                  <el-select
-                    v-model="form.applyStartDay"
-                    placeholder="开始"
-                    size="small"
-                    style="width: 140px"
-                    @change="onFormStartDayChange">
-                    <el-option
-                      v-for="d in planDayOptions"
-                      :key="`form-start-${d}`"
-                      :label="`第${d}天`"
-                      :value="d" />
-                  </el-select>
-                </div>
-                <div class="day-range-row">
-                  <span class="day-range-label">结束天数</span>
-                  <el-select
-                    v-model="form.applyEndDay"
-                    placeholder="结束"
-                    size="small"
-                    style="width: 140px">
-                    <el-option
-                      v-for="d in planDayOptions"
-                      :key="`form-end-${d}`"
-                      :label="`第${d}天`"
-                      :value="d"
-                      :disabled="form.applyStartDay && d <= form.applyStartDay" />
-                  </el-select>
-                </div>
-              </div>
-              <div
-                slot="reference"
-                class="day-range-input"
-                :class="{ disabled: form.applyRange !== 1 }">
-                <span class="day-range-input-text">
-                  {{
-                    form.applyRange === 1 &&
-                      form.applyStartDay &&
-                      form.applyEndDay
-                      ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
-                      : "选择天数"
-                  }}
-                </span>
-                <i class="el-icon-date"></i>
-              </div>
-            </el-popover>
+          </el-form-item>
+          <div style="padding: 0 0 0 14px; box-sizing: border-box;"
+            v-if="form.athleteType === 2">
+            <el-row
+              :gutter="8"
+              class="member-row member-row-header">
+              <el-col :span="3">
+                <span class="member-name">成员</span>
+              </el-col>
+              <el-col :span="5">
+                <span class="member-name">方式</span>
+              </el-col>
+              <el-col :span="4">
+                <span class="member-name">时间</span>
+              </el-col>
+              <el-col :span="8">
+                <span class="member-name">计划应用范围</span>
+              </el-col>
+              <el-col :span="3">
+                <span class="member-name">是否同步设备</span>
+              </el-col>
+              <el-col :span="1">
+                <span class="member-name"></span>
+              </el-col>
+            </el-row>
           </div>
-        </el-form-item>
-
-        <el-form-item label="是否同步设备" v-if="form.athleteType === 1">
-          <el-select
-            v-model="form.syncFlag"
-            placeholder="请选择"
-            size="small"
-            style="width: 120px">
-            <el-option label="不同步" :value="0"></el-option>
-            <el-option label="同步" :value="1"></el-option>
-          </el-select>
-        </el-form-item>
-        <div style="padding: 0 0 0 14px; box-sizing: border-box;"
-          v-if="form.athleteType === 2">
-          <el-row
-            :gutter="8"
-            class="member-row member-row-header">
-            <el-col :span="3">
-              <span class="member-name">成员</span>
-            </el-col>
-            <el-col :span="5">
-              <span class="member-name">方式</span>
-            </el-col>
-            <el-col :span="4">
-              <span class="member-name">时间</span>
-            </el-col>
-            <el-col :span="8">
-              <span class="member-name">计划应用范围</span>
-            </el-col>
-            <el-col :span="3">
-              <span class="member-name">是否同步设备</span>
-            </el-col>
-            <el-col :span="1">
-              <span class="member-name"></span>
-            </el-col>
-          </el-row>
-        </div>
-        <div style="padding: 0 0 0 14px; box-sizing: border-box;"
-          v-if="form.athleteType === 2 && members.length > 0">
-          <el-row
-            :gutter="8"
-            class="member-row"
-            v-for="(item, index) in members"
-            :key="index">
-            <el-col :span="3">
-              <span class="member-name"><span
-                  style="color: #F92B30;font-weight: bold;font-size: 14px;margin-right: 2px;">*</span>{{ item.userNickname }}</span>
-            </el-col>
-            <el-col :span="5" align="left">
-              <el-select
-                v-model="item.applyMode"
-                placeholder="请选择"
-                size="small"
-                style="width: 100%">
-                <el-option label="以开始日期" :value="1"></el-option>
-                <el-option label="以结束日期" :value="2"></el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="4" align="left">
-              <el-date-picker
-                v-model="item.applyDate"
-                value-format="yyyy-MM-dd"
-                type="date"
-                placeholder="选择日期"
-                style="width: 100%"
-                :picker-options="pickerOptions"
-                size="small">
-              </el-date-picker>
-            </el-col>
-            <el-col :span="8" align="left">
-              <div class="apply-range-cell">
+          <div style="padding: 0 0 0 14px; box-sizing: border-box;"
+            v-if="form.athleteType === 2 && members.length > 0">
+            <el-row
+              :gutter="8"
+              class="member-row"
+              v-for="(item, index) in members"
+              :key="index">
+              <el-col :span="3">
+                <span class="member-name"><span
+                    style="color: #F92B30;font-weight: bold;font-size: 14px;margin-right: 2px;">*</span>{{ item.userNickname }}</span>
+              </el-col>
+              <el-col :span="5" align="left">
                 <el-select
-                  v-model="item.applyRange"
+                  v-model="item.applyMode"
                   placeholder="请选择"
                   size="small"
-                  style="width: 100px; flex-shrink: 0"
-                  @change="onMemberApplyRangeChange(item)">
-                  <el-option label="全部应用" :value="0"></el-option>
-                  <el-option label="部分应用" :value="1"></el-option>
+                  style="width: 100%">
+                  <el-option label="以开始日期" :value="1"></el-option>
+                  <el-option label="以结束日期" :value="2"></el-option>
                 </el-select>
-                <el-popover
-                  v-model="item.dayPickerVisible"
-                  placement="bottom-start"
-                  trigger="click"
-                  popper-class="day-range-popper"
-                  :disabled="item.applyRange !== 1">
-                  <div class="day-range-popover">
-                    <div class="day-range-title">选择天数</div>
-                    <div class="day-range-row">
-                      <span class="day-range-label">开始天数</span>
-                      <el-select
-                        v-model="item.applyStartDay"
-                        placeholder="开始"
-                        size="small"
-                        style="width: 140px"
-                        @change="onMemberStartDayChange(item)">
-                        <el-option
-                          v-for="d in planDayOptions"
-                          :key="`start-${d}`"
-                          :label="`第${d}天`"
-                          :value="d" />
-                      </el-select>
+              </el-col>
+              <el-col :span="4" align="left">
+                <el-date-picker
+                  v-model="item.applyDate"
+                  value-format="yyyy-MM-dd"
+                  type="date"
+                  placeholder="选择日期"
+                  style="width: 100%"
+                  :picker-options="pickerOptions"
+                  size="small">
+                </el-date-picker>
+              </el-col>
+              <el-col :span="8" align="left">
+                <div class="apply-range-cell">
+                  <el-select
+                    v-model="item.applyRange"
+                    placeholder="请选择"
+                    size="small"
+                    style="width: 100px; flex-shrink: 0"
+                    @change="onMemberApplyRangeChange(item)">
+                    <el-option label="全部应用" :value="0"></el-option>
+                    <el-option label="部分应用" :value="1"></el-option>
+                  </el-select>
+                  <el-popover
+                    v-model="item.dayPickerVisible"
+                    placement="bottom-start"
+                    trigger="click"
+                    popper-class="day-range-popper"
+                    :disabled="item.applyRange !== 1">
+                    <div class="day-range-popover">
+                      <div class="day-range-title">选择天数</div>
+                      <div class="day-range-row">
+                        <span class="day-range-label">开始天数</span>
+                        <el-select
+                          v-model="item.applyStartDay"
+                          placeholder="开始"
+                          size="small"
+                          style="width: 140px"
+                          @change="onMemberStartDayChange(item)">
+                          <el-option
+                            v-for="d in planDayOptions"
+                            :key="`start-${d}`"
+                            :label="`第${d}天`"
+                            :value="d" />
+                        </el-select>
+                      </div>
+                      <div class="day-range-row">
+                        <span class="day-range-label">结束天数</span>
+                        <el-select
+                          v-model="item.applyEndDay"
+                          placeholder="结束"
+                          size="small"
+                          style="width: 140px">
+                          <el-option
+                            v-for="d in planDayOptions"
+                            :key="`end-${d}`"
+                            :label="`第${d}天`"
+                            :value="d"
+                            :disabled="item.applyStartDay && d <= item.applyStartDay" />
+                        </el-select>
+                      </div>
                     </div>
-                    <div class="day-range-row">
-                      <span class="day-range-label">结束天数</span>
-                      <el-select
-                        v-model="item.applyEndDay"
-                        placeholder="结束"
-                        size="small"
-                        style="width: 140px">
-                        <el-option
-                          v-for="d in planDayOptions"
-                          :key="`end-${d}`"
-                          :label="`第${d}天`"
-                          :value="d"
-                          :disabled="item.applyStartDay && d <= item.applyStartDay" />
-                      </el-select>
+                    <div
+                      slot="reference"
+                      class="day-range-input"
+                      :class="{ disabled: item.applyRange !== 1 }">
+                      <span class="day-range-input-text">
+                        {{
+                          item.applyRange === 1
+                            ? `第${item.applyStartDay}天~第${item.applyEndDay}天`
+                            : "选择天数"
+                        }}
+                      </span>
+                      <i class="el-icon-date"></i>
                     </div>
-                  </div>
-                  <div
-                    slot="reference"
-                    class="day-range-input"
-                    :class="{ disabled: item.applyRange !== 1 }">
-                    <span class="day-range-input-text">
-                      {{
-                        item.applyRange === 1
-                          ? `第${item.applyStartDay}天~第${item.applyEndDay}天`
-                          : "选择天数"
-                      }}
-                    </span>
-                    <i class="el-icon-date"></i>
-                  </div>
-                </el-popover>
-              </div>
-            </el-col>
-            <el-col :span="3" align="left">
-              <el-select
-                v-model="item.syncFlag"
-                placeholder="请选择"
-                size="small"
-                style="width: 100%">
-                <el-option label="不同步" :value="0"></el-option>
-                <el-option label="同步" :value="1"></el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="1" align="left">
-              <img
-                src="@/assets/plan/close.png"
-                alt="删除"
-                class="delete-icon-img"
-                @click="removeMember(item, index)" />
-              <!-- <i
+                  </el-popover>
+                </div>
+              </el-col>
+              <el-col :span="3" align="left">
+                <el-select
+                  v-model="item.syncFlag"
+                  placeholder="请选择"
+                  size="small"
+                  style="width: 100%">
+                  <el-option label="不同步" :value="0"></el-option>
+                  <el-option label="同步" :value="1"></el-option>
+                </el-select>
+              </el-col>
+              <el-col :span="1" align="left">
+                <img
+                  src="@/assets/plan/close.png"
+                  alt="删除"
+                  class="delete-icon-img"
+                  @click="removeMember(item, index)" />
+                <!-- <i
                   class="el-icon-circle-close delete-icon"
                   @click="removeMember(item, index)"
                 ></i> -->
-            </el-col>
-          </el-row>
-        </div>
-      </template>
-      <template v-else>
-        <el-form-item label="方式" prop="applyMode">
-          <el-select
-            v-model="form.applyMode"
-            placeholder="请选择"
-            style="width: 90%">
-            <el-option label="以开始日期" :value="1"></el-option>
-            <el-option label="以结束日期" :value="2"></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="时间" prop="applyDate">
-          <el-date-picker
-            v-model="form.applyDate"
-            value-format="yyyy-MM-dd"
-            type="date"
-            placeholder="选择日期"
-            style="width: 90%"
-            :picker-options="pickerOptions">
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item label="计划应用范围">
-          <div class="apply-range-cell">
+              </el-col>
+            </el-row>
+          </div>
+        </template>
+        <template v-else>
+          <el-form-item label="方式" prop="applyMode">
             <el-select
-              v-model="form.applyRange"
+              v-model="form.applyMode"
+              placeholder="请选择"
+              style="width: 90%">
+              <el-option label="以开始日期" :value="1"></el-option>
+              <el-option label="以结束日期" :value="2"></el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="时间" prop="applyDate">
+            <el-date-picker
+              v-model="form.applyDate"
+              value-format="yyyy-MM-dd"
+              type="date"
+              placeholder="选择日期"
+              style="width: 90%"
+              :picker-options="pickerOptions">
+            </el-date-picker>
+          </el-form-item>
+
+          <el-form-item label="计划应用范围">
+            <div class="apply-range-cell">
+              <el-select
+                v-model="form.applyRange"
+                placeholder="请选择"
+                size="small"
+                style="width: 120px; flex-shrink: 0"
+                @change="onFormApplyRangeChange">
+                <el-option label="全部应用" :value="0"></el-option>
+                <el-option label="部分应用" :value="1"></el-option>
+              </el-select>
+              <el-popover
+                v-model="form.dayPickerVisibleForm"
+                placement="bottom-start"
+                trigger="click"
+                popper-class="day-range-popper"
+                :disabled="form.applyRange !== 1">
+                <div class="day-range-popover">
+                  <div class="day-range-title">选择天数</div>
+                  <div class="day-range-row">
+                    <span class="day-range-label">开始天数</span>
+                    <el-select
+                      v-model="form.applyStartDay"
+                      placeholder="开始"
+                      size="small"
+                      style="width: 140px"
+                      @change="onFormStartDayChange">
+                      <el-option
+                        v-for="d in planDayOptions"
+                        :key="`form-start-${d}`"
+                        :label="`第${d}天`"
+                        :value="d" />
+                    </el-select>
+                  </div>
+                  <div class="day-range-row">
+                    <span class="day-range-label">结束天数</span>
+                    <el-select
+                      v-model="form.applyEndDay"
+                      placeholder="结束"
+                      size="small"
+                      style="width: 140px">
+                      <el-option
+                        v-for="d in planDayOptions"
+                        :key="`form-end-${d}`"
+                        :label="`第${d}天`"
+                        :value="d"
+                        :disabled="form.applyStartDay && d <= form.applyStartDay" />
+                    </el-select>
+                  </div>
+                </div>
+                <div
+                  slot="reference"
+                  class="day-range-input"
+                  :class="{ disabled: form.applyRange !== 1 }">
+                  <span class="day-range-input-text">
+                    {{
+                      form.applyRange === 1 &&
+                        form.applyStartDay &&
+                        form.applyEndDay
+                        ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
+                        : "选择天数"
+                    }}
+                  </span>
+                  <i class="el-icon-date"></i>
+                </div>
+              </el-popover>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="是否同步设备">
+            <el-select
+              v-model="form.syncFlag"
               placeholder="请选择"
               size="small"
-              style="width: 120px; flex-shrink: 0"
-              @change="onFormApplyRangeChange">
-              <el-option label="全部应用" :value="0"></el-option>
-              <el-option label="部分应用" :value="1"></el-option>
+              style="width: 120px">
+              <el-option label="不同步" :value="0"></el-option>
+              <el-option label="同步" :value="1"></el-option>
             </el-select>
-            <el-popover
-              v-model="form.dayPickerVisibleForm"
-              placement="bottom-start"
-              trigger="click"
-              popper-class="day-range-popper"
-              :disabled="form.applyRange !== 1">
-              <div class="day-range-popover">
-                <div class="day-range-title">选择天数</div>
-                <div class="day-range-row">
-                  <span class="day-range-label">开始天数</span>
-                  <el-select
-                    v-model="form.applyStartDay"
-                    placeholder="开始"
-                    size="small"
-                    style="width: 140px"
-                    @change="onFormStartDayChange">
-                    <el-option
-                      v-for="d in planDayOptions"
-                      :key="`form-start-${d}`"
-                      :label="`第${d}天`"
-                      :value="d" />
-                  </el-select>
-                </div>
-                <div class="day-range-row">
-                  <span class="day-range-label">结束天数</span>
-                  <el-select
-                    v-model="form.applyEndDay"
-                    placeholder="结束"
-                    size="small"
-                    style="width: 140px">
-                    <el-option
-                      v-for="d in planDayOptions"
-                      :key="`form-end-${d}`"
-                      :label="`第${d}天`"
-                      :value="d"
-                      :disabled="form.applyStartDay && d <= form.applyStartDay" />
-                  </el-select>
-                </div>
-              </div>
-              <div
-                slot="reference"
-                class="day-range-input"
-                :class="{ disabled: form.applyRange !== 1 }">
-                <span class="day-range-input-text">
-                  {{
-                    form.applyRange === 1 &&
-                      form.applyStartDay &&
-                      form.applyEndDay
-                      ? `第${form.applyStartDay}天~第${form.applyEndDay}天`
-                      : "选择天数"
-                  }}
-                </span>
-                <i class="el-icon-date"></i>
-              </div>
-            </el-popover>
-          </div>
-        </el-form-item>
+          </el-form-item>
+        </template>
+      </el-form>
 
-        <el-form-item label="是否同步设备">
-          <el-select
-            v-model="form.syncFlag"
-            placeholder="请选择"
-            size="small"
-            style="width: 120px">
-            <el-option label="不同步" :value="0"></el-option>
-            <el-option label="同步" :value="1"></el-option>
-          </el-select>
-        </el-form-item>
-      </template>
-    </el-form>
+      <div class="agreement-wrap">
+        <input v-model="agreementChecked" type="checkbox"
+          class="agreement-checkbox" />
+        <span class="agreement-text">
+          已阅读同意
+          <a href="javascript:;" class="agreement-link"
+            @click.stop.prevent="agreementDialogVisible = true">
+            《运动风险告知与免责协议》
+          </a>
+        </span>
+      </div>
 
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="onCancel">取消</el-button>
-      <el-button type="primary" @click="applyConfirm"
-        :loading="loading">确定</el-button>
-    </span>
-  </el-dialog>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="onCancel">取消</el-button>
+        <el-button type="primary" @click="applyConfirm"
+          :loading="loading">确定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog :visible.sync="agreementDialogVisible" width="720px"
+      class="risk-agreement-dialog" append-to-body>
+      <div class="risk-agreement-content">
+        <h3 class="title">运动风险告知与免责协议</h3>
+
+        <h4 class="section-title">一、风险告知</h4>
+        <ol class="risk-list">
+          <li>
+            本人已充分知晓并理解，任何体育运动（包括但不限于力量训练、有氧训练、专项技能训练等）均存在潜在风险，可能因自身身体状况、运动方式不当、场地器材、环境等因素导致身体损伤（如肌肉拉伤、关节扭伤、骨折、心脑血管意外等）、财产损失等后果。
+          </li>
+          <li>
+            本人确认已向平台内教练如实告知自身健康状况（包括但不限于既往病史、过敏史、运动禁忌、当前身体不适等），并根据自身情况选择适合的训练课程及强度。
+          </li>
+          <li>平台仅提供训练课表展示、信息对接服务，不直接提供教练服务，课表内容由教练 /
+            用户上传，平台无法逐一验证课表的科学性、安全性，因课表内容不当导致的运动风险，平台不承担责任。</li>
+        </ol>
+
+        <h4 class="section-title">二、免责声明</h4>
+        <ol class="risk-list">
+          <li>
+            本人自愿参与平台展示的各类运动训练课程，承诺在运动前进行充分热身，运动中遵循科学方法，量力而行，并对自身的运动行为及后果承担全部责任。
+          </li>
+          <li>因本人隐瞒健康状况、不遵守运动规范、擅自更改训练计划、使用不合格器材 /
+            场地等自身原因导致的一切损害后果，均由本人自行承担，与平台、课程上传者（教练 / 用户）无关。</li>
+          <li>平台仅为信息展示平台，不对教练的专业资质、课表内容的有效性作任何担保；教练 /
+            用户上传的课表仅为参考，本人已知晓需结合自身情况调整，因课表执行产生的风险由本人自行承担。</li>
+          <li>
+            因不可抗力（如地震、台风等）、第三方原因（如场地突发故障、其他参与者行为）导致的损害，平台无过错的，不承担赔偿责任。
+          </li>
+          <li>
+            本人同意，如因使用平台服务或参与运动训练产生纠纷，应优先与相关责任方协商解决；协商不成的，可向平台所在地有管辖权的人民法院提起诉讼。
+          </li>
+        </ol>
+
+        <h4 class="section-title">三、其他条款</h4>
+        <ol class="risk-list">
+          <li>本人确认已仔细阅读、完全理解本协议全部内容，自愿签署（勾选）本协议，本协议自勾选之日起生效。</li>
+          <li>如本人为未成年人，需由监护人代为阅读、理解并勾选本协议，监护人需对未成年人的运动行为及后果承担监护责任。
+          </li>
+          <li>平台有权根据法律法规及运营需要修改本协议，修改后的协议将在平台公示，继续使用平台服务视为同意修改后的协议。
+          </li>
+        </ol>
+
+        <label class="agreement-dialog-check">
+          <input v-model="agreementChecked" type="checkbox"
+            @change="handleAgreementDialogChange"
+            class="agreement-checkbox" />
+          <span>我已阅读同意《运动风险告知与免责协议》</span>
+        </label>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
 import { getData, submitData } from "@/api/common.js"
 import moment from "moment"
+import { mapGetters } from "vuex"
 export default {
   name: "ApplyCoach",
   props: {
@@ -528,6 +595,8 @@ export default {
       athletesList: [],
       members: [],
       loading: false,
+      agreementChecked: false,
+      agreementDialogVisible: false,
       teamCascaderKey: 0,
       clubCascaderKey: 0,
       memberProps: {
@@ -549,6 +618,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(["isEliteAthlete"]),
     teamOptions() {
       // 维度为“俱乐部”时，使用俱乐部列表作为选择项；否则使用团队列表
       if (this.form.applyDimension === "2") {
@@ -618,6 +688,8 @@ export default {
         }
         console.log("planClasses", this.planClasses)
       } else {
+        this.agreementChecked = false
+        this.agreementDialogVisible = false
         // clear validation when closing
         this.$nextTick(
           () =>
@@ -964,6 +1036,8 @@ export default {
     },
     onCancel() {
       this.innerVisible = false
+      this.agreementChecked = false
+      this.agreementDialogVisible = false
       this.form = {
         teamId: undefined,
         athleteIds: [],
@@ -981,6 +1055,11 @@ export default {
       this.members = []
       this.resetForm()
       this.$emit("cancel")
+    },
+    handleAgreementDialogChange() {
+      if (this.agreementChecked) {
+        this.agreementDialogVisible = false
+      }
     },
     // 判断是否在结束日期之后
     diffAffterDate(dates, classes) {
@@ -1125,12 +1204,48 @@ export default {
       }
       return days
     },
+    getApplyLastPlanDay() {
+      const planList = (Array.isArray(this.planClasses) ? this.planClasses : [])
+        .flat()
+        .filter((item) => Array.isArray(item.details) && item.details.length > 0)
+      if (this.form.applyRange === 1) {
+        return this.form.applyEndDay || 0
+      }
+      return planList.reduce((max, item) => Math.max(max, item.day || 0), 0)
+    },
+    hasFutureApplyByForm() {
+      if (!this.form.applyDate) return false
+      const lastPlanDay = this.getApplyLastPlanDay()
+      if (!lastPlanDay) return false
+      const today = moment().startOf("day")
+      const applyDate = moment(this.form.applyDate, "YYYY-MM-DD")
+
+      if (this.form.applyMode === 2) {
+        return applyDate.isAfter(today)
+      }
+
+      const lastApplyDate = applyDate.clone().add(Math.max(lastPlanDay - 1, 0), "days")
+      return lastApplyDate.isAfter(today)
+    },
     applyConfirm() {
+      if (!this.agreementChecked) {
+        this.$message.warning("请先阅读并同意《运动风险告知与免责协议》")
+        return
+      }
+
       this.$refs.formRef.validate((valid) => {
         if (!valid) return
-        this.$confirm("计划应用需要一些时间，可在应用历史中查看计划应用结果，请确认是否立即应用？", "提示", {
+        const isNonEliteFutureApply =
+          this.loginType === "1" &&
+          !this.isEliteAthlete &&
+          this.hasFutureApplyByForm()
+        const confirmMessage = isNonEliteFutureApply
+          ? "普通用户仅可将计划应用到今天，如需将计划应用到未来日期，请前往会员中心订阅精英版会员。<br><br>计划应用需要一些时间，可在应用历史中查看计划应用结果，请确认是否立即应用？"
+          : "计划应用需要一些时间，可在应用历史中查看计划应用结果，请确认是否立即应用？"
+        this.$confirm(confirmMessage, "提示", {
           confirmButtonText: "确认应用",
           cancelButtonText: "取消",
+          dangerouslyUseHTMLString: true,
           type: "warning",
         }).then(() => {
           this.onConfirm()
@@ -1307,6 +1422,8 @@ export default {
     },
     resetForm() {
       const loginType = localStorage.getItem("loginType")
+      this.agreementChecked = false
+      this.agreementDialogVisible = false
       this.form = {
         teamId: undefined,
         athleteIds: [],
@@ -1362,6 +1479,37 @@ export default {
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.agreement-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.agreement-checkbox {
+  margin-top: 0;
+  cursor: pointer;
+}
+
+.agreement-text {
+  line-height: 1.5;
+}
+
+.agreement-link {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.agreement-link:hover {
+  text-decoration: underline;
 }
 
 .statistics-divider-wrapper {
@@ -1516,5 +1664,59 @@ export default {
   width: 24px;
   height: 24px;
   cursor: pointer;
+}
+</style>
+
+<style>
+.risk-agreement-dialog .el-dialog__body {
+  max-height: 620px;
+  overflow-y: auto;
+}
+
+.risk-agreement-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.risk-agreement-content .title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.risk-agreement-content .section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+  color: #111;
+}
+
+.risk-agreement-content .risk-list {
+  padding-left: 22px;
+  margin: 6px 0 10px;
+}
+
+.risk-agreement-content .risk-list li {
+  margin: 6px 0;
+}
+
+.risk-agreement-content .agreement-dialog-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.risk-agreement-content .agreement-dialog-check .agreement-checkbox {
+  margin: 0;
+  flex-shrink: 0;
 }
 </style>

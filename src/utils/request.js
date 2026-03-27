@@ -3,10 +3,130 @@ import { MessageBox, Message } from "element-ui";
 import store from "@/store";
 import router from "@/router";
 import { getToken } from "@/utils/auth";
+import { vipDialog } from "@/plugins/vip-dialog";
 const isPoint401 = false;
 
 // 版本更新提示防重複彈框
 let versionUpdatePromptShown = false;
+// VIP 过期提示防重复弹框
+let vipExpiredPromptShown = false;
+let proVipExpiredPromptShown = false;
+// forceShow 会员弹窗打开期间，暂停到期提醒拦截，避免重复弹框抢焦点
+let vipExpirePromptLockedByForceShowDialog = false;
+
+const VIP_EXPIRE_CHECK_WHITE_LIST = [
+  "/logout",
+  "gateway/auth/wx/loginMock",
+  "ateway/wechat/wechatScanLogin",
+  "wechat/wechatScanLoginQrCode",
+  "gateway/wechat/getByUnionid",
+  "consumer/wx/switchIdentity",
+  "operate/api/activate/redeem",
+  "operate/api/vipPay/queryPayStatus"
+];
+
+function normalizeRequestUrl(url = "") {
+  return String(url).split("?")[0];
+}
+
+function shouldSkipVipExpireCheck(url = "") {
+  const normalizedUrl = normalizeRequestUrl(url);
+  return VIP_EXPIRE_CHECK_WHITE_LIST.some((item) =>
+    normalizedUrl.includes(item)
+  );
+}
+
+function redirectToLogin() {
+  const pushResult = router.push("/login");
+  if (pushResult && typeof pushResult.catch === "function") {
+    pushResult.catch(() => {});
+  }
+}
+
+function switchToAthlete() {
+  return service({
+    url: "/consumer/wx/switchIdentity?clinetType=web",
+    method: "post",
+    data: { clinetType: "web" },
+  })
+    .catch(() => {})
+    .finally(() => {
+      localStorage.setItem("loginType", "1");
+      localStorage.setItem("activeName", "class");
+      location.reload();
+    });
+}
+
+function logoutAndRedirect(options = {}) {
+  const { resetLoginType = false } = options;
+  return store
+    .dispatch("user/logout")
+    .catch(() => store.dispatch("user/resetToken"))
+    .finally(() => {
+      if (resetLoginType) {
+        localStorage.setItem("loginType", "1");
+      }
+      redirectToLogin();
+    });
+}
+
+function showVipExpiredConfirm({
+  message,
+  openDialog,
+  resetPromptFlag,
+  onCancel,
+  cancelButtonText = "退出登录",
+  reopenOnDialogCloseWhenForceShow = false,
+}) {
+  return MessageBox({
+    title: "会员到期提醒",
+    message,
+    confirmButtonText: "去订阅",
+    cancelButtonText,
+    showCancelButton: true,
+    distinguishCancelAndClose: true,
+    showClose: false,
+    closeOnClickModal: false,
+    closeOnPressEscape: false,
+    type: "warning",
+    beforeClose(action, instance, done) {
+      if (action === "confirm") {
+        const forceShow = true;
+        done();
+        if (forceShow) {
+          vipExpirePromptLockedByForceShowDialog = true;
+        }
+        openDialog({
+          tradeType: "2",
+          forceShow,
+          onClose: () => {
+            vipExpirePromptLockedByForceShowDialog = false;
+            if (typeof resetPromptFlag === "function") {
+              resetPromptFlag();
+            }
+            if (forceShow && reopenOnDialogCloseWhenForceShow) {
+              showVipExpiredConfirm({
+                message,
+                openDialog,
+                resetPromptFlag,
+                onCancel,
+                cancelButtonText,
+                reopenOnDialogCloseWhenForceShow,
+              });
+            }
+          },
+        });
+        return;
+      }
+      done();
+    },
+  }).catch((action) => {
+    if (typeof onCancel === "function") {
+      return onCancel(action);
+    }
+    return logoutAndRedirect();
+  });
+}
 
 /**
  * 從 extInfo 解析伺服器版本號
@@ -37,6 +157,9 @@ function getServerVersionFromExtInfo(extInfo) {
 function checkVersionAndPromptUpdate(extInfo) {
   console.log(process.env.NODE_ENV);
   console.log(process.env.VUE_APP_VERSION);
+  console.log(JSON.parse(extInfo));
+  const version = JSON.parse(extInfo);
+  console.log(JSON.parse(version.version));
   if (process.env.NODE_ENV === "development") return;
   if (versionUpdatePromptShown) return;
 
@@ -99,11 +222,45 @@ service.interceptors.response.use(
    */
   (response) => {
     const res = response.data;
+    const requestUrl = response.config?.url || "";
+    const skipVipExpireCheck = shouldSkipVipExpireCheck(requestUrl);
     if (res instanceof Blob) {
       return response;
     }
     if (res.code && res.code !== "100000") {
-      // if the custom code is not 20000, it is judged as an error.
+      // 运动员身份 + code 300：检查精英版是否过期
+      if (
+        (res.code === 300 || res.code === "300") &&
+        localStorage.getItem("loginType") === "1" &&
+        !vipExpirePromptLockedByForceShowDialog &&
+        !skipVipExpireCheck
+      ) {
+        let vipSubStatus = null;
+        try {
+          const extInfo =
+            typeof res.extInfo === "string"
+              ? JSON.parse(res.extInfo)
+              : res.extInfo;
+          vipSubStatus = Number(extInfo?.vipSubStatus);
+        } catch { /* extInfo 解析失败则保持 vipSubStatus 为 null */ }
+
+        if (vipSubStatus !== 1 && vipSubStatus !== 4 && !vipExpiredPromptShown) {
+          vipExpiredPromptShown = true;
+          showVipExpiredConfirm({
+            message: "您的精英版会员已经到期，请及时续费",
+            openDialog: vipDialog.openVip2.bind(vipDialog),
+            resetPromptFlag: () => {
+              vipExpiredPromptShown = false;
+            },
+            cancelButtonText: "暂不订阅",
+            onCancel: () => {
+              vipExpiredPromptShown = false;
+            },
+          });
+          return Promise.reject(res);
+        }
+      }
+
       Message({
         message: res.message || "Error",
         type: "error",
@@ -130,8 +287,42 @@ service.interceptors.response.use(
       return Promise.reject(res);
     } else {
       // 非開發環境下檢查版本，若與伺服器不一致則提示更新並強制刷新
+
       if (res.extInfo) {
         checkVersionAndPromptUpdate(res.extInfo);
+
+        if (
+          localStorage.getItem("loginType") === "2" &&
+          !proVipExpiredPromptShown &&
+          !vipExpirePromptLockedByForceShowDialog &&
+          !skipVipExpireCheck
+        ) {
+          let vipSubStatus = null;
+          try {
+            const extInfo =
+              typeof res.extInfo === "string"
+                ? JSON.parse(res.extInfo)
+                : res.extInfo;
+            vipSubStatus = Number(extInfo?.vipSubStatus);
+          } catch { /* ignore */ }
+
+          if (vipSubStatus !== 2 && vipSubStatus !== 4) {
+            proVipExpiredPromptShown = true;
+            showVipExpiredConfirm({
+              message: "您的专业版会员已经到期，请及时续费",
+              openDialog: vipDialog.openVip1.bind(vipDialog),
+              reopenOnDialogCloseWhenForceShow: true,
+              resetPromptFlag: () => {
+                proVipExpiredPromptShown = false;
+              },
+              cancelButtonText: "切换成运动员",
+              onCancel: () => {
+                proVipExpiredPromptShown = false;
+                return switchToAthlete();
+              },
+            });
+          }
+        }
       }
       return res;
     }

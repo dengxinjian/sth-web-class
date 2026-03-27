@@ -12,6 +12,7 @@ const getters = {
   roles: (state) => state.user.roles,
   permission_routes: (state) => state.permission.routes,
   errorLogs: (state) => state.errorLog.logs,
+  isEliteAthlete: (state) => state.user.isEliteAthlete, // 是否为精英版订阅用户
   options1: (state) => state.common.t2Options,
   options6: (state) => state.common.yearOptions,
   options3: (state) => state.common.lobOptions,

@@ -18,7 +18,7 @@
             <span class="summary-item">
               <span class="summary-label">支付方式：</span>
               <span
-                class="summary-value">{{ formatPayType(summary.payType, summary.subscribeType) }}</span>
+                class="summary-value">{{ formatPayType(summary.payType, summary.subscribeType, summary.clientType) }}</span>
             </span>
             <span class="summary-item">
               <span class="summary-label">支付金额：</span>
@@ -28,7 +28,7 @@
             <span class="summary-item">
               <span class="summary-label">到期时间：</span>
               <span
-                class="summary-value">{{ formatDate(summary.expireTime) }}</span>
+                class="summary-value">{{ summary.expireTime ? formatDate(summary.expireTime) : '永久' }}</span>
             </span>
           </div>
           <div v-else-if="!loading && records.length === 0"
@@ -36,22 +36,23 @@
             暂无付款记录
           </div>
 
-          <div class="table-title">付款记录</div>
+          <div class="table-title">付费记录</div>
           <el-table
             :data="records"
+            :max-height="480"
             border
             stripe
             size="small"
             class="record-table">
             <el-table-column prop="outTradeNo" label="订单号"
-              min-width="140" show-overflow-tooltip />
+              min-width="200" show-overflow-tooltip />
             <el-table-column label="订单类型" width="90">
               <template
                 slot-scope="{ row }">{{ formatTradeType(row.tradeType) }}</template>
             </el-table-column>
-            <el-table-column label="时长" width="90">
+            <el-table-column label="购买内容" width="110">
               <template
-                slot-scope="{ row }">{{ formatSubscribeType(row.subscribeType, row.subscribeDay) }}</template>
+                slot-scope="{ row }">{{ row.description }}</template>
             </el-table-column>
             <el-table-column label="生效时间" width="165">
               <template
@@ -63,7 +64,7 @@
             </el-table-column>
             <el-table-column label="支付方式" width="100">
               <template
-                slot-scope="{ row }">{{ formatPayType(row.payType, row.subscribeType) }}</template>
+                slot-scope="{ row }">{{ formatPayType(row.payType, row.subscribeType, row.clientType) }}</template>
             </el-table-column>
             <el-table-column label="订单金额(元)" width="110"
               align="right">
@@ -77,6 +78,10 @@
             <el-table-column label="支付时间" width="165">
               <template
                 slot-scope="{ row }">{{ formatDate(row.payTime) }}</template>
+            </el-table-column>
+            <el-table-column label="订单状态" width="100">
+              <template
+                slot-scope="{ row }">{{ formatPayStatus(row.payStatus) }}</template>
             </el-table-column>
           </el-table>
 
@@ -147,6 +152,7 @@ export default {
     visible(val) {
       this.innerVisible = val
       if (val) {
+        this.resetPagination()
         this.fetchLatestRecord()
         this.fetchList()
       }
@@ -154,9 +160,16 @@ export default {
     value(val) {
       if (typeof val !== "undefined") this.innerVisible = val
       if (this.innerVisible) {
+        this.resetPagination()
         this.fetchLatestRecord()
         this.fetchList()
       }
+    },
+    identityType() {
+      if (!this.innerVisible) return
+      this.resetPagination()
+      this.fetchLatestRecord()
+      this.fetchList()
     },
     innerVisible(val) {
       this.$emit("update:visible", val)
@@ -166,6 +179,11 @@ export default {
   methods: {
     onCancel() {
       this.innerVisible = false
+    },
+    resetPagination() {
+      this.pagination.pageNo = 1
+      this.pagination.pageSize = 10
+      this.pagination.total = 0
     },
     formatDate(val) {
       if (val == null || val === "") return "-"
@@ -191,12 +209,16 @@ export default {
       const s = String(d.getSeconds()).padStart(2, "0")
       return `${y}-${m}-${day} ${h}:${min}:${s}`
     },
-    formatPayType(v, subscribeType) {
+    formatPayType(v, subscribeType, clientType) {
       console.log(v, subscribeType)
       const n = Number(v)
       const s = Number(subscribeType)
-      if (n === 1) return "微信"
-      if (n === 2) return "支付宝"
+      const c = Number(clientType)
+      if (n === 1 && c === 1) return "小程序微信支付"
+      if (n === 1 && c === 2) return "网页微信支付"
+      if (n === 2 && c === 1) return "小程序支付宝支付"
+      if (n === 2 && c === 2) return "网页支付宝支付"
+      if (c === 3) return "Apple Pay支付"
       if (n === 3) {
         if (s === 11) return "激活码-精英版"
         if (s === 12) return "激活码-专业版"
@@ -207,23 +229,23 @@ export default {
       }
       return "-"
     },
-    formatSubscribeType(v) {
+    formatSubscribeType(v, subscribeDay) {
       const n = Number(v)
       if (n === 1) return "月卡"
       if (n === 2) return "连续包月"
       if (n === 3) return "年卡"
       if (n === 4) return "连续包年"
-      if (n === 11) return "精英版"
-      if (n === 12) return "专业版"
-      if (n === 13) return "精英天使用户"
-      if (n === 14) return "专业天使用户"
-      if (n === 15) return "PRO 版"
-      if (n === 16) return "认证教练"
+      if (n === 11) return `${subscribeDay === -1 ? '永久' : subscribeDay + '天'}`
+      if (n === 12) return `${subscribeDay === -1 ? '永久' : subscribeDay + '天'}`
+      if (n === 13) return `${subscribeDay === -1 ? '永久' : subscribeDay + '天'}`
+      if (n === 14) return `${subscribeDay === -1 ? '永久' : subscribeDay + '天'}`
+      if (n === 15) return `${subscribeDay === -1 ? '永久' : subscribeDay + '天'}`
+      if (n === 16) return `${subscribeDay === -1 ? '永久' : subscribeDay + '天'}`
       return "-"
     },
     formatTradeType(v) {
       const n = Number(v)
-      if (n === 1) return "订阅"
+      if (n === 1) return "新购"
       if (n === 2) return "续费"
       if (n === 3) return "购买席位"
       if (n === 4) return "激活码兑换"
@@ -231,10 +253,11 @@ export default {
     },
     formatPayStatus(v) {
       const n = Number(v)
+      if (n === 0) return "未支付"
       if (n === 1) return "支付成功"
-      if (n === 0) return "待支付"
       if (n === 2) return "支付失败"
       if (n === 3) return "退款成功"
+      if (n === 4) return "已取消"
       return "-"
     },
     formatAmount(v) {
@@ -259,6 +282,7 @@ export default {
             orderAmount: latest.orderAmount,
             expireTime: latest.expireTime,
             subscribeType: latest.subscribeType,
+            clientType: latest.clientType,
           }
         } else {
           this.summary = {}
@@ -282,9 +306,11 @@ export default {
         if (res && res.success && res.result) {
           const result = res.result
           this.records = result.records || []
-          this.pagination.total = Number(result.total) || 0
-          this.pagination.pageNo = Number(result.pageNo) || 1
-          this.pagination.pageSize = Number(result.pageSize) || 10
+          this.pagination.total = Number(result.total ?? result.count ?? result.totalCount) || 0
+          this.pagination.pageNo =
+            Number(result.pageNo ?? result.pageNum ?? result.current ?? this.pagination.pageNo) || 1
+          this.pagination.pageSize =
+            Number(result.pageSize ?? result.size ?? result.limit ?? this.pagination.pageSize) || 10
         } else {
           this.records = []
           this.pagination.total = 0
@@ -315,7 +341,7 @@ export default {
   z-index: 1000;
 
   .mask-container {
-    width: 980px;
+    width: 1080px;
     min-height: 460px;
     background: #fff;
     border-radius: 10px;

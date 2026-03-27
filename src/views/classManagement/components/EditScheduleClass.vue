@@ -38,8 +38,7 @@
               type="text"
               placeholder="标题"
               v-model="form.title"
-              :disabled="!classData.classesJson?.title && !!classData.activityName
-                "
+              :disabled="(!classData.classesJson?.title && !!classData.activityName) || !canEdit"
               :maxlength="50"
               style="width: 100%;" />
           </el-form-item>
@@ -105,7 +104,7 @@
           </div>
           <div
             class="metric-item"
-            v-if="!isActivity && !isRestType(classData.sportType)">
+            v-if="!isActivity && !isRestType(classData.sportType) && canEdit">
             <el-button
               type="primary"
               @click="handleEditClassDetail"
@@ -404,7 +403,7 @@
               </div>
               <div class="sync-params">
                 <span>平均{{ sportDetail.sportType === 1 ? "速度" : "配速"
-                  }}：{{
+                }}：{{
                     sportDetail.avgSpeed
                   }}
                   {{
@@ -520,6 +519,7 @@
                   v-model="classData.classesJson.summary"
                   :maxlength="classData.sportType === 'REMARK' ? 2000 : 500"
                   show-word-limit
+                  :disabled="!canEdit"
                   placeholder="请输入概要内容"></el-input>
               </div>
             </div>
@@ -533,6 +533,7 @@
                     width="20"
                     height="20"
                     alt=""
+                    v-if="canEdit"
                     @click="handleAddLink" />
                 </div>
               </div>
@@ -554,6 +555,7 @@
                         <el-input
                           size="small"
                           v-model="item.title"
+                          :disabled="!canEdit"
                           placeholder="请输入链接标题" />
                       </el-col>
                       <el-col :span="2">
@@ -568,6 +570,7 @@
                           <i
                             class="el-icon-remove-outline"
                             @click="handleRemoveLink(index)"
+                            v-if="canEdit"
                             style="
                               cursor: pointer;
                               font-size: 19px;
@@ -582,6 +585,7 @@
                       size="small"
                       style="width: 100%"
                       v-model="item.type"
+                      :disabled="!canEdit"
                       placeholder="请选择链接类型">
                       <el-option label="网页链接" value="1" />
                       <el-option label="小程序链接" value="2" />
@@ -600,7 +604,8 @@
                         <el-input
                           size="small"
                           v-model="item.url"
-                          placeholder="请输入链接" />
+                          placeholder="请输入链接"
+                          :disabled="!canEdit" />
                       </el-col>
                       <el-col :span="2">
                         <div
@@ -614,6 +619,7 @@
                           <i
                             class="el-icon-document-copy"
                             @click="handleCopyUrl(item.url)"
+                            v-if="isEliteAthlete"
                             style="
                               cursor: pointer;
                               font-size: 19px;
@@ -667,7 +673,8 @@
                 <el-input v-if="classData.classesJson" type="textarea"
                   :rows="4"
                   v-model="classData.classesJson.trainingAdvice"
-                  placeholder="请输入训练建议"></el-input>
+                  placeholder="请输入训练建议"
+                  :disabled="!canEdit"></el-input>
               </div>
             </div>
 
@@ -713,9 +720,9 @@
         <div></div>
         <div>
           <el-button @click="handleClose">取消</el-button>
-          <el-button type="primary"
+          <el-button type="primary" v-if="canEdit"
             @click="handleSave(false)">保存</el-button>
-          <el-button type="primary"
+          <el-button type="primary" v-if="canEdit"
             @click="handleSave(true)">保存并关闭</el-button>
         </div>
       </div>
@@ -740,6 +747,7 @@ import { scheduleApi } from "../services/classManagement.js"
 import TimeInput from "@/views/classManagement/components/timeInpt"
 import { getClassImageIcon, getSportTypeName } from "../utils/helpers"
 import { hhmmssToSeconds } from "@/utils/index"
+import { mapGetters } from "vuex"
 
 export default {
   name: "EditClass",
@@ -818,13 +826,13 @@ export default {
     }
   },
   computed: {
-    // 判断是否应该禁用输入（当课表日期大于当前时间时禁用）
+    // 从 Vuex 获取精英版订阅状态
+    ...mapGetters(["isEliteAthlete"]),
+    canEdit() {
+      return this.isEliteAthlete || !this.isFutureDate(this.classData.classesDate)
+    },
     isInputDisabled() {
-      if (!this.classData.classesDate) return false
-      const classDate = new Date(this.classData.classesDate)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      return classDate > today
+      return !this.canEdit
     },
     // 将sportType从数字转换为字符串类型
     normalizedSportType() {
@@ -964,6 +972,7 @@ export default {
     //   this.$message.success("复制成功");
     // },
     handleAddLink() {
+      if (!this.canEdit) return
       this.classData.classesJson?.links?.push({
         title: "",
         type: "1",
@@ -971,7 +980,16 @@ export default {
       })
     },
     handleRemoveLink(index) {
+      if (!this.canEdit) return
       this.classData.classesJson?.links?.splice(index, 1)
+    },
+    isFutureDate(dateStr) {
+      if (!dateStr) return false
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const targetDate = new Date(dateStr)
+      targetDate.setHours(0, 0, 0, 0)
+      return targetDate > today
     },
     async handleCopyUrl(url) {
       if (!url) {
@@ -1379,6 +1397,7 @@ export default {
     },
     // 还原字段到原始值
     restoreField(field) {
+      if (this.isInputDisabled) return
       if (field === "distance") {
         this.$set(
           this.actualData,
@@ -1393,6 +1412,7 @@ export default {
     },
     // 重置字段到默认值
     resetField(field) {
+      if (this.isInputDisabled) return
       if (field === "distance") {
         if (
           this.actualData.distanceUnit === "km" &&
@@ -1460,6 +1480,7 @@ export default {
       }
     },
     handleEditClassDetail() {
+      if (!this.canEdit) return
       // 只打开子对话框，不关闭当前对话框
       this.showClassDetailModal = true
     },
@@ -1635,6 +1656,7 @@ export default {
       })
     },
     async handleSave(flag) {
+      if (!this.canEdit) return
       console.log(this.classData, "classData")
       // 如果有标题表单且可编辑（有 classesJson.title），先验证并同步标题
       if (this.$refs.titleRef && this.classData.classesJson?.title) {
