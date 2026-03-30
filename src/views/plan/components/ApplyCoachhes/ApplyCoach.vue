@@ -607,6 +607,8 @@ export default {
       // 俱乐部列表
       clubList: [],
       pickerOptions: {
+        // 周起始日：1=周一（须放在 pickerOptions，el-date-picker 未声明 firstDayOfWeek 属性，模板上的 :first-day-of-week 无效）
+        firstDayOfWeek: 1,
         disabledDate(time) {
           // 禁用今天以前的日期（不包括今天）
           const today = new Date()
