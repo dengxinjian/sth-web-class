@@ -950,6 +950,7 @@ export default {
             sportType: data.sportType,
             classesJson: data.classesJson,
             triUserId: this.selectedAthletic,
+            identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
           })
           .then((res) => {
             console.log("******创建课表", res)
@@ -1229,6 +1230,7 @@ export default {
       const res = await scheduleApi.createSchedule({
         ...newData,
         triUserId: this.selectedAthletic,
+        identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
       })
       if (res.success) {
         this.classModalData = res.result
@@ -2769,6 +2771,7 @@ export default {
           classesDate: date,
           triUserId: this.selectedAthletic,
           sortVoList,
+          identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
         })
         .then((res) => {
           if (res.success) {
@@ -3258,6 +3261,7 @@ export default {
         triUserId: this.selectedAthletic,
         sortVoList,
         sort,
+        identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
       })
 
       if (res.success) {
@@ -3540,6 +3544,7 @@ export default {
           .createSchedule({
             ...josnData,
             triUserId: this.selectedAthletic,
+            identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
           })
           .then((res) => {
             if (res.success) {
@@ -3554,6 +3559,7 @@ export default {
                   type: type,
                   classesDate: data.exerciseData[0].dataDate,
                   triUserId: this.selectedAthletic,
+                  identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
                 })
                 .then((res) => {
                   // if (res.success) {
@@ -3623,6 +3629,7 @@ export default {
           type: type,
           classesDate: data.exerciseData[0].dataDate,
           triUserId: this.selectedAthletic,
+          identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
         })
         .then((res) => {
           if (res.success) {

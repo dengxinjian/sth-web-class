@@ -3,21 +3,19 @@
     <div style="padding: 10px">
       <!-- <div class="athletic-title">{{ teamName }}</div> -->
       <div class="athletic-operation">
-        <el-input size="mini" v-model="searchInput" @input="handleSearch">
+        <el-input size="mini" v-model="searchInput"
+          @input="handleSearch">
           <el-button
             slot="append"
             icon="el-icon-search"
-            @click="handleSearch"
-          ></el-button>
+            @click="handleSearch"></el-button>
         </el-input>
       </div>
       <div class="athletic-btn" v-if="defaultTeamId === teamId">
-        <el-button type="primary" size="mini" @click="handleInviteAthletic"
-          >邀请运动员</el-button
-        >
-        <el-button type="primary" size="mini" @click="handleInviteCoach"
-          >邀请执教</el-button
-        >
+        <el-button type="primary" size="mini"
+          @click="handleInviteAthletic">邀请运动员</el-button>
+        <el-button type="primary" size="mini"
+          @click="handleInviteCoach">邀请执教</el-button>
       </div>
     </div>
     <el-tree
@@ -25,42 +23,34 @@
       v-if="coachingData.length > 0"
       :data="coachingData"
       node-key="id"
-      default-expand-all
-    >
+      default-expand-all>
       <span class="athletic-btn-list" slot-scope="{ node }">
         <el-tooltip
           :content="node.label"
           placement="top"
-          :disabled="!node.label || node.label.length * 16 <= 148"
-        >
-          <span class="tree-label-text-athletic"
-            >{{ node.label }}
+          :disabled="!node.label || node.label.length * 16 <= 148">
+          <span class="tree-label-text-athletic">{{ node.label }}
             <span
               v-if="
                 !node.data.isGroup &&
                 node.data.userType === 1 &&
                 !isCurrentUser(node.data.triUserId)
-              "
-              >（主教练）</span
-            >
+              ">（主教练）</span>
             <span
-              v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)"
-              >（我）</span
-            >
-            <span v-if="node.data.isGroup">({{ node.data.membersCount }})</span>
+              v-if="!node.data.isGroup && isCurrentUser(node.data.triUserId)">（我）</span>
+            <span v-if="node.data.isGroup">({{ node.data.membersCount
+              }} / {{ seatCfg.coachMax }})</span>
           </span>
         </el-tooltip>
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
-          trigger="hover"
-        >
+          trigger="hover">
           <div class="btn-list-hover">
             <div
               class="btn-list-hover-item"
               v-if="node.data.isGroup"
-              @click="handleAddGroup"
-            >
+              @click="handleAddGroup">
               新增
             </div>
             <div
@@ -70,8 +60,7 @@
                 node.data.id !== 'unGrouped' &&
                 node.data.id !== 'coach'
               "
-              @click="handleEditGroup(node)"
-            >
+              @click="handleEditGroup(node)">
               编辑
             </div>
             <div
@@ -81,30 +70,26 @@
                 node.data.id !== 'unGrouped' &&
                 node.data.id !== 'coach'
               "
-              @click="handleDeleteGroup(node)"
-            >
+              @click="handleDeleteGroup(node)">
               删除
             </div>
             <!-- <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button> -->
             <div
               class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              @click="handleMoveAthletic(node)"
-            >
+              @click="handleMoveAthletic(node)">
               移动
             </div>
             <div
               class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              @click="handleMoveOutAthletic(node)"
-            >
+              @click="handleMoveOutAthletic(node)">
               解绑
             </div>
             <div
               class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id === 'coach'"
-              @click="handleMoveOutCoach(node)"
-            >
+              @click="handleMoveOutCoach(node)">
               解绑
             </div>
           </div>
@@ -114,44 +99,43 @@
         </el-popover>
       </span>
     </el-tree>
+    <!-- 运动员区块标题：与下方树行同高、左侧与「未分组」文字起点对齐（预留展开图标位） -->
+    <div
+      v-if="athleteMemberTotal > 0 || athleteSeatMax > 0"
+      class="member-section-head">
+      <span class="member-section-head__expand-gap" aria-hidden="true" />
+      <div class="member-section-head__row athletic-btn-list">
+        <span class="member-section-head__title">运动员（{{ athleteMemberTotal }} / {{ athleteSeatMax }}）</span>
+      </div>
+    </div>
     <el-tree
       :data="filteredAthleticData"
       node-key="id"
       default-expand-all
       @node-click="handleNodeClick"
-      :highlight-current="true"
-    >
+      :highlight-current="true">
       <span class="athletic-btn-list" slot-scope="{ node }">
         <el-tooltip
           v-if="node.level === 1"
           :content="node.label"
-          placement="top"
-        >
-          <span class="tree-label-text"
-            >{{ node.label }}
-            <span v-if="node.data.isGroup"
-              >({{ node.data.membersCount }})</span
-            ></span
-          >
+          placement="top">
+          <span class="tree-label-text">{{ node.label }}
+            <span v-if="node.data.isGroup">({{ node.data.membersCount
+              }})</span></span>
         </el-tooltip>
-        <span v-else class="tree-label-text"
-          >{{ node.label }}
-          <span v-if="node.data.isGroup"
-            >({{ node.data.membersCount }})</span
-          ></span
-        >
+        <span v-else class="tree-label-text">{{ node.label }}
+          <span v-if="node.data.isGroup">({{ node.data.membersCount
+            }})</span></span>
 
         <el-popover
           popper-class="athletic-btn-popover"
           placement="right"
-          trigger="hover"
-        >
+          trigger="hover">
           <div class="btn-list-hover">
             <div
               class="btn-list-hover-item"
               v-if="node.data.isGroup"
-              @click="handleAddGroup"
-            >
+              @click="handleAddGroup">
               新增
             </div>
             <div
@@ -159,8 +143,7 @@
               v-if="
                 node.data.isGroup && node.data.id && node.data.id !== 'coach'
               "
-              @click="handleEditGroup(node)"
-            >
+              @click="handleEditGroup(node)">
               编辑
             </div>
             <div
@@ -168,30 +151,26 @@
               v-if="
                 node.data.isGroup && node.data.id && node.data.id !== 'coach'
               "
-              @click="handleDeleteGroup(node)"
-            >
+              @click="handleDeleteGroup(node)">
               删除
             </div>
             <!-- <el-button v-if="node.data.isGroup && node.data.id !== 'unGrouped'" type="text" size="mini" @click="handleMoveGroup(node)">移动分组</el-button> -->
             <div
               class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              @click="handleMoveAthletic(node)"
-            >
+              @click="handleMoveAthletic(node)">
               移动
             </div>
             <div
               class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id !== 'coach'"
-              @click="handleMoveOutAthletic(node)"
-            >
+              @click="handleMoveOutAthletic(node)">
               解绑
             </div>
             <div
               class="btn-list-hover-item"
               v-if="!node.data.isGroup && node.parent.data.id === 'coach'"
-              @click="handleMoveOutCoach(node)"
-            >
+              @click="handleMoveOutCoach(node)">
               解绑
             </div>
           </div>
@@ -207,22 +186,19 @@
       :title="groupDialogTitle"
       :visible.sync="showGroupDialog"
       width="490px"
-      @close="resetGroupForm"
-    >
+      @close="resetGroupForm">
       <el-form
         :model="groupForm"
         :rules="groupRules"
         ref="groupForm"
-        label-width="80px"
-      >
+        label-width="80px">
         <el-form-item label="分组名称" prop="name">
           <el-input
             v-model="groupForm.name"
             placeholder="请输入分组名称"
             maxlength="20"
             show-word-limit
-            clearable
-          ></el-input>
+            clearable></el-input>
         </el-form-item>
         <!-- <el-form-item label="分组描述" prop="description">
           <el-input
@@ -241,30 +217,31 @@
     </el-dialog>
 
     <!-- 移动分组弹框 -->
-    <el-dialog title="移动分组" :visible.sync="showMoveDialog" width="400px">
+    <el-dialog title="移动分组" :visible.sync="showMoveDialog"
+      width="400px">
       <el-form label-width="80px">
         <el-form-item label="当前分组">
-          <el-input :value="currentGroup.groupName" disabled></el-input>
+          <el-input :value="currentGroup.groupName"
+            disabled></el-input>
         </el-form-item>
         <el-form-item label="目标分组">
           <el-select
             v-model="targetGroupId"
             placeholder="请选择目标分组"
-            style="width: 100%"
-          >
+            style="width: 100%">
             <el-option
               v-for="group in availableGroups"
               :key="group.id"
               :label="group.label"
-              :value="group.id"
-            >
+              :value="group.id">
             </el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showMoveDialog = false">取消</el-button>
-        <el-button type="primary" @click="confirmMoveGroup">确定</el-button>
+        <el-button type="primary"
+          @click="confirmMoveGroup">确定</el-button>
       </div>
     </el-dialog>
 
@@ -275,8 +252,7 @@
       width="500px"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      custom-class="invite-dialog"
-    >
+      custom-class="invite-dialog">
       <div class="invite-content">
         <!-- 插图 -->
         <div class="invite-illustration">
@@ -311,15 +287,13 @@
           type="primary"
           class="copy-btn"
           @click="copyInvitationCode"
-          :loading="copyLoading"
-        >
+          :loading="copyLoading">
           一键复制邀请码
         </el-button>
         <el-button
           class="regenerate-btn"
           @click="regenerateInvitationCode"
-          :loading="regenerateLoading"
-        >
+          :loading="regenerateLoading">
           重新生成邀请码
         </el-button>
       </div>
@@ -332,8 +306,7 @@
       width="500px"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
-      custom-class="invite-dialog"
-    >
+      custom-class="invite-dialog">
       <div class="invite-content">
         <!-- 插图 -->
         <div class="invite-illustration">
@@ -354,7 +327,8 @@
         <!-- 邀请码显示 -->
         <div class="invite-code-container">
           <div class="invite-code-label">执教邀请码:</div>
-          <div class="invite-code-value">{{ coachInvitationCode }}</div>
+          <div class="invite-code-value">{{ coachInvitationCode }}
+          </div>
         </div>
 
         <!-- 邀请码说明 -->
@@ -366,15 +340,13 @@
           type="primary"
           class="copy-btn"
           @click="copyCoachInvitationCode"
-          :loading="copyLoading"
-        >
+          :loading="copyLoading">
           一键复制执教邀请码
         </el-button>
         <el-button
           class="regenerate-btn"
           @click="getCoachInvitationCode"
-          :loading="regenerateLoading"
-        >
+          :loading="regenerateLoading">
           重新生成执教邀请码
         </el-button>
       </div>
@@ -382,8 +354,8 @@
   </div>
 </template>
 <script>
-import { getData, submitData } from "@/api/common.js";
-import { MessageBox } from "element-ui";
+import { getData, submitData } from "@/api/common.js"
+import { MessageBox } from "element-ui"
 
 export default {
   name: "AthleticManagement",
@@ -444,110 +416,153 @@ export default {
       regenerateLoading: false,
       moveType: "",
       coachingData: [],
-    };
+      seatCfg: {}, // 座位配置
+    }
   },
   computed: {
+    /** 教练席位上限（接口 seatCfg） */
+    coachSeatMax() {
+      const m = this.seatCfg && this.seatCfg.coachMax
+      if (m === undefined || m === null || m === "") return 0
+      const n = Number(m)
+      return Number.isFinite(n) ? n : 0
+    },
+    /** 当前教练总人数（教练树各分组 membersCount 之和） */
+    coachMemberTotal() {
+      if (!this.coachingData || !this.coachingData.length) return 0
+      return this.coachingData.reduce(
+        (sum, g) => sum + (Number(g.membersCount) || 0),
+        0
+      )
+    },
+    /** 运动员席位上限（接口 seatCfg） */
+    athleteSeatMax() {
+      const m = this.seatCfg && this.seatCfg.athleteMax
+      if (m === undefined || m === null || m === "") return 0
+      const n = Number(m)
+      return Number.isFinite(n) ? n : 0
+    },
+    /** 当前团队运动员总人数（各分组人数之和，勿用 filteredAthleticData.length） */
+    athleteMemberTotal() {
+      if (!this.athleticData || !this.athleticData.length) return 0
+      return this.athleticData.reduce(
+        (sum, g) => sum + (Number(g.membersCount) || 0),
+        0
+      )
+    },
     // 过滤后的数据（用于搜索）
     filteredAthleticData() {
       if (!this.searchInput) {
-        return this.athleticData;
+        return this.athleticData
       }
       return this.athleticData
         .map((group) => {
           // 检查分组名称是否匹配
-          const groupMatches = this.matchText(group.label, this.searchInput);
+          const groupMatches = this.matchText(group.label, this.searchInput)
           // 检查子成员是否匹配，并过滤出匹配的成员
           const matchedChildren =
             group.children && group.children.length > 0
               ? group.children.filter((member) =>
                 this.matchText(member.label, this.searchInput)
               )
-              : [];
+              : []
           // 如果分组名称匹配，保留整个分组（包括所有子成员）
           if (groupMatches) {
-            return group;
+            return group
           }
           // 如果只有子成员匹配，只保留匹配的子成员
           if (matchedChildren.length > 0) {
             return {
               ...group,
               children: matchedChildren,
-            };
+            }
           }
-          return null;
+          return null
         })
-        .filter((group) => group !== null);
+        .filter((group) => group !== null)
     },
     // 可用的目标分组（排除当前分组）
     availableGroups() {
       return this.athleticData.filter(
         (group) => group.id !== this.currentGroup.id
-      );
+      )
     },
   },
   watch: {
     teamId: {
       handler(newVal) {
         if (newVal) {
-          this.getAthleticData();
+          this.getAthleticData()
         }
       },
       immediate: false,
     },
   },
   mounted() {
-    this.getAthleticData();
+    this.getAthleticData()
   },
   methods: {
     // 判断是否为当前用户
     isCurrentUser(triUserId) {
-      const currentTriUserId = localStorage.getItem("triUserId");
-      return currentTriUserId && triUserId && currentTriUserId === triUserId;
+      const currentTriUserId = localStorage.getItem("triUserId")
+      return currentTriUserId && triUserId && currentTriUserId === triUserId
     },
 
     // 中英文匹配函数
     matchText(target, searchInput) {
-      if (!searchInput) return true;
-      if (!target) return false;
+      if (!searchInput) return true
+      if (!target) return false
 
       // 提取中文字符和英文字符
-      const chineseChars = searchInput.match(/[\u4e00-\u9fa5]/g) || [];
-      const englishChars = searchInput.match(/[a-zA-Z]/gi) || [];
+      const chineseChars = searchInput.match(/[\u4e00-\u9fa5]/g) || []
+      const englishChars = searchInput.match(/[a-zA-Z]/gi) || []
 
-      let matched = true;
+      let matched = true
 
       // 中文字符匹配：目标文本必须包含所有输入的中文字符
       if (chineseChars.length > 0) {
-        const targetChinese = target.match(/[\u4e00-\u9fa5]/g) || [];
+        const targetChinese = target.match(/[\u4e00-\u9fa5]/g) || []
         matched =
           matched &&
-          chineseChars.every((char) => targetChinese.includes(char));
+          chineseChars.every((char) => targetChinese.includes(char))
       }
 
       // 英文字符匹配：按字母匹配（忽略大小写）
       if (englishChars.length > 0) {
-        const targetLower = target.toLowerCase();
-        const searchLower = searchInput.toLowerCase();
+        const targetLower = target.toLowerCase()
+        const searchLower = searchInput.toLowerCase()
         // 提取英文部分进行匹配
-        const targetEnglish = target.match(/[a-zA-Z]/gi)?.join("").toLowerCase() || "";
-        const searchEnglish = englishChars.join("").toLowerCase();
-        matched = matched && targetEnglish.includes(searchEnglish);
+        const targetEnglish = target.match(/[a-zA-Z]/gi)?.join("").toLowerCase() || ""
+        const searchEnglish = englishChars.join("").toLowerCase()
+        matched = matched && targetEnglish.includes(searchEnglish)
       }
 
-      return matched;
+      return matched
     },
 
     handleNodeClick(node) {
-      console.log(node, "node");
+      console.log(node, "node")
       if (node.triUserId) {
-        this.$emit("athletic-click", node.triUserId);
+        this.$emit("athletic-click", node.triUserId)
       }
     },
 
     // 获取运动员数据
     getAthleticData() {
-      if (!this.teamId) return;
-
+      if (!this.teamId) return
+      getData({
+        url: `/consumer/api/team/seatCfg/${this.teamId}`,
+        // url: '/api/team/coach/all-teams',
+        teamId: this.teamId,
+      })
+        .then((res) => {
+          console.log(res, "res")
+          this.seatCfg = res.result
+        })
+        .catch((error) => {
+          console.error("获取运动员数据失败:", error)
+          this.$message.error("获取数据失败")
+        })
       getData({
         url: `/consumer/api/team/group/list/${this.teamId}`,
         // url: '/api/team/coach/all-teams',
@@ -570,36 +585,36 @@ export default {
                     label: member.userNickname,
                     triUserId: member.triUserId,
                     userType: member.userType,
-                  };
+                  }
                 }),
-              };
-            });
+              }
+            })
 
             // 处理unGrouped团队的members，将userType为1或2的members移动到新建的coach团队下
             const unGroupIndex = processedData.findIndex(
               (item) => item.id === null
-            );
+            )
             if (unGroupIndex !== -1) {
-              const unGroupData = processedData[unGroupIndex];
-              const allMembers = unGroupData.children || [];
+              const unGroupData = processedData[unGroupIndex]
+              const allMembers = unGroupData.children || []
 
               // 筛选出userType为1或2的members
               const coachMembers = allMembers.filter(
                 (member) => member.userType === 1 || member.userType === 2
-              );
+              )
 
               // 筛选出其他userType的members，保留在unGrouped团队中
               const remainingMembers = allMembers.filter(
                 (member) => member.userType !== 1 && member.userType !== 2
-              );
+              )
 
               // 更新unGrouped团队，只保留非coach类型的members
               processedData[unGroupIndex] = {
                 ...unGroupData,
                 membersCount: remainingMembers.length,
                 children: remainingMembers,
-              };
-              console.log(coachMembers, "this.coachingData");
+              }
+              console.log(coachMembers, "this.coachingData")
 
               // 只有当存在coach类型的members时才创建coach团队
               if (coachMembers.length > 0) {
@@ -613,21 +628,22 @@ export default {
                   membersCount: coachMembers?.length || 0,
                   triUserId: null,
                   children: coachMembers,
-                };
+                }
                 // 将coach团队添加到数据中
                 // processedData.unshift(coachTeam)
-                this.coachingData = [coachTeam];
-                console.log(this.coachingData, "this.coachingData");
+                this.coachingData = [coachTeam]
+                console.log(this.coachingData, "this.coachingData")
               }
             }
 
-            this.athleticData = processedData;
+            this.athleticData = processedData
+            console.log(this.athleticData, "this.athleticData")
           }
         })
         .catch((error) => {
-          console.error("获取运动员数据失败:", error);
-          this.$message.error("获取数据失败");
-        });
+          console.error("获取运动员数据失败:", error)
+          this.$message.error("获取数据失败")
+        })
     },
 
     // 搜索功能
@@ -636,14 +652,14 @@ export default {
     },
     // 邀请运动员
     handleInviteAthletic() {
-      this.showInviteDialog = true;
-      this.getInvitationCode();
+      this.showInviteDialog = true
+      this.getInvitationCode()
     },
 
     // 邀请执教
     handleInviteCoach() {
-      this.showInviteCoachDialog = true;
-      this.getCoachInvitationCode();
+      this.showInviteCoachDialog = true
+      this.getCoachInvitationCode()
     },
 
     // 获取邀请码
@@ -655,17 +671,17 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.invitationCode = res.result.inviteCode;
+            this.invitationCode = res.result.inviteCode
           } else {
-            this.$message.error(res.message || "获取邀请码失败");
-            this.createInvitationCode();
+            this.$message.error(res.message || "获取邀请码失败")
+            this.createInvitationCode()
           }
         })
         .catch((error) => {
-          console.error("获取邀请码失败:", error);
-          this.createInvitationCode();
-          this.$message.error("获取邀请码失败");
-        });
+          console.error("获取邀请码失败:", error)
+          this.createInvitationCode()
+          this.$message.error("获取邀请码失败")
+        })
     },
     // 获取执教邀请码
     getCoachInvitationCode() {
@@ -674,9 +690,9 @@ export default {
         userType: 2,
       }).then((res) => {
         if (res.success) {
-          this.coachInvitationCode = res.result.inviteCode;
+          this.coachInvitationCode = res.result.inviteCode
         }
-      });
+      })
     },
     // 创建邀请码
     createInvitationCode() {
@@ -686,116 +702,116 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.invitationCode = res.result.inviteCode;
+            this.invitationCode = res.result.inviteCode
           } else {
-            this.$message.error(res.message || "创建邀请码失败");
+            this.$message.error(res.message || "创建邀请码失败")
           }
         })
         .catch((error) => {
-          console.error("创建邀请码失败:", error);
-          this.$message.error("创建邀请码失败");
-        });
+          console.error("创建邀请码失败:", error)
+          this.$message.error("创建邀请码失败")
+        })
     },
 
     // 复制邀请码
     copyInvitationCode() {
       if (!this.invitationCode) {
-        this.$message.warning("邀请码为空");
-        return;
+        this.$message.warning("邀请码为空")
+        return
       }
 
-      this.copyLoading = true;
+      this.copyLoading = true
 
       // 使用现代浏览器的 Clipboard API
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard
           .writeText(this.invitationCode)
           .then(() => {
-            this.$message.success("邀请码已复制到剪贴板");
-            this.copyLoading = false;
+            this.$message.success("邀请码已复制到剪贴板")
+            this.copyLoading = false
           })
           .catch(() => {
-            this.fallbackCopyTextToClipboard(this.invitationCode);
-          });
+            this.fallbackCopyTextToClipboard(this.invitationCode)
+          })
       } else {
         // 降级方案
-        this.fallbackCopyTextToClipboard(this.invitationCode);
+        this.fallbackCopyTextToClipboard(this.invitationCode)
       }
     },
 
     // 复制执教邀请码
     copyCoachInvitationCode() {
       if (!this.coachInvitationCode) {
-        this.$message.warning("执教邀请码为空");
-        return;
+        this.$message.warning("执教邀请码为空")
+        return
       }
 
-      this.copyLoading = true;
+      this.copyLoading = true
 
       // 使用现代浏览器的 Clipboard API
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard
           .writeText(this.coachInvitationCode)
           .then(() => {
-            this.$message.success("执教邀请码已复制到剪贴板");
-            this.copyLoading = false;
+            this.$message.success("执教邀请码已复制到剪贴板")
+            this.copyLoading = false
           })
           .catch(() => {
-            this.fallbackCopyTextToClipboard(this.coachInvitationCode);
-          });
+            this.fallbackCopyTextToClipboard(this.coachInvitationCode)
+          })
       } else {
         // 降级方案
-        this.fallbackCopyTextToClipboard(this.coachInvitationCode);
+        this.fallbackCopyTextToClipboard(this.coachInvitationCode)
       }
     },
 
     // 降级复制方案
     fallbackCopyTextToClipboard(text) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
+      const textArea = document.createElement("textarea")
+      textArea.value = text
+      textArea.style.position = "fixed"
+      textArea.style.left = "-999999px"
+      textArea.style.top = "-999999px"
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
 
       try {
-        const successful = document.execCommand("copy");
+        const successful = document.execCommand("copy")
         if (successful) {
-          this.$message.success("邀请码已复制到剪贴板");
+          this.$message.success("邀请码已复制到剪贴板")
         } else {
-          this.$message.error("复制失败，请手动复制");
+          this.$message.error("复制失败，请手动复制")
         }
       } catch (err) {
-        this.$message.error("复制失败，请手动复制");
+        this.$message.error("复制失败，请手动复制")
       }
 
-      document.body.removeChild(textArea);
-      this.copyLoading = false;
+      document.body.removeChild(textArea)
+      this.copyLoading = false
     },
 
     // 重新生成邀请码
     regenerateInvitationCode() {
-      this.createInvitationCode();
+      this.createInvitationCode()
     },
 
     // 新建分组
     handleAddGroup() {
-      this.groupDialogTitle = "新增分组";
-      this.resetGroupForm();
-      this.showGroupDialog = true;
+      this.groupDialogTitle = "新增分组"
+      this.resetGroupForm()
+      this.showGroupDialog = true
     },
 
     // 编辑分组
     handleEditGroup(node) {
-      this.groupDialogTitle = "编辑分组";
+      this.groupDialogTitle = "编辑分组"
       this.groupForm = {
         id: node.data.id,
         name: node.label,
         description: node.data.description || "",
-      };
-      this.showGroupDialog = true;
+      }
+      this.showGroupDialog = true
     },
 
     // 删除分组
@@ -810,28 +826,28 @@ export default {
         }
       )
         .then(() => {
-          this.deleteGroup(node.data.id);
+          this.deleteGroup(node.data.id)
         })
         .catch(() => {
-          this.$message.info("已取消删除");
-        });
+          this.$message.info("已取消删除")
+        })
     },
 
     // 移动分组
     handleMoveGroup(node) {
-      this.currentGroup = node.data;
-      this.targetGroupId = "";
-      this.showMoveDialog = true;
-      this.moveType = "group";
+      this.currentGroup = node.data
+      this.targetGroupId = ""
+      this.showMoveDialog = true
+      this.moveType = "group"
     },
 
     // 运动员移动分组
     handleMoveAthletic(node) {
-      this.currentGroup = node.parent.data;
-      this.currentAthletic = node.data;
-      this.targetGroupId = "";
-      this.showMoveDialog = true;
-      this.moveType = "athletic";
+      this.currentGroup = node.parent.data
+      this.currentAthletic = node.data
+      this.targetGroupId = ""
+      this.showMoveDialog = true
+      this.moveType = "athletic"
     },
 
     // 运动员解绑分组
@@ -847,24 +863,24 @@ export default {
         })
           .then((res) => {
             if (res.success) {
-              this.$message.success("解绑成功");
-              this.getAthleticData();
+              this.$message.success("解绑成功")
+              this.getAthleticData()
             } else {
-              this.$message.error(res.message || "解绑失败");
+              this.$message.error(res.message || "解绑失败")
             }
           })
           .catch((error) => {
-            console.error("解绑失败:", error);
+            console.error("解绑失败:", error)
             // this.$message.error("解绑失败");
-          });
-      });
+          })
+      })
     },
 
     // 教练解绑分组
     handleMoveOutCoach(node) {
       if (node.data.userType === 1) {
-        this.$message.error("不能解绑主教练");
-        return;
+        this.$message.error("不能解绑主教练")
+        return
       }
       this.$confirm("确定解绑该执教吗？", "提示", {
         confirmButtonText: "确定",
@@ -877,17 +893,17 @@ export default {
         })
           .then((res) => {
             if (res.success) {
-              this.$message.success("解绑成功");
-              this.getAthleticData();
+              this.$message.success("解绑成功")
+              this.getAthleticData()
             } else {
-              this.$message.error(res.message || "解绑失败");
+              this.$message.error(res.message || "解绑失败")
             }
           })
           .catch((error) => {
-            console.error("解绑失败:", error);
+            console.error("解绑失败:", error)
             // this.$message.error("解绑失败");
-          });
-      });
+          })
+      })
     },
 
     // 保存分组（新建/编辑）
@@ -896,13 +912,13 @@ export default {
         if (valid) {
           if (this.groupForm.id) {
             // 编辑分组
-            this.updateGroup();
+            this.updateGroup()
           } else {
             // 新建分组
-            this.createGroup();
+            this.createGroup()
           }
         }
-      });
+      })
     },
 
     // 创建分组
@@ -911,7 +927,7 @@ export default {
         teamId: this.teamId,
         groupName: this.groupForm.name,
         description: this.groupForm.description,
-      };
+      }
 
       // TODO: 替换为实际的API地址
       submitData({
@@ -920,17 +936,17 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.$message.success("分组创建成功");
-            this.showGroupDialog = false;
-            this.getAthleticData();
+            this.$message.success("分组创建成功")
+            this.showGroupDialog = false
+            this.getAthleticData()
           } else {
-            this.$message.error(res.message || "创建失败");
+            this.$message.error(res.message || "创建失败")
           }
         })
         .catch((error) => {
-          console.error("创建分组失败:", error);
-          this.$message.error("创建失败");
-        });
+          console.error("创建分组失败:", error)
+          this.$message.error("创建失败")
+        })
     },
 
     // 更新分组
@@ -939,7 +955,7 @@ export default {
         groupId: this.groupForm.id,
         groupName: this.groupForm.name,
         description: this.groupForm.description,
-      };
+      }
 
       // TODO: 替换为实际的API地址
       submitData({
@@ -949,17 +965,17 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.$message.success("分组更新成功");
-            this.showGroupDialog = false;
-            this.getAthleticData();
+            this.$message.success("分组更新成功")
+            this.showGroupDialog = false
+            this.getAthleticData()
           } else {
-            this.$message.error(res.message || "更新失败");
+            this.$message.error(res.message || "更新失败")
           }
         })
         .catch((error) => {
-          console.error("更新分组失败:", error);
-          this.$message.error("更新失败");
-        });
+          console.error("更新分组失败:", error)
+          this.$message.error("更新失败")
+        })
     },
 
     // 删除分组
@@ -972,16 +988,16 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.$message.success("分组删除成功");
-            this.getAthleticData();
+            this.$message.success("分组删除成功")
+            this.getAthleticData()
           } else {
-            this.$message.error(res.message || "删除失败");
+            this.$message.error(res.message || "删除失败")
           }
         })
         .catch((error) => {
-          console.error("删除分组失败:", error);
-          this.$message.error("删除失败");
-        });
+          console.error("删除分组失败:", error)
+          this.$message.error("删除失败")
+        })
     },
 
     // 确认移动分组
@@ -991,7 +1007,7 @@ export default {
       //   return;
       // }
 
-      let params = {};
+      let params = {}
       if (this.moveType === "group") {
         params = {
           groupId: this.targetGroupId,
@@ -999,13 +1015,13 @@ export default {
           memberIds: this.currentGroup.children.map(
             (member) => member.triUserId
           ),
-        };
+        }
       } else {
         params = {
           groupId: this.targetGroupId,
           teamId: this.teamId,
           memberIds: [this.currentAthletic.triUserId],
-        };
+        }
       }
 
       submitData({
@@ -1014,17 +1030,17 @@ export default {
       })
         .then((res) => {
           if (res.success) {
-            this.$message.success("分组移动成功");
-            this.showMoveDialog = false;
-            this.getAthleticData();
+            this.$message.success("分组移动成功")
+            this.showMoveDialog = false
+            this.getAthleticData()
           } else {
-            this.$message.error(res.message || "移动失败");
+            this.$message.error(res.message || "移动失败")
           }
         })
         .catch((error) => {
-          console.error("移动分组失败:", error);
-          this.$message.error("移动失败");
-        });
+          console.error("移动分组失败:", error)
+          this.$message.error("移动失败")
+        })
     },
 
     // 重置分组表单
@@ -1033,23 +1049,25 @@ export default {
         id: "",
         name: "",
         description: "",
-      };
+      }
       if (this.$refs.groupForm) {
-        this.$refs.groupForm.resetFields();
+        this.$refs.groupForm.resetFields()
       }
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .athletic-management {
   flex: 0 0 280px;
+
   .athletic-title {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 20px;
   }
 }
+
 .athletic-btn-list {
   flex: 1;
   display: flex;
@@ -1058,6 +1076,7 @@ export default {
   font-size: 12px;
   padding-right: 8px;
 }
+
 .btn-list-hover-item {
   width: 60px;
   height: 32px;
@@ -1070,6 +1089,7 @@ export default {
   line-height: 32px;
   color: #101010;
   cursor: pointer;
+
   &:hover {
     background-color: #c3c9d740;
     font-family: PingFang SC;
@@ -1078,6 +1098,7 @@ export default {
     font-size: 14px;
   }
 }
+
 .athletic-btn {
   display: flex;
   flex-direction: row;
@@ -1098,6 +1119,7 @@ export default {
     flex: 1 1 100%;
   }
 }
+
 .athletic-operation {
   display: flex;
   flex-direction: row;
@@ -1109,6 +1131,7 @@ export default {
 // 弹框样式优化
 .dialog-footer {
   text-align: right;
+
   .el-button {
     margin-left: 10px;
   }
@@ -1119,13 +1142,89 @@ export default {
   .el-tree-node__content {
     height: 32px;
     line-height: 32px;
+
     &:hover {
       background-color: #f5f7fa;
     }
   }
 }
+
 .athletic-tree {
   border-bottom: 8px solid #f0f0f0;
+}
+
+/* 教练 / 运动员区块标题：行高与 .el-tree-node__content 一致，与首层分组行左右对齐 */
+.member-section-head {
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  min-height: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #ebeef5;
+  border-bottom: 1px solid #ebeef5;
+}
+
+/* 与 Element UI 树节点展开箭头占位同宽，使标题与「未分组」文案左缘对齐 */
+.member-section-head__expand-gap {
+  flex: 0 0 24px;
+  width: 24px;
+  align-self: center;
+  pointer-events: none;
+}
+
+.member-section-head__row {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-section-head__title {
+  font-size: 12px;
+  font-weight: 500;
+  color: #606266;
+  line-height: 32px;
+}
+
+.member-section-head__pill {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  height: 22px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 20px;
+  color: #606266;
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  border-radius: 11px;
+}
+
+.member-section-head__pill.is-full {
+  color: #e6a23c;
+  border-color: #f5dab1;
+  background: #fdf6ec;
+}
+
+.member-section-head__num {
+  font-weight: 600;
+  color: #303133;
+}
+
+.member-section-head__pill.is-full .member-section-head__num {
+  color: #e6a23c;
+}
+
+.member-section-head__sep {
+  color: #c0c4cc;
+  font-weight: 400;
+}
+
+.member-section-head__max {
+  font-weight: 400;
+  color: #909399;
 }
 
 // 搜索框样式
@@ -1172,6 +1271,7 @@ export default {
       justify-content: center;
       align-items: center;
       gap: 8px;
+
       .athlete-figure {
         width: 40px;
         height: 40px;
@@ -1301,12 +1401,14 @@ export default {
     font-weight: 500;
     font-style: Medium;
     line-height: 8px;
+
     &:hover {
       background: #555;
       border-color: #555;
     }
   }
 }
+
 .tree-label-text {
   display: inline-block;
   max-width: 158px !important;
@@ -1315,6 +1417,7 @@ export default {
   white-space: nowrap;
   vertical-align: middle;
 }
+
 .tree-label-text-athletic {
   display: inline-block;
   max-width: 148px !important;
