@@ -1392,6 +1392,7 @@ export default {
         teamId: _this.form.teamId,
         targets,
         applyDimension: _this.loginType === "1" ? "0" : _this.form.applyDimension,
+        identityType: _this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
       }
       submitData({
         url: "/gateway/training/planClasses/applyPlanClasses",

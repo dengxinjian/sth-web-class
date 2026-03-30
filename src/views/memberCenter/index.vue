@@ -383,23 +383,7 @@ export default {
     },
     handleBack() {
       // 仅当上一页是本站页面时才 history.back，避免从支付宝等外部页面返回
-      try {
-        const ref = document.referrer || ""
-        const sameOrigin =
-          ref &&
-          ref.indexOf(window.location.origin) === 0
-
-        if (window.history.length > 1 && sameOrigin) {
-          this.$router.back()
-          return
-        }
-      } catch (e) {
-        // ignore
-      }
-      const pushResult = this.$router.push("/timeTable/class")
-      if (pushResult && typeof pushResult.catch === "function") {
-        pushResult.catch(() => { })
-      }
+      this.$router.push("/timeTable/class")
     },
   },
 }
