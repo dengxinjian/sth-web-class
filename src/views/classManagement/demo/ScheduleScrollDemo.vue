@@ -38,11 +38,16 @@
         <span>已覆盖：<code>{{ loadedRangeText }}</code></span>
         <span>请求次数：<strong>{{ requestCount }}</strong></span>
         <el-checkbox v-model="useIntersection">IntersectionObserver</el-checkbox>
+        <el-checkbox v-model="showPartitionHint">显示分区提示</el-checkbox>
       </div>
       <p class="demo-hint">
         本 Demo 使用 <code>vuedraggable</code>（底层仍为 Sortable，但列表由 Vue 响应式驱动）。
         <strong>拖动中预加载出新日期时，新列会自动挂载新的 draggable，无需像原生 Sortable 那样手动 reinit</strong>，
         可验证「3/14 → 未加载的 2/16」类场景。正式页若沿用 dragMixin 原生 Sortable，需在加载后 <code>initAllDrag()</code>。
+      </p>
+      <p class="demo-hint">
+        分区固定策略：每个日期列按 <strong>健康 → 赛事(可接收运动) → 课表(可排序/可接收运动) → 运动(仅当天可拖)</strong> 渲染；
+        健康/赛事自身不可拖动、不参与排序。
       </p>
     </div>
 
@@ -76,42 +81,144 @@
               <span class="w">{{ d.weekday }}</span>
             </div>
             <div class="demo-day-body" @click.stop>
-              <div
-                class="schedule-table-cell-item js-schedule-drag-container js-class-drag-container"
-                :data-date="d.commonDate"
-              >
-                <draggable
-                  v-if="dayMap[d.commonDate]"
-                  :list="dayMap[d.commonDate].classSchedule"
-                  :group="dragGroup"
-                  :animation="150"
-                  :disabled="dragDisabled"
-                  handle=".demo-mock-card-body"
-                  ghost-class="is-drag-ghost"
-                  chosen-class="is-drag-chosen"
-                  :scroll="true"
-                  :scroll-sensitivity="300"
-                  :scroll-speed="40"
-                  :bubble-scroll="true"
-                  class="demo-draggable-list"
-                  @start="onDraggableStart"
-                  @end="onDraggableEnd"
-                >
-                  <div
-                    v-for="c in dayMap[d.commonDate].classSchedule"
-                    :key="c.id"
-                    class="demo-class-sort-item"
-                  >
+              <div v-if="dayMap[d.commonDate]" class="demo-partitions">
+                <!-- A. 健康数据：固定第一，不可拖/不可拖入 -->
+                <div class="demo-partition">
+                  <div v-if="showPartitionHint" class="demo-partition-title">健康</div>
+                  <div class="demo-fixed-list">
                     <div
-                      class="demo-mock-class-card classScheduleCard"
-                      @click.stop
+                      v-for="h in dayMap[d.commonDate].healthInfos"
+                      :key="h.id"
+                      class="demo-mock-health-card"
                     >
-                      <div class="card-body class-drap-handle demo-mock-card-body">
-                        {{ c.title }}
+                      <div class="demo-mock-card-body">
+                        {{ h.title }}
                       </div>
                     </div>
                   </div>
-                </draggable>
+                </div>
+
+                <!-- B. 赛事：自身固定不可拖；可接收运动（仅当天允许） -->
+                <div class="demo-partition">
+                  <div v-if="showPartitionHint" class="demo-partition-title">赛事（可接收运动）</div>
+                  <div
+                    v-for="ev in dayMap[d.commonDate].competitionList"
+                    :key="ev.id"
+                    class="demo-event-block"
+                  >
+                    <div class="demo-mock-event-card">
+                      <div class="demo-mock-card-body">{{ ev.title }}</div>
+                    </div>
+                    <draggable
+                      :list="ev.boundActivities"
+                      :group="eventDropGroup"
+                      :sort="false"
+                      :animation="150"
+                      :disabled="dragDisabled"
+                      ghost-class="is-drag-ghost"
+                      chosen-class="is-drag-chosen"
+                      class="demo-drop-zone"
+                      :move="(evt) => canMoveToEvent(evt, d.commonDate)"
+                      @add="(evt) => onEventAdd(evt, ev, d.commonDate)"
+                      @start="onDraggableStart"
+                      @end="onDraggableEnd"
+                    >
+                      <div
+                        v-for="a in ev.boundActivities"
+                        :key="a.id"
+                        class="demo-mock-activity-chip"
+                        :data-dnd-type="'activity'"
+                      >
+                        {{ a.title }}
+                      </div>
+                      <div v-if="!ev.boundActivities.length" class="demo-drop-zone-empty">
+                        拖入运动绑定到赛事
+                      </div>
+                    </draggable>
+                  </div>
+                </div>
+
+                <!-- C. 课表：可排序/可跨日拖拽；可接收运动（仅当天允许） -->
+                <div class="demo-partition">
+                  <div v-if="showPartitionHint" class="demo-partition-title">课表（可排序/可接收运动）</div>
+                  <div
+                    class="schedule-table-cell-item js-schedule-drag-container js-class-drag-container"
+                    :data-date="d.commonDate"
+                  >
+                    <draggable
+                      :list="dayMap[d.commonDate].classSchedule"
+                      :group="classGroup"
+                      :animation="150"
+                      :disabled="dragDisabled"
+                      handle=".demo-mock-card-body"
+                      ghost-class="is-drag-ghost"
+                      chosen-class="is-drag-chosen"
+                      :scroll="true"
+                      :scroll-sensitivity="300"
+                      :scroll-speed="40"
+                      :bubble-scroll="true"
+                      class="demo-draggable-list"
+                      :move="(evt) => canMoveToClass(evt, d.commonDate)"
+                      @add="(evt) => onClassAdd(evt, d.commonDate)"
+                      @start="onDraggableStart"
+                      @end="onDraggableEnd"
+                    >
+                      <div
+                        v-for="c in dayMap[d.commonDate].classSchedule"
+                        :key="c.id"
+                        class="demo-class-sort-item"
+                        :data-dnd-type="c._dndType"
+                      >
+                        <div
+                          class="demo-mock-class-card classScheduleCard"
+                          :class="{ 'is-from-activity': c._dndType === 'activity' }"
+                          @click.stop
+                        >
+                          <div class="card-body class-drap-handle demo-mock-card-body">
+                            {{ c.title }}
+                          </div>
+                        </div>
+                      </div>
+                      <div v-if="!dayMap[d.commonDate].classSchedule.length" class="demo-drop-zone-empty">
+                        （空）可拖入课表/运动
+                      </div>
+                    </draggable>
+                  </div>
+                </div>
+
+                <!-- D. 运动：不参与排序；仅当天可拖动；可拖到课表/赛事 -->
+                <div class="demo-partition">
+                  <div v-if="showPartitionHint" class="demo-partition-title">运动（仅当天可拖）</div>
+                  <draggable
+                    :list="dayMap[d.commonDate].activityList"
+                    :group="activityGroupForDate(d.commonDate)"
+                    :sort="false"
+                    :animation="150"
+                    :disabled="dragDisabled"
+                    :draggable="'.demo-mock-activity-card'"
+                    :options="activitySortableOptions"
+                    ghost-class="is-drag-ghost"
+                    chosen-class="is-drag-chosen"
+                    class="demo-activity-source"
+                    :move="(evt) => canMoveActivitySource(evt, d.commonDate)"
+                    @start="onDraggableStart"
+                    @end="onDraggableEnd"
+                  >
+                    <div
+                      v-for="a in dayMap[d.commonDate].activityList"
+                      :key="a.id"
+                      class="demo-mock-activity-card"
+                      :data-dnd-type="'activity'"
+                    >
+                      <div class="demo-mock-card-body">
+                        {{ a.title }}
+                      </div>
+                    </div>
+                    <div v-if="!dayMap[d.commonDate].activityList.length" class="demo-muted-empty">
+                      （无运动）
+                    </div>
+                  </draggable>
+                </div>
               </div>
             </div>
           </div>
@@ -171,6 +278,7 @@ const WEEKDAY_LABELS = ["周日", "周一", "周二", "周三", "周四", "周�
 
 function mockFetchRange(beginDate, endDate, requestSeq, athleteId) {
   const out = []
+  const today = formatYMD(new Date())
   let cur = beginDate
   while (cur <= endDate) {
     const dt = parseYMD(cur)
@@ -182,6 +290,31 @@ function mockFetchRange(beginDate, endDate, requestSeq, athleteId) {
       classSchedule.push({
         id: `${cur}-${i}-${athleteId}`,
         title: `[${String(athleteId).toUpperCase()}] 课表 ${i + 1} · 请求#${requestSeq}`,
+        _dndType: "class",
+      })
+    }
+    const healthInfos = [
+      {
+        id: `h-${cur}-${athleteId}`,
+        title: "健康数据（固定，不可拖）",
+      },
+    ]
+    const competitionList = [
+      {
+        id: `ev-${cur}-${athleteId}`,
+        title: "赛事（固定，可接收运动）",
+        boundActivities: [],
+      },
+    ]
+    const activityList = []
+    let an = (Number(seed) % 2) + (requestSeq % 2)
+    // 便于联调：确保“当天”至少有 1 条运动，避免看起来“无法拖拽”
+    if (cur === today) an = Math.max(1, an)
+    for (let i = 0; i < an; i++) {
+      activityList.push({
+        id: `a-${cur}-${i}-${athleteId}`,
+        title: `[${String(athleteId).toUpperCase()}] 运动 ${i + 1}`,
+        _dndType: "activity",
       })
     }
     out.push({
@@ -189,7 +322,10 @@ function mockFetchRange(beginDate, endDate, requestSeq, athleteId) {
       commonDate: cur,
       weekday: wd,
       dayNum: dt.getDate(),
+      healthInfos,
+      competitionList,
       classSchedule,
+      activityList,
     })
     cur = addDays(cur, 1)
   }
@@ -201,9 +337,29 @@ function mockFetchRange(beginDate, endDate, requestSeq, athleteId) {
 function mergeDayMap(prevMap, list) {
   const map = { ...prevMap }
   list.forEach((row) => {
+    const prev = map[row.commonDate]
     map[row.commonDate] = {
       ...row,
+      healthInfos: Array.isArray(row.healthInfos) ? row.healthInfos : [],
+      competitionList: Array.isArray(row.competitionList) ? row.competitionList : [],
       classSchedule: Array.isArray(row.classSchedule) ? row.classSchedule : [],
+      activityList: Array.isArray(row.activityList) ? row.activityList : [],
+    }
+    // 保留已有绑定（避免滚动加载/合并覆盖拖入后的状态）
+    if (prev && Array.isArray(prev.competitionList) && Array.isArray(map[row.commonDate].competitionList)) {
+      const byId = new Map(prev.competitionList.map((e) => [e.id, e]))
+      map[row.commonDate].competitionList = map[row.commonDate].competitionList.map((e) => {
+        const old = byId.get(e.id)
+        if (old && Array.isArray(old.boundActivities)) {
+          return { ...e, boundActivities: old.boundActivities }
+        }
+        return { ...e, boundActivities: Array.isArray(e.boundActivities) ? e.boundActivities : [] }
+      })
+    } else {
+      map[row.commonDate].competitionList = map[row.commonDate].competitionList.map((e) => ({
+        ...e,
+        boundActivities: Array.isArray(e.boundActivities) ? e.boundActivities : [],
+      }))
     }
   })
   return map
@@ -241,11 +397,26 @@ export default {
       dragPointerAttached: false,
       lastDragEdgePrefetchAt: 0,
       dragScrollPrefetchTimer: null,
+      showPartitionHint: true,
     }
   },
   computed: {
-    dragGroup() {
-      return { name: "classDrag", pull: true, put: true }
+    today() {
+      return formatYMD(new Date())
+    },
+    classGroup() {
+      return { name: "class", pull: true, put: ["class", "activity"] }
+    },
+    eventDropGroup() {
+      return { name: "eventDrop", pull: false, put: ["activity"] }
+    },
+    activitySortableOptions() {
+      // 某些浏览器/环境下原生拖拽启动不稳定，这里强制 fallback 提升可用性
+      return {
+        forceFallback: true,
+        fallbackOnBody: true,
+        fallbackTolerance: 3,
+      }
     },
     dragDisabled() {
       return this.loadingInitial || this.loadingMore || this.loadingPrev
@@ -331,6 +502,84 @@ export default {
     }
   },
   methods: {
+    isTodayDate(ds) {
+      return ds === this.today
+    },
+    activityGroupForDate(ds) {
+      // 仅当天允许拖出运动；非当天保持展示但不可拖动
+      return { name: "activity", pull: this.isTodayDate(ds), put: false }
+    },
+    getDndTypeFromEvent(evt) {
+      try {
+        // vuedraggable(move) 里更可靠的是 draggedContext.element
+        if (evt && evt.draggedContext && evt.draggedContext.element) {
+          const el = evt.draggedContext.element
+          if (el && el._dndType) return el._dndType
+        }
+        // 兜底：某些场景下能拿到 DOM
+        const dom = evt && evt.dragged && evt.dragged
+        if (dom && dom.dataset && dom.dataset.dndType) return dom.dataset.dndType
+      } catch (e) {
+        // 忽略：拖拽事件结构不符合预期时，按“不允许”处理
+      }
+      return ""
+    },
+    canMoveActivitySource(evt, sourceDate) {
+      // 运动列表本身只包含运动元素，这里只做“是否当天”校验，避免 move 误判导致无法开始拖拽
+      return this.isTodayDate(sourceDate)
+    },
+    canMoveToEvent(evt, targetDate) {
+      const type = this.getDndTypeFromEvent(evt)
+      if (type !== "activity") return false
+      return this.isTodayDate(targetDate)
+    },
+    onEventAdd(evt, ev, targetDate) {
+      if (!this.isTodayDate(targetDate)) {
+        this.$message && this.$message.warning("仅当天允许将运动拖入赛事")
+        if (evt && evt.added && evt.added.element) {
+          const el = evt.added.element
+          ev.boundActivities = ev.boundActivities.filter((x) => x !== el)
+          const dm = this.dayMap[this.today]
+          if (dm && Array.isArray(dm.activityList)) dm.activityList.push(el)
+        }
+        return
+      }
+      if (evt && evt.added && evt.added.element) {
+        const el = evt.added.element
+        el._dndType = "activity"
+      }
+    },
+    canMoveToClass(evt, targetDate) {
+      const type = this.getDndTypeFromEvent(evt)
+      if (type === "class") return true
+      if (type === "activity") return this.isTodayDate(targetDate)
+      return false
+    },
+    onClassAdd(evt, targetDate) {
+      console.log("[ScheduleScrollDemo] onClassAdd", evt, targetDate)
+      const isToday = this.isTodayDate(targetDate)
+      const type = this.getDndTypeFromEvent(evt)
+      if (type === "activity" && !isToday) {
+        this.$message && this.$message.warning("仅当天允许将运动拖入课表")
+        if (evt && evt.added && evt.added.element) {
+          const el = evt.added.element
+          const dm = this.dayMap[targetDate]
+          if (dm) dm.classSchedule = dm.classSchedule.filter((x) => x !== el)
+          const todayMap = this.dayMap[this.today]
+          if (todayMap && Array.isArray(todayMap.activityList)) todayMap.activityList.push(el)
+        }
+        return
+      }
+      if (evt && evt.added && evt.added.element) {
+        const el = evt.added.element
+        if (type === "activity") {
+          el._dndType = "activity"
+          el.title = `${el.title}（已拖入课表）`
+        } else {
+          el._dndType = "class"
+        }
+      }
+    },
     clearDragPrefetch() {
       document.removeEventListener("pointermove", this.handleDragPointerMove)
       if (this.dragScrollPrefetchTimer) {
@@ -341,6 +590,9 @@ export default {
       this.isDragging = false
     },
     onDraggableStart() {
+      // 便于排查“拖不起来”：如果这里没触发，说明 Sortable 根本没开始拖拽
+      // eslint-disable-next-line no-console
+      console.log("[ScheduleScrollDemo] drag start")
       if (this.dragPointerAttached) return
       this.dragPointerAttached = true
       this.isDragging = true
@@ -362,7 +614,8 @@ export default {
         }
       }, 200)
     },
-    onDraggableEnd() {
+    onDraggableEnd(e) {
+      console.log("[ScheduleScrollDemo] drag end", e)
       this.clearDragPrefetch()
     },
     handleDragPointerMove(e) {
@@ -469,7 +722,10 @@ export default {
         dataDate: r.dataDate,
         dayNum: r.dayNum,
         weekday: r.weekday,
+        healthInfos: r.healthInfos || [],
+        competitionList: r.competitionList || [],
         classSchedule: r.classSchedule || [],
+        activityList: r.activityList || [],
       }))
       this.dayMap = mergeDayMap(this.dayMap, mapped)
     },
@@ -791,6 +1047,94 @@ export default {
   min-height: 72px;
 }
 
+.demo-partitions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.demo-partition-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #909399;
+  margin-bottom: 6px;
+}
+
+.demo-fixed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.demo-mock-health-card {
+  background: #f4f4f5;
+  border-radius: 6px;
+  border: 1px dashed #e4e7ed;
+  color: #606266;
+  font-size: 11px;
+}
+
+.demo-event-block {
+  margin-bottom: 8px;
+}
+
+.demo-mock-event-card {
+  background: #fdf6ec;
+  border-radius: 6px;
+  border: 1px solid #faecd8;
+  color: #e6a23c;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.demo-drop-zone {
+  min-height: 36px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px dashed rgba(230, 162, 60, 0.45);
+  background: rgba(253, 246, 236, 0.4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.demo-drop-zone-empty {
+  font-size: 11px;
+  color: #c0c4cc;
+}
+
+.demo-mock-activity-chip {
+  font-size: 11px;
+  background: rgba(64, 158, 255, 0.12);
+  border: 1px solid rgba(64, 158, 255, 0.25);
+  color: #409eff;
+  border-radius: 999px;
+  padding: 2px 8px;
+  user-select: none;
+}
+
+.demo-activity-source {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 40px;
+}
+
+.demo-mock-activity-card {
+  font-size: 11px;
+  color: #606266;
+  background: rgba(64, 158, 255, 0.1);
+  border-radius: 6px;
+  border: 1px dashed rgba(64, 158, 255, 0.35);
+}
+
+.demo-muted-empty {
+  font-size: 11px;
+  color: #c0c4cc;
+  padding: 4px 2px;
+}
+
 ::v-deep .js-class-drag-container {
   transition: background-color 0.2s ease, box-shadow 0.2s ease;
   min-height: 40px;
@@ -811,6 +1155,10 @@ export default {
   background: #ecf5ff;
   border-radius: 6px;
   overflow: hidden;
+}
+
+.demo-mock-class-card.is-from-activity {
+  background: rgba(103, 194, 58, 0.12);
 }
 
 .demo-mock-card-body {
