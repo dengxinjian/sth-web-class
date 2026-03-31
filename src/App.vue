@@ -2,6 +2,27 @@
   <div id="app">
     <router-view v-if="isRouterAlive" />
     <GlobalVipHost />
+
+    <el-dialog
+      :visible="maintenance.visible"
+      width="420px"
+      top="20vh"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :lock-scroll="true"
+      custom-class="system-maintenance-dialog"
+      @close="noop"
+    >
+      <div class="system-maintenance-body">
+        <i class="el-icon-loading system-maintenance-icon" />
+        <div class="system-maintenance-title">系统升级中</div>
+        <div class="system-maintenance-desc">
+          {{ maintenance.message || "系统升级中，请稍后再试" }}
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -18,6 +39,13 @@ export default {
       isRouterAlive: true,
     };
   },
+  computed: {
+    maintenance() {
+      return this.$store.getters.maintenance || { visible: false, message: "" };
+    },
+  },
+  created() {
+  },
   methods: {
     reload() {
       this.isRouterAlive = false;
@@ -25,6 +53,7 @@ export default {
         this.isRouterAlive = true;
       });
     },
+    noop() {},
   },
 };
 </script>
@@ -85,5 +114,40 @@ export default {
   top: 0;
   left: 0;
   z-index: 10000;
+}
+
+.system-maintenance-dialog {
+  .el-dialog__header {
+    padding-bottom: 0;
+  }
+  .el-dialog__body {
+    padding: 18px 25px 22px;
+  }
+}
+
+.system-maintenance-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.system-maintenance-icon {
+  font-size: 28px;
+  color: #f92b30;
+  margin-bottom: 10px;
+}
+.system-maintenance-title {
+  font-family: PingFang SC;
+  font-weight: 600;
+  font-size: 16px;
+  color: #111;
+  margin-bottom: 6px;
+}
+.system-maintenance-desc {
+  font-family: PingFang SC;
+  font-weight: 400;
+  font-size: 13px;
+  color: #666;
+  line-height: 20px;
 }
 </style>

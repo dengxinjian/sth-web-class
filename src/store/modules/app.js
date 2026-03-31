@@ -11,6 +11,10 @@ const state = {
   device: "desktop",
   language: getLanguage(),
   size: Cookies.get("size") || "medium",
+  maintenance: {
+    visible: false,
+    message: "系统升级中，请稍后再试",
+  },
 };
 
 const mutations = {
@@ -39,6 +43,15 @@ const mutations = {
     state.size = size;
     Cookies.set("size", size);
   },
+  SET_MAINTENANCE: (state, payload = {}) => {
+    const { visible, message } = payload || {};
+    if (typeof visible === "boolean") {
+      state.maintenance.visible = visible;
+    }
+    if (typeof message === "string" && message.trim()) {
+      state.maintenance.message = message;
+    }
+  },
 };
 
 const actions = {
@@ -56,6 +69,9 @@ const actions = {
   },
   setSize({ commit }, size) {
     commit("SET_SIZE", size);
+  },
+  setMaintenance({ commit }, payload) {
+    commit("SET_MAINTENANCE", payload);
   },
 };
 
