@@ -233,21 +233,21 @@ export const asyncRoutes = [
   //     },
   //   ],
   // },
-  {
-    path: "/updatePassword",
-    component: Layout,
-    redirect: "/updatePassword/index",
-    meta: { title: "修改密码" },
-    hidden: true,
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/updatePassword/index"),
-        hidden: true,
-        meta: { title: "修改密码" },
-      },
-    ],
-  },
+  // {
+  //   path: "/updatePassword",
+  //   component: Layout,
+  //   redirect: "/updatePassword/index",
+  //   meta: { title: "修改密码" },
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: "index",
+  //       component: () => import("@/views/updatePassword/index"),
+  //       hidden: true,
+  //       meta: { title: "修改密码" },
+  //     },
+  //   ],
+  // },
 
   // 404 page must be placed at the end !!!
   { path: "*", redirect: "/404", hidden: true },
