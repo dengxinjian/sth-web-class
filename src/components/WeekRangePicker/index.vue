@@ -4,7 +4,7 @@
     <div class="picker-trigger">
       <div class="trigger-left" @click="toggleCalendar">
         <span class="date-display"
-          >{{ selectedYear }}年{{ selectedMonth }}月</span
+          >{{ pickerBarYear }}年{{ pickerBarMonth }}月</span
         >
         <i class="el-icon-caret-top" v-if="showCalendar"></i>
         <i class="el-icon-caret-bottom" v-else></i>
@@ -313,6 +313,24 @@ export default {
 
       return dates;
     },
+    /**
+     * 顶部条展示月：跨月周用周四所在月（与父页日程、computeCurrentMonthFromWeek 一致）。
+     * 弹窗内仍用 selectedYear/Month 作为「日历翻页」上下文，避免与浏览月份冲突。
+     */
+    pickerBarYear() {
+      if (!this.monthWeeks.length) return this.selectedYear;
+      const week = this.monthWeeks[this.selectedWeekIndex];
+      if (!week) return this.selectedYear;
+      const thursday = this.addDays(this.parseDate(week.monday), 3);
+      return thursday.getFullYear();
+    },
+    pickerBarMonth() {
+      if (!this.monthWeeks.length) return this.selectedMonth;
+      const week = this.monthWeeks[this.selectedWeekIndex];
+      if (!week) return this.selectedMonth;
+      const thursday = this.addDays(this.parseDate(week.monday), 3);
+      return thursday.getMonth() + 1;
+    },
   },
   watch: {
     selectedYear() {
@@ -396,7 +414,6 @@ export default {
 
     // 根据日期选择对应的周
     selectWeekByDate(date) {
-      const dateStr = this.formatDate(date);
       const weekIndex = this.findWeekIndexContainingDate(date);
 
       if (weekIndex >= 0) {
@@ -500,7 +517,6 @@ export default {
 
     // 处理日历中月份选择变化
     handleMonthChangeInCalendar(event) {
-      console.log("handleMonthChangeInCalendar", event);
       this.selectedMonth = parseInt(event, 10);
       this.recomputeWeeks(() => {
         // 切换月份后，选择该月的第一周
@@ -567,7 +583,7 @@ export default {
       const targetYear = thisMonday.getFullYear();
       const targetMonth = thisMonday.getMonth() + 1;
 
-      // 直接定位到「周一所在的年月」，避免需要點兩次
+      // 直接定位到「周一所在的年月」；顶部展示月由 pickerBarYear/Month（周四）统一
       this.setYearMonth(targetYear, targetMonth, () => {
         let idx = this.findWeekIndexContainingDate(thisMonday);
         if (idx < 0) {

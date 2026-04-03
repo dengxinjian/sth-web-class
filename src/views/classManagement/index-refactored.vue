@@ -211,16 +211,15 @@
             element-loading-text="加载中…"
             element-loading-background="rgba(255,255,255,0.55)"
             @scroll.passive="onScheduleScroll"
-            @wheel.passive="onScheduleWheelAtTop"
-          >
-            <div ref="scheduleSentinelTop" class="schedule-sentinel schedule-sentinel--top" />
+            @wheel.passive="onScheduleWheelAtTop">
+            <div ref="scheduleSentinelTop"
+              class="schedule-sentinel schedule-sentinel--top" />
 
             <!-- 向上加载时视口在列表顶部，提示若放在文档底部会看不到；置顶 + sticky 始终在可视区 -->
             <div
               v-if="scheduleLoadingPrev"
               class="schedule-scroll-loading-prev"
-              role="status"
-            >
+              role="status">
               向上加载 2 周…
             </div>
 
@@ -231,16 +230,13 @@
             -->
             <div
               class="right-stat-floating-handle-row"
-              :class="{ 'is-collapsed': rightPanelCollapsed }"
-            >
+              :class="{ 'is-collapsed': rightPanelCollapsed }">
               <div
                 class="panel-collapse-handle panel-collapse-handle--right"
                 :title="rightPanelCollapsed ? '展开统计栏' : '收起统计栏'"
-                @click="toggleRightPanel"
-              >
+                @click="toggleRightPanel">
                 <i
-                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"
-                ></i>
+                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
               </div>
             </div>
 
@@ -250,10 +246,10 @@
               class="schedule-main-row schedule-main-row--week"
               :data-week-monday="week.monday"
               :style="getScheduleWeekRowStyle(week.monday)"
-              ref="scheduleWeekRows"
-            >
+              ref="scheduleWeekRows">
               <!-- 日程表（每周一块，纵向堆叠） -->
-              <div class="schedule-calendar-week" ref="scheduleWeekCalendars">
+              <div class="schedule-calendar-week"
+                ref="scheduleWeekCalendars">
                 <ScheduleCalendar :current-week="week.days"
                   :team-list="teamList" :athletic-list="athleticList"
                   :selected-team="selectedTeam"
@@ -295,10 +291,13 @@
               </div>
             </div>
 
-            <div ref="scheduleSentinelBottom" class="schedule-sentinel schedule-sentinel--bottom" />
+            <div ref="scheduleSentinelBottom"
+              class="schedule-sentinel schedule-sentinel--bottom" />
 
-            <div v-if="scheduleLoadingInitial" class="schedule-scroll-footer">首屏加载中…</div>
-            <div v-else-if="scheduleLoadingMore" class="schedule-scroll-footer">向下加载 2 周…</div>
+            <div v-if="scheduleLoadingInitial"
+              class="schedule-scroll-footer">首屏加载中…</div>
+            <div v-else-if="scheduleLoadingMore"
+              class="schedule-scroll-footer">向下加载 2 周…</div>
           </div>
         </div>
       </div>
@@ -739,7 +738,6 @@ export default {
   computed: {
     athleticGroupOptions() {
       const list = Array.isArray(this.athleticList) ? this.athleticList : []
-      console.log(list, "list")
       const groups = new Map()
 
       list.forEach((m) => {
@@ -826,7 +824,6 @@ export default {
         (item) => item.triUserId === this.selectedAthletic
       )
       if (athletic && athletic.userAvatar && athletic.userAvatar.includes('wxfile')) {
-        console.log('=====获取运动员头像', athletic.userAvatar)
         return 'https://web-home.tos-cn-beijing.volces.com/avatar.png'
       }
       return athletic && athletic.userAvatar ? athletic.userAvatar : 'https://web-home.tos-cn-beijing.volces.com/avatar.png'
@@ -898,9 +895,6 @@ export default {
     // 只有从 /plan/add 跳转到本页，且 URL 带 teamId 时，才用路由参数更新 selectedTeam
     $route: {
       handler(to, from) {
-        // this.initMenuFromRoute();
-        console.log(to, "to")
-        console.log(from, "from")
         const fromPath = this.$store && this.$store.state && this.$store.state.fromPath
         const shouldUseRouteTeamId = fromPath === "/plan/add"
         const routeTeamId = shouldUseRouteTeamId && to && to.query && to.query.teamId
@@ -925,8 +919,6 @@ export default {
     })
     // 根据路由初始化菜单状态
     this.activeName = localStorage.getItem("activeName") || "class"
-    console.log(this.activeName, "this.activeName")
-    // this.initMenuFromRoute();
     if (localStorage.getItem("loginType") !== "1") {
       this.getAllTeamsAndClubs()
       this.getDefaultTeam()
@@ -937,7 +929,6 @@ export default {
       this.getAuthorizedDeviceList()
     }
     this.getClassList()
-    console.log(this.$store.state.fromPath, "this.$store.state.fromPath")
     if (this.$store.state.fromPath === "/plan/add") {
       this.isPlan = true
     }
@@ -1311,6 +1302,17 @@ export default {
       const dd = String(d.getDate()).padStart(2, "0")
       return `${y}-${m}-${dd}`
     },
+    /**
+     * 顶部「YYYY年MM月」：跨月周若用周一日期会整周多在次月仍显示上月。
+     * 用周四（index 3）所在月作为展示月，与常见周视图一致。
+     */
+    computeCurrentMonthFromWeek(currentWeek) {
+      if (!currentWeek || !currentWeek.length) return ""
+      const idx = Math.min(3, currentWeek.length - 1)
+      const dayStr = currentWeek[idx].commonDate
+      const date = new Date(String(dayStr).replace(/-/g, "/"))
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+    },
     addDays(dateStr, n) {
       const d = new Date(String(dateStr).replace(/-/g, "/"))
       d.setDate(d.getDate() + n)
@@ -1515,7 +1517,7 @@ export default {
           }))
           .filter((i) => !i.bindingManualActivityId && !i.bindCompetitionId)
 
-        ;(part.manualDeviceActivityVoList || []).forEach((i) => {
+          ; (part.manualDeviceActivityVoList || []).forEach((i) => {
           if (!i.activityId && !i.bindCompetitionId) {
             activityList.push({
               ...i,
@@ -1736,8 +1738,6 @@ export default {
       return null
     },
     handleAthleticInfoClick() {
-      console.log(this.selectedAthletic, "this.selectedAthletic")
-      console.log(this.athleticInfoData, "this.athleticInfoData")
       if (this.selectedAthletic) {
         this.showAthleticInfoDialog = true
         return
@@ -1779,7 +1779,6 @@ export default {
      * 删除该日期所有课表
      */
     handleDeleteAllSchedules(date) {
-      console.log("handleDeleteAllSchedules-1", date)
       scheduleApi.deleteAllSchedules({
         day: date,
         triUserId: this.selectedAthletic,
@@ -1789,8 +1788,7 @@ export default {
           this.getScheduleData()
         }
       })
-        .catch((err) => {
-          console.log(err, "err")
+        .catch(() => {
           this.$message.error("课表删除失败")
         })
     },
@@ -1798,14 +1796,11 @@ export default {
      * 处理身份切换事件
      */
     handleIdentityChanged(loginType) {
-      console.log("监听到身份切换事件")
       this.loginType = loginType
       // 身份切换后重新查询精英版订阅状态
       this.$store.dispatch("user/checkEliteSubscription")
       this.activeName = "class"
       localStorage.setItem("activeName", "class")
-      console.log(this.activeName, "this.activeName")
-      // this.initMenuFromRoute();
       if (localStorage.getItem("loginType") !== "1") {
         this.getAllTeamsAndClubs()
       } else {
@@ -1815,14 +1810,12 @@ export default {
         this.getAuthorizedDeviceList()
       }
       this.getClassList()
-      console.log(this.$store.state.fromPath, "this.$store.state.fromPath")
       if (this.$store.state.fromPath === "/plan/add") {
         this.isPlan = true
       }
     },
 
     handleChoosePlan(isPlan) {
-      console.log("handleChoosePlan")
       this.isPlan = isPlan
     },
     handleResetClassDetail() {
@@ -1858,7 +1851,6 @@ export default {
             identityType: this.loginType === "1" ? "R" : "C", // R 运动员/C 教练
           })
           .then((res) => {
-            console.log("******创建课表", res)
             if (res.success) {
               this.classDetailData = res.result
               this.scheduleType = "edit"
@@ -1871,8 +1863,6 @@ export default {
       this.getScheduleData()
     },
     async handleCutClass(classesDate, classItem) {
-      console.log(classesDate, "classesDate")
-      console.log(classItem, "classItem")
       await this.handlePasteClass(classesDate, classItem)
       this.handleDeleteClassSchedule(classItem, true)
     },
@@ -1880,7 +1870,6 @@ export default {
      * 粘贴赛事
      */
     async handlePasteEvent(date, eventItem) {
-      console.log(date, eventItem, "handlePasteEvent date, eventItem")
       if (!eventItem) {
         this.$message.error("赛事数据无效")
         return
@@ -1931,7 +1920,6 @@ export default {
      * 剪切赛事（粘贴后删除原位置）
      */
     async handleCutEvent(date, eventItem, cutEventInfo) {
-      console.log(date, eventItem, cutEventInfo, "handleCutEvent")
       // 先粘贴
       await this.handlePasteEvent(date, eventItem)
       // 然后删除原位置的赛事
@@ -1947,7 +1935,6 @@ export default {
       }
     },
     handleInputActivitySave(data) {
-      console.log(data, "data")
       data.triUserId = this.selectedAthletic
       scheduleApi.createActivity(data).then((res) => {
         if (res.success) {
@@ -1971,7 +1958,6 @@ export default {
           "当前为教练模式，请先选择运动员，或切换运动员身份，方可为当前日程视图添加课表/录入运动/添加赛事"
         )
       }
-      console.log(date, "date")
       this.inputActivityDate = date
       this.showInputActivity = true
     },
@@ -1979,7 +1965,6 @@ export default {
      * 赛事确认
      */
     handleEventConfirm(data) {
-      console.log("赛事数据:", data)
       if (!this.isEditMode) {
         data.competitionTime = this.addScheduleDate
 
@@ -1995,8 +1980,6 @@ export default {
             this.$message.error(message)
           })
       } else {
-        console.log(data, "data")
-        console.log(this.selectedAthletic, "this.selectedAthletic")
         competitionApi
           .updateCompetition(data, this.selectedAthletic)
           .then((res) => {
@@ -2011,7 +1994,6 @@ export default {
       // 如果需要刷新日程数据，可以调用 this.getScheduleData();
     },
     handleEventDetail(eventItem) {
-      console.log(eventItem, "eventItem")
       this.$confirm("确认删除该赛事？", "提示", {
         confirmButtonText: "删除",
         cancelButtonText: "取消",
@@ -2027,8 +2009,6 @@ export default {
       })
     },
     handleEditEvent(eventItem, type) {
-      console.log(eventItem, "eventItem")
-
       // 获取今天的日期（只比较日期部分，不考虑时间）
       const today = new Date()
       today.setHours(0, 0, 0, 0)
@@ -2036,7 +2016,6 @@ export default {
       // 解析 eventItem.competitionDate（可能是 "YYYY-MM-DD" 格式或 Date 对象）
       let eventDate
       if (typeof eventItem.competitionDate === "string") {
-        console.log(eventItem.competitionDate, "eventItem.competitionDate")
         eventDate = new Date(eventItem.competitionDate)
       } else if (eventItem.competitionDate instanceof Date) {
         eventDate = new Date(eventItem.competitionDate)
@@ -2085,10 +2064,8 @@ export default {
       this.classModalData = { title: "" }
       this.isClass = false
       this.isSchedule = true
-      console.log(date, "date")
     },
     async handlePasteClass(date, classItem) {
-      console.log(date, classItem, "date, classItem")
       await this.getAthleticThreshold(this.selectedAthletic, date)
       const newData = JSON.parse(JSON.stringify(classItem))
       newData.classesJson = parseClassesJson(newData.classesJson)
@@ -2105,7 +2082,6 @@ export default {
           newData.classesJson
         ).updateClassInfoCalculatedValues()
       }
-      console.log(newData, "newData")
       // 计算时间距离STH
       if (["RUN", "CYCLE"].includes(newData.sportType)) {
         const res = await scheduleApi.calculateTimeDistanceSth({
@@ -2144,13 +2120,11 @@ export default {
       }
     },
     handleEditClassSchedule(classItem) {
-      console.log(classItem, "classItem")
       this.showEditScheduleClass = true
       this.classDetailData = classItem
       this.isActivity = false
     },
     handleEditActivity(activity) {
-      console.log(activity, "activity")
       this.showEditScheduleClass = true
       this.activityDetailData = activity
       this.isActivity = true
@@ -2165,17 +2139,6 @@ export default {
       return item ? item.displayName : ""
     },
 
-    /**
-     * 根据路由初始化菜单状态
-     */
-    // initMenuFromRoute() {
-    //   const path = this.$route.path;
-    //   if (path.includes("athletic")) {
-    //     this.activeName = "athletic";
-    //   } else if (path.includes("class") || path.includes("timeTable")) {
-    //     this.activeName = "class";
-    //   }
-    // },
     /**
      * 类型切换（运动员/课程）
      */
@@ -2203,16 +2166,13 @@ export default {
      * 课程类型切换（我的/官方）
      */
     handleClassTypeChange(type) {
-      console.log(type, "=======******type")
       this.activeClassType = type
       this.getClassList()
       if (type === "team") {
         const loginType = localStorage.getItem("loginType")
-        console.log(loginType, "=======******loginType")
         if (loginType === "2") {
           this.getAllTeamsTreeList(this.teamClassSearchKeyword)
         } else {
-          console.log("运动员登陆时")
           this.getMyTeamsTreeList()
         }
         this.refreshTeamTree()
@@ -2256,7 +2216,6 @@ export default {
             )
             : []
         }
-        console.log("=======******this.teamTreeList", this.teamTreeList)
       } else {
         this.teamTreeList = []
       }
@@ -2302,7 +2261,6 @@ export default {
       if (res.success) {
         _this.defaultTeamId = res.result.id
       }
-      console.log(_this.defaultTeamId, "defaultTeamId")
     },
 
     /**
@@ -2337,7 +2295,6 @@ export default {
             }))
             : [],
       }))
-      console.log(teams, "teams")
       const clubs = (data.allCoachClubList || []).map((item) => ({
         id: item.id,
         name: item.name,
@@ -2357,18 +2314,13 @@ export default {
       // - 其他情况（直接进入 /timeTable/class、刷新、从其他页面来），都忽略 teamId，用当前用户团队或第一项
       if (_this.teamOrClubList.length > 0) {
         const fromPath = _this.$store.state.fromPath
-        console.log(fromPath, "fromPath")
         const shouldUseRouteTeamId = fromPath === "/plan/add"
-        console.log(shouldUseRouteTeamId, "shouldUseRouteTeamId")
         const routeTeamId = shouldUseRouteTeamId && _this.$route.query.teamId
-        console.log(_this.$route.query.teamId, "_this.$route.query.teamId")
-        console.log(routeTeamId, "routeTeamId")
         const foundByRoute =
           routeTeamId &&
           _this.teamOrClubList.find(
             (item) => String(item.id) === String(routeTeamId)
           )
-        console.log(foundByRoute, "foundByRoute")
         if (foundByRoute) {
           _this.selectedTeam = foundByRoute.id
           _this.selectedOrgType = foundByRoute.type || "team"
@@ -2399,7 +2351,6 @@ export default {
         payload && typeof payload === "object" ? payload.type : "team"
       this.selectedTeam = id
       this.selectedOrgType = type
-      console.log(this.selectedTeam, this.selectedOrgType, "this.selectedTeam, this.selectedOrgType")
       this.currentWeek.forEach(item => {
         item.activityList = []
         item.classSchedule = []
@@ -2425,7 +2376,6 @@ export default {
      * - 再重置滚动预加载缓存并拉取首屏（避免沿用上一位运动员的 scheduleDayMap）
      */
     handleAthleticChange(athleticId) {
-      console.log(athleticId, "athleticId")
       this.selectedAthletic = athleticId
       this.athleticInfoData = this.athleticList.find(
         (item) => item.triUserId === athleticId
@@ -2447,7 +2397,6 @@ export default {
      * 获取运动员列表（团队用 teamList.members，俱乐部用 /consumer/api/club/member/list）
      */
     getAthleticList() {
-      console.log(this.selectedTeam, "this.selectedTeam")
       if (!this.selectedTeam) {
         this.athleticList = []
         this.selectedAthletic = null
@@ -2457,9 +2406,7 @@ export default {
       }
       if (this.selectedOrgType === "team") {
         const team = this.teamList.find((item) => item.id === this.selectedTeam)
-        console.log(team, "team")
         this.athleticList = team && team.members ? team.members : []
-        console.log(this.athleticList, "this.athleticList")
       } else {
         // 俱乐部：参考 ApplyCoach 的 getClubMemberList
         this.fetchClubMemberList(this.selectedTeam)
@@ -2553,7 +2500,6 @@ export default {
           ? classApi.getOfficialClasses
           : classApi.getClassesByUserId
 
-      console.log(apiMethod, "this.classSearchInput")
       const res = await apiMethod(this.classSearchInput)
       if (res.success) {
         this.classList = res.result.map((item) => ({
@@ -2577,8 +2523,6 @@ export default {
      * 获取日程数据
      */
     async getScheduleData() {
-      console.log(this.currentWeek, "this.currentWeek")
-      console.log(process.env.VUE_APP_VERSION, "process.env.VUE_APP_VERSION")
       if (!this.selectedAthletic) {
         return
       }
@@ -2666,11 +2610,9 @@ export default {
                     preciseDistance: i.distance,
                     movingTime: i.activityDuration,
                   })
-                  console.log(activityList, "activityList")
                 } else {
                   activityList.forEach((item, index) => {
                     if (item.manualActivityId === i.manualActivityId) {
-                      console.log(i)
                       activityList[index] = {
                         ...i,
                         activityName: item.activityName,
@@ -2686,12 +2628,10 @@ export default {
                         oldActivitySthValue: item.oldActivitySthValue,
                         movingTime: i.activityDuration,
                       }
-                      console.log(activityList[index], "activityList[index]")
                     }
                   })
                 }
               })
-              console.log(activityList, "activityList")
               // 处理课表
               classSchedule = (part.classScheduleVoList || [])
                 .map((i) => ({
@@ -2703,7 +2643,6 @@ export default {
                 )
 
               // 处理健康数据
-              console.log(part.healthInfos, "part.healthInfos")
               healthInfos =
                 part.healthInfos && part.healthInfos.length > 0
                   ? [part.healthInfos[0]]
@@ -2783,10 +2722,6 @@ export default {
                         : 0,
                     })
                   }
-                  console.log(
-                    deviceActivityBindView.run,
-                    "============deviceActivityBindView.run"
-                  )
                 })
                 i.deviceActivityBindView.swim.forEach((item) => {
                   if (!item.manualActivityId) {
@@ -2823,7 +2758,6 @@ export default {
                         ? item.deviceActivity.sthValue
                         : 0,
                     })
-                    console.log(item, "item==============")
                   }
                 })
                 i.deviceActivityBindView.otherT1.forEach((item) => {
@@ -2948,7 +2882,6 @@ export default {
                 }
               })
               competitionList = part.competitionList
-              console.log(competitionList, "============competitionList")
             }
           })
 
@@ -2964,7 +2897,6 @@ export default {
         // 直接赋值新数组，确保 Vue 响应式更新
         // 对于根级别的 data 属性，直接赋值即可触发响应式更新
         this.currentWeek = [...newCurrentWeek]
-        console.log(this.currentWeek, "this.currentWeek")
 
         // 滚动预加载：当周锚点变化时，重置并加载首屏 4 周
         if (this.currentWeek && this.currentWeek.length > 0) {
@@ -3051,7 +2983,6 @@ export default {
         this.$message.error("该课表已过期")
         return
       }
-      console.log(device, "device")
 
       // if (device.syncStatus === 1) {
       //   this.$message.info("该设备已同步成功");
@@ -3116,13 +3047,9 @@ export default {
         }
       })
 
-      // 计算当前月份
+      // 计算当前月份（跨月周用周四所在月，避免「3/30～4/5」仍显示 3 月）
       if (this.currentWeek.length > 0) {
-        const firstDay = this.currentWeek[0].commonDate
-        const date = new Date(firstDay)
-        this.currentMonth = `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, "0")}`
+        this.currentMonth = this.computeCurrentMonthFromWeek(this.currentWeek)
       }
 
       // 无人员：切周也要渲染当周 7 天空数据
@@ -3249,7 +3176,6 @@ export default {
      * 分享课程
      */
     handleShareClass(classId) {
-      console.log(classId, "classId===分享课程id")
       this.shareClassId = classId
       this.showShareClassModal = true
     },
@@ -3275,9 +3201,6 @@ export default {
 
     },
     async handleUpdateClass(classData, flag) {
-      console.log(classData, "classData")
-      console.log(this.classModalData, "this.classModalData")
-      console.log(flag, "flag")
       if (this.activeClassType === "team") {
         classData.id = this.classModalData.sourceClassId
         delete classData.classesGroupId
@@ -3321,7 +3244,7 @@ export default {
      */
     handleClassDetail(classId, sportType) {
       this.classModalData = this.findClassById(classId)
-      // console.log(this.classDetailData, "classDetailData");
+      //
       // this.showClassDetailModal = true;
       this.classModalDataType = "edit"
       // this.showAddClassModal = true;
@@ -3344,11 +3267,11 @@ export default {
       //   const found = day.classSchedule.find((c) => c.id === classId);
       //   if (found) foundClass = found;
       // });
-      // console.log(foundClass, "foundClass");
+      //
       // this.classDetailData = foundClass;
       // this.classSportType = sportType;
       // this.showClassDetailModal = true;
-      // console.log(classItem, "classItem")
+      //
       this.classSportType = sportType
       this.classDetailData = classItem
       this.$nextTick(() => {
@@ -3447,7 +3370,6 @@ export default {
       //   id: classScheduleId,
       //   sportType,
       // };
-      console.log(this.sportDetailData, "this.sportDetailData")
       this.activityDetailData = activity
       // this.showSportDetailModal = true;
       this.showEditScheduleClass = true
@@ -3458,7 +3380,6 @@ export default {
      * 查看健康数据
      */
     handleViewHealthData(healthData) {
-      console.log("healthData:", healthData)
       this.healthViewData = healthData
       this.healthViewDate =
         healthData.date || new Date().toISOString().split("T")[0]
@@ -3506,7 +3427,6 @@ export default {
         const activityId = activity.activityId
           ? activity.activityId
           : activity.manualActivityId
-        console.log(activity, activityId, type, "activityId, type")
         const res = await scheduleApi.deleteActivity(activityId, type)
         if (res.success) {
           this.$message.success("删除成功")
@@ -3543,12 +3463,9 @@ export default {
     findClassById(id) {
       let findClass = {}
       if (this.activeClassType === 'team') {
-        console.log(this.shareGroupList, "this.shareGroupList")
         this.shareGroupList.forEach((item) => {
-          console.log(item, "item")
           if (item.classesList) {
             item.classesList.forEach((part) => {
-              console.log(part, "part")
               if (part.id === +id) {
                 findClass = part
               }
@@ -3596,10 +3513,8 @@ export default {
      * 日历拖拽添加
      */
     handleScheduleDragAdd(e) {
-      console.log(e, "======================")
       const classId = e.item.firstChild.dataset.id || e.item.dataset.id
       const date = e.to.dataset.date
-      console.log(classId, date, "classId, date")
       if (!this.selectedAthletic) {
         return
       }
@@ -3647,9 +3562,7 @@ export default {
       // 删除原数据
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(e.item.firstChild.dataset.date)) {
-          console.log(item.classSchedule, "item.classSchedule===============")
           item.classSchedule.forEach((itemClass, oldIndex) => {
-            console.log(itemClass.id, classId, "itemClass.id, classId")
             if (itemClass.id === +classId) {
               newClassSchedule = itemClass
               item.classSchedule.splice(oldIndex, 1)
@@ -3662,13 +3575,11 @@ export default {
       let currentData = []
       this.currentWeek.forEach((item) => {
         if (item.commonDate.includes(date)) {
-          console.log(item.classSchedule, "item.classSchedule")
           currentData = JSON.parse(JSON.stringify(item.classSchedule))
           // 使用只包含课程的索引插入，避免健康数据和赛事影响排序
           currentData.splice(targetClassIndex, 0, newClassSchedule)
         }
       })
-      console.log(currentData, "currentData===============")
 
       // 生成排序数据
       currentData.forEach((item, index) => {
@@ -3726,7 +3637,6 @@ export default {
       let currentClass = {}
       let currentActivity = {}
       let activityDate = ""
-      console.log(data, "data")
 
       this.currentWeek.forEach((item) => {
         item.activityList.forEach((activity) => {
@@ -3744,8 +3654,6 @@ export default {
           }
         })
       })
-      console.log(currentActivity, "currentActivity")
-      console.log(currentClass, "currentClass")
 
       // 检查运动是否已经匹配过课表
       if (currentActivity.classScheduleId) {
@@ -3757,7 +3665,6 @@ export default {
       // 判断是否从课程模板中拖拽
       if (type === "classTemplate") {
         currentClass = this.findClassById(classId)
-        console.log(currentClass, "currentClass===================")
         if (
           currentClass.sportType ===
           ACTIVITY_TYPE_DICT[currentActivity.sportType]
@@ -3771,11 +3678,6 @@ export default {
             "classTemplate"
           )
         } else {
-          console.log(
-            currentClass.sportType,
-            currentActivity.sportType,
-            "currentClass.sportType, currentActivity.sportType"
-          )
           this.$message.error("该运动类型与课程类型不匹配")
           this.getScheduleData()
         }
@@ -3788,11 +3690,6 @@ export default {
             dataDate: activityDate,
           })
         } else {
-          console.log(
-            currentClass.sportType,
-            currentActivity.sportType,
-            "currentClass.sportType, currentActivity.sportType"
-          )
           this.$message.error("该运动类型与课程类型不匹配")
           this.getScheduleData()
         }
@@ -3809,14 +3706,6 @@ export default {
       manualActivityId,
       activityDate,
     }) {
-      console.log(
-        eventId,
-        eventDate,
-        activityId,
-        manualActivityId,
-        activityDate,
-        "eventId, eventDate, activityId, manualActivityId, activityDate"
-      )
       if (!eventId) {
         this.$message.error("赛事信息无效")
         return
@@ -3829,7 +3718,6 @@ export default {
       const eventData = this.currentWeek.find(
         (item) => item.commonDate === eventDate
       )
-      console.log(eventData, "eventData")
       if (!eventData) {
         this.$message.error("未找到对应的日期数据")
         this.getScheduleData()
@@ -3858,21 +3746,10 @@ export default {
         return
       }
 
-      console.log("eventId:", eventId, "type:", typeof eventId)
-      console.log("competitionList:", eventData.competitionList)
-      console.log(
-        "competitionList ids:",
-        eventData.competitionList.map((item) => ({
-          id: item.id,
-          type: typeof item.id,
-        }))
-      )
-
       // 使用类型转换，支持字符串和数字类型匹配
       const competition = eventData.competitionList.find(
         (item) => String(item.id) === String(eventId)
       )
-      console.log(competition, "competition")
       if (!competition) {
         this.$message.error(
           `未找到对应的赛事数据，eventId: ${eventId}，可用ID: ${eventData.competitionList
@@ -3889,7 +3766,6 @@ export default {
           (activityId && item.activityId === activityId) ||
           (manualActivityId && item.manualActivityId === manualActivityId)
       )
-      console.log(activity, "activity")
       if (!activity) {
         this.$message.error("未找到对应的运动数据")
         this.getScheduleData()
@@ -4076,7 +3952,6 @@ export default {
           (classItem.classesJson && classItem.classesJson.distanceUnit) || null,
         sportType: classItem.sportType,
       }
-      console.log(exerciseData, "exerciseData")
       this.bindCourseData = courseData
       this.bindExerciseData = [exerciseData]
       this.bindType = type
@@ -4088,10 +3963,8 @@ export default {
      */
     async AddScheduleClass(data, type = "", index = 0) {
       if (!this.selectedAthletic) return
-      console.log(this.athleticThreshold, "old athleticThreshold")
       const originalClassesJson = parseClassesJson(data.classesJson)
       await this.getAthleticThreshold(this.selectedAthletic, data.classesDate)
-      console.log(this.athleticThreshold, "new athleticThreshold")
 
       // 根据运动类型计算阈值
       let calculatedClassesJson = originalClassesJson
@@ -4190,7 +4063,6 @@ export default {
     },
 
     handleClassDragEndFromClassList(e) {
-      console.log(e, "handleClassDragEndFromClassList===================")
       if (
         e.originalEvent.srcElement.offsetParent &&
         e.originalEvent.srcElement.offsetParent.dataset &&
@@ -4244,10 +4116,8 @@ export default {
         this.$nextTick(() => {
           this.showClassDetailModal = true
         })
-        console.log(this.addScheduleDate, "this.addScheduleDate")
         return
       }
-      console.log(item, "item")
 
       this.classModalData.sportType = Map[item.key]
       this.showAddClassModal = true
@@ -4263,7 +4133,6 @@ export default {
      * 保存各类型课程
      */
     onSaveAddClass(saveData, flag) {
-      console.log(saveData, "saveData")
       if (this.classModalDataType === "add") {
         classApi.createClass(saveData).then((res) => {
           if (res.success) {
@@ -4277,8 +4146,6 @@ export default {
           }
         })
       } else if (this.classModalDataType === "edit") {
-        console.log(saveData, "saveData")
-        console.log(this.classModalData, "this.classModalData")
         classApi.updateClass(saveData).then((res) => {
           if (res.success) {
             this.$message.success("课程保存成功")
@@ -4289,13 +4156,6 @@ export default {
           }
         })
       } else if (this.classModalDataType === "addSchedule") {
-        console.log(
-          saveData,
-          flag,
-          this.classModalData,
-          this.addScheduleDate,
-          "saveData, flag, classModalData, addScheduleDate"
-        )
         if (flag) this.showAddClassModal = false
         this.handlePasteClass(this.addScheduleDate, saveData)
       }
@@ -4307,7 +4167,6 @@ export default {
 
     // 添加分享分组
     handleAddShareGroup(node) {
-      console.log(node, "node--添加分享分组---分享组节点信息")
       this.currentShareGroup = {
         id: "",
         groupName: "",
@@ -4443,7 +4302,6 @@ export default {
      * 绑定确认
      */
     async onBind(data) {
-      console.log("匹配数据：", data)
       if (data.type === "classTemplate") {
         const params = {
           classesId: data.courseData.id,
@@ -4600,7 +4458,6 @@ export default {
      * 保存课程详情
      */
     handleClassDetailSave(data, flag) {
-      console.log(flag, "flag")
       if (flag) {
         this.showClassDetailModal = false
         this.showEditScheduleClass = false
