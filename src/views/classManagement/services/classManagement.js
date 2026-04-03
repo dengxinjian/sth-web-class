@@ -79,10 +79,14 @@ export const classApi = {
  * 课表相关API
  */
 export const scheduleApi = {
-  // 获取日历概览
-  getCalendarOverview({ begin, end, triUserId }) {
+  /**
+   * 获取日程概览 + 周统计（新接口）
+   * - 参数与旧接口保持一致
+   * - 返回：{ calenderOverview: 日程数据, statistics: 周统计列表 }
+   */
+  getCalenderOverviewStat({ begin, end, triUserId }) {
     return getData({
-      url: "/gateway/training/activity/getCalenderOverview",
+      url: "/gateway/training/activity/getCalenderOverviewStat",
       begin,
       end,
       triUserId,
@@ -189,21 +193,6 @@ export const scheduleApi = {
     return submitData({
       url: "/training/api/manualDeviceActivity/create",
       requestData: data,
-    })
-  },
-}
-
-/**
- * 统计相关API
- */
-export const statisticsApi = {
-  // 获取周统计数据
-  getWeekStatistics({ begin, end, triUserId }) {
-    return getData({
-      url: "/training/api/classSchedule/getStatistics",
-      begin,
-      end,
-      triUserId,
     })
   },
 }

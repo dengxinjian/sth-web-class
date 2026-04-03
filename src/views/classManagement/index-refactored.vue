@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="athletic-container" v-loading="loading">
+    <div class="athletic-container">
       <!-- 左侧菜单 -->
       <LeftMenu v-model="activeName" @change="handleTypeChange" />
       <div class="content-container"
@@ -202,54 +202,103 @@
             </div>
           </div>
 
-          <div class="schedule-main-row">
-            <!-- 日程表 -->
-            <ScheduleCalendar :current-week="currentWeek"
-              :team-list="teamList" :athletic-list="athleticList"
-              :selected-team="selectedTeam"
-              :selected-athletic="selectedAthletic"
-              @week-change="onWeekChange"
-              @team-change="handleTeamChange"
-              @athletic-change="handleAthleticChange"
-              @show-info="showAthleticInfoDialog = true"
-              @show-statistic="showMonthStatisticDialog = true"
-              @refresh="handleRefresh"
-              @class-detail="handleClassScheduleDetail"
-              @activity-detail="handleSportDetail"
-              @delete-schedule="handleDeleteClassSchedule"
-              @unbind="handleUnbind"
-              @delete-activity="handleDeleteActivity"
-              @device-click="handleDeviceClick"
-              @edit-schedule="handleEditClassSchedule"
-              @edit-activity="handleEditActivity"
-              @paste-class="handlePasteClass"
-              @cut-class="handleCutClass"
-              @paste-event="handlePasteEvent"
-              @cut-event="handleCutEvent"
-              @view-health-data="handleViewHealthData"
-              @add-schedule="handleAddSchedule"
-              @event-detail="handleEventDetail"
-              @edit-event="handleEditEvent"
-              @delete-all-schedules="handleDeleteAllSchedules"
-              @input-activity="handleInputActivity"
-              @click-event-activity="handleEditActivity" />
+          <!-- 日程区域：日程表 + 右侧统计（同一滚动容器，支持滚动预加载） -->
+          <div
+            ref="scheduleScrollRoot"
+            class="schedule-scroll-root"
+            :class="{ 'schedule-scroll-root--single': scheduleWeeksGrouped.length === 1 }"
+            v-loading="scheduleLoadingInitial"
+            element-loading-text="加载中…"
+            element-loading-background="rgba(255,255,255,0.55)"
+            @scroll.passive="onScheduleScroll"
+            @wheel.passive="onScheduleWheelAtTop"
+          >
+            <div ref="scheduleSentinelTop" class="schedule-sentinel schedule-sentinel--top" />
 
-            <!-- 右侧统计面板 -->
-            <div class="right-stat-wrapper"
-              :class="{ 'is-collapsed': rightPanelCollapsed }">
+            <!-- 向上加载时视口在列表顶部，提示若放在文档底部会看不到；置顶 + sticky 始终在可视区 -->
+            <div
+              v-if="scheduleLoadingPrev"
+              class="schedule-scroll-loading-prev"
+              role="status"
+            >
+              向上加载 2 周…
+            </div>
+
+            <!--
+              右侧统计栏收起/展开按钮：
+              - 需求：按钮固定定位在视口垂直中间，不随日程滚动变化
+              - 说明：面板内容仍在日程区域内一起滚动（同一滚动容器），仅按钮做 fixed
+            -->
+            <div
+              class="right-stat-floating-handle-row"
+              :class="{ 'is-collapsed': rightPanelCollapsed }"
+            >
               <div
                 class="panel-collapse-handle panel-collapse-handle--right"
                 :title="rightPanelCollapsed ? '展开统计栏' : '收起统计栏'"
-                @click="toggleRightPanel">
+                @click="toggleRightPanel"
+              >
                 <i
-                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"></i>
+                  :class="rightPanelCollapsed ? 'el-icon-arrow-left' : 'el-icon-arrow-right'"
+                ></i>
               </div>
-              <StatisticsPanel v-if="!rightPanelCollapsed"
-                :sth-data="sthData"
-                :statistic-data="statisticData"
-                :device-list="deviceList"
-                @device-change="handleDeviceChange" />
             </div>
+
+            <div
+              v-for="(week, wIdx) in scheduleWeeksGrouped"
+              :key="week.key"
+              class="schedule-main-row schedule-main-row--week"
+              :data-week-monday="week.monday"
+              :style="getScheduleWeekRowStyle(week.monday)"
+              ref="scheduleWeekRows"
+            >
+              <!-- 日程表（每周一块，纵向堆叠） -->
+              <div class="schedule-calendar-week" ref="scheduleWeekCalendars">
+                <ScheduleCalendar :current-week="week.days"
+                  :team-list="teamList" :athletic-list="athleticList"
+                  :selected-team="selectedTeam"
+                  :selected-athletic="selectedAthletic"
+                  @athletic-change="handleAthleticChange"
+                  @show-info="showAthleticInfoDialog = true"
+                  @show-statistic="showMonthStatisticDialog = true"
+                  @refresh="handleRefresh"
+                  @class-detail="handleClassScheduleDetail"
+                  @activity-detail="handleSportDetail"
+                  @delete-schedule="handleDeleteClassSchedule"
+                  @unbind="handleUnbind"
+                  @delete-activity="handleDeleteActivity"
+                  @device-click="handleDeviceClick"
+                  @edit-schedule="handleEditClassSchedule"
+                  @edit-activity="handleEditActivity"
+                  @paste-class="handlePasteClass"
+                  @cut-class="handleCutClass"
+                  @paste-event="handlePasteEvent"
+                  @cut-event="handleCutEvent"
+                  @view-health-data="handleViewHealthData"
+                  @add-schedule="handleAddSchedule"
+                  @event-detail="handleEventDetail"
+                  @edit-event="handleEditEvent"
+                  @delete-all-schedules="handleDeleteAllSchedules"
+                  @input-activity="handleInputActivity"
+                  @click-event-activity="handleEditActivity" />
+              </div>
+
+              <!-- 右侧统计面板：与日程一起滚动（当前阶段：仍展示当前周统计） -->
+              <div class="right-stat-wrapper"
+                :class="{ 'is-collapsed': rightPanelCollapsed }"
+                ref="scheduleWeekStats">
+                <StatisticsPanel v-if="!rightPanelCollapsed"
+                  :sth-data="getWeekSthData(week.monday)"
+                  :statistic-data="getWeekStatisticData(week.monday)"
+                  :device-list="deviceList"
+                  @device-change="handleDeviceChange" />
+              </div>
+            </div>
+
+            <div ref="scheduleSentinelBottom" class="schedule-sentinel schedule-sentinel--bottom" />
+
+            <div v-if="scheduleLoadingInitial" class="schedule-scroll-footer">首屏加载中…</div>
+            <div v-else-if="scheduleLoadingMore" class="schedule-scroll-footer">向下加载 2 周…</div>
           </div>
         </div>
       </div>
@@ -270,8 +319,6 @@
               :team-list="teamList" :athletic-list="athleticList"
               :selected-team="selectedTeam"
               :selected-athletic="selectedAthletic"
-              @week-change="onWeekChange"
-              @team-change="handleTeamChange"
               @athletic-change="handleAthleticChange"
               @show-info="showAthleticInfoDialog = true"
               @show-statistic="showMonthStatisticDialog = true"
@@ -475,7 +522,6 @@ import {
   teamApi,
   classApi,
   scheduleApi,
-  statisticsApi,
   athleteApi,
   groupApi,
   competitionApi,
@@ -531,7 +577,6 @@ export default {
   mixins: [dragMixin],
   data() {
     return {
-      loading: false,
       activeName: "class",
       activeClassType: "my",
       loginType: localStorage.getItem("loginType") || "2",
@@ -575,6 +620,40 @@ export default {
       // 日程数据
       currentWeek: [],
       currentMonth: "",
+      /** 滚动预加载（按周纵向） */
+      scheduleDayMap: {},
+      scheduleLoadedStart: "",
+      scheduleLoadedEnd: "",
+      scheduleAnchorWeekStart: "",
+      scheduleLoadingInitial: false,
+      scheduleLoadingMore: false,
+      scheduleLoadingPrev: false,
+      scheduleHasMore: true,
+      scheduleMaxFutureDays: 365,
+      scheduleMaxPastDays: 365,
+      scheduleUseIntersection: true,
+      scheduleIoBottom: null,
+      scheduleIoTop: null,
+      scheduleScrollTimer: null,
+      /** 曾离开过顶部（scrollTop 超过阈值），用于顶部 IO / 非 IO 回退；首屏若始终在顶需配合 onScheduleWheelAtTop */
+      scheduleHasUserScrolledDown: false,
+      scheduleLastPrevLoadAt: 0,
+      scheduleLastMoreLoadAt: 0,
+      /** 周行最小高度：max(最长列, 统计面板高度) */
+      scheduleWeekMinHeights: {},
+      /** 周统计：key=周一(YYYY-MM-DD) */
+      scheduleWeekStatisticsMap: {},
+      /** 预加载请求去重：key=triUserId_begin_end */
+      scheduleInFlightRangeKeys: {},
+      /** 首屏剩余周后台补齐 */
+      scheduleLoadingBackground: false,
+      /** 向上加载后轮询 scrollHeight：卡片内图表/图片异步撑高时继续对齐锚点 */
+      schedulePrevLoadPollTimer: null,
+      /**
+       * 向上加载锚点目标微调（px）：补偿后若「整周」仍相对视口偏下，可适当增大（如 12→20）；
+       * 若偏上则改为更小或负值。实际目标 offset = 记录值 − 本值。
+       */
+      schedulePrevLoadAnchorBiasPx: 300,
 
       // 统计数据
       sthData: {},
@@ -759,6 +838,60 @@ export default {
       )
       return (athletic && athletic.vipSubStatus != null) ? Number(athletic.vipSubStatus) : 0
     },
+    scheduleSortedDates() {
+      return Object.keys(this.scheduleDayMap || {}).sort()
+    },
+    scheduleWeeksGrouped() {
+      const sorted = this.scheduleSortedDates
+      if (!sorted.length) return []
+
+      const weeks = []
+      let current = []
+      let blockMonday = null
+
+      const padWeekTo7 = (monday) => {
+        const out = []
+        for (let i = 0; i < 7; i += 1) {
+          const ds = this.addDays(monday, i)
+          out.push(
+            this.scheduleDayMap[ds] || {
+              commonDate: ds,
+              dataDate: ds,
+              activityList: [],
+              classSchedule: [],
+              healthInfos: [],
+              competitionList: [],
+              timesp: new Date().getTime(),
+            }
+          )
+        }
+        return out
+      }
+
+      sorted.forEach((ds) => {
+        const day = this.scheduleDayMap[ds]
+        const monday = this.startOfWeekMonday(ds)
+        if (blockMonday === null) blockMonday = monday
+        if (monday !== blockMonday) {
+          weeks.push({
+            monday: blockMonday,
+            key: `wk_${blockMonday}_${current?.[current.length - 1]?.commonDate || ""}`,
+            days: padWeekTo7(blockMonday),
+          })
+          current = []
+          blockMonday = monday
+        }
+        current.push(day)
+      })
+      if (current.length) {
+        weeks.push({
+          monday: blockMonday,
+          key: `wk_${blockMonday}_${current?.[current.length - 1]?.commonDate || ""}`,
+          days: padWeekTo7(blockMonday),
+        })
+      }
+      return weeks
+    },
   },
   watch: {
     // 监听路由变化，同步菜单状态；
@@ -812,15 +945,787 @@ export default {
     this.$store.dispatch("user/checkEliteSubscription")
     // 监听身份切换事件
     this.$root.$on("identity-changed", this.handleIdentityChanged)
+    window.addEventListener("resize", this.handleScheduleResize, { passive: true })
   },
   beforeDestroy() {
     // 移除事件监听
     this.$root.$off("identity-changed", this.handleIdentityChanged)
+    window.removeEventListener("resize", this.handleScheduleResize)
+    if (this.scheduleIoBottom) {
+      this.scheduleIoBottom.disconnect()
+      this.scheduleIoBottom = null
+    }
+    if (this.scheduleIoTop) {
+      this.scheduleIoTop.disconnect()
+      this.scheduleIoTop = null
+    }
+    this.scheduleDetachPrevLoadAnchorPoll()
   },
   methods: {
+    /**
+     * 从周统计对象中提取“周一 key”（尽量兼容不同字段命名）。
+     * 约定：最终 key 为 YYYY-MM-DD（周一）。
+     */
+    getWeekKeyFromStatistics(stat) {
+      if (!stat) return ""
+      const pick =
+        stat.monday ||
+        stat.weekMonday ||
+        stat.weekStart ||
+        stat.weekStartDate ||
+        stat.begin ||
+        stat.beginDate ||
+        stat.start ||
+        stat.startDate ||
+        ""
+      if (!pick) return ""
+      const ymd = String(pick).slice(0, 10)
+      return this.startOfWeekMonday(ymd)
+    },
+    getWeekStatPayload(monday) {
+      const key = monday || ""
+      const payload = (this.scheduleWeekStatisticsMap && this.scheduleWeekStatisticsMap[key]) || null
+      return payload
+    },
+    getWeekSthData(monday) {
+      const payload = this.getWeekStatPayload(monday)
+      // 新结构：{ begin, end, statistics: { statisticsVoList, avgSthRespDto } }
+      return (payload && payload.statistics && payload.statistics.avgSthRespDto) || {}
+    },
+    getWeekStatisticData(monday) {
+      const payload = this.getWeekStatPayload(monday)
+      const list =
+        (payload && payload.statistics && payload.statistics.statisticsVoList) || []
+      return this.mapStatisticsVoList(list)
+    },
+    /**
+     * 统一处理统计列表展示字段（title/icon/unit/格式化/单位换算等）。
+     * 说明：StatisticsPanel 依赖这些展示字段；新接口返回的 statisticsVoList 需要在这里补齐。
+     */
+    mapStatisticsVoList(list) {
+      const rows = Array.isArray(list) ? list : []
+      return rows.map((item) => {
+        if (!item) return item
+        if (item.key === "totalSTH") {
+          const actualValue =
+            item.key === "totalSTH"
+              ? Math.round(Number(item.actualValue) / 100) / 100
+              : item.actualValue
+          const planValue =
+            item.key === "totalSTH"
+              ? Math.round(Number(item.planValue) / 100) / 100
+              : item.planValue
+          return {
+            ...item,
+            actualValue:
+              parseInt(item.actualValue) > 100000
+                ? unitConversion(actualValue, statisticKeyToTitle[item.key]?.unit)
+                : item.actualValue,
+            actualValueUnit: parseInt(item.actualValue) > 100000 ? "万" : "",
+            title: statisticKeyToTitle[item.key]?.title,
+            color: statisticKeyToTitle[item.key]?.color,
+            icon: statisticKeyToTitle[item.key]?.icon,
+            unit: statisticKeyToTitle[item.key]?.unit,
+            planValue:
+              parseInt(item.planValue) > 100000
+                ? unitConversion(planValue, statisticKeyToTitle[item.key]?.unit)
+                : item.planValue,
+            planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
+          }
+        }
+        if (item.key === "totalCalories") {
+          return {
+            ...item,
+            actualValue:
+              parseInt(item.actualValue) > 10000
+                ? unitConversion(
+                  item.actualValue,
+                  statisticKeyToTitle[item.key]?.unit || "kcal"
+                )
+                : item.actualValue,
+            actualValueUnit: parseInt(item.actualValue) > 10000 ? "万" : "",
+            title: statisticKeyToTitle[item.key]?.title,
+            color: statisticKeyToTitle[item.key]?.color,
+            icon: statisticKeyToTitle[item.key]?.icon,
+            unit: statisticKeyToTitle[item.key]?.unit,
+            planValue:
+              parseInt(item.planValue) > 10000
+                ? unitConversion(
+                  item.planValue,
+                  statisticKeyToTitle[item.key]?.unit || "kcal"
+                )
+                : item.planValue,
+            planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
+          }
+        }
+        return {
+          ...item,
+          actualValue: unitConversion(
+            item.actualValue,
+            statisticKeyToTitle[item.key]?.unit
+          ),
+          title: statisticKeyToTitle[item.key]?.title,
+          color: statisticKeyToTitle[item.key]?.color,
+          icon: statisticKeyToTitle[item.key]?.icon,
+          unit: statisticKeyToTitle[item.key]?.unit,
+        }
+      })
+    },
     toggleRightPanel() {
       this.rightPanelCollapsed = !this.rightPanelCollapsed
       localStorage.setItem("cm_rightPanelCollapsed", this.rightPanelCollapsed ? "1" : "0")
+      this.$nextTick(() => this.syncScheduleWeekMinHeights())
+    },
+    /**
+     * 获取“每周一行”的最小高度样式。
+     * 规则：minHeight = max(当前周 7 列中最高列高度, 统计面板可见高度)。
+     * 单周特殊：当只渲染 1 周时，强制 minHeight >= calc(100vh - 60px)。
+     */
+    getScheduleWeekRowStyle(monday) {
+      const h = this.scheduleWeekMinHeights && this.scheduleWeekMinHeights[monday]
+      if (!h) return null
+      return { minHeight: `${h}px` }
+    },
+    handleScheduleResize() {
+      this.syncScheduleWeekMinHeights()
+    },
+    /**
+     * 计算并同步每周行的最小高度。
+     * - “当前行最长列”：取 ScheduleCalendar 内 `.schedule-table-cell` 的最大 offsetHeight
+     * - “统计面板高度”：取 `.week-statistic` 的 scrollHeight，并受 max-height(calc(100vh - 60px)) 限制
+     * - 单周：强制 >= (window.innerHeight - 60)
+     * @returns {Promise<void>} minHeight 写入并再经一轮 DOM 更新后 resolve，便于向上加载后再补一次 scrollTop
+     */
+    syncScheduleWeekMinHeights() {
+      return new Promise((resolve) => {
+        this.$nextTick(() => {
+          const rowEls = this.$refs.scheduleWeekRows
+          const calEls = this.$refs.scheduleWeekCalendars
+          const statEls = this.$refs.scheduleWeekStats
+          if (!rowEls || !calEls || !statEls) {
+            resolve()
+            return
+          }
+
+          const rows = Array.isArray(rowEls) ? rowEls : [rowEls]
+          const cals = Array.isArray(calEls) ? calEls : [calEls]
+          const stats = Array.isArray(statEls) ? statEls : [statEls]
+          const isSingleWeek = (this.scheduleWeeksGrouped || []).length === 1
+          const singleWeekCap = Math.max(0, (window.innerHeight || 0) - 60)
+
+          rows.forEach((rowEl, idx) => {
+            if (!rowEl) return
+            const monday = rowEl.getAttribute("data-week-monday") || ""
+            if (!monday) return
+
+            const calEl = cals[idx]
+            const statEl = stats[idx]
+
+            // 当前周“最长列高度”：取 7 列 cell 的最大高度（包含标题+内容）
+            let maxCellHeight = 0
+            if (calEl) {
+              const cellEls = calEl.querySelectorAll(".schedule-table-cell")
+              cellEls.forEach((el) => {
+                const h = el.offsetHeight || 0
+                if (h > maxCellHeight) maxCellHeight = h
+              })
+              if (!maxCellHeight) {
+                maxCellHeight = calEl.offsetHeight || 0
+              }
+            }
+
+            // 统计面板高度：取面板内容的“目标高度”（scrollHeight 与 max-height 约束后的较小值）
+            // 注意：某些环境下 getComputedStyle(maxHeight) 可能仍返回 calc(...)，这里用视口高度兜底。
+            let statHeight = 0
+            if (statEl) {
+              const weekStatEl = statEl.querySelector(".week-statistic")
+              if (weekStatEl) {
+                const contentH = weekStatEl.scrollHeight || 0
+                const cs = window.getComputedStyle(weekStatEl)
+                const maxHRaw = cs && cs.maxHeight ? cs.maxHeight : ""
+                const maxH =
+                  maxHRaw && maxHRaw !== "none" && maxHRaw.endsWith("px")
+                    ? parseFloat(maxHRaw)
+                    : NaN
+                // StatisticsPanel 内部 max-height: calc(100vh - 60px)
+                const viewportCap = Math.max(0, (window.innerHeight || 0) - 60)
+                const cap =
+                  Number.isFinite(maxH) && maxH > 0
+                    ? maxH
+                    : (viewportCap > 0 ? viewportCap : contentH)
+                statHeight = Math.min(contentH, cap)
+              } else {
+                statHeight = statEl.scrollHeight || statEl.offsetHeight || 0
+              }
+            }
+
+            const minH = Math.max(maxCellHeight, statHeight, 0)
+            const finalMinH =
+              isSingleWeek && singleWeekCap > 0 ? Math.max(minH, singleWeekCap) : minH
+            if (finalMinH > 0) {
+              this.$set(this.scheduleWeekMinHeights, monday, finalMinH)
+            }
+          })
+          this.$nextTick(() => resolve())
+        })
+      })
+    },
+    /**
+     * 选取视口内可见面积最大的周行作锚点；偏移用「行顶 − 滚动容器顶」，避免用绝对视口 Y 时整页/侧栏布局变化带来的误差。
+     */
+    schedulePickAnchorWeekForScroll(scrollRoot) {
+      if (!scrollRoot) return null
+      const rows = scrollRoot.querySelectorAll(".schedule-main-row--week[data-week-monday]")
+      if (!rows.length) return null
+      const rr = scrollRoot.getBoundingClientRect()
+      let bestMonday = null
+      let bestArea = 0
+      let bestOffsetRel = 0
+      for (let i = 0; i < rows.length; i += 1) {
+        const row = rows[i]
+        const r = row.getBoundingClientRect()
+        const top = Math.max(r.top, rr.top)
+        const bottom = Math.min(r.bottom, rr.bottom)
+        const h = Math.max(0, bottom - top)
+        if (h > bestArea) {
+          bestArea = h
+          bestMonday = row.getAttribute("data-week-monday")
+          bestOffsetRel = r.top - rr.top
+        }
+      }
+      if (bestMonday && bestArea > 0) {
+        return { anchorMonday: bestMonday, anchorOffsetRelRoot: bestOffsetRel }
+      }
+      for (let i = 0; i < rows.length; i += 1) {
+        const row = rows[i]
+        const r = row.getBoundingClientRect()
+        if (r.bottom > rr.top + 2) {
+          return {
+            anchorMonday: row.getAttribute("data-week-monday"),
+            anchorOffsetRelRoot: r.top - rr.top,
+          }
+        }
+      }
+      return null
+    },
+    /** 向上加载时希望对齐到的「行顶相对容器顶」目标值（含 schedulePrevLoadAnchorBiasPx） */
+    scheduleGetAnchorTargetOffset(anchorOffsetRelRoot) {
+      const b = Number(this.schedulePrevLoadAnchorBiasPx)
+      const bias = Number.isFinite(b) ? b : 0
+      return anchorOffsetRelRoot + bias
+    },
+    /**
+     * 将锚点周行对齐到目标 offset（见 scheduleGetAnchorTargetOffset）。
+     * contentY = scrollTop + (行顶−容器顶)，一次算出目标 scrollTop。
+     */
+    scheduleNudgeScrollToAnchor(root, anchorMonday, anchorOffsetRelRoot, maxPass = 6) {
+      if (!root || !anchorMonday || typeof anchorOffsetRelRoot !== "number") return
+      const target = this.scheduleGetAnchorTargetOffset(anchorOffsetRelRoot)
+      for (let p = 0; p < maxPass; p += 1) {
+        const row = root.querySelector(
+          `.schedule-main-row--week[data-week-monday="${anchorMonday}"]`
+        )
+        if (!row) return
+        const rr = root.getBoundingClientRect()
+        const offsetNow = row.getBoundingClientRect().top - rr.top
+        if (Math.abs(offsetNow - target) < 0.35) return
+        const contentY = root.scrollTop + offsetNow
+        let next = contentY - target
+        const maxScroll = Math.max(0, root.scrollHeight - root.clientHeight)
+        next = Math.max(0, Math.min(maxScroll, next))
+        if (Math.abs(next - root.scrollTop) < 0.25) return
+        root.scrollTop = next
+      }
+    },
+    /** 结束向上加载后的 scrollHeight 轮询（新一次加载或销毁时调用） */
+    scheduleDetachPrevLoadAnchorPoll() {
+      if (this.schedulePrevLoadPollTimer != null) {
+        clearInterval(this.schedulePrevLoadPollTimer)
+        this.schedulePrevLoadPollTimer = null
+      }
+    },
+    /**
+     * 卡片/图表/长文本晚渲染：仅靠 scrollHeight 变化会漏（列内重排未必立刻反映到 scrollHeight 或存在多帧延迟）。
+     * 每拍都尝试锚点 nudge，并同时观察 scrollHeight + 锚点误差，二者均稳定后再停。
+     */
+    schedulePollScrollHeightForAnchor(anchorMonday, anchorOffsetRelRoot) {
+      this.scheduleDetachPrevLoadAnchorPoll()
+      if (!anchorMonday || typeof anchorOffsetRelRoot !== "number") return
+      const targetOffset = this.scheduleGetAnchorTargetOffset(anchorOffsetRelRoot)
+      const root0 = this.$refs.scheduleScrollRoot
+      if (!root0) return
+      let lastH = root0.scrollHeight
+      let heightStableTicks = 0
+      let anchorStableTicks = 0
+      let ticks = 0
+      const maxTicks = 70
+      const heightStableNeeded = 8
+      const anchorStableNeeded = 8
+      const intervalMs = 70
+      this.schedulePrevLoadPollTimer = setInterval(() => {
+        const root = this.$refs.scheduleScrollRoot
+        if (!root) {
+          this.scheduleDetachPrevLoadAnchorPoll()
+          return
+        }
+        const h = root.scrollHeight
+        if (h !== lastH) {
+          lastH = h
+          heightStableTicks = 0
+        } else {
+          heightStableTicks += 1
+        }
+
+        this.scheduleNudgeScrollToAnchor(root, anchorMonday, anchorOffsetRelRoot, 6)
+
+        const row = root.querySelector(
+          `.schedule-main-row--week[data-week-monday="${anchorMonday}"]`
+        )
+        if (!row) {
+          this.scheduleDetachPrevLoadAnchorPoll()
+          return
+        }
+        const rr = root.getBoundingClientRect()
+        const offsetNow = row.getBoundingClientRect().top - rr.top
+        const err = Math.abs(offsetNow - targetOffset)
+        if (err < 0.6) {
+          anchorStableTicks += 1
+        } else {
+          anchorStableTicks = 0
+        }
+
+        ticks += 1
+        if (
+          ticks >= maxTicks ||
+          (heightStableTicks >= heightStableNeeded && anchorStableTicks >= anchorStableNeeded)
+        ) {
+          this.scheduleDetachPrevLoadAnchorPoll()
+        }
+      }, intervalMs)
+    },
+    formatYMD(date) {
+      const d =
+        date instanceof Date ? date : new Date(String(date).replace(/-/g, "/"))
+      const y = d.getFullYear()
+      const m = String(d.getMonth() + 1).padStart(2, "0")
+      const dd = String(d.getDate()).padStart(2, "0")
+      return `${y}-${m}-${dd}`
+    },
+    addDays(dateStr, n) {
+      const d = new Date(String(dateStr).replace(/-/g, "/"))
+      d.setDate(d.getDate() + n)
+      return this.formatYMD(d)
+    },
+    startOfWeekMonday(dateStr) {
+      const d = new Date(String(dateStr).replace(/-/g, "/"))
+      const day = d.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      d.setDate(d.getDate() + diff)
+      return this.formatYMD(d)
+    },
+    /**
+     * 无运动员时的空数据兜底渲染。
+     * - 需求：如果没有默认选中的第一个运动员，也要渲染当周空数据（仅 1 周）
+     * - 说明：此时不请求接口，仅生成 scheduleDayMap，保证日程区域可见
+     */
+    initEmptySchedulePrefetch(anchorWeekMonday, days = 7) {
+      const anchor =
+        anchorWeekMonday ||
+        this.startOfWeekMonday(this.currentWeek?.[0]?.commonDate || this.formatYMD(new Date()))
+      // 空数据兜底不展示首屏 loading
+      this.scheduleLoadingInitial = false
+      this.scheduleAnchorWeekStart = anchor
+      const begin = anchor
+      const safeDays = Math.max(1, Number(days) || 7)
+      const end = this.addDays(begin, safeDays - 1)
+      const nextMap = {}
+      let cur = begin
+      while (cur <= end) {
+        nextMap[cur] = {
+          commonDate: cur,
+          dataDate: cur,
+          activityList: [],
+          classSchedule: [],
+          healthInfos: [],
+          competitionList: [],
+          timesp: new Date().getTime(),
+        }
+        cur = this.addDays(cur, 1)
+      }
+      this.scheduleDayMap = nextMap
+      this.scheduleLoadedStart = begin
+      this.scheduleLoadedEnd = end
+      this.scheduleHasMore = true
+      this.scheduleHasUserScrolledDown = false
+      this.scheduleLoadingInitial = false
+      this.scheduleLoadingMore = false
+      this.scheduleLoadingPrev = false
+      this.$nextTick(() => {
+        this.$forceUpdate()
+        this.setupScheduleIntersection()
+        this.syncScheduleWeekMinHeights()
+      })
+    },
+    setupScheduleIntersection() {
+      if (!this.scheduleUseIntersection) return
+      this.$nextTick(() => {
+        if (this.scheduleIoBottom) {
+          this.scheduleIoBottom.disconnect()
+          this.scheduleIoBottom = null
+        }
+        if (this.scheduleIoTop) {
+          this.scheduleIoTop.disconnect()
+          this.scheduleIoTop = null
+        }
+        const root = this.$refs.scheduleScrollRoot
+        const bottom = this.$refs.scheduleSentinelBottom
+        const top = this.$refs.scheduleSentinelTop
+        if (!root || !bottom || !window.IntersectionObserver) return
+
+        this.scheduleIoBottom = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) this.loadMoreScheduleTwoWeeks()
+            })
+          },
+          // 距离底部 < 300px 时提前预取
+          { root, rootMargin: "300px", threshold: 0 }
+        )
+        this.scheduleIoBottom.observe(bottom)
+
+        if (top) {
+          this.scheduleIoTop = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (!e.isIntersecting) return
+                if (!this.scheduleHasUserScrolledDown) return
+                this.loadPreviousScheduleTwoWeeks()
+              })
+            },
+            // 距离顶部 < 300px 时提前预取
+            { root, rootMargin: "300px", threshold: 0 }
+          )
+          this.scheduleIoTop.observe(top)
+        }
+      })
+    },
+    onScheduleScroll() {
+      const el = this.$refs.scheduleScrollRoot
+      if (el && el.scrollTop > 8) {
+        this.scheduleHasUserScrolledDown = true
+      }
+      if (this.scheduleUseIntersection) return
+      if (this.scheduleScrollTimer) clearTimeout(this.scheduleScrollTimer)
+      this.scheduleScrollTimer = setTimeout(() => {
+        const root = this.$refs.scheduleScrollRoot
+        if (!root) return
+        const { scrollTop, clientHeight, scrollHeight } = root
+        if (scrollHeight - scrollTop - clientHeight < 300) {
+          this.loadMoreScheduleTwoWeeks()
+        }
+        if (this.scheduleHasUserScrolledDown && scrollTop < 300) {
+          this.loadPreviousScheduleTwoWeeks()
+        }
+      }, 150)
+    },
+    /**
+     * 在 scrollTop≈0 时用户无法继续向上滚，wheel 的 deltaY<0 表示「想往更早的日程拉」。
+     * 与顶部 IO 互补：scrollTop=0 时无法产生 scroll 事件，用 wheel 向上手势触发更早周加载。
+     */
+    onScheduleWheelAtTop(e) {
+      const root = this.$refs.scheduleScrollRoot
+      if (!root || !this.selectedAthletic) return
+      if (root.scrollTop > 2) return
+      if (e.deltaY >= 0) return
+      this.loadPreviousScheduleTwoWeeks()
+    },
+    /**
+     * 拉取并合并指定日期区间的日程数据到 scheduleDayMap（滚动预加载数据源）。
+     * begin/end 参数：YYYY-MM-DD 00:00:00 / 23:59:59。
+     */
+    /**
+     * @param {Object} [opts]
+     * @param {boolean} [opts.deferMinHeightSync] 为 true 时不立刻算周行 min-height（向上 prepend 时先补偿 scrollTop，再算，避免闪动）
+     */
+    async fetchAndMergeSchedule(beginYmd, endYmd, opts = {}) {
+      if (!this.selectedAthletic) return
+      // 请求去重：接口慢时避免同区间重复请求
+      const rangeKey = `${this.selectedAthletic}_${beginYmd}_${endYmd}`
+      if (this.scheduleInFlightRangeKeys && this.scheduleInFlightRangeKeys[rangeKey]) return
+      this.$set(this.scheduleInFlightRangeKeys, rangeKey, true)
+      let res
+      try {
+        res = await scheduleApi.getCalenderOverviewStat({
+          begin: `${beginYmd} 00:00:00`,
+          end: `${endYmd} 23:59:59`,
+          triUserId: this.selectedAthletic,
+        })
+      } finally {
+        this.$delete(this.scheduleInFlightRangeKeys, rangeKey)
+      }
+      const result = res && res.success ? res.result : null
+      const calenderOverview =
+        result && Array.isArray(result.calenderOverview) ? result.calenderOverview : []
+      const statistics =
+        result && Array.isArray(result.statistics) ? result.statistics : []
+
+      const nextMap = { ...(this.scheduleDayMap || {}) }
+
+      // 先补齐区间日期，确保渲染连续
+      let cur = beginYmd
+      while (cur <= endYmd) {
+        if (!nextMap[cur]) {
+          nextMap[cur] = {
+            commonDate: cur,
+            dataDate: cur,
+            activityList: [],
+            classSchedule: [],
+            healthInfos: [],
+            competitionList: [],
+            timesp: new Date().getTime(),
+          }
+        }
+        cur = this.addDays(cur, 1)
+      }
+
+      // 将接口结果映射到 day 结构（复用 getScheduleData 的关键清洗逻辑）
+      calenderOverview.forEach((part) => {
+        const ds = part && part.dataDate ? String(part.dataDate).slice(0, 10) : ""
+        if (!ds) return
+        const base = nextMap[ds] || {
+          commonDate: ds,
+          dataDate: ds,
+          activityList: [],
+          classSchedule: [],
+          healthInfos: [],
+          competitionList: [],
+          timesp: new Date().getTime(),
+        }
+
+        const activityList = (part.activityOverviewList || [])
+          .map((i) => ({
+            ...i,
+            classesJson: i.classesJson ? parseClassesJson(i.classesJson) : null,
+            completion: i.classesJson ? getCompletionStatus(i.percent) : "",
+            distance: Math.round(i.distance / 10) / 100,
+            oldActivityDuration: i.duration,
+            oldActivityDistance: Math.round(i.distance),
+            preciseDistance: Math.round(i.distance),
+            oldActivitySthValue: i.sthValue,
+          }))
+          .filter((i) => !i.bindingManualActivityId && !i.bindCompetitionId)
+
+        ;(part.manualDeviceActivityVoList || []).forEach((i) => {
+          if (!i.activityId && !i.bindCompetitionId) {
+            activityList.push({
+              ...i,
+              classesJson: i.classesJson ? parseClassesJson(i.classesJson) : null,
+              distance: Math.round(i.distance / 10) / 100,
+              preciseDistance: i.distance,
+              movingTime: i.activityDuration,
+            })
+          } else {
+            activityList.forEach((item, index) => {
+              if (item.manualActivityId === i.manualActivityId) {
+                activityList[index] = {
+                  ...i,
+                  activityName: item.activityName,
+                  classesJson: i.classesJson ? parseClassesJson(i.classesJson) : null,
+                  distance: Math.round(i.distance / 10) / 100,
+                  preciseDistance: Math.round(i.distance),
+                  oldActivityDuration: item.oldActivityDuration,
+                  oldActivityDistance: Math.round(item.oldActivityDistance),
+                  oldActivitySthValue: item.oldActivitySthValue,
+                  movingTime: i.activityDuration,
+                }
+              }
+            })
+          }
+        })
+
+        const classSchedule = (part.classScheduleVoList || [])
+          .map((i) => ({
+            ...i,
+            classesJson: parseClassesJson(i.classesJson),
+          }))
+          .filter((i) => !i.bindingActivityId && !i.bindingManualActivityId)
+
+        const healthInfos =
+          part.healthInfos && part.healthInfos.length > 0 ? [part.healthInfos[0]] : []
+
+        const competitionList = Array.isArray(part.competitionList)
+          ? part.competitionList
+          : []
+
+        nextMap[ds] = {
+          ...base,
+          activityList,
+          classSchedule,
+          healthInfos,
+          competitionList,
+          timesp: new Date().getTime(),
+        }
+      })
+
+      this.scheduleDayMap = nextMap
+      // 合并周统计（按周一 key 存储）
+      if (statistics && statistics.length) {
+        const nextStatsMap = { ...(this.scheduleWeekStatisticsMap || {}) }
+        statistics.forEach((st) => {
+          const key = this.getWeekKeyFromStatistics(st)
+          if (!key) return
+          nextStatsMap[key] = st
+        })
+        this.scheduleWeekStatisticsMap = nextStatsMap
+      }
+      this.$nextTick(() => {
+        this.$forceUpdate()
+        this.initAllDrag()
+        this.setupScheduleIntersection()
+        if (!opts.deferMinHeightSync) {
+          this.syncScheduleWeekMinHeights()
+        }
+      })
+    },
+    async loadInitialScheduleFourWeeks() {
+      if (!this.scheduleAnchorWeekStart) return
+      /**
+       * 首屏分段加载（接口慢时更快“先看到”）：
+       * - 先加载当周 1 周（7天）并立刻渲染
+       * - 再后台补齐剩余 3 周（21天）
+       */
+      this.scheduleLoadingInitial = true
+      const begin = this.scheduleAnchorWeekStart
+      const firstEnd = this.addDays(begin, 6)
+      await this.fetchAndMergeSchedule(begin, firstEnd)
+      this.scheduleLoadedStart = begin
+      this.scheduleLoadedEnd = firstEnd
+      this.scheduleHasMore = true
+      this.scheduleHasUserScrolledDown = false
+      this.scheduleLoadingInitial = false
+      this.$nextTick(() => {
+        this.setupScheduleIntersection()
+        this.syncScheduleWeekMinHeights()
+      })
+
+      const restBegin = this.addDays(firstEnd, 1)
+      const restEnd = this.addDays(begin, 27)
+      if (restBegin <= restEnd) {
+        this.scheduleLoadingBackground = true
+        Promise.resolve()
+          .then(() => this.fetchAndMergeSchedule(restBegin, restEnd))
+          .then(() => {
+            this.scheduleLoadedEnd = restEnd
+          })
+          .finally(() => {
+            this.scheduleLoadingBackground = false
+          })
+      }
+    },
+    async loadMoreScheduleTwoWeeks() {
+      if (
+        !this.scheduleLoadedEnd ||
+        this.scheduleLoadingMore ||
+        this.scheduleLoadingPrev ||
+        this.scheduleLoadingInitial ||
+        !this.scheduleHasMore
+      ) {
+        return
+      }
+      const now = Date.now()
+      if (now - this.scheduleLastMoreLoadAt < 400) return
+      this.scheduleLastMoreLoadAt = now
+
+      const nextBegin = this.addDays(this.scheduleLoadedEnd, 1)
+      const limitEnd = this.addDays(this.scheduleAnchorWeekStart, this.scheduleMaxFutureDays)
+      if (nextBegin > limitEnd) {
+        this.scheduleHasMore = false
+        return
+      }
+      // 滚动预加载：每次向下加载 2 周（14 天）
+      const nextEnd = this.addDays(nextBegin, 13)
+      this.scheduleLoadingMore = true
+      await this.fetchAndMergeSchedule(nextBegin, nextEnd)
+      this.scheduleLoadedEnd = nextEnd
+      this.scheduleLoadingMore = false
+      this.$nextTick(() => {
+        this.setupScheduleIntersection()
+        this.syncScheduleWeekMinHeights()
+      })
+    },
+    async loadPreviousScheduleTwoWeeks() {
+      const now = Date.now()
+      if (now - this.scheduleLastPrevLoadAt < 400) return
+      if (
+        !this.scheduleLoadedStart ||
+        this.scheduleLoadingPrev ||
+        this.scheduleLoadingMore ||
+        this.scheduleLoadingInitial
+      ) {
+        return
+      }
+      const minBound = this.addDays(this.scheduleAnchorWeekStart, -this.scheduleMaxPastDays)
+      if (this.scheduleLoadedStart <= minBound) return
+
+      const prevEnd = this.addDays(this.scheduleLoadedStart, -1)
+      // 滚动预加载：每次向上加载 2 周（14 天），并在 prepend 后补偿 scrollTop 防止跳动
+      let prevBegin = this.addDays(this.scheduleLoadedStart, -14)
+      if (prevBegin < minBound) prevBegin = minBound
+      if (prevBegin > prevEnd) return
+
+      const el = this.$refs.scheduleScrollRoot
+      if (!el) return
+      this.scheduleDetachPrevLoadAnchorPoll()
+
+      const prevScrollHeight = el.scrollHeight
+      const prevScrollTop = el.scrollTop
+      const pick = this.schedulePickAnchorWeekForScroll(el)
+      const anchorMonday = pick ? pick.anchorMonday : null
+      const anchorOffsetRelRoot = pick ? pick.anchorOffsetRelRoot : null
+
+      this.scheduleLoadingPrev = true
+      await this.$nextTick()
+      await this.fetchAndMergeSchedule(prevBegin, prevEnd, { deferMinHeightSync: true })
+      this.scheduleLoadedStart = prevBegin
+      this.scheduleLoadingPrev = false
+      this.scheduleLastPrevLoadAt = Date.now()
+
+      // 双 rAF：首轮布局后补偿；await syncScheduleWeekMinHeights 后再 nudge；再一帧处理晚一拍布局
+      this.$nextTick(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(async () => {
+            const root = this.$refs.scheduleScrollRoot
+            if (!root) return
+            if (anchorMonday && typeof anchorOffsetRelRoot === "number") {
+              this.scheduleNudgeScrollToAnchor(root, anchorMonday, anchorOffsetRelRoot, 4)
+            } else {
+              const delta = root.scrollHeight - prevScrollHeight
+              root.scrollTop = Math.round(prevScrollTop + delta)
+            }
+            this.setupScheduleIntersection()
+            const hBeforeSync = root.scrollHeight
+            await this.syncScheduleWeekMinHeights()
+            await this.$nextTick()
+            await new Promise((r) => requestAnimationFrame(r))
+            const root2 = this.$refs.scheduleScrollRoot
+            if (!root2) return
+            if (anchorMonday && typeof anchorOffsetRelRoot === "number") {
+              this.scheduleNudgeScrollToAnchor(root2, anchorMonday, anchorOffsetRelRoot, 4)
+            } else {
+              root2.scrollTop = Math.round(
+                root2.scrollTop + (root2.scrollHeight - hBeforeSync)
+              )
+            }
+            await new Promise((r) => requestAnimationFrame(r))
+            const root3 = this.$refs.scheduleScrollRoot
+            if (anchorMonday && typeof anchorOffsetRelRoot === "number") {
+              this.scheduleNudgeScrollToAnchor(root3, anchorMonday, anchorOffsetRelRoot, 2)
+              // 卡片内图表/长文本晚渲染导致 scrollHeight 继续变，轮询对齐锚点直至高度稳定
+              this.schedulePollScrollHeightForAnchor(anchorMonday, anchorOffsetRelRoot)
+            }
+          })
+        })
+      })
     },
     // vipSubStatus: 0 未订阅 1 精英 2 专业 4 精英&专业 → 头框图片
     getVipFrameSrc(vipSubStatus) {
@@ -1288,6 +2193,10 @@ export default {
       }
       this.getClassList()
       this.isPlan = false
+      // 切换到课程/人员等视图时，如果当前无人员，兜底渲染当周 7 天空数据，避免日程区域空白
+      if (!this.selectedAthletic) {
+        this.initEmptySchedulePrefetch(null, 7)
+      }
     },
 
     /**
@@ -1510,12 +2419,26 @@ export default {
     onAthleticDropdownVisibleChange(visible) {
       if (!visible) this.athleticDropdownSearch = ""
     },
+    /**
+     * 运动员切换后的日程刷新逻辑。
+     * - 先刷新传统单周数据（currentWeek 绑定的 ScheduleCalendar 仍需要）
+     * - 再重置滚动预加载缓存并拉取首屏（避免沿用上一位运动员的 scheduleDayMap）
+     */
     handleAthleticChange(athleticId) {
+      console.log(athleticId, "athleticId")
       this.selectedAthletic = athleticId
       this.athleticInfoData = this.athleticList.find(
         (item) => item.triUserId === athleticId
       )
       this.getScheduleData()
+      // 人员切换时需要重置滚动预加载缓存，否则会继续使用上一个人的 scheduleDayMap 导致不渲染/渲染异常
+      this.scheduleAnchorWeekStart = this.startOfWeekMonday(this.currentWeek?.[0]?.commonDate)
+      this.scheduleDayMap = {}
+      this.scheduleLoadedStart = ""
+      this.scheduleLoadedEnd = ""
+      this.scheduleHasMore = true
+      this.scheduleHasUserScrolledDown = false
+      this.loadInitialScheduleFourWeeks()
       this.getAthleticThreshold(athleticId)
       this.getAuthorizedDeviceList()
     },
@@ -1528,6 +2451,8 @@ export default {
       if (!this.selectedTeam) {
         this.athleticList = []
         this.selectedAthletic = null
+        // 无团队/无人员：兜底渲染当周 7 天空数据，避免切换到计划/课程/团队后日程区域空白
+        this.initEmptySchedulePrefetch(null, 7)
         return
       }
       if (this.selectedOrgType === "team") {
@@ -1603,6 +2528,19 @@ export default {
         this.getAthleticThreshold(this.selectedAthletic)
         this.getAuthorizedDeviceList()
         this.getScheduleData()
+        // 默认选中人员时，同步重置并加载滚动预加载首屏数据（4周）
+        this.scheduleAnchorWeekStart = this.startOfWeekMonday(this.currentWeek?.[0]?.commonDate)
+        this.scheduleDayMap = {}
+        this.scheduleLoadedStart = ""
+        this.scheduleLoadedEnd = ""
+        this.scheduleHasMore = true
+        this.scheduleHasUserScrolledDown = false
+        this.loadInitialScheduleFourWeeks()
+      } else {
+        // 没有任何运动员：仍然渲染当周 1 周空数据，保证日程区域可见
+        this.selectedAthletic = null
+        this.athleticInfoData = {}
+        this.initEmptySchedulePrefetch(null, 7)
       }
     },
 
@@ -1644,14 +2582,38 @@ export default {
       if (!this.selectedAthletic) {
         return
       }
-      this.loading = true
-      const res = await scheduleApi.getCalendarOverview({
+      const res = await scheduleApi.getCalenderOverviewStat({
         begin: this.currentWeek[0].commonDate + " 00:00:00",
         end: this.currentWeek[6].commonDate + " 23:59:59",
         triUserId: this.selectedAthletic,
       })
       if (res.success && res.result) {
-        this.getStatisticData()
+        // 新接口：周统计随日程一起返回
+        const statsList = Array.isArray(res.result.statistics) ? res.result.statistics : []
+        if (statsList.length) {
+          const nextStatsMap = { ...(this.scheduleWeekStatisticsMap || {}) }
+          statsList.forEach((st) => {
+            const key = this.getWeekKeyFromStatistics(st)
+            if (!key) return
+            nextStatsMap[key] = st
+          })
+          this.scheduleWeekStatisticsMap = nextStatsMap
+          // 同步当前周统计到旧字段（供页面其它逻辑/组件复用）
+          const curKey = this.startOfWeekMonday(this.currentWeek?.[0]?.commonDate)
+          const curPayload = nextStatsMap[curKey] || statsList[0]
+          this.statisticData = this.mapStatisticsVoList(
+            (curPayload && curPayload.statistics && curPayload.statistics.statisticsVoList)
+              ? curPayload.statistics.statisticsVoList
+              : []
+          )
+          this.sthData =
+            (curPayload && curPayload.statistics && curPayload.statistics.avgSthRespDto)
+              ? curPayload.statistics.avgSthRespDto
+              : {}
+        } else {
+          this.statisticData = []
+          this.sthData = {}
+        }
         // 创建新数组确保 Vue 响应式更新
         const newCurrentWeek = this.currentWeek.map((item) => {
           let activityList = []
@@ -1667,7 +2629,10 @@ export default {
             strength: [],
           }
 
-          res.result.forEach((part) => {
+          const overviewList = Array.isArray(res.result.calenderOverview)
+            ? res.result.calenderOverview
+            : []
+          overviewList.forEach((part) => {
             if (item.commonDate === part.dataDate) {
               // 处理运动记录
               activityList = (part.activityOverviewList || [])
@@ -2000,104 +2965,27 @@ export default {
         // 对于根级别的 data 属性，直接赋值即可触发响应式更新
         this.currentWeek = [...newCurrentWeek]
         console.log(this.currentWeek, "this.currentWeek")
+
+        // 滚动预加载：当周锚点变化时，重置并加载首屏 4 周
+        if (this.currentWeek && this.currentWeek.length > 0) {
+          const nextAnchor = this.startOfWeekMonday(this.currentWeek[0].commonDate)
+          if (nextAnchor && nextAnchor !== this.scheduleAnchorWeekStart) {
+            this.scheduleAnchorWeekStart = nextAnchor
+            this.scheduleDayMap = {}
+            this.scheduleLoadedStart = ""
+            this.scheduleLoadedEnd = ""
+            this.scheduleHasMore = true
+            this.scheduleHasUserScrolledDown = false
+            this.loadInitialScheduleFourWeeks()
+          }
+        }
       }
       this.$nextTick(() => {
         // 确保视图更新 - 使用 $forceUpdate 强制重新渲染
         this.$forceUpdate()
         // 初始化拖拽
         this.initAllDrag()
-        setTimeout(() => {
-          this.loading = false
-        }, 1000)
       })
-    },
-
-    /**
-     * 获取统计数据
-     */
-    async getStatisticData() {
-      if (!this.selectedAthletic) return
-
-      const res = await statisticsApi.getWeekStatistics({
-        begin: this.currentWeek[0].commonDate,
-        end: this.currentWeek[6].commonDate,
-        triUserId: this.selectedAthletic,
-      })
-
-      if (res.success) {
-        this.statisticData = res.result.statisticsVoList.map((item) => {
-          if (item.key === "totalSTH") {
-            const actualValue =
-              item.key === "totalSTH"
-                ? Math.round(item.actualValue / 100) / 100
-                : item.actualValue
-            const planValue =
-              item.key === "totalSTH"
-                ? Math.round(item.planValue / 100) / 100
-                : item.planValue
-            return {
-              ...item,
-              actualValue:
-                parseInt(item.actualValue) > 100000
-                  ? unitConversion(
-                    actualValue,
-                    statisticKeyToTitle[item.key]?.unit
-                  )
-                  : item.actualValue,
-              actualValueUnit: parseInt(item.actualValue) > 100000 ? "万" : "",
-              title: statisticKeyToTitle[item.key]?.title,
-              color: statisticKeyToTitle[item.key]?.color,
-              icon: statisticKeyToTitle[item.key]?.icon,
-              unit: statisticKeyToTitle[item.key]?.unit,
-              planValue:
-                parseInt(item.planValue) > 100000
-                  ? unitConversion(
-                    planValue,
-                    statisticKeyToTitle[item.key]?.unit
-                  )
-                  : item.planValue,
-              planValueUnit: parseInt(item.planValue) > 100000 ? "万" : "",
-            }
-          }
-          if (item.key === "totalCalories") {
-            return {
-              ...item,
-              actualValue:
-                parseInt(item.actualValue) > 10000
-                  ? unitConversion(
-                    item.actualValue,
-                    statisticKeyToTitle[item.key]?.unit || "kcal"
-                  )
-                  : item.actualValue,
-              actualValueUnit: parseInt(item.actualValue) > 10000 ? "万" : "",
-              title: statisticKeyToTitle[item.key]?.title,
-              color: statisticKeyToTitle[item.key]?.color,
-              icon: statisticKeyToTitle[item.key]?.icon,
-              unit: statisticKeyToTitle[item.key]?.unit,
-              planValue:
-                parseInt(item.planValue) > 10000
-                  ? unitConversion(
-                    item.planValue,
-                    statisticKeyToTitle[item.key]?.unit || "kcal"
-                  )
-                  : item.planValue,
-              planValueUnit: parseInt(item.planValue) > 10000 ? "万" : "",
-            }
-          }
-          return {
-            ...item,
-            actualValue: unitConversion(
-              item.actualValue,
-              statisticKeyToTitle[item.key]?.unit
-            ),
-            title: statisticKeyToTitle[item.key]?.title,
-            color: statisticKeyToTitle[item.key]?.color,
-            icon: statisticKeyToTitle[item.key]?.icon,
-            unit: statisticKeyToTitle[item.key]?.unit,
-          }
-        })
-        this.sthData = res.result.avgSthRespDto
-      }
     },
 
     /**
@@ -2237,7 +3125,20 @@ export default {
         ).padStart(2, "0")}`
       }
 
+      // 无人员：切周也要渲染当周 7 天空数据
+      if (!this.selectedAthletic) {
+        this.initEmptySchedulePrefetch(null, 7)
+        return
+      }
       this.getScheduleData()
+      // 滚动预加载：以当前周为锚点，首屏加载 4 周
+      this.scheduleAnchorWeekStart = this.startOfWeekMonday(this.currentWeek?.[0]?.commonDate)
+      this.scheduleDayMap = {}
+      this.scheduleLoadedStart = ""
+      this.scheduleLoadedEnd = ""
+      this.scheduleHasMore = true
+      this.scheduleHasUserScrolledDown = false
+      this.loadInitialScheduleFourWeeks()
     },
 
     /**
@@ -2245,6 +3146,17 @@ export default {
      */
     handleRefresh() {
       this.getScheduleData()
+      /**
+       * 刷新时也同步刷新滚动预加载缓存：
+       * - 传统单周接口刷新 + 预加载区间刷新需保持一致
+       */
+      this.scheduleAnchorWeekStart = this.startOfWeekMonday(this.currentWeek?.[0]?.commonDate)
+      this.scheduleDayMap = {}
+      this.scheduleLoadedStart = ""
+      this.scheduleLoadedEnd = ""
+      this.scheduleHasMore = true
+      this.scheduleHasUserScrolledDown = false
+      this.loadInitialScheduleFourWeeks()
     },
 
     /**
@@ -3821,11 +4733,86 @@ export default {
   min-width: 0;
 }
 
+.schedule-scroll-root {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* 向上加载提示：sticky 贴在滚动视口上沿，请求进行中始终可见（底部 footer 在顶部滚动时不可见） */
+.schedule-scroll-loading-prev {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  flex-shrink: 0;
+  text-align: center;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #606266;
+  background: rgba(255, 255, 255, 0.97);
+  border-bottom: 1px solid #ebeef5;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* 仅渲染一周时，固定日程区域高度 */
+.schedule-scroll-root--single {
+  height: calc(100vh - 60px);
+  flex: 0 0 auto;
+}
+
+/* 收起按钮悬浮层：不占用布局高度，避免推挤内容 */
+.right-stat-floating-handle-row {
+  /* 固定在视口中间，不随滚动变化 */
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  pointer-events: none;
+
+  /* 默认：统计栏展开时，按钮固定在统计栏左边缘（235px 宽，向左外扩 12px） */
+  right: calc(235px - 12px);
+
+  &.is-collapsed {
+    /* 收起后统计栏宽度为 0，按钮贴右侧 */
+    right: 0;
+  }
+
+  /* 覆盖原有绝对定位规则（原规则依赖 right-stat-wrapper） */
+  .panel-collapse-handle {
+    pointer-events: auto;
+    position: static;
+    transform: none;
+  }
+}
+
+.schedule-main-row--week {
+  flex: 0 0 auto;
+}
+
+.schedule-calendar-week {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.schedule-sentinel {
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+.schedule-scroll-footer {
+  text-align: center;
+  padding: 10px 0;
+  font-size: 13px;
+  color: #909399;
+}
+
 .right-stat-wrapper {
   position: relative;
   flex: 0 0 235px;
   width: 235px;
-  max-height: calc(100vh - 60px);
+  // max-height: calc(100vh - 60px);
   // overflow-y: auto;
   // overflow-x: scroll;
   transition: flex-basis 0.2s ease, width 0.2s ease;

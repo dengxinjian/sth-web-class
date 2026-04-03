@@ -84,7 +84,7 @@
               <div v-if="dayMap[d.commonDate]" class="demo-partitions">
                 <!-- A. 健康数据：固定第一，不可拖/不可拖入 -->
                 <div class="demo-partition">
-                  <div v-if="showPartitionHint" class="demo-partition-title">健康</div>
+                  <div v-if="showPartitionHint" class="demo-partition-title">健康（固定）</div>
                   <div class="demo-fixed-list">
                     <div
                       v-for="h in dayMap[d.commonDate].healthInfos"
@@ -98,124 +98,70 @@
                   </div>
                 </div>
 
-                <!-- B. 赛事：自身固定不可拖；可接收运动（仅当天允许） -->
-                <div class="demo-partition">
-                  <div v-if="showPartitionHint" class="demo-partition-title">赛事（可接收运动）</div>
-                  <div
-                    v-for="ev in dayMap[d.commonDate].competitionList"
-                    :key="ev.id"
-                    class="demo-event-block"
-                  >
-                    <div class="demo-mock-event-card">
-                      <div class="demo-mock-card-body">{{ ev.title }}</div>
-                    </div>
-                    <draggable
-                      :list="ev.boundActivities"
-                      :group="eventDropGroup"
-                      :sort="false"
-                      :animation="150"
-                      :disabled="dragDisabled"
-                      ghost-class="is-drag-ghost"
-                      chosen-class="is-drag-chosen"
-                      class="demo-drop-zone"
-                      :move="(evt) => canMoveToEvent(evt, d.commonDate)"
-                      @add="(evt) => onEventAdd(evt, ev, d.commonDate)"
-                      @start="onDraggableStart"
-                      @end="onDraggableEnd"
-                    >
-                      <div
-                        v-for="a in ev.boundActivities"
-                        :key="a.id"
-                        class="demo-mock-activity-chip"
-                        :data-dnd-type="'activity'"
-                      >
-                        {{ a.title }}
-                      </div>
-                      <div v-if="!ev.boundActivities.length" class="demo-drop-zone-empty">
-                        拖入运动绑定到赛事
-                      </div>
-                    </draggable>
-                  </div>
-                </div>
-
-                <!-- C. 课表：可排序/可跨日拖拽；可接收运动（仅当天允许） -->
-                <div class="demo-partition">
-                  <div v-if="showPartitionHint" class="demo-partition-title">课表（可排序/可接收运动）</div>
-                  <div
-                    class="schedule-table-cell-item js-schedule-drag-container js-class-drag-container"
-                    :data-date="d.commonDate"
-                  >
-                    <draggable
-                      :list="dayMap[d.commonDate].classSchedule"
-                      :group="classGroup"
-                      :animation="150"
-                      :disabled="dragDisabled"
-                      handle=".demo-mock-card-body"
-                      ghost-class="is-drag-ghost"
-                      chosen-class="is-drag-chosen"
-                      :scroll="true"
-                      :scroll-sensitivity="300"
-                      :scroll-speed="40"
-                      :bubble-scroll="true"
-                      class="demo-draggable-list"
-                      :move="(evt) => canMoveToClass(evt, d.commonDate)"
-                      @add="(evt) => onClassAdd(evt, d.commonDate)"
-                      @start="onDraggableStart"
-                      @end="onDraggableEnd"
-                    >
-                      <div
-                        v-for="c in dayMap[d.commonDate].classSchedule"
-                        :key="c.id"
-                        class="demo-class-sort-item"
-                        :data-dnd-type="c._dndType"
-                      >
-                        <div
-                          class="demo-mock-class-card classScheduleCard"
-                          :class="{ 'is-from-activity': c._dndType === 'activity' }"
-                          @click.stop
-                        >
-                          <div class="card-body class-drap-handle demo-mock-card-body">
-                            {{ c.title }}
-                          </div>
-                        </div>
-                      </div>
-                      <div v-if="!dayMap[d.commonDate].classSchedule.length" class="demo-drop-zone-empty">
-                        （空）可拖入课表/运动
-                      </div>
-                    </draggable>
-                  </div>
-                </div>
-
-                <!-- D. 运动：不参与排序；仅当天可拖动；可拖到课表/赛事 -->
-                <div class="demo-partition">
-                  <div v-if="showPartitionHint" class="demo-partition-title">运动（仅当天可拖）</div>
+                <!-- 赛事 + 课表 + 运动：同一 draggable 列表，使用 @end 判断落点 -->
+                <div
+                  class="schedule-table-cell-item js-schedule-drag-container js-class-drag-container demo-mix-container"
+                  :data-date="d.commonDate"
+                >
                   <draggable
-                    :list="dayMap[d.commonDate].activityList"
-                    :group="activityGroupForDate(d.commonDate)"
-                    :sort="false"
+                    :list="dayMap[d.commonDate].mixList"
+                    :group="mixGroup"
                     :animation="150"
                     :disabled="dragDisabled"
-                    :draggable="'.demo-mock-activity-card'"
-                    :options="activitySortableOptions"
+                    :draggable="'.demo-mix-item'"
+                    :options="mixSortableOptions"
+                    :data-date="d.commonDate"
+                    :move="onMixMove"
                     ghost-class="is-drag-ghost"
                     chosen-class="is-drag-chosen"
-                    class="demo-activity-source"
-                    :move="(evt) => canMoveActivitySource(evt, d.commonDate)"
+                    class="demo-draggable-list"
                     @start="onDraggableStart"
-                    @end="onDraggableEnd"
+                    @end="onMixEnd"
                   >
                     <div
-                      v-for="a in dayMap[d.commonDate].activityList"
-                      :key="a.id"
-                      class="demo-mock-activity-card"
-                      :data-dnd-type="'activity'"
+                      v-for="it in dayMap[d.commonDate].mixList"
+                      :key="it._key"
+                      class="demo-mix-item"
+                      :class="{
+                        'is-no-drag':
+                          it._kind === 'event'
+                      }"
                     >
-                      <div class="demo-mock-card-body">
-                        {{ a.title }}
+                      <!-- 赛事：不可拖，但作为 drop 目标 -->
+                      <div
+                        v-if="it._kind === 'event'"
+                        class="demo-mock-event-card js-drop-target"
+                        :data-type="'event'"
+                        :data-id="it.id"
+                        :data-date="d.commonDate"
+                      >
+                        <div class="demo-mock-card-body">{{ it.title }}</div>
+                        <div class="demo-drop-zone-empty">拖入运动绑定到赛事</div>
                       </div>
-                    </div>
-                    <div v-if="!dayMap[d.commonDate].activityList.length" class="demo-muted-empty">
-                      （无运动）
+
+                      <!-- 课表：可拖 -->
+                      <div
+                        v-else-if="it._kind === 'classSchedule'"
+                        class="demo-mock-class-card classScheduleCard js-drop-target"
+                        :data-type="'classSchedule'"
+                        :data-id="it.id"
+                      >
+                        <div class="card-body class-drap-handle demo-mock-card-body">
+                          {{ it.title }}
+                        </div>
+                      </div>
+
+                      <!-- 运动：仅当天可拖 -->
+                      <div
+                        v-else
+                        class="demo-mock-activity-card js-drop-target"
+                        :data-type="'activity'"
+                        :data-activityid="it.activityId"
+                        :data-manualactivityid="it.manualActivityId"
+                        :data-date="d.commonDate"
+                      >
+                        <div class="demo-mock-card-body">{{ it.title }}</div>
+                      </div>
                     </div>
                   </draggable>
                 </div>
@@ -276,6 +222,39 @@ function parseYMD(s) {
 
 const WEEKDAY_LABELS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
 
+function buildMixList(day) {
+  const mix = []
+  const events = Array.isArray(day.competitionList) ? day.competitionList : []
+  const classes = Array.isArray(day.classSchedule) ? day.classSchedule : []
+  const acts = Array.isArray(day.activityList) ? day.activityList : []
+  events.forEach((e) => {
+    mix.push({
+      _kind: "event",
+      _key: `event_${e.id}`,
+      id: e.id,
+      title: e.title,
+    })
+  })
+  classes.forEach((c) => {
+    mix.push({
+      _kind: "classSchedule",
+      _key: `class_${c.id}`,
+      id: c.id,
+      title: c.title,
+    })
+  })
+  acts.forEach((a) => {
+    mix.push({
+      _kind: "activity",
+      _key: `act_${a.id}`,
+      activityId: a.id,
+      manualActivityId: a.manualActivityId || "",
+      title: a.title,
+    })
+  })
+  return mix
+}
+
 function mockFetchRange(beginDate, endDate, requestSeq, athleteId) {
   const out = []
   const today = formatYMD(new Date())
@@ -326,7 +305,9 @@ function mockFetchRange(beginDate, endDate, requestSeq, athleteId) {
       competitionList,
       classSchedule,
       activityList,
+      mixList: [],
     })
+    out[out.length - 1].mixList = buildMixList(out[out.length - 1])
     cur = addDays(cur, 1)
   }
   return new Promise((resolve) => {
@@ -344,6 +325,7 @@ function mergeDayMap(prevMap, list) {
       competitionList: Array.isArray(row.competitionList) ? row.competitionList : [],
       classSchedule: Array.isArray(row.classSchedule) ? row.classSchedule : [],
       activityList: Array.isArray(row.activityList) ? row.activityList : [],
+      mixList: Array.isArray(row.mixList) ? row.mixList : buildMixList(row),
     }
     // 保留已有绑定（避免滚动加载/合并覆盖拖入后的状态）
     if (prev && Array.isArray(prev.competitionList) && Array.isArray(map[row.commonDate].competitionList)) {
@@ -361,6 +343,8 @@ function mergeDayMap(prevMap, list) {
         boundActivities: Array.isArray(e.boundActivities) ? e.boundActivities : [],
       }))
     }
+    // 合并后重建 mixList，保证顺序为：赛事 → 课表 → 运动
+    map[row.commonDate].mixList = buildMixList(map[row.commonDate])
   })
   return map
 }
@@ -403,6 +387,20 @@ export default {
   computed: {
     today() {
       return formatYMD(new Date())
+    },
+    mixGroup() {
+      // 同一 draggable：赛事/课表/运动都在一个列表里
+      return { name: "mixDrag", pull: true, put: true }
+    },
+    mixSortableOptions() {
+      return {
+        forceFallback: true,
+        fallbackOnBody: true,
+        fallbackTolerance: 3,
+        // 赛事不可拖；非当天运动不可拖
+        filter: ".is-no-drag",
+        preventOnFilter: false,
+      }
     },
     classGroup() {
       return { name: "class", pull: true, put: ["class", "activity"] }
@@ -504,6 +502,205 @@ export default {
   methods: {
     isTodayDate(ds) {
       return ds === this.today
+    },
+    rebuildMixList(dateStr) {
+      const dm = this.dayMap[dateStr]
+      if (!dm) return
+      dm.mixList = buildMixList(dm)
+    },
+    findDropDatasetFromPoint(e) {
+      if (!e || !e.originalEvent) return null
+      const oe = e.originalEvent
+      const x = oe.clientX
+      const y = oe.clientY
+      if (typeof x !== "number" || typeof y !== "number") return null
+      const el = document.elementFromPoint(x, y)
+      let cur = el
+      let level = 0
+      while (cur && level < 12) {
+        if (cur.dataset && cur.dataset.type) return cur.dataset
+        cur = cur.parentElement
+        level += 1
+      }
+      return null
+    },
+    findDropDatasetFromOriginalEvent(e) {
+      // 模拟 dragMixin.js：优先从 originalEvent.target/srcElement 往上找 dataset.type
+      if (!e || !e.originalEvent) return null
+      const oe = e.originalEvent
+      let cur = oe.target || oe.srcElement
+      let level = 0
+      while (cur && level < 12) {
+        if (cur.dataset && cur.dataset.type) return cur.dataset
+        cur = cur.offsetParent || cur.parentElement
+        level += 1
+      }
+      return null
+    },
+    onMixEnd(e) {
+      this.onDraggableEnd(e)
+
+      if (!e || !e.item || !e.to || !e.from) return
+      const fromDate = e.from && e.from.dataset ? e.from.dataset.date : ""
+      const toDate = e.to && e.to.dataset ? e.to.dataset.date : ""
+      const dragged = e.item.querySelector("[data-type]")
+      const draggedType = dragged && dragged.dataset ? dragged.dataset.type : ""
+      const dropDs =
+        this.findDropDatasetFromOriginalEvent(e) || this.findDropDatasetFromPoint(e)
+
+      // 规则兜底：拖拽结束后始终重建 mixList，恢复固定顺序（赛事→课表→运动）
+      const rebuildBoth = () => {
+        if (fromDate) this.rebuildMixList(fromDate)
+        if (toDate && toDate !== fromDate) this.rebuildMixList(toDate)
+      }
+
+      if (!fromDate || !toDate || !draggedType) {
+        rebuildBoth()
+        return
+      }
+      console.log(draggedType, "draggedType");
+      console.log(dropDs, "dropDs");
+
+      // 1) 课表拖到运动：通过落点 dataset.type === activity 判断
+      if (draggedType === "classSchedule" && dropDs && dropDs.type === "activity") {
+        this.handleMatchClass({
+          classId: dragged.dataset.id,
+          activityId: dropDs.activityid,
+          manualActivityId: dropDs.manualactivityid,
+          type: "activity",
+        })
+        rebuildBoth()
+        return
+      }
+
+      // 1.5) 课表跨天移动：把课表从源日 classSchedule 移到目标日 classSchedule
+      if (draggedType === "classSchedule" && fromDate !== toDate) {
+        const classId = dragged.dataset.id
+        const fromMap = this.dayMap[fromDate]
+        const toMap = this.dayMap[toDate]
+        if (fromMap && toMap && classId) {
+          let moved = null
+          if (Array.isArray(fromMap.classSchedule)) {
+            const idx = fromMap.classSchedule.findIndex((x) => String(x.id) === String(classId))
+            if (idx >= 0) {
+              moved = fromMap.classSchedule.splice(idx, 1)[0]
+            }
+          }
+          if (!moved) {
+            // 兜底：如果源数组里没找到，用当前 DOM 上的标题构造一条
+            moved = {
+              id: classId,
+              title: (dragged.textContent || "").trim() || `课表 ${classId}`,
+              _dndType: "class",
+            }
+          }
+          if (!Array.isArray(toMap.classSchedule)) toMap.classSchedule = []
+          moved._dndType = "class"
+          // 支持跨天“插入排序”：按目标列 mixList 中课表相对顺序计算插入位置
+          let insertAt = toMap.classSchedule.length
+          if (Array.isArray(toMap.mixList)) {
+            const clsOrder = toMap.mixList
+              .filter((x) => x && x._kind === "classSchedule")
+              .map((x) => String(x.id))
+            const pos = clsOrder.indexOf(String(classId))
+            if (pos >= 0) insertAt = pos
+          }
+          toMap.classSchedule.splice(insertAt, 0, moved)
+        }
+        rebuildBoth()
+        return
+      }
+
+      // 1.6) 课表同日排序：把 mixList 中课表顺序同步回 classSchedule
+      if (draggedType === "classSchedule" && fromDate === toDate) {
+        const dm = this.dayMap[fromDate]
+        if (dm && Array.isArray(dm.mixList) && Array.isArray(dm.classSchedule)) {
+          const orderIds = dm.mixList
+            .filter((x) => x && x._kind === "classSchedule")
+            .map((x) => String(x.id))
+          if (orderIds.length) {
+            const byId = new Map(dm.classSchedule.map((c) => [String(c.id), c]))
+            const next = []
+            orderIds.forEach((id) => {
+              const item = byId.get(id)
+              if (item) next.push(item)
+            })
+            // 兜底：把未出现在 mixList 的课表追加在后面
+            dm.classSchedule.forEach((c) => {
+              if (!orderIds.includes(String(c.id))) next.push(c)
+            })
+            dm.classSchedule = next
+          }
+        }
+        rebuildBoth()
+        return
+      }
+
+      // 2) 运动拖到课表/赛事
+      if (draggedType === "activity") {
+        // 非当天运动不可拖：若发生（例如异常状态），直接回滚
+        // if (!this.isTodayDate(fromDate)) {
+        //   this.$message && this.$message.warning("仅当天运动允许拖拽")
+        //   rebuildBoth()
+        //   return
+        // }
+
+        if (dropDs && dropDs.type === "classSchedule") {
+          this.handleMatchClass({
+            classId: dropDs.id,
+            activityId: dragged.dataset.activityid,
+            manualActivityId: dragged.dataset.manualactivityid,
+            type: "activity",
+          })
+          rebuildBoth()
+          return
+        }
+        if (dropDs && dropDs.type === "event") {
+          this.handleMatchEvent({
+            eventId: dropDs.id,
+            eventDate: dropDs.date,
+            activityId: dragged.dataset.activityid,
+            manualActivityId: dragged.dataset.manualactivityid,
+            activityDate: dragged.dataset.date,
+          })
+          rebuildBoth()
+          return
+        }
+      }
+
+      rebuildBoth()
+    },
+    onMixMove(evt) {
+      // 在拖动过程中直接拦截“运动跨天”
+      try {
+        const draggedEl =
+          (evt && evt.draggedContext && evt.draggedContext.element) || null
+        const kind = draggedEl && draggedEl._kind ? draggedEl._kind : ""
+        const fromHost = evt && evt.from && evt.from.closest ? evt.from.closest("[data-date]") : null
+        const toHost = evt && evt.to && evt.to.closest ? evt.to.closest("[data-date]") : null
+        const fromDate = fromHost && fromHost.dataset ? fromHost.dataset.date : ""
+        const toDate = toHost && toHost.dataset ? toHost.dataset.date : ""
+
+        // 赛事本身不可拖（通过 filter 已处理，这里再兜底）
+        if (kind === "event") return false
+
+        // 运动：不允许跨天
+        if (kind === "activity" && fromDate && toDate && fromDate !== toDate) {
+          return false
+        }
+      } catch (e) {
+        // 忽略：出现异常时按“允许”处理，避免把拖拽彻底卡死
+      }
+      return true
+    },
+    handleMatchClass(payload) {
+      // Demo 版：仅做可视化效果（真实页这里会调用接口）
+      // eslint-disable-next-line no-console
+      console.log("[ScheduleScrollDemo] handleMatchClass", payload)
+    },
+    handleMatchEvent(payload) {
+      // eslint-disable-next-line no-console
+      console.log("[ScheduleScrollDemo] handleMatchEvent", payload)
     },
     activityGroupForDate(ds) {
       // 仅当天允许拖出运动；非当天保持展示但不可拖动
@@ -726,6 +923,7 @@ export default {
         competitionList: r.competitionList || [],
         classSchedule: r.classSchedule || [],
         activityList: r.activityList || [],
+        mixList: r.mixList || [],
       }))
       this.dayMap = mergeDayMap(this.dayMap, mapped)
     },
@@ -1127,6 +1325,7 @@ export default {
   background: rgba(64, 158, 255, 0.1);
   border-radius: 6px;
   border: 1px dashed rgba(64, 158, 255, 0.35);
+  height: 40px;
 }
 
 .demo-muted-empty {
@@ -1155,6 +1354,7 @@ export default {
   background: #ecf5ff;
   border-radius: 6px;
   overflow: hidden;
+  height: 40px;
 }
 
 .demo-mock-class-card.is-from-activity {

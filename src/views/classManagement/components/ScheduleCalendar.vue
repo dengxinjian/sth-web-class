@@ -658,9 +658,10 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%;
   // overflow: hidden;
-  height: calc(100vh - 60px);
-  overflow: auto;
+  // height: calc(100vh - 60px);
+  // overflow: auto;
 
   /* 自定义滚动条样式 */
   &::-webkit-scrollbar {
